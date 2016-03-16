@@ -2,10 +2,11 @@ using Umbraco.Core.Services;
 using System;
 using System.Web.UI.WebControls;
 using System.Collections.Generic;
+using System.Linq;
 using umbraco.interfaces;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 using Action = Umbraco.Web.LegacyActions.Action;
@@ -16,7 +17,7 @@ namespace umbraco.cms.presentation.user
     {
         public EditUserType()
         {
-            CurrentApp = Constants.Applications.Users.ToString();
+            CurrentApp = Constants.Applications.Users;
         }
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -53,7 +54,7 @@ namespace umbraco.cms.presentation.user
 
         void save_Click(object sender, EventArgs e)
         {
-            UserType userType = CurrentUserType;
+            var userType = CurrentUserType;
             userType.Name = txtUserTypeName.Text;
             string actions = "";
 
@@ -62,8 +63,8 @@ namespace umbraco.cms.presentation.user
                     actions += li.Value;
             }
 
-            userType.DefaultPermissions = actions;
-            userType.Save();
+            userType.Permissions = actions.ToCharArray().Select(x => x.ToString());
+            Services.UserService.SaveUserType(userType);
 
             ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editUserTypeSaved"), "");
         }
@@ -73,21 +74,21 @@ namespace umbraco.cms.presentation.user
             get
             {
                 if (m_userTypeActions == null)
-                    m_userTypeActions = Action.FromString(CurrentUserType.DefaultPermissions);
+                    m_userTypeActions = Action.FromString(string.Join("", CurrentUserType.Permissions));
                 return m_userTypeActions;
             }
         }
 
-        protected UserType CurrentUserType
+        protected IUserType CurrentUserType
         {
             get
             {
                 if (m_userType == null)
-                    m_userType = UserType.GetUserType(m_userTypeID);
+                    m_userType = Services.UserService.GetUserTypeById(m_userTypeID);
                 return m_userType;
             }
         }
-        private UserType m_userType;
+        private IUserType m_userType;
         private List<IAction> m_userTypeActions;
         private int m_userTypeID;
 

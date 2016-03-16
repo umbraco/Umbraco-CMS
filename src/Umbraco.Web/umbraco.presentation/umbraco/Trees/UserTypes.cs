@@ -25,14 +25,14 @@ function openUserTypes(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            List<UserType> userTypes = UserType.GetAllUserTypes();
-            foreach (UserType userType in userTypes)
+            var userTypes = Services.UserService.GetAllUserTypes();
+            foreach (var userType in userTypes)
             {
                 if (userType.Id > 1) //don't show the admin user type, they should always have full permissions
                 {
                     XmlTreeNode node = XmlTreeNode.Create(this);
                     node.NodeID = userType.Id.ToString();
-                    node.Action = string.Format("javascript:openUserTypes({0})", userType.Id.ToString());
+                    node.Action = string.Format("javascript:openUserTypes({0})", userType.Id);
                     node.Icon = "icon-users";
                     node.Text = userType.Name;
 

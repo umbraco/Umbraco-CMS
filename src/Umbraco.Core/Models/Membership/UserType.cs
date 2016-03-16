@@ -24,6 +24,16 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Alias);
         private static readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserType, IEnumerable<string>>(x => x.Permissions);
 
+        public UserType(string name, string alias)
+        {
+            Name = name;
+            Alias = alias;
+        }
+
+        public UserType()
+        {
+        }
+
         [DataMember]
         public string Alias
         {

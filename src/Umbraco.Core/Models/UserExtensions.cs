@@ -11,6 +11,26 @@ namespace Umbraco.Core.Models
     public static class UserExtensions
     {
         /// <summary>
+        /// Determines whether this user is an admin.
+        /// </summary>
+        /// <returns>
+        /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsAdmin(this IUser user)
+        {
+            return user.UserType.Alias == "admin";
+        }
+
+        public static void ClearAllowedSections(this IUser user)
+        {
+            var allowed = user.AllowedSections.ToArray();
+            foreach (var s in allowed)
+            {
+                user.RemoveAllowedSection(s);
+            }
+        }
+
+        /// <summary>
         /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
         /// </summary>
         /// <param name="user"></param>

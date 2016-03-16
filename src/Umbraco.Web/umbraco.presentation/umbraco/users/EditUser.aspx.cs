@@ -2,6 +2,7 @@
 using System;
 using System.Configuration.Provider;
 using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -18,6 +19,7 @@ using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 
@@ -58,7 +60,7 @@ namespace umbraco.cms.presentation.user
 
         protected Pane pp = new Pane();
 
-        private User u;
+        private IUser u;
 
         private MembershipHelper _membershipHelper;
 
@@ -71,7 +73,7 @@ namespace umbraco.cms.presentation.user
         {
             _membershipHelper = new MembershipHelper(UmbracoContext.Current);
             int UID = int.Parse(Request.QueryString["id"]);
-            u = BusinessLogic.User.GetUser(UID);
+            u = Services.UserService.GetUserById(UID);
 
             //the true admin can only edit the true admin
             if (u.Id == 0 && Security.CurrentUser.Id != 0)
@@ -86,9 +88,9 @@ namespace umbraco.cms.presentation.user
             }
 
             // Populate usertype list
-            foreach (UserType ut in UserType.getAll)
+            foreach (var ut in Services.UserService.GetAllUserTypes())
             {
-                if (UmbracoContext.UmbracoUser.IsAdmin() || ut.Alias != "admin")
+                if (Security.CurrentUser.IsAdmin() || ut.Alias != "admin")
                 {
                     ListItem li = new ListItem(Services.TextService.Localize("user", ut.Name.ToLower()), ut.Id.ToString());
                     if (ut.Id == u.UserType.Id)
@@ -114,8 +116,8 @@ namespace umbraco.cms.presentation.user
             }
 
             // Console access and disabling
-            NoConsole.Checked = u.NoConsole;
-            Disabled.Checked = u.Disabled;
+            NoConsole.Checked = u.IsLockedOut;
+            Disabled.Checked = u.IsApproved == false;
 
             PlaceHolder medias = new PlaceHolder();
             mediaPicker.AppAlias = Constants.Applications.Media;
@@ -132,8 +134,8 @@ namespace umbraco.cms.presentation.user
             contentPicker.AppAlias = Constants.Applications.Content;
             contentPicker.TreeAlias = "content";
 
-            if (u.StartNodeId > 0)
-                contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
+            if (u.StartContentId > 0)
+                contentPicker.Value = u.StartContentId.ToString(CultureInfo.InvariantCulture);
             else
                 contentPicker.Value = "-1";
 
@@ -231,12 +233,12 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, false);
+                MembershipUser user = BackOfficeProvider.GetUser(u.Username, false);
                 uname.Text = u.Name;
-                lname.Text = (user == null) ? u.LoginName : user.UserName;
+                lname.Text = (user == null) ? u.Username : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
 
-                contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
+                contentPicker.Value = u.StartContentId.ToString(CultureInfo.InvariantCulture);
                 mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
 
                 // get the current users applications
@@ -244,13 +246,19 @@ namespace umbraco.cms.presentation.user
                 foreach (var a in Security.CurrentUser.AllowedSections)
                     currentUserApps += a + ";";
 
-                Application[] uapps = u.Applications;
-                foreach (Application app in BusinessLogic.Application.getAll())
+                var uapps = u.AllowedSections.ToArray();
+                foreach (var app in Services.SectionService.GetSections())
                 {
-                    if (UmbracoContext.UmbracoUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
+                    if (Security.CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.Alias + ";"))
                     {
-                        ListItem li = new ListItem(Services.TextService.Localize("sections", app.alias), app.alias);
-                        if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;
+                        var li = new ListItem(Services.TextService.Localize("sections", app.Alias), app.Alias);
+                        if (IsPostBack == false)
+                        {
+                            foreach (var tmp in uapps)
+                            { 
+                                if (app.Alias == tmp) li.Selected = true;
+                            }
+                        }
                         lapps.Items.Add(li);
                     }
                 }
@@ -289,7 +297,7 @@ namespace umbraco.cms.presentation.user
                 if (string.IsNullOrEmpty(passwordChangerControl.ChangingPasswordModel.NewPassword) == false)
                 {
                     // make sure password is not empty
-                    if (string.IsNullOrEmpty(u.Password)) u.Password = "default";
+                    if (string.IsNullOrEmpty(u.RawPasswordValue)) u.RawPasswordValue = "default";
                 }
 
                 var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
@@ -325,10 +333,10 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, false);
+                    var membershipUser = BackOfficeProvider.GetUser(u.Username, false);
                     if (membershipUser == null)
                     {
-                        throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);
+                        throw new ProviderException("Could not find user in the membership provider with login name " + u.Username);
                     }
 
                     var passwordChangerControl = (passwordChanger)passw.Controls[0];
@@ -344,22 +352,22 @@ namespace umbraco.cms.presentation.user
                     // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
                     u.Name = uname.Text.Trim();
                     u.Language = userLanguage.SelectedValue;
-                    u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
+                    u.UserType = Services.UserService.GetUserTypeById(int.Parse(userType.SelectedValue));
                     u.Email = email.Text.Trim();
-                    u.LoginName = lname.Text;
-                    u.Disabled = Disabled.Checked;
-                    u.NoConsole = NoConsole.Checked;
+                    u.Username = lname.Text;
+                    u.IsApproved = Disabled.Checked == false;
+                    u.IsLockedOut = NoConsole.Checked;
 
                     int startNode;
                     if (int.TryParse(contentPicker.Value, out startNode) == false)
                     {
                         //set to default if nothing is choosen
-                        if (u.StartNodeId > 0)
-                            startNode = u.StartNodeId;
+                        if (u.StartContentId > 0)
+                            startNode = u.StartContentId;
                         else
                             startNode = -1;
                     }
-                    u.StartNodeId = startNode;
+                    u.StartContentId = startNode;
 
 
                     int mstartNode;
@@ -373,14 +381,14 @@ namespace umbraco.cms.presentation.user
                     }
                     u.StartMediaId = mstartNode;
 
-                    u.ClearApplications();
+                    u.ClearAllowedSections();
                     foreach (ListItem li in lapps.Items)
                     {
-                        if (li.Selected) u.AddApplication(li.Value);
+                        if (li.Selected)
+                            u.AddAllowedSection(li.Value);
                     }
 
-                    u.Save();
-
+                    Services.UserService.Save(u);
 
                     ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editUserSaved"), "");
                 }
