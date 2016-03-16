@@ -55,28 +55,29 @@ namespace Umbraco.Web.WebServices
 
             if (language != null)
             {
+                // yet there is a race condition here...
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
+                {
                     wildcard.LanguageId = language.Id;
+                }
                 else
                 {
-                    // yet there is a race condition here...
-                    var newDomain = new UmbracoDomain("*" + model.NodeId)
+                    wildcard = new UmbracoDomain("*" + model.NodeId)
                     {
                         LanguageId = model.Language,
                         RootContentId = model.NodeId
                     };
-
-                    var saveAttempt = Services.DomainService.Save(newDomain);
-                    if (saveAttempt == false)
-                    {
-                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                        response.Content = new StringContent("Saving new domain failed");
-                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
-                        throw new HttpResponseException(response);
-                    }
                 }
-                    
+
+                var saveAttempt = Services.DomainService.Save(wildcard);
+                if (saveAttempt == false)
+                {
+                    var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    response.Content = new StringContent("Saving domain failed");
+                    response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                    throw new HttpResponseException(response);
+                }
             }
             else
             {
@@ -85,7 +86,6 @@ namespace Umbraco.Web.WebServices
                 {
                     Services.DomainService.Delete(wildcard);
                 }
-                    
             }
 
             // process domains
@@ -95,7 +95,7 @@ namespace Umbraco.Web.WebServices
             {
                 Services.DomainService.Delete(domain);
             }
-                
+
 
             var names = new List<string>();
 
@@ -154,7 +154,7 @@ namespace Umbraco.Web.WebServices
                         response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
                         throw new HttpResponseException(response);
                     }
-                } 
+                }
             }
 
             model.Valid = model.Domains.All(m => m.Duplicate == false);
