@@ -52,7 +52,7 @@ namespace umbraco.presentation.create
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    UmbracoContext.UmbracoUser,
+                    Security.CurrentUser,
                     Request.GetItemAsString("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);

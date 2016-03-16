@@ -1,15 +1,16 @@
 using System;
+using System.Linq;
 using System.Net.Mail;
 using System.Web;
 using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic;
-using umbraco.BusinessLogic;
 using umbraco.uicontrols;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 using Language = umbraco.cms.businesslogic.language.Language;
@@ -69,7 +70,8 @@ namespace umbraco.presentation.dialogs
                     includeSubpages.Enabled = false;
 
                 // Translators
-                foreach (var u in BusinessLogic.User.getAll())
+                int totalUsers;
+                foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
                     if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
@@ -84,10 +86,11 @@ namespace umbraco.presentation.dialogs
             }
         }
 
-        private bool UserHasTranslatePermission(User u, CMSNode node)
+        private bool UserHasTranslatePermission(IUser u, CMSNode node)
         {
             //the permissions column in umbracoUserType is legacy and needs to be rewritten but for now this is the only way to test 
-            return u.GetPermissions(node.Path).Contains("4");
+            var permissions = Services.UserService.GetPermissions(u, node.Path);
+            return permissions.AssignedPermissions.Contains("4");
         }
 
         protected void doTranslation_Click(object sender, EventArgs e)
@@ -95,9 +98,9 @@ namespace umbraco.presentation.dialogs
             // testing translate
             MakeNew(
                 _currentPage,
-                UmbracoContext.UmbracoUser,
-                BusinessLogic.User.GetUser(Int32.Parse(translator.SelectedValue)),
-                new Language(Int32.Parse(language.SelectedValue)),
+                Security.CurrentUser,
+                Services.UserService.GetUserById(int.Parse(translator.SelectedValue)),
+                new Language(int.Parse(language.SelectedValue)),
                 comment.Text, includeSubpages.Checked,
                 true);
 
@@ -108,7 +111,7 @@ namespace umbraco.presentation.dialogs
             feedback.type = Feedback.feedbacktype.success;
         }
 
-        public void MakeNew(CMSNode Node, User User, User Translator, Language Language, string Comment,
+        public void MakeNew(CMSNode Node, IUser User, IUser Translator, Language Language, string Comment,
             bool IncludeSubpages, bool SendEmail)
         {
             // Get translation taskType for obsolete task constructor
@@ -152,9 +155,9 @@ namespace umbraco.presentation.dialogs
                     MailMessage mail = new MailMessage(User.Email, Translator.Email);
 
                     // populate the message
-                    mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.UserEntity.GetUserCulture(Services.TextService), subjectVars);
+                    mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService), subjectVars);
                     mail.IsBodyHtml = false;
-                    mail.Body = Services.TextService.Localize("translation/mailBody", Translator.UserEntity.GetUserCulture(Services.TextService), bodyVars);
+                    mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService), bodyVars);
                     try
                     {
                         SmtpClient sender = new SmtpClient();

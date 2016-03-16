@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using umbraco.BusinessLogic;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.LegacyActions;
 
 namespace umbraco.cms.presentation.user
@@ -14,9 +15,9 @@ namespace umbraco.cms.presentation.user
     /// </summary>    
     public class UserPermissions
     {
-        readonly User _user;
+        readonly IUser _user;
 
-        public UserPermissions(User user)
+        public UserPermissions(IUser user)
         {
             _user = user;
         }
@@ -36,8 +37,9 @@ namespace umbraco.cms.presentation.user
             var lstNoPermissions = new List<int>();
             foreach (var nodeId in nodeIDs)
             {
-                var nodeActions = UmbracoContext.Current.UmbracoUser.GetPermissions(GetNodePath(nodeId));
-                var lstActions = Action.FromString(nodeActions);
+                var nodeActions = ApplicationContext.Current.Services.UserService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, GetNodePath(nodeId));
+                
+                var lstActions = Action.FromEntityPermission(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
                     lstNoPermissions.Add(nodeId);
             }
@@ -90,8 +92,9 @@ namespace umbraco.cms.presentation.user
             if (path != "")
             {
                 //get the user and their permissions
-                string permissions = _user.GetPermissions(path);
-                return Action.FromString(permissions);
+
+                var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(_user, path);
+                return Action.FromEntityPermission(permissions);
             }
             return null;
         }

@@ -61,11 +61,12 @@ namespace umbraco.dialogs
             }
 
             ht.Rows.Add(names);
-            
-            foreach (var u in BusinessLogic.User.getAll())
+
+            int totalUsers;
+            foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
             {
                 // Not disabled users and not system account
-                if (u.Disabled == false && u.Id > 0)
+                if (u.IsApproved && u.Id > 0)
                 {
                     var hc = new HtmlTableCell("th")
                         {
@@ -85,7 +86,9 @@ namespace umbraco.dialogs
 
                         if (a.CanBePermissionAssigned == false) continue;
 
-                        if (u.GetPermissions(_node.Path).IndexOf(a.Letter) > -1)
+                        var permission = Services.UserService.GetPermissions(u, _node.Path);
+
+                        if (permission.AssignedPermissions.Contains(a.Letter.ToString(), StringComparer.Ordinal))
                         {
                             chk.Checked = true;
                         }
@@ -113,9 +116,10 @@ namespace umbraco.dialogs
         {
             //get non disabled, non admin users and project to a dictionary, 
             // the string (value) portion will store the array of chars = their permissions
-            var usersPermissions = BusinessLogic.User.getAll()
-                                                .Where(user => user.Disabled == false && user.Id > 0)
-                                                .ToDictionary(user => user, user => "");
+            int totalUsers;
+            var usersPermissions = Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
+                .Where(user => user.IsApproved && user.Id > 0)
+                .ToDictionary(user => user, user => "");
             
             //iterate over each row which equals:
             // * a certain permission and the user's who will be allowed/denied that permission

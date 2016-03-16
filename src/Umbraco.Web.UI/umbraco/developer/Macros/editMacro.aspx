@@ -132,7 +132,7 @@
                                 <%=Services.TextService.Localize("general/type")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "sort",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/sort")%>
                             </th>
                             <th></th>
                         </tr>

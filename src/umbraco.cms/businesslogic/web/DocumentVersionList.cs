@@ -1,5 +1,5 @@
 using System;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -11,7 +11,7 @@ namespace umbraco.cms.businesslogic.web
         private Guid _version;
         private DateTime _date;
         private string _text;
-        private User _user;
+        private IUser _user;
 
         /// <summary>
         /// The unique id of the version
@@ -40,7 +40,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// The user which created the version
         /// </summary>
-        public User User
+        public IUser User
         {
             get { return _user; }
         }
@@ -52,7 +52,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="Date">Version createdate</param>
         /// <param name="Text">Version name</param>
         /// <param name="User">Creator</param>
-        public DocumentVersionList(Guid Version, DateTime Date, string Text, User User)
+        public DocumentVersionList(Guid Version, DateTime Date, string Text, IUser User)
         {
             _version = Version;
             _date = Date;

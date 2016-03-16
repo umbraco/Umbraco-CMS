@@ -8,6 +8,7 @@ using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using TypeFinder = Umbraco.Core.TypeFinder;
 
 namespace Umbraco.Web.LegacyActions
@@ -143,6 +144,23 @@ namespace Umbraco.Web.LegacyActions
         public static ArrayList GetAll()
         {
             return new ArrayList(ActionsResolver.Current.Actions.ToList());
+        }
+
+        internal static List<IAction> FromEntityPermission(EntityPermission entityPermission)
+        {
+            List<IAction> list = new List<IAction>();
+            foreach (var c in entityPermission.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToCharArray()[0]))
+            {
+                IAction action = ActionsResolver.Current.Actions.ToList().Find(
+                    delegate (IAction a)
+                    {
+                        return a.Letter == c;
+                    }
+                );
+                if (action != null)
+                    list.Add(action);
+            }
+            return list;
         }
 
         /// <summary>

@@ -50,7 +50,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
                     var previewVal = HttpContext.Current.Request.GetPreviewCookieValue();
-                    previewContent.EnsureInitialized(context.UmbracoUser, previewVal, true, () =>
+                    previewContent.EnsureInitialized(context.Security.CurrentUser, previewVal, true, () =>
                     {
                         if (previewContent.ValidPreviewSet)
                             previewContent.LoadPreviewset();

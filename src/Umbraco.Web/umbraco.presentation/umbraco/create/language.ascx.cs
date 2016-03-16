@@ -40,7 +40,7 @@ namespace umbraco.cms.presentation.create.controls
         {
             LegacyDialogHandler.Create(
                 new HttpContextWrapper(Context),
-                UmbracoContext.UmbracoUser,
+                Security.CurrentUser,
                 Request.GetItemAsString("nodeType"),
                 -1,
                 Cultures.SelectedValue);

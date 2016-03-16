@@ -17,7 +17,7 @@ namespace umbraco.presentation.actions
 
             if (Security.ValidateUserApp(Constants.Applications.Content) == false)
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
-            if (Security.ValidateUserNodeTreePermissions(UmbracoUser, d.Path, "D") == false)
+            if (Security.ValidateUserNodeTreePermissions(Security.CurrentUser, d.Path, "D") == false)
                 throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
             
             pane_delete.Text = Services.TextService.Localize("delete") + " '" + d.Text + "'";

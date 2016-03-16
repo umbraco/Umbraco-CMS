@@ -2,9 +2,9 @@ using Umbraco.Core.Services;
 using System;
 using System.Web.UI;
 using Umbraco.Core;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.user
@@ -14,7 +14,7 @@ namespace umbraco.cms.presentation.user
     {
 	    public PermissionEditor()
 	    {
-            CurrentApp = Constants.Applications.Users.ToString();
+            CurrentApp = Constants.Applications.Users;
 
 	    }
 
@@ -60,11 +60,11 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Since Umbraco stores users in cache, we'll use this method to retrieve our user object by the selected id
         /// </summary>
-        public User UmbracoUser
+        public IUser UmbracoUser
         {
             get
             {
-                return BusinessLogic.User.GetUser(Convert.ToInt32(Request.QueryString["id"]));
+                return Services.UserService.GetUserById(Convert.ToInt32(Request.QueryString["id"]));
             }
         }
       
@@ -76,11 +76,11 @@ namespace umbraco.cms.presentation.user
         {
             int id;
             bool parsed = false;
-            umbraco.BusinessLogic.User oUser = null;
+            IUser oUser = null;
             if (parsed = int.TryParse(strID, out id))
-                oUser = umbraco.BusinessLogic.User.GetUser(id);
+                oUser = Services.UserService.GetUserById(id);
 
-            if (oUser == null || oUser.UserType == null || !parsed)
+            if (oUser == null || oUser.UserType == null || parsed == false)
                 throw new Exception("No user found with id: " + strID);
         }
 

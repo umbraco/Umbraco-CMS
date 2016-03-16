@@ -139,7 +139,7 @@ namespace umbraco.dialogs
         /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
-            var currUserPermissions = new UserPermissions(UmbracoContext.UmbracoUser);
+            var currUserPermissions = new UserPermissions(Security.CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
             return lstCurrUserActions.Contains(currentAction);
@@ -283,14 +283,14 @@ namespace umbraco.dialogs
                         {
                             var doc = (IContent)currContent;
                             var copyToId = Request.GetItemAs<int>("copyTo");
-                            Services.ContentService.Move(doc, copyToId, UmbracoUser.Id);
+                            Services.ContentService.Move(doc, copyToId, Security.CurrentUser.Id);
 
                         }
                         else
                         {
                             var media = (IMedia)currContent;
                             var copyToId = Request.GetItemAs<int>("copyTo");
-                            Services.MediaService.Move(media, copyToId, UmbracoUser.Id);
+                            Services.MediaService.Move(media, copyToId, Security.CurrentUser.Id);
                         }
 
                         feedback.Text = Services.TextService.Localize("moveOrCopy/moveDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
@@ -304,7 +304,7 @@ namespace umbraco.dialogs
                         //NOTE: We ONLY support Copy on content not media for some reason.
                         
                         var newContent = (IContent)currContent;
-                        Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, UmbracoUser.Id);
+                        Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, Security.CurrentUser.Id);
 
                         feedback.Text = Services.TextService.Localize("moveOrCopy/copyDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;

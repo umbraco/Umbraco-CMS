@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
 {
@@ -34,7 +35,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 				if (rootDoc.Text.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
 				{
 
-					rootDoc.PublishWithChildrenWithResult(umbraco.BusinessLogic.User.GetUser(0));
+					rootDoc.PublishWithChildrenWithResult(ApplicationContext.Current.Services.UserService.GetUserById(0));
 
 
 					break;

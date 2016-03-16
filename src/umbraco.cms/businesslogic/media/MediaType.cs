@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using System.Linq;
-using umbraco.BusinessLogic;
+using System.Threading;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -87,19 +89,13 @@ namespace umbraco.cms.businesslogic.media
             return mediaTypes.OrderBy(x => x.Name).Select(x => new MediaType(x));
         }
 
-        /// <summary>
-        /// Create a new Mediatype
-        /// </summary>
-        /// <param name="u">The Umbraco user context</param>
-        /// <param name="Text">The name of the MediaType</param>
-        /// <returns>The new MediaType</returns>
         [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
-        public static MediaType MakeNew(User u, string Text)
+        public static MediaType MakeNew(IUser u, string Text)
         {
             return MakeNew(u, Text, -1);
         }
 
-        internal static MediaType MakeNew(User u, string text, int parentId)
+        internal static MediaType MakeNew(IUser u, string text, int parentId)
         {
             var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
@@ -123,9 +119,9 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentTypeService.Save(MediaTypeItem, userId);
+                var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
+                var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();
+                ApplicationContext.Current.Services.ContentTypeService.Save(MediaTypeItem, userId.Success ? userId.Result : 0);
 
                 base.Save();
 

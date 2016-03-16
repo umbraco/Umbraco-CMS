@@ -9,14 +9,10 @@ using Umbraco.Core;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Packaging;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.propertytype;
-using umbraco.BusinessLogic;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
-using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -298,7 +294,7 @@ namespace umbraco.cms.businesslogic.packager
                 //bool saveNeeded = false;
 
                 // Get current user, with a fallback
-                var currentUser = new User(0);
+                var currentUser = ApplicationContext.Current.Services.UserService.GetUserById(0);
 
                 //TODO: Need to migrate this class/code/logic so that we can replicate this functionality, until then everything will be installed by ADMIN
 

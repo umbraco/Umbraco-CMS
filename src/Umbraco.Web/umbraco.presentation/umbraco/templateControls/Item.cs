@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Web;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.LegacyActions;
@@ -304,8 +307,11 @@ namespace umbraco.presentation.templateControls
         /// <value><c>true</c> if the current item is editable by the current user; otherwise, <c>false</c>.</value>
         protected virtual bool FieldEditableWithUserPermissions()
         {   
-            BusinessLogic.User u = UmbracoContext.Current.UmbracoUser;
-            return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString());
+            var u = UmbracoContext.Current.Security.CurrentUser;
+            if (u == null) return false;
+            var permission = ApplicationContext.Current.Services.UserService.GetPermissions(u, PageElements["path"].ToString());
+
+            return permission.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(), StringComparer.Ordinal);
         } 
 
         #endregion

@@ -40,13 +40,13 @@ namespace umbraco.presentation.translation
             Tasks ts = new Tasks();
             if (Request["mode"] == "owned")
             {
-                ts = Task.GetOwnedTasks(UmbracoContext.UmbracoUser, false);
+                ts = Task.GetOwnedTasks(Security.CurrentUser, false);
                 pane_tasks.Text = Services.TextService.Localize("translation/ownedTasks");
                 Panel2.Text = Services.TextService.Localize("translation/ownedTasks");
             }
             else
             {
-                ts = Task.GetTasks(UmbracoContext.UmbracoUser, false);
+                ts = Task.GetTasks(Security.CurrentUser, false);
                 pane_tasks.Text = Services.TextService.Localize("translation/assignedTasks");
                 Panel2.Text = Services.TextService.Localize("translation/assignedTasks");
             }
@@ -181,7 +181,7 @@ namespace umbraco.presentation.translation
                     if (t != null)
                     {
                         //user auth and content node validation
-                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == UmbracoUser.Id || t.ParentUser.Id == UmbracoUser.Id))
+                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == Security.CurrentUser.Id || t.ParentUser.Id == Security.CurrentUser.Id))
                         {
 
                             //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore

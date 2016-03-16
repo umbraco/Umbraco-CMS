@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -12,7 +13,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web
 {
-    //NOTE: all of these require an UmbracoContext because currently to send the notifications we need an HttpContext, this is based on legacy code
+    //TODO: all of these require an UmbracoContext because currently to send the notifications we need an HttpContext, this is based on legacy code
     // for which probably requires updating so that these can be sent outside of the http context.
 
     internal static class NotificationServiceExtensions

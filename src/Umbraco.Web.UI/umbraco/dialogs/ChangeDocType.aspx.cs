@@ -244,7 +244,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 propertiesMappedMessageBuilder.Append("</ul>");
 
                 // Save
-                var user = global::umbraco.BusinessLogic.User.GetCurrent();
+                var user = Security.CurrentUser;
                 Services.ContentService.Save(_content, user.Id);
 
                 // Publish if the content was already published

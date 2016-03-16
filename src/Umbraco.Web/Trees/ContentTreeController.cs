@@ -123,10 +123,9 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                //TODO: Use the new services to get permissions
-                var nodeActions = global::Umbraco.Web.LegacyActions.Action.FromString(
-                    UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
-                                        .Select(x => new MenuItem(x));
+                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
+                var nodeActions = global::Umbraco.Web.LegacyActions.Action.FromEntityPermission(permission)
+                    .Select(x => new MenuItem(x));
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));

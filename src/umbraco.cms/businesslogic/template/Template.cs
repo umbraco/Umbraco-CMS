@@ -9,8 +9,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -278,22 +278,22 @@ namespace umbraco.cms.businesslogic.template
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
 
-        public static Template MakeNew(string Name, User u, Template master)
+        public static Template MakeNew(string Name, IUser u, Template master)
         {
             return MakeNew(Name, u, master, null);
         }
         
-        private static Template MakeNew(string name, User u, string design)
+        private static Template MakeNew(string name, IUser u, string design)
         {
             return MakeNew(name, u, null, design);
         }
 
-        public static Template MakeNew(string name, User u)
+        public static Template MakeNew(string name, IUser u)
         {
             return MakeNew(name, u, design: null);
         }
 
-        private static Template MakeNew(string name, User u, Template master, string design)
+        private static Template MakeNew(string name, IUser u, Template master, string design)
         {
             var foundMaster = master == null ? null : ApplicationContext.Current.Services.FileService.GetTemplate(master.Id);
             var template = ApplicationContext.Current.Services.FileService.CreateTemplateWithIdentity(name, design, foundMaster, u.Id);
@@ -522,7 +522,7 @@ namespace umbraco.cms.businesslogic.template
             return found == null ? null : new Template(found);
         }
 
-        public static Template Import(XmlNode n, User u)
+        public static Template Import(XmlNode n, IUser u)
         {
             var element = System.Xml.Linq.XElement.Parse(n.OuterXml);
             var templates = ApplicationContext.Current.Services.PackagingService.ImportTemplates(element, u.Id);

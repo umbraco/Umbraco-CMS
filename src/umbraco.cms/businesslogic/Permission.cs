@@ -30,12 +30,12 @@ namespace umbraco.BusinessLogic
         /// </summary>
         private Permission() { }
         
-        public static void MakeNew(User User, CMSNode Node, char PermissionKey)
+        public static void MakeNew(IUser User, CMSNode Node, char PermissionKey)
         {
             MakeNew(User, Node, PermissionKey, true);
         }
 
-        private static void MakeNew(User user, IEnumerable<CMSNode> nodes, char permissionKey, bool raiseEvents)
+        private static void MakeNew(IUser user, IEnumerable<CMSNode> nodes, char permissionKey, bool raiseEvents)
         {
             var asArray = nodes.ToArray();
 
@@ -47,7 +47,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        private static void MakeNew(User User, CMSNode Node, char PermissionKey, bool raiseEvents)
+        private static void MakeNew(IUser User, CMSNode Node, char PermissionKey, bool raiseEvents)
         {
             MakeNew(User, new[] {Node}, PermissionKey, raiseEvents);
         }
@@ -57,9 +57,9 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static IEnumerable<Permission> GetUserPermissions(User user)
+        public static IEnumerable<Permission> GetUserPermissions(IUser user)
         {
-            var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user.UserEntity);
+            var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user);
 
             return permissions.SelectMany(
                 entityPermission => entityPermission.AssignedPermissions,
@@ -99,12 +99,12 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="user"></param>
         /// <param name="node"></param>
-        public static void DeletePermissions(User user, CMSNode node)
+        public static void DeletePermissions(IUser user, CMSNode node)
         {
             DeletePermissions(user, node, true);
         }
 
-        internal static void DeletePermissions(User user, CMSNode node, bool raiseEvents)
+        internal static void DeletePermissions(IUser user, CMSNode node, bool raiseEvents)
         {
             ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id, node.Id);
             if (raiseEvents)
@@ -117,7 +117,7 @@ namespace umbraco.BusinessLogic
         /// deletes all permissions for the user
         /// </summary>
         /// <param name="user"></param>
-        public static void DeletePermissions(User user)
+        public static void DeletePermissions(IUser user)
         {
             ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id);
 
@@ -146,7 +146,7 @@ namespace umbraco.BusinessLogic
             OnDeleted(new UserPermission(null, node, null), new DeleteEventArgs());
         }
 
-        public static void UpdateCruds(User user, CMSNode node, string permissions)
+        public static void UpdateCruds(IUser user, CMSNode node, string permissions)
         {
             ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
                 user.Id, 
@@ -201,14 +201,14 @@ namespace umbraco.BusinessLogic
             _nodeIds = nodeIds.ToArray();
         }
 
-        internal UserPermission(User user, CMSNode node, char[] permissionKeys)
+        internal UserPermission(IUser user, CMSNode node, char[] permissionKeys)
         {
             User = user;
             Nodes = new[] { node };
             PermissionKeys = permissionKeys;
         }
 
-        internal UserPermission(User user, IEnumerable<CMSNode> nodes, char[] permissionKeys)
+        internal UserPermission(IUser user, IEnumerable<CMSNode> nodes, char[] permissionKeys)
         {
             User = user;
             Nodes = nodes;
@@ -247,7 +247,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        internal User User { get; private set; }
+        internal IUser User { get; private set; }
         internal IEnumerable<CMSNode> Nodes { get; private set; }
         internal char[] PermissionKeys { get; private set; }
     }

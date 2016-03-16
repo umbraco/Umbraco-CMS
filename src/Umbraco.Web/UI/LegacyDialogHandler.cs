@@ -5,8 +5,8 @@ using System.Web;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.BusinessLogic;
 using umbraco.interfaces;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.UI
 {
@@ -42,7 +42,7 @@ namespace Umbraco.Web.UI
         /// <remarks>
         /// This will first check if we've already created the ITask in the current Http request
         /// </remarks>
-        private static ITask GetTaskForOperation(HttpContextBase httpContext, User umbracoUser, Operation op, string nodeType)
+        private static ITask GetTaskForOperation(HttpContextBase httpContext, IUser umbracoUser, Operation op, string nodeType)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (umbracoUser == null) throw new ArgumentNullException("umbracoUser");
@@ -118,7 +118,7 @@ namespace Umbraco.Web.UI
         /// 
         /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
         /// </remarks>
-        internal static bool UserHasCreateAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
+        internal static bool UserHasCreateAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
             var dialogTask = task as LegacyDialogTask;
@@ -142,7 +142,7 @@ namespace Umbraco.Web.UI
         /// 
         /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
         /// </remarks>
-        internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
+        internal static bool UserHasDeleteAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
             var dialogTask = task as LegacyDialogTask;
@@ -153,7 +153,7 @@ namespace Umbraco.Web.UI
             return true;
         }
 
-        public static void Delete(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text)
+        public static void Delete(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
             
@@ -163,7 +163,7 @@ namespace Umbraco.Web.UI
             typeInstance.Delete();
         }
 
-        public static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
+        public static string Create(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
             
@@ -180,7 +180,7 @@ namespace Umbraco.Web.UI
                 : "";
         }
 
-        internal static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
+        internal static string Create(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
 

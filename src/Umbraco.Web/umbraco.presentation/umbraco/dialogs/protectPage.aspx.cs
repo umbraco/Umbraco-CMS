@@ -354,7 +354,7 @@ namespace umbraco.presentation.umbraco.dialogs
                         //if it's the umbraco membership provider, then we need to tell it what member type to create it with
                         if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                         {
-                            MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
+                            MemberType.MakeNew(Services.UserService.GetUserById(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                         }
                         var castedProvider = provider.AsUmbracoMembershipProvider();
                         MembershipCreateStatus status;

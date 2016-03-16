@@ -1,12 +1,9 @@
 using System;
-using System.Data;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
-using umbraco.DataLayer;
-using System.Collections;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -160,7 +157,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="Name">The name of the MemberGroup</param>
 		/// <param name="u">The creator of the MemberGroup</param>
 		/// <returns>The new MemberGroup</returns>
-		public static MemberGroup MakeNew(string Name, BusinessLogic.User u) 
+		public static MemberGroup MakeNew(string Name, IUser u) 
 		{
 		    var group = new global::Umbraco.Core.Models.MemberGroup {Name = Name};
 		    ApplicationContext.Current.Services.MemberGroupService.Save(group);

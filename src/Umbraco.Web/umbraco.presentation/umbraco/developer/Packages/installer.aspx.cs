@@ -21,7 +21,7 @@ namespace umbraco.presentation.developer.packages
         public Installer()
         {
             CurrentApp = Constants.Applications.Developer.ToString();
-            _installer = new cms.businesslogic.packager.Installer(UmbracoUser.Id);
+            _installer = new cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
         }
 
         private Control _configControl;
@@ -73,7 +73,7 @@ namespace umbraco.presentation.developer.packages
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), UmbracoUser.Id));
+                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), Security.CurrentUser.Id));
                         UpdateSettings();
 
                     }

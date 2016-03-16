@@ -38,7 +38,7 @@ namespace umbraco.cms.presentation.create.controls
 
                     var returnUrl = LegacyDialogHandler.Create(
                         new HttpContextWrapper(Context),
-                        new User(Security.CurrentUser),
+                        Security.CurrentUser,
                         Request.GetItemAsString("nodeType"),
                             nodeId,
                             rename.Text.Trim(),

@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 
@@ -17,9 +16,8 @@ using System.ComponentModel;
 using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.workflow;
+using Umbraco.Core.Models.Membership;
 using File = System.IO.File;
-using Media = umbraco.cms.businesslogic.media.Media;
 using Notification = umbraco.cms.businesslogic.workflow.Notification;
 using Task = umbraco.cms.businesslogic.task.Task;
 
@@ -292,7 +290,7 @@ namespace umbraco.cms.businesslogic
                 IEnumerable<Permission> permissions = Permission.GetNodePermissions(parent);
                 foreach (Permission p in permissions)
                 {
-                    Permission.MakeNew(User.GetUser(p.UserId), retVal, p.PermissionId);
+                    Permission.MakeNew(ApplicationContext.Current.Services.UserService.GetUserById(p.UserId), retVal, p.PermissionId);
                 }
 
             }
@@ -688,11 +686,11 @@ order by level,sortOrder";
         /// Gets the creator
         /// </summary>
         /// <value>The user.</value>
-        public BusinessLogic.User User
+        public IUser User
         {
             get
             {
-                return BusinessLogic.User.GetUser(_userId);
+                return ApplicationContext.Current.Services.UserService.GetUserById(_userId);
             }
         }
 

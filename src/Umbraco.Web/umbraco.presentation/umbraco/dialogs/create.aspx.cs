@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Globalization;
 using System.Linq;
 using System.Web.UI;
@@ -89,8 +90,8 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return UmbracoContext.UmbracoUser.GetPermissions(new CMSNode(nodeId).Path)
-                .Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture));
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, new CMSNode(nodeId).Path);
+            return permission.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
 

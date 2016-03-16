@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Services.Description;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
@@ -38,7 +40,9 @@ namespace Umbraco.Web.WebServices
                 throw new HttpResponseException(response);
             }
 
-            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+
+            if (permission.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");

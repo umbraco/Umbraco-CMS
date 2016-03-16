@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.UI
 {
@@ -63,14 +64,14 @@ namespace Umbraco.Web.UI
         /// <remarks>
         /// accessible by inheritors but can only be set internally
         /// </remarks>
-        protected internal User User { get; internal set; }
+        protected internal IUser User { get; internal set; }
 
         /// <summary>
         /// Implemented explicitly as we don't want to expose this
         /// </summary>
         int ITask.UserId
         {
-            set { User = User.GetUser(value); }
+            set { User = ApplicationContext.Current.Services.UserService.GetUserById(value); }
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace Umbraco.Web.UI
             if (User == null)
                 throw new InvalidOperationException("Cannot authenticate, no User object assigned");
 
-            return User.Applications.Any(app => app.alias.InvariantEquals(AssignedApp));
+            return User.AllowedSections.Any(app => app.InvariantEquals(AssignedApp));
         }
 
         public abstract string ReturnUrl { get; }

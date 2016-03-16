@@ -2,6 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -53,7 +55,7 @@ namespace umbraco.cms.businesslogic.packager
                 Uninstalled = dr.GetBoolean("uninstalled");
                 UpgradeId = dr.GetInt("upgradeId");
                 InstallDate = dr.GetDateTime("installDate");
-                User = User.GetUser(dr.GetInt("userId"));
+                User = ApplicationContext.Current.Services.UserService.GetUserById(dr.GetInt("userId"));
                 PackageId = dr.GetGuid("package");
                 VersionMajor = dr.GetInt("versionMajor");
                 VersionMinor = dr.GetInt("versionMinor");
@@ -101,7 +103,7 @@ namespace umbraco.cms.businesslogic.packager
         public bool Uninstalled { get; set; }
 
 
-        public User User { get; set; }
+        public IUser User { get; set; }
 
 
         public DateTime InstallDate { get; set; }

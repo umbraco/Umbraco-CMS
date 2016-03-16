@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Controls;
@@ -25,7 +26,7 @@ namespace umbraco.cms.presentation.user
             DataBind();
         }
 
-        private User m_umbracoUser;
+        private IUser m_umbracoUser;
         private int[] m_nodeID = {-1};
         private UserPermissions m_userPermissions;
         private string m_clientItemChecked = "void(0);";
@@ -35,7 +36,7 @@ namespace umbraco.cms.presentation.user
             get { return m_umbracoUser.Id; }
             set
             {
-                m_umbracoUser = BusinessLogic.User.GetUser(value);
+                m_umbracoUser = Services.UserService.GetUserById(value);
                 m_userPermissions = new UserPermissions(m_umbracoUser);
             }
         }
@@ -70,7 +71,7 @@ namespace umbraco.cms.presentation.user
                 throw new ArgumentNullException("No User specified");
 
             //get the logged in user's permissions
-            UserPermissions currUserPermissions = new UserPermissions(UmbracoContext.Current.UmbracoUser);
+            UserPermissions currUserPermissions = new UserPermissions(Security.CurrentUser);
             
             //lookup permissions for last node selected
             int selectedNodeId = m_nodeID[m_nodeID.Length - 1];

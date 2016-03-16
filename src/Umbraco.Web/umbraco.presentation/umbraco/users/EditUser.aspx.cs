@@ -82,7 +82,7 @@ namespace umbraco.cms.presentation.user
             }
 
             //only another admin can edit another admin (who is not the true admin)
-            if (u.IsAdmin() && UmbracoContext.UmbracoUser.IsAdmin() == false)
+            if (u.IsAdmin() && Security.CurrentUser.IsAdmin() == false)
             {
                 throw new Exception("Admin users can only be edited by admins");
             }

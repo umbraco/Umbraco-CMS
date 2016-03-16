@@ -37,7 +37,7 @@ namespace umbraco.presentation.umbraco.create
 			{
                 string returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    UmbracoContext.UmbracoUser,
+                    Security.CurrentUser,
                     Request.GetItemAsString("nodeType"),
 					createFolder,
                     rename.Text + '\u00A4' + scriptType.SelectedValue);

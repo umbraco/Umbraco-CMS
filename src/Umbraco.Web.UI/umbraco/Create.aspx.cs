@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.Umbraco
         {
             return LegacyDialogHandler.UserHasCreateAccess(
                 new HttpContextWrapper(Context),
-                UmbracoContext.UmbracoUser,
+                Security.CurrentUser,
                 nodeTypeAlias);
         }
 

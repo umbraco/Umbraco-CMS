@@ -2,6 +2,7 @@
 using System.Web.UI.WebControls;
 using Umbraco.Core.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 
 namespace Umbraco.Web.UI.Umbraco.Create
@@ -68,9 +69,9 @@ namespace Umbraco.Web.UI.Umbraco.Create
 
         }
 
-        public global::umbraco.BusinessLogic.User CurrentUser
+        public IUser CurrentUser
         {
-            get { return UmbracoContext.UmbracoUser; }
+            get { return Security.CurrentUser; }
         }
 
         protected void EmailValidator_OnServerValidate(object source, ServerValidateEventArgs args)

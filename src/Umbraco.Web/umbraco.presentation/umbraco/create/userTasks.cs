@@ -69,8 +69,9 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            var u = User.GetUser(ParentID);
-            u.disable();
+            var u = ApplicationContext.Current.Services.UserService.GetUserById(ParentID);
+            u.IsApproved = false;
+            ApplicationContext.Current.Services.UserService.Save(u);
             return true;
         }
     }

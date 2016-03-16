@@ -747,11 +747,24 @@ namespace Umbraco.Core.Services
                 var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
                 foreach (var id in missingIds)
                 {
-                    result.Add(
-                        new EntityPermission(
-                            user.Id,
-                            id,
-                            user.DefaultPermissions.ToArray()));
+                    if (id == -1 && user.DefaultPermissions.Any() == false)
+                    {
+                        // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
+                        result.Add(
+                            new EntityPermission(
+                                user.Id,
+                                id,
+                                user.DefaultPermissions.ToArray()));
+                    }
+                    else
+                    {
+                        //use the user's user type permissions
+                        result.Add(
+                           new EntityPermission(
+                               user.Id,
+                               id,
+                               user.DefaultPermissions.ToArray()));
+                    }                    
                 }
 
                 return result;

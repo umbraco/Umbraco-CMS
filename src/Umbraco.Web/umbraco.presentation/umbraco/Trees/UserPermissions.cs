@@ -36,14 +36,15 @@ namespace umbraco.cms.presentation.Trees
 
         public override void Render(ref XmlTree tree)
         {
-            foreach (umbraco.BusinessLogic.User user in umbraco.BusinessLogic.User.getAll())
+            int totalusers;
+            foreach (var user in Services.UserService.GetAll(0, int.MaxValue, out totalusers))
             {
-                if (user.Id > 0 && !user.Disabled)
+                if (user.Id > 0 && user.IsApproved)
                 {
                     XmlTreeNode node = XmlTreeNode.Create(this);
                     node.NodeID = user.Id.ToString();
                     node.Text = user.Name;
-                    node.Action = "javascript:openUserPermissions('" + user.Id.ToString() + "');";
+                    node.Action = "javascript:openUserPermissions('" + user.Id + "');";
                     node.Icon = "icon-users";
 
                     OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);

@@ -5,6 +5,7 @@ using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -128,7 +129,7 @@ namespace umbraco.cms.businesslogic.web
             throw new NotSupportedException("The legacy " + typeof(T) + " API is no longer functional for retrieving stylesheets based on an integer ID. Stylesheets are no longer persisted in database tables. Use the new Umbraco.Core.Services.IFileSystem APIs instead of working with Umbraco stylesheets.");
         }
     
-        public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
+        public static StyleSheet MakeNew(IUser user, string Text, string FileName, string Content)
         {
 
             if (FileName.IsNullOrWhiteSpace())
@@ -167,7 +168,7 @@ namespace umbraco.cms.businesslogic.web
             return retval;
         }
         
-        public StylesheetProperty AddProperty(string Alias, BusinessLogic.User u)
+        public StylesheetProperty AddProperty(string Alias, IUser u)
         {
             return StylesheetProperty.MakeNew(Alias, this, u);
         }
@@ -216,7 +217,7 @@ namespace umbraco.cms.businesslogic.web
             return new StyleSheet(found);
         }
 
-        public static StyleSheet Import(XmlNode n, umbraco.BusinessLogic.User u)
+        public static StyleSheet Import(XmlNode n, IUser u)
         {
             string stylesheetName = XmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
             StyleSheet s = GetByName(stylesheetName);

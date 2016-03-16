@@ -1,6 +1,7 @@
 using Umbraco.Core.Services;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -54,8 +55,9 @@ namespace umbraco.dialogs
                    
                     CheckBox c = new CheckBox();
                     c.ID = a.Letter.ToString();
-                    
-                    if (UmbracoContext.UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1)
+
+                    var notifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, node.Path);
+                    if (notifications.Any(x => x.Action == a.Letter.ToString()))
                         c.Checked = true;
 
                     uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
@@ -93,10 +95,8 @@ namespace umbraco.dialogs
                 if (c.Checked)
                     notifications += c.ID;
             }
-            Notification.UpdateNotifications(UmbracoContext.UmbracoUser, node, notifications);
-            UmbracoContext.UmbracoUser.resetNotificationCache();
-            UmbracoContext.UmbracoUser.initNotifications();
-
+            Notification.UpdateNotifications(Security.CurrentUser, node, notifications);
+            
             var feedback = new umbraco.uicontrols.Feedback();
             feedback.Text = Services.TextService.Localize("notifications") + " " + Services.TextService.Localize("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
             feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;

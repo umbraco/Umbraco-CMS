@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Linq;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -63,17 +64,10 @@ namespace umbraco.cms.businesslogic.media
         /// -
         /// </summary>
         public static Guid _objectType = new Guid(Constants.ObjectTypes.Media);
+       
 
-        /// <summary>
-        /// Creates a new Media
-        /// </summary>
-        /// <param name="Name">The name of the media</param>
-        /// <param name="dct">The type of the media</param>
-        /// <param name="u">The user creating the media</param>
-        /// <param name="ParentId">The id of the folder under which the media is created</param>
-        /// <returns></returns>
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
-        public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
+        public static Media MakeNew(string Name, MediaType dct, IUser u, int ParentId)
         {
             var e = new NewEventArgs();
             OnNewing(e);

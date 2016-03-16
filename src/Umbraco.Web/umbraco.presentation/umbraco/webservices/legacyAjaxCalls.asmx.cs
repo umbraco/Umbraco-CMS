@@ -14,10 +14,9 @@ using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Web;
 using Umbraco.Web.WebServices;
-
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Core.Models.Membership;
 
 
 namespace umbraco.presentation.webservices
@@ -31,7 +30,7 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
-        private User _currentUser;
+        private IUser _currentUser;
         
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
@@ -56,21 +55,21 @@ namespace umbraco.presentation.webservices
             {
                  LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, 0, nodeId);
             }
             else if (int.TryParse(nodeId, out intNodeId) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, intNodeId, alias);
             }
             else
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, 0, nodeId);
             }
         }
@@ -119,7 +118,11 @@ namespace umbraco.presentation.webservices
         {
             AuthorizeRequest(Constants.Applications.Users.ToString(), true);
 
-            BusinessLogic.User.GetUser(userId).disable();
+            var user = Services.UserService.GetUserById(userId);
+            if (user == null) return;
+
+            user.IsApproved = false;
+            Services.UserService.Save(user);
         }
 
         [WebMethod]

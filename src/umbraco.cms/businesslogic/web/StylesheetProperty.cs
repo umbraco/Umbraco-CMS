@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -80,7 +81,7 @@ namespace umbraco.cms.businesslogic.web
             set { StylesheetProp.Value = value; }
         }
 
-        public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
+        public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, IUser user)
         {
             //we need to create it with a temp place holder!
             var prop = new Umbraco.Core.Models.StylesheetProperty(Text, "#" + Text.ToSafeAlias(), "");

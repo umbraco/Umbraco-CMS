@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
+            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, Security.GetUserId());
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
@@ -576,8 +576,8 @@ namespace Umbraco.Web.Editors
             if (Guid.TryParse(previewId, out id))
             {
                 var d = new Document(contentId);
-                var pc = new PreviewContent(UmbracoUser, id, false);
-                pc.PrepareDocument(UmbracoUser, d, true);
+                var pc = new PreviewContent(Security.CurrentUser, id, false);
+                pc.PrepareDocument(Security.CurrentUser, d, true);
                 pc.SavePreviewSet();
             }
         }

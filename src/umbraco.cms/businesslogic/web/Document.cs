@@ -5,8 +5,8 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -105,8 +105,8 @@ namespace umbraco.cms.businesslogic.web
         private int _template;
         private bool _published;
         private XmlNode _xml;
-        private User _creator;
-        private User _writer;
+        private IUser _creator;
+        private IUser _writer;
         private int? _writerId;
         private readonly bool _optimizedMode;
         protected internal IContent ContentEntity;
@@ -272,7 +272,7 @@ namespace umbraco.cms.businesslogic.web
         /// Gets the user who created the document.
         /// </summary>
         /// <value>The creator.</value>
-        public User Creator
+        public IUser Creator
         {
             get
             {
@@ -288,7 +288,7 @@ namespace umbraco.cms.businesslogic.web
         /// Gets the writer.
         /// </summary>
         /// <value>The writer.</value>
-        public User Writer
+        public IUser Writer
         {
             get
             {
@@ -298,7 +298,7 @@ namespace umbraco.cms.businesslogic.web
                     {
                         throw new NullReferenceException("Writer ID has not been specified for this document");
                     }
-                    _writer = User.GetUser(_writerId.Value);
+                    _writer = ApplicationContext.Current.Services.UserService.GetUserById(_writerId.Value);
                 }
                 return _writer;
             }
@@ -452,7 +452,7 @@ namespace umbraco.cms.businesslogic.web
         
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
-        public bool PublishWithChildrenWithResult(User u)
+        public bool PublishWithChildrenWithResult(IUser u)
         {
             var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(ContentEntity, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
@@ -553,8 +553,8 @@ namespace umbraco.cms.businesslogic.web
                 Version = ContentEntity.Version;
 
             //Setting private properties from IContent replacing Document.setupNode()
-            _creator = User.GetUser(ContentEntity.CreatorId);
-            _writer = User.GetUser(ContentEntity.WriterId);
+            _creator = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.CreatorId);
+            _writer = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.WriterId);
             _updated = ContentEntity.UpdateDate;
 
             if (ContentEntity.Template != null)

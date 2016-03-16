@@ -1,11 +1,8 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Xml;
-using Umbraco.Core.Logging;
 using System.Linq;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.member
@@ -154,7 +151,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="Text">The name of the MemberType</param>
         /// <param name="u">Creator of the MemberType</param>
-        public static MemberType MakeNew(User u, string Text)
+        public static MemberType MakeNew(IUser u, string Text)
         {
             var alias = Text.ToSafeAliasWithForcingCheck();
             //special case, if it stars with an underscore, we have to re-add it for member types

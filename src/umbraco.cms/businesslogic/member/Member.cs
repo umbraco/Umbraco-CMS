@@ -11,12 +11,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
-using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.member
@@ -185,7 +185,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="mbt">Member type</param>
         /// <param name="u">The umbraco usercontext</param>
         /// <returns>The new member</returns>
-        public static Member MakeNew(string Name, MemberType mbt, User u)
+        public static Member MakeNew(string Name, MemberType mbt, IUser u)
         {
             return MakeNew(Name, "", "", mbt, u);
         }
@@ -199,7 +199,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
-        public static Member MakeNew(string Name, string Email, MemberType mbt, User u)
+        public static Member MakeNew(string Name, string Email, MemberType mbt, IUser u)
         {
             return MakeNew(Name, "", Email, mbt, u);
         }
@@ -212,7 +212,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
-        public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
+        public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, IUser u)
         {
             if (mbt == null) throw new ArgumentNullException("mbt");            
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;

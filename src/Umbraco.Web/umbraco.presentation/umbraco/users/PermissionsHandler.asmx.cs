@@ -56,7 +56,7 @@ namespace umbraco.cms.presentation.user
         {
             AuthorizeRequest(true);
 
-            UserPermissions uPermissions = new UserPermissions(BusinessLogic.User.GetUser(userID));
+            UserPermissions uPermissions = new UserPermissions(Services.UserService.GetUserById(userID));
             List<IAction> actions = Action.FromString(permissions);
             uPermissions.SaveNewPermissions(toIntArray(nodes), actions, replaceChild);
 

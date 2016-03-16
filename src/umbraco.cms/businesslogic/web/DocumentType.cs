@@ -1,16 +1,15 @@
 using System;
 using System.Collections;
-using System.Text;
 using System.Xml;
 using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -83,7 +82,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
-        public static DocumentType MakeNew(User u, string Text)
+        public static DocumentType MakeNew(IUser u, string Text)
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
@@ -410,9 +409,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);
+                var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
+                var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();                
+                ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId.Success ? userId.Result : 0);
 
                 base.Save();
                 FireAfterSave(e);
