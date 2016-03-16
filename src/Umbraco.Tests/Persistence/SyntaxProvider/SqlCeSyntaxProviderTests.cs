@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
 FROM [cmsContentXml]
 INNER JOIN [umbracoNode]
 ON [cmsContentXml].[nodeId] = [umbracoNode].[id]
-WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "),
+WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "),
                                                 sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
 
             Assert.AreEqual(1, sqlOutput.Arguments.Length);
