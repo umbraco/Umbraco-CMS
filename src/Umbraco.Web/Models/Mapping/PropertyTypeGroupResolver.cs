@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
             var genericProperties = new List<TPropertyType>();
 
             // add generic properties local to this content type
-            var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null || x.PropertyGroupId.Value == 0);
+            var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
             genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupBasic.GenericPropertiesGroupId, false));
 
             // add generic properties inherited through compositions
