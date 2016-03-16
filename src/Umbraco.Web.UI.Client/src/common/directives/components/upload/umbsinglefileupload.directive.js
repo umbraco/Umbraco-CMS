@@ -1,6 +1,6 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbFileUpload
+* @name umbraco.directives.directive:umbSingleFileUpload
 * @function
 * @restrict A
 * @scope

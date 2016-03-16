@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PrevalueEditors.RteController">
+<div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval">
 
 	<umb-control-group label="Toolbar" hide-label="false">
 		<div ng-repeat="cmd in tinyMceConfig.commands">
@@ -8,9 +8,10 @@
 				       ng-model="cmd.selected" 
 				       ng-change="selectCommand(cmd)" /> 
 
-				<img ng-src="{{cmd.icon}}" />
+				<!--<img ng-src="{{cmd.icon}}" />-->
+                <i class="mce-ico" ng-class="(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon"></i>
 
-				{{cmd.frontEndCommand}}
+                {{cmd.name}}
             </label>
 		</div>
 	</umb-control-group>
@@ -27,12 +28,12 @@
 		</div>
 	</umb-control-group>
 
-	<umb-control-group label="Dimensions" description="Width x Height">
+    <umb-control-group label="Dimensions" description="Width x Height">
         <div class="vertical-align-items">
-            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-editor-tiny" placeholder="Width" /> &times; 
+            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-editor-tiny" placeholder="Width" /> &times;
             <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-editor-tiny" placeholder="Height" /> Pixels
-        </div> 
-	</umb-control-group>
+        </div>
+    </umb-control-group>
 
     <umb-control-group label="Maximum size for inserted images" description="0 to disable resizing">
         <div class="vertical-align-items">

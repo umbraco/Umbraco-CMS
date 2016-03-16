@@ -1,7 +1,8 @@
 /**
- * @ngdoc directive
- * @name umbraco.directives.directive:headline
- **/
+* @ngdoc directive
+* @name umbraco.directives.directive:hotkey
+**/
+
 angular.module("umbraco.directives")
     .directive('hotkey', function($window, keyboardService, $log) {
 

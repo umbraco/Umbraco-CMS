@@ -103,10 +103,18 @@ namespace Umbraco.Core.Security
             var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
             if (backOfficeIdentity != null) return backOfficeIdentity;
 
+            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+            var claimsPrincipal = http.User as ClaimsPrincipal;
+            if (claimsPrincipal != null)
+            {
+                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
+                if (backOfficeIdentity != null) return backOfficeIdentity;
+            }
+
             //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = http.User.Identity as ClaimsIdentity;
             if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
-            {
+            {                
                 try
                 {
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);

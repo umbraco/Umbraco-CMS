@@ -72,7 +72,6 @@
     <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
     <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.xml" target="lib\UmbracoExamine.xml" />
     <file src="tools\install.core.ps1" target="tools\install.ps1" />
-    <file src="tools\uninstall.core.ps1" target="tools\uninstall.ps1" />
 
     <!-- Added to be able to produce a symbols package -->
     <file src="..\_BuildOutput\bin\SQLCE4Umbraco.pdb" target="lib" />

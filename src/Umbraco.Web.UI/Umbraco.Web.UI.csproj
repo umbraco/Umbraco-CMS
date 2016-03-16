@@ -328,8 +328,8 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.0.90, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.0\lib\Umbraco.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.1.92, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.1\lib\Umbraco.ModelsBuilder.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
@@ -1020,12 +1020,7 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\content.ascx" />
     <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Umbraco\Create\member.ascx" />
-    <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Create\simple.ascx" />

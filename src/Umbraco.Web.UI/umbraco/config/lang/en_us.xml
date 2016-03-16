@@ -1051,7 +1051,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yesDelete">Yes, delete</key>
 
     <key alias="movedUnderneath">was moved underneath</key>
+    <key alias="copiedUnderneath">was copied underneath</key>
     <key alias="folderToMove">Select the folder to move</key>
+    <key alias="folderToCopy">Select the folder to copy</key>
     <key alias="structureBelow">to in the tree structure below</key>
 
     <key alias="allDocumentTypes">All Document types</key>

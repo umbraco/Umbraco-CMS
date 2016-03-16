@@ -292,35 +292,9 @@ namespace Umbraco.Web.Models.Mapping
                     source.HasIdentity ? source.Id : source.ParentId)
                     .FirstOrDefault();
 
-                if (permissions == null)
-                {
-                    return Enumerable.Empty<char>();
-                }
-
-                var result = new List<char>();
-
-                //can they publish ?
-                if (permissions.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionPublish.Instance.Letter);
-                }
-                //can they send to publish ?
-                if (permissions.AssignedPermissions.Contains(ActionToPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionToPublish.Instance.Letter);
-                }
-                //can they save ?
-                if (permissions.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionUpdate.Instance.Letter);
-                }
-                //can they create ?
-                if (permissions.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionNew.Instance.Letter);
-                }
-
-                return result;
+                return permissions == null
+                    ? Enumerable.Empty<char>()
+                    : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
             }
         }
 

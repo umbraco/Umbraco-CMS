@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,9 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly IMigration[] _migrations;
 
         public MigrationRunner(IMigrationResolver resolver, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         {
             if (resolver == null) throw new ArgumentNullException("resolver");
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
@@ -67,7 +71,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
             
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, _productName, true), this))
             {
                 _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
                 return false;
@@ -96,7 +100,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 throw;
             }
 
-            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, false), this);
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, _productName, false), this);
 
             return true;
         }

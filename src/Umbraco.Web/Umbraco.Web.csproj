@@ -400,6 +400,7 @@
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
+    <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
@@ -424,6 +425,7 @@
     <Compile Include="Security\Identity\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Services\ApplicationTreeService.cs" />
+    <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />

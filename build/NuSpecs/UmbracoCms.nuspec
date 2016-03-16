@@ -17,7 +17,7 @@
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
       <dependency id="Newtonsoft.Json" version="[6.0.8, 9.0.0)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[3.0.0, 4.0.0)" />
+      <dependency id="Umbraco.ModelsBuilder" version="[3.0.1, 4.0.0)" />
     </dependencies>
   </metadata>
   <files>
@@ -33,7 +33,6 @@
     <file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
     <file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
-    <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
     <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
     <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />

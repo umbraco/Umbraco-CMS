@@ -3,8 +3,11 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using ClientDependency.Core.Config;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web
@@ -30,6 +33,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
         {
+            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
                 Umbraco.Sys = {};
@@ -40,7 +44,9 @@ namespace Umbraco.Web
                         ""externalLoginsUrl"": """ + externalLoginsUrl + @"""
                     },
                     ""application"": {
-                        ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @"""
+                        ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @""",
+                        ""version"": """ + version + @""",
+                        ""cdf"": """ + ClientDependencySettings.Instance.Version + @"""
                     },
                     ""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
                 };       

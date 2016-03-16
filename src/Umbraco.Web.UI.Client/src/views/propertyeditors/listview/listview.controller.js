@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -58,8 +58,66 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         totalPages: 0,
         items: []
     };
+    
+    //when this is null, we don't check permissions
+    $scope.buttonPermissions = null;
+
+    //When we are dealing with 'content', we need to deal with permissions on child nodes.
+    // Currently there is no real good way to 
+    if ($scope.entityType === "content") {
+
+        var idsWithPermissions = null;
+
+        $scope.buttonPermissions = {
+            canCopy: true,
+            canCreate: true,
+            canDelete: true,
+            canMove: true,
+            canPublish: true,
+            canUnpublish: true
+        };
+
+        $scope.$watch(function() {
+            return $scope.selection.length;
+        }, function(newVal, oldVal) {
+
+            if ((idsWithPermissions == null && newVal > 0) || (idsWithPermissions != null)) {
+                
+                //get all of the selected ids
+                var ids = _.map($scope.selection, function(i) {
+                    return i.id.toString();
+                });
+
+                //remove the dictionary items that don't have matching ids
+                var filtered = {};
+                _.each(idsWithPermissions, function (value, key, list) {
+                    if (_.contains(ids, key)) {
+                        filtered[key] = value;
+                    }
+                });
+                idsWithPermissions = filtered;
+
+                //find all ids that we haven't looked up permissions for
+                var existingIds = _.keys(idsWithPermissions);
+                var missingLookup = _.map(_.difference(ids, existingIds), function (i) {
+                    return Number(i);
+                });
+
+                if (missingLookup.length > 0) {
+                    contentResource.getPermissions(missingLookup).then(function(p) {
+                        $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
+                    });
+                }
+                else {
+                    $scope.buttonPermissions = listViewHelper.getButtonPermissions({}, idsWithPermissions);
+                }
+            }
+        });
+
+    }
 
     $scope.options = {
+        displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: '',
@@ -165,9 +223,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         getListResultsCallback(id, $scope.options).then(function(data) {
 
             $scope.actionInProgress = false;
-
             $scope.listViewResultSet = data;
-
+            
             //update all values for display
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function(e, index) {

@@ -81,6 +81,9 @@ div.umb-codeeditor .umb-btn-toolbar {
   font-size:16px !important;
 }
 
+/* pre-value editor */
+.rte-editor-preval .control-group .controls > div > label .mce-ico { line-height: 20px; }
+
 
 //
 // Color picker
@@ -275,11 +278,12 @@ ul.color-picker li a  {
 
 .umb-cropper{
   position: relative;
-  padding: 10px;
 }
 
 .umb-cropper img, .umb-cropper-gravity img{
-   position: absolute;
+   position: relative;
+   max-width: 100%;
+   height: auto;
    top: 0;
    left: 0;
  }
@@ -293,19 +297,22 @@ ul.color-picker li a  {
   left: 0;
   cursor: move;
   z-index: 6001;
+  position: absolute;
 }
 
 .umb-cropper .viewport{
     overflow: hidden;
     position: relative;
     margin: auto;
+    max-width: 100%;
+    height: auto;
  }
 
 .umb-cropper-gravity .viewport{
    overflow: hidden;
    position: relative;
-   width: 400px;
-   height: 300px
+   width: 100%;
+   height: 100%;
 }
 
 
@@ -335,27 +342,45 @@ ul.color-picker li a  {
   opacity: 0.8;
 }
 
-.umb-cropper-gravity .overlay i{
+.umb-cropper-gravity .overlay i {
   font-size: 26px;
   line-height: 26px;
   opacity: 0.8 !important;
 }
 
-.umb-cropper .crop-container{
+.umb-cropper .crop-container {
     text-align: center;
 }
 
-.umb-cropper .crop-slider{
-   vertical-align: middle;
-   padding: 10px 50px 10px 50px;
+.umb-cropper .crop-slider {
+   padding: 10px;
    border-top: 1px solid @grayLighter;
    margin-top: 10px;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   flex-wrap: wrap;
+
+   @media (min-width: 769px) {
+        padding: 10px 50px 10px 50px;
+   }
 }
 
-.umb-cropper .crop-slider i{color: @gray;}
-.umb-cropper .crop-slider input{
-   margin-top: 7px;
-   width: 320px;
+.umb-cropper .crop-slider i {
+    color: @gray;
+    flex: 0 0 25px;
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+
+.umb-cropper .crop-slider i:first-of-type {
+    text-align: right;
+}
+
+.umb-cropper .crop-slider input {
+    flex: 0 1 auto;
 }
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
@@ -372,74 +397,103 @@ ul.color-picker li a  {
     }
 
     .gravity-container .viewport {
-        width: 494px;
+        max-width: 600px;
+    }
+
+    .gravity-container .viewport:hover {
+        cursor: pointer;
+    }
+
+    .imagecropper {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: row;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            float: left;
+            max-width: 100%;
+        }
+    }
+
+    .imagecropper .umb-cropper__container {
+        position: relative;
+        margin-bottom: 10px;
+        max-width: 100%;
+        border: 1px solid #f8f8f8;
+
+        @media (min-width: 769px) {
+            width: 600px;
+        }
+    }
+
+    .umb-close-cropper {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        cursor: pointer;
+    }
+
+    .umb-close-cropper:hover {
+        opacity: .9;
+        background: @grayLighter;
     }
 
     .imagecropper .umb-sortable-thumbnails {
-        border-left: 2px solid #f8f8f8;
-        margin-left: 4px;
-        padding-left: 2px;
-        float: left;
-        width: 100px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
     .imagecropper .umb-sortable-thumbnails li {
-        display: block;
-    }
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
-    .imagecropper .umb-sortable-thumbnails li.current a, .imagecropper .umb-sortable-thumbnails li.current a:hover {
-        background: #eeeeee;
-        text-decoration: none;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li:first-of-type {
+        padding: 8px;
         margin-top: 0;
-        padding-top: 0;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-name, .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li.current {
+        border-color: @grayLight;
+        background: @grayLighter;
+        color: @black;
+        cursor: pointer;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li:hover,
+    .imagecropper .umb-sortable-thumbnails li.current:hover {
+        border-color: @grayLight;
+        background: @grayLighter;
+        color: @black;
+
+        cursor: pointer;
+
+        opacity: .95;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name,
+    .imagecropper .umb-sortable-thumbnails li .crop-size {
         display: block;
         text-align: left;
-        font-size: 11px;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name {
+        font-weight: bold;
+        margin: 10px 0 5px;
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-size {
         font-size: 10px;
         font-style: italic;
-        color: #666;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a {
-        display: block;
-        padding: 5px;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a:hover {
-        background: #f8f8f8;
-        text-decoration: none;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a:hover .crop-text {
-        text-decoration: none;
+        margin: 0 0 5px;
     }
 
     .btn-crop-delete {
         display: block;
         text-align: left;
-    }
-
-    .imagecropper .umb-sortable-thumbnails.many {
-        width: 210px;
-    }
-
-    .imagecropper .umb-sortable-thumbnails.many li {
-        width: 85px;
-        float: left;
-    }
-
-    .imagecropper .umb-sortable-thumbnails.many li:nth-child(2) {
-        margin-top: 0;
-        padding-top: 0;
     }
 
 //
