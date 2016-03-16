@@ -271,7 +271,7 @@ namespace Umbraco.Web.Security.Identity
         public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, ApplicationContext appContext, PipelineStage stage)
         {
             //don't apply if app isnot ready
-            if (appContext.IsUpgrading || appContext.IsConfigured)
+            if (appContext.IsConfigured)
             {
                 var authOptions = CreateCookieAuthOptions();                
                 app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
