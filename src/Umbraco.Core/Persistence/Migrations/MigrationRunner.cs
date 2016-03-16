@@ -30,9 +30,6 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly IMigration[] _migrations;
 
         public MigrationRunner(IMigrationResolver resolver, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         {
             if (resolver == null) throw new ArgumentNullException("resolver");
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");

@@ -101,7 +101,7 @@ namespace Umbraco.Web.Security.Identity
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
-                || request.Uri.IsInstallerRequest()                
+                || request.Uri.IsInstallerRequest())         
             {
                 return true;
             }
