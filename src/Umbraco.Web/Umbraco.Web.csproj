@@ -343,6 +343,7 @@
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
+    <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
     <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />

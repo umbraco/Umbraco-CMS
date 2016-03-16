@@ -13,6 +13,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [ValidateAngularAntiForgeryToken]
     [AngularJsonOnlyConfiguration]
+    [DisableBrowserCache]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
         protected UmbracoAuthorizedJsonController()
