@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
 
-            Assert.AreEqual("[umbracoNode].[parentID] = @0", result);
+            Assert.AreEqual("([umbracoNode].[parentID] = @0)", result);
             Assert.AreEqual(-1, modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
 
-            Assert.AreEqual("[umbracoUser].[userLogin] = @0", result);
+            Assert.AreEqual("([umbracoUser].[userLogin] = @0)", result);
             Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
 
