@@ -12,8 +12,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
+using Umbraco.Web;
 using umbraco;
 using System.Linq;
+using System.Web;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
 
@@ -47,7 +49,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 if (preview)
                 {
                     var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
-                    previewContent.EnsureInitialized(context.UmbracoUser, StateHelper.Cookies.Preview.GetValue(), true, () =>
+                    var previewVal = HttpContext.Current.Request.GetPreviewCookieValue();
+                    previewContent.EnsureInitialized(context.UmbracoUser, previewVal, true, () =>
                     {
                         if (previewContent.ValidPreviewSet)
                             previewContent.LoadPreviewset();

@@ -188,7 +188,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="StateHelper.cs" />
     <Compile Include="User.cs">
       <SubType>Code</SubType>
     </Compile>

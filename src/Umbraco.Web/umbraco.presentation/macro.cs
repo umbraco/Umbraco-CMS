@@ -265,7 +265,10 @@ namespace umbraco
             {
                 TraceInfo("renderMacro", macroInfo, excludeProfiling: true);
 
-                StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Items[MacrosAddedKey] = HttpContext.Current.GetContextItem<int>(MacrosAddedKey) + 1;
+                }
 
                 // zb-00037 #29875 : parse attributes here (and before anything else)
                 foreach (MacroPropertyModel prop in Model.Properties)
@@ -1379,7 +1382,7 @@ namespace umbraco
                 else
                     oControl.ID =
                         string.Format("{0}_{1}", fileName.Substring(slashIndex, fileName.IndexOf(".ascx") - slashIndex),
-                                      StateHelper.GetContextValue<int>(MacrosAddedKey));
+                                      HttpContext.Current.GetContextItem<int>(MacrosAddedKey));
 
                 TraceInfo(LoadUserControlKey, string.Format("Usercontrol added with id '{0}'", oControl.ID));
 
@@ -1533,9 +1536,12 @@ namespace umbraco
                 //TODO: This is the worst thing ever. This will also not work if people decide to put their own
                 // custom auth system in place.
 
-                HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
-                var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
-                                        HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
+                HttpCookie inCookie = HttpContext.Current.Request.Cookies[UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName];
+                if (inCookie == null) throw new NullReferenceException("No auth cookie found");
+                var cookie = new Cookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
+                    inCookie.Value,
+                    inCookie.Path,
+                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
                 myHttpWebRequest.CookieContainer = new CookieContainer();
                 myHttpWebRequest.CookieContainer.Add(cookie);
 

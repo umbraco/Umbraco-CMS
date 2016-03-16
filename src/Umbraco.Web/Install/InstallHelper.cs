@@ -16,6 +16,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web;
 
 
 namespace Umbraco.Web.Install
@@ -104,18 +105,19 @@ namespace Umbraco.Web.Install
 
                 // Check for current install Id
                 var installId = Guid.NewGuid();
-                var installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
-                if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+
+                var installCookie = _umbContext.HttpContext.Request.GetPreviewCookieValue();
+                if (string.IsNullOrEmpty(installCookie) == false)
                 {
-                    if (Guid.TryParse(installCookie.GetValue(), out installId))
+                    if (Guid.TryParse(installCookie, out installId))
                     {
                         // check that it's a valid Guid
                         if (installId == Guid.Empty)
                             installId = Guid.NewGuid();
                     }
                 }
-                installCookie.SetValue(installId.ToString());
-
+                _umbContext.HttpContext.Response.Cookies.Set(new HttpCookie("umb_installId", "1"));
+                
                 string dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
                     dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();

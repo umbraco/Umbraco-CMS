@@ -210,29 +210,8 @@ namespace umbraco
                 xd.LoadXml(string.Format("<error>Could not convert JSON to XML. Error: {0}</error>", ex));
                 return xd.CreateNavigator().Select("/error");
             }
-        }
-
-        /// <summary>
-        /// Add a session variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value</param>
-        public static void setSession(string key, string value)
-        {
-            if (HttpContext.Current.Session != null)
-                HttpContext.Current.Session[key] = value;
-        }
-
-        /// <summary>
-        /// Add a cookie variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value of the variable</param>
-        public static void setCookie(string key, string value)
-        {
-            StateHelper.SetCookieValue(key, value);
-        }
-
+        }        
+        
         /// <summary>
         /// Returns a string with a friendly url from a node.
         /// IE.: Instead of having /482 (id) as an url, you can have
@@ -1683,7 +1662,7 @@ namespace umbraco
         public static string RequestCookies(string key)
         {
             // zb-00004 #29956 : refactor cookies handling
-            var value = StateHelper.GetCookieValue(key);
+            var value = HttpContext.Current.Request.GetCookieValue(key);
             return value ?? "";
         }
 

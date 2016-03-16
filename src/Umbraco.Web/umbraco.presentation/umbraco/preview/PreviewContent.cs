@@ -216,26 +216,24 @@ namespace umbraco.presentation.preview
 
         public void ActivatePreviewCookie()
         {
-            // zb-00004 #29956 : refactor cookies names & handling
-            StateHelper.Cookies.Preview.SetValue(PreviewSet.ToString());
+            HttpContext.Current.Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, PreviewSet.ToString()));
         }
 
         public static void ClearPreviewCookie()
         {
-            // zb-00004 #29956 : refactor cookies names & handling
             if (UmbracoContext.Current.UmbracoUser != null)
             {
-                if (StateHelper.Cookies.Preview.HasValue)
+                if (HttpContext.Current.Request.HasPreviewCookie())
                 {
 
                     DeletePreviewFile(
                         UmbracoContext.Current.UmbracoUser.Id,
                         new FileInfo(GetPreviewsetPath(
                             UmbracoContext.Current.UmbracoUser.Id,
-                            new Guid(StateHelper.Cookies.Preview.GetValue()))));
+                            new Guid(HttpContext.Current.Request.GetPreviewCookieValue()))));
                 }
             }
-            StateHelper.Cookies.Preview.Clear();
+            HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
         }
     }
 }

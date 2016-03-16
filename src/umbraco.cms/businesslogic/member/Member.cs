@@ -713,14 +713,6 @@ namespace umbraco.cms.businesslogic.member
             return string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id);
         }
 
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static void ClearMemberState()
-        {
-            // zb-00004 #29956 : refactor cookies names & handling
-            StateHelper.Cookies.Member.Clear();
-            FormsAuthentication.SignOut();
-        }
-
         #endregion
 
         #region MemberHandle functions
@@ -844,48 +836,7 @@ namespace umbraco.cms.businesslogic.member
         public static void RemoveMemberFromCache(int NodeId)
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(NodeId));
-        }
-
-        /// <summary>
-        /// Deletes the member cookie from the browser 
-        /// 
-        /// Can be used in the public website
-        /// </summary>
-        /// <param name="m">Member</param>
-        [Obsolete("Obsolete, use the ClearMemberFromClient(int NodeId) instead", false)]
-        public static void ClearMemberFromClient(Member m)
-        {
-
-            if (m != null)
-                ClearMemberFromClient(m.Id);
-            else
-            {
-                // If the member doesn't exists as an object, we'll just make sure that cookies are cleared
-                // zb-00035 #29931 : cleanup member state management
-                ClearMemberState();
-            }
-
-            FormsAuthentication.SignOut();
-        }
-
-        /// <summary>
-        /// Deletes the member cookie from the browser 
-        /// 
-        /// Can be used in the public website
-        /// </summary>
-        /// <param name="NodeId">The Node id of the member to clear</param>
-        [Obsolete("Use FormsAuthentication.SignOut instead")]
-        public static void ClearMemberFromClient(int NodeId)
-        {
-            // zb-00035 #29931 : cleanup member state management
-            // NH 4.7.1: We'll no longer use legacy Umbraco cookies to handle members
-            // ClearMemberState();
-
-            FormsAuthentication.SignOut();
-
-            RemoveMemberFromCache(NodeId);
-
-        }
+        }        
 
         /// <summary>
         /// Retrieve a collection of members in the cache

@@ -453,11 +453,7 @@ namespace Umbraco.Tests.Web.Mvc
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-
-
-            //set the state helper
-            StateHelper.HttpContext = factory.HttpContext;
-
+            
             return factory;
         }
 
