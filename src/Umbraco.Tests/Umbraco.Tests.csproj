@@ -513,7 +513,6 @@
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="Macros\MacroEngineFactoryTests.cs" />
-    <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="Plugins\PluginManagerExtensions.cs" />
     <Compile Include="Plugins\PluginManagerTests.cs" />
