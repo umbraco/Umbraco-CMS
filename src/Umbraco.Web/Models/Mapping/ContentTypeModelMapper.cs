@@ -256,6 +256,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
                 .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             config.CreateMap<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>()
@@ -263,6 +264,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
                 .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion
