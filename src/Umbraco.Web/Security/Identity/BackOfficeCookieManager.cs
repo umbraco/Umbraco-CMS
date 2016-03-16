@@ -101,9 +101,7 @@ namespace Umbraco.Web.Security.Identity
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
-                || request.Uri.IsInstallerRequest()
-                //detect in preview
-                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+                || request.Uri.IsInstallerRequest()                
                 //check for base
                 || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
             {

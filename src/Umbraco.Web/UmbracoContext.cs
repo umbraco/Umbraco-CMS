@@ -466,14 +466,11 @@ namespace Umbraco.Web
             var request = GetRequestFromContext();
             if (request == null || request.Url == null)
                 return false;
-
-            var currentUrl = request.Url.AbsolutePath;
-            // zb-00004 #29956 : refactor cookies names & handling
+            
             return
-                //StateHelper.Cookies.Preview.HasValue // has preview cookie
                 HttpContext.Request.HasPreviewCookie()
-                && currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false
-                && UmbracoUser != null; // has user
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false
+                && Security.CurrentUser != null; // has user
         }
         
         private HttpRequestBase GetRequestFromContext()
