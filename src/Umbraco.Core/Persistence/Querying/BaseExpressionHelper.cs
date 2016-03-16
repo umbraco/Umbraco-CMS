@@ -277,7 +277,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // false property , i.e. x => !Trashed
                     SqlParameters.Add(true);
-                    return "NOT (" + o + " = @0)";
+                    return string.Format("NOT ({0} = @{1})", o, SqlParameters.Count - 1);
                 default:
                     // could be anything else, such as: x => !x.Path.StartsWith("-20")
                     return "NOT (" + o + ")";
@@ -293,7 +293,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // true property, i.e. x => Trashed
                     SqlParameters.Add(true);
-                    return o + " = @0";
+                    return string.Format("({0} = @{1})", o, SqlParameters.Count - 1);
                 default:
                     // could be anything else, such as: x => x.Path.StartsWith("-20")
                     return o;
