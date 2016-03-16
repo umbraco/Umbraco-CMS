@@ -18,6 +18,7 @@ namespace Umbraco.Web.WebApi
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
     [UmbracoAuthorize]
+    [DisableBrowserCache]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
         protected UmbracoAuthorizedApiController()

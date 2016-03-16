@@ -12,8 +12,7 @@ namespace Umbraco.Web.Editors
     /// methods that are not called by Angular or don't contain a valid csrf header will NOT work.
     /// </remarks>
     [ValidateAngularAntiForgeryToken]
-    [AngularJsonOnlyConfiguration]
-    [DisableBrowserCache]
+    [AngularJsonOnlyConfiguration]    
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
         protected UmbracoAuthorizedJsonController()
