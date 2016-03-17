@@ -12,6 +12,7 @@ using umbraco.interfaces;
 
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.cms.presentation.user
 {

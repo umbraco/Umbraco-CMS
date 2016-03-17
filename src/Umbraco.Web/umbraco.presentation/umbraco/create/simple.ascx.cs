@@ -7,6 +7,7 @@ using System;
 using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Umbraco.Web._Legacy.UI;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls

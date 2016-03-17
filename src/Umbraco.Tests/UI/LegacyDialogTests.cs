@@ -9,6 +9,7 @@ using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.user;
 using umbraco.interfaces;
+using Umbraco.Web._Legacy.UI;
 
 namespace Umbraco.Tests.UI
 {

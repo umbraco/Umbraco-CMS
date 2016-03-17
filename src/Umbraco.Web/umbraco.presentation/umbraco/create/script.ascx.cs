@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using Umbraco.Web;
 using Umbraco.Web.UI.Controls;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.umbraco.create
 {

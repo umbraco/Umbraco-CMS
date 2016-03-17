@@ -124,7 +124,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ITaskReturnUrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -132,9 +131,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IPackageAction.cs" />
-    <Compile Include="ITask.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ITree.cs">
       <SubType>Code</SubType>
     </Compile>

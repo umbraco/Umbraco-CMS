@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
 using Umbraco.Web;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.cms.presentation.create.controls
 {

@@ -5,6 +5,7 @@ using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Security;
 using Umbraco.Core;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {

@@ -17,6 +17,7 @@ using Umbraco.Web.WebServices;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web._Legacy.UI;
 
 
 namespace umbraco.presentation.webservices

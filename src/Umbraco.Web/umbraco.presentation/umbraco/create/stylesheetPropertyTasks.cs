@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.UI;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
