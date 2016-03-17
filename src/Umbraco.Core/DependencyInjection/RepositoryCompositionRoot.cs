@@ -121,8 +121,8 @@ namespace Umbraco.Core.DependencyInjection
                 factory.GetInstance<IContentSection>()));
             container.Register<IUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewRepository(
                 work,
-                factory.GetInstance<IFileSystem>("ScriptFileSystem")),
-                serviceName: "PartialViewFileSystem");
+                factory.GetInstance<IFileSystem>("PartialViewFileSystem")),
+                serviceName: "PartialViewRepository");
             container.Register<IUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewMacroRepository(
                 work,
                 factory.GetInstance<IFileSystem>("PartialViewMacroFileSystem")),
