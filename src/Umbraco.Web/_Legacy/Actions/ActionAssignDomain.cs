@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using umbraco.interfaces;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions

@@ -9,7 +9,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
-using umbraco.interfaces;
 using System.Linq;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 

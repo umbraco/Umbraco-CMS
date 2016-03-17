@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.Trees;

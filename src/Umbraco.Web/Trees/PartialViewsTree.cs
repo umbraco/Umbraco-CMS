@@ -10,7 +10,6 @@ using Umbraco.Core.IO;
 
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
-using umbraco.interfaces;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees

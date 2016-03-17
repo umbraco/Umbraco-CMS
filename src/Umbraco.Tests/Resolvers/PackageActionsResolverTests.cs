@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Tests.Resolvers
 {

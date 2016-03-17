@@ -2,7 +2,7 @@ using System;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 
 
 namespace umbraco.cms.businesslogic.packager

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
-using umbraco.interfaces;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;

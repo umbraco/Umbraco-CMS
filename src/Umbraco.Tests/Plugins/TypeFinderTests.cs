@@ -18,7 +18,6 @@ using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using umbraco.interfaces;
 using umbraco.uicontrols;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;

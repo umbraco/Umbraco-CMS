@@ -6,8 +6,6 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
-using umbraco.interfaces;
-
 namespace umbraco.presentation
 {
     public class EnsureSystemPathsApplicationStartupHandler : ApplicationEventHandler

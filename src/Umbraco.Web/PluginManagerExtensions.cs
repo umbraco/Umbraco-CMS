@@ -9,7 +9,6 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.cms.presentation.Trees;
-using umbraco.interfaces;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web._Legacy.Actions;
 

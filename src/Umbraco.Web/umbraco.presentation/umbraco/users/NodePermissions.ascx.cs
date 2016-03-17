@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;

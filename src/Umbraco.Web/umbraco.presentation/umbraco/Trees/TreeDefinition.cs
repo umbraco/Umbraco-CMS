@@ -7,7 +7,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.Trees

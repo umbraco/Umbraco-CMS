@@ -11,7 +11,6 @@ using System.Web.WebPages;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;

@@ -5,7 +5,6 @@ using System.Web.Script.Services;
 using System.Web.UI;
 using System.IO;
 using System.Collections.Generic;
-using umbraco.interfaces;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;

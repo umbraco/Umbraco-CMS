@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web._Legacy.Utils;

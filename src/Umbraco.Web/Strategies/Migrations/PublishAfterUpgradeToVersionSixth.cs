@@ -6,7 +6,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.UnitOfWork;
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Configuration;

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco.cms.presentation.Trees;

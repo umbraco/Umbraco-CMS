@@ -12,7 +12,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
-using umbraco.interfaces;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Profiling;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {

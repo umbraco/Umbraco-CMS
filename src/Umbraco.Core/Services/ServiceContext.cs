@@ -8,7 +8,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
-using umbraco.interfaces;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
 

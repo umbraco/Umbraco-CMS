@@ -13,7 +13,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using umbraco.interfaces;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Sync

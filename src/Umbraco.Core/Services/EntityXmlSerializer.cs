@@ -10,7 +10,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {

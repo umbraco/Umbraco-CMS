@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Web;
 using System.Xml;
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Membership;

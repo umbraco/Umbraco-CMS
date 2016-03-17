@@ -8,8 +8,6 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Umbraco.Web.UI;
-using umbraco.interfaces;
-
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web._Legacy.UI;

@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
-using umbraco.interfaces;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Services

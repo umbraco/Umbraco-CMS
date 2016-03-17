@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core;
-using umbraco.interfaces;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Trees

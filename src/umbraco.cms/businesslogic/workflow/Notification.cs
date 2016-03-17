@@ -13,7 +13,6 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 

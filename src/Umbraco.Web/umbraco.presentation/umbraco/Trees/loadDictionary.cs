@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 
 using umbraco.cms.businesslogic;
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.Trees;

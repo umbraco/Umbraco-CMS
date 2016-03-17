@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using umbraco.cms.businesslogic.task;
-
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;

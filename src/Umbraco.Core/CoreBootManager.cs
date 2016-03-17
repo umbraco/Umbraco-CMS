@@ -31,6 +31,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Strings;
+using Umbraco.Core._Legacy.PackageActions;
 
 
 namespace Umbraco.Core

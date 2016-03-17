@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Xml;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {

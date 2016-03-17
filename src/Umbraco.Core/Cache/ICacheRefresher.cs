@@ -1,5 +1,4 @@
 ﻿using System;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Cache
 {

@@ -18,7 +18,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Cache;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 using File = System.IO.File;
 
 namespace Umbraco.Core

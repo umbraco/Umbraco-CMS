@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 
 namespace umbraco.cms.businesslogic.macro

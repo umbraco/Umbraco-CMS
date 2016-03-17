@@ -1,8 +1,8 @@
 using System;
 using System.Xml;
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {

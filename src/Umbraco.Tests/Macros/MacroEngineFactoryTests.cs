@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Macros

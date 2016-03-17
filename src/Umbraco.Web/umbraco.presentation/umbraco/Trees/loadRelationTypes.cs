@@ -6,7 +6,6 @@ using System.Web;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
-using umbraco.interfaces;
 using umbraco.cms.presentation.developer.RelationTypes.TreeMenu;
 
 using Umbraco.Core;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.media;
-using umbraco.interfaces;
 
 namespace umbraco.cms
 {

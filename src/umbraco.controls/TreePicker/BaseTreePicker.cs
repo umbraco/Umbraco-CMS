@@ -2,7 +2,6 @@
 using System.Web.UI;
 using ClientDependency.Core;
 using ClientDependency.Core.Controls;
-using umbraco.interfaces;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic;

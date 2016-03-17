@@ -14,7 +14,6 @@ using umbraco;
 
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 using Umbraco.Web._Legacy.Actions;
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
-using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI;

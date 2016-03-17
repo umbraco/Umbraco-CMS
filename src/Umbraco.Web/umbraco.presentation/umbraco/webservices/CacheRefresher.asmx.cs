@@ -10,7 +10,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using umbraco.interfaces;
 using Umbraco.Core.Security;
 
 namespace umbraco.presentation.webservices
