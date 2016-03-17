@@ -49,7 +49,7 @@ namespace umbraco.cms.presentation.Trees
             if (typeInstance != null)
             {
                 //convert to BaseTree
-                return (BaseTree.IsBaseTree(typeInstance) ? typeInstance as BaseTree : BaseTree.FromITree(typeInstance, m_tree.Alias, m_app.Alias, m_tree.IconClosed, m_tree.IconOpened, null));                    
+                return typeInstance;
             }
             return null;
         }
@@ -90,20 +90,20 @@ namespace umbraco.cms.presentation.Trees
         /// <param name="tree">The tree.</param>
         /// <param name="appAlias">The app alias.</param>
         /// <returns></returns>
-        public static ITree CreateTreeInstance(Type tree, string appAlias)
+        public static BaseTree CreateTreeInstance(Type tree, string appAlias)
         {
-            ITree typeInstance;
+            BaseTree typeInstance;
             //call the correct constructor
             if (typeof(BaseTree).IsAssignableFrom(tree))
-                typeInstance = Activator.CreateInstance(tree, new object[] { appAlias }) as ITree; //the BaseTree constructor
+                typeInstance = Activator.CreateInstance(tree, new object[] { appAlias }) as BaseTree; //the BaseTree constructor
             else
                 typeInstance = CreateTreeInstance(tree);
             return typeInstance;
         }
 
-        private static ITree CreateTreeInstance(Type tree)
+        private static BaseTree CreateTreeInstance(Type tree)
         {
-            ITree typeInstance = Activator.CreateInstance(tree) as ITree; //an empty constructor (ITree)
+            BaseTree typeInstance = Activator.CreateInstance(tree) as BaseTree; //an empty constructor (ITree)
             return typeInstance;
         }
 

@@ -11,7 +11,7 @@ namespace umbraco.cms.presentation.Trees
 	public class LegacyTree : BaseTree
 	{
 
-        public LegacyTree(ITree tree, string application, XmlTreeNode rootNode)
+        public LegacyTree(BaseTree tree, string application, XmlTreeNode rootNode)
             : base(application)
         {
             _tree = tree;
@@ -21,7 +21,7 @@ namespace umbraco.cms.presentation.Trees
             Initialize();
         }
 
-		private ITree _tree;
+		private BaseTree _tree;
         private XmlTreeNode _rootNode;
 
         public void SetRootNode(XmlTreeNode rootNode)

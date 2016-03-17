@@ -8,6 +8,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
+using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web._Legacy.Actions;
@@ -54,7 +55,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		internal static IEnumerable<Type> ResolveTrees(this PluginManager resolver)
 		{
-			return resolver.ResolveTypes<ITree>();
+			return resolver.ResolveTypes<BaseTree>();
 		}
 
 

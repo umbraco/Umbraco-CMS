@@ -33,7 +33,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="tree"></param>
         /// <returns></returns>
-        public TreeDefinition FindTree(ITree tree)
+        public TreeDefinition FindTree(BaseTree tree)
         {
 			EnsureTreesRegistered();
 
@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TreeDefinition FindTree<T>() where T : ITree
+        public TreeDefinition FindTree<T>() where T : BaseTree
         {
 			EnsureTreesRegistered();
 
