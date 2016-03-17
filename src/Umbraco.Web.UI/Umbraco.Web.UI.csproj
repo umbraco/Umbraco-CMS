@@ -441,10 +441,6 @@
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
-      <DependentUpon>EditMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.cs">
       <DependentUpon>moveOrCopy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -459,9 +455,6 @@
     <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
       <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
-      <DependentUpon>EditMacro.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dialogs\Publish.aspx.cs">
       <DependentUpon>publish.aspx</DependentUpon>
@@ -668,7 +661,6 @@
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
     <Content Include="Umbraco\Images\download.png" />
@@ -694,8 +686,6 @@
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
-    <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
-    <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />

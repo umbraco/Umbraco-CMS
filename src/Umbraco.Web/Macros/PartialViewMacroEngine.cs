@@ -79,11 +79,7 @@ namespace Umbraco.Web.Macros
 		{
 			get { return Enumerable.Empty<string>(); }
 		}
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
-        {
-            get { throw new NotSupportedException(); }
-        }
-
+       
         public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
         {
             var temp = GetVirtualPathFromPhysicalPath(tempFileName);

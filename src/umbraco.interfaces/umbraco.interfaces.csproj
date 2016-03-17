@@ -137,9 +137,6 @@
     <Compile Include="ICacheRefresher.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IMacroGuiRendering.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IMenuElement.cs" />
     <Compile Include="IPackageAction.cs" />
     <Compile Include="ITask.cs">
@@ -149,10 +146,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IUseTags.cs" />
-    <Compile Include="skinning\IDependencyType.cs" />
-    <Compile Include="skinning\ITaskType.cs" />
-    <Compile Include="skinning\TaskExecutionDetails.cs" />
-    <Compile Include="skinning\TaskExecutionStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

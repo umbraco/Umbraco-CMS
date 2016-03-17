@@ -504,18 +504,7 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveCacheRefreshers()
         {
             return ResolveTypes<ICacheRefresher>();
-        }
-
-      
-        
-        /// <summary>
-        /// Returns all available IMacroGuiRendering in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMacroRenderings()
-        {
-            return ResolveTypes<IMacroGuiRendering>();
-        }
+        }      
 
         /// <summary>
         /// Returns all available IPackageAction in application

@@ -110,12 +110,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
                 umbDictionary.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", Services.TextService.Localize("template/insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
-
-                uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-                umbMacro.ImageURL = SystemDirectories.Umbraco + "/images/editor/insMacro.gif";
-                umbMacro.AltText = Services.TextService.Localize("template/insertMacro");
-                umbMacro.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, Services.TextService.Localize("template/insertMacro"), 470, 530);
-
+                
                 // Help
                 Panel1.Menu.InsertSplitter();
 

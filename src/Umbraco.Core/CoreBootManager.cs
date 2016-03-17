@@ -450,11 +450,7 @@ namespace Umbraco.Core
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolveCacheRefreshers());
-
-            MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolveMacroRenderings());
-
+                        
             PackageActionsResolver.Current = new PackageActionsResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolvePackageActions());

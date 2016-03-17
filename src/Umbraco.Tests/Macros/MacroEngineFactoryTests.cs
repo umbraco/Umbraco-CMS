@@ -91,12 +91,7 @@ namespace Umbraco.Tests.Macros
 			public IEnumerable<string> SupportedUIExtensions
 			{
 				get { throw new NotImplementedException(); }
-			}
-
-			public Dictionary<string, IMacroGuiRendering> SupportedProperties
-			{
-				get { throw new NotImplementedException(); }
-			}
+			}			
 
 			public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
 			{
@@ -125,12 +120,7 @@ namespace Umbraco.Tests.Macros
 			{
 				get { throw new NotImplementedException(); }
 			}
-
-			public Dictionary<string, IMacroGuiRendering> SupportedProperties
-			{
-				get { throw new NotImplementedException(); }
-			}
-
+            
 			public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
 			{
 				throw new NotImplementedException();

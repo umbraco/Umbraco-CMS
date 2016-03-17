@@ -56,33 +56,13 @@ namespace umbraco.cms.businesslogic
 
         #region Private static
 
-        private static readonly string DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.UmbracoClient + "/Tree/treeIcons.css");
+        
         private static readonly List<string> InternalDefaultIconClasses = new List<string>();
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         private static void InitializeIconClasses()
         {
-            StreamReader re = File.OpenText(DefaultIconCssFile);
-            string content = string.Empty;
-            string input = null;
-            while ((input = re.ReadLine()) != null)
-            {
-                content += input.Replace("\n", "") + "\n";
-            }
-            re.Close();
-
-            // parse the classes
-            var m = Regex.Matches(content, "([^{]*){([^}]*)}", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-            foreach (Match match in m)
-            {
-                var groups = match.Groups;
-                var cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
-                if (string.IsNullOrEmpty(cssClass) == false)
-                {
-                    InternalDefaultIconClasses.Add(cssClass);
-                }
-            }
+            
         }
         private const string SqlSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
         private const string SqlDescendants = @"

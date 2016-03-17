@@ -195,11 +195,18 @@ namespace umbraco.cms.presentation.settings
 		private void LoadMacros()
 		{
 			var macroRenderings =
-				DatabaseContext.Database.Fetch<dynamic>("select id, macroAlias, macroName from cmsMacro order by macroName");
+				DatabaseContext.Database.Fetch<TempMacroClass>("select id, macroAlias, macroName from cmsMacro order by macroName");
 
 			rpt_macros.DataSource = macroRenderings;
 			rpt_macros.DataBind();
 		}
+
+	    private class TempMacroClass
+	    {
+	        public int id { get; set; }
+            public string macroAlias { get; set; }
+            public string macroName { get; set; }
+	    }
 
 		public string DoesMacroHaveSettings(string macroId)
 		{
