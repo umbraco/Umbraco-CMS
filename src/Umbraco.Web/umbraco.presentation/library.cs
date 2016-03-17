@@ -71,16 +71,7 @@ namespace umbraco
         private page _page;
 
         #endregion
-
-        #region Properties
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
-        }
-
-        #endregion
-
+        
         #region Constructors
 
         /// <summary>
@@ -1213,16 +1204,15 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
+            foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(
+                "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
+                new { dataTypeId = DataTypeId }))
             {
-                while (dr.Read())
-                {
-                    XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.GetString("value"));
-                    n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.GetInt("id").ToString()));
-                    xd.DocumentElement.AppendChild(n);
-                }
+                XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
+                xd.DocumentElement.AppendChild(n);
             }
+          
             XPathNavigator xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
@@ -1236,8 +1226,9 @@ namespace umbraco
         {
             try
             {
-                return SqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
-                                                       SqlHelper.CreateParameter("@id", Id));
+                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                    "select [value] from cmsDataTypePreValues where id = @id",
+                    new {id = Id});
             }
             catch
             {

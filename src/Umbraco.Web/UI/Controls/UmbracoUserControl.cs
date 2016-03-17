@@ -136,12 +136,5 @@ namespace Umbraco.Web.UI.Controls
             get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
         }
 
-        /// <summary>
-        /// Returns the legacy SqlHelper
-        /// </summary>
-        protected ISqlHelper SqlHelper
-        {
-            get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
-        }
     }
 }

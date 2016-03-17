@@ -147,12 +147,7 @@ namespace umbraco
         {
             get { return _xmlContent == null; }
         }
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         #endregion
 
         #region Public Methods
@@ -493,57 +488,48 @@ where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDoc
 order by umbracoNode.level, umbracoNode.sortOrder";
 
 
-
-                        using (
-                            IRecordsReader dr = SqlHelper.ExecuteReader(sql,
-                                                                        SqlHelper.CreateParameter("@type",
-                                                                                                  new Guid(
-                                                                                                      Constants.ObjectTypes.Document)))
-                            )
+                        foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document)}))
                         {
-                            while (dr.Read())
+                            int currentId = dr.id;
+                            int parentId = dr.parentId;
+                            string xml = dr.xml;
+
+                            // fix sortOrder - see notes in UpdateSortOrder
+                            var tmp = new XmlDocument();
+                            tmp.LoadXml(xml);
+                            var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
+                            attr.Value = dr.sortOrder.ToString();
+                            xml = tmp.InnerXml;
+
+                            // Call the eventhandler to allow modification of the string
+                            var e1 = new ContentCacheLoadNodeEventArgs();
+                            FireAfterContentCacheDatabaseLoadXmlString(ref xml, e1);
+                            // check if a listener has canceled the event
+                            if (!e1.Cancel)
                             {
-                                int currentId = dr.GetInt("id");
-                                int parentId = dr.GetInt("parentId");
-                                string xml = dr.GetString("xml");
-
-                                // fix sortOrder - see notes in UpdateSortOrder
-                                var tmp = new XmlDocument();
-                                tmp.LoadXml(xml);
-                                var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
-                                attr.Value = dr.GetInt("sortOrder").ToString();
-                                xml = tmp.InnerXml;
-
-                                // Call the eventhandler to allow modification of the string
-                                var e1 = new ContentCacheLoadNodeEventArgs();
-                                FireAfterContentCacheDatabaseLoadXmlString(ref xml, e1);
-                                // check if a listener has canceled the event
+                                // and parse it into a DOM node
+                                xmlDoc.LoadXml(xml);
+                                XmlNode node = xmlDoc.FirstChild;
+                                // same event handler loader form the xml node
+                                var e2 = new ContentCacheLoadNodeEventArgs();
+                                FireAfterContentCacheLoadNodeFromDatabase(node, e2);
+                                // and checking if it was canceled again
                                 if (!e1.Cancel)
                                 {
-                                    // and parse it into a DOM node
-                                    xmlDoc.LoadXml(xml);
-                                    XmlNode node = xmlDoc.FirstChild;
-                                    // same event handler loader form the xml node
-                                    var e2 = new ContentCacheLoadNodeEventArgs();
-                                    FireAfterContentCacheLoadNodeFromDatabase(node, e2);
-                                    // and checking if it was canceled again
-                                    if (!e1.Cancel)
-                                    {
-                                        nodeIndex.Add(currentId, node);
+                                    nodeIndex.Add(currentId, node);
 
-                                        // verify if either of the handlers canceled the children to load
-                                        if (!e1.CancelChildren && !e2.CancelChildren)
+                                    // verify if either of the handlers canceled the children to load
+                                    if (!e1.CancelChildren && !e2.CancelChildren)
+                                    {
+                                        // Build the content hierarchy
+                                        List<int> children;
+                                        if (!hierarchy.TryGetValue(parentId, out children))
                                         {
-                                            // Build the content hierarchy
-                                            List<int> children;
-                                            if (!hierarchy.TryGetValue(parentId, out children))
-                                            {
-                                                // No children for this parent, so add one
-                                                children = new List<int>();
-                                                hierarchy.Add(parentId, children);
-                                            }
-                                            children.Add(currentId);
+                                            // No children for this parent, so add one
+                                            children = new List<int>();
+                                            hierarchy.Add(parentId, children);
                                         }
+                                        children.Add(currentId);
                                     }
                                 }
                             }

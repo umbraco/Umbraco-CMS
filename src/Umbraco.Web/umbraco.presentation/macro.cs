@@ -60,12 +60,7 @@ namespace umbraco
         private readonly StringBuilder _content = new StringBuilder();
         private const string MacrosAddedKey = "macrosAdded";
         public IList<Exception> Exceptions = new List<Exception>();
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         static macro()
         {
             _xsltSettings = SystemUtilities.GetCurrentTrustLevel() > AspNetHostingPermissionLevel.Medium

@@ -8,10 +8,6 @@ namespace umbraco
     public class macroTasks : LegacyDialogTask
     {
         
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
         
         public override bool PerformSave()
         {
