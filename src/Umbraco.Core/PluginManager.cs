@@ -515,14 +515,7 @@ namespace Umbraco.Core
             return ResolveTypes<IPackageAction>();
         }
 
-        /// <summary>
-        /// Returns all available IAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveActions()
-        {
-            return ResolveTypes<IAction>();
-        }
+        
 
         /// <summary>
         /// Returns all mapper types that have a MapperFor attribute defined

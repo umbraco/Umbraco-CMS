@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.LegacyActions;
 using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
@@ -40,8 +41,8 @@ namespace umbraco.presentation.umbraco.dialogs
 			action = action.ToLower();
 			if (action == "new")
 				action = "create";
-			ArrayList actions = Action.GetAll();
-			foreach (interfaces.IAction a in actions)
+			var actions = ActionsResolver.Current.Actions;
+			foreach (var a in actions)
 			{
 			    return Services.TextService.Localize(action);
             }

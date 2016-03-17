@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using System.Linq;
 using umbraco.cms.presentation.user;
-using umbraco.interfaces;
 using Umbraco.Web;
-using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
 using Action = Umbraco.Web.LegacyActions.Action;
 using Umbraco.Core.Services;
+using Umbraco.Web.LegacyActions;
 
 namespace umbraco.dialogs
 {

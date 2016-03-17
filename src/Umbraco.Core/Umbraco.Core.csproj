@@ -1170,7 +1170,6 @@
     <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\IPublishedContent.cs" />
-    <Compile Include="ActionsResolver.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />

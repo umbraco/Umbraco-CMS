@@ -3,7 +3,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Resolvers
 {

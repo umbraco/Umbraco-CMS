@@ -136,16 +136,6 @@ namespace Umbraco.Web.LegacyActions
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>An arraylist containing all javascript variables for the contextmenu in the tree</returns>
-        [Obsolete("Use ActionsResolver.Current.Actions instead")]
-        public static ArrayList GetAll()
-        {
-            return new ArrayList(ActionsResolver.Current.Actions.ToList());
-        }
-
         internal static List<IAction> FromEntityPermission(EntityPermission entityPermission)
         {
             List<IAction> list = new List<IAction>();

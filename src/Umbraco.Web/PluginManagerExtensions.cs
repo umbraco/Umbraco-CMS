@@ -9,6 +9,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web
@@ -18,7 +19,14 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class PluginManagerExtensions
 	{
-
+        /// <summary>
+        /// Returns all available IAction in application
+        /// </summary>
+        /// <returns></returns>
+        internal static IEnumerable<Type> ResolveActions(this PluginManager resolver)
+        {
+            return resolver.ResolveTypes<IAction>();
+        }
         /// <summary>
         /// Returns all available TreeApiController's in application that are attribute with TreeAttribute
         /// </summary>

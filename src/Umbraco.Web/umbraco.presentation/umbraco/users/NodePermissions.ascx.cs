@@ -115,7 +115,7 @@ namespace umbraco.cms.presentation.user
         {
             
             List<AssignedPermission> assignedPermissions = new List<AssignedPermission>();
-            foreach (umbraco.interfaces.IAction a in allActions)
+            foreach (var a in allActions)
             {
                 AssignedPermission p = new AssignedPermission();
                 p.Permission = a;

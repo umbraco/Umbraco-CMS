@@ -149,18 +149,6 @@ namespace Umbraco.Tests.Plugins
             
         }
 
-        public class MyTag : ITag
-        {
-            public int Id { get; private set; }
-            public string TagCaption { get; private set; }
-            public string Group { get; private set; }
-        }
-
-        public class MySuperTag : MyTag
-        {
-            
-        }
-
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
         public class MyTestAttribute : Attribute
         {

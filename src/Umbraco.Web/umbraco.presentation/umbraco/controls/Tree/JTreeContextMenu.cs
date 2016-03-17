@@ -21,9 +21,9 @@ namespace umbraco.controls.Tree
 					{ 	
 						new JTreeContextMenuItem()
 					});
-
+            
 			List<IAction> allActions = new List<IAction>();
-			foreach (IAction a in global::Umbraco.Web.LegacyActions.Action.GetAll())
+			foreach (var a in ActionsResolver.Current.Actions)
 			{
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try

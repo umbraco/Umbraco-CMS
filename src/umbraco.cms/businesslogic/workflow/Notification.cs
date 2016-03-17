@@ -47,58 +47,7 @@ namespace umbraco.cms.businesslogic.workflow
         protected static ISqlHelper SqlHelper
         {
             get { return LegacySqlHelper.SqlHelper; }
-        }
-
-        /// <summary>
-        /// Sends the notifications for the specified user regarding the specified node and action.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="user">The user.</param>
-        /// <param name="action">The action.</param>
-        public static void GetNotifications(CMSNode node, IUser user, IAction action)
-        {
-
-            int totalUsers;
-            var allUsers = ApplicationContext.Current.Services.UserService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers)
-            {
-                try
-                {
-                    if (u.IsApproved)
-                    {
-                        //TODO: N+1 !!!!
-                        var notifications = ApplicationContext.Current.Services.NotificationService.GetUserNotifications(u, node.Path);
-                        
-                        if (notifications.Any(x => x.Action.InvariantEquals(action.Letter.ToString(CultureInfo.InvariantCulture))))
-                        {
-                            LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})",
-                            ApplicationContext.Current.Services.TextService.Localize("actions/" + action.Alias, u.GetUserCulture(ApplicationContext.Current.Services.TextService)),
-                            u.Name, u.Email));
-                            SendNotification(user, u, (Document)node, action);
-                        }
-                    }
-                }
-                catch (Exception notifyExp)
-                {
-					LogHelper.Error<Notification>("Error in notification", notifyExp);
-                }
-            }
-        }
-
-        //TODO: Include update with html mail notification and document contents
-        private static void SendNotification(IUser performingUser, IUser mailingUser, Document documentObject, IAction action)
-        {
-            var nService = ApplicationContext.Current.Services.NotificationService;
-            var pUser = ApplicationContext.Current.Services.UserService.GetUserById(performingUser.Id);
-
-            nService.SendNotifications(
-                pUser, documentObject.ContentEntity, action.Letter.ToString(CultureInfo.InvariantCulture), ApplicationContext.Current.Services.TextService.Localize(action.Alias), 
-                new HttpContextWrapper(HttpContext.Current),
-                (user, strings) => ApplicationContext.Current.Services.TextService.Localize("notifications/mailSubject", mailingUser.GetUserCulture(ApplicationContext.Current.Services.TextService), strings),
-                (user, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                    ? ApplicationContext.Current.Services.TextService.Localize("notifications/mailBody", mailingUser.GetUserCulture(ApplicationContext.Current.Services.TextService), strings)
-                    : ApplicationContext.Current.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.GetUserCulture(ApplicationContext.Current.Services.TextService), strings));
-        }
+        }        
 
         /// <summary>
         /// Returns the notifications for a user

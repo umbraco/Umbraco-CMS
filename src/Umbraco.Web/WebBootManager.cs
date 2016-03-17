@@ -41,6 +41,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.LegacyActions;
+using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 using TypeHelper = Umbraco.Core.TypeHelper;
@@ -447,6 +449,10 @@ namespace Umbraco.Web
                         }
                     }));
             }
+
+            ActionsResolver.Current = new ActionsResolver(
+                ServiceProvider, ProfilingLogger.Logger,
+                () => PluginManager.ResolveActions());
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 ServiceProvider, ProfilingLogger.Logger,

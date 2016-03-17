@@ -26,9 +26,9 @@ namespace Umbraco.Core.Configuration
         /// <value>The version comment.</value>
         public static string CurrentComment { get { return "beta"; } }
 
-        // Get the version of the umbraco.dll by looking at a class in that dll
+        // Get the version of the Umbraco.Core.dll by looking at a class in that dll
         // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
-        public static string AssemblyVersion { get { return new AssemblyName(typeof(ActionsResolver).Assembly.FullName).Version.ToString(); } }
+        public static string AssemblyVersion { get { return new AssemblyName(typeof(UmbracoVersion).Assembly.FullName).Version.ToString(); } }
 
         public static SemVersion GetSemanticVersion()
         {

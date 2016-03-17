@@ -10,6 +10,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 using umbraco;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Tests.Resolvers
 {

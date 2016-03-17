@@ -9,6 +9,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Pages;
 using Action = Umbraco.Web.LegacyActions.Action;
 
@@ -46,9 +47,9 @@ namespace umbraco.dialogs
 
             node = new cms.businesslogic.CMSNode(int.Parse(Request.GetItemAsString("id")));
 
-            ArrayList actionList = Action.GetAll();
+            var actionList = ActionsResolver.Current.Actions;
             
-            foreach (interfaces.IAction a in actionList)
+            foreach (var a in actionList)
             {
                 if (a.ShowInNotifier)
                 {

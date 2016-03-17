@@ -5,6 +5,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Web.Trees
 {

@@ -454,11 +454,7 @@ namespace Umbraco.Core
             PackageActionsResolver.Current = new PackageActionsResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolvePackageActions());
-
-            ActionsResolver.Current = new ActionsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolveActions());
-
+            
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 Container, ProfilingLogger.Logger,
