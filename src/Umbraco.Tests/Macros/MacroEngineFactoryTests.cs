@@ -9,6 +9,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Macros
 {
@@ -93,12 +94,12 @@ namespace Umbraco.Tests.Macros
 				get { throw new NotImplementedException(); }
 			}			
 
-			public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
+			public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
 			{
 				throw new NotImplementedException();
 			}
 
-			public string Execute(MacroModel macro, INode currentPage)
+			public string Execute(MacroModel macro, IPublishedContent currentPage)
 			{
 				throw new NotImplementedException();
 			}
@@ -121,12 +122,12 @@ namespace Umbraco.Tests.Macros
 				get { throw new NotImplementedException(); }
 			}
             
-			public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
+			public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
 			{
 				throw new NotImplementedException();
 			}
 
-			public string Execute(MacroModel macro, INode currentPage)
+			public string Execute(MacroModel macro, IPublishedContent currentPage)
 			{
 				throw new NotImplementedException();
 			}

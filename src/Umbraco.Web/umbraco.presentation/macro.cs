@@ -1239,7 +1239,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-            var ret = engine.Execute(macro, LegacyNodeHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+            var ret = engine.Execute(macro, UmbracoContext.Current.PublishedContentRequest.PublishedContent);
             
 			retVal.Result = ret;
 			return retVal;

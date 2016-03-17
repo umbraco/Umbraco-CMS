@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.businesslogic.macro
 {
@@ -13,7 +14,7 @@ namespace umbraco.cms.businesslogic.macro
         IEnumerable<string> SupportedExtensions { get; }
         IEnumerable<string> SupportedUIExtensions { get; }
 
-        bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage);
-        string Execute(MacroModel macro, INode currentPage);
+        bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage);
+        string Execute(MacroModel macro, IPublishedContent currentPage);
     }
 }

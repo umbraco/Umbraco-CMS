@@ -80,7 +80,7 @@ namespace Umbraco.Web.Macros
 			get { return Enumerable.Empty<string>(); }
 		}
        
-        public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
+        public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
         {
             var temp = GetVirtualPathFromPhysicalPath(tempFileName);
             try
@@ -95,20 +95,7 @@ namespace Umbraco.Web.Macros
             errorMessage = string.Empty;
             return true;
         }
-
-        public string Execute(MacroModel macro, INode node)
-        {
-            if (node == null) return string.Empty;
-
-            var umbCtx = _getUmbracoContext();
-            //NOTE: This is a bit of a nasty hack to check if the INode is actually already based on an IPublishedContent 
-            // (will be the case when using LegacyConvertedNode )
-            return Execute(macro,
-                (node is IPublishedContent)
-                    ? (IPublishedContent)node
-                    : umbCtx.ContentCache.GetById(node.Id));
-        }
-
+        
         public string Execute(MacroModel macro, IPublishedContent content)
         {
             if (macro == null) throw new ArgumentNullException("macro");

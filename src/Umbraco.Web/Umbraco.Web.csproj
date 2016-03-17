@@ -439,8 +439,6 @@
     <Compile Include="ITagQuery.cs" />
     <Compile Include="ITypedPublishedContentQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Models\LegacyConvertedNode.cs" />
-    <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
     <Compile Include="Models\Mapping\RelationModelMapper.cs" />
     <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
@@ -921,7 +919,6 @@
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="Models\LegacyNodeHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

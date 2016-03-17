@@ -124,8 +124,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="INode.cs" />
-    <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
     <Compile Include="ITaskReturnUrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
