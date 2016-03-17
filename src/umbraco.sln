@@ -56,8 +56,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco.businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.cms", "umbraco.cms\umbraco.cms.csproj", "{CCD75EC3-63DB-4184-B49D-51C1DD337230}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.interfaces", "umbraco.interfaces\umbraco.interfaces.csproj", "{511F6D8D-7717-440A-9A57-A507E9A8B27F}"
@@ -119,10 +117,6 @@ Global
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Release|Any CPU.ActiveCfg = Release|Any CPU

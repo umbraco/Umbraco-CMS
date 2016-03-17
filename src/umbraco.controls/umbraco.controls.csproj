@@ -118,10 +118,6 @@
     <Compile Include="TabView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Name>umbraco.businesslogic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
       <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
