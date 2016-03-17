@@ -282,7 +282,7 @@ function keyboardService($window, $timeout) {
         keyboardManagerService.keyboardEvent[label] = {
             'callback': callback,
             'target':   elt,
-            'opt':      opt['type']
+            'opt':      opt
         };
 
         if (!found) {
