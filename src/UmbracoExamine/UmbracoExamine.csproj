@@ -173,10 +173,6 @@
       <Project>{c7cb79f0-1c97-4b33-bfa7-00731b579ae2}</Project>
       <Name>umbraco.datalayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Project>{511f6d8d-7717-440a-9a57-a507e9a8b27f}</Project>
-      <Name>umbraco.interfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
