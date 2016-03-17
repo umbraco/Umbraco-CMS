@@ -105,12 +105,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ProvidersElement)this["providers"]; }
         }
 
-        [ConfigurationProperty("help")]
-        internal HelpElement Help
-        {
-            get { return (HelpElement)this["help"]; }
-        }
-
         [ConfigurationProperty("web.routing")]
         internal WebRoutingElement WebRouting
         {
@@ -165,11 +159,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IProvidersSection IUmbracoSettingsSection.Providers
         {
             get { return Providers; }
-        }
-
-        IHelpSection IUmbracoSettingsSection.Help
-        {
-            get { return Help; }
         }
 
         IWebRoutingSection IUmbracoSettingsSection.WebRouting
