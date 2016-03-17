@@ -1,7 +1,22 @@
-﻿using umbraco.interfaces;
+﻿using System;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.Cache
 {
+    /// <summary>
+    /// The IcacheRefresher Interface is used for loadbalancing.
+    /// 
+    /// </summary>
+    public interface ICacheRefresher
+    {
+        Guid UniqueIdentifier { get; }
+        string Name { get; }
+        void RefreshAll();
+        void Refresh(int id);
+        void Remove(int id);
+        void Refresh(Guid id);
+    }
+
     /// <summary>
     /// Strongly type cache refresher that is able to refresh cache of real instances of objects as well as IDs
     /// </summary>

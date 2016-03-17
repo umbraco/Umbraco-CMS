@@ -322,6 +322,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
+    <Compile Include="Cache\ICacheRefresher.cs" />
     <Compile Include="DefaultHttpContextAccessor.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />

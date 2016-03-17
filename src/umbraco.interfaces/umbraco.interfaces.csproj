@@ -127,9 +127,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ICacheRefresher.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IPackageAction.cs" />
   </ItemGroup>
   <ItemGroup>

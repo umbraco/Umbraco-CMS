@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Sync;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Cache
 {
