@@ -12,10 +12,10 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees

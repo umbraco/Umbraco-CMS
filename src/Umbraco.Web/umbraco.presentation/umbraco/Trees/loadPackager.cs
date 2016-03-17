@@ -6,8 +6,8 @@ using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco
 {

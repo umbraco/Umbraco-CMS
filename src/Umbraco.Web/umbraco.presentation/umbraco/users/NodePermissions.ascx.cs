@@ -4,9 +4,9 @@ using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Controls;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.user
 {

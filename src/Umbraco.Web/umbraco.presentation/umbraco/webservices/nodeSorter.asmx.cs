@@ -8,8 +8,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.presentation.webservices
 {

@@ -16,7 +16,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
 using umbraco.interfaces;
 using Umbraco.Core.Models;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {

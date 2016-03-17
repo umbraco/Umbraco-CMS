@@ -7,10 +7,10 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Editors
 {

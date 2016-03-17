@@ -9,8 +9,8 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web
 {

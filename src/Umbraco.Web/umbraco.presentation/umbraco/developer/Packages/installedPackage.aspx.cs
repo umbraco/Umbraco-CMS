@@ -13,7 +13,7 @@ using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Web.UI.Pages;
-using BizLogicAction = Umbraco.Web.LegacyActions.Action;
+using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
 

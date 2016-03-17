@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {

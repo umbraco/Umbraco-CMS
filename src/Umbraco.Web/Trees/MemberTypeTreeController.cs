@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {

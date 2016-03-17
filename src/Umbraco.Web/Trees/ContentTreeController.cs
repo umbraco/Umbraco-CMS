@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Trees
 
                 // we need to get the default permissions as you can't set permissions on the very root node
                 var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
-                var nodeActions = global::Umbraco.Web.LegacyActions.Action.FromEntityPermission(permission)
+                var nodeActions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items

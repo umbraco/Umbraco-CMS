@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {

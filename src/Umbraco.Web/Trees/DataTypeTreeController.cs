@@ -13,7 +13,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees

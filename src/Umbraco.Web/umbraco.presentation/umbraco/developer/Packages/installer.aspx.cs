@@ -9,7 +9,7 @@ using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
-using BizLogicAction = Umbraco.Web.LegacyActions.Action;
+using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
 {

@@ -9,9 +9,9 @@ using System.Linq;
 using umbraco.cms.presentation.user;
 using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {

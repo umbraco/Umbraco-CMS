@@ -15,7 +15,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using System.Globalization;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            var actions = global::Umbraco.Web.LegacyActions.Action.FromEntityPermission(permission);
+            var actions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission);
 
             // A user is allowed to delete their own stuff
             if (dd.CreatorId == Security.CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)

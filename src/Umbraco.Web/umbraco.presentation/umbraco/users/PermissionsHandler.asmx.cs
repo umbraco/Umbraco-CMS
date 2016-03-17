@@ -7,8 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.user
 {

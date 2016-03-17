@@ -12,7 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {

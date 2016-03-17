@@ -6,10 +6,10 @@ using System.Linq;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.user
 {

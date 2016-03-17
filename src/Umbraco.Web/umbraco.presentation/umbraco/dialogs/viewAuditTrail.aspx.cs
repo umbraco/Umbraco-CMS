@@ -10,8 +10,8 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
 {

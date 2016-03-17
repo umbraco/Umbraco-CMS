@@ -5,8 +5,8 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 
 namespace umbraco.dialogs

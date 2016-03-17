@@ -5,7 +5,7 @@ using umbraco.interfaces;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web._Legacy.Utils;
 
 namespace umbraco.controls.Tree

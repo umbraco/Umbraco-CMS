@@ -9,9 +9,9 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
 using Umbraco.Core;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Pages;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.dialogs
 {

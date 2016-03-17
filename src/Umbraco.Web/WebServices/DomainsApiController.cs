@@ -14,8 +14,8 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebServices
 {

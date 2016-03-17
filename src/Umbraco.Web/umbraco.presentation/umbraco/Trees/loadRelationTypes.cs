@@ -10,8 +10,8 @@ using umbraco.interfaces;
 using umbraco.cms.presentation.developer.RelationTypes.TreeMenu;
 
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco
 {

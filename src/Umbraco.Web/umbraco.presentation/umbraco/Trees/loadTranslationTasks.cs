@@ -8,7 +8,7 @@ using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco {
     public class loadOpenTasks : BaseTree {

@@ -41,7 +41,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;

@@ -1,4 +1,4 @@
-﻿using Umbraco.Web.LegacyActions;
+﻿using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 {
