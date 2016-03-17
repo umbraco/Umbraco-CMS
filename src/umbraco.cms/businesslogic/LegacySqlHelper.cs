@@ -1,21 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using AutoMapper;
+using umbraco.DataLayer;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using umbraco.DataLayer;
 
-
-namespace umbraco.BusinessLogic
+namespace umbraco.cms.businesslogic
 {
-    /// <summary>
-    /// Class for handling all registered applications in Umbraco.
-    /// </summary>
-    [Obsolete("Use ApplicationContext.Current.Services.SectionService and/or Umbraco.Core.Sections.SectionCollection instead")]
-    public class LegacySqlHelper
+    [Obsolete("Remove this! This is a temporary class whilst we refactor out old code")]
+    internal class LegacySqlHelper
     {
         private static ISqlHelper _sqlHelper;
         

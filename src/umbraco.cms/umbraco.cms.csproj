@@ -173,6 +173,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
+    <Compile Include="businesslogic\LegacySqlHelper.cs" />
     <Compile Include="businesslogic\macro\IMacroEngine.cs" />
     <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
