@@ -136,7 +136,7 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The SQL helper.</value>
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         #endregion

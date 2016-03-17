@@ -31,7 +31,7 @@ namespace umbraco.dialogs
                 {
                     _app = Request.CleanForXss("app");
                     //validate the app
-                    if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(_app)) == false)
+                    if (Services.SectionService.GetSections().Any(x => x.Alias.InvariantEquals(_app)) == false)
                     {
                         throw new InvalidOperationException("A requested app: " + Request.GetItemAsString("app") + " was not found");
                     }

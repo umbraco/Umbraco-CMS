@@ -11,7 +11,7 @@ namespace umbraco.cms.businesslogic.packager
     {
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         public Package()

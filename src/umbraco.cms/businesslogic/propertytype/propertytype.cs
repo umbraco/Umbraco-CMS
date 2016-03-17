@@ -39,7 +39,7 @@ namespace umbraco.cms.businesslogic.propertytype
 
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         #region Constructors

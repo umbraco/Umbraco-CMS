@@ -15,7 +15,7 @@ namespace umbraco.cms.businesslogic.macro
     {
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         public static List<MacroPropertyType> GetAll

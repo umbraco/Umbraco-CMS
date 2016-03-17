@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
 {
@@ -27,15 +28,19 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			string alias = xmlData.Attributes["appAlias"].Value;
 			string icon = xmlData.Attributes["appIcon"].Value;
 
-			BusinessLogic.Application.MakeNew(name, alias, icon);
-
+		    ApplicationContext.Current.Services.SectionService.MakeNew(name, alias, icon);
+            
 			return true;
 		}
 
 		public bool Undo(string packageName, XmlNode xmlData)
 		{
 			string alias = xmlData.Attributes["appAlias"].Value;
-			BusinessLogic.Application.getByAlias(alias).Delete();
+		    var section = ApplicationContext.Current.Services.SectionService.GetByAlias(alias);
+		    if (section != null)
+		    {
+		        ApplicationContext.Current.Services.SectionService.DeleteSection(section);
+		    }
 			return true;
 		}
 		/// <summary>

@@ -53,7 +53,7 @@ namespace umbraco.cms.businesslogic.task
 
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         private Tasks _tasks;
