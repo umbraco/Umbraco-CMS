@@ -43,10 +43,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<PublicAccessEntry> IsProtected(string contentPath);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use AddRule instead, this method will be removed in future versions")]
-        Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string ruleValue);
-
         /// <summary>
         /// Adds a rule if the entry doesn't already exist
         /// </summary>
