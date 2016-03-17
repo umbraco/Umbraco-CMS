@@ -1063,6 +1063,16 @@
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplication.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
+    <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
+    <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
+    <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
+    <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
+    <Compile Include="_Legacy\PackageActions\moveRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
+    <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />

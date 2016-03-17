@@ -2,12 +2,12 @@ using System;
 using System.Xml;
 using Umbraco.Core;
 
-namespace umbraco.cms.businesslogic.packager.standardPackageActions
+namespace Umbraco.Web._Legacy.PackageActions
 {
 	public class PackageHelper
 	{
 		//Helper method to replace umbraco tags that breaks the xml format..
-		public static string ParseToValidXml(template.Template templateObj, ref bool hasAspNetContentBeginning, string template, bool toValid)
+		public static string ParseToValidXml(global::umbraco.cms.businesslogic.template.Template templateObj, ref bool hasAspNetContentBeginning, string template, bool toValid)
 		{
 			string retVal = template;
 			if (toValid)

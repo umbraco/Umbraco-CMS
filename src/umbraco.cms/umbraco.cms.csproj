@@ -180,15 +180,6 @@
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
     <Compile Include="businesslogic\Packager\Package.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addApplication.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addDashboardSection.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addProxyFeedHost.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addStringToHtmlElement.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\allowDoctype.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\PackageHelper.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
@@ -233,7 +224,6 @@
     <Compile Include="businesslogic\Packager\PackageInstance\IPackageInstance.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackageActions.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackageInstance.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addApplicationTree.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackagerUtility.cs" />
     <Compile Include="businesslogic\Packager\Installer.cs">
       <SubType>Code</SubType>
