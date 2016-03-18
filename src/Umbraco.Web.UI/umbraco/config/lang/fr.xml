@@ -843,8 +843,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="chooseLayout">Choisissez une mise en page</key>
     <key alias="addRows">Ajouter une ligne</key>
     <key alias="addElement">Ajouter du contenu</key>
-    <key alias="dropElement">Drop content</key>
-    <key alias="settingsApplied">Contenu goutte</key>
+    <key alias="dropElement">Contenu goutte</key>
+    <key alias="settingsApplied">Paramètres appliqués</key>
 
     <key alias="contentNotAllowed">Ce contenu est pas autorisée ici</key>
     <key alias="contentAllowed">Ce contenu est permis ici</key>
