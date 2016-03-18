@@ -1577,14 +1577,12 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDictionary.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadLanguages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadTemplates.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
