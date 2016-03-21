@@ -215,8 +215,10 @@
     
     <key alias="yesDelete">ДА, удалить</key>
     
-    <key alias="movedUnderneath">была перемещена внутрь</key>
+    <key alias="movedUnderneath">перемещены внутрь</key>
+    <key alias="copiedUnderneath">скопированы внутрь</key>
     <key alias="folderToMove">Выбрать папку для перемещения</key>
+    <key alias="folderToCopy">Выбрать папку для копировани</key>
     <key alias="structureBelow">в структуре дерева</key>
     
     <key alias="allDocumentTypes">Все типы документов</key>
