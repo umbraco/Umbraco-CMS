@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web.UI;
 
 namespace umbraco.settings
@@ -61,8 +62,8 @@ namespace umbraco.settings
 			{
 			    var path = BuildPath(currentItem);
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDictionary>().Tree.Alias)
-					.SyncTree(path, false);
+					.SetActiveTreeType(Constants.Trees.Dictionary)
+                    .SyncTree(path, false);
 			}
 
 
