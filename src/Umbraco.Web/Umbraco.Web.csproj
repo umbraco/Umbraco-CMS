@@ -1577,7 +1577,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadDictionary.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadLanguages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
