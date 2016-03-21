@@ -851,6 +851,7 @@
     <key alias="templates">Plantillas</key>
     <key alias="xslt">Archivos XSLT</key>
     <key alias="userTypes">Tipos de Usuarios</key>
+    <key alias="users">Usuarios</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Existe una nueva actualización</key>

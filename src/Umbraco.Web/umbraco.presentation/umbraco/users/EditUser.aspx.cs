@@ -214,8 +214,8 @@ namespace umbraco.cms.presentation.user
             SetupForm();
 
             ClientTools
-                .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
-                .SyncTree(UID.ToString(), IsPostBack);
+                .SetActiveTreeType(Constants.Trees.Users)
+                .SyncTree(UID.ToString(), false);
         }
 
 

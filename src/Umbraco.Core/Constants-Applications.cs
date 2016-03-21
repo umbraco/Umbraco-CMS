@@ -112,6 +112,11 @@
             /// </summary>
             public const string UserTypes = "userTypes";
 
+            /// <summary>
+            /// alias for the users tree.
+            /// </summary>
+            public const string Users = "users";
+
             //TODO: Fill in the rest!
         }
 	}

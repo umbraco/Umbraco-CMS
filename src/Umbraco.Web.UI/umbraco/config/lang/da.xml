@@ -999,6 +999,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="xslt">XSLT-filer</key>
     <key alias="analytics">Analytics</key>
     <key alias="userTypes">Bruger Typer</key>
+    <key alias="users">Brugere</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>
