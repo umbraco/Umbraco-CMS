@@ -984,6 +984,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="stylesheets">Feuilles de style</key>
     <key alias="templates">Modèles</key>
     <key alias="xslt">Fichiers XSLT</key>
+    <key alias="userTypes">Types d'utilisateurs</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nouvelle mise à jour prête</key>
