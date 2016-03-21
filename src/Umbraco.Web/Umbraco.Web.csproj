@@ -1588,7 +1588,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\LegacyTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
@@ -1707,7 +1706,6 @@
     <Compile Include="WebViewPageExtensions.cs" />
     <Compile Include="_Legacy\Utils\EncodedStringWriter.cs" />
     <Compile Include="_Legacy\Utils\JSONSerializer.cs" />
-    <Compile Include="_Legacy\Utils\SerializableData.cs" />
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
