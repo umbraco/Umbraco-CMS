@@ -7,7 +7,6 @@ using System.Web.Script.Serialization;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
-using Umbraco.Web._Legacy.Utils;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.Trees
@@ -48,7 +47,7 @@ namespace umbraco.cms.presentation.Trees
 
 		private void Init()
 		{
-            m_JSSerializer = new JSONSerializer { MaxJsonLength = int.MaxValue };
+            m_JSSerializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
 			switch (m_TreeType)
 			{
@@ -70,7 +69,7 @@ namespace umbraco.cms.presentation.Trees
 
 		}
 
-		private JSONSerializer m_JSSerializer;
+		private JavaScriptSerializer m_JSSerializer;
 		private SerializedTreeType m_TreeType;
 
 		/// <summary>
@@ -717,7 +716,7 @@ namespace umbraco.cms.presentation.Trees
 				metadata.Add("source", node.Source);
 
 				//the metadata/jsTree requires this property to be in a quoted JSON syntax
-				JSONSerializer jsSerializer = new JSONSerializer();
+				JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
 				string strMetaData = jsSerializer.Serialize(metadata).Replace("\"", "'");
                 dataAttributes.Add("umb:nodedata", strMetaData);
 
