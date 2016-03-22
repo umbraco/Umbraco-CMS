@@ -30,6 +30,8 @@ using umbraco.BusinessLogic;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Web.DependencyInjection;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
@@ -97,6 +99,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             var settings = SettingsForTests.GetDefault();
 
+            //register mappers            
+            Container.RegisterFrom<CoreModelMappersCompositionRoot>();
+            Container.RegisterFrom<WebModelMappersCompositionRoot>();
+
             Container.Register<IServiceContainer>(factory => Container);
             Container.Register<PluginManager>(factory => PluginManager.Current);
 
@@ -105,7 +111,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //register basic stuff that might need to be there for some container resolvers to work,  we can 
             // add more to this in base classes in resolution freezing
-            Container.Register<ILogger>(factory => Logger);
+            Container.RegisterSingleton<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
             Container.Register<ProfilingLogger>(factory => ProfilingLogger);
             Container.RegisterSingleton<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
@@ -157,11 +163,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 Mapper.Initialize(configuration =>
                 {
-                    var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
-                        specificAssemblies: new[]
-                        {
-                            typeof(ContentModelMapper).Assembly
-                        });
+                    var mappers = Container.GetAllInstances<ModelMapperConfiguration>();
                     foreach (var mapper in mappers)
                     {
                         mapper.ConfigureMappings(configuration, ApplicationContext);

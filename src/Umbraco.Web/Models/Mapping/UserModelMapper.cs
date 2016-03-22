@@ -11,9 +11,9 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class UserModelMapper : MapperConfiguration
+    internal class UserModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))

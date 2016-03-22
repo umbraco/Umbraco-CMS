@@ -29,7 +29,7 @@
       <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
       <dependency id="ClientDependency" version="[1.8.4, 2.0.0)" />
       <dependency id="ClientDependency-Mvc5" version="[1.8.0, 2.0.0)" />
-      <dependency id="AutoMapper" version="[3.0.0, 3.1.0)" />
+      <dependency id="AutoMapper" version="[4.2.1, 5.0.0)" />
       <dependency id="Newtonsoft.Json" version="[6.0.8, 9.0.0)" />
       <dependency id="Examine" version="[0.1.68, 1.0.0)" />
       <dependency id="ImageProcessor" version="[2.3.3, 3.0.0)" />

@@ -37,8 +37,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -288,6 +288,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\CoreModelMappersCompositionRoot.cs" />
     <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />
     <Compile Include="DependencyInjection\ServicesCompositionRoot.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -684,8 +685,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentWrapped.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyType.cs" />
-    <Compile Include="Models\Mapping\IMapperConfiguration.cs" />
-    <Compile Include="Models\Mapping\MapperConfiguration.cs" />
+    <Compile Include="Models\Mapping\ModelMapperConfiguration.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
