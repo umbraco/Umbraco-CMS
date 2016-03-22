@@ -73,6 +73,17 @@ namespace Umbraco.Core.Services
         void DeleteNotifications(IUser user, IEntity entity);
 
         /// <summary>
+        /// Sets the specific notifications for the user and entity
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="entity"></param>
+        /// <param name="actions"></param>
+        /// <remarks>
+        /// This performs a full replace
+        /// </remarks>
+        IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions);
+
+        /// <summary>
         /// Creates a new notification
         /// </summary>
         /// <param name="user"></param>

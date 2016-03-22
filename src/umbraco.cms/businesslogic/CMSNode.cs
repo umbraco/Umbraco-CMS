@@ -18,7 +18,7 @@ using System.Collections;
 using umbraco.cms.businesslogic.task;
 using Umbraco.Core.Models.Membership;
 using File = System.IO.File;
-using Notification = umbraco.cms.businesslogic.workflow.Notification;
+
 using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
@@ -527,10 +527,7 @@ order by level,sortOrder";
             {
                 t.Delete();
             }
-
-            //remove notifications
-            Notification.DeleteNotifications(this);
-
+            
             //remove permissions
             Permission.DeletePermissions(this);
 

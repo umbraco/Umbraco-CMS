@@ -2,16 +2,12 @@ using Umbraco.Core.Services;
 using System;
 using System.Collections;
 using System.Linq;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.workflow;
 using Umbraco.Core;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
-using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.dialogs
 {
@@ -21,7 +17,7 @@ namespace umbraco.dialogs
     public partial class notifications : UmbracoEnsuredPage
     {
         private ArrayList actions = new ArrayList();
-        private CMSNode node;
+        private IUmbracoEntity node;
 
         public notifications()
         {
@@ -32,7 +28,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = Services.TextService.Localize("update");
-            pane_form.Text = Services.TextService.Localize("notifications/editNotifications", new[] { node.Text});
+            pane_form.Text = Services.TextService.Localize("notifications/editNotifications", new[] { node.Name});
         }
 
         #region Web Form Designer generated code
@@ -45,7 +41,7 @@ namespace umbraco.dialogs
             InitializeComponent();
             base.OnInit(e);
 
-            node = new cms.businesslogic.CMSNode(int.Parse(Request.GetItemAsString("id")));
+            node = Services.EntityService.Get(int.Parse(Request.GetItemAsString("id")));
 
             var actionList = ActionsResolver.Current.Actions;
             
@@ -96,7 +92,8 @@ namespace umbraco.dialogs
                 if (c.Checked)
                     notifications += c.ID;
             }
-            Notification.UpdateNotifications(Security.CurrentUser, node, notifications);
+
+            ApplicationContext.Current.Services.NotificationService.SetNotifications(Security.CurrentUser, node, notifications.ToCharArray().Select(x => x.ToString()).ToArray());
             
             var feedback = new umbraco.uicontrols.Feedback();
             feedback.Text = Services.TextService.Localize("notifications") + " " + Services.TextService.Localize("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
