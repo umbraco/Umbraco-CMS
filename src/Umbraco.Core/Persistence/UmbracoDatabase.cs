@@ -108,7 +108,7 @@ namespace Umbraco.Core.Persistence
 
         // fixme.poco - has new interceptors?
 
-        protected override void OnExecutingCommand(IDbCommand cmd)
+        protected override void OnExecutingCommand(DbCommand cmd)
         {
             // if no timeout is specified, and the connection has a longer timeout, use it
             if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)

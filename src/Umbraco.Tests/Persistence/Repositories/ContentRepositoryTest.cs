@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Rebuild_Xml_Structures_With_Non_Latest_Version()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))

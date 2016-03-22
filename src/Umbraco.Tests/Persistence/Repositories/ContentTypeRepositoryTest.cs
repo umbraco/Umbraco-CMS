@@ -531,7 +531,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Query_On_ContentTypeRepository_Sort_By_Name()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {

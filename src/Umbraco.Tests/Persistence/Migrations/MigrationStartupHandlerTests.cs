@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
