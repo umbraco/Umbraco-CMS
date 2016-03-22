@@ -43,7 +43,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     .Where<NodeDto>(_sqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<NodeDto>(_sqlSyntax, x => x.Path.StartsWith("-1"));
 
-                var dtos = e.MigrationContext.Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
+                var dtos = e.MigrationContext.Database.Fetch<DocumentDto>(sql);
                 var toUpdate = new List<DocumentDto>();
                 var versionGroup = dtos.GroupBy(x => x.NodeId);
                 foreach (var grp in versionGroup)

@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
             //Delete database file before continueing
-            string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
+            string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -89,18 +89,18 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //legacy API database connection close
             SqlCeContextGuardian.CloseBackgroundConnection();
 
-            string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
+            string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
         }
-        
+
         public string Path { get; set; }
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public string GetDatabaseSpecificSqlScript()

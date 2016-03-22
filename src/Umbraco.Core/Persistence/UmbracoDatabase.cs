@@ -12,12 +12,12 @@ using Umbraco.Core.Persistence.Mappers;
 namespace Umbraco.Core.Persistence
 {
     /// <summary>
-    /// Represents the Umbraco implementation of the PetaPoco Database object
+    /// Extends NPoco Database for Umbraco.
     /// </summary>
     /// <remarks>
-    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we
-    /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
-    /// this object instead of the base PetaPoco database object.
+    /// <para>Is used everywhere in place of the original NPoco Database object, and provides additional features
+    /// such as profiling, retry policies, logging, etc.</para>
+    /// <para>Is never created directly but obtained from the <see cref="DefaultDatabaseFactory"/>.</para>
     /// </remarks>
     public class UmbracoDatabase : Database, IDisposeOnRequestEnd
     {
@@ -63,16 +63,6 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal int SqlCount { get; private set; }
 
-        private void CommonInitialize()
-        {
-            EnableSqlTrace = false;
-
-            // fixme - should inject somehow
-            // fixme - NPoco v2 has only 1 mapper, v3 has a collection?
-            Mappers.Clear();
-            Mappers.Add(new PocoMapper());
-        }
-
         // used by DefaultDatabaseFactory
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
@@ -80,7 +70,7 @@ namespace Umbraco.Core.Persistence
             : base(connectionString, providerName, DefaultIsolationLevel)
         {
             _logger = logger;
-            CommonInitialize();
+            EnableSqlTrace = false;
         }
 
         // used by DefaultDatabaseFactory
@@ -89,7 +79,7 @@ namespace Umbraco.Core.Persistence
             : base(connectionStringName, DefaultIsolationLevel)
         {
             _logger = logger;
-            CommonInitialize();
+            EnableSqlTrace = false;
         }
 
         protected override DbConnection OnConnectionOpened(DbConnection connection)
@@ -100,7 +90,7 @@ namespace Umbraco.Core.Persistence
             connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
 
             // wrap the connection with a retrying connection
-            // fixme - inject policies, do not recompute all the time!
+            // fixme.npoco - inject policies, do not recompute all the time!
             var connectionString = connection.ConnectionString ?? string.Empty;
             var conRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
             var cmdRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);

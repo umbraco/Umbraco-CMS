@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IMedia>
+        #region Overrides of NPocoRepositoryBase<int,IMedia>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -272,14 +272,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = createSql(umbracoFileValue);
 
-            var propertyDataDto = Database.FetchMultiple<PropertyDataDto, PropertyTypeDto>(sql).Item1.FirstOrDefault();
+            var propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
 
-            // If the stripped-down url returns null, we try again with the original url. 
+            // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
             if (propertyDataDto == null)
             {
                 sql = createSql(mediaPath);
-                propertyDataDto = Database.FetchMultiple<PropertyDataDto, PropertyTypeDto>(sql).Item1.FirstOrDefault();
+                propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
             }
 
             return propertyDataDto == null ? null : Get(propertyDataDto.NodeId);
@@ -505,8 +505,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IMedia> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.FetchMultiple<ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
-            
+            var dtos = Database.Fetch<ContentVersionDto>(sql);
+
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types

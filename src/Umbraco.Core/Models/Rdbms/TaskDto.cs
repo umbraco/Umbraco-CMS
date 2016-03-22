@@ -45,6 +45,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Comment { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "TaskTypeId")]
         public TaskTypeDto TaskTypeDto { get; set; }
     }
 }

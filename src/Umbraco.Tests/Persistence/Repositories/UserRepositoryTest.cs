@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_Delete_On_UserRepository_With_Permissions_Assigned()
         //{
         //    // Arrange
-        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
+        //    var provider = new NPocoUnitOfWorkProvider(Logger);
         //    var unitOfWork = provider.GetUnitOfWork();
         //    UserTypeRepository userTypeRepository;
         //using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -469,7 +469,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var users = repository.GetUsersAssignedToSection("test");
 
-                // Assert            
+                // Assert
                 Assert.AreEqual(2, users.Count());
                 var names = users.Select(x => x.Username).ToArray();
                 Assert.IsTrue(names.Contains("TestUser1"));
@@ -485,7 +485,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
             using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo, MappingResolver))
-            { 
+            {
 
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");

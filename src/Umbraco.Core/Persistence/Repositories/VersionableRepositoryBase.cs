@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dtos = Database.FetchMultiple<ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
+            var dtos = Database.Fetch<ContentVersionDto>(sql);
             return dtos.Select(x => GetByVersion(x.VersionId));
         }
 

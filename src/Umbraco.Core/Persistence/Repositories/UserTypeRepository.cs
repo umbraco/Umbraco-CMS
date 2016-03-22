@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var userTypeFactory = new UserTypeFactory();
 
             var sql = GetBaseQuery(false);
-            
+
             if (ids.Any())
             {
                 sql.Where("umbracoUserType.id in (@ids)", new { ids = ids });
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IUserType>
+        #region Overrides of NPocoRepositoryBase<int,IUserType>
 
         protected override Sql GetBaseQuery(bool isCount)
         {

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Mappers
         public MappingResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
             : base(container, logger, assignedMapperTypes)
         {
-            
+
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             return _mapperCache.GetOrAdd(type, type1 =>
                 {
-                    
+
                     //first check if we can resolve it by attribute
 
                     var byAttribute = TryGetMapperByAttribute(type);
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Mappers
         /// <param name="entityType"></param>
         /// <returns></returns>
         private Attempt<BaseMapper> TryGetMapperByAttribute(Type entityType)
-        {            
+        {
             //check if any of the mappers are assigned to this type
             var mapper = Values.FirstOrDefault(
                 x => x.GetType().GetCustomAttributes<MapperForAttribute>(false)
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Mappers
             }
 
             return Attempt<BaseMapper>.Succeed(mapper);
-        }  
+        }
 
         internal string GetMapping(Type type, string propertyName)
         {

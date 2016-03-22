@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Password { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public ContentVersionDto ContentVersionDto { get; set; }
     }
 }

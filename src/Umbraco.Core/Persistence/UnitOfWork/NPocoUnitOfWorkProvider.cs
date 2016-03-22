@@ -10,7 +10,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     public class NPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
         private readonly IDatabaseFactory _dbFactory;
-      
+
+        // fixme.npoco STOP creating database factory all the time!!!
+        // there should be one and only one
+
         /// <summary>
         /// Parameterless constructor uses defaults
         /// </summary>
@@ -47,7 +50,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
+        /// fixme.npoco this is not true - _dbFactory.CreateDatabase() will keep reusing the db that's in cache?!
+        ///   and DatabaseContext.Database does it too - so the whole comment here is moot
+        ///   kill this:
+        /// Each UOW uses it's own Database object, not the shared Database object that comes from
         /// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
         /// and we Dispose of this Database object when the UOW is disposed.
         /// </remarks>

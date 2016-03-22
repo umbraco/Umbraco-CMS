@@ -188,6 +188,7 @@
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttributeTests.cs" />
+    <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -284,7 +285,7 @@
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\NPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />

@@ -33,6 +33,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int SortOrder { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeGroupId")]
         public List<PropertyTypeDto> PropertyTypeDtos { get; set; }
 
         [Column("uniqueID")]

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 GetAllCacheAllowZeroCount = true,
                 //Set to 1000 just to ensure that all of them are cached, The GetAll on this repository gets called *A lot*, we want max performance
                 GetAllCacheThresholdLimit = 1000,
-                //Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
+                //Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to
                 // return the raw cache without validation. The GetAll on this repository gets called *A lot*, we want max performance
                 GetAllCacheValidateCount = false
             };
@@ -40,8 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database
-                .FetchMultiple<AccessDto, AccessRuleDto>(sql)
-                .Map(new AccessRulesRelator().Map)
+                .FetchOneToMany<AccessDto>(x => x.Rules, sql)
                 .FirstOrDefault();
 
             if (dto == null)
@@ -63,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.FetchMultiple<AccessDto, AccessRuleDto>(sql).Map(new AccessRulesRelator().Map);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -74,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.FetchMultiple<AccessDto, AccessRuleDto>(sql).Map(new AccessRulesRelator().Map);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -85,7 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
                 .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
-                
+
             return sql;
         }
 
@@ -188,6 +187,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity.Key;
         }
 
-    
+
     }
 }

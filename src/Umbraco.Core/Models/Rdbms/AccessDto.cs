@@ -40,6 +40,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime UpdateDate { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "AccessId")]
         public List<AccessRuleDto> Rules { get; set; }
     }
 }

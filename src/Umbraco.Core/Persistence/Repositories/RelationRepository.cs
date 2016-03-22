@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,Relation>
+        #region Overrides of NPocoRepositoryBase<int,Relation>
 
         protected override Sql GetBaseQuery(bool isCount)
         {

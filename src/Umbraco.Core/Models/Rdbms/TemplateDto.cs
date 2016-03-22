@@ -28,6 +28,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Design { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }
     }
 }

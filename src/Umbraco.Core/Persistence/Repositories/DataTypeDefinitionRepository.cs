@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.FetchMultiple<DataTypeDto, NodeDto>(dataTypeSql).Item1;
+            var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
             return dtos.Select(factory.BuildEntity).ToArray();
         }
 
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.FetchMultiple<DataTypeDto, NodeDto>(sql).Item1;
+            var dtos = Database.Fetch<DataTypeDto>(sql);
 
             return dtos.Select(factory.BuildEntity).ToArray();
         }
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,DataTypeDefinition>
+        #region Overrides of NPocoRepositoryBase<int,DataTypeDefinition>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -278,8 +278,8 @@ AND umbracoNode.id <> @id",
 
         #endregion
 
-      
-        
+
+
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
             var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
@@ -471,7 +471,7 @@ AND umbracoNode.id <> @id",
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-         
+
 
             var sql = new Sql();
             sql.Select("*")
@@ -573,7 +573,7 @@ AND umbracoNode.id <> @id",
                 }
 
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
-                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -593,10 +593,10 @@ AND umbracoNode.id <> @id",
                 {
                     throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
                 }
-                
+
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
                 // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
-                // there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -611,7 +611,7 @@ AND umbracoNode.id <> @id",
                 Database.Update(dto);
             }
 
-            
+
         }
 
         internal static class PreValueConverter

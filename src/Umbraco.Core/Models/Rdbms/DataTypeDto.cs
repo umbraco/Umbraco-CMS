@@ -27,6 +27,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string DbType { get; set; }//NOTE Is set to [varchar] (50) in Sql Server script
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
         public NodeDto NodeDto { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <summary>
         /// Executes the migrations against the database.
         /// </summary>
-        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
+        /// <param name="database">The NPoco Database, which the migrations will be run against</param>
         /// <param name="databaseProvider"></param>
         /// <param name="sqlSyntaxProvider"></param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                  ? OrderedUpgradeMigrations(foundMigrations).ToList()
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
-            
+
             if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
             {
                 _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
@@ -164,9 +164,9 @@ namespace Umbraco.Core.Persistence.Migrations
         }
 
         internal MigrationContext InitializeMigrations(
-            List<IMigration> migrations, 
-            Database database, 
-            DatabaseProviders databaseProvider, 
+            List<IMigration> migrations,
+            Database database,
+            DatabaseProviders databaseProvider,
             ISqlSyntaxProvider sqlSyntax,
             bool isUpgrade = true)
         {
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                 var exeSql = sb.ToString();
                                 _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
                                 database.Execute(exeSql);
-                                
+
                                 //restart the string builder
                                 sb.Remove(0, sb.Length);
                             }
@@ -259,7 +259,7 @@ namespace Umbraco.Core.Persistence.Migrations
                             database.Execute(exeSql);
                         }
                     }
-                    
+
                     i++;
                 }
 
@@ -273,9 +273,9 @@ namespace Umbraco.Core.Persistence.Migrations
                 var exists = _migrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, _targetVersion);
                 if (exists == null)
                 {
-                    _migrationEntryService.CreateEntry(_productName, _targetVersion);    
+                    _migrationEntryService.CreateEntry(_productName, _targetVersion);
                 }
-               
+
             }
         }
 

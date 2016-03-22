@@ -5,8 +5,7 @@ using NPoco;
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents the PetaPocoMapper, which is the implementation of the IMapper interface.
-    /// This is currently only used to ensure that nullable dates are not saved to the database.
+    /// Extends NPoco default mapper and ensures that nullable dates are not saved to the database.
     /// </summary>
     public class PocoMapper : DefaultMapper
     {

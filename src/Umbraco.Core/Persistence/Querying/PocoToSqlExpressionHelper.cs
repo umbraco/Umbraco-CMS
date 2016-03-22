@@ -18,11 +18,12 @@ namespace Umbraco.Core.Persistence.Querying
         public PocoToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntaxProvider)
             : base(sqlSyntaxProvider)
         {
-            // fixme - this is a hack!
-            // should reuse some cached factory!
-            var m = new MapperCollection { new PocoMapper() };
-            var f = new PocoDataFactory(m);
-            _pd = f.ForType(typeof (T));
+            // fixme.npoco - this sort-of will work but there HAS to be a better way!
+
+            if (ApplicationContext.Current != null && ApplicationContext.Current.DatabaseContext != null)
+                _pd = ApplicationContext.Current.DatabaseContext.Database.PocoDataFactory.ForType(typeof (T));
+            else // this is a hack - hopefully only for tests
+                _pd = new PocoDataFactory(new MapperCollection { new PocoMapper() }).ForType(typeof (T));
         }
 
         protected override string VisitMemberAccess(MemberExpression m)

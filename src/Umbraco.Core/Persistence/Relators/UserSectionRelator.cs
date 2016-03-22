@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Relators
         internal UserDto Map(UserDto a, User2AppDto p)
         {
             // Terminating call.  Since we can return null from this function
-            // we need to be ready for PetaPoco to callback later with null
+            // we need to be ready for NPoco to callback later with null
             // parameters
             if (a == null)
                 return Current;
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Relators
                 return null;
             }
 
-            // This is a different User to the current one, or this is the 
+            // This is a different User to the current one, or this is the
             // first time through and we don't have one yet
 
             // Save the current User
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence.Relators
             //this can be null since we are doing a left join
             if (p.AppAlias != null)
             {
-                Current.User2AppDtos.Add(p);    
+                Current.User2AppDtos.Add(p);
             }
 
             // Return the now populated previous User (or null if first time through)

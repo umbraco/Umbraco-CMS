@@ -6,7 +6,7 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
 	/// <summary>
-	/// Represents the Unit of Work implementation for PetaPoco
+	/// Represents the Unit of Work implementation for NPoco
 	/// </summary>
 	internal class NPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
 	{
@@ -81,11 +81,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		}
 
 		/// <summary>
-		/// Commits all batched changes within the scope of a PetaPoco transaction <see cref="Transaction"/>
+		/// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
 		/// </summary>
 		/// <remarks>
 		/// Unlike a typical unit of work, this UOW will let you commit more than once since a new transaction is creaed per
-		/// Commit() call instead of having one Transaction per UOW. 
+		/// Commit() call instead of having one transaction per UOW. 
 		/// </remarks>
 		public void Commit()
 		{
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		}
 
         /// <summary>
-        /// Commits all batched changes within the scope of a PetaPoco transaction <see cref="Transaction"/>
+        /// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
         /// </summary>
         /// <param name="transactionCompleting">
         /// Allows you to set a callback which is executed before the transaction is committed, allow you to add additional SQL

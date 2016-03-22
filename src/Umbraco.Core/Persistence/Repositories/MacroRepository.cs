@@ -30,9 +30,9 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var macroDto = Database
-                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
-                .Map(new MacroPropertyRelator().Map)
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
                 .FirstOrDefault();
+
             if (macroDto == null)
                 return null;
 
@@ -55,10 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
 
-            var dtos = Database
-                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
-                .Map(new MacroPropertyRelator().Map);
-            return ConvertFromDtos(dtos).ToArray(); // do it now and once
+            return Database
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+                .Transform(ConvertFromDtos)
+                .ToArray(); // do it now and once
         }
 
         private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
@@ -90,8 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             return Database
-                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
-                .Map(new MacroPropertyRelator().Map)
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
                 .Select(x => Get(x.Id));
         }
 
@@ -129,7 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                 {
                     "DELETE FROM cmsMacroProperty WHERE macro = @Id",
-                    "DELETE FROM cmsMacro WHERE id = @Id"                           
+                    "DELETE FROM cmsMacro WHERE id = @Id"
                 };
             return list;
         }
@@ -212,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                
+
             }
 
             entity.ResetDirtyProperties();
@@ -234,7 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories
         //    {
         //        return GetAll(new int[] {});
         //    }
-            
+
         //}
     }
 }

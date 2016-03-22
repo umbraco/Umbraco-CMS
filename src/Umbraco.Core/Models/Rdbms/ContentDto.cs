@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int ContentTypeId { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }
     }
 }

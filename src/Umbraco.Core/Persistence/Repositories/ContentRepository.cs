@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<IContent>
+        #region Overrides of NPocoRepositoryBase<IContent>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
 
-                // cannot do this because PetaPoco does not know how to alias the table
+                // cannot do this because NPoco does not know how to alias the table
                 //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
                 //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
                 // so have to rely on writing our own SQL
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -275,7 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
                 .Where<ContentVersionDto>(SqlSyntax, x => x.VersionId == versionId)
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null) return;
 
@@ -296,7 +296,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<ContentVersionDto>(SqlSyntax, x => x.NodeId == id)
                 .Where<ContentVersionDto>(SqlSyntax, x => x.VersionDate < versionDate)
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var list = Database.FetchMultiple<DocumentDto, ContentVersionDto>(sql).Item1;
+            var list = Database.Fetch<DocumentDto>(sql);
             if (list.Any() == false) return;
 
             using (var transaction = Database.GetTransaction())
@@ -324,7 +324,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(IContent entity)
         {
-            //We need to clear out all access rules but we need to do this in a manual way since 
+            //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
             var subQuery = new Sql()
                 .Select("umbracoAccessRule.accessId")
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = level;
 
             //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161     
+            // http://issues.umbraco.org/issue/U4-2161
             var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
@@ -660,7 +660,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1;
+            var dtos = Database.Fetch<DocumentDto>(sql);
 
             foreach (var dto in dtos)
             {
@@ -711,7 +711,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>        
+        /// <param name="userIds"></param>
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
@@ -730,7 +730,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {           
+        {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
@@ -768,7 +768,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string orderBy, Direction orderDirection, string filter = "")
         {
 
-            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
+            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is
             // what we always require for a paged result, so we'll ensure it's included in the filter
 
             var args = new List<object>();
@@ -818,7 +818,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IContent> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1;
+            var dtos = Database.Fetch<DocumentDto>(sql);
 
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();
@@ -828,11 +828,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
-            
+
             var ids = dtos
                 .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                 .Select(x => x.TemplateId.Value).ToArray();
-            
+
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 

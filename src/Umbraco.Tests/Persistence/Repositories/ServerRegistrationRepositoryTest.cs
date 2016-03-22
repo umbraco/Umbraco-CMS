@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Assert
-                Assert.That(repository, Is.Not.Null);    
+                Assert.That(repository, Is.Not.Null);
             }
         }
 
@@ -100,10 +100,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(server, Is.Not.Null);
                 Assert.That(server.HasIdentity, Is.True);
-                Assert.That(server.ServerAddress, Is.EqualTo("http://localhost"));    
+                Assert.That(server.ServerAddress, Is.EqualTo("http://localhost"));
             }
 
-            
+
         }
 
         [Test]
@@ -118,9 +118,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var servers = repository.GetAll();
 
                 // Assert
-                Assert.That(servers.Count(), Is.EqualTo(3));    
+                Assert.That(servers.Count(), Is.EqualTo(3));
             }
-            
+
         }
 
         // queries are not supported due to in-memory caching
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_GetByQuery_On_Repository()
         //{
         //    // Arrange
-        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
+        //    var provider = new NPocoUnitOfWorkProvider(Logger);
         //    var unitOfWork = provider.GetUnitOfWork();
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //        var result = repository.GetByQuery(query);
 
         //        // Assert
-        //        Assert.AreEqual(1, result.Count());    
+        //        Assert.AreEqual(1, result.Count());
         //    }
         //}
 
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_Count_On_Repository()
         //{
         //    // Arrange
-        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
+        //    var provider = new NPocoUnitOfWorkProvider(Logger);
         //    var unitOfWork = provider.GetUnitOfWork();
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //        int count = repository.Count(query);
 
         //        // Assert
-        //        Assert.That(count, Is.EqualTo(2));    
+        //        Assert.That(count, Is.EqualTo(2));
         //    }
         //}
 
@@ -174,8 +174,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(server.HasIdentity, Is.True);
-                Assert.That(server.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4   
-            }            
+                Assert.That(server.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4
+            }
         }
 
         [Test]
@@ -199,8 +199,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(serverUpdated, Is.Not.Null);
                 Assert.That(serverUpdated.ServerAddress, Is.EqualTo("https://umbraco.com"));
-                Assert.That(serverUpdated.IsActive, Is.EqualTo(true));   
-            }            
+                Assert.That(serverUpdated.IsActive, Is.EqualTo(true));
+            }
         }
 
         [Test]
@@ -220,8 +220,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var exists = repository.Exists(3);
 
                 // Assert
-                Assert.That(exists, Is.False);   
-            }            
+                Assert.That(exists, Is.False);
+            }
         }
 
         [Test]
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(exists, Is.True);
-                Assert.That(doesntExist, Is.False);    
+                Assert.That(doesntExist, Is.False);
             }
         }
 

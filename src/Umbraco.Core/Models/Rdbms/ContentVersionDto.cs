@@ -29,6 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime VersionDate { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
         public ContentDto ContentDto { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.FetchMultiple<TaskDto, TaskTypeDto>(sql).Item1.FirstOrDefault();
+            var taskDto = Database.Fetch<TaskDto>(sql).FirstOrDefault();
             if (taskDto == null)
                 return null;
 
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new TaskFactory();
-            var dtos = Database.FetchMultiple<TaskDto, TaskTypeDto>(sql).Item1;
+            var dtos = Database.Fetch<TaskDto>(sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new TaskFactory();
-            var dtos = Database.FetchMultiple<TaskDto, TaskTypeDto>(sql).Item1;
+            var dtos = Database.Fetch<TaskDto>(sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM cmsTask WHERE id = @Id"                           
+                    "DELETE FROM cmsTask WHERE id = @Id"
                 };
             return list;
         }
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where<NodeDto>(SqlSyntax, dto => dto.NodeId == itemId.Value);
             }
 
-            var dtos = Database.FetchMultiple<TaskDto, TaskTypeDto>(sql).Item1;
+            var dtos = Database.Fetch<TaskDto>(sql);
             var factory = new TaskFactory();
             return dtos.Select(factory.BuildEntity);
         }

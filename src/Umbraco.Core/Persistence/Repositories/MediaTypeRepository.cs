@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                 .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
 
-            var dtos = Database.FetchMultiple<ContentTypeDto, NodeDto>(sql).Item1;
+            var dtos = Database.Fetch<ContentTypeDto>(sql);
             return dtos.Any()
                 ? GetAll(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
                 : Enumerable.Empty<IMediaType>();

@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int SortOrder { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne)]
         public ContentTypeDto ContentTypeDto { get; set; }
     }
 }

@@ -40,9 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             var dto = Database
-                .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                .Map(new DictionaryLanguageTextRelator().Map)
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .FirstOrDefault();
+
             if (dto == null)
                 return null;
 
@@ -70,8 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var allLanguages = _languageRepository.GetAll().ToArray();
 
             return Database
-                .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                .Map(new DictionaryLanguageTextRelator().Map)
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(dto => ConvertFromDto(dto, allLanguages));
         }
 
@@ -86,14 +85,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var allLanguages = _languageRepository.GetAll().ToArray();
 
             return Database
-                .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                .Map(new DictionaryLanguageTextRelator().Map)
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(x => ConvertFromDto(x, allLanguages));
         }
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,DictionaryItem>
+        #region Overrides of NPocoRepositoryBase<int,DictionaryItem>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -226,16 +224,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var entity = factory.BuildEntity(dto);
 
             var list = new List<IDictionaryTranslation>();
-            foreach (var textDto in dto.LanguageTextDtos)
-            {
-                //Assuming this is cached!
-                var language = allLanguages.FirstOrDefault(x => x.Id == textDto.LanguageId);
-                if (language == null)
-                    continue;
+            if (dto.LanguageTextDtos != null)
+                foreach (var textDto in dto.LanguageTextDtos)
+                {
+                    //Assuming this is cached!
+                    var language = allLanguages.FirstOrDefault(x => x.Id == textDto.LanguageId);
+                    if (language == null)
+                        continue;
 
-                var translationFactory = new DictionaryTranslationFactory(dto.UniqueId, language);
-                list.Add(translationFactory.BuildEntity(textDto));
-            }
+                    var translationFactory = new DictionaryTranslationFactory(dto.UniqueId, language);
+                    list.Add(translationFactory.BuildEntity(textDto));
+                }
             entity.Translations = list;
 
             return entity;
@@ -286,8 +285,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
                         return Database
-                            .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                            .Map(new DictionaryLanguageTextRelator().Map)
+                            .FetchOneToMany<DictionaryDto>(x=> x.LanguageTextDtos, sql)
                             .Select(x => ConvertFromDto(x, allLanguages));
                     });
             };
@@ -313,8 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
                 return Database
-                    .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                    .Map(new DictionaryLanguageTextRelator().Map);
+                    .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
             protected override Sql GetBaseQuery(bool isCount)
@@ -358,8 +355,7 @@ namespace Umbraco.Core.Persistence.Repositories
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
                 return Database
-                    .FetchMultiple<DictionaryDto, LanguageTextDto>(sql)
-                    .Map(new DictionaryLanguageTextRelator().Map);
+                    .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
             protected override Sql GetBaseQuery(bool isCount)

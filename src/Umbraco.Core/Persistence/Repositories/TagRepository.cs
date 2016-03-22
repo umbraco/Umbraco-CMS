@@ -276,7 +276,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetTagsQuerySelect(true);
 
             sql = ApplyRelationshipJoinToTagsQuery(sql);
-            
+
             if (objectType != TaggableObjectTypes.All)
             {
                 var nodeObjectType = GetNodeObjectType(objectType);
@@ -410,7 +410,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">
-        /// If set to true, this will replace all tags with the given tags, 
+        /// If set to true, this will replace all tags with the given tags,
         /// if false this will append the tags that already exist for the content item
         /// </param>
         /// <returns></returns>
@@ -437,8 +437,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //ok so now we're actually assigning tags...
-            //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist, 
-            // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up 
+            //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist,
+            // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up
             // with quite a few additional queries.
 
             //do all this in one transaction
@@ -523,7 +523,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void ClearTagsFromProperty(int contentId, int propertyTypeId)
         {
-            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId", 
+            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
                 new { nodeId = contentId, propertyTypeId = propertyTypeId });
         }
 
@@ -550,18 +550,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         /// <summary>
         /// This is a clever way to produce an SQL statement like this:
-        /// 
-        ///     (select 'Spacesdd' as Tag, 'default' as [Group] 
-        ///     union 
+        ///
+        ///     (select 'Spacesdd' as Tag, 'default' as [Group]
+        ///     union
         ///     select 'Cool' as Tag, 'default' as [Group]
         ///     ) as TagSet
-        /// 
-        /// This allows us to use the tags to be inserted as a temporary in memory table. 
+        ///
+        /// This allows us to use the tags to be inserted as a temporary in memory table.
         /// </summary>
         /// <param name="tagsToInsert"></param>
         /// <returns></returns>
         private string GetTagSet(IEnumerable<ITag> tagsToInsert)
         {
+            // fixme.npoco
             //TODO: Fix this query, since this is going to be basically a unique query each time, this will cause some mem usage in peta poco,
             // and surely there's a nicer way!
             //TODO: When we fix, be sure to remove the @ symbol escape

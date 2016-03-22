@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return ProcessQuery(sql);
-            
+
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
                     .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
-                return ProcessQuery(baseQuery);    
+                return ProcessQuery(baseQuery);
             }
             else
             {
@@ -105,14 +105,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
-                return ProcessQuery(sql);    
+                return ProcessQuery(sql);
             }
 
         }
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IMembershipUser>
+        #region Overrides of NPocoRepositoryBase<int,IMembershipUser>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<MemberDto>(SqlSyntax)
                 .InnerJoin<ContentVersionDto>(SqlSyntax)
-                .On<ContentVersionDto, MemberDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)                
+                .On<ContentVersionDto, MemberDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 //We're joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.        
+            // - member object contains.
             var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
             var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
             var keyDictionary = new Dictionary<int, int>();
@@ -310,9 +310,9 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
             Database.Update(dto.ContentVersionDto);
-            
+
             //Updates the cmsMember entry if it has changed
-            
+
             //NOTE: these cols are the REAL column names in the db
             var changedCols = new List<string>();
 
@@ -332,19 +332,19 @@ namespace Umbraco.Core.Persistence.Repositories
             //only update the changed cols
             if (changedCols.Count > 0)
             {
-                Database.Update(dto, changedCols);    
+                Database.Update(dto, changedCols);
             }
 
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);            
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.            
+            // - member object contains.
             var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
 
             var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
+            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -561,7 +561,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
-            
+
             var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>(SqlSyntax).Where<Member2MemberGroupDto>(SqlSyntax, dto => dto.MemberGroup == memberGroup.Id);
 
             var sql = GetBaseQuery(false)
@@ -570,7 +570,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments))
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
-            
+
             return ProcessQuery(sql);
 
         }
@@ -595,7 +595,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get the COUNT base query
             var fullSql = GetBaseQuery(true)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
-            
+
             return Database.ExecuteScalar<int>(fullSql);
         }
 
@@ -613,7 +613,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>
-        /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
+        /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using NPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
@@ -627,14 +627,14 @@ namespace Umbraco.Core.Persistence.Repositories
                                 "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
                 args.Add("%" + filter + "%");
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
-            }           
+            }
 
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsMember", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
                 filterCallback);
         }
-        
+
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
         {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(content, xml));
@@ -674,7 +674,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IMember> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
+            var dtos = Database.Fetch<MemberDto>(sql);
 
             var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
 
@@ -696,12 +696,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs); 
+            var propertyData = GetPropertyCollection(sql, docDefs);
 
             return dtosWithContentTypes.Select(d => CreateMemberFromDto(
                         d.dto,
                         contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                        propertyData[d.dto.NodeId])); 
+                        propertyData[d.dto.NodeId]));
         }
 
         /// <summary>

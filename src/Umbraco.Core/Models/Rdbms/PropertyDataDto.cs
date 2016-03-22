@@ -53,6 +53,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Text { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "PropertyTypeId")]
         public PropertyTypeDto PropertyTypeDto { get; set; }
 
         [Ignore]
@@ -69,12 +70,12 @@ namespace Umbraco.Core.Models.Rdbms
                 {
                     return Decimal.Value;
                 }
-                
+
                 if (Date.HasValue)
                 {
                     return Date.Value;
                 }
-                
+
                 if (string.IsNullOrEmpty(VarChar) == false)
                 {
                     return VarChar;

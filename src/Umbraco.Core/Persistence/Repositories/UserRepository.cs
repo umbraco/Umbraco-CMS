@@ -42,10 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database
-                .FetchMultiple<UserDto, User2AppDto>(sql)
-                .Map(new UserSectionRelator().Map)
+                .FetchOneToMany<UserDto>(x => x.User2AppDtos, sql)
                 .FirstOrDefault();
-            
+
             if (dto == null)
                 return null;
 
@@ -66,12 +65,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var dtos = Database
-                .FetchMultiple<UserDto, User2AppDto>(sql)
-                .Map(new UserSectionRelator().Map);
+                .FetchOneToMany<UserDto>(x => x.User2AppDtos, sql);
 
             return ConvertFromDtos(dtos).ToArray(); // do it now and do it once, else can end up with nulls in cache
         }
-        
+
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var sqlClause = GetBaseQuery(false);
@@ -79,8 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var dtos = Database
-                .FetchMultiple<UserDto, User2AppDto>(sql)
-                .Map(new UserSectionRelator().Map)
+                .FetchOneToMany<UserDto>(x => x.User2AppDtos, sql)
                 .DistinctBy(x => x.Id);
 
             return ConvertFromDtos(dtos).ToArray(); // do it now and do it once, else can end up with nulls in cache
@@ -88,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IUser>
+        #region Overrides of NPocoRepositoryBase<int,IUser>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -121,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
-        {            
+        {
             var list = new List<string>
                            {
                                "DELETE FROM cmsTask WHERE userId = @Id",
@@ -139,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
-        
+
         protected override void PersistNewItem(IUser entity)
         {
             var userFactory = new UserFactory(entity.UserType);
@@ -149,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
             }
-            
+
             var userDto = userFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(userDto));
@@ -189,8 +186,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"startStructureID", "StartContentId"},
                 {"startMediaID", "StartMediaId"},
                 {"userName", "Name"},
-                {"userLogin", "Username"},                
-                {"userEmail", "Email"},                
+                {"userLogin", "Username"},
+                {"userEmail", "Email"},
                 {"userLanguage", "Language"},
                 {"securityStampToken", "SecurityStamp"},
                 {"lastLockoutDate", "LastLockoutDate"},
@@ -225,7 +222,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Update(userDto, changedCols);
             }
-            
+
             //update the sections if they've changed
             var user = (User)entity;
             if (user.IsPropertyDirty("AllowedSections"))
@@ -245,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //if something has been added then insert it
                     if (user.AddedSections.Contains(sectionDto.AppAlias))
                     {
-                        //we need to insert since this was added  
+                        //we need to insert since this was added
                         Database.Insert(sectionDto);
                     }
                     else
@@ -256,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                
+
             }
 
             entity.ResetDirtyProperties();
@@ -310,8 +307,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
 
             var dtos = Database
-                .FetchMultiple<UserDto, User2AppDto>(sql)
-                .Map(new UserSectionRelator().Map);
+                .FetchOneToMany<UserDto>(x => x.User2AppDtos, sql);
 
             return ConvertFromDtos(dtos);
         }
@@ -328,7 +324,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         /// <remarks>
-        /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using PetaPoco paging (SQL paging)
+        /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
         {
@@ -376,13 +372,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //now we need to ensure this result is also ordered by the same order by clause
             return result.OrderBy(orderBy.Compile());
         }
-        
+
         /// <summary>
         /// Returns permissions for a given user for any number of nodes
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
@@ -422,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var allUserTypes = userTypeIds.Length == 0 ? Enumerable.Empty<IUserType>() : _userTypeRepository.GetAll(userTypeIds);
 
             return dtos.Select(dto =>
-                {   
+                {
                     var userType = allUserTypes.Single(x => x.Id == dto.Type);
 
                     var userFactory = new UserFactory(userType);

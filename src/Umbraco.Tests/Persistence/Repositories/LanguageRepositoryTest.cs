@@ -39,6 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
+            unitOfWork.Database.EnableSqlTrace = true;
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act

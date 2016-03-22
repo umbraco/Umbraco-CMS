@@ -64,8 +64,6 @@ namespace Umbraco.Core.Persistence
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
 
-            // fixme - is this enough to properly configure NPoco?
-
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
             // so that everything NPoco is properly cached for the lifetime of the application
 	        var mappers = new MapperCollection { new PocoMapper() };

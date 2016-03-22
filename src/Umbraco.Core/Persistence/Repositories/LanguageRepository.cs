@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //even though legacy didn't sort, it should be by id
             sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
 
-            
+
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
         }
 
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,Language>
+        #region Overrides of NPocoRepositoryBase<int,Language>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -171,6 +171,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 
-   
+
     }
 }

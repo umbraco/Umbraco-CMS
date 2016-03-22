@@ -24,6 +24,7 @@ namespace Umbraco.Core.Models.Rdbms
         public bool IsDefault { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne)]
         public ContentTypeDto ContentTypeDto { get; set; }
     }
 }

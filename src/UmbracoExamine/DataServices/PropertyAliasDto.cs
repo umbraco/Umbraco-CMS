@@ -1,7 +1,7 @@
 ﻿namespace UmbracoExamine.DataServices
 {
     /// <summary>
-    /// A Dto object for returning property aliases from PetaPoco
+    /// A Dto object for returning property aliases from NPoco
     /// </summary>
     public class PropertyAliasDto
     {

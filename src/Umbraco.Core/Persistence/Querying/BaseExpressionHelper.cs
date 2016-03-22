@@ -10,6 +10,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
+    // fixme.npoco - are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
+
     internal abstract class BaseExpressionHelper<T> : BaseExpressionHelper
     {
         protected BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
