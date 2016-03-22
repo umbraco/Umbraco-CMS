@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
-    /// The PetaPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
+    /// The NPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
     /// </summary>
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
@@ -86,12 +86,12 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         protected override void SetupApplicationContext()
-        {           
+        {
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-            
+
             var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(
                         Container.GetInstance<RepositoryFactory>(),
-                        new PetaPocoUnitOfWorkProvider(dbFactory),
+                        new NPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(evtMsgs, Logger),
                         CacheHelper,
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";
+            return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 GetDbConnectionString());
 
-            _dbPath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            _dbPath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
 
             //create a new database file if
             // - is the first test in the session
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.TestHelpers
                 || (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
-                
+
                 using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
                 {
                     RemoveDatabaseFile(ex =>
@@ -210,7 +210,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
         }
-        
+
 
         /// <summary>
         /// sets up resolvers before resolution is frozen
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.TestHelpers
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(_appContext);
 
-                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
+                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the
                 // damn db for each test
                 CloseDbConnections();
 
@@ -291,7 +291,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private void CloseDbConnections()
         {
-            //Ensure that any database connections from a previous test is disposed. 
+            //Ensure that any database connections from a previous test is disposed.
             //This is really just double safety as its also done in the TearDown.
             if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
                 DatabaseContext.Database.Dispose();
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             try
             {
-                string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+                string filePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
@@ -368,7 +368,7 @@ namespace Umbraco.Tests.TestHelpers
                 doc.LoadXml(GetXmlContent(templateId));
                 return doc;
             });
-            
+
             PublishedContentCache.UnitTesting = true;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -411,7 +411,7 @@ namespace Umbraco.Tests.TestHelpers
 		<umbracoNaviHide>1</umbracoNaviHide>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>

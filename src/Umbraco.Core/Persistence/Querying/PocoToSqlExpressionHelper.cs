@@ -5,18 +5,25 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using NPoco;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
     internal class PocoToSqlExpressionHelper<T> : BaseExpressionHelper<T>
     {
-        private readonly Database.PocoData _pd;
+        private readonly PocoData _pd;
 
         public PocoToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntaxProvider)
             : base(sqlSyntaxProvider)
         {
-            _pd = new Database.PocoData(typeof(T));
+            // fixme.npoco - this sort-of will work but there HAS to be a better way!
+
+            if (ApplicationContext.Current != null && ApplicationContext.Current.DatabaseContext != null)
+                _pd = ApplicationContext.Current.DatabaseContext.Database.PocoDataFactory.ForType(typeof (T));
+            else // this is a hack - hopefully only for tests
+                _pd = new PocoDataFactory(new MapperCollection { new PocoMapper() }).ForType(typeof (T));
         }
 
         protected override string VisitMemberAccess(MemberExpression m)
@@ -47,9 +54,9 @@ namespace Umbraco.Core.Persistence.Querying
 
         }
 
-        protected virtual string GetFieldName(Database.PocoData pocoData, string name)
+        protected virtual string GetFieldName(PocoData pocoData, string name)
         {
-            var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
+            var column = pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);
             return string.Format("{0}.{1}",
                 SqlSyntax.GetQuotedTableName(pocoData.TableInfo.TableName),
                 SqlSyntax.GetQuotedColumnName(column.Value.ColumnName));

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using log4net;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -58,9 +59,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
+                .Transform(new PropertyTypePropertyGroupRelator().MapOneToManies)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
@@ -74,9 +76,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
+                .Transform(new PropertyTypePropertyGroupRelator().MapOneToManies)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
@@ -98,7 +101,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
                 "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
-                "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
+                "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
                 "cmsPropertyTypeGroup.text AS PropertyGroupName",
                 "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
                 .From<NodeDto>(SqlSyntax)
@@ -160,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ValidateAlias(entity);
 
             ((MemberType)entity).AddingEntity();
-            
+
             //set a default icon if one is not specified
             if (entity.Icon.IsNullOrWhiteSpace())
             {
@@ -311,7 +314,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// If this is one of our internal properties - we will manually assign the data type since they must 
+        /// If this is one of our internal properties - we will manually assign the data type since they must
         /// always correspond to the correct db type no matter what the backing data type is assigned.
         /// </summary>
         /// <param name="propAlias"></param>
@@ -338,7 +341,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="propAlias"></param>
         /// <param name="propertyEditor"></param>

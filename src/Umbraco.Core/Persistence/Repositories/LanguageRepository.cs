@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Language"/>
     /// </summary>
-    internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
+    internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -56,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //even though legacy didn't sort, it should be by id
             sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
 
-            
+
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
         }
 
@@ -70,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,Language>
+        #region Overrides of NPocoRepositoryBase<int,Language>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -166,6 +167,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 
-   
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the UserTypeRepository for doing CRUD operations for <see cref="IUserType"/>
     /// </summary>
-    internal class UserTypeRepository : PetaPocoRepositoryBase<int, IUserType>, IUserTypeRepository
+    internal class UserTypeRepository : NPocoRepositoryBase<int, IUserType>, IUserTypeRepository
     {
         public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var userTypeFactory = new UserTypeFactory();
 
             var sql = GetBaseQuery(false);
-            
+
             if (ids.Any())
             {
                 sql.Where("umbracoUserType.id in (@ids)", new { ids = ids });
@@ -63,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IUserType>
+        #region Overrides of NPocoRepositoryBase<int,IUserType>
 
         protected override Sql GetBaseQuery(bool isCount)
         {

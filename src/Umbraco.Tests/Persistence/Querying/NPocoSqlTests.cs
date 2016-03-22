@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Linq;
+using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Tests.Persistence.Querying
 {
     [TestFixture]
-    public class PetaPocoSqlTests : BaseUsingSqlCeSyntax
+    public class NPocoSqlTests : BaseUsingSqlCeSyntax
     {
         //x => 
 
@@ -44,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Where_Clause_With_Not_Starts_With()
         {
-            var level = 1;
+            const int level = 1;
             var sql = new Sql("SELECT *").From<NodeDto>(SqlSyntax)
                 .Where<NodeDto>(SqlSyntax, x => x.Level == level && !x.Path.StartsWith("-20"));
 
@@ -57,8 +54,9 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Where_Clause_With_EqualsFalse_Starts_With()
         {
-            var level = 1;
-            var sql = new Sql("SELECT *").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.Level == level && x.Path.StartsWith("-20") == false);
+            const int level = 1;
+            var sql = new Sql("SELECT *").From<NodeDto>(SqlSyntax)
+                .Where<NodeDto>(SqlSyntax, x => x.Level == level && x.Path.StartsWith("-20") == false);
 
             Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ((([umbracoNode].[level] = @0) AND NOT (upper([umbracoNode].[path]) LIKE upper(@1))))", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(2, sql.Arguments.Length);
@@ -81,7 +79,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Where_Clause_With_False_Boolean()
         {
             var sql = new Sql("SELECT *").From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, x => !x.Trashed);
+                .Where<NodeDto>(SqlSyntax, x => x.Trashed == false);
 
             Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);

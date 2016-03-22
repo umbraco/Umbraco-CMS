@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -26,7 +27,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
+    internal abstract class VersionableRepositoryBase<TId, TEntity> : NPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
         private readonly IContentSection _contentSection;
@@ -52,11 +53,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            foreach (var dto in dtos)
-            {
-                yield return GetByVersion(dto.VersionId);
-            }
+            var dtos = Database.Fetch<ContentVersionDto>(sql);
+            return dtos.Select(x => GetByVersion(x.VersionId));
         }
 
         public virtual void DeleteVersion(Guid versionId)

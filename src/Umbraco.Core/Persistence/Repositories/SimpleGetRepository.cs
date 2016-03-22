@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
-    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : PetaPocoRepositoryBase<TId, TEntity>
+    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : NPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
         where TDto: class
     {

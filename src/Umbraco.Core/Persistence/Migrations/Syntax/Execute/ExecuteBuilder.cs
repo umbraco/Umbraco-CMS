@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 

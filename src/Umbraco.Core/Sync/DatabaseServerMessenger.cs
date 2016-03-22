@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

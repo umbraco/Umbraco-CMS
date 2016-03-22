@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;

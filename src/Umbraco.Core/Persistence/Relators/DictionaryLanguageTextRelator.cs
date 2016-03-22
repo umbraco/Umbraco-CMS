@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Relators
@@ -10,7 +12,7 @@ namespace Umbraco.Core.Persistence.Relators
         internal DictionaryDto Map(DictionaryDto a, LanguageTextDto p)
         {
             // Terminating call.  Since we can return null from this function
-            // we need to be ready for PetaPoco to callback later with null
+            // we need to be ready for NPoco to callback later with null
             // parameters
             if (a == null)
                 return Current;
@@ -25,7 +27,7 @@ namespace Umbraco.Core.Persistence.Relators
                 return null;
             }
 
-            // This is a different DictionaryItem to the current one, or this is the 
+            // This is a different DictionaryItem to the current one, or this is the
             // first time through and we don't have a Tab yet
 
             // Save the current DictionaryItem

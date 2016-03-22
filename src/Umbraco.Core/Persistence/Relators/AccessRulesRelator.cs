@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Relators
         internal AccessDto Map(AccessDto a, AccessRuleDto p)
         {
             // Terminating call.  Since we can return null from this function
-            // we need to be ready for PetaPoco to callback later with null
+            // we need to be ready for NPoco to callback later with null
             // parameters
             if (a == null)
                 return Current;

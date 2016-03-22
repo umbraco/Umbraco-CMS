@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Services
         {            
             base.CreateTestData();
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.GetUnitOfWork())
             using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver))
             {

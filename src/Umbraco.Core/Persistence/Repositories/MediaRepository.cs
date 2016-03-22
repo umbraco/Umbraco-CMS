@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dynamics;
@@ -56,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IMedia>
+        #region Overrides of NPocoRepositoryBase<int,IMedia>
 
         protected override Sql GetBaseQuery(bool isCount)
         {
@@ -145,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -226,7 +227,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        private void RebuildXmlStructuresProcessQuery(Func<IMedia, XElement> serializer, IQuery<IMedia> query, Transaction tr, int pageSize)
+        private void RebuildXmlStructuresProcessQuery(Func<IMedia, XElement> serializer, IQuery<IMedia> query, ITransaction tr, int pageSize)
         {
             var pageIndex = 0;
             var total = long.MinValue;
@@ -271,14 +272,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = createSql(umbracoFileValue);
 
-            var propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+            var propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
 
-            // If the stripped-down url returns null, we try again with the original url. 
+            // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
             if (propertyDataDto == null)
             {
                 sql = createSql(mediaPath);
-                propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+                propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
             }
 
             return propertyDataDto == null ? null : Get(propertyDataDto.NodeId);
@@ -332,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -504,8 +505,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IMedia> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            
+            var dtos = Database.Fetch<ContentVersionDto>(sql);
+
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types

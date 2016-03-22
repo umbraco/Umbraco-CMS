@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;

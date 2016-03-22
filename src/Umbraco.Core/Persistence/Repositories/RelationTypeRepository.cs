@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="RelationType"/>
     /// </summary>
-    internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
+    internal class RelationTypeRepository : NPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
 
         public RelationTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
@@ -81,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,RelationType>
+        #region Overrides of NPocoRepositoryBase<int,RelationType>
 
         protected override Sql GetBaseQuery(bool isCount)
         {

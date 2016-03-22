@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -66,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentTypeDto>(sql);
 
             return
                 //This returns a lookup from the GetAll cached looup

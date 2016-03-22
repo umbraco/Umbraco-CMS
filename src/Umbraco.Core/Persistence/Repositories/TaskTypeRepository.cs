@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -12,7 +13,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class TaskTypeRepository : PetaPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
+    internal class TaskTypeRepository : NPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
     {
         public TaskTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)

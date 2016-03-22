@@ -301,5 +301,16 @@ namespace Umbraco.Core
                && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
         }
 
+        /// <summary>
+        /// Transforms an enumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="transform"></param>
+        /// <returns></returns>
+        public static IEnumerable<TTarget> Transform<TSource, TTarget>(this IEnumerable<TSource> source, Func<IEnumerable<TSource>, IEnumerable<TTarget>> transform)
+        {
+            return transform(source);
+        }
     }
 }

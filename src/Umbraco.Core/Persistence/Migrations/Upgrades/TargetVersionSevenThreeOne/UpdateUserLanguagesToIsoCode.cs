@@ -1,4 +1,5 @@
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -59,6 +60,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string MacroFilePath { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "Macro")]
         public List<MacroPropertyDto> MacroPropertyDtos { get; set; }
     }
 }

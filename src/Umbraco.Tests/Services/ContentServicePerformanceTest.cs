@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
             using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
             using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))

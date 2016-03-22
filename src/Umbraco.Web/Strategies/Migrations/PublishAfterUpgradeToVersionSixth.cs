@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     .Where<NodeDto>(_sqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<NodeDto>(_sqlSyntax, x => x.Path.StartsWith("-1"));
 
-                var dtos = e.MigrationContext.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                var dtos = e.MigrationContext.Database.Fetch<DocumentDto>(sql);
                 var toUpdate = new List<DocumentDto>();
                 var versionGroup = dtos.GroupBy(x => x.NodeId);
                 foreach (var grp in versionGroup)

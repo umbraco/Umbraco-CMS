@@ -12,10 +12,11 @@ namespace Umbraco.Core.Persistence.Factories
         public IMacro BuildEntity(MacroDto dto)
         {
             var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
-            foreach (var p in dto.MacroPropertyDtos)
-            {
-                model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
-            }
+            if (dto.MacroPropertyDtos != null)
+                foreach (var p in dto.MacroPropertyDtos)
+                {
+                    model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
+                }
             
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

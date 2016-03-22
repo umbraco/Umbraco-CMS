@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,7 +14,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MigrationEntryRepository : PetaPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
+    internal class MigrationEntryRepository : NPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
         public MigrationEntryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,7 +15,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class PublicAccessRepository : PetaPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
+    internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -48,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -70,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
                 .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
-                
+
             return sql;
         }
 
@@ -164,6 +165,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity.Key;
         }
 
-    
+
     }
 }

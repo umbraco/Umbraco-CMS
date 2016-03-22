@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate();                
 
-            var dtos = Database.Fetch<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
 
             return
                 //This returns a lookup from the GetAll cached looup
@@ -79,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //order the result by name
                     .OrderBy(x => x.Name);
         }
-        
+
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -169,7 +170,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.DocumentType); }
         }
-        
+
         /// <summary>
         /// Deletes a content type
         /// </summary>
@@ -282,7 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-        
+
         protected override IContentType PerformGet(Guid id)
         {
             //use the underlying GetAll which will force cache all content types

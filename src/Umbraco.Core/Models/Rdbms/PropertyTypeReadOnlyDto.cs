@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms

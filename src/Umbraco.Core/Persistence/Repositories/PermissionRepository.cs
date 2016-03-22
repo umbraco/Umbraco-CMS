@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web.Caching;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;

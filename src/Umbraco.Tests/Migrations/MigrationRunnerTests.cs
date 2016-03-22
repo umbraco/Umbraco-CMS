@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Logging;
@@ -29,6 +30,7 @@ namespace Umbraco.Tests.Migrations
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
+                // fixme Database vs UmbracoDatabase
                 new Database("umbracoDbDSN")
                 , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
@@ -48,6 +50,7 @@ namespace Umbraco.Tests.Migrations
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
+                // fixme Database vs UmbracoDatabase
                 new Database("umbracoDbDSN")
                 , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
@@ -67,6 +70,7 @@ namespace Umbraco.Tests.Migrations
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
+                // fixme Database vs UmbracoDatabase
                 new Database("umbracoDbDSN")
                 , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Relators
     //    internal TaskDto Map(TaskDto a, UserDto p)
     //    {
     //        // Terminating call.  Since we can return null from this function
-    //        // we need to be ready for PetaPoco to callback later with null
+    //        // we need to be ready for NPoco to callback later with null
     //        // parameters
     //        if (a == null)
     //            return Current;
@@ -18,14 +18,14 @@ namespace Umbraco.Core.Persistence.Relators
     //        // Is this the same TaskDto as the current one we're processing
     //        if (Current != null && Current.Id == a.Id)
     //        {
-    //            // Yes, set the user 
+    //            // Yes, set the user
     //            Current.MacroPropertyDtos.Add(p);
 
     //            // Return null to indicate we're not done with this Macro yet
     //            return null;
     //        }
 
-    //        // This is a different Macro to the current one, or this is the 
+    //        // This is a different Macro to the current one, or this is the
     //        // first time through and we don't have one yet
 
     //        // Save the current Macro
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Relators
         internal MacroDto Map(MacroDto a, MacroPropertyDto p)
         {
             // Terminating call.  Since we can return null from this function
-            // we need to be ready for PetaPoco to callback later with null
+            // we need to be ready for NPoco to callback later with null
             // parameters
             if (a == null)
                 return Current;
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Relators
                 return null;
             }
 
-            // This is a different Macro to the current one, or this is the 
+            // This is a different Macro to the current one, or this is the
             // first time through and we don't have one yet
 
             // Save the current Macro

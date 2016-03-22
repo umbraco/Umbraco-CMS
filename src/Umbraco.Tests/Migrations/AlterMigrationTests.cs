@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -19,6 +20,7 @@ namespace Umbraco.Tests.Migrations
         {
             // Arrange
             var sqlSyntax = new SqlCeSyntaxProvider();
+            // fixme Database vs UmbracoDatabase
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(), sqlSyntax);
             var stub = new DropForeignKeyMigrationStub(sqlSyntax, Mock.Of<ILogger>());
 

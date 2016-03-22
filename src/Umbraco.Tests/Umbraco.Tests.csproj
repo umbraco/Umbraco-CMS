@@ -94,6 +94,10 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NPoco, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NPoco.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
@@ -197,6 +201,7 @@
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
+    <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -295,7 +300,7 @@
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\NPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
@@ -405,7 +410,7 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
-    <Compile Include="Persistence\Querying\PetaPocoSqlTests.cs" />
+    <Compile Include="Persistence\Querying\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />

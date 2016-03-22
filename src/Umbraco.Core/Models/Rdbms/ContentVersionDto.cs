@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -28,6 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime VersionDate { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
         public ContentDto ContentDto { get; set; }
     }
 }

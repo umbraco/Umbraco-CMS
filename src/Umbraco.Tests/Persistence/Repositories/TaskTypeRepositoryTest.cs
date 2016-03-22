@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var taskType = new TaskType("asdfasdf");
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))

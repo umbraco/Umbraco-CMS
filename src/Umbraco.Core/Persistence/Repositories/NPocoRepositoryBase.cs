@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -11,11 +12,11 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Represent an abstract Repository for PetaPoco based repositories
+    /// Represent an abstract Repository for NPoco based repositories
     /// </summary>
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
+    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
@@ -36,9 +37,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public override Query<TEntity> Query
         {
             get { return QueryFactory.Create<TEntity>(); }
-        } 
+        }
 
-        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger)
         {
             if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
@@ -56,11 +57,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
 		protected UmbracoDatabase Database
         {
-            get { return UnitOfWork.Database; }			
+            get { return UnitOfWork.Database; }
         }
 
         #region Abstract Methods
-        
+
         protected abstract Sql GetBaseQuery(bool isCount);
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();

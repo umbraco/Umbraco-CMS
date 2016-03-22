@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// An internal repository for managing entity containers such as doc type, media type, data type containers.
     /// </summary>
-    internal class EntityContainerRepository : PetaPocoRepositoryBase<int, EntityContainer>
+    internal class EntityContainerRepository : NPocoRepositoryBase<int, EntityContainer>
     {
         private readonly Guid _containerObjectType;
 
@@ -209,7 +210,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // insert, get the id, update the path with the id
             var id = Convert.ToInt32(Database.Insert(nodeDto));
             nodeDto.Path = nodeDto.Path + "," + nodeDto.NodeId;
-            Database.Save(nodeDto);
+            Database.Save<NodeDto>(nodeDto);
 
             // refresh the entity
             entity.Id = id;

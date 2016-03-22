@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <remarks>Exposes shared functionality</remarks>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
+    internal abstract class ContentTypeBaseRepository<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
@@ -104,12 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
-
-            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeNodeId))
-            {
-                yield return dto.ContentTypeNodeId;
-            }
+            return Database
+                .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
+                .Select(x => x.ContentTypeNodeId).Distinct();
         }
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
@@ -145,7 +143,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -280,7 +278,7 @@ AND umbracoNode.id <> @id",
                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                    .Where<ContentDto>(SqlSyntax, x => x.ContentTypeId == entity.Id);
 
-                var contentDtos = Database.Fetch<ContentDto, NodeDto>(sql);
+                var contentDtos = Database.Fetch<ContentDto>(sql);
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
@@ -297,7 +295,7 @@ AND umbracoNode.id <> @id",
                             var propertySql = new Sql().Select("cmsPropertyData.id")
                                                        .From<PropertyDataDto>(SqlSyntax)
                                                        .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                                                       .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, 
+                                                       .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax,
                                                            left => left.PropertyTypeId, right => right.Id)
                                                        .Where<PropertyDataDto>(SqlSyntax, x => x.NodeId == nodeId)
                                                        .Where<PropertyTypeDto>(SqlSyntax, x => x.Id == propertyTypeId);
@@ -431,7 +429,7 @@ AND umbracoNode.id <> @id",
                .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(SqlSyntax, left => left.AllowedId, right => right.NodeId)
                .Where<ContentTypeAllowedContentTypeDto>(SqlSyntax, x => x.Id == id);
 
-            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);
+            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql);
             return allowedContentTypeDtos.Select(x => new ContentTypeSort(new Lazy<int>(() => x.AllowedId), x.SortOrder, x.ContentTypeDto.Alias)).ToList();
         }
 
@@ -447,7 +445,9 @@ AND umbracoNode.id <> @id",
                .Where<PropertyTypeGroupDto>(SqlSyntax, x => x.ContentTypeNodeId == id)
                .OrderBy<PropertyTypeGroupDto>(SqlSyntax, x => x.Id);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
+
+            var dtos = Database
+                .Fetch<PropertyTypeGroupDto>(sql);
 
             var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
@@ -463,7 +463,7 @@ AND umbracoNode.id <> @id",
                .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
                .Where<PropertyTypeDto>(SqlSyntax, x => x.ContentTypeId == id);
 
-            var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
+            var dtos = Database.Fetch<PropertyTypeDto>(sql);
 
             //TODO Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();
@@ -849,7 +849,7 @@ AND umbracoNode.id <> @id",
                 return mediaType;
             }
 
-            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,                
+            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, List<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
