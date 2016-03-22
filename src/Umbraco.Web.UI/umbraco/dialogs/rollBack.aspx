@@ -1,4 +1,4 @@
-<%@ Page Language="c#" Codebehind="rollBack.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master"AutoEventWireup="True" Inherits="umbraco.presentation.dialogs.rollBack" %>
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"AutoEventWireup="True" Inherits="umbraco.presentation.dialogs.rollBack" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
