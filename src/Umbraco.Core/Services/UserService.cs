@@ -147,9 +147,9 @@ namespace Umbraco.Core.Services
                     IsApproved = true
                 };
                 //adding default sections content, media + translation
-                user.AddAllowedSection("content");
-                user.AddAllowedSection("media");
-                user.AddAllowedSection("translation");
+                user.AddAllowedSection(Constants.Applications.Content);
+                user.AddAllowedSection(Constants.Applications.Media);
+                user.AddAllowedSection(Constants.Applications.Translation);
 
                 if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
                     return user;
