@@ -164,8 +164,6 @@
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\LegacySqlHelper.cs" />
-    <Compile Include="businesslogic\macro\IMacroEngine.cs" />
-    <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
     <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
@@ -178,7 +176,6 @@
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

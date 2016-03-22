@@ -509,7 +509,6 @@
     <Compile Include="UmbracoExamine\TestContentService.cs" />
     <Compile Include="UriExtensionsTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
-    <Compile Include="Macros\MacroEngineFactoryTests.cs" />
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="Plugins\PluginManagerExtensions.cs" />
     <Compile Include="Plugins\PluginManagerTests.cs" />
