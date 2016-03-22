@@ -7,7 +7,6 @@ using System.Web.Script.Serialization;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Media;
-using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.WebServices
 {
@@ -17,7 +16,7 @@ namespace Umbraco.Web.WebServices
     {
         public static string Embed()
         {
-            var currentUser = User.GetCurrent();
+            var currentUser = UmbracoContext.Current.Security.CurrentUser;
 
             if (currentUser == null)
                 throw new UnauthorizedAccessException("You must be logged in to use this service");

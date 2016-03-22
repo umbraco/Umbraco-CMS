@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using umbraco.interfaces;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
-using Umbraco.Web.LegacyActions;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web.UI.Controls;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.user
 {
@@ -12,7 +13,7 @@ namespace umbraco.cms.presentation.user
     /// <summary>
     /// An object to display the current permissions for a user and a node.
     /// </summary>
-    public partial class NodePermissions : System.Web.UI.UserControl
+    public partial class NodePermissions : UmbracoUserControl
     {
 
         protected override void OnInit(EventArgs e) {
@@ -24,7 +25,7 @@ namespace umbraco.cms.presentation.user
             DataBind();
         }
 
-        private User m_umbracoUser;
+        private IUser m_umbracoUser;
         private int[] m_nodeID = {-1};
         private UserPermissions m_userPermissions;
         private string m_clientItemChecked = "void(0);";
@@ -34,7 +35,7 @@ namespace umbraco.cms.presentation.user
             get { return m_umbracoUser.Id; }
             set
             {
-                m_umbracoUser = BusinessLogic.User.GetUser(value);
+                m_umbracoUser = Services.UserService.GetUserById(value);
                 m_userPermissions = new UserPermissions(m_umbracoUser);
             }
         }
@@ -69,7 +70,7 @@ namespace umbraco.cms.presentation.user
                 throw new ArgumentNullException("No User specified");
 
             //get the logged in user's permissions
-            UserPermissions currUserPermissions = new UserPermissions(UmbracoContext.Current.UmbracoUser);
+            UserPermissions currUserPermissions = new UserPermissions(Security.CurrentUser);
             
             //lookup permissions for last node selected
             int selectedNodeId = m_nodeID[m_nodeID.Length - 1];
@@ -113,7 +114,7 @@ namespace umbraco.cms.presentation.user
         {
             
             List<AssignedPermission> assignedPermissions = new List<AssignedPermission>();
-            foreach (umbraco.interfaces.IAction a in allActions)
+            foreach (var a in allActions)
             {
                 AssignedPermission p = new AssignedPermission();
                 p.Permission = a;

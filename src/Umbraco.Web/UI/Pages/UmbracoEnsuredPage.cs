@@ -88,26 +88,7 @@ namespace Umbraco.Web.UI.Pages
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
         protected bool RedirectToUmbraco { get; set; }
-        
-        /// <summary>
-        /// Returns the current user
-        /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        protected User UmbracoUser
-        {
-            get
-            {
-                //throw exceptions if not valid (true)
-                if (!_hasValidated)
-                {
-                    Security.ValidateCurrentUser(true);
-                    _hasValidated = true;
-                }
-                
-                return new User(Security.CurrentUser);
-            }
-        }
-        
+      
         /// <summary>
         /// Used to assign a webforms page's security to a specific tree which will in turn check to see
         /// if the current user has access to the specified tree's registered section

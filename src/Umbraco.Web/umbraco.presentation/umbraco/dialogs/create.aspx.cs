@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Globalization;
 using System.Linq;
 using System.Web.UI;
@@ -8,8 +9,9 @@ using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {
@@ -29,7 +31,7 @@ namespace umbraco.dialogs
                 {
                     _app = Request.CleanForXss("app");
                     //validate the app
-                    if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(_app)) == false)
+                    if (Services.SectionService.GetSections().Any(x => x.Alias.InvariantEquals(_app)) == false)
                     {
                         throw new InvalidOperationException("A requested app: " + Request.GetItemAsString("app") + " was not found");
                     }
@@ -43,8 +45,8 @@ namespace umbraco.dialogs
             // Put user code to initialize the page here
             if (Request.GetItemAsString("nodeId") == "")
             {
-                var appType = ui.Text("sections", App).ToLower();
-                pane_chooseNode.Text = ui.Text("create", "chooseNode", appType, UmbracoUser) + "?";
+                var appType = Services.TextService.Localize("sections", App).ToLower();
+                pane_chooseNode.Text = Services.TextService.Localize("create/chooseNode", new[] { appType }) + "?";
 
                 DataBind();
             }
@@ -71,7 +73,7 @@ namespace umbraco.dialogs
                 else
                 {
                     PageNameHolder.type = uicontrols.Feedback.feedbacktype.error;
-                    PageNameHolder.Text = ui.GetText("rights") + " " + ui.GetText("error");
+                    PageNameHolder.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("error");
                     JTree.DataBind();
                 }
             }
@@ -88,8 +90,8 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return UmbracoContext.UmbracoUser.GetPermissions(new CMSNode(nodeId).Path)
-                .Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture));
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, new CMSNode(nodeId).Path);
+            return permission.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
 

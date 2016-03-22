@@ -6,13 +6,13 @@ using System.Web;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using User = umbraco.BusinessLogic.User;
 
 namespace Umbraco.Web.Security
 {
@@ -274,14 +274,18 @@ namespace Umbraco.Web.Security
         /// <param name="path">The path.</param>
         /// <param name="action">The action.</param>
         /// <returns></returns>
-        internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
+        internal bool ValidateUserNodeTreePermissions(IUser umbracoUser, string path, string action)
         {
-            var permissions = umbracoUser.GetPermissions(path);
-            if (permissions.IndexOf(action, StringComparison.Ordinal) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId + ",")))
+            
+            //we only want permissions for the last node in the pat
+            var permission = _applicationContext.Services.UserService.GetPermissions(umbracoUser, path);
+            if (permission == null) throw new InvalidOperationException("No permissions found");
+
+            if (permission.AssignedPermissions.Contains(action, StringComparer.Ordinal) && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartContentId + ",")))
                 return true;
 
             var user = umbracoUser;
-            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
+            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => string.Join(",", permission.AssignedPermissions), () => action);
             return false;
         }
 
@@ -412,12 +416,6 @@ namespace Umbraco.Web.Security
         {
             var apps = user.AllowedSections;
             return apps.Any(uApp => uApp.InvariantEquals(app));
-        }
-
-        [Obsolete("Do not use this method if you don't have to, use the overload with IUser instead")]
-        internal bool UserHasAppAccess(string app, User user)
-        {
-            return user.Applications.Any(uApp => uApp.alias == app);
         }
 
         /// <summary>

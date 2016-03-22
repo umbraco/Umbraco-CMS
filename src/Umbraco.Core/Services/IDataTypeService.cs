@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -10,11 +9,14 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
-        Attempt<int> CreateContainer(int parentId, string name, int userId = 0);
-        void SaveContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
-        void DeleteContainer(int containerId, int userId = 0);
+        IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+        IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition);
+        IEnumerable<EntityContainer> GetContainers(int[] containerIds);
+        Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0);
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
@@ -136,5 +138,6 @@ namespace Umbraco.Core.Services
         string GetPreValueAsString(int id);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
+        
     }
 }

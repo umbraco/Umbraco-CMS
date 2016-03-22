@@ -124,6 +124,9 @@
     <Compile Include="ExamineHelper.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyLibrary.cs" />
+    <Compile Include="LocalStorage\AzureLocalStorageDirectory.cs" />
+    <Compile Include="LocalStorage\CodeGenLocalStorageDirectory.cs" />
+    <Compile Include="LocalStorage\ILocalStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalStorageType.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectoryTracker.cs" />
@@ -158,10 +161,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Project>{e469a9ce-1bec-423f-ac44-713cd72457ea}</Project>
-      <Name>umbraco.businesslogic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
       <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
@@ -173,10 +172,6 @@
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{c7cb79f0-1c97-4b33-bfa7-00731b579ae2}</Project>
       <Name>umbraco.datalayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Project>{511f6d8d-7717-440a-9a57-a507e9a8b27f}</Project>
-      <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

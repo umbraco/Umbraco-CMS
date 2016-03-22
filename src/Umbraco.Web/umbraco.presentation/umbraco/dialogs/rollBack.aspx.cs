@@ -35,13 +35,13 @@
 //                diffPanel.Visible = true;
 //                Document rollback = new Document(currentDoc.Id, new Guid(allVersions.SelectedValue));
 
-//                propertiesCompare.Text = "<tr><th style='width: 25%;' valign='top'>" + ui.Text("general", "name") + ":</th><td>" + rollback.Text + "</td></tr>";
-//                propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + ui.Text("content", "createDate") + ":</th><td>" + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + " " + ui.Text("general", "by") + ": " + rollback.User.Name + "</td></tr>";
+//                propertiesCompare.Text = "<tr><th style='width: 25%;' valign='top'>" + Services.TextService.Localize("general/name") + ":</th><td>" + rollback.Text + "</td></tr>";
+//                propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + Services.TextService.Localize("content/createDate") + ":</th><td>" + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + " " + Services.TextService.Localize("general/by") + ": " + rollback.User.Name + "</td></tr>";
 
 //                if (rbl_mode.SelectedValue == "diff")
-//                    lt_notice.Text = ui.Text("rollback", "diffHelp");
+//                    lt_notice.Text = Services.TextService.Localize("rollback/diffHelp");
 //                else
-//                    lt_notice.Text = ui.Text("rollback", "htmlHelp");
+//                    lt_notice.Text = Services.TextService.Localize("rollback/htmlHelp");
 
 
 //                var props = rollback.GenericProperties;
@@ -115,14 +115,14 @@
 //                rbl_mode.AutoPostBack = true;
 
 //            currentVersionTitle.Text = currentDoc.Text;
-//            currentVersionMeta.Text = ui.Text("content", "createDate") + ": " + currentDoc.VersionDate.ToShortDateString() + " " + currentDoc.VersionDate.ToShortTimeString();
+//            currentVersionMeta.Text = Services.TextService.Localize("content/createDate") + ": " + currentDoc.VersionDate.ToShortDateString() + " " + currentDoc.VersionDate.ToShortTimeString();
 
 //            if (!IsPostBack) {
-//                allVersions.Items.Add(new ListItem(ui.Text("rollback", "selectVersion")+ "...", ""));
+//                allVersions.Items.Add(new ListItem(Services.TextService.Localize("rollback/selectVersion")+ "...", ""));
 //                foreach (DocumentVersionList dl in currentDoc.GetVersions()) {
-//                    allVersions.Items.Add(new ListItem(dl.Text + " (" + ui.Text("content", "createDate") + ": " + dl.Date.ToShortDateString() + " " + dl.Date.ToShortTimeString() + ")", dl.Version.ToString()));
+//                    allVersions.Items.Add(new ListItem(dl.Text + " (" + Services.TextService.Localize("content/createDate") + ": " + dl.Date.ToShortDateString() + " " + dl.Date.ToShortTimeString() + ")", dl.Version.ToString()));
 //                }
-//                Button1.Text = ui.Text("actions", "rollback");
+//                Button1.Text = Services.TextService.Localize("actions/rollback");
 //            }
 //        }
 
@@ -158,7 +158,7 @@
 //                feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
 //                string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
                 
-//                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+//                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 //                diffPanel.Visible = false;
 //                pl_buttons.Visible = false;
 //            }

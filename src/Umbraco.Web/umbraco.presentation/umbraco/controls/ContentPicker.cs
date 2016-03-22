@@ -1,16 +1,7 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.presentation.Trees;
-using umbraco.presentation;
 using umbraco.uicontrols.TreePicker;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.controls
 {
@@ -52,7 +43,7 @@ namespace umbraco.controls
         {
             get
             {
-                return ui.GetText("general", "choose") + " " + ui.GetText("sections", TreeAlias.ToLower());
+                return ApplicationContext.Current.Services.TextService.Localize("general/choose") + " " + ApplicationContext.Current.Services.TextService.Localize("sections/" + TreeAlias.ToLower());
             }
         }
 
@@ -67,7 +58,7 @@ namespace umbraco.controls
                 }
                 else
                 {
-                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ui.Text(TreeAlias) : ui.Text(AppAlias));
+                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ApplicationContext.Current.Services.TextService.Localize(TreeAlias) : ApplicationContext.Current.Services.TextService.Localize(AppAlias));
 
                 }
             }

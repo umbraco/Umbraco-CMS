@@ -4,11 +4,24 @@
       ng-if="entityType !== 'media'">
 
       <umb-content-grid
+         ng-if="items"
          content="items"
          content-properties="options.includeProperties"
-         on-click="vm.clickItem"
-         on-select="vm.selectItem">
+         on-click="vm.selectContentItem"
+         on-click-name="vm.goToItem">
       </umb-content-grid>
+
+      <umb-empty-state
+          ng-if="!items && options.filter.length > 0"
+          position="center">
+          <localize key="general_searchNoResult"></localize>
+      </umb-empty-state>
+
+      <umb-empty-state
+          ng-if="!items && vm.isRecycleBin"
+          position="center">
+          <localize key="general_recycleBinEmpty"></localize>
+      </umb-empty-state>
 
    </div>
 
@@ -19,27 +32,28 @@
    on-drag-enter="vm.dragEnter()">
 
       <umb-file-dropzone
+         ng-if="!vm.isRecycleBin"
          parent-id="{{vm.nodeId}}"
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
          max-file-size="{{vm.maxFileSize}}"
-         hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+         hide-dropzone="{{ options.filter.length > 0 }}"
          compact="{{ items.length > 0 }}"
          files-queued="vm.onFilesQueue">
       </umb-file-dropzone>
 
       <umb-folder-grid
-         ng-if="folders.length > 0"
+         ng-if="folders.length > 0 && !vm.isRecycleBin"
          folders="folders"
-         on-select="vm.selectFolder"
-         on-click="vm.clickItem">
+         on-click="vm.selectFolder"
+         on-click-name="vm.goToItem">
       </umb-folder-grid>
 
       <umb-media-grid
          items="vm.itemsWithoutFolders"
          on-details-hover="vm.hoverMediaItemDetails"
-         on-select="vm.selectItem"
-         on-click="vm.clickItem">
+         on-click="vm.selectItem"
+         on-click-name="vm.goToItem">
       </umb-media-grid>
 
       <umb-tooltip
@@ -53,6 +67,18 @@
          </ul>
       </umb-tooltip>
 
-   <div>
+      <umb-empty-state
+          ng-if="vm.itemsWithoutFolders.length === 0 && vm.isRecycleBin"
+          position="center">
+          <localize key="general_recycleBinEmpty"></localize>
+      </umb-empty-state>
+
+      <umb-empty-state
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length > 0"
+          position="center">
+          <localize key="general_searchNoResult"></localize>
+      </umb-empty-state>
+
+    </div>
 
 </div>

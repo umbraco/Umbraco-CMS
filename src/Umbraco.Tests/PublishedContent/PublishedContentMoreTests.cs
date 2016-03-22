@@ -234,9 +234,9 @@ namespace Umbraco.Tests.PublishedContent
                         new PublishedPropertyType("prop1", 1, "?"), 
                     };
 
-            var contentType1 = new PublishedContentType(1, "ContentType1", props);
-            var contentType2 = new PublishedContentType(2, "ContentType2", props);
-            var contentType2s = new PublishedContentType(3, "ContentType2Sub", props);
+            var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+            var contentType2 = new PublishedContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
+            var contentType2s = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
 
             cache.Add(new SolidPublishedContent(contentType1)
                 {

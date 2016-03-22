@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿
+using Umbraco.Core.Services;
+using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core;
-using umbraco.businesslogic;
+
 using Umbraco.Core.Configuration;
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 
 namespace umbraco
@@ -20,7 +21,7 @@ namespace umbraco
         {
             rootNode.NodeType = "init" + TreeAlias;
             rootNode.NodeID = "init";
-            rootNode.Text = ui.Text("treeHeaders", "scripts");
+            rootNode.Text = Services.TextService.Localize("treeHeaders/scripts");
         }
 
         public override void RenderJS(ref StringBuilder Javascript)

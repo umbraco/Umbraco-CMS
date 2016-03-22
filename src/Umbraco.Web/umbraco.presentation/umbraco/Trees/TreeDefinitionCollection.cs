@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web;
-using umbraco.interfaces;
 using umbraco.BusinessLogic;
 
 namespace umbraco.cms.presentation.Trees
@@ -33,7 +32,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="tree"></param>
         /// <returns></returns>
-        public TreeDefinition FindTree(ITree tree)
+        public TreeDefinition FindTree(BaseTree tree)
         {
 			EnsureTreesRegistered();
 
@@ -51,7 +50,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TreeDefinition FindTree<T>() where T : ITree
+        public TreeDefinition FindTree<T>() where T : BaseTree
         {
 			EnsureTreesRegistered();
 

@@ -1,18 +1,17 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
+        var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
                 $scope.model.config.startNodeId = userData.startMediaId;
             });
         }
-            
-
          
         function setupViewModel() {
             $scope.images = [];
@@ -57,37 +56,37 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.sync();
         };
 
+        $scope.goToItem = function(item) {
+            $location.path('media/media/edit/' + item.id);
+        };
+
        $scope.add = function() {
 
-          $scope.mediaPickerOverlay = {};
-          $scope.mediaPickerOverlay.startNodeId = $scope.model.config.startNodeId;
-          $scope.mediaPickerOverlay.multiPicker = multiPicker;
-          $scope.mediaPickerOverlay.view = "mediaPicker";
-          $scope.mediaPickerOverlay.title = "Select media";
-          $scope.mediaPickerOverlay.show = true;
+           $scope.mediaPickerOverlay = {
+               view: "mediapicker",
+               title: "Select media",
+               startNodeId: $scope.model.config.startNodeId,
+               multiPicker: multiPicker,
+               show: true,
+               submit: function(model) {
 
-          $scope.mediaPickerOverlay.submit = function(model) {
+                   _.each(model.selectedImages, function(media, i) {
 
-             _.each(model.selectedImages, function(media, i) {
+                       if (!media.thumbnail) {
+                           media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                       }
 
-                 if (!media.thumbnail) {
-                     media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                 }
+                       $scope.images.push(media);
+                       $scope.ids.push(media.id);
+                   });
 
-                 $scope.images.push(media);
-                 $scope.ids.push(media.id);
-             });
+                   $scope.sync();
 
-             $scope.sync();
+                   $scope.mediaPickerOverlay.show = false;
+                   $scope.mediaPickerOverlay = null;
 
-             $scope.mediaPickerOverlay.show = false;
-             $scope.mediaPickerOverlay = null;
-          };
-
-          $scope.mediaPickerOverlay.close = function(oldModel) {
-             $scope.mediaPickerOverlay.show = false;
-             $scope.mediaPickerOverlay = null;
-          };
+               }
+           };
 
        };
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,15 +6,13 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -26,7 +23,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Content,
         Constants.Applications.Media,
         Constants.Applications.Members)]
-    [Tree(Constants.Applications.Members, Constants.Trees.Members)]
+    [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class MemberTreeController : TreeController
@@ -121,7 +118,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, ui.Text("member", "allMembers"), "icon-users", false,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", false,
                             queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
@@ -154,7 +151,7 @@ namespace Umbraco.Web.Trees
                     menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                     //Create the normal create action
-                    menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
                 }
                 else
                 {
@@ -166,12 +163,12 @@ namespace Umbraco.Web.Trees
                     menu.Items.Add(createMenuItem);
                 }
                 
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
 
             return menu;
         }

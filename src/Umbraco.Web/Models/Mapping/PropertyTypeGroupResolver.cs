@@ -9,7 +9,8 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class PropertyTypeGroupResolver : ValueResolver<IContentTypeComposition, IEnumerable<PropertyGroupDisplay>>
+    internal class PropertyTypeGroupResolver<TPropertyType> : ValueResolver<IContentTypeComposition, IEnumerable<PropertyGroupDisplay<TPropertyType>>> 
+        where TPropertyType : PropertyTypeDisplay, new()
     {
         private readonly ApplicationContext _applicationContext;
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
@@ -40,15 +41,35 @@ namespace Umbraco.Web.Models.Mapping
                 .FirstOrDefault(x => x != null);
         }
 
-        protected override IEnumerable<PropertyGroupDisplay> ResolveCore(IContentTypeComposition source)
+        /// <summary>
+        /// Gets the content type that defines a property group, within a composition.
+        /// </summary>
+        /// <param name="contentType">The composition.</param>
+        /// <param name="propertyTypeId">The identifier of the property type.</param>
+        /// <returns>The composition content type that defines the specified property group.</returns>
+        private static IContentTypeComposition GetContentTypeForPropertyType(IContentTypeComposition contentType, int propertyTypeId)
+        {
+            // test local property types
+            if (contentType.PropertyTypes.Any(x => x.Id == propertyTypeId))
+                return contentType;
+
+            // test composition property types
+            // .ContentTypeComposition is just the local ones, not recursive,
+            // so we have to recurse here
+            return contentType.ContentTypeComposition
+                .Select(x => GetContentTypeForPropertyType(x, propertyTypeId))
+                .FirstOrDefault(x => x != null);
+        }
+
+        protected override IEnumerable<PropertyGroupDisplay<TPropertyType>> ResolveCore(IContentTypeComposition source)
         {
             // deal with groups
-            var groups = new List<PropertyGroupDisplay>();
+            var groups = new List<PropertyGroupDisplay<TPropertyType>>();
 
             // add groups local to this content type
             foreach (var tab in source.PropertyGroups)
             {
-                var group = new PropertyGroupDisplay
+                var group = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = tab.Id,
                     Inherited = false,
@@ -73,7 +94,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (definingContentType == null) 
                     throw new Exception("PropertyGroup with id=" + tab.Id + " was not found on any of the content type's compositions.");
 
-                var group = new PropertyGroupDisplay
+                var group = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = tab.Id,
                     Inherited = true,
@@ -89,25 +110,31 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             // deal with generic properties
-            var genericProperties = new List<PropertyTypeDisplay>();
+            var genericProperties = new List<TPropertyType>();
 
             // add generic properties local to this content type
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
-            genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, false));
+            genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupBasic.GenericPropertiesGroupId, false));
 
             // add generic properties inherited through compositions
             var localGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
             var compositionGenericProperties = source.CompositionPropertyTypes
                 .Where(x => x.PropertyGroupId == null // generic
                     && localGenericPropertyIds.Contains(x.Id) == false); // skip those that are local
-            genericProperties.AddRange(MapProperties(compositionGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, true));
+            foreach (var compositionGenericProperty in compositionGenericProperties)
+            {
+                var definingContentType = GetContentTypeForPropertyType(source, compositionGenericProperty.Id);
+                if (definingContentType == null)
+                    throw new Exception("PropertyType with id=" + compositionGenericProperty.Id + " was not found on any of the content type's compositions.");
+                genericProperties.AddRange(MapProperties(new [] { compositionGenericProperty }, definingContentType, PropertyGroupBasic.GenericPropertiesGroupId, true));
+            }
 
             // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
             {
-                var genericTab = new PropertyGroupDisplay
+                var genericTab = new PropertyGroupDisplay<TPropertyType>
                 {
-                    Id = PropertyGroupDisplay.GenericPropertiesGroupId, 
+                    Id = PropertyGroupBasic.GenericPropertiesGroupId, 
                     Name = "Generic properties",
                     ContentTypeId = source.Id, 
                     SortOrder = 999,
@@ -117,10 +144,23 @@ namespace Umbraco.Web.Models.Mapping
                 groups.Add(genericTab);
             }
 
+            // handle locked properties
+            var lockedPropertyAliases = new List<string>();
+            // add built-in member property aliases to list of aliases to be locked
+            foreach (var propertyAlias in Constants.Conventions.Member.GetStandardPropertyTypeStubs().Keys)
+            {
+                lockedPropertyAliases.Add(propertyAlias);
+            }
+            // lock properties by aliases
+            foreach (var property in groups.SelectMany(x => x.Properties))
+            {
+                property.Locked = lockedPropertyAliases.Contains(property.Alias);
+            }
+
             // now merge tabs based on names
             // as for one name, we might have one local tab, plus some inherited tabs
             var groupsGroupsByName = groups.GroupBy(x => x.Name).ToArray();
-            groups = new List<PropertyGroupDisplay>(); // start with a fresh list
+            groups = new List<PropertyGroupDisplay<TPropertyType>>(); // start with a fresh list
             foreach (var groupsByName in groupsGroupsByName)
             {
                 // single group, just use it
@@ -151,33 +191,36 @@ namespace Umbraco.Web.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
-            var mappedProperties = new List<PropertyTypeDisplay>();
+            var mappedProperties = new List<TPropertyType>();
 
             foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0).OrderBy(x => x.SortOrder))
             {
                 var propertyEditor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
                 var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
-                mappedProperties.Add(new PropertyTypeDisplay
-                    {
-                        Id = p.Id,
-                        Alias = p.Alias,
-                        Description = p.Description,
-                        Editor = p.PropertyEditorAlias,
-                        Validation = new PropertyTypeValidation { Mandatory = p.Mandatory, Pattern = p.ValidationRegExp },
-                        Label = p.Name,
-                        View = propertyEditor.ValueEditor.View,
-                        Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues) ,
-                        //Value = "",
-                        ContentTypeId = contentType.Id,
-                        ContentTypeName = contentType.Name,
-                        GroupId = groupId,
-                        Inherited = inherited,
-                        DataTypeId = p.DataTypeDefinitionId,
-                        SortOrder = p.SortOrder
-                    });
+                if (propertyEditor == null) 
+                    throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");
+
+                mappedProperties.Add(new TPropertyType
+                {
+                    Id = p.Id,
+                    Alias = p.Alias,
+                    Description = p.Description,
+                    Editor = p.PropertyEditorAlias,
+                    Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
+                    Label = p.Name,
+                    View = propertyEditor.ValueEditor.View,
+                    Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues),
+                    //Value = "",
+                    GroupId = groupId,
+                    Inherited = inherited,
+                    DataTypeId = p.DataTypeDefinitionId,
+                    SortOrder = p.SortOrder,
+                    ContentTypeId = contentType.Id,
+                    ContentTypeName = contentType.Name
+                });
             }
 
             return mappedProperties;

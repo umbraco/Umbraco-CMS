@@ -1,11 +1,14 @@
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbHeader
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
 * @restrict E
 * @function
 * @description
 * The header on an editor that contains tabs using bootstrap tabs - THIS IS OBSOLETE, use umbTabHeader instead
 **/
+
 angular.module("umbraco.directives")
 .directive('umbHeader', function ($parse, $timeout) {
     return {

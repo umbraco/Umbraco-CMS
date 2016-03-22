@@ -457,11 +457,7 @@ namespace umbraco
 
         #endregion
 
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+    
         #region constructors
 
         public static string GetMasterPageName(int templateID)
@@ -482,28 +478,28 @@ namespace umbraco
         {
             var tId = templateID;
 
-            var t = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            var t = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   using (var templateData = SqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design
+                   var templateData = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<dynamic>(
+                       @"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)
 where nodeId = @templateID",
-                           SqlHelper.CreateParameter("@templateID", templateID)))
-                    {
-                       if (templateData.Read())
-                       {
-                           // Get template master and replace content where the template
-                           if (!templateData.IsNull("master"))
-                               _masterTemplate = templateData.GetInt("master");
-                           if (!templateData.IsNull("alias"))
-                               _templateAlias = templateData.GetString("alias");
-                           if (!templateData.IsNull("text"))
-                               _templateName = templateData.GetString("text");
-                           if (!templateData.IsNull("design"))
-                               _templateDesign = templateData.GetString("design");
-                       }
+                       new {templateID = templateID});
+                   if (templateData != null)
+                   {
+                       // Get template master and replace content where the template
+                       if (templateData.master != null)
+                           _masterTemplate = templateData.master;
+                       if (templateData.alias != null)
+                           _templateAlias = templateData.alias;
+                       if (templateData.text != null)
+                           _templateName = templateData.text;
+                       if (templateData.design != null)
+                           _templateDesign = templateData.design;
                    }
+                   
                    return this;
                });
 

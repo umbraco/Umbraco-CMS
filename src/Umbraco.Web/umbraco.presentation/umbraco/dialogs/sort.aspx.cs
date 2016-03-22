@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using System.Web.UI;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace umbraco.cms.presentation
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sortDone.Text = ui.Text("sort", "sortDone");
+            sortDone.Text = Services.TextService.Localize("sort/sortDone");
         }
         protected override void OnPreRender(EventArgs e)
         {
@@ -126,8 +127,8 @@ namespace umbraco.cms.presentation
 
             foreach (var n in _nodes)
                 lt_nodes.Text += string.Format(
-                    "<tr id='node_{0}'><td>{1}</td><td class='nowrap' style='display:{5};'>{2} {3}</td><td style='text-align: center;'>{4}</td></tr>", 
-                    n.id, n.Name, n.createDate.ToShortDateString(), n.createDate.ToShortTimeString(), n.sortOder, HideDateColumn ? "none" : "block");
+                    "<tr id='node_{0}'><td>{1}</td><td class='nowrap' style='display:{5};'>{2} {3}</td><td style='text-align: center;'>{4}</td></tr>",
+                    n.id, n.Name, n.createDate.ToShortDateString(), n.createDate.ToShortTimeString(), n.sortOrder, HideDateColumn ? "none" : "table-cell");
         }
 
         private static SortableNode CreateNode(string id, int sortOrder, string name, DateTime createDateTime, string icon)
@@ -135,7 +136,7 @@ namespace umbraco.cms.presentation
             var node = new SortableNode
                             {
                                 id = id,
-                                sortOder = sortOrder,
+                                sortOrder = sortOrder,
                                 Name = name,
                                 icon = icon,
                                 createDate = createDateTime
@@ -146,7 +147,7 @@ namespace umbraco.cms.presentation
         public struct SortableNode
         {
             public string id;
-            public int sortOder;
+            public int sortOrder;
             public string Name;
             public string icon;
             public DateTime createDate;

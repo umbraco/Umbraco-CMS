@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core
 {

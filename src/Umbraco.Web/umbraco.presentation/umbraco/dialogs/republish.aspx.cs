@@ -60,7 +60,7 @@
 
 //        protected void Page_Load(object sender, System.EventArgs e)
 //        {
-//            bt_go.Text = ui.Text("republish");
+//            bt_go.Text = Services.TextService.Localize("republish");
 //        }
 
 		

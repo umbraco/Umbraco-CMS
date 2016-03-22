@@ -13,13 +13,14 @@ using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using umbraco;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using umbraco.interfaces;
 using umbraco.uicontrols;
+using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Plugins
 {
@@ -73,14 +74,14 @@ namespace Umbraco.Tests.Plugins
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(8, typesFound.Count());
-            Assert.AreEqual(8, originalTypesFound.Count());
+            Assert.AreEqual(9, typesFound.Count());
+            Assert.AreEqual(9, originalTypesFound.Count());
         }
 
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typesFound = TypeFinder.FindClassesWithAttribute<Umbraco.Web.Trees.TreeAttribute>(_assemblies);
+            var typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
             //TODO: Fix this with the correct count
             Assert.AreEqual(1, typesFound.Count());
         }
@@ -144,18 +145,6 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
-        }
-
-        public class MyTag : ITag
-        {
-            public int Id { get; private set; }
-            public string TagCaption { get; private set; }
-            public string Group { get; private set; }
-        }
-
-        public class MySuperTag : MyTag
-        {
             
         }
 

@@ -1,14 +1,8 @@
 using System;
 using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.dialogs {
     public partial class RegexWs : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
@@ -21,8 +15,8 @@ namespace umbraco.presentation.dialogs {
         }
 
         protected void Page_Load(object sender, EventArgs e) {
-            pp_search.Text = ui.Text("general", "search");
-            bt_search.Text = ui.Text("general", "search");
+            pp_search.Text = Services.TextService.Localize("general/search");
+            bt_search.Text = Services.TextService.Localize("general/search");
         }
 
         protected void findRegex(object sender, EventArgs e) {
@@ -43,7 +37,7 @@ namespace umbraco.presentation.dialogs {
                 ds.Dispose();
             } catch{
                 Literal err = new Literal();
-                err.Text = "<div class='diff'><p>" + ui.Text("defaultdialogs", "regexSearchError") + "</p></div>";
+                err.Text = "<div class='diff'><p>" + Services.TextService.Localize("defaultdialogs/regexSearchError") + "</p></div>";
                 regexPanel.Controls.Clear();
                 regexPanel.Controls.Add(err);
             }

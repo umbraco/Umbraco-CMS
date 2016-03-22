@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic.relation
 
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
 		public CMSNode Parent 

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyType")]
     public class PropertyTypeDisplay : PropertyTypeBasic
-    {  
+    {
         [DataMember(Name = "editor")]
         [ReadOnly(true)]
         public string Editor { get; set; }
@@ -23,14 +19,30 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public IDictionary<string, object> Config { get; set; }
         
-        //SD: Seems strange that this is needed
+        /// <summary>
+        /// Gets a value indicating whether this property should be locked when editing.
+        /// </summary>
+        /// <remarks>This is used for built in properties like the default MemberType
+        /// properties that should not be editable from the backoffice.</remarks>
+        [DataMember(Name = "locked")]
+        [ReadOnly(true)]
+        public bool Locked { get; set; }
+
+        /// <summary>
+        /// This is required for the UI editor to know if this particular property belongs to 
+        /// an inherited item or the current item.
+        /// </summary>        
         [DataMember(Name = "contentTypeId")]
         [ReadOnly(true)]
         public int ContentTypeId { get; set; }
 
-        //SD: Seems strange that this is needed
+        /// <summary>
+        /// This is required for the UI editor to know which content type name this property belongs
+        /// to based on the property inheritance structure
+        /// </summary>
         [DataMember(Name = "contentTypeName")]
         [ReadOnly(true)]
         public string ContentTypeName { get; set; }
+
     }
 }

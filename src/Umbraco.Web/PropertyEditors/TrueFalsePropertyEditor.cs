@@ -13,5 +13,15 @@ namespace Umbraco.Web.PropertyEditors
         public TrueFalsePropertyEditor(ILogger logger) : base(logger)
         {
         }
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new TrueFalsePreValueEditor();
+        }
+
+        internal class TrueFalsePreValueEditor : PreValueEditor
+        {
+            [PreValueField("default", "Default Value", "boolean")]
+            public string Default { get; set; }
+        }
     }
 }

@@ -4,15 +4,11 @@ using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.BusinessLogic;
-
 using umbraco.cms.businesslogic.template;
-using umbraco.cms.presentation.Trees;
-using umbraco.DataLayer;
 using umbraco.uicontrols;
-using System.Linq;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings
@@ -49,7 +45,7 @@ namespace umbraco.cms.presentation.settings
 
 			if (!IsPostBack)
 			{
-				MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
+				MasterTemplate.Items.Add(new ListItem(Services.TextService.Localize("none"), "0"));
 				foreach (Template t in Template.GetAllAsList())
 				{
 					if (t.Id != _template.Id)
@@ -92,22 +88,22 @@ namespace umbraco.cms.presentation.settings
 			base.OnInit(e);
 			Panel1.hasMenu = true;
 
-		    var editor = Panel1.NewTabPage(ui.Text("template"));
+		    var editor = Panel1.NewTabPage(Services.TextService.Localize("template"));
             editor.Controls.Add(Pane8);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane7);
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
 
-			Panel1.Text = ui.Text("edittemplate");
-			pp_name.Text = ui.Text("name", UmbracoUser);
-            pp_alias.Text = ui.Text("alias", UmbracoUser);
-            pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoUser);
+			Panel1.Text = Services.TextService.Localize("edittemplate");
+			pp_name.Text = Services.TextService.Localize("name");
+            pp_alias.Text = Services.TextService.Localize("alias");
+            pp_masterTemplate.Text = Services.TextService.Localize("mastertemplate");
 
 
 			// Editing buttons
@@ -116,8 +112,8 @@ namespace umbraco.cms.presentation.settings
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
-			umbField.AltText = ui.Text("template", "insertPageField");
+					editorSource.ClientID + "&tagName=UMBRACOGETDATA", Services.TextService.Localize("template/insertPageField"), 640, 550);
+			umbField.AltText = Services.TextService.Localize("template/insertPageField");
 
 
 			// TODO: Update icon
@@ -126,7 +122,7 @@ namespace umbraco.cms.presentation.settings
 			umbDictionary.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"),
+					editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", Services.TextService.Localize("template/insertDictionaryItem"),
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 
@@ -136,20 +132,20 @@ namespace umbraco.cms.presentation.settings
 			{
 			    MenuIconI umbContainer = editorSource.Menu.NewIcon();
 				umbContainer.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpagePlaceHolder.gif";
-				umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+				umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
 				umbContainer.OnClickCommand =
 					ClientTools.Scripts.OpenModalWindow(
 						IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
 						"/dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id,
-						ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
+						Services.TextService.Localize("template/insertContentAreaPlaceHolder"), 470, 320);
 
                 MenuIconI umbContent = editorSource.Menu.NewIcon();
 				umbContent.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpageContent.gif";
-				umbContent.AltText = ui.Text("template", "insertContentArea");
+				umbContent.AltText = Services.TextService.Localize("template/insertContentArea");
 				umbContent.OnClickCommand =
 					ClientTools.Scripts.OpenModalWindow(
 						IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" +
-						_template.Id, ui.Text("template", "insertContentArea"), 470, 300);
+						_template.Id, Services.TextService.Localize("template/insertContentArea"), 470, 300);
 			}
 
 
@@ -164,9 +160,9 @@ namespace umbraco.cms.presentation.settings
 			helpIcon.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=" +
-					_template.Alias, ui.Text("template", "quickGuide"), 600, 580);
+					_template.Alias, Services.TextService.Localize("template/quickGuide"), 600, 580);
 			helpIcon.ImageURL = SystemDirectories.Umbraco + "/images/editor/help.png";
-			helpIcon.AltText = ui.Text("template", "quickGuide");
+			helpIcon.AltText = Services.TextService.Localize("template/quickGuide");
 		}
 
 
@@ -199,11 +195,18 @@ namespace umbraco.cms.presentation.settings
 		private void LoadMacros()
 		{
 			var macroRenderings =
-				DatabaseContext.Database.Fetch<dynamic>("select id, macroAlias, macroName from cmsMacro order by macroName");
+				DatabaseContext.Database.Fetch<TempMacroClass>("select id, macroAlias, macroName from cmsMacro order by macroName");
 
 			rpt_macros.DataSource = macroRenderings;
 			rpt_macros.DataBind();
 		}
+
+	    private class TempMacroClass
+	    {
+	        public int id { get; set; }
+            public string macroAlias { get; set; }
+            public string macroName { get; set; }
+	    }
 
 		public string DoesMacroHaveSettings(string macroId)
 		{

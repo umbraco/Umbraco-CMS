@@ -1,20 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using umbraco.businesslogic;
-using umbraco.interfaces;
-using System.Xml;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -45,14 +35,15 @@ namespace umbraco.cms.presentation.Trees
 
         public override void Render(ref XmlTree tree)
         {
-            foreach (umbraco.BusinessLogic.User user in umbraco.BusinessLogic.User.getAll())
+            int totalusers;
+            foreach (var user in Services.UserService.GetAll(0, int.MaxValue, out totalusers))
             {
-                if (user.Id > 0 && !user.Disabled)
+                if (user.Id > 0 && user.IsApproved)
                 {
                     XmlTreeNode node = XmlTreeNode.Create(this);
                     node.NodeID = user.Id.ToString();
                     node.Text = user.Name;
-                    node.Action = "javascript:openUserPermissions('" + user.Id.ToString() + "');";
+                    node.Action = "javascript:openUserPermissions('" + user.Id + "');";
                     node.Icon = "icon-users";
 
                     OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);
@@ -68,7 +59,7 @@ namespace umbraco.cms.presentation.Trees
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
-            rootNode.Text = ui.Text("user", "userPermissions");
+            rootNode.Text = Services.TextService.Localize("user/userPermissions");
         }
 
         public override void RenderJS(ref StringBuilder Javascript)

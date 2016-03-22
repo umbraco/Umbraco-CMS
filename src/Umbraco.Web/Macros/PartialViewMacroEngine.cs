@@ -11,7 +11,6 @@ using System.Web.WebPages;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
@@ -22,13 +21,11 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// A macro engine using MVC Partial Views to execute
     /// </summary>
-    public class PartialViewMacroEngine : IMacroEngine
+    public class PartialViewMacroEngine 
     {
         private readonly Func<HttpContextBase> _getHttpContext;
         private readonly Func<UmbracoContext> _getUmbracoContext;
-
-        public const string EngineName = "Partial View Macro Engine";
-
+        
         public PartialViewMacroEngine()
         {
             _getHttpContext = () =>
@@ -57,11 +54,6 @@ namespace Umbraco.Web.Macros
             _getUmbracoContext = () => umbracoContext;
         }
 
-        public string Name
-        {
-            get { return EngineName; }
-        }
-
 		//NOTE: We do not return any supported extensions because we don't want the MacroEngineFactory to return this
 		// macro engine when searching for engines via extension. Those types of engines are reserved for files that are
 		// stored in the ~/macroScripts folder and each engine must support unique extensions. This is a total Hack until 
@@ -79,12 +71,8 @@ namespace Umbraco.Web.Macros
 		{
 			get { return Enumerable.Empty<string>(); }
 		}
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
-        {
-            get { throw new NotSupportedException(); }
-        }
-
-        public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
+       
+        public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
         {
             var temp = GetVirtualPathFromPhysicalPath(tempFileName);
             try
@@ -99,20 +87,7 @@ namespace Umbraco.Web.Macros
             errorMessage = string.Empty;
             return true;
         }
-
-        public string Execute(MacroModel macro, INode node)
-        {
-            if (node == null) return string.Empty;
-
-            var umbCtx = _getUmbracoContext();
-            //NOTE: This is a bit of a nasty hack to check if the INode is actually already based on an IPublishedContent 
-            // (will be the case when using LegacyConvertedNode )
-            return Execute(macro,
-                (node is IPublishedContent)
-                    ? (IPublishedContent)node
-                    : umbCtx.ContentCache.GetById(node.Id));
-        }
-
+        
         public string Execute(MacroModel macro, IPublishedContent content)
         {
             if (macro == null) throw new ArgumentNullException("macro");
@@ -124,7 +99,7 @@ namespace Umbraco.Web.Macros
             var routeVals = new RouteData();
             routeVals.Values.Add("controller", "PartialViewMacro");
             routeVals.Values.Add("action", "Index");
-            routeVals.DataTokens.Add("umbraco-context", umbCtx); //required for UmbracoViewPage
+            routeVals.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
 
 			//lets render this controller as a child action
 			var viewContext = new ViewContext {ViewData = new ViewDataDictionary()};;

@@ -18,7 +18,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Cache;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 using File = System.IO.File;
 
 namespace Umbraco.Core
@@ -504,18 +504,7 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveCacheRefreshers()
         {
             return ResolveTypes<ICacheRefresher>();
-        }
-
-      
-        
-        /// <summary>
-        /// Returns all available IMacroGuiRendering in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMacroRenderings()
-        {
-            return ResolveTypes<IMacroGuiRendering>();
-        }
+        }      
 
         /// <summary>
         /// Returns all available IPackageAction in application
@@ -526,14 +515,7 @@ namespace Umbraco.Core
             return ResolveTypes<IPackageAction>();
         }
 
-        /// <summary>
-        /// Returns all available IAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveActions()
-        {
-            return ResolveTypes<IAction>();
-        }
+        
 
         /// <summary>
         /// Returns all mapper types that have a MapperFor attribute defined

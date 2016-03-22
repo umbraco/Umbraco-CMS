@@ -7,11 +7,10 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
-using umbraco.interfaces;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -77,8 +76,8 @@ namespace Umbraco.Web.Trees
 		protected override void OnRenderFileNode(ref XmlTreeNode xNode)
 		{
 			ChangeNodeAction(xNode);
-			xNode.Icon = "settingView.gif";
-			xNode.OpenIcon = "settingView.gif";
+			xNode.Icon = "icon-article";
+			xNode.OpenIcon = "icon-article";
 
             xNode.Text = xNode.Text.StripFileExtension();
 		}

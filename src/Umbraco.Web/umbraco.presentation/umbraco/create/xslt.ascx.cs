@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using Umbraco.Core.Services;
+using System.Web;
 using System.Web.UI.WebControls;
 using System.IO;
 using Umbraco.Core;
@@ -6,6 +7,7 @@ using Umbraco.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using Umbraco.Web.UI.Controls;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.create
 {
@@ -20,7 +22,7 @@ namespace umbraco.presentation.create
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            sbmt.Text = ui.Text("create");
+            sbmt.Text = Services.TextService.Localize("create");
             foreach (string fileName in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + GetXsltTemplatePath()), "*.xslt"))
             {
                 FileInfo fi = new FileInfo(fileName);
@@ -51,7 +53,7 @@ namespace umbraco.presentation.create
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    UmbracoContext.UmbracoUser,
+                    Security.CurrentUser,
                     Request.GetItemAsString("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);

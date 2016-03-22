@@ -7,6 +7,7 @@ using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -127,7 +128,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(result, p, ApplicationContext);
             }            
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")));
             Assert.IsTrue(result.Tabs.First().IsActive);
             Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
         }
@@ -173,8 +174,8 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(result, p, ApplicationContext);
             }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
-            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == ui.Text("general", "properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")));
+            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == ApplicationContext.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions

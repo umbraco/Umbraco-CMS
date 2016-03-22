@@ -108,18 +108,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Method to call on entity saved when first added
-        /// </summary>
-        internal override void AddingEntity()
-        {
-            if (Key == default(Guid))
-            {
-                Key = Guid.NewGuid();
-            }
-            base.AddingEntity();
-        }
-
         [DataMember]
         public int LoginNodeId
         {

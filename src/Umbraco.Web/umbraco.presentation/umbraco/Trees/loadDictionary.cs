@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic;
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 
 namespace umbraco
 {
 
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", sortOrder: 3)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, "Dictionary", sortOrder: 0)]
     public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }

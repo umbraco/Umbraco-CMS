@@ -22,9 +22,7 @@
         IRepositoriesSection PackageRepositories { get; }
 
         IProvidersSection Providers { get; }
-
-        IHelpSection Help { get; }
-
+        
         IWebRoutingSection WebRouting { get; }
 
     }

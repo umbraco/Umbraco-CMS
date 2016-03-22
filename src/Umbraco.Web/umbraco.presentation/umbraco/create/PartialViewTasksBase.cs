@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Web;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.UI;
 using Umbraco.Core;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -48,7 +50,7 @@ namespace umbraco
             if (IsPartialViewMacro == false)
             {
                 var attempt = fileService.CreatePartialView(model, snippetName, User.Id);
-                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViews&file={0}", model.Path.TrimStart('/'));
+                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViews&file={0}", HttpUtility.UrlEncode(model.Path.TrimStart('/').Replace("\\", "/")));
                 return attempt.Success;
             }
             else
@@ -64,7 +66,7 @@ namespace umbraco
                     macroService.Save(new Macro(attempt.Result.Alias, attempt.Result.Alias) { ScriptPath = virtualPath });
                 }
 
-                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViewMacros&file={0}", model.Path.TrimStart('/'));
+                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViewMacros&file={0}", HttpUtility.UrlEncode(model.Path.TrimStart('/').Replace("\\", "/")));
                 return attempt.Success;
             }
 

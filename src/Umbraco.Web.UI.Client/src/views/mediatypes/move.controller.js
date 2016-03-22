@@ -1,6 +1,6 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.MediaTypes.MoveController",
-    function ($scope, mediaTypeResource, treeService, navigationService, notificationsService, appState) {
+    function ($scope, mediaTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
 
         var dialogOptions = $scope.dialogOptions;
         $scope.dialogTreeEventHandler = $({});
@@ -45,6 +45,8 @@ angular.module("umbraco")
                             navigationService.syncTree({ tree: "mediaTypes", path: activeNodePath, forceReload: false, activate: true });
                         }
                     });
+
+                    eventsService.emit('app.refreshEditor');
 
                 }, function (err) {
                     $scope.success = false;

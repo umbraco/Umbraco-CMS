@@ -8,9 +8,9 @@
 
                 <div class="umb-table-cell">
                     <input class="umb-table__input" type="checkbox"
-                    ng-click="selectAll($event)"
-                    ng-checked="isSelectedAll()"
-                    >
+                           ng-if="allowSelectAll"
+                           ng-click="selectAll($event)"
+                           ng-checked="isSelectedAll()">
                 </div>
 
                 <div class="umb-table-cell umb-table__name">
@@ -22,8 +22,8 @@
 
                 <div class="umb-table-cell" ng-repeat="column in itemProperties">
                     <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
-                        ng-click="sort(column.alias, column.allowSorting)"
-                        ng-class="{'sortable':column.allowSorting}" prevent-default>
+                       ng-click="sort(column.alias, column.allowSorting)"
+                       ng-class="{'sortable':column.allowSorting}" prevent-default>
 
                         <span ng-bind="column.header"></span>
                         <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
@@ -36,14 +36,13 @@
         <!-- Listview body section -->
         <div class="umb-table-body">
             <div class="umb-table-row"
-                ng-repeat="item in items"
-                ng-class="{
+                 ng-repeat="item in items"
+                 ng-class="{
                     '-selected':item.selected,
                     '-published':item.published,
                     '-unpublished':!item.published
                 }"
-                ng-click="selectItem(item, $index, $event)"
-                >
+                 ng-click="selectItem(item, $index, $event)">
 
 
                 <div class="umb-table-cell">
@@ -53,8 +52,8 @@
 
                 <div class="umb-table-cell umb-table__name">
                     <a title="{{ item.name }}" class="umb-table-body__link" href=""
-                        ng-click="clickItem(item, $event)"
-                        ng-bind="item.name">
+                       ng-click="clickItem(item, $event)"
+                       ng-bind="item.name">
                     </a>
                 </div>
 
@@ -68,8 +67,10 @@
     </div>
 
     <!-- If list is empty, then display -->
-    <div ng-if="!items" class="umb-empty-state-text -center">
+    <umb-empty-state
+        ng-if="!items"
+        position="center">
         <localize key="content_listViewNoItems">There are no items show in the list.</localize>
-    </div>
+    </umb-empty-state>
 
 </div>

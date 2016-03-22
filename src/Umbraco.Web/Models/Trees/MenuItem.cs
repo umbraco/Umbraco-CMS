@@ -2,10 +2,10 @@
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Trees;
-using umbraco;
-using umbraco.interfaces;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -190,7 +190,7 @@ namespace Umbraco.Web.Models.Trees
                 .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection),
                            view => LaunchDialogView(
                                view,
-                               ui.GetText("defaultdialogs", "confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
+                               ApplicationContext.Current.Services.TextService.Localize("defaultdialogs/confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
         } 
         #endregion
 

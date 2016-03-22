@@ -10,6 +10,7 @@ using Umbraco.Core.Profiling;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
+using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco
@@ -103,9 +104,9 @@ namespace umbraco
                                 attributeValue = HttpContext.Current.Request[keyName];
                                 break;
                             case "%":
-                                attributeValue = StateHelper.GetSessionValue<string>(keyName);
-                                if (String.IsNullOrEmpty(attributeValue))
-                                    attributeValue = StateHelper.GetCookieValue(keyName);
+                                attributeValue = HttpContext.Current.Session[keyName] != null ? HttpContext.Current.Session[keyName].ToString() : null;
+                                if (string.IsNullOrEmpty(attributeValue))
+                                    attributeValue = HttpContext.Current.Request.GetCookieValue(keyName);
                                 break;
                             case "#":
                                 if (pageElements[keyName] != null)

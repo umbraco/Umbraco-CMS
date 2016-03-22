@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
@@ -33,11 +34,16 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+    public class BackOfficeModel
+    {
+        public string Path { get; set; }
+    }
+
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
@@ -70,8 +76,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }));
         }
 
         /// <summary>
@@ -84,7 +90,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel { Path = GlobalSettings.Path}),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -100,7 +106,8 @@ namespace Umbraco.Web.Editors
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
                 ? Security.IsAuthenticated()
-                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                    //current culture is set at the very beginning of each request
+                    ? Thread.CurrentThread.CurrentCulture
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
@@ -348,6 +355,10 @@ namespace Umbraco.Web.Editors
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                             },
                             {
+                                "disallowedUploadFiles",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            },
+                            {
                                 "maxFileSize",
                                 GetMaxRequestLength()
                             },
@@ -399,7 +410,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -567,6 +578,9 @@ namespace Umbraco.Web.Editors
                             else
                             {
 
+                                if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
+                                if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
                                 var autoLinkUser = new BackOfficeIdentityUser()
                                 {
                                     Email = loginInfo.Email,
@@ -643,6 +657,7 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
+        
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

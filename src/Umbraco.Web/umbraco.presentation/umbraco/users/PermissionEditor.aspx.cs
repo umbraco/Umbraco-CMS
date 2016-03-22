@@ -1,9 +1,10 @@
+using Umbraco.Core.Services;
 using System;
 using System.Web.UI;
 using Umbraco.Core;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.user
@@ -13,7 +14,7 @@ namespace umbraco.cms.presentation.user
     {
 	    public PermissionEditor()
 	    {
-            CurrentApp = Constants.Applications.Users.ToString();
+            CurrentApp = Constants.Applications.Users;
 
 	    }
 
@@ -40,13 +41,13 @@ namespace umbraco.cms.presentation.user
             save.ID = "btnSave";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
             save.OnClientClick = "SavePermissions(); return false;";
-            save.Text = ui.Text("save");
-            save.ToolTip = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
+            save.ToolTip = Services.TextService.Localize("save");
 
 
             nodePermissions.UserID = Convert.ToInt32(Request.QueryString["id"]);
-            pnlUmbraco.Text = ui.Text("user", "userPermissions");
-            pnl1.Text = ui.Text("user", "permissionSelectPages");
+            pnlUmbraco.Text = Services.TextService.Localize("user/userPermissions");
+            pnl1.Text = Services.TextService.Localize("user/permissionSelectPages");
 
 			if (!IsPostBack)
 			{	
@@ -59,11 +60,11 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Since Umbraco stores users in cache, we'll use this method to retrieve our user object by the selected id
         /// </summary>
-        public User UmbracoUser
+        public IUser UmbracoUser
         {
             get
             {
-                return BusinessLogic.User.GetUser(Convert.ToInt32(Request.QueryString["id"]));
+                return Services.UserService.GetUserById(Convert.ToInt32(Request.QueryString["id"]));
             }
         }
       
@@ -75,11 +76,11 @@ namespace umbraco.cms.presentation.user
         {
             int id;
             bool parsed = false;
-            umbraco.BusinessLogic.User oUser = null;
+            IUser oUser = null;
             if (parsed = int.TryParse(strID, out id))
-                oUser = umbraco.BusinessLogic.User.GetUser(id);
+                oUser = Services.UserService.GetUserById(id);
 
-            if (oUser == null || oUser.UserType == null || !parsed)
+            if (oUser == null || oUser.UserType == null || parsed == false)
                 throw new Exception("No user found with id: " + strID);
         }
 

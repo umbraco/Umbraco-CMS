@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
                             //It's also important to note that by default the dropdown angular controller is expecting the 
                             // config options to come in with a property called 'items'
                             Key = "items",
-                            Name = ui.Text("editdatatype", "addPrevalue"),
+                            Name = ApplicationContext.Current.Services.TextService.Localize("editdatatype/addPrevalue"),
                             View = "multivalues"
                         }                   
                 };

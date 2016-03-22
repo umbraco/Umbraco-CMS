@@ -27,7 +27,6 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-        private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
@@ -35,7 +34,6 @@ namespace Umbraco.Core.Persistence.Repositories
             IContentTypeRepository contentTypeRepository, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
-            _cacheHelper = cache;
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
         }
@@ -240,7 +238,7 @@ AND umbracoNode.id <> @id",
 
             //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
             // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            _cacheHelper.RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+            RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -281,7 +279,7 @@ AND umbracoNode.id <> @id",
         
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
+            var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
             if (cached != null && cached.Any())
             {
                 //return from the cache, ensure it's a cloned result
@@ -300,7 +298,7 @@ AND umbracoNode.id <> @id",
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
+            var cached = RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
@@ -353,20 +351,29 @@ AND umbracoNode.id <> @id",
                 new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)
             };
 
+            var origPath = toMove.Path;
+
             //do the move to a new parent
             toMove.ParentId = parentId;
+
+            //set the updated path
+            toMove.Path = string.Concat(container == null ? parentId.ToInvariantString() : container.Path, ",", toMove.Id);
+
             //schedule it for updating in the transaction
             AddOrUpdate(toMove);
 
-            //update all descendants
-            var descendants = this.GetByQuery(Query.Where(type => type.Path.StartsWith(toMove.Path + ",")));
-            foreach (var descendant in descendants)
+            //update all descendants from the original path, update in order of level
+            var descendants = this.GetByQuery(
+                Query.Where(type => type.Path.StartsWith(origPath + ",")));
+
+            var lastParent = toMove;
+            foreach (var descendant in descendants.OrderBy(x => x.Level))
             {
                 moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
 
-                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
-                descendant.ParentId = descendant.ParentId + 1;
-                descendant.ParentId = descendant.ParentId - 1;
+                descendant.ParentId = lastParent.Id;
+                descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
+
                 //schedule it for updating in the transaction
                 AddOrUpdate(descendant);
             }
@@ -459,7 +466,7 @@ AND umbracoNode.id <> @id",
                       + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
 
             //store into cache
-            _cacheHelper.RuntimeCache.InsertCacheItem(key, () => collection,
+            RuntimeCache.InsertCacheItem(key, () => collection,
                 //30 mins
                 new TimeSpan(0, 0, 30),
                 //sliding is true

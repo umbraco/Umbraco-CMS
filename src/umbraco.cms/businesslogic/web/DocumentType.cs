@@ -1,16 +1,15 @@
 using System;
 using System.Collections;
-using System.Text;
 using System.Xml;
 using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -83,15 +82,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
-        public static DocumentType MakeNew(User u, string Text)
+        public static DocumentType MakeNew(IUser u, string Text)
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType);
 
-            //event
-            NewEventArgs e = new NewEventArgs();
-            newDt.OnNew(e);
 
             return newDt;
         }
@@ -348,23 +344,16 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
         public override void delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (e.Cancel == false)
+            // check that no document types uses me as a master
+            if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
             {
-                // check that no document types uses me as a master
-                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
-                {
-                    throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
-                }
-                
-                ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
-
-                clearTemplates();
-
-                FireAfterDelete(e);
+                throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
             }
+                
+            ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
+
+            clearTemplates();
+
         }
 
         public void clearTemplates()
@@ -376,7 +365,10 @@ namespace umbraco.cms.businesslogic.web
         public XmlElement ToXml(XmlDocument xd)
         {
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, ContentType);
+            var xml = exporter.Serialize(
+                ApplicationContext.Current.Services.DataTypeService,
+                ApplicationContext.Current.Services.ContentTypeService,
+                ContentType);
 
             //convert the Linq to Xml structure to the old .net xml structure
             var xNode = xml.GetXmlNode();
@@ -402,18 +394,11 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+            var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
+            var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();                
+            ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId.Success ? userId.Result : 0);
 
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);
-
-                base.Save();
-                FireAfterSave(e);
-            }
+            base.Save();
         }
 
         #endregion
@@ -439,7 +424,10 @@ namespace umbraco.cms.businesslogic.web
         protected override void setupNode()
         {
             var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
-            SetupNode(contentType);
+            
+            // If it's null, it's probably a folder
+            if (contentType != null)
+                SetupNode(contentType);
         }
 
         #endregion
@@ -461,94 +449,5 @@ namespace umbraco.cms.businesslogic.web
         }
         #endregion
 
-        #region Events
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(DocumentType sender, SaveEventArgs e);
-        /// <summary>
-        /// The New event handler
-        /// </summary>
-        public delegate void NewEventHandler(DocumentType sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(DocumentType sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-            {
-                var updated = this.ContentType == null
-                                  ? new DocumentType(this.Id)
-                                  : new DocumentType(this.ContentType);
-                AfterSave(updated, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-        #endregion
     }
 }

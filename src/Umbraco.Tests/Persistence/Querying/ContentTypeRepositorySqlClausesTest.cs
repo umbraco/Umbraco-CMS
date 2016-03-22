@@ -24,8 +24,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
-                .Where("[cmsDocumentType].[IsDefault] = @0", true);
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
+                .Where("([cmsDocumentType].[IsDefault] = @0)", true);
 
             var sql = new Sql();
             sql.Select("*")
@@ -61,9 +61,9 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
                 .Where("[cmsDocumentType].[IsDefault] = @0", true)
-                .Where("[umbracoNode].[id] = @0", 1050);
+                .Where("([umbracoNode].[id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var sqlSyntaxProvider = new SqlCeSyntaxProvider();
             expected.Select("*")
                 .From("[cmsContentTypeAllowedContentType]")
-                .Where("[cmsContentTypeAllowedContentType].[Id] = @0", 1050);
+                .Where("([cmsContentTypeAllowedContentType].[Id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
                 .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]")
-                .Where("[cmsPropertyType].[contentTypeId] = @0", 1050);
+                .Where("([cmsPropertyType].[contentTypeId] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")

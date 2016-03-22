@@ -152,7 +152,7 @@
 //            if (TabTxt.Text.Trim() != "") 
 //            {
 //                docType.AddVirtualTab(TabTxt.Text);
-//                xtra = ui.Text("speechBubbles", "contentTypeTabCreated");
+//                xtra = Services.TextService.Localize("speechBubbles/contentTypeTabCreated");
 //                populateTabDDLs();
 //                TabsPane.Controls.Clear();
 //                LoadExistingTabsOnTabsPane();
@@ -163,7 +163,7 @@
 //            SaveAllowedChildTypes();
 
 //            NodeTypeEditorCtrl.Save();
-//            prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.SpeechBubbleIcon.Save, ui.Text("speechBubbles", "contentTypeSavedHeader"),"" + xtra);
+//            prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),"" + xtra);
 //        }
 
 //        private void SaveAllowedChildTypes() {
@@ -286,7 +286,7 @@
 //            LoadExistingTabsOnTabsPane();
 			
 //            populateTabDDLs();
-//            prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypeTabDeleted"), ui.Text("speechBubbles", "contentTypeTabDeletedText", b.ID));
+//            prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, Services.TextService.Localize("speechBubbles/contentTypeTabDeleted"), ui.Text("speechBubbles", "contentTypeTabDeletedText", b.ID));
 //        }
 
 
@@ -413,7 +413,7 @@
 //                if (NameTxt.Text.Trim() != "" && AliasTxt.Text.Trim() != "") 
 //                {
 //                    string[] info = {NameTxt.Text, DataTypeDDL.SelectedItem.Value};
-//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeCreated"), ui.Text("speechBubbles", "contentTypePropertyTypeCreatedText", info));
+//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, Services.TextService.Localize("speechBubbles/contentTypePropertyTypeCreated"), ui.Text("speechBubbles", "contentTypePropertyTypeCreatedText", info));
 //                    _dt.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(int.Parse(DataTypeDDL.SelectedValue)),AliasTxt.Text,NameTxt.Text);
 					
 //                    if (int.Parse(TabDDL.SelectedValue) != 0) 
@@ -430,7 +430,7 @@
 //                else
 //                {
 					
-//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, ui.Text("error"), ui.Text("errors", "contentTypeAliasAndNameNotNull"));
+//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, Services.TextService.Localize("error"), Services.TextService.Localize("errors/contentTypeAliasAndNameNotNull"));
 //                }
 //            }
 //        }
@@ -554,7 +554,7 @@
 //                    ent.loadGenericPropertyTypesOnPane();
 
 //                    BasePages.BasePage bp = (BasePages.BasePage) this.Page;
-//                    bp.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeDeleted"), "");
+//                    bp.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, Services.TextService.Localize("speechBubbles/contentTypePropertyTypeDeleted"), "");
 //                    ent.OnPropertyTypeDelete(this, new System.EventArgs());
 //                }
 

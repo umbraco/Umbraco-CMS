@@ -12,7 +12,12 @@
 
          <div class="form-search">
             <i class="icon-search"></i>
-            <input class="umb-search-field search-query" ng-model="searchTerm" placeholder="Filter..." type="text">
+            <input
+                class="umb-search-field search-query"
+                ng-model="searchTerm"
+                localize="placeholder"
+                placeholder="@placeholders_filter"
+                type="text">
          </div>
 
          <div class="upload-button">
@@ -70,7 +75,12 @@
       <umb-media-grid
          items="images"
          filter-by="searchTerm"
-         on-click="clickHandler">
+         on-click="clickHandler"
+         on-click-name="clickItemName"
+         item-max-width="150"
+         item-max-height="150"
+         item-min-width="100"
+         item-min-height="100">
       </umb-media-grid>
 
    </div>
@@ -91,7 +101,9 @@
 
          <div ng-if="cropSize">
 
-            <h5>Preview</h5>
+            <h5>
+                <localize key="general_preview">Preview</localize>
+            </h5>
 
             <umb-image-thumbnail
                center="target.focalPoint"

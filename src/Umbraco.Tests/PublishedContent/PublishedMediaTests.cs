@@ -292,7 +292,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -316,7 +316,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Descendants_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -340,7 +340,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void DescendantsOrSelf_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -366,7 +366,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Parent_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -391,7 +391,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ancestors_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -410,7 +410,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void AncestorsOrSelf_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 

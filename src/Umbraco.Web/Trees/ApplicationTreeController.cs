@@ -72,7 +72,7 @@ namespace Umbraco.Web.Trees
             }
 
             var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
-            multiTree.Name = ui.Text("sections", application);
+            multiTree.Name = Services.TextService.Localize("sections/"+ application);
             return multiTree;
         }
 

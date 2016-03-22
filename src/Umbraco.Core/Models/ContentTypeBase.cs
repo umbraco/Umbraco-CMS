@@ -452,11 +452,6 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public bool AddPropertyType(PropertyType propertyType)
         {
-            if (propertyType.HasIdentity == false)
-            {
-                propertyType.Key = Guid.NewGuid();
-            }
-
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 _propertyTypes.Add(propertyType);                
@@ -492,11 +487,8 @@ namespace Umbraco.Core.Models
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x => 
                 x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
 
-            // reset PropertyGroupId, which will be re-evaluated when the content type
-            // is saved - what is important is group.PropertyTypes - see code in
-            // ContentTypeBaseRepository.PersistUpdatedBaseContentType
-            propertyType.PropertyGroupId = new Lazy<int>(() => default(int));
-            propertyType.ResetDirtyProperties(); // PropertyGroupId must not be dirty
+            // set new group
+            propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
 
             // remove from old group, if any - add to new group, if any
             if (oldPropertyGroup != null)
@@ -545,7 +537,7 @@ namespace Umbraco.Core.Models
             // re-assign the group's properties to no group
             foreach (var property in group.PropertyTypes)
             {
-                property.PropertyGroupId = new Lazy<int>(() => 0);
+                property.PropertyGroupId = null;
                 _propertyTypes.Add(property);
             }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.uicontrols.TreePicker
 {
@@ -21,7 +22,7 @@ namespace umbraco.uicontrols.TreePicker
         {
             get
             {
-                return ui.GetText("general", "choose") + " " + ui.GetText("sections", "content");
+                return ApplicationContext.Current.Services.TextService.Localize("general/choose") + " " + ApplicationContext.Current.Services.TextService.Localize("sections/content");
             }
         }
     }

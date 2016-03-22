@@ -1,6 +1,4 @@
-﻿using umbraco.interfaces;
-
-namespace Umbraco.Core.Cache
+﻿namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// A cache refresher that supports refreshing cache based on a custom payload

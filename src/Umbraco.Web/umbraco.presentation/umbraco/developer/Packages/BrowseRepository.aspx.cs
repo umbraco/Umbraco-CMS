@@ -1,16 +1,6 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Xml;
-using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web;
@@ -31,7 +21,7 @@ namespace umbraco.presentation.developer.packages {
             if (!cms.businesslogic.packager.Settings.HasFileAccess(ref ex)) {
                 fb.Style.Add("margin-top", "7px");
                 fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
-                fb.Text = "<strong>" + ui.Text("errors", "filePermissionsError") + ":</strong><br/>" + ex.Message;
+                fb.Text = "<strong>" + Services.TextService.Localize("errors/filePermissionsError") + ":</strong><br/>" + ex.Message;
             }
 
             string category = Request.CleanForXss("category");

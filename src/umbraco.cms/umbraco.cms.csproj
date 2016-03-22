@@ -148,11 +148,6 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Name>umbraco.businesslogic</Name>
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
@@ -161,11 +156,6 @@
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Name>umbraco.interfaces</Name>
-      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
@@ -173,11 +163,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
-    <Compile Include="businesslogic\macro\IMacroEngine.cs" />
-    <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
+    <Compile Include="businesslogic\LegacySqlHelper.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
     <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
-    <Compile Include="businesslogic\media\IMediaFactory.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -185,19 +173,9 @@
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
     <Compile Include="businesslogic\Packager\Package.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addApplication.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addDashboardSection.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addProxyFeedHost.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addStringToHtmlElement.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\allowDoctype.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\PackageHelper.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -216,7 +194,6 @@
     <Compile Include="businesslogic\Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\events\EventArgs.cs" />
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -238,7 +215,6 @@
     <Compile Include="businesslogic\Packager\PackageInstance\IPackageInstance.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackageActions.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackageInstance.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addApplicationTree.cs" />
     <Compile Include="businesslogic\Packager\PackageInstance\PackagerUtility.cs" />
     <Compile Include="businesslogic\Packager\Installer.cs">
       <SubType>Code</SubType>

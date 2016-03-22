@@ -29,7 +29,7 @@
 
     <cc1:Pane runat="server" ID="ChangeDocTypePane">
         <p class="help">
-            <%= umbraco.ui.Text("changeDocType", "changeDocTypeInstruction") %>            
+            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction") %>            
         </p>
 
         <cc1:PropertyPanel ID="ContentNamePropertyPanel" runat="server">
@@ -43,7 +43,7 @@
         <cc1:PropertyPanel ID="NewTypePropertyPanel" runat="server">
             <asp:DropDownList ID="NewDocumentTypeList" runat="server" AutoPostBack="true" OnSelectedIndexChanged="NewDocumentTypeList_SelectedIndexChanged" />
             <asp:RequiredFieldValidator ControlToValidate="NewDocumentTypeList" ErrorMessage="*" ID="NewDocumentTypeValidator" runat="server" Display="Dynamic" />          
-            <br /><small><%=umbraco.ui.Text("changeDocType", "validDocTypesNote") %></small>
+            <br /><small><%=Services.TextService.Localize("changeDocType/validDocTypesNote") %></small>
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="NewTemplatePropertyPanel" runat="server">
@@ -52,7 +52,7 @@
 
         <asp:PlaceHolder ID="NotAvailablePlaceholder" runat="server" Visible="false">        
             <div class="propertyItem notice" style="padding-top: 10px">     
-                <p><%=umbraco.ui.Text("changeDocType", "docTypeCannotBeChanged") %></p>
+                <p><%=Services.TextService.Localize("changeDocType/docTypeCannotBeChanged") %></p>
             </div>
         </asp:PlaceHolder>
     </cc1:Pane>
@@ -60,7 +60,7 @@
     <cc1:Pane runat="server" ID="ChangeDocTypePropertyMappingPane">
 
         <p class="help">
-            <%= umbraco.ui.Text("changeDocType", "changeDocTypeInstruction2") %>            
+            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction2") %>            
         </p>
 
         <asp:Repeater ID="PropertyMappingRepeater" runat="server">
@@ -68,8 +68,8 @@
                 <table id="propertyMapping">
                     <thead>
                         <tr>
-                            <th><%= umbraco.ui.Text("changeDocType", "currentProperty") %></th>
-                            <th><%= umbraco.ui.Text("changeDocType", "mapToProperty") %></th>
+                            <th><%= Services.TextService.Localize("changeDocType/currentProperty") %></th>
+                            <th><%= Services.TextService.Localize("changeDocType/mapToProperty") %></th>
                         </tr>
                     </thead>
             </HeaderTemplate>
@@ -91,13 +91,13 @@
     </cc1:Pane>
 
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
-        <p><%=umbraco.ui.Text("changeDocType", "docTypeChanged") %></p>
+        <p><%=Services.TextService.Localize("changeDocType/docTypeChanged") %></p>
         <p>        
             <asp:Literal ID="SuccessMessage" runat="server" />
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("defaultdialogs/closeThisWindow") %></a>  
         </p>
     </asp:PlaceHolder>
 
@@ -113,9 +113,9 @@
         <p>
             <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
                 <asp:Button ID="ValidateAndSave" runat="server" OnClick="ValidateAndSave_Click" />
-                <em> <%= umbraco.ui.Text("or") %> </em>
+                <em> <%= Services.TextService.Localize("or") %> </em>
             </asp:PlaceHolder>        
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>  
         </p>
     </asp:PlaceHolder>
   

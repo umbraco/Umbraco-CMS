@@ -185,9 +185,9 @@ namespace Umbraco.Web.Mvc
             while (currentContext != null)
             {
                 var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.DataTokens.ContainsKey("umbraco-route-def"))
+                if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
                 {
-                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens["umbraco-route-def"]);
+                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
                 }
                 if (currentContext.IsChildAction)
                 {

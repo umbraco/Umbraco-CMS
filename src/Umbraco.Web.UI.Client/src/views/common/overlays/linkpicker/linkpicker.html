@@ -20,14 +20,22 @@
     <umb-control-group label="@content_target">
         <select class="umb-editor umb-dropdown" ng-model="model.target.target">
             <option value=""></option>
-            <option value="_blank">Opens the linked document in a new window or tab</option>
-            <option value="_top">Opens the linked document in the full body of the window</option>
-            <option value="_parent">Opens the linked document in the parent frame</option>
+            <option value="_blank">
+                <localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize>
+            </option>
+            <option value="_top">
+                <localize key="defaultdialogs_openInFullBody">Opens the linked document in the full body of the window</localize>
+            </option>
+            <option value="_parent">
+                <localize key="defaultdialogs_openInParentFrame">Opens the linked document in the parent frame</localize>
+            </option>
         </select>
     </umb-control-group>
 
     <div class="umb-control-group">
-        <h5>Link to page</h5>
+        <h5>
+            <localize key="defaultdialogs_linkToPage">Link to page</localize>
+        </h5>
 
         <umb-tree-search-box
             hide-search-callback="hideSearch"
@@ -60,8 +68,12 @@
     </div>
 
     <div class="umb-control-group">
-        <h5>Link to media</h5>
-        <a href ng-click="switchToMediaPicker()" class="btn">Select media</a>
+        <h5>
+            <localize key="defaultdialogs_linkToMedia">Link to media</localize>
+        </h5>
+        <a href ng-click="switchToMediaPicker()" class="btn">
+            <localize key="defaultdialogs_selectMedia">Select media</localize>
+        </a>
     </div>
 
     <umb-overlay

@@ -13,13 +13,13 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes)]
+    [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, null, sortOrder:7)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class DataTypeTreeController : TreeController
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Trees
 
                 // root actions              
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 

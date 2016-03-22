@@ -8,7 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using umbraco;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Strategies
 {

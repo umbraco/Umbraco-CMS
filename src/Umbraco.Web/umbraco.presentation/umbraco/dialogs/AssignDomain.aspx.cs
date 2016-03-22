@@ -6,6 +6,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Services;
 
 namespace umbraco.dialogs
 {
@@ -25,10 +26,10 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             _currentId = Request.GetItemAs<int>("id");
-            prop_domain.Text = ui.Text("assignDomain", "domain", UmbracoUser);
-            prop_lang.Text = ui.Text("general", "language", UmbracoUser);
-            pane_addnew.Text = ui.Text("assignDomain", "addNew", UmbracoUser);
-            pane_edit.Text = ui.Text("assignDomain", "orEdit", UmbracoUser);
+            prop_domain.Text = Services.TextService.Localize("assignDomain/domain");
+            prop_lang.Text = Services.TextService.Localize("general/language");
+            pane_addnew.Text = Services.TextService.Localize("assignDomain/addNew");
+            pane_edit.Text = Services.TextService.Localize("assignDomain/orEdit");
 
             if (Request.GetItemAsString("editDomain").Trim() != "")
             {
@@ -39,7 +40,7 @@ namespace umbraco.dialogs
             {
                 var d = new Domain(Request.GetItemAs<int>("delDomain"));
                 FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, UmbracoUser);
+                FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainDeleted", new[] { d.Name });
                 d.Delete();
                 UpdateDomainList();
             }
@@ -47,7 +48,7 @@ namespace umbraco.dialogs
             if (!IsPostBack)
             {
                 // Add caption to button
-                ok.Text = ui.Text("assignDomain", "addNew", UmbracoUser);
+                ok.Text = Services.TextService.Localize("assignDomain/addNew");
 
                 var selectedLanguage = -1;
 
@@ -57,18 +58,18 @@ namespace umbraco.dialogs
                     var d = new Domain(_editDomain);
                     selectedLanguage = d.Language.id;
                     DomainName.Text = d.Name.StartsWith("*") ? "*" : d.Name;
-                    ok.Text = ui.Text("general", "update", UmbracoUser);
+                    ok.Text = Services.TextService.Localize("general/update");
                 }
 
                 // Add caption to language validator
-                LanguageValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser) + "<br/>";
-                DomainValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser);
+                LanguageValidator.ErrorMessage = Services.TextService.Localize("defaultdialogs/requiredField") + "<br/>";
+                DomainValidator.ErrorMessage = Services.TextService.Localize("defaultdialogs/requiredField");
 
-                DomainValidator2.ErrorMessage = ui.Text("assignDomain", "invalidDomain", UmbracoUser);
+                DomainValidator2.ErrorMessage = Services.TextService.Localize("assignDomain/invalidDomain");
                 //DomainValidator2.ValidationExpression = @"^(?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?$";
                 DomainValidator2.ValidationExpression = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
 
-                Languages.Items.Add(new ListItem(ui.Text("general", "choose", UmbracoUser), ""));
+                Languages.Items.Add(new ListItem(Services.TextService.Localize("general/choose"), ""));
                 foreach (var l in Language.GetAllAsList())
                 {
                     var li = new ListItem();
@@ -96,10 +97,10 @@ namespace umbraco.dialogs
                 {
                     var name = d.Name.StartsWith("*") ? "*" : d.Name;
                     allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + _currentId + "&editDomain=" +
-                                       d.Id.ToString(CultureInfo.InvariantCulture) + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + _currentId +
+                                       d.Id.ToString(CultureInfo.InvariantCulture) + "\">" + Services.TextService.Localize("edit") + "</a></td><td><a href=\"?id=" + _currentId +
                                        "&delDomain=" + d.Id.ToString(CultureInfo.InvariantCulture) + "\" onClick=\"return confirm('" +
-                                       ui.Text("defaultdialogs", "confirmdelete", UmbracoUser) +
-                                       "');\" style=\"color: red\">" + ui.Text("delete") + "</a></td></tr>";
+                                       Services.TextService.Localize("defaultdialogs/confirmdelete") +
+                                       "');\" style=\"color: red\">" + Services.TextService.Localize("delete") + "</a></td></tr>";
                 }
 
                 allDomains.Text += "</table>";
@@ -121,7 +122,7 @@ namespace umbraco.dialogs
                     d.Language = new Language(int.Parse(Languages.SelectedValue));
                     d.Name = DomainName.Text.ToLower();
                     FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, UmbracoUser);
+                    FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainUpdated", new[] { DomainName.Text });
                     d.Save();
 
                     DomainName.Text = "";
@@ -140,7 +141,7 @@ namespace umbraco.dialogs
                     if (!Domain.Exists(domainName.ToLower()))
                     {
                         Domain.MakeNew(domainName, _currentId, int.Parse(Languages.SelectedValue));
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, UmbracoUser);
+                        FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainCreated", new[] { domainName });
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
 
                         DomainName.Text = "";
@@ -152,7 +153,7 @@ namespace umbraco.dialogs
                     }
                     else
                     {
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), UmbracoUser);
+                        FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainExists", new[] { DomainName.Text.Trim() });
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.error;
                     }
                 }

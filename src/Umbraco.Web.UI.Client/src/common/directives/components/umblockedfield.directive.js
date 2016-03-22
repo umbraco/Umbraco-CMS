@@ -1,19 +1,54 @@
 /**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbContentName 
-* @restrict E
-* @function
-* @description 
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
+@ngdoc directive
+@name umbraco.directives.directive:umbLockedField
+@restrict E
+@scope
+
+@description
+Use this directive to render a value with a lock next to it. When the lock is clicked the value gets unlocked and can be edited.
+
+<h3>Markup example</h3>
+<pre>
+	<div ng-controller="My.Controller as vm">
+
+		<umb-locked-field
+			ng-model="vm.value"
+			placeholder-text="'Click to unlock...'">
+		</umb-locked-field>
+
+	</div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+	(function () {
+		"use strict";
+
+		function Controller() {
+
+			var vm = this;
+			vm.value = "My locked text";
+
+        }
+
+		angular.module("umbraco").controller("My.Controller", Controller);
+
+	})();
+</pre>
+
+@param {string} ngModel (<code>binding</code>): The locked text.
+@param {boolean=} locked (<code>binding</code>): <Code>true</code> by default. Set to <code>false</code> to unlock the text.
+@param {string=} placeholderText (<code>binding</code>): If ngModel is empty this text will be shown.
+@param {string=} regexValidation (<code>binding</code>): Set a regex expression for validation of the field.
+@param {string=} serverValidationField (<code>attribute</code>): Set a server validation field.
 **/
+
 (function() {
 	'use strict';
 
 	function LockedFieldDirective($timeout, localizationService) {
 
-	    function link(scope, el, attr, ngModel) {
-
-			var input = el.find('.umb-locked-field__input');
+	    function link(scope, el, attr, ngModelCtrl) {
 
 			function activate() {
 
@@ -41,35 +76,13 @@
 
 			scope.lock = function() {
 				scope.locked = true;
-				input.unbind("blur");
 			};
 
 			scope.unlock = function() {
 				scope.locked = false;
-				autoFocusField();
 			};
 
-			function autoFocusField() {
-
-				var onBlurHandler = function() {
-					scope.$apply(function(){
-						scope.lock();
-					});
-				};
-
-				$timeout(function() {
-					input.focus();
-					input.select();
-					input.on("blur", onBlurHandler);
-				});
-
-			}
-
 			activate();
-
-			scope.$on('$destroy', function() {
-				input.unbind('blur');
-			});
 
 		}
 
@@ -79,7 +92,7 @@
 			replace: true,
 			templateUrl: 'views/components/umb-locked-field.html',
 			scope: {
-				model: '=ngModel',
+			    ngModel: "=",
 				locked: "=?",
 				placeholderText: "=?",
 				regexValidation: "=?",

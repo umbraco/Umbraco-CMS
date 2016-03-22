@@ -8,9 +8,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Umbraco.Web.UI;
-using umbraco.interfaces;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.cms.presentation.user
 {
@@ -20,7 +20,8 @@ namespace umbraco.cms.presentation.user
         {
             try
             {
-                var u = UserType.MakeNew(Alias, "", Alias);
+                var u = new UserType(Alias, Alias);
+                ApplicationContext.Current.Services.UserService.SaveUserType(u);
                 _returnUrl = string.Format("users/EditUserType.aspx?id={0}", u.Id);
                 return true;
             }
@@ -32,10 +33,10 @@ namespace umbraco.cms.presentation.user
 
         public override bool PerformDelete()
         {
-            var userType = UserType.GetUserType(ParentID);
+            var userType = ApplicationContext.Current.Services.UserService.GetUserTypeById(ParentID);
             if (userType == null)
                 return false;
-            userType.Delete();
+            ApplicationContext.Current.Services.UserService.DeleteUserType(userType);
             return true;
         }
 

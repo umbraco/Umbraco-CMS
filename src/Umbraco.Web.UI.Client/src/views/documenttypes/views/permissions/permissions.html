@@ -3,12 +3,13 @@
     <div class="sub-view-columns">
 
         <div class="sub-view-column-left">
-            <h5>Allow as root</h5>
-            <small>Allow editors to create content if this type in the root of the content tree</small>
+            <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
+            <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
         </div>
         <div class="sub-view-column-right">
             <label class="checkbox no-indent" >
-                <input type="checkbox" ng-model="model.allowAsRoot" hotkey="alt+shift+r" /> Yes - allow content of this type in the root
+                <input type="checkbox" ng-model="model.allowAsRoot" hotkey="alt+shift+r" />
+                <localize key="contentTypeEditor_allowAsRootCheckbox" />
             </label>
         </div>
 
@@ -17,8 +18,8 @@
     <div class="sub-view-columns">
 
         <div class="sub-view-column-left">
-            <h5>Allowed child node types</h5>
-            <small>Allow content of these types to be created underneath content this type</small>
+            <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
+            <small><localize key="contentTypeEditor_childNodesDescription" /></small>
         </div>
 
         <div class="sub-view-column-right">

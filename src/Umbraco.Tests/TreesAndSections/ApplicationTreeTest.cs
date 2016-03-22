@@ -4,6 +4,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TreesAndSections
 {

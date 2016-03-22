@@ -105,13 +105,6 @@ namespace Umbraco.Core.Services
             return Attempt.If(result != null, result);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use AddRule instead, this method will be removed in future versions")]
-        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string ruleValue)
-        {
-            return AddRule(content, ruleType, ruleValue);
-        }
-
         /// <summary>
         /// Adds a rule
         /// </summary>
@@ -183,7 +176,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 repo.AddOrUpdate(entry);
@@ -191,7 +184,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
 
         }
@@ -207,7 +200,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -218,7 +211,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
@@ -232,7 +225,7 @@ namespace Umbraco.Core.Services
                     new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -243,7 +236,7 @@ namespace Umbraco.Core.Services
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>

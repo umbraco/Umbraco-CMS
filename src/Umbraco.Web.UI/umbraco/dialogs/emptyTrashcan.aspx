@@ -30,14 +30,14 @@
 		    }
 		    
 		    function updateStatusLabel(retVal) {
-                jQuery('#statusLabel').html("<strong>" + retVal + " <%=umbraco.ui.Text("remaining")%></strong>");            
+                jQuery('#statusLabel').html("<strong>" + retVal + " <%=Services.TextService.Localize("remaining")%></strong>");            
 
                 if (retVal != '' && retVal != '0') {
                     setTimeout('updateStatus();', 500);
                 } else {
                     jQuery('#div_form').hide();
                     jQuery('#notification').show();
-                    jQuery('#notification').html("<p><%=umbraco.ui.Text("defaultdialogs", "recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.closeModalWindow()'><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a></p>");
+                    jQuery('#notification').html("<p><%=Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.closeModalWindow()'><%= Services.TextService.Localize("defaultdialogs/closeThisWindow")%></a></p>");
                     UmbClientMgr.mainTree().reloadActionNode();
                 }
                 
@@ -57,26 +57,26 @@
 		
 		
 		<div id="animation" align="center" style="display: none;">
-		<p><%= umbraco.ui.Text("defaultdialogs", "recycleBinDeleting")%></p>
+		<p><%= Services.TextService.Localize("defaultdialogs/recycleBinDeleting")%></p>
 		
 		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
 		<br />
-		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", UmbracoUser)%></span>
+		<span class="guiDialogTiny" id="statusLabel"><%=Services.TextService.Localize("deleting")%></span>
 		</div>
 	  	  	  
 	  <div id="formDiv">
-	    <p><%= umbraco.ui.Text("defaultdialogs", "recycleBinWarning")%></p>
-		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture), UmbracoUser)%></label>
+	    <p><%= Services.TextService.Localize("defaultdialogs/recycleBinWarning")%></p>
+		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=Services.TextService.Localize("defaultdialogs/confirmEmptyTrashcan", new[] { umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture)})%></label>
 		</div>
 	  </cc1:PropertyPanel>
 	  </cc1:Pane>
 	  
 		<br />
 		<div id="buttons">
-		<input type="button" ID="ok" value="<%=umbraco.ui.Text("actions", "emptyTrashcan", UmbracoUser) %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
-		<em><%= umbraco.ui.Text("or") %></em> 
+		<input type="button" ID="ok" value="<%=Services.TextService.Localize("actions/emptyTrashcan") %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
+		<em><%= Services.TextService.Localize("or") %></em> 
     <a href="#" onclick="UmbClientMgr.closeModalWindow();">
-      <%=umbraco.ui.Text("cancel")%>
+      <%=Services.TextService.Localize("cancel")%>
     </a>
 		</div>
 		</div>

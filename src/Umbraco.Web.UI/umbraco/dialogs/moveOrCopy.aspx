@@ -16,9 +16,9 @@
 				if (id > 0)
 						umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				else{
-					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>";
+					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=Services.TextService.Localize(Request.CleanForXss("app"))%></strong>' <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>";
 			    
-					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
+					jQuery("#pageNameContent").html("<strong><%=Services.TextService.Localize(Request.CleanForXss("app"))%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>");
 					jQuery("#pageNameHolder").attr("class","success");
 			  }
 			}
@@ -28,7 +28,7 @@
 			function updateName(result) {
                 if(actionIsValid)
                 {
-				    jQuery("#pageNameContent").html("'<strong>" + result + "</strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
+				    jQuery("#pageNameContent").html("'<strong>" + result + "</strong>' <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>");
 				    jQuery("#pageNameHolder").attr("class","success");
                 }
 			}
@@ -37,7 +37,7 @@
             function notValid()
             {
                 jQuery("#pageNameHolder").attr("class", "error");
-                jQuery("#pageNameContent").html("<%= umbraco.ui.Text("moveOrCopy","notValid") %>");
+                jQuery("#pageNameContent").html("<%= Services.TextService.Localize("moveOrCopy/notValid") %>");
                 actionIsValid = false;
             }
 	
@@ -70,7 +70,7 @@
 	<asp:PlaceHolder ID="pane_form_notice" runat="server" Visible="false">
 		<div class="notice" id="pageNameHolder" style="margin-top: 10px;">
 			<p id="pageNameContent">
-				<%= umbraco.ui.Text("moveOrCopy","noNodeSelected") %></p>
+				<%= Services.TextService.Localize("moveOrCopy/noNodeSelected") %></p>
 		</div>
 	</asp:PlaceHolder>
 	<cc1:Pane ID="pane_settings" runat="server" Visible="false">
@@ -85,8 +85,8 @@
 		<p>
 			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy" UseSubmitBehavior="false" OnClientClick="this.disabled = 'disabled';"></asp:Button>
 			&nbsp; <em>
-				<%=umbraco.ui.Text("general", "or", UmbracoUser)%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
-					<%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
+				<%=Services.TextService.Localize("general/or")%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
+					<%=Services.TextService.Localize("general/cancel")%></a>
 		</p>
 	</asp:Panel>
 </asp:Content>

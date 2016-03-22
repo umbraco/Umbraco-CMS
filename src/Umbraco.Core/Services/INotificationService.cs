@@ -9,7 +9,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {

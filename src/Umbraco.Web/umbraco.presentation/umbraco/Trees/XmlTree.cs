@@ -1,23 +1,20 @@
 using System.Xml.Serialization;
 using System.Collections;
 using System;
-using umbraco.BusinessLogic.Utils;
 using System.Xml.Schema;
-using umbraco.interfaces;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
-using umbraco.businesslogic.Utils;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.Utils;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.Trees
 {
 
 	public enum SerializedTreeType
 	{
-		XmlTree,
 		JSONTree,
 		JsTree
 	}
@@ -55,8 +52,6 @@ namespace umbraco.cms.presentation.Trees
 
 			switch (m_TreeType)
 			{
-				case SerializedTreeType.XmlTree:
-					break;
 				case SerializedTreeType.JSONTree:
 					m_JSSerializer.RegisterConverters(new List<JavaScriptConverter>() 
 					{ 
@@ -92,8 +87,6 @@ namespace umbraco.cms.presentation.Trees
 		{
 			switch (type)
 			{
-				case SerializedTreeType.XmlTree:
-					return SerializableData.Serialize(this, typeof(XmlTree));
 				case SerializedTreeType.JsTree:
 					return m_JSSerializer.Serialize(this.treeCollection);
 				case SerializedTreeType.JSONTree:
@@ -475,7 +468,7 @@ namespace umbraco.cms.presentation.Trees
 							this.m_action = reader.Value;
 							break;
 						case TreeAttributes.menu:
-							this.m_menu = (!string.IsNullOrEmpty(reader.Value) ? Umbraco.Web.LegacyActions.Action.FromString(reader.Value) : null);
+							this.m_menu = (!string.IsNullOrEmpty(reader.Value) ? Umbraco.Web._Legacy.Actions.Action.FromString(reader.Value) : null);
 							break;
 						case TreeAttributes.rootSrc:
 							this.m_rootSrc = reader.Value;
@@ -520,7 +513,7 @@ namespace umbraco.cms.presentation.Trees
 			writer.WriteAttributeString(TreeAttributes.text.ToString(), this.m_text);
 			writer.WriteAttributeString(TreeAttributes.iconClass.ToString(), this.m_iconClass);
 			writer.WriteAttributeString(TreeAttributes.action.ToString(), this.m_action);
-			writer.WriteAttributeString(TreeAttributes.menu.ToString(), (this.m_menu != null && this.m_menu.Count > 0 ? Umbraco.Web.LegacyActions.Action.ToString(this.m_menu) : ""));
+			writer.WriteAttributeString(TreeAttributes.menu.ToString(), (this.m_menu != null && this.m_menu.Count > 0 ? Umbraco.Web._Legacy.Actions.Action.ToString(this.m_menu) : ""));
 			writer.WriteAttributeString(TreeAttributes.rootSrc.ToString(), this.m_rootSrc);
 			writer.WriteAttributeString(TreeAttributes.src.ToString(), this.m_src);
 			writer.WriteAttributeString(TreeAttributes.icon.ToString(), this.m_icon);

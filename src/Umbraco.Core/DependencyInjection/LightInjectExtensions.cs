@@ -7,6 +7,47 @@ namespace Umbraco.Core.DependencyInjection
     internal static class LightInjectExtensions
     {
         /// <summary>
+        /// Extension method to register a singleton (syntax sugar)
+        /// </summary>
+        public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory, string serviceName)
+        {
+            container.Register<TService>(factory, serviceName, new PerContainerLifetime());
+        }
+
+        /// <summary>
+        /// Extension method to register a singleton (syntax sugar)
+        /// </summary>
+        /// <typeparam name="TContract"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="container"></param>
+        public static void RegisterSingleton<TContract, TImplementation>(this IServiceRegistry container) 
+            where TImplementation : TContract
+        {
+            container.Register<TContract, TImplementation>(new PerContainerLifetime());
+        }
+
+        /// <summary>
+        /// Extension method to register a singleton (syntax sugar)
+        /// </summary>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="container"></param>
+        public static void RegisterSingleton<TImplementation>(this IServiceRegistry container)
+        {
+            container.Register<TImplementation>(new PerContainerLifetime());
+        }
+
+        /// <summary>
+        /// Extension method to register a singleton (syntax sugar)
+        /// </summary>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="container"></param>
+        /// <param name="factory"></param>
+        public static void RegisterSingleton<TImplementation>(this IServiceRegistry container, Func<IServiceFactory, TImplementation> factory)
+        {
+            container.Register<TImplementation>(factory);
+        }
+
+        /// <summary>
         /// In order for LightInject to deal with enumerables of the same type, each one needs to be named individually
         /// </summary>
         /// <typeparam name="TLifetime"></typeparam>

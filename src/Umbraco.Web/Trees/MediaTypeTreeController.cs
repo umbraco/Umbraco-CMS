@@ -11,12 +11,12 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:8)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MediaTypeTreeController : TreeController
@@ -91,6 +91,7 @@ namespace Umbraco.Web.Trees
             {                
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
                 menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), hasSeparator: true);
+                menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
             }
 
             return menu;

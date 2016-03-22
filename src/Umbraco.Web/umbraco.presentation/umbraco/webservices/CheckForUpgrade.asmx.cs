@@ -6,6 +6,7 @@ using System.Web.Script.Services;
 using Umbraco.Core;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Configuration;
+using Umbraco.Web;
 
 
 namespace umbraco.presentation.webservices
@@ -56,10 +57,10 @@ namespace umbraco.presentation.webservices
 
             // Check for current install Id
             Guid installId = Guid.NewGuid();
-            var installCookie = new BusinessLogic.StateHelper.Cookies.Cookie("umb_installId", 1);
-            if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+            var installCookie = Context.Request.GetCookieValue("umb_installId");
+            if (string.IsNullOrEmpty(installCookie) == false)
             {
-                if (Guid.TryParse(installCookie.GetValue(), out installId))
+                if (Guid.TryParse(installCookie, out installId))
                 {
                     // check that it's a valid Guid
                     if (installId == Guid.Empty)
@@ -67,7 +68,7 @@ namespace umbraco.presentation.webservices
 
                 }
             }
-            installCookie.SetValue(installId.ToString());
+            Context.Response.Cookies.Set(new HttpCookie("umb_installId", installId.ToString()));
 
             string dbProvider = string.Empty;
             if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)

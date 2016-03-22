@@ -88,43 +88,53 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
 			scope.avatarClick = function(){
 
+                if(scope.helpDialog) {
+                    closeHelpDialog();
+                }
+
                 if(!scope.userDialog) {
-
-                    scope.userDialog = {};
-                    scope.userDialog.view = "user";
-                    scope.userDialog.show = true;
-
-                    scope.userDialog.close = function(oldModel) {
-                        scope.userDialog.show = false;
-                        scope.userDialog = null;
+                    scope.userDialog = {
+                        view: "user",
+                        show: true,
+                        close: function(oldModel) {
+                            closeUserDialog();
+                        }
                     };
-
                 } else {
-                    scope.userDialog.show = false;
-                    scope.userDialog = null;
+                    closeUserDialog();
                 }
 
 			};
+
+            function closeUserDialog() {
+                scope.userDialog.show = false;
+                scope.userDialog = null;
+            }
 
 			scope.helpClick = function(){
 
+                if(scope.userDialog) {
+                    closeUserDialog();
+                }
+
                 if(!scope.helpDialog) {
-
-                    scope.helpDialog = {};
-                    scope.helpDialog.show = true;
-                    scope.helpDialog.view = "help";
-
-                    scope.helpDialog.close = function(oldModel) {
-                        scope.helpDialog.show = false;
-                        scope.helpDialog = null;
+                    scope.helpDialog = {
+                        view: "help",
+                        show: true,
+                        close: function(oldModel) {
+                            closeHelpDialog();
+                        }
                     };
-
                 } else {
-                    scope.helpDialog.show = false;
-                    scope.helpDialog = null;
+                    closeHelpDialog();
                 }
 
 			};
+
+            function closeHelpDialog() {
+                scope.helpDialog.show = false;
+                scope.helpDialog = null;
+            }
 
 			scope.sectionClick = function (event, section) {
 
@@ -136,12 +146,11 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			        return;
 			    }
 
-
-			    if (navigationService.userDialog) {
-			        navigationService.userDialog.close();
+                if (scope.userDialog) {
+                    closeUserDialog();
 			    }
-			    if (navigationService.helpDialog) {
-			        navigationService.helpDialog.close();
+			    if (scope.helpDialog) {
+                    closeHelpDialog();
 			    }
 
 			    navigationService.hideSearch();
@@ -155,11 +164,11 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
 			scope.trayClick = function () {
                 // close dialogs
-			    if (navigationService.userDialog) {
-			        navigationService.userDialog.close();
+			    if (scope.userDialog) {
+                    closeUserDialog();
 			    }
-			    if (navigationService.helpDialog) {
-			        navigationService.helpDialog.close();
+			    if (scope.helpDialog) {
+                    closeHelpDialog();
 			    }
 
 			    if (appState.getGlobalState("showTray") === true) {

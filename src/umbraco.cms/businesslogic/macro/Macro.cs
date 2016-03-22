@@ -37,7 +37,7 @@ namespace umbraco.cms.businesslogic.macro
 
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
 		/// <summary>
@@ -210,34 +210,16 @@ namespace umbraco.cms.businesslogic.macro
 	    /// </summary>
 	    public virtual void Save()
 	    {
-	        //event
-	        var e = new SaveEventArgs();
-	        FireBeforeSave(e);
-
-	        if (e.Cancel == false)
-	        {
-	            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
-
-	            FireAfterSave(e);
-	        }
-	    }
+            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
+        }
 
 	    /// <summary>
 		/// Deletes the current macro
 		/// </summary>
 		public void Delete() 
 		{
-            //event
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-		    if (e.Cancel == false)
-		    {
-		        ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
-
-		        FireAfterDelete(e);
-		    }
-		}
+            ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
+        }
 
         //TODO: Fix this, this should wrap a new API!
 
@@ -379,10 +361,6 @@ namespace umbraco.cms.businesslogic.macro
 
             var newMacro = new Macro(macro);
            
-            //fire new event
-            var e = new NewEventArgs();
-            newMacro.OnNew(e);
-            
             return newMacro;
 		}
 
@@ -404,10 +382,10 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
         public static Macro GetByAlias(string alias)
 		{
-		    return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+		    return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
 		        GetCacheKey(alias),
-		        TimeSpan.FromMinutes(30),
-		        () =>
+		        timeout:        TimeSpan.FromMinutes(30),
+		        getCacheItem:   () =>
 		            {
                         var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
 		                if (macro == null) return null;
@@ -417,10 +395,10 @@ namespace umbraco.cms.businesslogic.macro
 
         public static Macro GetById(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
                 GetCacheKey(string.Format("macro_via_id_{0}", id)),
-                TimeSpan.FromMinutes(30),
-                () =>
+                timeout:        TimeSpan.FromMinutes(30),
+                getCacheItem:   () =>
                     {
                         var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
                         if (macro == null) return null;
@@ -479,45 +457,7 @@ namespace umbraco.cms.businesslogic.macro
         #endregion
 
 
-        //Macro events
-
-        //Delegates
-        public delegate void SaveEventHandler(Macro sender, SaveEventArgs e);
-        public delegate void NewEventHandler(Macro sender, NewEventArgs e);
-        public delegate void DeleteEventHandler(Macro sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when a macro is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e) {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e) {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+       
 		#endregion
 	}
 }

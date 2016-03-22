@@ -1,25 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.Threading;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Xml;
-using System.Xml.XPath;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
-using BizLogicAction = Umbraco.Web.LegacyActions.Action;
+using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -31,7 +21,7 @@ namespace umbraco.presentation.developer.packages
         public Installer()
         {
             CurrentApp = Constants.Applications.Developer.ToString();
-            _installer = new cms.businesslogic.packager.Installer(UmbracoUser.Id);
+            _installer = new cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
         }
 
         private Control _configControl;
@@ -48,7 +38,7 @@ namespace umbraco.presentation.developer.packages
             {
                 fb.Style.Add("margin-top", "7px");
                 fb.type = uicontrols.Feedback.feedbacktype.error;
-                fb.Text = "<strong>" + ui.Text("errors", "filePermissionsError") + ":</strong><br/>" + ex.Message;
+                fb.Text = "<strong>" + Services.TextService.Localize("errors/filePermissionsError") + ":</strong><br/>" + ex.Message;
             }
 
             if (!IsPostBack)
@@ -83,7 +73,7 @@ namespace umbraco.presentation.developer.packages
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), UmbracoUser.Id));
+                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), Security.CurrentUser.Id));
                         UpdateSettings();
 
                     }
@@ -294,7 +284,7 @@ namespace umbraco.presentation.developer.packages
             bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
 
             if (!string.IsNullOrEmpty(url))
-                lit_authorUrl.Text = " <em>" + ui.Text("or") + "</em> <a href='" + url + "' target=\"_blank\">" + ui.Text("viewPackageWebsite") + "</a>";
+                lit_authorUrl.Text = " <em>" + Services.TextService.Localize("or") + "</em> <a href='" + url + "' target=\"_blank\">" + Services.TextService.Localize("viewPackageWebsite") + "</a>";
 
 
             pane_success.Visible = true;

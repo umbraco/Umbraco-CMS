@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
-    function ($scope, $timeout, $log, tinyMceService, stylesheetResource) {
+    function ($scope, $timeout, $log, tinyMceService, stylesheetResource, assetsService) {
         var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
@@ -23,6 +23,14 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
 
+            // extend commands with properties for font-icon and if it is a custom command
+            $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
+                var icon = getFontIcon(obj.frontEndCommand);
+                return angular.extend(obj, {
+                    fontIcon: icon.name,
+                    isCustom: icon.isCustom
+                });
+            });
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
@@ -57,6 +65,43 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };
+        
+        // map properties for specific commands
+        function getFontIcon(alias) {
+            var icon = { name: alias, isCustom: false };
+
+            switch (alias) {
+                case "codemirror":
+                    icon.name = "code";
+                    icon.isCustom = false;
+                    break;
+                case "styleselect":
+                    icon.name = "icon-list";
+                    icon.isCustom = true;
+                    break;
+                case "umbembeddialog":
+                    icon.name = "icon-tv";
+                    icon.isCustom = true;
+                    break;
+                case "umbmediapicker":
+                    icon.name = "icon-picture";
+                    icon.isCustom = true;
+                    break;
+                case "umbmacro":
+                    icon.name = "icon-settings-alt";
+                    icon.isCustom = true;
+                    break;
+                case "umbmacro":
+                    icon.name = "icon-settings-alt";
+                    icon.isCustom = true;
+                    break;
+                default:
+                    icon.name = alias;
+                    icon.isCustom = false;
+            }
+
+            return icon;
+        }
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 
@@ -65,9 +110,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             
         });
 
-        //when the scope is destroyed we need to unsubscribe
+        // when the scope is destroyed we need to unsubscribe
         $scope.$on('$destroy', function () {
             unsubscribe();
         });
 
+        // load TinyMCE skin which contains css for font-icons
+        assetsService.loadCss("lib/tinymce/skins/umbraco/skin.min.css");
     });

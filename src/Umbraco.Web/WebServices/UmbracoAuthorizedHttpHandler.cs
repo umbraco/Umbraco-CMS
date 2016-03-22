@@ -2,7 +2,7 @@
 using System.Security;
 using Umbraco.Core;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.WebServices
 {
@@ -57,7 +57,7 @@ namespace Umbraco.Web.WebServices
             {
                 return true;
             }
-            var hasAccess = UserHasAppAccess(app, UmbracoUser);
+            var hasAccess = UserHasAppAccess(app, Security.CurrentUser);
             if (!hasAccess && throwExceptions)
                 throw new SecurityException("The user does not have access to the required application");
             return hasAccess;
@@ -69,7 +69,7 @@ namespace Umbraco.Web.WebServices
         /// <param name="app"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        protected bool UserHasAppAccess(string app, User user)
+        protected bool UserHasAppAccess(string app, IUser user)
         {
             return Security.UserHasAppAccess(app, user);
         }
@@ -96,22 +96,6 @@ namespace Umbraco.Web.WebServices
             return result == ValidateRequestAttempt.Success;
         }
 
-        /// <summary>
-        /// Returns the current user
-        /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        protected User UmbracoUser
-        {
-            get
-            {
-                if (!_hasValidated)
-                {
-                    Security.ValidateCurrentUser();
-                    _hasValidated = true;
-                }
-                return new User(Security.CurrentUser);
-            }
-        }
 
     }
 }

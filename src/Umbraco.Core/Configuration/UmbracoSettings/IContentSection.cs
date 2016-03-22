@@ -53,5 +53,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool GlobalPreviewStorageEnabled { get; }
 
         string DefaultDocumentTypeProperty { get; }
+
+        bool EnableInheritedDocumentTypes { get; }
     }
 }

@@ -15,11 +15,11 @@
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <asp:Panel ID="p_republish" runat="server">
     <div class="propertyDiv">      
-          <p><%= umbraco.ui.Text("defaultdialogs", "siterepublishHelp")%> </p>
+          <p><%= Services.TextService.Localize("defaultdialogs/siterepublishHelp")%> </p>
     </div>
       
     <div id="buttons" class="btn-toolbar umb-btn-toolbar">
-        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow();"><%=umbraco.ui.Text("cancel")%></a>
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow();"><%=Services.TextService.Localize("cancel")%></a>
         <asp:Button ID="bt_go" cssclass="btn btn-primary" OnClick="go" OnClientClick="showProgress(document.getElementById('buttons'),'progress'); return true;" runat="server" Text="Republish" />
     </div>     
       
@@ -33,7 +33,7 @@
     
     <asp:Panel ID="p_done" Visible="false" runat="server">
      <div class="success">
-      <p><%= umbraco.ui.Text("defaultdialogs", "siterepublished")%></p>
+      <p><%= Services.TextService.Localize("defaultdialogs/siterepublished")%></p>
       
      </div>
       <input type="button" class="btn btn-primary" onclick="UmbClientMgr.closeModalWindow();" value="Ok" />

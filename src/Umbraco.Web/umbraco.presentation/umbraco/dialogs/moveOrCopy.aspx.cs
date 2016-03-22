@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using System.Linq;
 using umbraco.cms.presentation.user;
-using umbraco.interfaces;
 using Umbraco.Web;
-using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Action = Umbraco.Web._Legacy.Actions.Action;
+using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {
@@ -37,7 +35,7 @@ namespace umbraco.dialogs
             // Put user code to initialize the page here
             if (IsPostBack == false)
             {
-                pp_relate.Text = ui.Text("moveOrCopy", "relateToOriginal");
+                pp_relate.Text = Services.TextService.Localize("moveOrCopy/relateToOriginal");
 
                 //Document Type copy Hack...                
 
@@ -47,14 +45,14 @@ namespace umbraco.dialogs
                     pane_form_notice.Visible = false;
                     pane_settings.Visible = true;
 
-                    ok.Text = ui.Text("general", "ok", UmbracoUser);
+                    ok.Text = Services.TextService.Localize("general/ok");
                     ok.Attributes.Add("style", "width: 60px");
 
                     var documentType = Services.ContentTypeService.GetContentType(int.Parse(Request.GetItemAsString("id")));
 
                     //Load master types... 
                     masterType.Attributes.Add("style", "width: 350px;");
-                    masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
+                    masterType.Items.Add(new ListItem(Services.TextService.Localize("none") + "...", "0"));
 
                     foreach (var docT in Services.ContentTypeService.GetAllContentTypes().OrderBy(x => x.Name))
                     {
@@ -75,7 +73,7 @@ namespace umbraco.dialogs
                     pane_settings.Visible = false;
 
                     // Caption and properies on BUTTON
-                    ok.Text = ui.Text("general", "ok", UmbracoUser);
+                    ok.Text = Services.TextService.Localize("general/ok");
                     ok.Attributes.Add("style", "width: 60px");
                     ok.Attributes.Add("disabled", "true");
 
@@ -101,12 +99,12 @@ namespace umbraco.dialogs
 
                     if (Request.GetItemAsString("mode") == "cut")
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", currContent.Name, UmbracoUser);
+                        pane_form.Text = Services.TextService.Localize("moveOrCopy/moveTo", new[] { currContent.Name });
                         pp_relate.Visible = false;
                     }
                     else
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", currContent.Name, UmbracoUser);
+                        pane_form.Text = Services.TextService.Localize("moveOrCopy/copyTo", new[] { currContent.Name });
                         pp_relate.Visible = true;
                     }
 
@@ -138,7 +136,7 @@ namespace umbraco.dialogs
         /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
-            var currUserPermissions = new UserPermissions(UmbracoContext.UmbracoUser);
+            var currUserPermissions = new UserPermissions(Security.CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
             return lstCurrUserActions.Contains(currentAction);
@@ -235,7 +233,7 @@ namespace umbraco.dialogs
                     nodeAllowed = currContentType.AllowedAsRoot;
                     if (!nodeAllowed)
                     {
-                        feedback.Text = ui.Text("moveOrCopy", "notAllowedAtRoot", UmbracoUser);
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedAtRoot");
                         feedback.type = uicontrols.Feedback.feedbacktype.error;
                     }
                 }
@@ -249,7 +247,7 @@ namespace umbraco.dialogs
 
                     if (nodeAllowed == false)
                     {
-                        feedback.Text = ui.Text("moveOrCopy", "notAllowedByContentType", UmbracoUser);
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedByContentType");
                         feedback.type = uicontrols.Feedback.feedbacktype.error;
                     }
                     else
@@ -258,7 +256,7 @@ namespace umbraco.dialogs
                         if ((string.Format(",{0},", parentContent.Path)).IndexOf(string.Format(",{0},", currContent.Id)) > -1)
                         {
                             nodeAllowed = false;
-                            feedback.Text = ui.Text("moveOrCopy", "notAllowedByPath", UmbracoUser);
+                            feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedByPath");
                             feedback.type = uicontrols.Feedback.feedbacktype.error;
                         }
                     }
@@ -271,7 +269,7 @@ namespace umbraco.dialogs
                     panel_buttons.Visible = false;
 
                     var newNodeCaption = parentContent == null 
-                        ? ui.Text(CurrentApp) 
+                        ? Services.TextService.Localize(CurrentApp) 
                         : parentContent.Name;
 
                     string[] nodes = { currContent.Name, newNodeCaption };
@@ -282,17 +280,17 @@ namespace umbraco.dialogs
                         {
                             var doc = (IContent)currContent;
                             var copyToId = Request.GetItemAs<int>("copyTo");
-                            Services.ContentService.Move(doc, copyToId, UmbracoUser.Id);
+                            Services.ContentService.Move(doc, copyToId, Security.CurrentUser.Id);
 
                         }
                         else
                         {
                             var media = (IMedia)currContent;
                             var copyToId = Request.GetItemAs<int>("copyTo");
-                            Services.MediaService.Move(media, copyToId, UmbracoUser.Id);
+                            Services.MediaService.Move(media, copyToId, Security.CurrentUser.Id);
                         }
 
-                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/moveDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
@@ -303,9 +301,9 @@ namespace umbraco.dialogs
                         //NOTE: We ONLY support Copy on content not media for some reason.
                         
                         var newContent = (IContent)currContent;
-                        Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, UmbracoUser.Id);
+                        Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, Security.CurrentUser.Id);
 
-                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/copyDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree

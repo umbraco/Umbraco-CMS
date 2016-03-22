@@ -23,10 +23,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 			  if(contentType === "content") {
 				  entityType = "Document";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectContent");
+				  }
 			  } else if(contentType === "member") {
 				  entityType = "Member";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectMember");
+				  }
 			  } else if(contentType === "media") {
 				  entityType = "Media";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
+				  }
 			  }
 		  }
 
@@ -267,12 +276,23 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 		 function multiSelectItem(item) {
 
-			 var i = $scope.model.selection.indexOf(item);
+			 var found = false;
+			 var foundIndex = 0;
 
-			 if (i < 0) {
-				  $scope.model.selection.push(item);
+			 if($scope.model.selection.length > 0) {
+				 for(i = 0; $scope.model.selection.length > i; i++) {
+					 var selectedItem = $scope.model.selection[i];
+					 if(selectedItem.id === item.id) {
+						 found = true;
+						 foundIndex = i;
+					 }
+				 }
+			 }
+
+			 if(found) {
+				 $scope.model.selection.splice(foundIndex, 1);
 			 } else {
-				  $scope.model.selection.splice(i, 1);
+				 $scope.model.selection.push(item);
 			 }
 
 		 }

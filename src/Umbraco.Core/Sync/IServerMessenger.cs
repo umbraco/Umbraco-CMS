@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {

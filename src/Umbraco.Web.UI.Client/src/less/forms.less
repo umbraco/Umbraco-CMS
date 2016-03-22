@@ -16,18 +16,18 @@ label small, .guiDialogTiny {
   font-size: 11px
 }
 
-label.control-label {
+label.control-label, .control-label {
   padding: 0 10px 0 0 !important;
   font-weight: bold;
-
 }
+
 
 .umb-status-label{
     color: @gray !important;
   }
 
 
-.controls-row label{padding: 0 10px 0 10px; vertical-align: center}
+.controls-row label{padding: 0 10px 0 10px; vertical-align: middle;}
 
 
 
@@ -69,6 +69,11 @@ label.control-label {
   left: 4px;
   color: @grayLight;
 }
+
+.form-search .icon-search {
+    pointer-events: none;
+}
+
 .form-search input {
   width: 90%;
   font-size: @fontSizeLarge;
@@ -78,6 +83,28 @@ label.control-label {
   padding-left: 25px !Important;
   line-height: 22px;
   background: @white
+}
+
+
+.form-search .search-input {
+    font-weight: bold;
+    border-color: @grayLight;
+
+    &:hover,
+    &:focus,
+    &:focus:hover {
+        border-color: #ccc;
+    }
+
+    &:-moz-placeholder {
+      font-weight: normal;
+    }
+    &:-ms-input-placeholder {
+      font-weight: normal;
+    }
+    &::-webkit-input-placeholder {
+      font-weight: normal;
+    }
 }
 
 
@@ -137,7 +164,7 @@ textarea {
 
 // Identify controls by their labels
 label {
-  display: block;
+  display: inline-block;
   margin-bottom: 5px;
 }
 
@@ -177,6 +204,7 @@ input.-full-width-input {
    width: 100%;
    box-sizing: border-box;
    padding: 4px 6px;
+   height: 30px;
 }
 
 // Reset appearance properties for textual inputs and textarea

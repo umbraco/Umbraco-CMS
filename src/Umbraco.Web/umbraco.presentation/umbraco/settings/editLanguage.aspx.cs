@@ -1,18 +1,10 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.Trees;
 using Umbraco.Web.UI;
 
 namespace umbraco.settings
@@ -38,8 +30,8 @@ namespace umbraco.settings
            
 
 			// Put user code to initialize the page here
-            Panel1.Text = ui.Text("editlanguage");
-            pp_language.Text = ui.Text("language", "displayName", Security.CurrentUser);
+            Panel1.Text = Services.TextService.Localize("editlanguage");
+            pp_language.Text = Services.TextService.Localize("language/displayName");
             if (!IsPostBack) 
 			{
 				updateCultureList();
@@ -55,7 +47,7 @@ namespace umbraco.settings
 		{
             SortedList sortedCultures = new SortedList();
             Cultures.Items.Clear();
-            Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+            Cultures.Items.Add(new ListItem(Services.TextService.Localize("choose") + "...", ""));
             foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
                 sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
 
@@ -76,7 +68,7 @@ namespace umbraco.settings
 		    currentLanguage.Save();
 			updateCultureList();
 
-            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "languageSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/languageSaved"), "");	
 		}
 
 		#region Web Form Designer generated code
@@ -85,12 +77,12 @@ namespace umbraco.settings
 			Panel1.hasMenu = true;
 			var save = Panel1.Menu.NewButton();
 			save.Click += save_click;
-			save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+			save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
 		    save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 	
-			Panel1.Text = ui.Text("language", "editLanguage");
+			Panel1.Text = Services.TextService.Localize("language/editLanguage");
 
 			InitializeComponent();
 			base.OnInit(e);

@@ -134,13 +134,13 @@ namespace Umbraco.Web.PropertyEditors
                             if (umbracoFile.SupportsResizing)
                             {
                                 var additionalSizes = new List<int>();
-                                //get the pre-vals value
+                                //get the pre-vals value		
                                 var thumbs = editorValue.PreValues.FormatAsDictionary();
                                 if (thumbs.Any())
                                 {
                                     var thumbnailSizes = thumbs.First().Value.Value;
-                                    // additional thumbnails configured as prevalues on the DataType
-									foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
+                                    // additional thumbnails configured as prevalues on the DataType		
+                                    foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                                     {
                                         int thumbSize;
                                         if (thumb == "" || int.TryParse(thumb, out thumbSize) == false) continue;
@@ -152,8 +152,8 @@ namespace Umbraco.Web.PropertyEditors
                                 {
                                     ImageHelper.GenerateMediaThumbnails(fs, fileName, umbracoFile.Extension, image, additionalSizes);
                                 }
-
                             }
+
                             newValue.Add(umbracoFile.Url);
                             //add to the saved paths
                             savedFilePaths.Add(umbracoFile.Url);

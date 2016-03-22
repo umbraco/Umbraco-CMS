@@ -10,6 +10,8 @@ using umbraco;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
+using Umbraco.Core.Services;
+using Umbraco.Web.WebServices;
 
 namespace umbraco.controls.Tree
 {
@@ -18,7 +20,7 @@ namespace umbraco.controls.Tree
     /// </summary>
     [ScriptService]
     [WebService]
-    public class CustomTreeService : WebService
+    public class CustomTreeService : UmbracoWebService
     {
         /// <summary>
         /// Returns some info about the node such as path and id
@@ -104,8 +106,8 @@ namespace umbraco.controls.Tree
 
                 //we're going to hijack the node name here to make it say content/media
                 var node = tree.RootNode;
-                if (node.Text.Equals("[FilteredContentTree]")) node.Text = ui.GetText("content");
-                else if (node.Text.Equals("[FilteredMediaTree]")) node.Text = ui.GetText("media");
+                if (node.Text.Equals("[FilteredContentTree]")) node.Text = Services.TextService.Localize("content");
+                else if (node.Text.Equals("[FilteredMediaTree]")) node.Text = Services.TextService.Localize("media");
                 xTree.Add(node);
 
                 returnVal.Add("json", xTree.ToString());

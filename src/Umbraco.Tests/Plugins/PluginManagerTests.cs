@@ -8,7 +8,7 @@ using Moq;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using umbraco;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;

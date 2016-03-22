@@ -18,10 +18,11 @@ using System.Text;
 using Umbraco.Web.WebApi;
 using ContentType = System.Net.Mime.ContentType;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO:  We'll need to be careful about the security on this controller, when we start implementing 
+    //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
 
@@ -48,11 +49,15 @@ namespace Umbraco.Web.Editors
         public MediaTypeController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-           
+
         }
 
+        public int GetCount()
+        {
+            return Services.ContentTypeService.CountContentTypes();
+        }
 
-        public ContentTypeCompositionDisplay GetById(int id)
+        public MediaTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.GetMediaType(id);
             if (ct == null)
@@ -60,7 +65,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
             return dto;
         }
 
@@ -83,17 +88,39 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType);
+            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType, filter.FilterContentTypes, filter.FilterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
         }
 
-        public ContentTypeCompositionDisplay GetEmpty(int parentId)
+        public MediaTypeDisplay GetEmpty(int parentId)
         {
             var ct = new MediaType(parentId);
             ct.Icon = "icon-picture";
 
-            var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
             return dto;
         }
 
@@ -102,8 +129,8 @@ namespace Umbraco.Web.Editors
         /// Returns all member types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
-        {   
-            
+        {
+
             return Services.ContentTypeService.GetAllMediaTypes()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
@@ -127,21 +154,21 @@ namespace Umbraco.Web.Editors
             var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
-                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
+        public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.GetMediaType(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type));
+            var savedCt = PerformPostSave<IMediaType, MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
+                contentTypeSave:        contentTypeSave,
+                getContentType:         i => Services.ContentTypeService.GetMediaType(i),
+                saveContentType:        type => Services.ContentTypeService.Save(type));
 
-            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
+            var display = Mapper.Map<MediaTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/mediaTypeSavedHeader"),
                             string.Empty);
 
             return display;
@@ -201,10 +228,22 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             return PerformMove(
-                move, 
-                getContentType: i => Services.ContentTypeService.GetMediaType(i), 
-                doMove:         (type, i) => Services.ContentTypeService.MoveMediaType(type, i));            
+                move,
+                getContentType: i => Services.ContentTypeService.GetMediaType(i),
+                doMove: (type, i) => Services.ContentTypeService.MoveMediaType(type, i));
         }
-        
+
+        /// <summary>
+        /// Copy the media type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                getContentType: i => Services.ContentTypeService.GetMediaType(i),
+                doCopy: (type, i) => Services.ContentTypeService.CopyMediaType(type, i));
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -29,6 +30,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
@@ -76,10 +78,34 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns an item to be used to display the recycle bin for content
+        /// </summary>
+        /// <returns></returns>
+        public ContentItemDisplay GetRecycleBin()
+        {
+            var display = new ContentItemDisplay
+            {
+                Id = Constants.System.RecycleBinContent,
+                Alias = "recycleBin",
+                ParentId = -1,
+                Name = Services.TextService.Localize("general/recycleBin"),
+                ContentTypeAlias = "recycleBin",
+                CreateDate = DateTime.Now,
+                IsContainer = true,
+                Path = "-1," + Constants.System.RecycleBinContent
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+
+            return display;
+        }
+
+        /// <summary>
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
@@ -115,6 +141,7 @@ namespace Umbraco.Web.Editors
         /// If this is a container type, we'll remove the umbContainerView tab for a new item since
         /// it cannot actually list children if it doesn't exist yet.
         /// </returns>
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
@@ -123,7 +150,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
+            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, Security.GetUserId());
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
@@ -186,6 +213,19 @@ namespace Umbraco.Web.Editors
         public bool GetHasPermission(string permissionToCheck, int nodeId)
         {
            return HasPermission(permissionToCheck, nodeId);
+        }
+
+        /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            return Services.UserService
+                .GetPermissions(Security.CurrentUser, nodeIds)
+                .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
         }
 
         [HttpGet]
@@ -325,9 +365,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
         
-
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>
@@ -538,8 +576,8 @@ namespace Umbraco.Web.Editors
             if (Guid.TryParse(previewId, out id))
             {
                 var d = new Document(contentId);
-                var pc = new PreviewContent(UmbracoUser, id, false);
-                pc.PrepareDocument(UmbracoUser, d, true);
+                var pc = new PreviewContent(Security.CurrentUser, id, false);
+                pc.PrepareDocument(Security.CurrentUser, d, true);
                 pc.SavePreviewSet();
             }
         }
@@ -661,9 +699,17 @@ namespace Umbraco.Web.Editors
                             new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
                     break;
                 case PublishStatusType.FailedHasExpired:
-                    //TODO: We should add proper error messaging for this!
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                            new[]
+                            {
+                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                            }).Trim());
+                    break;
                 case PublishStatusType.FailedIsTrashed:
                     //TODO: We should add proper error messaging for this!
+                    break;
                 case PublishStatusType.FailedContentInvalid:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),

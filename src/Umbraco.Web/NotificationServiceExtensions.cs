@@ -6,12 +6,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using umbraco;
-using umbraco.interfaces;
+using Umbraco.Core.Models;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web
 {
-    //NOTE: all of these require an UmbracoContext because currently to send the notifications we need an HttpContext, this is based on legacy code
+    //TODO: all of these require an UmbracoContext because currently to send the notifications we need an HttpContext, this is based on legacy code
     // for which probably requires updating so that these can be sent outside of the http context.
 
     internal static class NotificationServiceExtensions
@@ -71,12 +71,12 @@ namespace Umbraco.Web
                 sender,
                 entity,
                 action.Letter.ToString(CultureInfo.InvariantCulture),
-                ui.Text("actions", action.Alias),
+                applicationContext.Services.TextService.Localize("actions", action.Alias),
                 umbracoContext.HttpContext,
-                (mailingUser, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
+                (mailingUser, strings) => applicationContext.Services.TextService.Localize("notifications/mailSubject", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings),
                 (mailingUser, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                                              ? ui.Text("notifications", "mailBody", strings, mailingUser)
-                                              : ui.Text("notifications", "mailBodyHtml", strings, mailingUser));
+                                              ? applicationContext.Services.TextService.Localize("notifications/mailBody", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings)
+                                              : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings));
         }
     }
 }

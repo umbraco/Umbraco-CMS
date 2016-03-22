@@ -258,7 +258,6 @@
    align-items: center;
    padding: 10px 15px;
    background: @grayLighter;
-   border-radius: 5px;
    margin-bottom: 1px;
 }
 
@@ -297,7 +296,6 @@
    margin-right: 10px;
    vertical-align: middle;
    border: 1px solid @grayLight;
-   border-radius: 5px;
    background: #ffffff;
    padding: 6px 8px;
    display: block;
@@ -309,17 +307,15 @@
    text-decoration: none;
 }
 
-.list-view-layout__remove-layout {
-   flex: 2;
-   text-align: right;
-   font-size: 20px;
+.list-view-layout__remove {
+    position: relative;
+    cursor: pointer;
 }
 
 .list-view-add-layout {
    margin-top: 10px;
    color: @blue;
    border: 1px dashed #d9d9d9;
-   border-radius: 5px;
    display: flex;
    align-items: center;
    justify-content: center;

@@ -4,7 +4,6 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Models
 {

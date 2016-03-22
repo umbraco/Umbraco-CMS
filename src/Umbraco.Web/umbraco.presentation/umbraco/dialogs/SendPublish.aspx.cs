@@ -12,7 +12,7 @@ using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {

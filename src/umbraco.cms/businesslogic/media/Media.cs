@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Linq;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -63,33 +64,17 @@ namespace umbraco.cms.businesslogic.media
         /// -
         /// </summary>
         public static Guid _objectType = new Guid(Constants.ObjectTypes.Media);
+       
 
-        /// <summary>
-        /// Creates a new Media
-        /// </summary>
-        /// <param name="Name">The name of the media</param>
-        /// <param name="dct">The type of the media</param>
-        /// <param name="u">The user creating the media</param>
-        /// <param name="ParentId">The id of the folder under which the media is created</param>
-        /// <returns></returns>
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
-        public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
+        public static Media MakeNew(string Name, MediaType dct, IUser u, int ParentId)
         {
-            var e = new NewEventArgs();
-            OnNewing(e);
-            if (e.Cancel)
-            {
-                return null;
-            }
-
             var media = ApplicationContext.Current.Services.MediaService.CreateMediaWithIdentity(Name, ParentId, dct.Alias, u.Id);
             //The media object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled
             if (((Entity)media).WasCancelled)
                 return null;
 
             var tmp = new Media(media);
-
-            tmp.OnNew(e);
 
             return tmp;
         }
@@ -315,27 +300,18 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Delete()", false)]
         private bool DeletePermanently()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
+            if (MediaItem != null)
             {
-                if (MediaItem != null)
-                {
-                    ApplicationContext.Current.Services.MediaService.Delete(MediaItem);
-                }
-                else
-                {
-                    var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
-                    ApplicationContext.Current.Services.MediaService.Delete(media);
-                }
-
-                base.delete();
-
-                FireAfterDelete(e);
+                ApplicationContext.Current.Services.MediaService.Delete(MediaItem);
             }
-            return !e.Cancel;
+            else
+            {
+                var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
+                ApplicationContext.Current.Services.MediaService.Delete(media);
+            }
+
+            base.delete();
+            return true;
         }
 
         /// <summary>
@@ -345,161 +321,26 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
-            MoveToTrashEventArgs e = new MoveToTrashEventArgs();
-            FireBeforeMoveToTrash(e);
-
-            if (!e.Cancel)
+            if (MediaItem != null)
             {
-                if (MediaItem != null)
-                {
-                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(MediaItem);
-                }
-                else
-                {
-                    var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
-                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(media);
-                }
-
-                //Move((int)RecycleBin.RecycleBinType.Media);
-
-                //TODO: Now that we've moved it to trash, we need to move the actual files so they are no longer accessible
-                //from the original URL.
-
-                FireAfterMoveToTrash(e);
+                ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(MediaItem);
             }
-            return !e.Cancel;           
-            
+            else
+            {
+                var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
+                ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(media);
+            }
+
+            //Move((int)RecycleBin.RecycleBinType.Media);
+
+            //TODO: Now that we've moved it to trash, we need to move the actual files so they are no longer accessible
+            //from the original URL.
+            return true;
+
         }
         
         #endregion
 		
-        #region Events
-
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Media sender, SaveEventArgs e);
-        /// <summary>
-        /// The new  event handler
-        /// </summary>
-        public delegate void NewEventHandler(Media sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Media sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event EventHandler<NewEventArgs> Newing;
-        protected static void OnNewing(NewEventArgs e)
-        {
-            if (Newing != null)
-            {
-                Newing(null, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-
-        /// <summary>
-        /// The Move to trash event handler
-        /// </summary>
-        public delegate void MoveToTrashEventHandler(Media sender, MoveToTrashEventArgs e);
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public static event MoveToTrashEventHandler BeforeMoveToTrash;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeMoveToTrash(MoveToTrashEventArgs e)
-        {
-            if (BeforeMoveToTrash != null)
-                BeforeMoveToTrash(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after move to trash].
-        /// </summary>
-        public static event MoveToTrashEventHandler AfterMoveToTrash;
-        /// <summary>
-        /// Fires the after move to trash.
-        /// </summary>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.MoveToTrashEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterMoveToTrash(MoveToTrashEventArgs e)
-        {
-            if (AfterMoveToTrash != null)
-                AfterMoveToTrash(this, e);
-        } 
-        #endregion
-    
+       
     }
 }

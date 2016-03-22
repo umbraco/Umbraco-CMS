@@ -23,8 +23,8 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent)
             : this(parent, null)
-		{
-		}
+        {
+        }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
             : base(parent, alias)
@@ -122,10 +122,10 @@ namespace Umbraco.Core.Models
                     return false;
 
                 RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
-                
+
                 //If the ContentType we are removing has Compositions of its own these needs to be removed as well
                 var compositionIdsToRemove = contentTypeComposition.CompositionIds().ToList();
-                if(compositionIdsToRemove.Any())
+                if (compositionIdsToRemove.Any())
                     RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
                 OnPropertyChanged(ContentTypeCompositionSelector);
@@ -210,16 +210,13 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
         {
-            if (propertyType.HasIdentity == false)
-                propertyType.Key = Guid.NewGuid();
-
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.Contains(propertyGroupName) 
-                ? PropertyGroups[propertyGroupName] 
+            var group = PropertyGroups.Contains(propertyGroupName)
+                ? PropertyGroups[propertyGroupName]
                 : AddAndReturnPropertyGroup(propertyGroupName);
             if (group == null)
                 return false;

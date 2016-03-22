@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Security;
@@ -19,7 +17,7 @@ namespace umbraco.presentation.members
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            panel1.Text = ui.Text("member");
+            panel1.Text = Services.TextService.Localize("member");
             BindRp();
         }
 
@@ -66,8 +64,8 @@ namespace umbraco.presentation.members
                     _email.Text = mem.Email;
 
                     _button.CommandArgument = mem.Id.ToString();
-                    _button.OnClientClick = "return confirm(\"" + ui.Text("confirmdelete") + "'" + mem.Text + "' ?\")";
-                    _button.Text = ui.Text("delete");
+                    _button.OnClientClick = "return confirm(\"" + Services.TextService.Localize("confirmdelete") + "'" + mem.Text + "' ?\")";
+                    _button.Text = Services.TextService.Localize("delete");
                 }
                 else
                 {

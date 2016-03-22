@@ -12,6 +12,7 @@ using umbraco.cms.presentation.Trees;
 using System.Drawing;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.controls.Tree
 {
@@ -406,7 +407,7 @@ namespace umbraco.controls.Tree
                 //container node labelled with the current application.
                 XmlTree xTree = new XmlTree();
                 XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
-                xNode.Text = ui.Text("sections", GetCurrentApp(), Security.CurrentUser);
+                xNode.Text = Services.TextService.Localize("sections", GetCurrentApp());
                 xNode.Source = m_TreeService.GetServiceUrl();
                 xNode.Action = "javascript:" + global::Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenDashboard(GetCurrentApp());
                 xNode.NodeType = m_TreeService.App.ToLower();

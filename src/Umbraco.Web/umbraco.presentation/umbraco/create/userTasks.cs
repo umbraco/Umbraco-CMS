@@ -5,6 +5,7 @@ using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Security;
 using Umbraco.Core;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -69,8 +70,9 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            var u = User.GetUser(ParentID);
-            u.disable();
+            var u = ApplicationContext.Current.Services.UserService.GetUserById(ParentID);
+            u.IsApproved = false;
+            ApplicationContext.Current.Services.UserService.Save(u);
             return true;
         }
     }

@@ -5,8 +5,8 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -105,8 +105,8 @@ namespace umbraco.cms.businesslogic.web
         private int _template;
         private bool _published;
         private XmlNode _xml;
-        private User _creator;
-        private User _writer;
+        private IUser _creator;
+        private IUser _writer;
         private int? _writerId;
         private readonly bool _optimizedMode;
         protected internal IContent ContentEntity;
@@ -159,7 +159,7 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.DatabaseContext.Database.Execute(
                 "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
             //We need to clear cache for Documents since this is touching the database directly
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Properties
-
+        
         public override int sortOrder
         {
             get
@@ -220,10 +220,7 @@ namespace umbraco.cms.businesslogic.web
 
         public override int ParentId
         {
-            get
-            {
-                return ContentEntity == null ? base.ParentId : ContentEntity.ParentId;
-            }
+            get { return ContentEntity == null ? base.ParentId : ContentEntity.ParentId; }
         }
 
         public override string Path
@@ -275,7 +272,7 @@ namespace umbraco.cms.businesslogic.web
         /// Gets the user who created the document.
         /// </summary>
         /// <value>The creator.</value>
-        public User Creator
+        public IUser Creator
         {
             get
             {
@@ -291,7 +288,7 @@ namespace umbraco.cms.businesslogic.web
         /// Gets the writer.
         /// </summary>
         /// <value>The writer.</value>
-        public User Writer
+        public IUser Writer
         {
             get
             {
@@ -301,7 +298,7 @@ namespace umbraco.cms.businesslogic.web
                     {
                         throw new NullReferenceException("Writer ID has not been specified for this document");
                     }
-                    _writer = User.GetUser(_writerId.Value);
+                    _writer = ApplicationContext.Current.Services.UserService.GetUserById(_writerId.Value);
                 }
                 return _writer;
             }
@@ -455,7 +452,7 @@ namespace umbraco.cms.businesslogic.web
         
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
-        public bool PublishWithChildrenWithResult(User u)
+        public bool PublishWithChildrenWithResult(IUser u)
         {
             var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(ContentEntity, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
@@ -467,16 +464,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
         {
-            UnPublishEventArgs e = new UnPublishEventArgs();
-
-            FireBeforeUnPublish(e);
-
-            if (!e.Cancel)
-            {
-                _published = ApplicationContext.Current.Services.ContentService.UnPublish(ContentEntity);
-                
-                FireAfterUnPublish(e);
-            }
+            _published = ApplicationContext.Current.Services.ContentService.UnPublish(ContentEntity);
         }      
 
         
@@ -556,8 +544,8 @@ namespace umbraco.cms.businesslogic.web
                 Version = ContentEntity.Version;
 
             //Setting private properties from IContent replacing Document.setupNode()
-            _creator = User.GetUser(ContentEntity.CreatorId);
-            _writer = User.GetUser(ContentEntity.WriterId);
+            _creator = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.CreatorId);
+            _writer = ApplicationContext.Current.Services.UserService.GetUserById(ContentEntity.WriterId);
             _updated = ContentEntity.UpdateDate;
 
             if (ContentEntity.Template != null)
@@ -606,28 +594,19 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Delete()", false)]
         private bool DeletePermanently()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
+            if (ContentEntity != null)
             {
-                if (ContentEntity != null)
-                {
-                    ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
-                }
-                else
-                {
-                    ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                    ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
-                }
-
-                //Keeping the base.delete() as it looks to be clear 'private/internal cache'
-                base.delete();
-
-                FireAfterDelete(e);
+                ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
             }
-            return !e.Cancel;
+            else
+            {
+                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
+            }
+
+            //Keeping the base.delete() as it looks to be clear 'private/internal cache'
+            base.delete();
+            return true;
         }
 
         /// <summary>
@@ -637,138 +616,22 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
-            MoveToTrashEventArgs e = new MoveToTrashEventArgs();
-            FireBeforeMoveToTrash(e);
 
-            if (!e.Cancel)
+            UnPublish();
+            if (ContentEntity != null)
             {
-                UnPublish();
-                if (ContentEntity != null)
-                {
-                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
-                }
-                else
-                {
-                    ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
-                }
-                FireAfterMoveToTrash(e);
+                ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
             }
-            return !e.Cancel;
+            else
+            {
+                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
+            }
+            return true;
         }
 
         #endregion
-
-        #region Events
-
-        /// <summary>
-        /// The delete  event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Document sender, DeleteEventArgs e);
-        /// <summary>
-        /// The unpublish event handler
-        /// </summary>
-        public delegate void UnPublishEventHandler(Document sender, UnPublishEventArgs e);
         
-        
-        /// <summary>
-        /// The Move to trash event handler
-        /// </summary>
-        public delegate void MoveToTrashEventHandler(Document sender, MoveToTrashEventArgs e);
-        
-        
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public static event MoveToTrashEventHandler BeforeMoveToTrash;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeMoveToTrash(MoveToTrashEventArgs e)
-        {
-            if (BeforeMoveToTrash != null)
-                BeforeMoveToTrash(this, e);
-        }
-
-
-        /// <summary>
-        /// Occurs when [after move to trash].
-        /// </summary>
-        public static event MoveToTrashEventHandler AfterMoveToTrash;
-        /// <summary>
-        /// Fires the after move to trash.
-        /// </summary>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.MoveToTrashEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterMoveToTrash(MoveToTrashEventArgs e)
-        {
-            if (AfterMoveToTrash != null)
-                AfterMoveToTrash(this, e);
-        }
-        
-        
-        /// <summary>
-        /// Occurs when [before un publish].
-        /// </summary>
-        public static event UnPublishEventHandler BeforeUnPublish;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeUnPublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeUnPublish(UnPublishEventArgs e)
-        {
-            if (BeforeUnPublish != null)
-                BeforeUnPublish(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after un publish].
-        /// </summary>
-        public static event UnPublishEventHandler AfterUnPublish;
-        /// <summary>
-        /// Raises the <see cref="E:AfterUnPublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterUnPublish(UnPublishEventArgs e)
-        {
-            if (AfterUnPublish != null)
-                AfterUnPublish(this, e);
-        }
-        
-        
-        #endregion
-
 
     }
 }

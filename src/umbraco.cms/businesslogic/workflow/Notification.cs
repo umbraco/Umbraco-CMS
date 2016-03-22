@@ -1,6 +1,9 @@
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Web;
 using Umbraco.Core;
@@ -10,7 +13,8 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
-using umbraco.interfaces;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.workflow
 {
@@ -41,56 +45,15 @@ namespace umbraco.cms.businesslogic.workflow
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
-        }
-
-        /// <summary>
-        /// Sends the notifications for the specified user regarding the specified node and action.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="user">The user.</param>
-        /// <param name="action">The action.</param>
-        public static void GetNotifications(CMSNode node, User user, IAction action)
-        {
-            User[] allUsers = User.getAll();
-            foreach (User u in allUsers)
-            {
-                try
-                {
-                    if (u.Disabled == false && u.GetNotifications(node.Path).IndexOf(action.Letter.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) > -1)
-                    {
-                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(action.Alias, u), u.Name, u.Email));
-                        SendNotification(user, u, (Document)node, action);
-                    }
-                }
-                catch (Exception notifyExp)
-                {
-					LogHelper.Error<Notification>("Error in notification", notifyExp);
-                }
-            }
-        }
-
-        //TODO: Include update with html mail notification and document contents
-        private static void SendNotification(User performingUser, User mailingUser, Document documentObject, IAction action)
-        {
-            var nService = ApplicationContext.Current.Services.NotificationService;
-            var pUser = ApplicationContext.Current.Services.UserService.GetUserById(performingUser.Id);
-
-            nService.SendNotifications(
-                pUser, documentObject.ContentEntity, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
-                new HttpContextWrapper(HttpContext.Current),
-                (user, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
-                (user, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                    ? ui.Text("notifications", "mailBody", strings, mailingUser)
-                    : ui.Text("notifications", "mailBodyHtml", strings, mailingUser));
-        }
+            get { return LegacySqlHelper.SqlHelper; }
+        }        
 
         /// <summary>
         /// Returns the notifications for a user
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static IEnumerable<Notification> GetUserNotifications(User user)
+        public static IEnumerable<Notification> GetUserNotifications(IUser user)
         {
             var items = new List<Notification>();
             var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<User2NodeNotifyDto>(
@@ -147,7 +110,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// Delete notifications by user
         /// </summary>
         /// <param name="user"></param>
-        public static void DeleteNotifications(User user)
+        public static void DeleteNotifications(IUser user)
         {
             // delete all settings on the node for this node id
             ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId",
@@ -159,7 +122,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// </summary>
         /// <param name="user"></param>
         /// <param name="node"></param>
-        public static void DeleteNotifications(User user, CMSNode node)
+        public static void DeleteNotifications(IUser user, CMSNode node)
         {
             // delete all settings on the node for this user
             ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodeNotifyDto>(
@@ -173,7 +136,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// <param name="node">The node.</param>
         /// <param name="actionLetter">The action letter.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void MakeNew(User user, CMSNode node, char actionLetter)
+        public static void MakeNew(IUser user, CMSNode node, char actionLetter)
         {
             bool exists = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
                 "SELECT COUNT(userId) FROM umbracoUser2nodeNotify WHERE userId = @userId AND nodeId = @nodeId AND action = @action", 
@@ -197,7 +160,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// <param name="node">The node.</param>
         /// <param name="notifications">The notifications.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void UpdateNotifications(User user, CMSNode node, string notifications)
+        public static void UpdateNotifications(IUser user, CMSNode node, string notifications)
         {
             // delete all settings on the node for this user
             DeleteNotifications(user, node);

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using umbraco.businesslogic;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco
 {
@@ -97,7 +96,7 @@ namespace umbraco
                         {
                             xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=installed" + "&rnd=" + Guid.NewGuid();
                             xNode.NodeType = "installedPackages";                            
-                            xNode.Text =  ui.Text("treeHeaders", "installedPackages");
+                            xNode.Text =  Services.TextService.Localize("treeHeaders/installedPackages");
                             xNode.HasChildren = true;
                         }
                         else
@@ -123,7 +122,7 @@ namespace umbraco
                         {
                             xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repositories" + "&rnd=" + Guid.NewGuid();
                             xNode.NodeType = "packagesRepositories";                            
-                            xNode.Text = ui.Text("treeHeaders", "repositories");
+                            xNode.Text = Services.TextService.Localize("treeHeaders/repositories");
                             xNode.HasChildren = true;
                         }
                         */
@@ -147,7 +146,7 @@ namespace umbraco
                         xNode.Menu.Clear();                        
                         xNode.Menu.Add(ActionNew.Instance);
                         xNode.Menu.Add(ActionRefresh.Instance);
-                        xNode.Text = ui.Text("treeHeaders", "createdPackages");
+                        xNode.Text = Services.TextService.Localize("treeHeaders/createdPackages");
                         xNode.HasChildren = true;
                         xNode.Action = "javascript:void(0);";
                         
@@ -158,7 +157,7 @@ namespace umbraco
                         xNode.NodeType = "uploadPackage";
                         xNode.Icon = "icon-page-up";
                         xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
-                        xNode.Text = ui.Text("treeHeaders", "localPackage");
+                        xNode.Text = Services.TextService.Localize("treeHeaders/localPackage");
                         xNode.Menu.Clear();
                         break;
 
@@ -167,7 +166,7 @@ namespace umbraco
                         xNode.NodeType = "starterKits";
                         xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
                         xNode.Icon = "icon-flash";
-                        xNode.Text = ui.Text("treeHeaders", "installStarterKit");
+                        xNode.Text = Services.TextService.Localize("treeHeaders/installStarterKit");
                         xNode.Menu.Clear();
                         break;
 

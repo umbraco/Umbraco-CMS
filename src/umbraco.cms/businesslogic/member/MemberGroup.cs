@@ -1,12 +1,9 @@
 using System;
-using System.Data;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
-using umbraco.DataLayer;
-using System.Collections;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -65,9 +62,6 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Role.DeleteRole")]
         public override void delete()
         {
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-            if (e.Cancel) return;
 
             if (_memberGroupItem != null)
             {
@@ -81,7 +75,6 @@ namespace umbraco.cms.businesslogic.member
             
             // Delete all content and cmsnode specific data!
             base.delete();
-            FireAfterDelete(e);
         }
 
 
@@ -90,13 +83,9 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-            if (e.Cancel) return;
 
             ApplicationContext.Current.Services.MemberGroupService.Save(_memberGroupItem);
 
-            FireAfterSave(e);
         }
 
 		/// <summary>
@@ -160,14 +149,12 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="Name">The name of the MemberGroup</param>
 		/// <param name="u">The creator of the MemberGroup</param>
 		/// <returns>The new MemberGroup</returns>
-		public static MemberGroup MakeNew(string Name, BusinessLogic.User u) 
+		public static MemberGroup MakeNew(string Name, IUser u) 
 		{
 		    var group = new global::Umbraco.Core.Models.MemberGroup {Name = Name};
 		    ApplicationContext.Current.Services.MemberGroupService.Save(group);
 
             var mg = new MemberGroup(group);
-            var e = new NewEventArgs();
-            mg.OnNew(e);
             return mg;
 		}
 
@@ -195,54 +182,6 @@ namespace umbraco.cms.businesslogic.member
             base.PopulateCMSNodeFromUmbracoEntity(_memberGroupItem, MemberGroupObjectType);
         }
 
-	    //EVENTS
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(MemberGroup sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(MemberGroup sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(MemberGroup sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when a language is saved.
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        protected override void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public new static event SaveEventHandler AfterSave;
-        protected override void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        public new static event DeleteEventHandler BeforeDelete;
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public new static event DeleteEventHandler AfterDelete;
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+	  
 	}
 }

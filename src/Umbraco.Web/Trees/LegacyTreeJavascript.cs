@@ -5,6 +5,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -54,10 +55,10 @@ namespace Umbraco.Web.Trees
                     if (string.IsNullOrEmpty(a.Alias) == false && (string.IsNullOrEmpty(a.JsFunctionName) == false || string.IsNullOrEmpty(a.JsSource) == false))
                     {
                         // if the action is using invalid javascript we need to do something about this
-                        if (global::Umbraco.Web.LegacyActions.Action.ValidateActionJs(a) == false)
+                        if (global::Umbraco.Web._Legacy.Actions.Action.ValidateActionJs(a) == false)
                         {
                             js.AppendLine("function IActionProxy_" + a.Alias.ToSafeAlias() + "() {");
-                            js.AppendLine(global::Umbraco.Web.LegacyActions.Action.ConvertLegacyJs(a.JsFunctionName));
+                            js.AppendLine(global::Umbraco.Web._Legacy.Actions.Action.ConvertLegacyJs(a.JsFunctionName));
                             js.AppendLine("}");
                         }
                     }

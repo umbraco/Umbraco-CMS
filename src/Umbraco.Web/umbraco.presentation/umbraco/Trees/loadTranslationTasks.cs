@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
-
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Web.LegacyActions;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco {
     public class loadOpenTasks : BaseTree {
@@ -14,8 +14,8 @@ namespace umbraco {
         public loadOpenTasks(string application) : base(application) { }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
-            rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ",'open');";
-            rootNode.Text = ui.Text("translation", "assignedTasks");
+            rootNode.Action = "javascript:openTranslationOverview(" + CurrentUser().Id + ",'open');";
+            rootNode.Text = Services.TextService.Localize("translation/assignedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {
@@ -34,11 +34,13 @@ namespace umbraco {
                     ");     
         }
 
-        private User currentUser() {
-            return User.GetCurrent();
+        private IUser CurrentUser()
+        {
+            return UmbracoContext.Current.Security.CurrentUser;
         }
+
         public override void Render(ref XmlTree tree) {
-            foreach (Task t in Task.GetTasks(currentUser(), false)) {
+            foreach (Task t in Task.GetTasks(CurrentUser(), false)) {
                 
                 if (t.Type.Alias == "toTranslate") {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
@@ -68,8 +70,8 @@ namespace umbraco {
         public loadYourTasks(string application) : base(application) { }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
-            rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ", 'owned');";
-            rootNode.Text = ui.Text("translation", "ownedTasks");
+            rootNode.Action = "javascript:openTranslationOverview(" + CurrentUser().Id + ", 'owned');";
+            rootNode.Text = Services.TextService.Localize("translation/ownedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {
@@ -84,13 +86,13 @@ namespace umbraco {
                     }");
         }
 
-        private User currentUser()
+        private IUser CurrentUser()
         {
-            return User.GetCurrent();
+            return UmbracoContext.Current.Security.CurrentUser;
         }
 
         public override void Render(ref XmlTree tree) {
-            foreach (Task t in Task.GetOwnedTasks(currentUser(), false)) {
+            foreach (Task t in Task.GetOwnedTasks(CurrentUser(), false)) {
 
                 if (t.Type.Alias == "toTranslate") {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);

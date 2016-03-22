@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -214,15 +215,15 @@ namespace umbraco.presentation.umbraco.dialogs
             ph_errorpage.Controls.Add(errorPagePicker);
             ph_loginpage.Controls.Add(loginPagePicker);
 
-            pp_login.Text = ui.Text("login");
-            pp_pass.Text = ui.Text("password");
-            pp_loginPage.Text = ui.Text("paLoginPage");
-            pp_errorPage.Text = ui.Text("paErrorPage");
+            pp_login.Text = Services.TextService.Localize("login");
+            pp_pass.Text = Services.TextService.Localize("password");
+            pp_loginPage.Text = Services.TextService.Localize("paLoginPage");
+            pp_errorPage.Text = Services.TextService.Localize("paErrorPage");
 
-            pane_chooseMode.Text = ui.Text("publicAccess", "paHowWould", UmbracoUser);
-            pane_pages.Text = ui.Text("publicAccess", "paSelectPages", UmbracoUser);
-            pane_simple.Text = ui.Text("publicAccess", "paSimple", UmbracoUser);
-            pane_advanced.Text = ui.Text("publicAccess", "paAdvanced", UmbracoUser);
+            pane_chooseMode.Text = Services.TextService.Localize("publicAccess/paHowWould");
+            pane_pages.Text = Services.TextService.Localize("publicAccess/paSelectPages");
+            pane_simple.Text = Services.TextService.Localize("publicAccess/paSimple");
+            pane_advanced.Text = Services.TextService.Localize("publicAccess/paAdvanced");
 
             if (IsPostBack == false)
             {
@@ -230,7 +231,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     && GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;
-                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "')");
+                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + Services.TextService.Localize("areyousure") + "')");
 
                     // Get login and error pages
                     int errorPage = GetErrorPage(documentObject.Path);
@@ -305,8 +306,8 @@ namespace umbraco.presentation.umbraco.dialogs
             groupsSelector.Controls.Add(_memberGroups);
 
 
-            bt_protect.Text = ui.Text("update");
-            bt_buttonRemoveProtection.Text = ui.Text("paRemoveProtection");
+            bt_protect.Text = Services.TextService.Localize("update");
+            bt_buttonRemoveProtection.Text = Services.TextService.Localize("paRemoveProtection");
 
             // Put user code to initialize the page here
         }
@@ -331,71 +332,71 @@ namespace umbraco.presentation.umbraco.dialogs
             SimpleLoginNameValidator.IsValid = true;
 
             var provider = Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-            if (Page.IsValid)
-            {
+            
                 int pageId = int.Parse(Request.GetItemAsString("nodeId"));
 
-                if (e.CommandName == "simple")
+            if (e.CommandName == "simple")
+            {
+                var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
+
+                var member = provider.GetUser(memberLogin, false);
+                if (member == null)
                 {
-                    var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
+                    var tempEmail = "u" + Guid.NewGuid().ToString("N") + "@example.com";
 
-                    var member = provider.GetUser(memberLogin, false);
-                    if (member == null)
+                    // this needs to work differently depending on umbraco members or external membership provider
+                    if (provider.IsUmbracoMembershipProvider() == false)
                     {
-                        var tempEmail = "u" + Guid.NewGuid().ToString("N") + "@example.com";
-
-                        // this needs to work differently depending on umbraco members or external membership provider
-                        if (provider.IsUmbracoMembershipProvider() == false)
+                        member = provider.CreateUser(memberLogin, simplePassword.Text, tempEmail);
+                    }
+                    else
+                    {
+                        //if it's the umbraco membership provider, then we need to tell it what member type to create it with
+                        if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                         {
-                            member = provider.CreateUser(memberLogin, simplePassword.Text, tempEmail);
+                            MemberType.MakeNew(Services.UserService.GetUserById(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                         }
-                        else
+                        var castedProvider = provider.AsUmbracoMembershipProvider();
+                        MembershipCreateStatus status;
+                        member = castedProvider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
+                                            memberLogin, simplePassword.Text, tempEmail, null, null, true, null, out status);
+                        if (status != MembershipCreateStatus.Success)
                         {
-                            //if it's the umbraco membership provider, then we need to tell it what member type to create it with
-                            if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
-                            {
-                                MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
-                            }
-                            var castedProvider = provider.AsUmbracoMembershipProvider();
-                            MembershipCreateStatus status;
-                            member = castedProvider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
-                                                memberLogin, simplePassword.Text, tempEmail, null, null, true, null, out status);
-                            if (status != MembershipCreateStatus.Success)
-                            {
-                                SimpleLoginNameValidator.IsValid = false;
-                                SimpleLoginNameValidator.ErrorMessage = "Could not create user: " + status;
-                                SimpleLoginNameValidator.Text = "Could not create user: " + status;
-                                return;
-                            }
+                            SimpleLoginNameValidator.IsValid = false;
+                            SimpleLoginNameValidator.ErrorMessage = "Could not create user: " + status;
+                            SimpleLoginNameValidator.Text = "Could not create user: " + status;
+                            return;
                         }
                     }
-                    else if (pp_pass.Visible)
-                    {
-                        SimpleLoginNameValidator.IsValid = false;
-                        SimpleLoginLabel.Visible = true;
-                        SimpleLoginLabel.Text = memberLogin;
-                        simpleLogin.Visible = false;
-                        pp_pass.Visible = false;
-                        return;
-                    }
+                }
+                else if (pp_pass.Visible)
+                {
+                    SimpleLoginNameValidator.IsValid = false;
+                    SimpleLoginLabel.Visible = true;
+                    SimpleLoginLabel.Text = memberLogin;
+                    simpleLogin.Visible = false;
+                    pp_pass.Visible = false;
+                    return;
+                }
 
-                    // Create or find a memberGroup
-                    var simpleRoleName = "__umbracoRole_" + member.UserName;
-                    if (Roles.RoleExists(simpleRoleName) == false)
-                    {
-                        Roles.CreateRole(simpleRoleName);
-                    }
-                    if (Roles.IsUserInRole(member.UserName, simpleRoleName) == false)
-                    {
-                        Roles.AddUserToRole(member.UserName, simpleRoleName);
-                    }
+                // Create or find a memberGroup
+                var simpleRoleName = "__umbracoRole_" + member.UserName;
+                if (Roles.RoleExists(simpleRoleName) == false)
+                {
+                    Roles.CreateRole(simpleRoleName);
+                }
+                if (Roles.IsUserInRole(member.UserName, simpleRoleName) == false)
+                {
+                    Roles.AddUserToRole(member.UserName, simpleRoleName);
+                }
 
                     ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
                     AddMembershipRoleToDocument(pageId, simpleRoleName);
                     AddMembershipUserToDocument(pageId, member.UserName);
-                }
-                else if (e.CommandName == "advanced")
+            }
+            else if (e.CommandName == "advanced")
+            {
+                if (cv_errorPage.IsValid && cv_loginPage.IsValid)
                 {
                     ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
@@ -405,19 +406,23 @@ namespace umbraco.presentation.umbraco.dialogs
                         else
                             RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
-
-                feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
-
-                p_buttons.Visible = false;
-                pane_advanced.Visible = false;
-                pane_simple.Visible = false;
-                var content = Services.ContentService.GetById(pageId);
-                //reloads the current node in the tree
-                ClientTools.SyncTree(content.Path, true);
-                //reloads the current node's children in the tree
-                ClientTools.ReloadActionNode(false, true);
-                feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+                else
+                {
+                    return;
+                }
             }
+
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+
+            p_buttons.Visible = false;
+            pane_advanced.Visible = false;
+            pane_simple.Visible = false;
+                var content = Services.ContentService.GetById(pageId);
+            //reloads the current node in the tree
+            ClientTools.SyncTree(content.Path, true);
+            //reloads the current node's children in the tree
+            ClientTools.ReloadActionNode(false, true);
+            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
 
 
@@ -430,7 +435,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             RemoveProtection(pageId);
 
-            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsRemoved", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             var content = Services.ContentService.GetById(pageId);
             //reloads the current node in the tree

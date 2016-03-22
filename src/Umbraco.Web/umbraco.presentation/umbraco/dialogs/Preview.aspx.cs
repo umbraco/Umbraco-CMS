@@ -29,8 +29,8 @@ namespace umbraco.presentation.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             var d = new Document(Request.GetItemAs<int>("id"));
-            var pc = new PreviewContent(UmbracoUser, Guid.NewGuid(), false);
-            pc.PrepareDocument(UmbracoUser, d, true);
+            var pc = new PreviewContent(Security.CurrentUser, Guid.NewGuid(), false);
+            pc.PrepareDocument(Security.CurrentUser, d, true);
             pc.SavePreviewSet();
             docLit.Text = d.Text;
             changeSetUrl.Text = pc.PreviewsetPath;

@@ -7,8 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using Umbraco.Web.UI.JavaScript;
-
 namespace Umbraco.Web.UI.Umbraco.Dashboard {
     
     
@@ -21,7 +19,7 @@ namespace Umbraco.Web.UI.Umbraco.Dashboard {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected UmbracoClientDependencyLoader ClientLoader;
+        protected global::Umbraco.Web.UI.JavaScript.UmbracoClientDependencyLoader ClientLoader;
         
         /// <summary>
         /// CssInclude1 control.

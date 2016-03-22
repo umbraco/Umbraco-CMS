@@ -8,10 +8,12 @@ using Examine.SearchCriteria;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Web.UI.Controls;
 
 namespace umbraco.presentation.umbraco.members
 {
-    public partial class MemberSearch : UserControl
+    public partial class MemberSearch : UmbracoUserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -19,7 +21,7 @@ namespace umbraco.presentation.umbraco.members
 
             if (provider.IsUmbracoMembershipProvider())
 
-                ButtonSearch.Text = ui.Text("search");
+                ButtonSearch.Text = Services.TextService.Localize("search");
         }
 
         protected void ButtonSearch_Click(object sender, EventArgs e)

@@ -7,13 +7,35 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAvailableCompositeContentTypes: function (contentTypeId) {
+        getCount: function () {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
-                       "GetAvailableCompositeMediaTypes",
-                       [{ contentTypeId: contentTypeId }])),
+                       "GetCount")),
+               'Failed to retrieve count');
+        },
+
+        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
+            if (!filterContentTypes) {
+                filterContentTypes = [];
+            }
+            if (!filterPropertyTypes) {
+                filterPropertyTypes = [];
+            }
+
+            var query = {
+                contentTypeId: contentTypeId,
+                filterContentTypes: filterContentTypes,
+                filterPropertyTypes: filterPropertyTypes
+            };
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "GetAvailableCompositeMediaTypes"),
+                       query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
@@ -31,7 +53,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *    .then(function(array) {
          *        $scope.type = type;
          *    });
-         * </pre> 
+         * </pre>
          * @param {Int} mediaId id of the media item to retrive allowed child types for
          * @returns {Promise} resourcePromise object.
          *
@@ -123,9 +145,9 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *    .then(function() {
          *        alert("node was moved");
          *    }, function(err){
-         *      alert("node didnt move:" + err.data.Message); 
+         *      alert("node didnt move:" + err.data.Message);
          *    });
-         * </pre> 
+         * </pre>
          * @param {Object} args arguments object
          * @param {Int} args.idd the ID of the node to move
          * @param {Int} args.parentId the ID of the parent node to move to
@@ -150,6 +172,26 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                         id: args.id
                     }),
                 'Failed to move content');
+        },
+
+        copy: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostCopy"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to copy content');
         },
 
         createContainer: function(parentId, name) {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web.UI.Pages;
 
@@ -25,7 +26,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             var contentNodeId = int.Parse(Request.QueryString["id"]);
-            _content = ApplicationContext.Current.Services.ContentService.GetById(contentNodeId);
+            _content = Services.ContentService.GetById(contentNodeId);
 
             LocalizeTexts();
 
@@ -47,13 +48,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private void LocalizeTexts()
         {
-            ChangeDocTypePane.Text = global::umbraco.ui.Text("changeDocType", "selectNewDocType");
-            ContentNamePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "selectedContent");
-            CurrentTypePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "currentType");
-            NewTypePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "newType");
-            NewTemplatePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "newTemplate");
-            ChangeDocTypePropertyMappingPane.Text = global::umbraco.ui.Text("changeDocType", "mapProperties");
-            ValidateAndSave.Text = global::umbraco.ui.Text("buttons", "save");
+            ChangeDocTypePane.Text = Services.TextService.Localize("changeDocType/selectNewDocType");
+            ContentNamePropertyPanel.Text = Services.TextService.Localize("changeDocType/selectedContent");
+            CurrentTypePropertyPanel.Text = Services.TextService.Localize("changeDocType/currentType");
+            NewTypePropertyPanel.Text = Services.TextService.Localize("changeDocType/newType");
+            NewTemplatePropertyPanel.Text = Services.TextService.Localize("changeDocType/newTemplate");
+            ChangeDocTypePropertyMappingPane.Text = Services.TextService.Localize("changeDocType/mapProperties");
+            ValidateAndSave.Text = Services.TextService.Localize("buttons/save");
         }
 
         private void DisplayContentDetails()
@@ -65,12 +66,12 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private bool PopulateListOfValidAlternateDocumentTypes()
         {
             // Start with all content types
-            var documentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
+            var documentTypes = Services.ContentTypeService.GetAllContentTypes().ToArray();
 
             // Remove invalid ones from list of potential alternatives
-            documentTypes = RemoveCurrentDocumentTypeFromAlternatives(documentTypes);
-            documentTypes = RemoveInvalidByParentDocumentTypesFromAlternatives(documentTypes);
-            documentTypes = RemoveInvalidByChildrenDocumentTypesFromAlternatives(documentTypes);
+            documentTypes = RemoveCurrentDocumentTypeFromAlternatives(documentTypes).ToArray();
+            documentTypes = RemoveInvalidByParentDocumentTypesFromAlternatives(documentTypes).ToArray();
+            documentTypes = RemoveInvalidByChildrenDocumentTypesFromAlternatives(documentTypes).ToArray();
 
             // If we have at least one, bind to list and return true
             if (documentTypes.Any())
@@ -102,7 +103,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             else
             {
                 // Below root, so only include those allowed as sub-nodes for the parent
-                var parentNode = ApplicationContext.Current.Services.ContentService.GetById(_content.ParentId);
+                var parentNode = Services.ContentService.GetById(_content.ParentId);
                 return documentTypes
                     .Where(x => parentNode.ContentType.AllowedContentTypes
                         .Select(y => y.Id.Value)
@@ -132,7 +133,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             NewTemplateList.DataValueField = "Id";
             NewTemplateList.DataTextField = "Name";
             NewTemplateList.DataBind();
-            NewTemplateList.Items.Add(new ListItem("<" + global::umbraco.ui.Text("changeDocType", "none") + ">", "0"));
+            NewTemplateList.Items.Add(new ListItem("<" + Services.TextService.Localize("changeDocType/none") + ">", "0"));
 
             // Set default template
             if (contentType.DefaultTemplate != null)
@@ -173,7 +174,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     ddl.DataValueField = "Alias";
                     ddl.DataTextField = "Name";
                     ddl.DataBind();
-                    ddl.Items.Insert(0, new ListItem("<" + global::umbraco.ui.Text("changeDocType", "none") + ">", string.Empty));
+                    ddl.Items.Insert(0, new ListItem("<" + Services.TextService.Localize("changeDocType/none") + ">", string.Empty));
 
                     // Set default selection to be one with matching alias
                     var alias = ((HiddenField)ri.FindControl("Alias")).Value;
@@ -188,19 +189,12 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private IContentType GetSelectedDocumentType()
         {
-            return ApplicationContext.Current.Services.ContentTypeService.GetContentType(int.Parse(NewDocumentTypeList.SelectedItem.Value));
+            return Services.ContentTypeService.GetContentType(int.Parse(NewDocumentTypeList.SelectedItem.Value));
         }
 
         private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
         {
-            var properties = contentType.PropertyTypes.ToList();
-            while (contentType.ParentId > -1)
-            {
-                contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentType.ParentId);
-                properties.AddRange(contentType.PropertyTypes);
-            }
-
-            return properties.OrderBy(x => x.Name);
+            return contentType.CompositionPropertyTypes;
         }
 
         private void DisplayNotAvailable()
@@ -236,7 +230,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 if (NewTemplateList.SelectedItem != null)
                 {
                     var templateId = int.Parse(NewTemplateList.SelectedItem.Value);
-                    _content.Template = templateId > 0 ? ApplicationContext.Current.Services.FileService.GetTemplate(templateId) : null;
+                    _content.Template = templateId > 0 ? Services.FileService.GetTemplate(templateId) : null;
                 }
 
                 // Set the property values
@@ -244,33 +238,33 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 foreach (var propertyMapping in propertyMappings)
                 {
                     propertiesMappedMessageBuilder.AppendFormat("<li>{0} {1} {2}</li>",
-                        propertyMapping.FromName, global::umbraco.ui.Text("changeDocType", "to"), propertyMapping.ToName);
+                        propertyMapping.FromName, Services.TextService.Localize("changeDocType/to"), propertyMapping.ToName);
                     _content.SetValue(propertyMapping.ToAlias, propertyMapping.Value);
                 }
                 propertiesMappedMessageBuilder.Append("</ul>");
 
                 // Save
-                var user = global::umbraco.BusinessLogic.User.GetCurrent();
-                ApplicationContext.Current.Services.ContentService.Save(_content, user.Id);
+                var user = Security.CurrentUser;
+                Services.ContentService.Save(_content, user.Id);
 
                 // Publish if the content was already published
                 if (wasPublished)
                 {
-                    ApplicationContext.Current.Services.ContentService.Publish(_content, user.Id);
+                    Services.ContentService.Publish(_content, user.Id);
                 }
 
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
-
+                
                 // Reload the page if the content was already being viewed
-                ClientTools.ReloadContentFrameUrlIfPathLoaded("/editContent.aspx?id=" + _content.Id);
+                ClientTools.ReloadLocation();
 
                 // Display success message
-                SuccessMessage.Text = global::umbraco.ui.Text("changeDocType", "successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");
+                SuccessMessage.Text = Services.TextService.Localize("changeDocType/successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");
                 PropertiesMappedMessage.Text = propertiesMappedMessageBuilder.ToString();
                 if (wasPublished)
                 {
-                    ContentPublishedMessage.Text = global::umbraco.ui.Text("changeDocType", "contentRepublished");
+                    ContentPublishedMessage.Text = Services.TextService.Localize("changeDocType/contentRepublished");
                     ContentPublishedMessage.Visible = true;
                 }
                 else
@@ -303,7 +297,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     {
                         if (mappedPropertyAliases.Contains(mappedPropertyAlias))
                         {
-                            ValidationError.Text = global::umbraco.ui.Text("changeDocType", "validationErrorPropertyWithMoreThanOneMapping");
+                            ValidationError.Text = Services.TextService.Localize("changeDocType/validationErrorPropertyWithMoreThanOneMapping");
                             return false;
                         }
 

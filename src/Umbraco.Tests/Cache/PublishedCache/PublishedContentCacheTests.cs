@@ -51,9 +51,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             base.Initialize();
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
-            //ensure the StateHelper is using our custom context
-            StateHelper.HttpContext = _httpContextFactory.HttpContext;
-
+            
 		    var settings = SettingsForTests.GenerateMockSettings();
 
 		    SettingsForTests.ConfigureSettings(settings);

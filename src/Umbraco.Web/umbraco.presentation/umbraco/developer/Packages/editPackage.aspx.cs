@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Web.UI;
@@ -401,13 +402,13 @@ namespace umbraco.presentation.developer.packages
             packageActions.Controls.Add(Pane4);
 
             var pubs = TabView1.Menu.NewButton();
-            pubs.Text = ui.Text("publish");
+            pubs.Text = Services.TextService.Localize("publish");
             pubs.CommandName = "publish";
             pubs.Command += new CommandEventHandler(saveOrPublish);
             pubs.ID = "saveAndPublish";
 
             var saves = TabView1.Menu.NewButton();
-            saves.Text = ui.Text("save");
+            saves.Text = Services.TextService.Localize("save");
             saves.CommandName = "save";
             saves.Command += new CommandEventHandler(saveOrPublish);
             saves.ButtonType = uicontrols.MenuButtonType.Primary;

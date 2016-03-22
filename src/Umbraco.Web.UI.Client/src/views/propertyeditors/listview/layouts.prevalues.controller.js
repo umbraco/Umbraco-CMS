@@ -24,6 +24,8 @@
       };
 
       vm.addLayout = addLayout;
+      vm.showPrompt = showPrompt;
+      vm.hidePrompt = hidePrompt;
       vm.removeLayout = removeLayout;
       vm.openIconPicker = openIconPicker;
 
@@ -46,6 +48,14 @@
 
          $scope.model.value.push(layout);
 
+      }
+
+      function showPrompt(layout) {
+          layout.deletePrompt = true;
+      }
+
+      function hidePrompt(layout) {
+          layout.deletePrompt = false;
       }
 
       function removeLayout($index, layout) {

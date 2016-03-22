@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using Umbraco.Web.UI;
 using Umbraco.Web;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.create
 {
@@ -19,7 +20,7 @@ namespace umbraco.presentation.create
         {
             LegacyDialogHandler.Delete(
                 new HttpContextWrapper(HttpContext.Current),
-                UmbracoContext.Current.UmbracoUser,
+                UmbracoContext.Current.Security.CurrentUser,
                 NodeType, NodeId, Text);
         }
 
@@ -32,7 +33,7 @@ namespace umbraco.presentation.create
         {
             return LegacyDialogHandler.Create(
                 new HttpContextWrapper(HttpContext.Current),
-                UmbracoContext.Current.UmbracoUser,
+                UmbracoContext.Current.Security.CurrentUser,
                 NodeType, NodeId, Text, TypeId);
         }
     }

@@ -71,16 +71,7 @@ namespace umbraco
         private page _page;
 
         #endregion
-
-        #region Properties
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
-        }
-
-        #endregion
-
+        
         #region Constructors
 
         /// <summary>
@@ -210,29 +201,8 @@ namespace umbraco
                 xd.LoadXml(string.Format("<error>Could not convert JSON to XML. Error: {0}</error>", ex));
                 return xd.CreateNavigator().Select("/error");
             }
-        }
-
-        /// <summary>
-        /// Add a session variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value</param>
-        public static void setSession(string key, string value)
-        {
-            if (HttpContext.Current.Session != null)
-                HttpContext.Current.Session[key] = value;
-        }
-
-        /// <summary>
-        /// Add a cookie variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value of the variable</param>
-        public static void setCookie(string key, string value)
-        {
-            StateHelper.SetCookieValue(key, value);
-        }
-
+        }        
+        
         /// <summary>
         /// Returns a string with a friendly url from a node.
         /// IE.: Instead of having /482 (id) as an url, you can have
@@ -441,11 +411,11 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
-                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        () => GetMediaDo(MediaId, Deep));
+                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem:   () => GetMediaDo(MediaId, Deep));
 
                     if (xml != null)
                     {                   
@@ -501,11 +471,11 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
-                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        () => GetMemberDo(MemberId));
+                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem:   () => GetMemberDo(MemberId));
 
                     if (xml != null)
                     {
@@ -1234,16 +1204,15 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
+            foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(
+                "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
+                new { dataTypeId = DataTypeId }))
             {
-                while (dr.Read())
-                {
-                    XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.GetString("value"));
-                    n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.GetInt("id").ToString()));
-                    xd.DocumentElement.AppendChild(n);
-                }
+                XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
+                xd.DocumentElement.AppendChild(n);
             }
+          
             XPathNavigator xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
@@ -1257,8 +1226,9 @@ namespace umbraco
         {
             try
             {
-                return SqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
-                                                       SqlHelper.CreateParameter("@id", Id));
+                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                    "select [value] from cmsDataTypePreValues where id = @id",
+                    new {id = Id});
             }
             catch
             {
@@ -1683,7 +1653,7 @@ namespace umbraco
         public static string RequestCookies(string key)
         {
             // zb-00004 #29956 : refactor cookies handling
-            var value = StateHelper.GetCookieValue(key);
+            var value = HttpContext.Current.Request.GetCookieValue(key);
             return value ?? "";
         }
 

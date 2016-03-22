@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using System.Web.Compilation;
 using Examine.LuceneEngine;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
@@ -42,9 +43,30 @@ namespace UmbracoExamine.LocalStorage
 
         public void Initialize(NameValueCollection config, string configuredPath, FSDirectory baseLuceneDirectory, Analyzer analyzer, LocalStorageType localStorageType)
         {
-            var codegenPath = HttpRuntime.CodegenDir;
+            //this is the default
+            ILocalStorageDirectory localStorageDir = new CodeGenLocalStorageDirectory();
+            if (config["tempStorageDirectory"] != null)
+            {
+                //try to get the type
+                var dirType = BuildManager.GetType(config["tempStorageDirectory"], false);
+                if (dirType != null)
+                {
+                    try
+                    {
+                        localStorageDir = (ILocalStorageDirectory)Activator.CreateInstance(dirType);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<LocalTempStorageIndexer>(
+                            string.Format("Could not create a temp storage location of type {0}, reverting to use the " + typeof (CodeGenLocalStorageDirectory).FullName, dirType),
+                            ex);
+                    }
+                }
+            }
 
-            TempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
+            var tempPath = localStorageDir.GetLocalStorageDirectory(config, configuredPath);
+            if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorageDir.GetType() + " specified");
+            TempPath = tempPath.FullName;
 
             switch (localStorageType)
             {
@@ -101,7 +123,7 @@ namespace UmbracoExamine.LocalStorage
                             baseLuceneDirectory,
                             //Disable mirrored index, we're kind of screwed here only use master index
                             true);
-                    }                   
+                    }
 
                     break;
                 case LocalStorageType.LocalOnly:
@@ -234,7 +256,7 @@ namespace UmbracoExamine.LocalStorage
                     IndexWriter.Unlock(dir);
                 }
 
-                if (IndexWriter.IsLocked(dir) == false) return Attempt.Succeed(true);                
+                if (IndexWriter.IsLocked(dir) == false) return Attempt.Succeed(true);
                 LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock for {0} writer, retrying ....", dir.ToString);
                 return Attempt<bool>.Fail();
             }, 5, TimeSpan.FromSeconds(1));
@@ -267,7 +289,7 @@ namespace UmbracoExamine.LocalStorage
                 {
                     //NOTE: To date I've not seen this error occur
                     using (writerAttempt.Result.GetReader())
-                    {                        
+                    {
                     }
                 }
                 catch (Exception ex)
@@ -275,14 +297,14 @@ namespace UmbracoExamine.LocalStorage
                     writerAttempt.Result.Dispose();
 
                     LogHelper.Error<LocalTempStorageIndexer>(
-                        string.Format("Could not open an index reader, {0} is empty or corrupt... attempting to clear index files in master folder", configuredPath), 
+                        string.Format("Could not open an index reader, {0} is empty or corrupt... attempting to clear index files in master folder", configuredPath),
                         ex);
 
                     if (ClearLuceneDirFiles(baseLuceneDirectory) == false)
                     {
                         //hrm, not much we can do in this situation, but this shouldn't happen
-                        LogHelper.Error<LocalTempStorageIndexer>("Could not open an index reader, index is corrupt.", ex);                        
-                        return InitializeDirectoryFlags.FailedCorrupt;                        
+                        LogHelper.Error<LocalTempStorageIndexer>("Could not open an index reader, index is corrupt.", ex);
+                        return InitializeDirectoryFlags.FailedCorrupt;
                     }
 
                     //the main index is now blank, we'll proceed as normal with a new empty index...
@@ -338,7 +360,7 @@ namespace UmbracoExamine.LocalStorage
                                         }
 
                                         LogHelper.Debug<LocalTempStorageIndexer>("Could not delete non synced index file file, index sync will continue but old index files will remain - this shouldn't affect indexing/searching operations. {0}", () => ex.ToString());
-                                        
+
                                     }
                                 }
                             }

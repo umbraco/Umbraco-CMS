@@ -42,7 +42,7 @@
     
     
 <umb:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
      <asp:Button ID="addButton" runat="server" Text="Create" cssclass="btn btn-primary" onclick="AddButton_Click" CausesValidation="true" ValidationGroup="NewRelationType" />
 </umb:Pane>
 

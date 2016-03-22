@@ -19,7 +19,7 @@
 </div>
 
 <div runat="server" ID="panel_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>  
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>  
        <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary" OnClick="Button1_Click"></asp:Button>
 </div>
  </asp:Content>

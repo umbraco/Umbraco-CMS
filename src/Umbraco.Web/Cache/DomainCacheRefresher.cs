@@ -41,8 +41,8 @@ namespace Umbraco.Web.Cache
         }
 
         private void ClearCache()
-        {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IDomain>();
+        {            
+            ClearAllIsolatedCacheByEntityType<IDomain>();
 
             // SD: we need to clear the routes cache here!             
             //

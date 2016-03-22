@@ -2,8 +2,9 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
-using umbraco.interfaces;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Tests.Resolvers
 {

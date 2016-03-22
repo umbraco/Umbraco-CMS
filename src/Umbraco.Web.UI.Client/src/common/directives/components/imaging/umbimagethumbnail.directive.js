@@ -1,10 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbCropsy
+* @name umbraco.directives.directive:umbImageThumbnail
 * @restrict E
 * @function
 * @description
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
 	.directive('umbImageThumbnail',
@@ -26,6 +25,7 @@ angular.module("umbraco.directives")
 				link: function(scope, element, attrs) {
 					//// INIT /////
 					var $image = element.find("img");
+					scope.loaded = false;
 
 					$image.load(function(){
 						$timeout(function(){
@@ -52,6 +52,7 @@ angular.module("umbraco.directives")
 							}
 
 							setPreviewStyle();
+							scope.loaded = true;
 						});
 					});
 

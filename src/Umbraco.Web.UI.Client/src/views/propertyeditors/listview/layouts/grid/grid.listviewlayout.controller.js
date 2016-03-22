@@ -14,20 +14,26 @@
       var vm = this;
 
       vm.nodeId = $scope.contentId;
-      vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+       //vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        //instead of passing in a whitelist, we pass in a blacklist by adding ! to the ext
+      vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.disallowedUploadFiles).replace(/\./g, "!.");
+
       vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
       vm.activeDrag = false;
       vm.mediaDetailsTooltip = {};
       vm.itemsWithoutFolders = [];
+      vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
-		vm.onFilesQueue = onFilesQueue;
+	  vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
+
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
+      vm.selectContentItem = selectContentItem;
       vm.selectItem = selectItem;
       vm.selectFolder = selectFolder;
-      vm.clickItem = clickItem;
+      vm.goToItem = goToItem;
 
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
@@ -85,16 +91,20 @@
 
       }
 
-      function selectItem(selectedItem, $event, index) {
-         listViewHelper.selectHandler(selectedItem, index, vm.itemsWithoutFolders, $scope.selection, $event);
+      function selectContentItem(item, $event, $index) {
+          listViewHelper.selectHandler(item, $index, $scope.items, $scope.selection, $event);
       }
 
-      function selectFolder(selectedItem, $event, index) {
-         listViewHelper.selectHandler(selectedItem, index, $scope.folders, $scope.selection, $event);
+      function selectItem(item, $event, $index) {
+          listViewHelper.selectHandler(item, $index, vm.itemsWithoutFolders, $scope.selection, $event);
       }
 
-      function clickItem(item) {
-         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+      function selectFolder(folder, $event, $index) {
+          listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
+      }
+
+      function goToItem(item, $event, $index) {
+          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
       }
 
       activate();

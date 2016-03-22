@@ -18,6 +18,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
@@ -145,36 +147,19 @@ namespace umbraco
         {
             get { return _xmlContent == null; }
         }
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         #endregion
 
         #region Public Methods
-
-        [Obsolete("This is no longer used and will be removed in future versions, if you use this method it will not refresh 'async' it will perform the refresh on the current thread which is how it should be doing it")]
-        public virtual void RefreshContentFromDatabaseAsync()
-        {
-            RefreshContentFromDatabase();
-        }
 
         /// <summary>
         /// Load content from database and replaces active content when done.
         /// </summary>
         public virtual void RefreshContentFromDatabase()
         {
-            var e = new RefreshContentEventArgs();
-            FireBeforeRefreshContent(e);
-
-            if (!e.Cancel)
+            using (var safeXml = GetSafeXmlWriter())
             {
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = LoadContentFromDatabase();
-                }
+                safeXml.Xml = LoadContentFromDatabase();
             }
         }
 
@@ -189,7 +174,7 @@ namespace umbraco
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-                var parentId = d.Level == 1 ? -1 : d.Parent.Id;
+                var parentId = d.Level == 1 ? -1 : d.ParentId;
 
                 // fix sortOrder - see note in UpdateSortOrder
                 var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
@@ -204,13 +189,18 @@ namespace umbraco
 
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
+            var contentItem = d.ContentEntity;
+            var services = ApplicationContext.Current.Services;
+
             if (isPreview)
             {
-                return d.ToPreviewXml(xmlContentCopy);
+                var xml = services.ContentService.GetContentPreviewXml(contentItem.Id, contentItem.Version);
+                return xml.GetXmlNode(xmlContentCopy);
             }
             else
             {
-                return d.ToXml(xmlContentCopy, false);
+                var xml = services.ContentService.GetContentXml(contentItem.Id);
+                return xml.GetXmlNode(xmlContentCopy);
             }
         }
 
@@ -258,24 +248,20 @@ namespace umbraco
         public virtual void UpdateDocumentCache(Document d)
         {
             var e = new DocumentCacheEventArgs();
-            FireBeforeUpdateDocumentCache(d, e);
 
-            if (!e.Cancel)
+            // lock the xml cache so no other thread can write to it at the same time
+            // note that some threads could read from it while we hold the lock, though
+            using (var safeXml = GetSafeXmlWriter())
             {
-                // lock the xml cache so no other thread can write to it at the same time
-                // note that some threads could read from it while we hold the lock, though
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
-                }
-
-                ClearContextCache();
-
-                var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);
-
-                FireAfterUpdateDocumentCache(d, e);
+                safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
             }
+
+            ClearContextCache();
+
+            var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+
+            FireAfterUpdateDocumentCache(d, e);
         }
 
         internal virtual void UpdateSortOrder(int contentId)
@@ -342,21 +328,10 @@ namespace umbraco
 
             ClearContextCache();
         }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
-        public virtual void UpdateDocumentCacheAsync(int documentId)
-        {
-            UpdateDocumentCache(documentId);
-        }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
-        public virtual void ClearDocumentCacheAsync(int documentId)
-        {
-            ClearDocumentCache(documentId);
-        }
-
+        
         public virtual void ClearDocumentCache(int documentId)
         {
+            var e = new DocumentCacheEventArgs();
             // Get the document
             Document d;
             try
@@ -371,6 +346,7 @@ namespace umbraco
                 return;
             }
             ClearDocumentCache(d);
+            FireAfterClearDocumentCache(d, e);
         }
 
         /// <summary>
@@ -381,24 +357,17 @@ namespace umbraco
         internal void ClearDocumentCache(Document doc)
         {
             var e = new DocumentCacheEventArgs();
-            FireBeforeClearDocumentCache(doc, e);
+            XmlNode x;
 
-            if (!e.Cancel)
-            {
-                XmlNode x;
+            // remove from xml db cache 
+            doc.XmlRemoveFromDB();
 
-                // remove from xml db cache 
-                doc.XmlRemoveFromDB();
+            // clear xml cache
+            ClearDocumentXmlCache(doc.Id);
 
-                // clear xml cache
-                ClearDocumentXmlCache(doc.Id);
+            ClearContextCache();
 
-                ClearContextCache();
-
-                //SD: changed to fire event BEFORE running the sitemap!! argh.
-                FireAfterClearDocumentCache(doc, e);
-                
-            }
+            FireAfterClearDocumentCache(doc, e);
         }
 
         internal void ClearDocumentXmlCache(int id)
@@ -486,60 +455,35 @@ where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDoc
 order by umbracoNode.level, umbracoNode.sortOrder";
 
 
-
-                        using (
-                            IRecordsReader dr = SqlHelper.ExecuteReader(sql,
-                                                                        SqlHelper.CreateParameter("@type",
-                                                                                                  new Guid(
-                                                                                                      Constants.ObjectTypes.Document)))
-                            )
+                        foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document)}))
                         {
-                            while (dr.Read())
+                            int currentId = dr.id;
+                            int parentId = dr.parentId;
+                            string xml = dr.xml;
+
+                            // fix sortOrder - see notes in UpdateSortOrder
+                            var tmp = new XmlDocument();
+                            tmp.LoadXml(xml);
+                            var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
+                            attr.Value = dr.sortOrder.ToString();
+                            xml = tmp.InnerXml;
+
+                            // check if a listener has canceled the event
+                            // and parse it into a DOM node
+                            xmlDoc.LoadXml(xml);
+                            XmlNode node = xmlDoc.FirstChild;
+                            nodeIndex.Add(currentId, node);
+
+                            // verify if either of the handlers canceled the children to load
+                            // Build the content hierarchy
+                            List<int> children;
+                            if (!hierarchy.TryGetValue(parentId, out children))
                             {
-                                int currentId = dr.GetInt("id");
-                                int parentId = dr.GetInt("parentId");
-                                string xml = dr.GetString("xml");
-
-                                // fix sortOrder - see notes in UpdateSortOrder
-                                var tmp = new XmlDocument();
-                                tmp.LoadXml(xml);
-                                var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
-                                attr.Value = dr.GetInt("sortOrder").ToString();
-                                xml = tmp.InnerXml;
-
-                                // Call the eventhandler to allow modification of the string
-                                var e1 = new ContentCacheLoadNodeEventArgs();
-                                FireAfterContentCacheDatabaseLoadXmlString(ref xml, e1);
-                                // check if a listener has canceled the event
-                                if (!e1.Cancel)
-                                {
-                                    // and parse it into a DOM node
-                                    xmlDoc.LoadXml(xml);
-                                    XmlNode node = xmlDoc.FirstChild;
-                                    // same event handler loader form the xml node
-                                    var e2 = new ContentCacheLoadNodeEventArgs();
-                                    FireAfterContentCacheLoadNodeFromDatabase(node, e2);
-                                    // and checking if it was canceled again
-                                    if (!e1.Cancel)
-                                    {
-                                        nodeIndex.Add(currentId, node);
-
-                                        // verify if either of the handlers canceled the children to load
-                                        if (!e1.CancelChildren && !e2.CancelChildren)
-                                        {
-                                            // Build the content hierarchy
-                                            List<int> children;
-                                            if (!hierarchy.TryGetValue(parentId, out children))
-                                            {
-                                                // No children for this parent, so add one
-                                                children = new List<int>();
-                                                hierarchy.Add(parentId, children);
-                                            }
-                                            children.Add(currentId);
-                                        }
-                                    }
-                                }
+                                // No children for this parent, so add one
+                                children = new List<int>();
+                                hierarchy.Add(parentId, children);
                             }
+                            children.Add(currentId);
                         }
 
                         LogHelper.Debug<content>("Xml Pages loaded");
@@ -1241,40 +1185,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         #endregion
 
         #region Events
-
-        /// <summary>
-        /// Occurs when [after loading the xml string from the database].
-        /// </summary>
-        public delegate void ContentCacheDatabaseLoadXmlStringEventHandler(
-            ref string xml, ContentCacheLoadNodeEventArgs e);
-
-        /// <summary>
-        /// Occurs when [after loading the xml string from the database and creating the xml node].
-        /// </summary>
-        public delegate void ContentCacheLoadNodeEventHandler(XmlNode xmlNode, ContentCacheLoadNodeEventArgs e);
-
+        
         public delegate void DocumentCacheEventHandler(Document sender, DocumentCacheEventArgs e);
 
         public delegate void RefreshContentEventHandler(Document sender, RefreshContentEventArgs e);
-
-        /// <summary>
-        /// Occurs when [before document cache update].
-        /// </summary>
-        public static event DocumentCacheEventHandler BeforeUpdateDocumentCache;
-
-        /// <summary>
-        /// Fires the before document cache.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
-        {
-            if (BeforeUpdateDocumentCache != null)
-            {
-                BeforeUpdateDocumentCache(sender, e);
-            }
-        }
-
+      
         /// <summary>
         /// Occurs when [after document cache update].
         /// </summary>
@@ -1284,30 +1199,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// Fires after document cache updater.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DocumentCacheEventArgs"/> instance containing the event data.</param>
         protected virtual void FireAfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (AfterUpdateDocumentCache != null)
             {
                 AfterUpdateDocumentCache(sender, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [before document cache unpublish].
-        /// </summary>
-        public static event DocumentCacheEventHandler BeforeClearDocumentCache;
-
-        /// <summary>
-        /// Fires the before document cache unpublish.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeClearDocumentCache(Document sender, DocumentCacheEventArgs e)
-        {
-            if (BeforeClearDocumentCache != null)
-            {
-                BeforeClearDocumentCache(sender, e);
             }
         }
 
@@ -1317,7 +1214,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// Fires the after document cache unpublish.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DocumentCacheEventArgs"/> instance containing the event data.</param>
         protected virtual void FireAfterClearDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (AfterClearDocumentCache != null)
@@ -1326,113 +1223,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        /// <summary>
-        /// Occurs when [before refresh content].
-        /// </summary>
-        public static event RefreshContentEventHandler BeforeRefreshContent;
 
-        /// <summary>
-        /// Fires the content of the before refresh.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.RefreshContentEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeRefreshContent(RefreshContentEventArgs e)
-        {
-            if (BeforeRefreshContent != null)
-            {
-                BeforeRefreshContent(null, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [after refresh content].
-        /// </summary>
-        public static event RefreshContentEventHandler AfterRefreshContent;
-
-        /// <summary>
-        /// Fires the content of the after refresh.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.RefreshContentEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterRefreshContent(RefreshContentEventArgs e)
-        {
-            if (AfterRefreshContent != null)
-            {
-                AfterRefreshContent(null, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [after loading the xml string from the database].
-        /// </summary>
-        public static event ContentCacheDatabaseLoadXmlStringEventHandler AfterContentCacheDatabaseLoadXmlString;
-
-        /// <summary>
-        /// Fires the before when creating the document cache from database
-        /// </summary>
-        /// <param name="node">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
-        internal static void FireAfterContentCacheDatabaseLoadXmlString(ref string xml, ContentCacheLoadNodeEventArgs e)
-        {
-            if (AfterContentCacheDatabaseLoadXmlString != null)
-            {
-                AfterContentCacheDatabaseLoadXmlString(ref xml, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [before when creating the document cache from database].
-        /// </summary>
-        public static event ContentCacheLoadNodeEventHandler BeforeContentCacheLoadNode;
-
-        /// <summary>
-        /// Fires the before when creating the document cache from database
-        /// </summary>
-        /// <param name="node">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
-        internal static void FireBeforeContentCacheLoadNode(XmlNode node, ContentCacheLoadNodeEventArgs e)
-        {
-            if (BeforeContentCacheLoadNode != null)
-            {
-                BeforeContentCacheLoadNode(node, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [after loading document cache xml node from database].
-        /// </summary>
-        public static event ContentCacheLoadNodeEventHandler AfterContentCacheLoadNodeFromDatabase;
-
-        /// <summary>
-        /// Fires the after loading document cache xml node from database
-        /// </summary>
-        /// <param name="node">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
-        internal static void FireAfterContentCacheLoadNodeFromDatabase(XmlNode node, ContentCacheLoadNodeEventArgs e)
-        {
-            if (AfterContentCacheLoadNodeFromDatabase != null)
-            {
-                AfterContentCacheLoadNodeFromDatabase(node, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [before a publish action updates the content cache].
-        /// </summary>
-        public static event ContentCacheLoadNodeEventHandler BeforePublishNodeToContentCache;
-
-        /// <summary>
-        /// Fires the before a publish action updates the content cache
-        /// </summary>
-        /// <param name="node">The sender.</param>
-        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
-        public static void FireBeforePublishNodeToContentCache(XmlNode node, ContentCacheLoadNodeEventArgs e)
-        {
-            if (BeforePublishNodeToContentCache != null)
-            {
-                BeforePublishNodeToContentCache(node, e);
-            }
-        }
+        public class DocumentCacheEventArgs : System.ComponentModel.CancelEventArgs { }
+        public class RefreshContentEventArgs : System.ComponentModel.CancelEventArgs { }
 
         #endregion
     }

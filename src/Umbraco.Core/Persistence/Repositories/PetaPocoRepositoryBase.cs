@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
-        private QueryFactory _queryFactory;
+        private readonly QueryFactory _queryFactory;
         /// <summary>
         /// Returns the Query factory
         /// </summary>

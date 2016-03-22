@@ -156,8 +156,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id",
-                               "DELETE FROM umbracoAccess WHERE nodeId = @Id"
+                               "DELETE FROM umbracoAccess WHERE nodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -235,8 +235,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
-
+                //NOTE: This is an important call, we cannot simply make a call to:
+                //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                // because that method is used to query 'latest' content items where in this case we don't necessarily
+                // want latest content items because a pulished content item might not actually be the latest.
+                // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
+                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
+                    new Tuple<string, string>("cmsDocument", "nodeId"),
+                    ProcessQuery, "Path", Direction.Ascending);
+                
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
@@ -683,8 +690,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public int CountPublished()
         {
             var sql = GetBaseQuery(true).Where<NodeDto>(SqlSyntax, x => x.Trashed == false)
-                .Where<DocumentDto>(SqlSyntax, x => x.Published == true)
-                .Where<DocumentDto>(SqlSyntax, x => x.Newest == true);
+                .Where<DocumentDto>(SqlSyntax, x => x.Published == true);
             return Database.ExecuteScalar<int>(sql);
         }
 
@@ -729,7 +735,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {           
+        {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
@@ -788,6 +794,34 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public XElement GetContentXml(int contentId)
+        {
+            var sql = new Sql().Select("*").From<ContentXmlDto>(SqlSyntax).Where<ContentXmlDto>(SqlSyntax, d => d.NodeId == contentId);
+            var dto = Database.SingleOrDefault<ContentXmlDto>(sql);
+            if (dto == null) return null;
+            return XElement.Parse(dto.Xml);
+        }
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public XElement GetContentPreviewXml(int contentId, Guid version)
+        {
+            var sql = new Sql().Select("*").From<PreviewXmlDto>(SqlSyntax)
+                .Where<PreviewXmlDto>(SqlSyntax, d => d.NodeId == contentId && d.VersionId == version);
+            var dto = Database.SingleOrDefault<PreviewXmlDto>(sql);
+            if (dto == null) return null;
+            return XElement.Parse(dto.Xml);
+        }
+
         #endregion
 
         #region IRecycleBinRepository members
@@ -827,11 +861,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
-            
+
             var ids = dtos
                 .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                 .Select(x => x.TemplateId.Value).ToArray();
-            
+
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 

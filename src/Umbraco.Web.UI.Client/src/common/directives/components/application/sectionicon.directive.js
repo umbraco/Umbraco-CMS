@@ -17,7 +17,7 @@
                 if(convert){
                     element.html("<i class='icon-section " + convert + "'></i>");
                 }else{
-                    element.html("<img src='images/tray/" + icon + "'>");
+                    element.html("<img class='icon-section' src='images/tray/" + icon + "'>");
                 }
                 //it's a file, normally legacy so look in the icon tray images
             }

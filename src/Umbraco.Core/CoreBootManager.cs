@@ -31,6 +31,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Strings;
+using Umbraco.Core._Legacy.PackageActions;
 
 
 namespace Umbraco.Core
@@ -140,8 +141,11 @@ namespace Umbraco.Core
             {
                 try
                 {
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationInitialized", x.GetType())))
+                            {
                     x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
                 }
+                        }
                 catch (Exception ex)
                 {
                     ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
@@ -162,16 +166,16 @@ namespace Umbraco.Core
             container.Register<IServiceContainer>(factory => container);
             
             //Logging
-            container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
-            container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
-            container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
+            container.RegisterSingleton<ILogger>(factory => _umbracoApplication.Logger);
+            container.RegisterSingleton<IProfiler>(factory => ProfilingLogger.Profiler);
+            container.RegisterSingleton<ProfilingLogger>(factory => ProfilingLogger);
             
             //Config
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
             //Cache
-            container.Register<CacheHelper>(factory => ApplicationCache, new PerContainerLifetime());
-            container.Register<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache, new PerContainerLifetime());
+            container.RegisterSingleton<CacheHelper>(factory => ApplicationCache);
+            container.RegisterSingleton<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache);
 
             //Datalayer/Repositories/SQL/Database/etc...
             container.RegisterFrom<RepositoryCompositionRoot>();
@@ -179,10 +183,10 @@ namespace Umbraco.Core
             //Data Services/ServiceContext/etc...
             container.RegisterFrom<ServicesCompositionRoot>();
 
-            container.Register<IServiceProvider, ActivatorServiceProvider>();
-            container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());                                    
+            container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
+            container.RegisterSingleton<PluginManager>(factory => PluginManager);
 
-            container.Register<ApplicationContext>(new PerContainerLifetime());
+            container.RegisterSingleton<ApplicationContext>();
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
             
         }
@@ -202,10 +206,16 @@ namespace Umbraco.Core
         protected virtual CacheHelper CreateApplicationCache()
         {
             var cacheHelper = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
+                //we need to have the dep clone runtime cache provider to ensure 
+                //all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
-                new NullCacheProvider());
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    //we need to have the dep clone runtime cache provider to ensure 
+                    //all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
             return cacheHelper;
         }
@@ -264,8 +274,11 @@ namespace Umbraco.Core
             {
                 try
                 {
+		                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarting", x.GetType())))
+		                    {
                     x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
                 }
+		                }
                 catch (Exception ex)
                 {
                     ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
@@ -310,7 +323,10 @@ namespace Umbraco.Core
             {
                 try
                 {
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarted", x.GetType())))
+                            {
                     x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                            }
                 }
                 catch (Exception ex)
                 {
@@ -435,19 +451,11 @@ namespace Umbraco.Core
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolveCacheRefreshers());
-
-            MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolveMacroRenderings());
-
+                        
             PackageActionsResolver.Current = new PackageActionsResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolvePackageActions());
-
-            ActionsResolver.Current = new ActionsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolveActions());
-
+            
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 Container, ProfilingLogger.Logger,

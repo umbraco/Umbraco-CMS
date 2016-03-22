@@ -492,6 +492,10 @@ module.exports = function (grunt) {
                             keepExpandedHierarchy: false,
                             files: ['ng-file-upload.min.js']
                         },
+                        'angular-local-storage': {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/angular-local-storage.min.js']
+                        },
                         'codemirror': {
                             files: [
                                 'lib/codemirror.js',

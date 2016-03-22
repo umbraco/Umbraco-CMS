@@ -14,6 +14,7 @@ function valRegex() {
 
             var flags = "";
             var regex;
+            var eventBindings = [];
 
             attrs.$observe("valRegexFlags", function (newVal) {
                 if (newVal) {
@@ -38,6 +39,12 @@ function valRegex() {
                 }
             });
 
+            eventBindings.push(scope.$watch('ngModel', function(newValue, oldValue){
+                if(newValue && newValue !== oldValue) {
+                    patternValidator(newValue);
+                }
+            }));
+
             var patternValidator = function (viewValue) {
                 if (regex) {
                     //NOTE: we don't validate on empty values, use required validator for that
@@ -58,7 +65,13 @@ function valRegex() {
                 }
             };
 
-            ctrl.$parsers.push(patternValidator);
+            scope.$on('$destroy', function(){
+              // unbind watchers
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
+            });
+
         }
     };
 }

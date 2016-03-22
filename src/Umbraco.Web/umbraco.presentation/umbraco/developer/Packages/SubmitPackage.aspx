@@ -105,7 +105,7 @@
     </div>
     
     <p>
-      <asp:Button ID="bt_submit" runat="server" Text="Submit package" OnClick="submitPackage" /> &nbsp;<em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="editpackage.aspx?id=<%= Request.QueryString["id"] %>"><%= umbraco.ui.Text("cancel") %></a>
+      <asp:Button ID="bt_submit" runat="server" Text="Submit package" OnClick="submitPackage" /> &nbsp;<em><%= Services.TextService.Localize("or") %></em> &nbsp;<a href="editpackage.aspx?id=<%= Request.QueryString["id"] %>"><%= Services.TextService.Localize("cancel") %></a>
     </p>
     </asp:PlaceHolder>
     

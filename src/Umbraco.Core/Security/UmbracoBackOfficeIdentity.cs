@@ -209,16 +209,18 @@ namespace Umbraco.Core.Security
 
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
-            
-            ////TODO: Not sure why this is null sometimes, it shouldn't be. Somewhere it's not being set 
-            /// I think it's due to some bug I had in chrome, we'll see 
-            //if (UserData.SessionId.IsNullOrWhiteSpace())
-            //{
-            //    UserData.SessionId = Guid.NewGuid().ToString();
-            //}
 
-            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false)
+            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
+            {
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
+
+                //The security stamp claim is also required... this is because this claim type is hard coded 
+                // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
+                if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
+                {
+                    AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
+                }
+            }
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false)

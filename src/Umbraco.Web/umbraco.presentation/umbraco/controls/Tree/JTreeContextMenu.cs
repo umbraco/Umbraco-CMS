@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
-using umbraco.businesslogic.Utils;
 using Umbraco.Core;
-using Umbraco.Web.LegacyActions;
-using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.Utils;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.controls.Tree
 {
@@ -21,9 +20,9 @@ namespace umbraco.controls.Tree
 					{ 	
 						new JTreeContextMenuItem()
 					});
-
+            
 			List<IAction> allActions = new List<IAction>();
-			foreach (IAction a in global::Umbraco.Web.LegacyActions.Action.GetAll())
+			foreach (var a in ActionsResolver.Current.Actions)
 			{
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try

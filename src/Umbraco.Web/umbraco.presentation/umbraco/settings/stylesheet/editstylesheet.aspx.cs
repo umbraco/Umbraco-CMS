@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.IO;
 using System.Linq;
 using System.Web.UI;
@@ -34,14 +35,14 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             filename = Request.QueryString["id"].Replace('\\', '/').TrimStart('/');
 
-            var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
+            var editor = Panel1.NewTabPage(Services.TextService.Localize("stylesheet"));
             editor.Controls.Add(Pane7);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane8);
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
@@ -49,9 +50,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         protected void Page_Load(object sender, EventArgs e)
         {           
-            Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
-            pp_name.Text = ui.Text("name", UmbracoUser);
-            pp_path.Text = ui.Text("path", UmbracoUser);
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheet");
+            pp_name.Text = Services.TextService.Localize("name");
+            pp_path.Text = Services.TextService.Localize("path");
 
             var stylesheet = Services.FileService.GetStylesheetByName(filename);
             if (stylesheet == null) // not found
@@ -59,7 +60,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
             editorSource.Text = stylesheet.Content;
-            TreeSyncPath = BaseTree.GetTreePathFromFilePath(filename);
+            TreeSyncPath = BaseTree.GetTreePathFromFilePath(filename).TrimEnd(".css");
 
             // name derives from path, without the .css extension, clean for xss
             NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');

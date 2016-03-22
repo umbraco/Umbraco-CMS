@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Routing
             var content = umbracoContext.ContentCache.GetById(nodeId);
             Assert.IsNotNull(content);
 
-            var culture = Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, content.Id, content.Path, new Uri(currentUrl));
+            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, content.Id, content.Path, new Uri(currentUrl));
             Assert.AreEqual(expectedCulture, culture.Name);
         }
     }

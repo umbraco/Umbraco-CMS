@@ -103,10 +103,18 @@ namespace Umbraco.Core.Security
             var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
             if (backOfficeIdentity != null) return backOfficeIdentity;
 
+            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+            var claimsPrincipal = http.User as ClaimsPrincipal;
+            if (claimsPrincipal != null)
+            {
+                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
+                if (backOfficeIdentity != null) return backOfficeIdentity;
+            }
+
             //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = http.User.Identity as ClaimsIdentity;
             if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
-            {
+            {                
                 try
                 {
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
@@ -167,74 +175,18 @@ namespace Umbraco.Core.Security
         /// This clears the forms authentication cookie for webapi since cookies are handled differently
         /// </summary>
         /// <param name="response"></param>
-        [Obsolete("Use OWIN IAuthenticationManager.SignOut instead")]
+        [Obsolete("Use OWIN IAuthenticationManager.SignOut instead", true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void UmbracoLogoutWebApi(this HttpResponseMessage response)
         {
-            if (response == null) throw new ArgumentNullException("response");
-            //remove the cookie
-            var authCookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
-            {
-                Expires = DateTime.Now.AddYears(-1),                
-                Path = "/"
-            };
-            //remove the preview cookie too
-            var prevCookie = new CookieHeaderValue(Constants.Web.PreviewCookieName, "")
-            {
-                Expires = DateTime.Now.AddYears(-1),
-                Path = "/"
-            };
-            //remove the external login cookie too
-            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
-            {
-                Expires = DateTime.Now.AddYears(-1),
-                Path = "/"
-            };
-
-            response.Headers.AddCookies(new[] { authCookie, prevCookie, extLoginCookie });
+            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");
         }
 
-        [Obsolete("Use WebSecurity.SetPrincipalForRequest")]
+        [Obsolete("Use WebSecurity.SetPrincipalForRequest", true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
         {
-            if (response == null) throw new ArgumentNullException("response");
-
-            //remove the external login cookie
-            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
-            {
-                Expires = DateTime.Now.AddYears(-1),
-                Path = "/"
-            };
-
-            var userDataString = JsonConvert.SerializeObject(Mapper.Map<UserData>(user));
-
-            var ticket = new FormsAuthenticationTicket(
-                4,
-                user.Username,
-                DateTime.Now,
-                DateTime.Now.AddMinutes(GlobalSettings.TimeOutInMinutes),
-                true,
-                userDataString,
-                "/"
-                );
-            
-            // Encrypt the cookie using the machine key for secure transport
-            var encrypted = FormsAuthentication.Encrypt(ticket);
-
-            //add the cookie
-            var authCookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, encrypted)
-            {
-                //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
-                Expires = DateTime.Now.AddMinutes(1440),
-                Path = "/",
-                Secure = GlobalSettings.UseSSL,
-                HttpOnly = true
-            };
-
-            response.Headers.AddCookies(new[] { authCookie, extLoginCookie });
-
-            return ticket;
+            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");            
         }
 
         /// <summary>

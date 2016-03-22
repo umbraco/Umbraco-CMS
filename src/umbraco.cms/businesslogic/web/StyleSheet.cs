@@ -5,6 +5,7 @@ using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -105,14 +106,8 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
 
-                FireAfterSave(e);
-            }
         }
 
         /// <summary>
@@ -128,7 +123,7 @@ namespace umbraco.cms.businesslogic.web
             throw new NotSupportedException("The legacy " + typeof(T) + " API is no longer functional for retrieving stylesheets based on an integer ID. Stylesheets are no longer persisted in database tables. Use the new Umbraco.Core.Services.IFileSystem APIs instead of working with Umbraco stylesheets.");
         }
     
-        public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
+        public static StyleSheet MakeNew(IUser user, string Text, string FileName, string Content)
         {
 
             if (FileName.IsNullOrWhiteSpace())
@@ -149,8 +144,6 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.Services.FileService.SaveStylesheet(newSheet);
 
             var newCss = new StyleSheet(newSheet);
-            var e = new NewEventArgs();
-            newCss.OnNew(e);
 
             return newCss;
         }
@@ -167,22 +160,14 @@ namespace umbraco.cms.businesslogic.web
             return retval;
         }
         
-        public StylesheetProperty AddProperty(string Alias, BusinessLogic.User u)
+        public StylesheetProperty AddProperty(string Alias, IUser u)
         {
             return StylesheetProperty.MakeNew(Alias, this, u);
         }
 
         public override void delete()
         {
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-            
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetEntity.Path);
-
-                FireAfterDelete(e);
-            }
+            ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetEntity.Path);
 
         }
 
@@ -216,7 +201,7 @@ namespace umbraco.cms.businesslogic.web
             return new StyleSheet(found);
         }
 
-        public static StyleSheet Import(XmlNode n, umbraco.BusinessLogic.User u)
+        public static StyleSheet Import(XmlNode n, IUser u)
         {
             string stylesheetName = XmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
             StyleSheet s = GetByName(stylesheetName);
@@ -254,113 +239,8 @@ namespace umbraco.cms.businesslogic.web
         }
 
 
-        //EVENTS
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(StyleSheet sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(StyleSheet sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(StyleSheet sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-
         
     }
 
-    [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-    public class StyleSheetComparer : IComparer
-    {
-        public StyleSheetComparer()
-        {
-            //default constructor
-        }
-
-        public Int32 Compare(Object pFirstObject, Object pObjectToCompare)
-        {
-            if (pFirstObject is StyleSheet)
-            {
-                return String.Compare(((StyleSheet)pFirstObject).Text, ((StyleSheet)pObjectToCompare).Text);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
 
 }

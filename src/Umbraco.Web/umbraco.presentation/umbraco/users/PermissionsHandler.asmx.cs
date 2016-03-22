@@ -5,10 +5,9 @@ using System.Web.Script.Services;
 using System.Web.UI;
 using System.IO;
 using System.Collections.Generic;
-using umbraco.interfaces;
 using Umbraco.Core.IO;
-using Umbraco.Web.LegacyActions;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.user
 {
@@ -56,7 +55,7 @@ namespace umbraco.cms.presentation.user
         {
             AuthorizeRequest(true);
 
-            UserPermissions uPermissions = new UserPermissions(BusinessLogic.User.GetUser(userID));
+            UserPermissions uPermissions = new UserPermissions(Services.UserService.GetUserById(userID));
             List<IAction> actions = Action.FromString(permissions);
             uPermissions.SaveNewPermissions(toIntArray(nodes), actions, replaceChild);
 

@@ -10,7 +10,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
-using umbraco.interfaces;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging

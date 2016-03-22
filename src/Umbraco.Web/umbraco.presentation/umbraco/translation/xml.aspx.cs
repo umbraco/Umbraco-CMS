@@ -54,7 +54,7 @@ namespace umbraco.presentation.translation
                 var nodes = new SortedList();
                 int totalWords = 0;
 
-                foreach (Task t in Task.GetTasks(UmbracoContext.UmbracoUser, false))
+                foreach (Task t in Task.GetTasks(Security.CurrentUser, false))
                 {
                     if (!nodes.ContainsKey(t.Node.Path))
                     {

@@ -99,10 +99,13 @@
     </ProjectReference>
     <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.5.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
@@ -114,6 +117,7 @@
     </Reference>
     <Reference Include="Examine, Version=0.1.68.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Examine.0.1.68.0\lib\Examine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -148,6 +152,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
+    <Reference Include="MarkdownSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdown.1.14.4\lib\net45\MarkdownSharp.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -178,8 +187,9 @@
       <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MiniProfiler, Version=3.2.0.157, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
       <HintPath>..\packages\MiniProfiler.3.2.0.157\lib\net40\MiniProfiler.dll</HintPath>
@@ -187,6 +197,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -230,6 +241,7 @@
     <Reference Include="System.Web.Extensions.Design" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Http">
@@ -246,6 +258,7 @@
     </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Services">
@@ -253,14 +266,17 @@
     </Reference>
     <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
@@ -280,11 +296,6 @@
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Name>umbraco.businesslogic</Name>
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
       <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
       <Name>umbraco.cms</Name>
@@ -293,14 +304,10 @@
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Name>umbraco.interfaces</Name>
-      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.60829.1\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -310,61 +317,92 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
+    <Compile Include="Cache\ICacheRefresher.cs" />
+    <Compile Include="DefaultHttpContextAccessor.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
+    <Compile Include="Editors\EditorValidationResolver.cs" />
+    <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
+    <Compile Include="Editors\IEditorValidator.cs" />
+    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
-    <Compile Include="LegacyActions\Action.cs" />
-    <Compile Include="LegacyActions\ActionAssignDomain.cs" />
-    <Compile Include="LegacyActions\ActionAudit.cs" />
-    <Compile Include="LegacyActions\ActionBrowse.cs" />
-    <Compile Include="LegacyActions\ActionChangeDocType.cs" />
-    <Compile Include="LegacyActions\ActionCopy.cs" />
-    <Compile Include="LegacyActions\ActionDelete.cs" />
-    <Compile Include="LegacyActions\ActionDisable.cs" />
-    <Compile Include="LegacyActions\ActionEmptyTranscan.cs" />
-    <Compile Include="LegacyActions\ActionExport.cs" />
-    <Compile Include="LegacyActions\ActionImport.cs" />
-    <Compile Include="LegacyActions\ActionMove.cs" />
-    <Compile Include="LegacyActions\ActionNew.cs" />
-    <Compile Include="LegacyActions\ActionNewFolder.cs" />
-    <Compile Include="LegacyActions\ActionNotify.cs" />
-    <Compile Include="LegacyActions\ActionNull.cs" />
-    <Compile Include="LegacyActions\ActionPackage.cs" />
-    <Compile Include="LegacyActions\ActionPackageCreate.cs" />
-    <Compile Include="LegacyActions\ActionProtect.cs" />
-    <Compile Include="LegacyActions\ActionPublish.cs" />
-    <Compile Include="LegacyActions\ActionQuit.cs" />
-    <Compile Include="LegacyActions\ActionRefresh.cs" />
-    <Compile Include="LegacyActions\ActionRePublish.cs" />
-    <Compile Include="LegacyActions\ActionRestore.cs" />
-    <Compile Include="LegacyActions\ActionRights.cs" />
-    <Compile Include="LegacyActions\ActionRollback.cs" />
-    <Compile Include="LegacyActions\ActionSendToTranslate.cs" />
-    <Compile Include="LegacyActions\ActionSort.cs" />
-    <Compile Include="LegacyActions\ActionToPublish.cs" />
-    <Compile Include="LegacyActions\ActionTranslate.cs" />
-    <Compile Include="LegacyActions\ActionUnPublish.cs" />
-    <Compile Include="LegacyActions\ActionUpdate.cs" />
-    <Compile Include="LegacyActions\ContextMenuSeperator.cs" />
-    <Compile Include="LegacyActions\LegacyActionMenuItemAttribute.cs" />
+    <Compile Include="Trees\UserTypesTreeController.cs" />
+    <Compile Include="_Legacy\Actions\Action.cs" />
+    <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
+    <Compile Include="_Legacy\Actions\ActionAudit.cs" />
+    <Compile Include="_Legacy\Actions\ActionBrowse.cs" />
+    <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
+    <Compile Include="_Legacy\Actions\ActionCopy.cs" />
+    <Compile Include="_Legacy\Actions\ActionDelete.cs" />
+    <Compile Include="_Legacy\Actions\ActionDisable.cs" />
+    <Compile Include="_Legacy\Actions\ActionEmptyTranscan.cs" />
+    <Compile Include="_Legacy\Actions\ActionExport.cs" />
+    <Compile Include="_Legacy\Actions\ActionImport.cs" />
+    <Compile Include="_Legacy\Actions\ActionMove.cs" />
+    <Compile Include="_Legacy\Actions\ActionNew.cs" />
+    <Compile Include="_Legacy\Actions\ActionNewFolder.cs" />
+    <Compile Include="_Legacy\Actions\ActionNotify.cs" />
+    <Compile Include="_Legacy\Actions\ActionNull.cs" />
+    <Compile Include="_Legacy\Actions\ActionPackage.cs" />
+    <Compile Include="_Legacy\Actions\ActionPackageCreate.cs" />
+    <Compile Include="_Legacy\Actions\ActionProtect.cs" />
+    <Compile Include="_Legacy\Actions\ActionPublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionQuit.cs" />
+    <Compile Include="_Legacy\Actions\ActionRefresh.cs" />
+    <Compile Include="_Legacy\Actions\ActionRePublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionRestore.cs" />
+    <Compile Include="_Legacy\Actions\ActionRights.cs" />
+    <Compile Include="_Legacy\Actions\ActionRollback.cs" />
+    <Compile Include="_Legacy\Actions\ActionSendToTranslate.cs" />
+    <Compile Include="_Legacy\Actions\ActionSort.cs" />
+    <Compile Include="_Legacy\Actions\ActionToPublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionTranslate.cs" />
+    <Compile Include="_Legacy\Actions\ActionUnPublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionUpdate.cs" />
+    <Compile Include="_Legacy\Actions\ContextMenuSeperator.cs" />
+    <Compile Include="_Legacy\Actions\LegacyActionMenuItemAttribute.cs" />
+    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
+    <Compile Include="Models\Trees\ApplicationAttribute.cs" />
+    <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
+    <Compile Include="Models\Trees\IApplication.cs" />
+    <Compile Include="Services\SectionService.cs" />
+    <Compile Include="Trees\TreeAttribute.cs" />
+    <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
-    <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\MediaTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MediaTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\MemberPropertyTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
+    <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Mvc\ControllerContextExtensions.cs" />
+    <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
+    <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
+    <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
@@ -378,6 +416,9 @@
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\Identity\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
+    <Compile Include="Services\ApplicationTreeService.cs" />
+    <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
+    <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
@@ -395,8 +436,6 @@
     <Compile Include="ITagQuery.cs" />
     <Compile Include="ITypedPublishedContentQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Models\LegacyConvertedNode.cs" />
-    <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
     <Compile Include="Models\Mapping\RelationModelMapper.cs" />
     <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
@@ -590,7 +629,6 @@
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
@@ -703,6 +741,7 @@
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
+    <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
@@ -777,7 +816,6 @@
     <Compile Include="Models\Trees\ActionMenuItem.cs" />
     <Compile Include="Models\Trees\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
-    <Compile Include="Trees\ApplicationTreeRegistrar.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
     <Compile Include="Trees\LegacyTreeController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
@@ -791,8 +829,6 @@
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
-    <Compile Include="Trees\TreeAttribute.cs" />
-    <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />
@@ -880,7 +916,6 @@
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="Models\LegacyNodeHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1024,8 +1059,20 @@
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="UI\LegacyDialogHandler.cs" />
-    <Compile Include="UI\LegacyDialogTask.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplication.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
+    <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
+    <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
+    <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
+    <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
+    <Compile Include="_Legacy\PackageActions\moveRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
+    <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
+    <Compile Include="_Legacy\UI\ITask.cs" />
+    <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
+    <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
+    <Compile Include="_Legacy\UI\LegacyDialogTask.cs" />
     <Compile Include="UI\Controls\ProgressBar.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
     <Compile Include="UI\Controls\UmbracoUserControl.cs">
@@ -1066,9 +1113,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
@@ -1202,7 +1246,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\GenericValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\LabelButton.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\macroParameterControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1403,13 +1446,6 @@
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx.cs">
-      <DependentUpon>insertMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx.designer.cs">
-      <DependentUpon>insertMacro.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1542,25 +1578,21 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDictionary.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadLanguages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadTemplates.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\LegacyTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeService.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\UserPermissions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\UserTypes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>
@@ -1672,6 +1704,8 @@
     </Compile>
     <Compile Include="WebServices\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
+    <Compile Include="_Legacy\Utils\EncodedStringWriter.cs" />
+    <Compile Include="_Legacy\Utils\JSONSerializer.cs" />
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
@@ -1738,9 +1772,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1749,7 +1780,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <None Include="app.config" />
     <None Include="packages.config">
@@ -1791,9 +1824,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
-      <SubType>Designer</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1848,22 +1878,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsd">
-      <SubType>
-      </SubType>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsx">
-      <DependentUpon>package.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsc">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xss">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsx">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
@@ -1892,7 +1906,6 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
