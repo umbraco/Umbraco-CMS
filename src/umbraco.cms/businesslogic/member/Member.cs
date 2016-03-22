@@ -235,9 +235,6 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             var legacy = new Member(model);
-            var e = new NewEventArgs();
-
-            legacy.OnNew(e);
             
             legacy.Save();
 
@@ -602,26 +599,19 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MemberService.Delete()", false)]
         public override void delete()
         {
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
+            if (MemberItem != null)
             {
-                if (MemberItem != null)
-                {
-                    ApplicationContext.Current.Services.MemberService.Delete(MemberItem);
-                }
-                else
-                {
-                    var member = ApplicationContext.Current.Services.MemberService.GetById(Id);
-                    ApplicationContext.Current.Services.MemberService.Delete(member);
-                }
-
-                // Delete all content and cmsnode specific data!
-                base.delete();
-
-                FireAfterDelete(e);
+                ApplicationContext.Current.Services.MemberService.Delete(MemberItem);
             }
+            else
+            {
+                var member = ApplicationContext.Current.Services.MemberService.GetById(Id);
+                ApplicationContext.Current.Services.MemberService.Delete(member);
+            }
+
+            // Delete all content and cmsnode specific data!
+            base.delete();
+
         }
 
         /// <summary>
@@ -650,23 +640,15 @@ namespace umbraco.cms.businesslogic.member
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddGroup(int GroupId)
         {
-            var e = new AddGroupEventArgs();
-            e.GroupId = GroupId;
-            FireBeforeAddGroup(e);
-
-            if (!e.Cancel)
-            {
-                var parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
-                                                         SqlHelper.CreateParameter("@groupId", GroupId) };
-                bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
-                                                           parameters) > 0;
-                if (!exists)
-                    SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
-                                              parameters);
-                PopulateGroups();
-
-                FireAfterAddGroup(e);
-            }
+            var parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
+                SqlHelper.CreateParameter("@groupId", GroupId) };
+            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
+                parameters) > 0;
+            if (!exists)
+                SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
+                    parameters);
+            PopulateGroups();
+            
         }
 
         /// <summary>
@@ -675,18 +657,10 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="GroupId">The MemberGroup from which the Member is removed</param>
         public void RemoveGroup(int GroupId)
         {
-            var e = new RemoveGroupEventArgs();
-            e.GroupId = GroupId;
-            FireBeforeRemoveGroup(e);
-
-            if (!e.Cancel)
-            {
-                SqlHelper.ExecuteNonQuery(
-                    "delete from cmsMember2MemberGroup where member = @id and Membergroup = @groupId",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@groupId", GroupId));
-                PopulateGroups();
-                FireAfterRemoveGroup(e);
-            }
+            SqlHelper.ExecuteNonQuery(
+                "delete from cmsMember2MemberGroup where member = @id and Membergroup = @groupId",
+                SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@groupId", GroupId));
+            PopulateGroups();
         }
         #endregion
 
@@ -733,34 +707,26 @@ namespace umbraco.cms.businesslogic.member
 
             if (m != null)
             {
-                var e = new AddToCacheEventArgs();
-                m.FireBeforeAddToCache(e);
+                // Add cookie with member-id, guid and loginname
+                // zb-00035 #29931 : cleanup member state management
+                // NH 4.7.1: We'll no longer use legacy cookies to handle Umbraco Members
+                //SetMemberState(m);
 
-                if (!e.Cancel)
-                {
-                    // Add cookie with member-id, guid and loginname
-                    // zb-00035 #29931 : cleanup member state management
-                    // NH 4.7.1: We'll no longer use legacy cookies to handle Umbraco Members
-                    //SetMemberState(m);
+                FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
-                    FormsAuthentication.SetAuthCookie(m.LoginName, true);
+                //cache the member
+                var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
+                    GetCacheKey(m.Id),
+                    timeout:        TimeSpan.FromMinutes(30),
+                    getCacheItem:   () =>
+                    {
+                        // Debug information
+                        HttpContext.Current.Trace.Write("member",
+                            string.Format("Member added to cache: {0}/{1} ({2})",
+                                m.Text, m.LoginName, m.Id));
 
-                    //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
-                        GetCacheKey(m.Id),
-                        timeout:        TimeSpan.FromMinutes(30),
-                        getCacheItem:   () =>
-                        {
-                            // Debug information
-                            HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
-
-                            return m;
-                        });
-
-                    m.FireAfterAddToCache(e);
-                }
+                        return m;
+                    });
             }
 
         }
@@ -783,33 +749,25 @@ namespace umbraco.cms.businesslogic.member
         {
             if (m != null)
             {
-                var e = new AddToCacheEventArgs();
-                m.FireBeforeAddToCache(e);
+                // zb-00035 #29931 : cleanup member state management
+                // NH 4.7.1: We'll no longer use Umbraco legacy cookies to handle members
+                //SetMemberState(m, UseSession, TimespanForCookie.TotalDays);
 
-                if (!e.Cancel)
-                {
-                    // zb-00035 #29931 : cleanup member state management
-                    // NH 4.7.1: We'll no longer use Umbraco legacy cookies to handle members
-                    //SetMemberState(m, UseSession, TimespanForCookie.TotalDays);
+                FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
 
-                    FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
+                //cache the member
+                var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
+                    GetCacheKey(m.Id),
+                    timeout:        TimeSpan.FromMinutes(30),
+                    getCacheItem:   () =>
+                    {
+                        // Debug information
+                        HttpContext.Current.Trace.Write("member",
+                            string.Format("Member added to cache: {0}/{1} ({2})",
+                                m.Text, m.LoginName, m.Id));
 
-                    //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
-                        GetCacheKey(m.Id),
-                        timeout:        TimeSpan.FromMinutes(30),
-                        getCacheItem:   () =>
-                        {
-                            // Debug information
-                            HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
-
-                            return m;
-                        });
-
-                    m.FireAfterAddToCache(e);
-                }
+                        return m;
+                    });
 
             }
         }
@@ -942,150 +900,6 @@ namespace umbraco.cms.businesslogic.member
 
         #endregion
 
-        #region Events
-
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Member sender, SaveEventArgs e);
-
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(Member sender, NewEventArgs e);
-
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Member sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// The add to cache event handler
-        /// </summary>
-        public delegate void AddingToCacheEventHandler(Member sender, AddToCacheEventArgs e);
-
-        /// <summary>
-        /// The add group event handler
-        /// </summary>
-        public delegate void AddingGroupEventHandler(Member sender, AddGroupEventArgs e);
-
-        /// <summary>
-        /// The remove group event handler
-        /// </summary>
-        public delegate void RemovingGroupEventHandler(Member sender, RemoveGroupEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        new public static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-            {
-                BeforeSave(this, e);
-            }
-        }
-
-
-        new public static event SaveEventHandler AfterSave;
-        new protected virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-            {
-                AfterSave(this, e);
-            }
-        }
-
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-            {
-                New(this, e);
-            }
-        }
-
-
-        public static event AddingGroupEventHandler BeforeAddGroup;
-        protected virtual void FireBeforeAddGroup(AddGroupEventArgs e)
-        {
-            if (BeforeAddGroup != null)
-            {
-                BeforeAddGroup(this, e);
-            }
-        }
-        public static event AddingGroupEventHandler AfterAddGroup;
-        protected virtual void FireAfterAddGroup(AddGroupEventArgs e)
-        {
-            if (AfterAddGroup != null)
-            {
-                AfterAddGroup(this, e);
-            }
-        }
-
-
-        public static event RemovingGroupEventHandler BeforeRemoveGroup;
-        protected virtual void FireBeforeRemoveGroup(RemoveGroupEventArgs e)
-        {
-            if (BeforeRemoveGroup != null)
-            {
-                BeforeRemoveGroup(this, e);
-            }
-        }
-
-        public static event RemovingGroupEventHandler AfterRemoveGroup;
-        protected virtual void FireAfterRemoveGroup(RemoveGroupEventArgs e)
-        {
-            if (AfterRemoveGroup != null)
-            {
-                AfterRemoveGroup(this, e);
-            }
-        }
-
-
-        public static event AddingToCacheEventHandler BeforeAddToCache;
-        protected virtual void FireBeforeAddToCache(AddToCacheEventArgs e)
-        {
-            if (BeforeAddToCache != null)
-            {
-                BeforeAddToCache(this, e);
-            }
-        }
-
-
-        public static event AddingToCacheEventHandler AfterAddToCache;
-        protected virtual void FireAfterAddToCache(AddToCacheEventArgs e)
-        {
-            if (AfterAddToCache != null)
-            {
-                AfterAddToCache(this, e);
-            }
-        }
-
-        new public static event DeleteEventHandler BeforeDelete;
-        new protected virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-            {
-                BeforeDelete(this, e);
-            }
-        }
-
-        new public static event DeleteEventHandler AfterDelete;
-        new protected virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-            {
-                AfterDelete(this, e);
-            }
-        }
-        #endregion
 
         #region Membership helper class used for encryption methods
         /// <summary>

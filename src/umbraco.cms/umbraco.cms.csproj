@@ -194,7 +194,6 @@
     <Compile Include="businesslogic\Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\events\EventArgs.cs" />
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>

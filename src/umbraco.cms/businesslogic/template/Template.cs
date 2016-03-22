@@ -88,15 +88,7 @@ namespace umbraco.cms.businesslogic.template
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.FileService.SaveTemplate(TemplateEntity);
-                //base.Save();
-                FireAfterSave(e);
-            }
+            ApplicationContext.Current.Services.FileService.SaveTemplate(TemplateEntity);
         }
 
         public string GetRawText()
@@ -299,8 +291,6 @@ namespace umbraco.cms.businesslogic.template
             var template = ApplicationContext.Current.Services.FileService.CreateTemplateWithIdentity(name, design, foundMaster, u.Id);
 
             var legacyTemplate = new Template(template);
-            var e = new NewEventArgs();
-            legacyTemplate.OnNew(e);
 
             return legacyTemplate;
         }
@@ -345,19 +335,13 @@ namespace umbraco.cms.businesslogic.template
 	            throw ex;
             }
 
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
 
-            if (!e.Cancel)
-            {
-                //remove refs from documents
-                SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+            //remove refs from documents
+            SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
 
                 
-                ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
+            ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
 
-                FireAfterDelete(e);
-            }
         }
 
         [Obsolete("This method, doesnt actually do anything, as the file is created when the design is set", false)]
@@ -530,92 +514,6 @@ namespace umbraco.cms.businesslogic.template
         }
         
 
-        #region Events
-        //EVENTS
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Template sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(Template sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Template sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-        #endregion
 
     }
 }

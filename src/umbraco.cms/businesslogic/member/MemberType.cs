@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -102,33 +103,17 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		public override void delete() 
 		{
-            var e = new DeleteEventArgs();
+		    ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
 
-            FireBeforeDelete(e);
-
-            if (e.Cancel == false) {
-
-                ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
-
-                // delete all documents of this type
-                FireAfterDelete(e);
-            }
-        }
+		}
 
         /// <summary>
         /// Used to persist object changes to the database
         /// </summary>
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (e.Cancel == false)
-            {
-                ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
-                base.Save();
-                FireAfterSave(e);
-            }
+            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
+            base.Save();
         }
        
 
@@ -165,8 +150,6 @@ namespace umbraco.cms.businesslogic.member
             };
             ApplicationContext.Current.Services.MemberTypeService.Save(mt);
             var legacy = new MemberType(mt);
-            var e = new NewEventArgs();
-            legacy.OnNew(e);
             return legacy;
         }
 
@@ -205,59 +188,5 @@ namespace umbraco.cms.businesslogic.member
 
         #endregion
 
-        #region Events
-
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(MemberType sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(MemberType sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(MemberType sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when a language is saved.
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        protected override void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public new static event SaveEventHandler AfterSave;
-        protected override void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        public new static event DeleteEventHandler BeforeDelete;
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public new static event DeleteEventHandler AfterDelete;
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        } 
-        #endregion
 	}
 }
