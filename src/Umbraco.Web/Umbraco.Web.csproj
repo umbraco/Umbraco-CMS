@@ -1085,17 +1085,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Help.cs" />
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\publishStatus.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
@@ -1238,8 +1231,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\GenericValidation.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\LabelButton.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1447,13 +1438,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
-      <DependentUpon>RegexWs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.designer.cs">
-      <DependentUpon>RegexWs.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
@@ -1527,10 +1511,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\NodeActionsEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeRequestParams.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx.cs">
-      <DependentUpon>MacroContainerService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
@@ -1627,10 +1607,6 @@
       <DependentUpon>CheckForUpgrade.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx.cs">
-      <DependentUpon>CMSNode.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx.cs">
       <DependentUpon>codeEditorSave.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1645,19 +1621,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx.cs">
       <DependentUpon>nodeSorter.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx.cs">
-      <DependentUpon>progressStatus.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\publication.asmx.cs">
-      <DependentUpon>publication.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\Settings.asmx.cs">
-      <DependentUpon>Settings.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\templates.asmx.cs">
@@ -1732,7 +1695,6 @@
     <Content Include="umbraco.presentation\umbraco\actions\publish.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
@@ -1765,7 +1727,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1826,18 +1787,10 @@
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\Developer.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\publication.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\Settings.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\templates.asmx" />
     <None Include="umbraco.presentation\umbraco\Trees\Trees.cd" />
     <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsd">

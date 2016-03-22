@@ -179,9 +179,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\CMSModuleI.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\CMSNode.cs">
       <SubType>Code</SubType>
     </Compile>

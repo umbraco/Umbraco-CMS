@@ -436,13 +436,6 @@
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.cs">
-      <DependentUpon>moveOrCopy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.designer.cs">
-      <DependentUpon>moveOrCopy.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
       <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -763,7 +756,6 @@
     <Content Include="Umbraco\Css\permissionsEditor.css" />
     <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
     <Content Include="Umbraco\Images\Editor\spellchecker.gif" />
-    <Content Include="Umbraco\Webservices\MacroContainerService.asmx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
     <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
     <Content Include="Umbraco\Developer\Packages\proxy.htm" />
@@ -835,12 +827,10 @@
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\insertMacro.aspx" />
-    <Content Include="Umbraco\Dialogs\moveOrCopy.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\publish.aspx" />
-    <Content Include="Umbraco\Dialogs\RegexWs.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
     <Content Include="Umbraco\Dialogs\treePicker.aspx" />
@@ -1213,7 +1203,6 @@
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
     <Content Include="Umbraco\Settings\editTemplate.aspx" />
@@ -1229,20 +1218,11 @@
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Webservices\CMSNode.asmx" />
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\Developer.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco\Webservices\progressStatus.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="Umbraco\Webservices\publication.asmx" />
-    <Content Include="Umbraco\Webservices\Settings.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Webservices\templates.asmx" />
-    <Content Include="Umbraco\Webservices\wsdl.xslt" />
     <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
     <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
     <Content Include="Umbraco\Xslt\sqlNodeHierachy.xslt" />
