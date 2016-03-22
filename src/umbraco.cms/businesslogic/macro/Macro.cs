@@ -210,34 +210,16 @@ namespace umbraco.cms.businesslogic.macro
 	    /// </summary>
 	    public virtual void Save()
 	    {
-	        //event
-	        var e = new SaveEventArgs();
-	        FireBeforeSave(e);
-
-	        if (e.Cancel == false)
-	        {
-	            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
-
-	            FireAfterSave(e);
-	        }
-	    }
+            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
+        }
 
 	    /// <summary>
 		/// Deletes the current macro
 		/// </summary>
 		public void Delete() 
 		{
-            //event
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-		    if (e.Cancel == false)
-		    {
-		        ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
-
-		        FireAfterDelete(e);
-		    }
-		}
+            ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
+        }
 
         //TODO: Fix this, this should wrap a new API!
 
@@ -379,10 +361,6 @@ namespace umbraco.cms.businesslogic.macro
 
             var newMacro = new Macro(macro);
            
-            //fire new event
-            var e = new NewEventArgs();
-            newMacro.OnNew(e);
-            
             return newMacro;
 		}
 
@@ -479,45 +457,7 @@ namespace umbraco.cms.businesslogic.macro
         #endregion
 
 
-        //Macro events
-
-        //Delegates
-        public delegate void SaveEventHandler(Macro sender, SaveEventArgs e);
-        public delegate void NewEventHandler(Macro sender, NewEventArgs e);
-        public delegate void DeleteEventHandler(Macro sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when a macro is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e) {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e) {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+       
 		#endregion
 	}
 }

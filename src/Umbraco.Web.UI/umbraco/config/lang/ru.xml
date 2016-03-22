@@ -1161,6 +1161,7 @@
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
     <key alias="xslt">Файлы XSLT</key>
+    <key alias="userTypes">Типы пользователей</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Доступны обновления</key>

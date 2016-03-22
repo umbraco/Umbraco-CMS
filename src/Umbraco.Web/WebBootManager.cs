@@ -41,6 +41,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.DependencyInjection;
 using Umbraco.Web._Legacy.Actions;
 using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -329,6 +330,9 @@ namespace Umbraco.Web
         internal override void ConfigureCoreServices(ServiceContainer container)
         {
             base.ConfigureCoreServices(container);
+
+            //ModelMappers
+            container.RegisterFrom<WebModelMappersCompositionRoot>();
 
             container.EnablePerWebRequestScope();
 

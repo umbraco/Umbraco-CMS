@@ -15,7 +15,6 @@ namespace umbraco.cms.presentation.Trees
 
 	public enum SerializedTreeType
 	{
-		XmlTree,
 		JSONTree,
 		JsTree
 	}
@@ -53,8 +52,6 @@ namespace umbraco.cms.presentation.Trees
 
 			switch (m_TreeType)
 			{
-				case SerializedTreeType.XmlTree:
-					break;
 				case SerializedTreeType.JSONTree:
 					m_JSSerializer.RegisterConverters(new List<JavaScriptConverter>() 
 					{ 
@@ -90,8 +87,6 @@ namespace umbraco.cms.presentation.Trees
 		{
 			switch (type)
 			{
-				case SerializedTreeType.XmlTree:
-					return SerializableData.Serialize(this, typeof(XmlTree));
 				case SerializedTreeType.JsTree:
 					return m_JSSerializer.Serialize(this.treeCollection);
 				case SerializedTreeType.JSONTree:

@@ -17,8 +17,6 @@ namespace umbraco.controls.Tree
     /// Since we're inheriting from a UserControl and all of the ClientDependency registrations are done inline, we need
     /// to re-register the ClientDependencies.
     /// </remarks>
-    [ClientDependency(11, ClientDependencyType.Css, "Tree/menuIcons.css", "UmbracoClient")]
-    [ClientDependency(12, ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoApplicationActions.js", "UmbracoClient")]

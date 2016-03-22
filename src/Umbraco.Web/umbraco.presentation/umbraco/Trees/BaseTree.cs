@@ -175,20 +175,6 @@ namespace umbraco.cms.presentation.Trees
         public abstract void RenderJS(ref StringBuilder Javascript);
 
         /// <summary>
-        /// This will call the new Render method which works using a typed XmlTree object instead of the untyped XmlDocument object.
-        /// This can still be overriden but is only for backwards compatibility.
-        /// </summary>
-        /// <param name="Tree"></param>
-        [Obsolete("Use the other Render method instead")]
-        public virtual void Render(ref XmlDocument Tree)
-        {
-            //call our render method by passing in the XmlTree instead of the XmlDocument
-            Render(ref m_xTree);
-            //now that we have an XmlTree object filled, we'll serialize it back to the XmlDocument of the ITree
-			Tree.LoadXml(m_xTree.ToString(SerializedTreeType.XmlTree));			
-        }
-
-        /// <summary>
         /// Classes need to override thid method to create the nodes for the XmlTree
         /// </summary>
         /// <param name="tree"></param>

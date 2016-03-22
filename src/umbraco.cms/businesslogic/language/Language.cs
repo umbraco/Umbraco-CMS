@@ -91,9 +91,7 @@ namespace umbraco.cms.businesslogic.language
                 {
                     CultureName = culture.DisplayName
                 };
-                ApplicationContext.Current.Services.LocalizationService.Save(lang);
-                var ct = new Language(lang);
-                ct.OnNew(new NewEventArgs());
+                ApplicationContext.Current.Services.LocalizationService.Save(lang);             
             }
         }
 
@@ -230,16 +228,8 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         public virtual void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
             //Do the update!
             ApplicationContext.Current.Services.LocalizationService.Save(LanguageEntity);
-
-            if (!e.Cancel)
-            {
-                FireAfterSave(e);
-            }
         }
 
         /// <summary>
@@ -254,15 +244,7 @@ namespace umbraco.cms.businesslogic.language
         {
             if (ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
             {
-                var e = new DeleteEventArgs();
-                FireBeforeDelete(e);
-
-                if (!e.Cancel)
-                {
-                    ApplicationContext.Current.Services.LocalizationService.Delete(LanguageEntity);
-
-                    FireAfterDelete(e);
-                }
+                ApplicationContext.Current.Services.LocalizationService.Delete(LanguageEntity);
             }
             else
             {
@@ -282,60 +264,6 @@ namespace umbraco.cms.businesslogic.language
             var serializer = new EntityXmlSerializer();
             var xml = serializer.Serialize(LanguageEntity);
             return xml.GetXmlNode(xd);
-        } 
-        #endregion
-
-        #region Events
-
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Language sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(Language sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Language sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when a language is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
         } 
         #endregion
     }

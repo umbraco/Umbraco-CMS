@@ -5,9 +5,9 @@ using Umbraco.Core.Models.Mapping;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TabModelMapper : MapperConfiguration
+    internal class TabModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<ITag, TagModel>();
         }

@@ -7,12 +7,14 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LogModelMapper : MapperConfiguration
+    internal class LogModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<AuditItem, AuditLog>()
-                  .ForMember(log => log.LogType, expression => expression.MapFrom(item => item.AuditType.ToString()));
+                .ForMember(log => log.NodeId, expression => expression.Ignore())
+                .ForMember(log => log.Timestamp, expression => expression.MapFrom(item => item.CreateDate))
+                .ForMember(log => log.LogType, expression => expression.MapFrom(item => item.AuditType.ToString()));
         }
     }
 }

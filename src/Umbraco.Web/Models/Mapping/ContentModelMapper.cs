@@ -21,9 +21,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>
-    internal class ContentModelMapper : MapperConfiguration
+    internal class ContentModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
 
             //FROM IContent TO ContentItemDisplay

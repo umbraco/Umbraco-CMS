@@ -13,7 +13,7 @@ using Umbraco.Web._Legacy.Actions;
 namespace umbraco
 {
 
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", sortOrder: 3)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, "Dictionary", sortOrder: 0)]
     public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }

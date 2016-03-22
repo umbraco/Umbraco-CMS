@@ -14,9 +14,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Configure's model mappings for Data types
     /// </summary>
-    internal class DataTypeModelMapper : MapperConfiguration
+    internal class DataTypeModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
 
