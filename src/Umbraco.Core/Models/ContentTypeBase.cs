@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _sortOrder;
-        private string _icon = "folder.png";
+        private string _icon = "icon-folder";
         private string _thumbnail = "folder.png";
         private int _creatorId;
         private bool _allowedAsRoot;
@@ -373,43 +373,35 @@ namespace Umbraco.Core.Models
             {
                 _propertyGroups = value;
                 _propertyGroups.CollectionChanged += PropertyGroupsChanged;
+                PropertyGroupsChanged(_propertyGroups, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
         /// <summary>
-        /// List of PropertyTypes available on this ContentType.
-        /// This list aggregates PropertyTypes across the PropertyGroups.
+        /// Gets all property types, across all property groups.
         /// </summary>
-        /// <remarks>
-        /// 
-        /// The setter is used purely to set the property types that DO NOT belong to a group!
-        /// 
-        /// Marked as DoNotClone because the result of this property is not the natural result of the data, it is 
-        /// a union of data so when auto-cloning if the setter is used it will be setting the unnatural result of the 
-        /// data. We manually clone this instead. 
-        /// </remarks>
         [IgnoreDataMember]
         [DoNotClone]
         public virtual IEnumerable<PropertyType> PropertyTypes
         {
             get
             {
-                var types = _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
-                return types;
-            }
-            internal set
-            {
-                _propertyTypes = new PropertyTypeCollection(value);
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                return _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
             }
         }
 
         /// <summary>
-        /// Returns the property type collection containing types that are non-groups - used for tests
+        /// Gets or sets the property types that are not in a group.
         /// </summary>
-        internal IEnumerable<PropertyType> NonGroupedPropertyTypes
+        public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
             get { return _propertyTypes; }
+            set
+            {
+                _propertyTypes = new PropertyTypeCollection(value);
+                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
         }
 
             /// <summary>
@@ -460,11 +452,6 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public bool AddPropertyType(PropertyType propertyType)
         {
-            if (propertyType.HasIdentity == false)
-            {
-                propertyType.Key = Guid.NewGuid();
-            }
-
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 _propertyTypes.Add(propertyType);                
@@ -480,24 +467,34 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
+        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to 
+        /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
-            if (PropertyTypes.Any(x => x.Alias == propertyTypeAlias) == false || PropertyGroups.Any(x => x.Name == propertyGroupName) == false)
-                return false;
+            // note: not dealing with alias casing at all here?
 
-            var propertyType = PropertyTypes.First(x => x.Alias == propertyTypeAlias);
-            //The PropertyType already belongs to a PropertyGroup, so we have to remove the PropertyType from that group
-            if (PropertyGroups.Any(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias)))
-            {
-                var oldPropertyGroup = PropertyGroups.First(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+            // get property, ensure it exists
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            if (propertyType == null) return false;
+
+            // get new group, if required, and ensure it exists
+            var newPropertyGroup = propertyGroupName == null
+                ? null
+                : PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
+            if (propertyGroupName != null && newPropertyGroup == null) return false;
+
+            // get old group
+            var oldPropertyGroup = PropertyGroups.FirstOrDefault(x => 
+                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+
+            // set new group
+            propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
+
+            // remove from old group, if any - add to new group, if any
+            if (oldPropertyGroup != null)
                 oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
-            }
-
-            propertyType.PropertyGroupId = new Lazy<int>(() => default(int));
-            propertyType.ResetDirtyProperties();
-
-            var propertyGroup = PropertyGroups.First(x => x.Name == propertyGroupName);
-            propertyGroup.PropertyTypes.Add(propertyType);
+            if (newPropertyGroup != null)
+                newPropertyGroup.PropertyTypes.Add(propertyType);
 
             return true;
         }
@@ -533,6 +530,18 @@ namespace Umbraco.Core.Models
         /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         public void RemovePropertyGroup(string propertyGroupName)
         {
+            // if no group exists with that name, do nothing
+            var group = PropertyGroups[propertyGroupName];
+            if (group == null) return;
+
+            // re-assign the group's properties to no group
+            foreach (var property in group.PropertyTypes)
+            {
+                property.PropertyGroupId = null;
+                _propertyTypes.Add(property);
+            }
+
+            // actually remove the group
             PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(PropertyGroupCollectionSelector);
         }

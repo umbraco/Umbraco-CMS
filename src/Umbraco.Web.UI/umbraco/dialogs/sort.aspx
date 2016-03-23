@@ -47,9 +47,9 @@
                     <table id="sortableNodes">
                         <thead>
                             <tr>
-                                <th style="width: 100%">Name</th>
-                                <th class="nowrap" style="display: <%=HideDateColumn ? "none;" : "block;" %>">Creation date</th>
-                                <th class="nowrap">Sort order</th>
+                                <th style="width: 100%"><%= umbraco.ui.Text("general", "name") %></th>
+                                <th class="nowrap" style="display: <%= HideDateColumn ? "none" : "table-cell" %>;"><%= umbraco.ui.Text("sort", "sortCreationDate") %></th>
+                                <th class="nowrap"><%= umbraco.ui.Text("sort", "sortOrder") %></th>
                             </tr>
                         </thead>
                         <tbody>

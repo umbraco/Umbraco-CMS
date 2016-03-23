@@ -6,7 +6,7 @@
             ui-sortable
             ng-model="model.value">
             <li ng-repeat="node in model.value">
-                <i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i>
+                <a href=""><i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i></a>
                 <i class="icon icon-picture handle hover-hide"></i>
 
                 <a href prevent-default ng-click="edit(node, $event)">{{node.alias}}</a>
@@ -24,26 +24,26 @@
         <div class="control-group">
             <label>Alias</label>
             <input name="newItem.alias" type="text"
-                   ng-model="newItem.alias" val-highlight="hasError" />
+                   ng-model="newItem.alias" val-highlight="{{hasError}}" />
         </div>
 
         <div class="control-group">
             <label>Size</label>
             <input name="newItem.width" type="number" placeholder="Width"
-                   ng-model="newItem.width" class="umb-editor-tiny" val-highlight="hasError" />
+                   ng-model="newItem.width" class="umb-editor-tiny" val-highlight="{{hasError}}" />
             &times;
             <input name="newItem.height" type="number" placeholder="Height"
-                   ng-model="newItem.height" class="umb-editor-tiny" val-highlight="hasError" />
+                   ng-model="newItem.height" class="umb-editor-tiny" val-highlight="{{hasError}}" />
         </div>
 
         <div class="control-group">
-            <button class="btn btn-small" ng-click="add($event)">Save crop</button>
-            <a href class="btn btn-small btn-link" ng-click="cancel($event)">Cancel</a>
+            <button class="btn" ng-click="add($event)">Save crop</button>
+            <a href class="btn btn-link" ng-click="cancel($event)">Cancel</a>
         </div>
     </div>
 
     <div class="control-group" ng-hide="newItem">
-        <button class="btn btn-small" ng-click="newItem = {}" prevent-default>Add new crop</button>
+        <button class="btn" ng-click="newItem = {}" prevent-default>Add new crop</button>
     </div>
 
 </div>

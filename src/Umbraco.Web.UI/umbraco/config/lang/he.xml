@@ -316,6 +316,7 @@
     <key alias="showPageOnSend">הצג עמוד בשליחה</key>
     <key alias="size">גודל</key>
     <key alias="sort">סדר</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">סוג</key>
     <key alias="typeToSearch">הקלד לחיפוש...</key>
     <key alias="up">למעלה</key>
@@ -330,6 +331,8 @@
     <key alias="welcome">ברוכים הבאים...</key>
     <key alias="width">רוחב</key>
     <key alias="yes">כן</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">צבע רקע</key>
@@ -652,6 +655,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabs">לשוניות</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">המיון הושלם.</key>
     <key alias="sortHelp">יש לגרור את הפריטים מעלה או מטה כדי להגדיר את סדר התוכן. או לחץ על כותרת העמודה כדי למיין את כל פריטי התוכן</key>
     <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.<br/> <br/> נא לא לסגור את החלון בזמן המיון]]></key>
@@ -721,6 +726,45 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mastertemplate">תבנית ראשית</key>
     <key alias="quickGuide">מדריך מהיר עבור תבנית תגיות באומברקו</key>
     <key alias="template">תבנית</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">שדה אלטרנטיבי</key>
@@ -800,7 +844,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cacheBrowser">זיכרון מטמון בדפדפן</key>
     <key alias="contentRecycleBin">סל מיחזור</key>
     <key alias="createdPackages">יצירת חבילות</key>
-    <key alias="datatype">סוגי מידע</key>
+    <key alias="dataTypes">סוגי מידע</key>
     <key alias="dictionary">מילון</key>
     <key alias="installedPackages">חבילות מותקנות</key>
     <key alias="installSkin">התקן עיצוב</key>
@@ -810,10 +854,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="macros">מקרו</key>
     <key alias="mediaTypes">סוגי מדיה</key>
     <key alias="member">משתמשים</key>
-    <key alias="memberGroup">קבוצות משתמשים</key>
+    <key alias="memberGroups">קבוצות משתמשים</key>
     <key alias="memberRoles">כללים</key>
-    <key alias="memberType">סוגי משתמשים</key>
-    <key alias="nodeTypes">סוגי מסמכים</key>
+    <key alias="memberTypes">סוגי משתמשים</key>
+    <key alias="documentTypes">סוגי מסמכים</key>
     <key alias="packager">חבילות</key>
     <key alias="packages">חבילות</key>
     <key alias="python">קבצי פייתון</key>

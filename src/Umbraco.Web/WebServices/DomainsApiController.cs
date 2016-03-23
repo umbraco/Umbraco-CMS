@@ -13,6 +13,7 @@ using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
@@ -20,6 +21,7 @@ namespace Umbraco.Web.WebServices
     /// A REST controller used for managing domains.
     /// </summary>
     /// <remarks>Nothing to do with Active Directory.</remarks>
+    [ValidateAngularAntiForgeryToken]
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
         [HttpPost]
@@ -53,28 +55,29 @@ namespace Umbraco.Web.WebServices
 
             if (language != null)
             {
+                // yet there is a race condition here...
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
+                {
                     wildcard.LanguageId = language.Id;
+                }
                 else
                 {
-                    // yet there is a race condition here...
-                    var newDomain = new UmbracoDomain("*" + model.NodeId)
+                    wildcard = new UmbracoDomain("*" + model.NodeId)
                     {
                         LanguageId = model.Language,
                         RootContentId = model.NodeId
                     };
-
-                    var saveAttempt = Services.DomainService.Save(newDomain);
-                    if (saveAttempt == false)
-                    {
-                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                        response.Content = new StringContent("Saving new domain failed");
-                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
-                        throw new HttpResponseException(response);
-                    }
                 }
-                    
+
+                var saveAttempt = Services.DomainService.Save(wildcard);
+                if (saveAttempt == false)
+                {
+                    var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    response.Content = new StringContent("Saving domain failed");
+                    response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                    throw new HttpResponseException(response);
+                }
             }
             else
             {
@@ -83,7 +86,6 @@ namespace Umbraco.Web.WebServices
                 {
                     Services.DomainService.Delete(wildcard);
                 }
-                    
             }
 
             // process domains
@@ -93,7 +95,7 @@ namespace Umbraco.Web.WebServices
             {
                 Services.DomainService.Delete(domain);
             }
-                
+
 
             var names = new List<string>();
 
@@ -112,7 +114,10 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
+                {
                     domain.LanguageId = language.Id;
+                    Services.DomainService.Save(domain);
+                }
                 else if (Services.DomainService.Exists(domainModel.Name))
                 {
                     domainModel.Duplicate = true;
@@ -149,7 +154,7 @@ namespace Umbraco.Web.WebServices
                         response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
                         throw new HttpResponseException(response);
                     }
-                } 
+                }
             }
 
             model.Valid = model.Domains.All(m => m.Duplicate == false);

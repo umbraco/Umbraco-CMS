@@ -12,12 +12,16 @@ namespace Umbraco.Web.WebApi
     /// The base class for auto-routed API controllers for Umbraco
     /// </summary>
     public abstract class UmbracoApiController : UmbracoApiControllerBase
-    {
+    {        
         protected UmbracoApiController()
         {
         }
 
         protected UmbracoApiController(UmbracoContext umbracoContext) : base(umbracoContext)
+        {
+        }
+
+        protected UmbracoApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
         {
         }
     }

@@ -29,13 +29,22 @@
 	min-width: 100%;
 	width: auto;
 }
-.umb-tree li.current > div, .umb-tree div.selected {
+.umb-tree li.current > div,
+.umb-tree div.selected {
 	background: @blue;
 }
-.umb-tree li.current > div a.umb-options i, .umb-tree div.selected i {
+.umb-tree li.current > div a.umb-options i,
+.umb-tree div.selected i {
 	background: #fff;
 	border-color: @blue;
+	transition: opacity 120ms ease;
 }
+
+.umb-tree li.current > div a.umb-options:hover i,
+.umb-tree div.selected i {
+	opacity: .7;
+}
+
 .umb-tree li.current > div a,
 .umb-tree li.current > div i.icon,
 .umb-tree li.current > div ins {
@@ -43,13 +52,23 @@
 	background: @blue;
 	border-color: @blue;
 }
+
 .umb-tree li.root > div {
-	padding-left: 20px;
+	padding: 0;
 }
 
-
 .umb-tree li.root > div h5 {
-	margin-top: 10px;
+	margin: 0;
+	width: 100%;
+
+	display: flex;
+	align-items: center;
+}
+
+.umb-tree li.root > div h5 > a, .umb-tree-header {
+	display: flex;
+	padding: 20px 0 20px 20px;
+	box-sizing: border-box;
 }
 
 .umb-tree * {
@@ -68,9 +87,9 @@
 }
 
 .umb-tree a {
-	vertical-align: middle;
-	display: inline-block;
     cursor:pointer;
+	text-decoration: none;
+	outline: none;
 }
 
 .umb-tree a:hover {
@@ -78,10 +97,13 @@
 }
 
 .umb-tree div {
-	vertical-align: middle;
 	padding: 5px 0 5px 0;
 	position: relative;
 	overflow: hidden;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+
 }
 
 .umb-tree a.noSpr {
@@ -95,7 +117,8 @@
 	visibility: visible;
 }
 
-.umb-tree li.root > div a, .umb-tree li.root h5, .umb-tree-header {
+.umb-tree li.root > div a,
+.umb-tree li.root h5, .umb-tree-header {
 	text-transform: uppercase;
 	color: #b3b3b3;
 	font-weight: bold;
@@ -103,14 +126,18 @@
 }
 
 .umb-tree ins {
-	vertical-align: middle;
 	margin: -4px 0 0 -16px;
 	width: 16px;
 	height: 16px;
-	display: inline-block;
 	visibility: hidden;
 	text-decoration: none;
     font-size: 12px;
+
+	transition: opacity 120ms ease;
+}
+
+.umb-tree ins:hover {
+	opacity: .7;
 }
 
 .umb-tree li:hover ins {
@@ -118,12 +145,27 @@
 	cursor: pointer
 }
 
+.umb-tree li div {
+	padding: 0;
+}
+
+.umb-tree li > div a:not(.umb-options) {
+	padding: 6px 0;
+	width: 100%;
+	display: flex;
+}
+
 .umb-tree .icon {
 	vertical-align: middle;
-	margin: 1px 13px 1px 0px;
+	margin: 0 13px 0 0;
 	color: #21201C;
 	font-size: 20px;
 }
+
+.umb-tree-icon {
+	cursor: pointer;
+}
+
 .umb-tree i.noSpr {
 	display: inline-block;
 	margin-top: 1px;
@@ -147,6 +189,16 @@
     /*color:@turquoise;*/
 }
 
+.umb-tree .umb-search-group-item {
+	padding-left: 20px;
+}
+
+.umb-tree .umb-search-group-item-link {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+}
+
 .icon-check:before {
 	content: "\e165";
 }
@@ -161,14 +213,14 @@
 
 a.umb-options {
 	visibility: hidden;
-	cursor: pointer;
-	display: inline-block;
-	text-align: center;
-	position: absolute;
-	right: 10px;
-	top: 3px;
-	padding: 0 3px 3px 5px;
-	border: 1px solid transparent;
+
+	display: flex;
+	justify-content: flex-end;
+
+    padding: 9px 5px;
+    text-align: center;
+    cursor: pointer;
+    margin-right: 10px;
 }
 
 a.umb-options i {
@@ -180,14 +232,20 @@ a.umb-options i {
 	margin: 0 2px 0 0;
 }
 
+a.umb-options i:last-child {
+	margin: 0;
+}
+
 a.umb-options:hover {
 	background: @btnBackgroundHighlight;
-	border: 1px solid @grayLight;
 	.border-radius(@baseBorderRadius);
 }
 
 li.root > div > a.umb-options {
-    top: 13px;
+    top: 18px;
+
+	display: flex;
+    padding: 10px 5px;
 }
 
 .hide-options a.umb-options{display: none !important}
@@ -247,6 +305,7 @@ div.protected:before{
 	font-size: 20px;
 	padding-left: 7px;
 	padding-top: 7px;
+	bottom: 0;
 }
 
 div.has-unpublished-version:before{
@@ -257,6 +316,7 @@ div.has-unpublished-version:before{
 	font-size: 20px;
 	padding-left: 7px;
 	padding-top: 7px;
+	bottom: 0;
 }
 
 div.not-allowed > i.icon,div.not-allowed > a{
@@ -275,6 +335,8 @@ div.is-container:before{
 	font-size: 8px;
 	padding-left: 13px;
 	padding-top: 8px;
+	pointer-events: none;
+	bottom: 0;
 }
 
 div.locked:before{
@@ -285,6 +347,7 @@ div.locked:before{
 	font-size: 20px;
 	padding-left: 7px;
 	padding-top: 7px;
+	bottom: 0;
 }
 
 // Tree context menu
@@ -294,11 +357,6 @@ div.locked:before{
 	padding: 0px;
 	list-style: none;
 
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 }
 
@@ -306,19 +364,20 @@ div.locked:before{
 }
 
 .umb-actions li.sep {
-	margin-top: 4px;
 	display: block;
 	border-top: 1px solid #efefef;
 }
-.umb-actions li.sep a {
-	margin-top: 4px;
+
+.umb-actions li.sep:first-child {
+	border-top: none;
 }
+
 .umb-actions a {
 	white-space: nowrap;
 	display: block;
 	font-size: 14px;
 	color: @black;
-	padding: 4px 25px 4px 20px;
+	padding: 8px 25px 8px 20px;
 	text-decoration: none;
 	cursor: pointer;
 }
@@ -360,7 +419,6 @@ div.locked:before{
 }
 .umb-actions-child li .menu-label {
 	font-size: 12px;
-	margin-bottom: 10px;
 	color: #000;
 	margin-left: 20px;
 }
@@ -416,9 +474,13 @@ div.locked:before{
 // ------------------------
 
 .umb-tree li div.l{
-width:100%;
-height:1px;
-overflow:hidden;
+	width:100%;
+	height:1px;
+	overflow:hidden;
+
+	position: absolute;
+	left: 0;
+	bottom: 0;
 }
 
 .umb-tree li div.l div {

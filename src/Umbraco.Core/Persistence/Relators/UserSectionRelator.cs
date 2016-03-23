@@ -18,8 +18,11 @@ namespace Umbraco.Core.Persistence.Relators
             // Is this the same DictionaryItem as the current one we're processing
             if (Current != null && Current.Id == a.Id)
             {
-                // Yes, just add this User2AppDto to the current item's collection
-                Current.User2AppDtos.Add(p);
+                if (p.AppAlias.IsNullOrWhiteSpace() == false)
+                {
+                    // Yes, just add this User2AppDto to the current item's collection
+                    Current.User2AppDtos.Add(p);
+                }
 
                 // Return null to indicate we're not done with this User yet
                 return null;
@@ -35,7 +38,7 @@ namespace Umbraco.Core.Persistence.Relators
             Current = a;
             Current.User2AppDtos = new List<User2AppDto>();
             //this can be null since we are doing a left join
-            if (p.AppAlias != null)
+            if (p.AppAlias.IsNullOrWhiteSpace() == false)
             {
                 Current.User2AppDtos.Add(p);    
             }

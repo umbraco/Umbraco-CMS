@@ -18,10 +18,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public MySqlSyntaxProvider(ILogger logger)
         {
             _logger = logger;
-            DefaultStringLength = 255;
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
-
+            
             AutoIncrementDefinition = "AUTO_INCREMENT";
             IntColumnDefinition = "int(11)";
             BoolColumnDefinition = "tinyint(1)";
@@ -29,10 +26,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             TimeColumnDefinition = "time";
             DecimalColumnDefinition = "decimal(38,6)";
             GuidColumnDefinition = "char(36)";
+            
+            DefaultValueFormat = "DEFAULT {0}";
 
             InitColumnTypeMap();
-
-            DefaultValueFormat = "DEFAULT {0}";
         }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)

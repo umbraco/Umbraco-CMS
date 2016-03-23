@@ -131,20 +131,18 @@
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
-  -webkit-border-radius: @tabsBorderRadius;
-  border-radius: @tabsBorderRadius;
   color: @gray;
   padding-top: 5px;
   padding-bottom: 4px;
   line-height: @baseLineHeight;
   border: 1px solid transparent;
-  .border-radius(4px 4px 0 0);
+
   &:hover {
       color: @black;
   }
   &:hover,
   &:focus {
-    border-color: @grayLighter @grayLighter #ddd;    
+    border-color: @grayLighter @grayLighter #ddd;
   }
 }
 // Active state, and it's :hover/:focus to override normal :hover/:focus
@@ -248,6 +246,14 @@
 
 // DROPDOWNS
 // ---------
+
+.dropdown-menu {
+    border-radius: 0;
+}
+
+.dropdown-menu > li > a {
+    padding: 8px 20px;
+}
 
 .nav-tabs .dropdown-menu {
   .border-radius(0 0 6px 6px); // remove the top rounded corners here since there is a hard edge above the menu

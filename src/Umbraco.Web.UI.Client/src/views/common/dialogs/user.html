@@ -8,6 +8,7 @@
             </div>
         </div>
         <h1 class="headline">{{user.name}}</h1>
+        <small class="umb-version">Umbraco version {{version}}</small>
         <p class="muted">
             <small>
                 <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
@@ -19,18 +20,27 @@
     <div class="umb-panel-body umb-scrollable">
         <div class="tab-content umb-control-group">
 
-            <div class="umb-pane" ng-if="canEditProfile">
-                <h5><localize key="user_yourProfile" /></h5>
-                <p>
-                    <a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
-                       class="btn btn-primary"
-                       ng-click="close()">
-                        <localize key="general_edit">Edit</localize>
-                    </a>
-                </p>
+            <div class="umb-pane" ng-if="!showPasswordFields">
+
+               <h5><localize key="user_yourProfile" /></h5>
+
+               <a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
+                  class="btn btn-primary"
+                  ng-click="close()"
+                  ng-if="canEditProfile">
+                  <localize key="general_edit">Edit</localize>
+               </a>
+
+               <umb-button
+                  type="button"
+                  action="togglePasswordFields()"
+                  label="Change password"
+                  button-style="success">
+               </umb-button>
+
             </div>
 
-            <div class="umb-pane external-logins" ng-if="externalLoginProviders.length > 0">
+            <div class="umb-pane external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
 
                 <h5>External login providers</h5>
 
@@ -63,7 +73,7 @@
 
             </div>
 
-            <div class="umb-pane">
+            <div class="umb-pane" ng-if="!showPasswordFields">
                 <h5><localize key="user_yourHistory" /></h5>
                 <ul class="umb-tree">
                     <li ng-repeat="item in history | orderBy:'time':true">
@@ -74,8 +84,36 @@
                 </ul>
             </div>
 
-        </div>
+            <div class="umb-pane" ng-show="showPasswordFields">
 
-        <small class="umb-version">Umbraco version {{version}}</small>
+               <h5>Change password</h5>
+
+               <form
+                  name="passwordForm"
+                  class="block-form"
+                  ng-submit="changePassword()"
+                  novalidate
+                  val-form-manager>
+
+                  <umb-editor model="changePasswordModel"></umb-editor>
+
+                  <umb-button
+                     type="button"
+                     action="togglePasswordFields()"
+                     label="Back"
+                     button-style="Cancel">
+                  </umb-button>
+
+                  <umb-button
+                     type="submit"
+                     label="Change password"
+                     state="changePasswordButtonState"
+                     button-style="success">
+                  </umb-button>
+
+               </form>
+
+            </div>
+
     </div>
 </div>

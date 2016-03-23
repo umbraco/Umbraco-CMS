@@ -1,0 +1,299 @@
+<div class="clearfix">
+
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-right>
+
+            <umb-button
+                ng-if="compositions !== false"
+                type="button"
+                button-style="link"
+                label-key="contentTypeEditor_compositions"
+                icon="icon-merge"
+                action="openCompositionsDialog()">
+            </umb-button>
+
+            <umb-button
+                ng-if="sorting !== false"
+                type="button"
+                button-style="link"
+                label-key="{{sortingButtonKey}}"
+                icon="icon-navigation"
+                action="toggleSortingMode();">
+            </umb-button>
+
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
+    <div ng-if="sortingMode && model.groups.length <= 1" class="umb-group-builder__no-data-text">
+        <localize key="contentTypeEditor_noTabs"></localize>
+    </div>
+
+    <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
+
+        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}">
+
+            <!-- TAB INIT STATE -->
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
+
+                <div class="umb-group-builder__group-title-wrapper -placeholder">
+                  <div class="umb-group-builder__group-title -placeholder"></div>
+                </div>
+
+                <localize ng-if="model.groups.length === 1" key="contentTypeEditor_addNewTab"></localize>
+                <localize ng-if="model.groups.length > 1" key="contentTypeEditor_addAnotherTab"></localize>
+
+            </a>
+
+            <!-- TAB ACTIVE OR INACTIVE STATE -->
+            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
+
+                <div class="umb-group-builder__group-remove" ng-if="!sortingMode && tab.properties.length <= 1 && model.groups.length > 1">
+                    <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
+                    <umb-confirm-action
+                        ng-if="tab.deletePrompt"
+                        direction="left"
+                        on-confirm="removeGroup($index)"
+                        on-cancel="hidePrompt(tab)">
+                    </umb-confirm-action>
+                </div>
+
+                <div class="umb-group-builder__group-title-wrapper">
+
+                    <ng-form name="groupNameForm">
+                        <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
+                            <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
+                            <input class="umb-group-builder__group-title-input"
+                                   type="text"
+                                   localize="placeholder"
+                                   placeholder="@placeholders_entername"
+                                   name="groupName"
+                                   ng-model="tab.name"
+                                   ng-class="{'-placeholder': tab.name == ''}"
+                                   ng-change="updateGroupTitle(tab)"
+                                   ng-disabled="tab.inherited"
+                                   umb-auto-focus
+                                   umb-auto-resize
+                                   on-focus="activateGroup(tab)"
+                                   required
+                                   val-server-field="{{'Groups[' + $index + '].Name'}}" />
+
+                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
+                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="required"><localize key="required"></localize></div>
+
+                        </div>
+                    </ng-form>
+
+                    <ng-form name="groupSortOrderForm">
+                        <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
+                            <input name="groupSortOrder" type="number" class="umb-group-builder__group-sort-value" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
+                            <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
+                            <div class="umb-validation-label -arrow-left" ng-if="!tab.showSortOrderMissing" val-msg-for="groupSortOrder" val-toggle-msg="required"><localize key="required"></localize></div>
+                        </div>
+                    </ng-form>
+
+                    <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
+                        <i class="icon icon-merge"></i>
+                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{ tab.inheritedFromName }}
+
+                        <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
+                            {{ contentTypeName }}
+                            <span ng-if="!$last">, </span>
+                        </span>
+                    </div>
+
+                </div>
+
+                <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
+
+                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
+
+                        <!-- Init property / Property placeholder / add new property -->
+                        <a href=""
+                            class="umb-group-builder__property -placeholder"
+                            ng-if="property.propertyState=='init' && !sortingMode"
+                            ng-class="{'-placeholder': property.propertyState=='init'}"
+                            hotkey="alt+shift+p"
+                            hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
+                            ng-click="addProperty(property, tab)"
+                            on-focus="activateGroup(tab)"
+                            focus-when="{{property.focus}}">
+
+                            <div class="umb-group-builder__property-meta">
+                                <div class="umb-group-builder__placeholder-box -input-small"></div>
+                                <div class="umb-group-builder__placeholder-box -input"></div>
+                                <div class="umb-group-builder__placeholder-box-group">
+                                    <div class="umb-group-builder__placeholder-box -text-full-width"></div>
+                                    <div class="umb-group-builder__placeholder-box -text-full-width"></div>
+                                    <div class="umb-group-builder__placeholder-box -text-short"></div>
+                                </div>
+                            </div>
+
+                            <div class="umb-group-builder__property-preview umb-group-builder__placeholder-box">
+                                <localize key="contentTypeEditor_addProperty"></localize>
+                            </div>
+
+                            <div class="umb-group-builder__property-actions"></div>
+
+                        </a>
+
+                        <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
+
+                            <!-- property meta text -->
+                            <div class="umb-group-builder__property-meta" ng-class="{'-full-width': sortingMode}">
+
+                                <ng-form name="propertyTypeForm">
+                                    <div class="control-group -no-margin" ng-if="!sortingMode">
+
+                                        <div class="umb-group-builder__property-meta-alias" ng-if="property.inherited || property.locked">{{ property.alias }}</div>
+                                        <umb-locked-field
+                                            ng-if="!property.inherited && !property.locked"
+                                            locked="locked"
+                                            ng-model="property.alias"
+                                            placeholder-text="'Alias...'"
+                                            server-validation-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Alias'}}">
+                                        </umb-locked-field>
+
+                                        <div class="umb-group-builder__property-meta-label">
+                                            <textarea
+                                                localize="placeholder"
+                                                placeholder="@placeholders_label"
+                                                ng-model="property.label"
+                                                ng-disabled="property.inherited || property.locked"
+                                                name="groupName"
+                                                umb-auto-resize
+                                                required
+                                                val-server-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Label'}}">
+                                            </textarea>
+
+                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
+                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                                        </div>
+
+                                        <div class="umb-group-builder__property-meta-description">
+                                            <textarea
+                                                localize="placeholder"
+                                                placeholder="@placeholders_enterDescription"
+                                                ng-model="property.description"
+                                                ng-disabled="property.inherited || property.locked"
+                                                umb-auto-resize>
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                </ng-form>
+
+                                <div ng-if="sortingMode">
+                                    <i class="icon icon-navigation" ng-if="!property.inherited"></i>
+                                    <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
+                                    <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
+                                </div>
+
+                            </div>
+
+
+                            <div tabindex="-1" class="umb-group-builder__property-preview" ng-click="editPropertyTypeSettings(property, tab)" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && (property.inherited || property.locked)}">
+
+                                <div class="umb-group-builder__property-tags">
+
+                                    <span class="umb-group-builder__property-tag -white">
+                                        <span ng-if="property.dataTypeName !== undefined">{{property.dataTypeName}}</span>
+                                        <span ng-if="property.dataTypeName == undefined"><localize key="general_preview"></localize></span>
+                                    </span>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.validation.mandatory">
+                                        <i class="umb-group-builder__property-tag-icon">*</i>
+                                        <localize key="general_mandatory"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.showOnMemberProfile">
+                                        <i class="icon-eye umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.memberCanEdit">
+                                        <i class="icon-edit umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_memberCanEdit"></localize>
+                                    </div>
+
+                                </div>
+
+                                <div class="umb-group-builder__property-tags -right">
+
+                                    <div class="umb-group-builder__property-tag" ng-if="property.inherited">
+                                        <i class="icon icon-merge"></i>
+                                        <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
+                                        {{property.contentTypeName}}
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag" ng-if="property.locked">
+                                        <i class="icon icon-lock"></i>
+                                        <localize key="general_locked"></localize>
+                                    </div>
+
+                                </div>
+
+                                <ng-form name="propertyEditorPreviewForm" umb-disable-form-validation>
+                                    <umb-property-editor
+                                        ng-if="property.view !== undefined"
+                                        model="property"
+                                        preview="true">
+                                    </umb-property-editor>
+                                </ng-form>
+
+                            </div>
+
+                            <!-- row tools -->
+                            <div class="umb-group-builder__property-actions" ng-if="!sortingMode">
+
+                                <div ng-if="!property.inherited && !property.locked">
+
+                                    <!-- settings for property -->
+                                    <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
+                                        <i class="icon icon-settings"></i>
+                                    </div>
+
+                                    <!-- delete property -->
+                                    <div class="umb-group-builder__property-action">
+                                        <i class="icon-trash" ng-click="togglePrompt(property)"></i>
+                                        <umb-confirm-action
+                                            ng-if="property.deletePrompt"
+                                            direction="left"
+                                            on-confirm="deleteProperty(tab, $index)"
+                                            on-cancel="hidePrompt(property)">
+                                        </umb-confirm-action>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <br>
+
+        </li>
+
+    </ul>
+
+    <umb-overlay
+            ng-if="compositionsDialogModel.show"
+            model="compositionsDialogModel"
+            position="right"
+            view="compositionsDialogModel.view">
+    </umb-overlay>
+
+    <umb-overlay
+            ng-if="propertySettingsDialogModel.show"
+            model="propertySettingsDialogModel"
+            position="right"
+            view="propertySettingsDialogModel.view">
+    </umb-overlay>
+
+</div>

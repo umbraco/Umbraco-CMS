@@ -31,6 +31,159 @@ namespace Umbraco.Tests.Persistence.Repositories
             return new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
         }
 
+        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.MediaTypeContainerGuid);
+        }
+
+        [Test]
+        public void Can_Move()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container1 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah1" };
+                containerRepository.AddOrUpdate(container1);
+                unitOfWork.Commit();
+
+                var container2 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                containerRepository.AddOrUpdate(container2);
+                unitOfWork.Commit();
+
+                var contentType = (IMediaType)MockedContentTypes.CreateVideoMediaType();
+                contentType.ParentId = container2.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                //create a 
+                var contentType2 = (IMediaType)new MediaType(contentType, "hello")
+                {
+                    Name = "Blahasdfsadf"
+                };
+                contentType.ParentId = contentType.Id;
+                repository.AddOrUpdate(contentType2);
+                unitOfWork.Commit();
+
+                var result = repository.Move(contentType, container1).ToArray();
+                unitOfWork.Commit();
+
+                Assert.AreEqual(2, result.Count());
+
+                //re-get
+                contentType = repository.Get(contentType.Id);
+                contentType2 = repository.Get(contentType2.Id);
+
+                Assert.AreEqual(container1.Id, contentType.ParentId);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
+            }
+            
+        }
+
+        [Test]
+        public void Can_Create_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+                Assert.That(container.Id, Is.GreaterThan(0));
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNotNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+                Assert.That(container.Id, Is.GreaterThan(0));
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                // Act
+                containerRepository.Delete(container);
+                unitOfWork.Commit();
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Create_Container_Containing_Media_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+
+                var contentType = MockedContentTypes.CreateVideoMediaType();
+                contentType.ParentId = container.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                Assert.AreEqual(container.Id, contentType.ParentId);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container_Containing_Media_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            IMediaType contentType;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+
+                contentType = MockedContentTypes.CreateVideoMediaType();
+                contentType.ParentId = container.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                containerRepository.Delete(container);
+                unitOfWork.Commit();
+
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
+
+                contentType = repository.Get(contentType.Id);
+                Assert.IsNotNull(contentType);
+                Assert.AreEqual(-1, contentType.ParentId);
+            }
+        }
+
         [Test]
         public void Can_Perform_Add_On_MediaTypeRepository()
         {
@@ -188,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
 
-                var mediaTypes = repository.GetAll(allGuidIds);
+                var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetAll(allGuidIds);
 
                 int count =
                     DatabaseContext.Database.ExecuteScalar<int>(

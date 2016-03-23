@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Umbraco.Dialogs
 {
@@ -25,7 +25,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             var contentNodeId = int.Parse(Request.QueryString["id"]);
-            _content = ApplicationContext.Current.Services.ContentService.GetById(contentNodeId);
+            _content = Services.ContentService.GetById(contentNodeId);
 
             LocalizeTexts();
 
@@ -65,12 +65,12 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private bool PopulateListOfValidAlternateDocumentTypes()
         {
             // Start with all content types
-            var documentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
+            var documentTypes = Services.ContentTypeService.GetAllContentTypes().ToArray();
 
             // Remove invalid ones from list of potential alternatives
-            documentTypes = RemoveCurrentDocumentTypeFromAlternatives(documentTypes);
-            documentTypes = RemoveInvalidByParentDocumentTypesFromAlternatives(documentTypes);
-            documentTypes = RemoveInvalidByChildrenDocumentTypesFromAlternatives(documentTypes);
+            documentTypes = RemoveCurrentDocumentTypeFromAlternatives(documentTypes).ToArray();
+            documentTypes = RemoveInvalidByParentDocumentTypesFromAlternatives(documentTypes).ToArray();
+            documentTypes = RemoveInvalidByChildrenDocumentTypesFromAlternatives(documentTypes).ToArray();
 
             // If we have at least one, bind to list and return true
             if (documentTypes.Any())
@@ -102,7 +102,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             else
             {
                 // Below root, so only include those allowed as sub-nodes for the parent
-                var parentNode = ApplicationContext.Current.Services.ContentService.GetById(_content.ParentId);
+                var parentNode = Services.ContentService.GetById(_content.ParentId);
                 return documentTypes
                     .Where(x => parentNode.ContentType.AllowedContentTypes
                         .Select(y => y.Id.Value)
@@ -188,19 +188,12 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private IContentType GetSelectedDocumentType()
         {
-            return ApplicationContext.Current.Services.ContentTypeService.GetContentType(int.Parse(NewDocumentTypeList.SelectedItem.Value));
+            return Services.ContentTypeService.GetContentType(int.Parse(NewDocumentTypeList.SelectedItem.Value));
         }
 
         private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
         {
-            var properties = contentType.PropertyTypes.ToList();
-            while (contentType.ParentId > -1)
-            {
-                contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentType.ParentId);
-                properties.AddRange(contentType.PropertyTypes);
-            }
-
-            return properties.OrderBy(x => x.Name);
+            return contentType.CompositionPropertyTypes;
         }
 
         private void DisplayNotAvailable()
@@ -236,7 +229,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 if (NewTemplateList.SelectedItem != null)
                 {
                     var templateId = int.Parse(NewTemplateList.SelectedItem.Value);
-                    _content.Template = templateId > 0 ? ApplicationContext.Current.Services.FileService.GetTemplate(templateId) : null;
+                    _content.Template = templateId > 0 ? Services.FileService.GetTemplate(templateId) : null;
                 }
 
                 // Set the property values
@@ -251,19 +244,19 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
                 // Save
                 var user = global::umbraco.BusinessLogic.User.GetCurrent();
-                ApplicationContext.Current.Services.ContentService.Save(_content, user.Id);
+                Services.ContentService.Save(_content, user.Id);
 
                 // Publish if the content was already published
                 if (wasPublished)
                 {
-                    ApplicationContext.Current.Services.ContentService.Publish(_content, user.Id);
+                    Services.ContentService.Publish(_content, user.Id);
                 }
 
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
-
+                
                 // Reload the page if the content was already being viewed
-                ClientTools.ReloadContentFrameUrlIfPathLoaded("/editContent.aspx?id=" + _content.Id);
+                ClientTools.ReloadLocation();
 
                 // Display success message
                 SuccessMessage.Text = global::umbraco.ui.Text("changeDocType", "successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");

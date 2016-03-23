@@ -42,6 +42,23 @@
     bottom: 90px;
 }
 
+.umb-mediapicker-upload {
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+
+    .form-search {
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+    }
+
+    .upload-button {
+        margin-left: 16px;
+    }
+}
+
 .umb-panel.editor-breadcrumb .umb-panel-body, .umb-panel.editor-breadcrumb .umb-bottom-bar {
     bottom: 31px !important;
 }
@@ -75,13 +92,6 @@
     color: @red;
 }
 
-.umb-panel-header .umb-nav-tabs {
-    bottom: -1px;
-    position: absolute;
-    padding: 0px 0px 0px 20px;
-}
-
-
 .umb-panel-header p {
     margin: 0px 20px;
 }
@@ -106,25 +116,19 @@
     color: @red;
 }
 
+.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder,
+.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder,
 .umb-headline-editor-wrapper input.ng-invalid::-webkit-input-placeholder {
     color: @red;
     line-height: 22px;
 }
 
-.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder {
-    color: @red;
-    line-height: 22px;
-}
-
-.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {
-    color: @red;
-    line-height: 22px;
-}
-
+/*
 .umb-panel-header i {
     font-size: 13px;
     vertical-align: middle;
 }
+*/
 
 .umb-panel-header-meta {
     height: 50px;
@@ -153,6 +157,7 @@
     border-radius: @tabsBorderRadius;
     box-shadow: none;
     padding: 0;
+    z-index: 6020;
 }
 
 .umb-btn-toolbar .dropdown-menu small {
@@ -274,9 +279,6 @@
     display: none;
 }
 
-
-
-
 // Utility classes
 
 //SD: Had to add these because if we want to use the bootstrap text colors
@@ -347,4 +349,147 @@
 }
 .external-logins button {
     margin:5px;
+}
+
+/* --------- UMB PANEL HEADER ---------- */
+
+.umb-panel-header-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100px;
+  padding: 0 20px;
+}
+
+.umb-panel-header-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.umb-panel-header-content.-top-position {
+  position: relative;
+  top: -12px;
+}
+
+.umb-panel-header-left-side {
+   display: flex;
+   flex: 1;
+   flex-direction: row;
+}
+
+.umb-panel-header-icon {
+  cursor: pointer;
+  margin-right: 5px;
+  height: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #ECECEC;
+  animation: fadeIn 0.5s;
+  flex: 0 0 55px;
+}
+
+.umb-panel-header-title-wrapper {
+   position: relative;
+   width: 80%;
+}
+
+.umb-panel-header-alias {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+
+.umb-panel-header-alias .umb-locked-field {
+   display: flex;
+   align-items: center;
+}
+
+.umb-panel-header-alias .umb-locked-field,
+.umb-panel-header-alias .umb-locked-field .umb-locked-field__wrapper {
+   margin-bottom: 0;
+}
+
+.umb-panel-header-alias .umb-validation-label:after {
+   visibility: hidden;
+}
+
+.umb-panel-header-alias .umb-locked-field:after {
+   display: none;
+}
+
+.umb-panel-header-icon.-placeholder {
+  border: 1px dashed @grayLight;
+}
+
+.umb-panel-header-icon .icon {
+  font-size: 35px;
+  color: @grayLight;
+}
+
+.umb-panel-header-icon-text {
+  color: @blue;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.umb-panel-header .umb-nav-tabs {
+  bottom: -1px;
+}
+
+input.umb-panel-header-name-input {
+  border-color: #ECECEC;
+  font-size: 15px;
+  color: #000000;
+  margin-bottom: 0;
+  font-weight: bold;
+  box-sizing: border-box;
+  height: 30px;
+  line-height: 30px;
+  width: 100%;
+  &:hover {
+    background: #ffffff;
+    border: 1px solid #cccccc;
+  }
+}
+
+input.umb-panel-header-name-input.name-is-empty {
+  border: 1px dashed @grayLight;
+  background: #ffffff;
+}
+
+.umb-panel-header-name {
+   font-size: 16px;
+   font-weight: bold;
+}
+
+
+input.umb-panel-header-description {
+  background: transparent;
+  border-color: transparent;
+  margin-bottom: 0;
+  font-size: 12px;
+  box-sizing: border-box;
+  height: 25px;
+  line-height: 25px;
+  width: 100%;
+  &:hover {
+    background: #ffffff;
+    border-color: #cccccc;
+  }
+}
+
+.umb-editor-drawer-content {
+  display: flex;
+  align-items: center;
+  //justify-content: space-between;
+}
+
+.umb-editor-drawer-content__right-side {
+	margin-left: auto;
+}
+
+.umb-editor-drawer-content__left-side {
+	margin-right: auto;
 }

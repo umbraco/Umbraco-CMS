@@ -30,9 +30,9 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUser>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
+            ClearAllIsolatedCacheByEntityType<IUser>();
+            if (UserPermissionsCache)
+                UserPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             base.RefreshAll();
         }
 
@@ -44,15 +44,19 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
+            var userCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUser>();
+            if (userCache)
+                userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
-
-            //we need to clear all UserContextCacheKey since we cannot invalidate based on ID since the cache is done so based
-            //on the current contextId stored in the database
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
-
+            if (UserPermissionsCache)
+                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
+            
             base.Remove(id);
+        }
+
+        private Attempt<IRuntimeCacheProvider> UserPermissionsCache
+        {
+            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
         }
 
     }

@@ -509,11 +509,8 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
 
-            if (Key == Guid.Empty)
-            {
-                Key = Guid.NewGuid();
+            if (ProviderUserKey == null)
                 ProviderUserKey = Key;
-            }
         }
 
         /// <summary>

@@ -1,0 +1,59 @@
+.umb-editor-sub-header {
+   padding: 15px 0;
+   margin-bottom: 30px;
+   background: #ffffff;
+   display: flex;
+   justify-content: space-between;
+   margin-top: -30px;
+   position: relative;
+   top: 0;
+}
+
+.umb-editor-sub-header.-umb-sticky-bar {
+   box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.16);
+   transition: box-shadow 1s;
+   top: 100px;
+   transform: translate(0, 50%);
+
+}
+
+.umb-group-builder__property-preview .umb-editor-sub-header {
+    display: none;
+}
+
+.umb-editor-sub-header__content-left {
+   margin-right: auto;
+}
+
+.umb-editor-sub-header__content-right {
+   margin-left: auto;
+}
+
+.umb-editor-sub-header__content-left,
+.umb-editor-sub-header__content-right {
+   display: flex;
+   align-items: stretch;
+}
+
+.umb-editor-sub-header__section {
+   border-left: 1px solid @grayLight;
+   display: flex;
+   align-items: center;
+   padding-left: 20px;
+   padding-right: 20px;
+}
+
+.umb-editor-sub-header__content-left .umb-editor-sub-header__section:first-child {
+   border-left: none;
+   padding-left: 0;
+}
+
+.umb-editor-sub-header__content-right .umb-editor-sub-header__section {
+   border-left: none;
+   border-right: 1px solid @grayLight;
+}
+
+.umb-editor-sub-header__content-right .umb-editor-sub-header__section:last-child {
+   border-right: none;
+   padding-right: 0;
+}

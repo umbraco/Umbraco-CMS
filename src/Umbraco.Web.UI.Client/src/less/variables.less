@@ -14,9 +14,10 @@
 @grayDarker:            #222;
 @grayDark:              #343434;
 @gray:                  #555;
+@grayMed:               #999;
 @grayLight:             #d9d9d9;
 @grayLighter:           #f8f8f8;
-@white:                 #fff; 
+@white:                 #fff;
 
 
 // Accent colors
@@ -85,9 +86,11 @@
 @paddingSmall:          2px 10px;  // 26px
 @paddingMini:           0 6px;   // 22px
 
-@baseBorderRadius:      2px;
-@borderRadiusLarge:     6px;
-@borderRadiusSmall:     3px;
+
+// Disabled this to keep consistency throughout the backoffice UI. Untill a better solution is thought up, this will do.
+@baseBorderRadius:      0px; // 2px;
+@borderRadiusLarge:     0px; // 6px;
+@borderRadiusSmall:     0px; // 3px;
 
 
 // Tables
@@ -112,11 +115,11 @@
 @btnSuccessBackground:              #53a93f;
 @btnSuccessBackgroundHighlight:     #53a93f;
 
-@btnWarningBackground:              lighten(@orange, 15%);
+@btnWarningBackground:              @orange;
 @btnWarningBackgroundHighlight:     @orange;
 
 @btnDangerBackground:               #ee5f5b;
-@btnDangerBackgroundHighlight:      #bd362f;
+@btnDangerBackgroundHighlight:      #ee5f5b;
 
 @btnInverseBackground:              #444;
 @btnInverseBackgroundHighlight:     @grayDarker;
@@ -348,4 +351,4 @@
 // SORTABLE
 // --------------------------------------------------
 @sortableHelperBg: rgba(4, 156, 219, 0.5);
-@sortablePlaceholderBg : @blue;
+@sortablePlaceholderBg : @blue;

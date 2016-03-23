@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+            entity.ResetDirtyProperties(false);
 
             return entity;
         }

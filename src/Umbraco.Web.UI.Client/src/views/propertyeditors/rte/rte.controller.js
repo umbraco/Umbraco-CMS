@@ -1,7 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
-        
+    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+
         $scope.isLoading = true;
 
         //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
@@ -34,7 +34,7 @@ angular.module("umbraco")
 
             //These are absolutely required in order for the macros to render inline
             //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style]";
+            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],span[id|class|style]";
 
             var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
@@ -64,8 +64,7 @@ angular.module("umbraco")
 
             //queue rules loading
             angular.forEach(editorConfig.stylesheets, function (val, key) {
-                stylesheets.push("../css/" + val + ".css?" + new Date().getTime());
-
+                stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css?" + new Date().getTime());
                 await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                     angular.forEach(rules, function (rule) {
                         var r = {};
@@ -118,7 +117,7 @@ angular.module("umbraco")
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
-                    content_css: stylesheets.join(','),
+                    content_css: stylesheets,
                     relative_urls: false,
                     style_formats: styleFormats
                 };
@@ -126,7 +125,7 @@ angular.module("umbraco")
 
                 if (tinyMceConfig.customConfig) {
 
-                    //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to 
+                    //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
                     // convert it to json instead of having it as a string since this is what tinymce requires
                     for (var i in tinyMceConfig.customConfig) {
                         var val = tinyMceConfig.customConfig[i];
@@ -135,7 +134,7 @@ angular.module("umbraco")
                             if (val.detectIsJson()) {
                                 try {
                                     tinyMceConfig.customConfig[i] = JSON.parse(val);
-                                    //now we need to check if this custom config key is defined in our baseline, if it is we don't want to 
+                                    //now we need to check if this custom config key is defined in our baseline, if it is we don't want to
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
                                     if (angular.isArray(baseLineConfigObj[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
@@ -145,7 +144,7 @@ angular.module("umbraco")
                                 }
                                 catch (e) {
                                     //cannot parse, we'll just leave it
-                                } 
+                                }
                             }
                         }
                     }
@@ -165,13 +164,13 @@ angular.module("umbraco")
                         editor.getBody().setAttribute('spellcheck', true);
                     });
 
-                    //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
+                    //We need to listen on multiple things here because of the nature of tinymce, it doesn't
                     //fire events when you think!
                     //The change event doesn't fire when content changes, only when cursor points are changed and undo points
-                    //are created. the blur event doesn't fire if you insert content into the editor with a button and then 
-                    //press save. 
-                    //We have a couple of options, one is to do a set timeout and check for isDirty on the editor, or we can 
-                    //listen to both change and blur and also on our own 'saving' event. I think this will be best because a 
+                    //are created. the blur event doesn't fire if you insert content into the editor with a button and then
+                    //press save.
+                    //We have a couple of options, one is to do a set timeout and check for isDirty on the editor, or we can
+                    //listen to both change and blur and also on our own 'saving' event. I think this will be best because a
                     //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
                     //save before the timeout elapsed.
 
@@ -191,7 +190,7 @@ angular.module("umbraco")
                     //            currForm.$setDirty();
                     //            alreadyDirty = true;
                     //        }
-                            
+
                     //    });
                     //});
 
@@ -226,19 +225,75 @@ angular.module("umbraco")
                         var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
-                        
+
                         syncContent(editor);
                     });
 
+                    tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
+                        $scope.linkPickerOverlay = {
+                            view: "linkpicker",
+                            currentTarget: currentTarget,
+                            show: true,
+                            submit: function(model) {
+                                tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                                $scope.linkPickerOverlay.show = false;
+                                $scope.linkPickerOverlay = null;
+                            }
+                        };
+                    });
 
                     //Create the insert media plugin
-                    tinyMceService.createMediaPicker(editor, $scope);
+                    tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
 
+                        $scope.mediaPickerOverlay = {
+                            currentTarget: currentTarget,
+                            onlyImages: true,
+                            showDetails: true,
+                            disableFolderSelect: true,
+                            startNodeId: userData.startMediaId,
+                            view: "mediapicker",
+                            show: true,
+                            submit: function(model) {
+                                tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
+                                $scope.mediaPickerOverlay.show = false;
+                                $scope.mediaPickerOverlay = null;
+                            }
+                        };
+
+                    });
+                    
                     //Create the embedded plugin
-                    tinyMceService.createInsertEmbeddedMedia(editor, $scope);
+                    tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
+
+                      $scope.embedOverlay = {
+                          view: "embed",
+                          show: true,
+                          submit: function(model) {
+                              tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
+                              $scope.embedOverlay.show = false;
+                              $scope.embedOverlay = null;
+                          }
+                      };
+
+                    });
+
 
                     //Create the insert macro plugin
-                    tinyMceService.createInsertMacro(editor, $scope);
+                    tinyMceService.createInsertMacro(editor, $scope, function(dialogData) {
+
+                        $scope.macroPickerOverlay = {
+                            view: "macropicker",
+                            dialogData: dialogData,
+                            show: true,
+                            submit: function(model) {
+                                var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+                                tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
+                                $scope.macroPickerOverlay.show = false;
+                                $scope.macroPickerOverlay = null;
+                            }
+                        };
+
+                    });
                 };
 
 
@@ -281,7 +336,7 @@ angular.module("umbraco")
                 });
 
                 //when the element is disposed we need to unsubscribe!
-                // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom 
+                // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
                     unsubscribe();

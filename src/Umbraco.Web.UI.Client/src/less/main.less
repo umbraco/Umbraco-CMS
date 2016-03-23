@@ -34,10 +34,14 @@ h5{
   margin-top: 15px;
 }
 
+h5.-border-bottom {
+	border-bottom: 1px solid #ECECEC;
+	padding-bottom: 5px;
+}
 
-
-
-
+h5.-black {
+	color: @black;
+}
 
 /* MISC FORM ELEMENTS */
 .umb-form-actions {
@@ -106,6 +110,11 @@ h5{
   margin-bottom: 15px !important;
 }
 
+.umb-control-group.-no-border {
+  border: none;
+}
+
+
 /*COMPACT MODE */
 .compact .umb-pane{margin: 0px 0px 15px 0px;}
 .compact .umb-control-group {
@@ -130,10 +139,13 @@ h5{
 }
 
 /* LABELS*/
-.umb-control-group label.control-label {
-  text-align: left
+.umb-control-group label.control-label, .umb-control-group .control-label {
+  text-align: left;
 }
-.umb-control-group label .help-block, 
+.umb-control-group label.control-label > div > label {
+  padding-left: 0;
+}
+.umb-control-group label .help-block,
 .umb-control-group label small {
   font-size: 11px;
   color: #a0a0a0;
@@ -141,21 +153,49 @@ h5{
   padding-top: 5px;
 }
 .umb-nolabel .controls {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .controls-row {
   padding-top: 5px;
   margin-left: 240px;
 }
-.controls-row label {
-  display: inline-block
+
+.umb-user-panel .controls-row {
+    margin-left: 0;
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row  {
-  padding: 0px;
+.controls-row label {
+  display: inline-block;
+}
+
+.controls-row > div > label {
+  padding-left: 0;
+}
+
+.block-form .controls-row {
+   margin-left: 0;
+   padding-top: 0;
+}
+
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls {
+  padding: 0;
   border: none;
-  margin: 0px !important;
+  margin: 0 !important;
+}
+
+.controls-row > .vertical-align-items {
+  display: flex;
+  align-items: center;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+  margin-left: 0;
 }
 
 .thumbnails .selected {
@@ -187,30 +227,9 @@ h5{
   left: 2px
 }
 
-.umb-dashboard-control a{text-decoration: underline;}
-
-.umb-dashboard-control 
+.umb-dashboard-control
   iframe{ position: absolute; display: block; width: 99%; height: 99%; overflow: auto !important;}
 
-
-/* NOTIFICATIONS */
-.umb-notification ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 100px;
-  padding-right: 20px;
-  position: relative;
-}
-.umb-notification li {
-  padding: 5px 30px 5px 20px;
-  text-shadow: none;
-  font-size: 12px;
-  margin: auto;
-  margin-top: 5px;
-  border: none;
-  border-radius: 5;
-  position: relative;
-}
 
 /* TABLE */
 .umb-table {
@@ -234,16 +253,16 @@ table thead a {
 
 .umb-table tbody.ui-sortable tr.ui-sortable-helper {
   background-color: @sortableHelperBg;
-  border: none; 
+  border: none;
 }
-.umb-table tbody.ui-sortable tr.ui-sortable-helper td 
+.umb-table tbody.ui-sortable tr.ui-sortable-helper td
  {
     border:none;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-placeholder {
   background-color: @sortablePlaceholderBg;
-  border:none;   
+  border:none;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-placeholder td
@@ -363,7 +382,7 @@ table thead a {
   background: @inputBorder;
   height: 1px;
   margin: 20px 0 0 0;
-  width: 82%; 
+  width: 82%;
   float: left;
 }
 
@@ -432,7 +451,7 @@ table thead a {
     color:@green;
 }
 
-// Loading Animation 
+// Loading Animation
 // ------------------------
 
 .umb-loader{
@@ -518,11 +537,79 @@ height:1px;
 }
 
 .umb-loader-wrapper {
-    
+
     position: absolute;
     right: 0;
     left: 0;
     margin: 10px 0;
-    overflow: hidden; 
+    overflow: hidden;
 
+}
+
+.umb-loader-wrapper.-bottom {
+	bottom: 0;
+}
+
+// Helpers
+
+.strong {
+	font-weight: bold;
+}
+
+.inline {
+	display: inline;
+}
+
+
+// Input label styles
+// @Simon: not sure where to put this part yet
+// --- TODO Needs to be divided into the right .less directories
+
+
+// Titles for input fields
+.input-label--title {
+	font-weight: bold;
+	color: @black;
+
+	margin-bottom: 3px;
+}
+
+
+// Used for input checkmark fields
+.input-label--small {
+	display: inline;
+
+	font-size: 12px;
+	font-weight: bold;
+	color: fade(@black, 70);
+
+	&:hover {
+		color: @black;
+	}
+}
+
+input[type=checkbox]:checked + .input-label--small {
+	color: @blue;
+}
+
+
+// Use this for headers in the panels
+.panel-dialog--header {
+	border-bottom: 1px solid @gray;
+
+	margin: 10px 0;
+	padding-bottom: 10px;
+
+	font-size: @fontSizeLarge;
+	font-weight: bold;
+	line-height: 20px;
+}
+
+
+// Datepicker styles
+.bootstrap-datetimepicker-widget,
+.bootstrap-datetimepicker-widget td,
+.bootstrap-datetimepicker-widget th,
+.bootstrap-datetimepicker-widget td span {
+	border-radius: 0 !important;
 }

@@ -18,7 +18,6 @@ namespace Umbraco.Web.Editors
     /// The API controller used for building content queries within the template
     /// </summary>
     [PluginController("UmbracoApi")]
-    [DisableBrowserCache]
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {

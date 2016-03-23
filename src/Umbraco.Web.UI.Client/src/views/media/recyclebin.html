@@ -1,14 +1,16 @@
-<umb-panel ng-controller="Umbraco.Editors.Media.RecycleBinController">
-    <umb-header>
-        <div class="umb-headline-editor-wrapper span12">
-            <h1><localize key="general_recycleBin">Recycle Bin</localize></h1>
-        </div>
-    </umb-header>
-    <umb-tab-view>
-        <umb-tab id="tabRecycleBin" rel="RecycleBin" style="display: block;">
-            <umb-pane>
-                <div ng-include="listViewPath"></div>
-            </umb-pane>
-        </umb-tab>
-    </umb-tab-view>
-</umb-panel>
+<umb-editor-view ng-controller="Umbraco.Editors.Media.RecycleBinController">
+    <form>
+        <umb-editor-header name="page.name"
+                           name-locked="page.nameLocked"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <div ng-include="listViewPath"></div>
+
+        </umb-editor-container>
+    </form>
+</umb-editor-view>

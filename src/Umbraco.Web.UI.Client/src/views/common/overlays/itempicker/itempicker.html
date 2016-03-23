@@ -1,0 +1,26 @@
+<div ng-controller="Umbraco.Overlays.ItemPickerOverlay">
+
+    <div class="form-search" ng-hide="model.filter === false">
+      <i class="icon-search"></i>
+      <input type="text"
+        style="width: 100%"
+        ng-model="searchTerm"
+        class="umb-search-field search-query input-block-level"
+        localize="placeholder"
+        placeholder="@placeholders_filter"
+        umb-auto-focus />
+    </div>
+
+    <ul class="umb-card-grid">
+      <li
+        ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
+        ng-click="selectItem(availableItem)"
+        class="-three-in-row">
+        <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
+            <i class="{{ availableItem.icon }}"></i>
+            {{ availableItem.name }}
+        </a>
+      </li>
+    </ul>
+
+</div>

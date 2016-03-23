@@ -309,6 +309,7 @@
     <key alias="showPageOnSend">Mostra la pagina inviata</key>
     <key alias="size">Dimensione</key>
     <key alias="sort">Ordina</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Tipo</key>
     <key alias="typeToSearch"><![CDATA[Parola da cercare...]]></key>
     <key alias="up">Su</key>
@@ -323,6 +324,8 @@
     <key alias="welcome">Benvenuto...</key>
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Colore di sfondo</key>
@@ -616,6 +619,8 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="tabs">Tabs</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone"><![CDATA[Ordinamento completato.]]></key>
     <key alias="sortHelp"><![CDATA[Sposta su o giù le pagine trascinandole per determinarne l'ordinamento. Oppure clicca la testata della colonna per ordinare l'intero gruppo di pagine]]></key>
     <key alias="sortPleaseWait"><![CDATA[Si prega di attendere. Gli elementi sono in fase di ordinamento, questo può richiedere del tempo.<br/> <br/>Non chiudere questa finestra durante l'operazione]]></key>
@@ -691,6 +696,45 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="mastertemplate">Master template</key>
     <key alias="quickGuide"><![CDATA[Guida rapida sui tags dei template Umbraco]]></key>
     <key alias="template">Template</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField"><![CDATA[Campo alternativo]]></key>
@@ -773,7 +817,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Cestino</key>
     <key alias="createdPackages">Pacchetti creati</key>
-    <key alias="datatype">Tipi di dato</key>
+    <key alias="dataTypes">Tipi di dato</key>
     <key alias="dictionary">Dizionario</key>
     <key alias="installedPackages">Pacchetti installati</key>
     <key alias="installSkin">Installare skin</key>
@@ -783,10 +827,10 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipi di media</key>
     <key alias="member">Membri</key>
-    <key alias="memberGroup">Gruppi di Membri</key>
+    <key alias="memberGroups">Gruppi di Membri</key>
     <key alias="memberRoles">Ruoli</key>
-    <key alias="memberType">Tipologia Membri</key>
-    <key alias="nodeTypes">Tipi di documento</key>
+    <key alias="memberTypes">Tipologia Membri</key>
+    <key alias="documentTypes">Tipi di documento</key>
     <key alias="packager">Pacchetti</key>
 	  <key alias="packages">Pacchetti</key>
     <key alias="python">Files Python</key>

@@ -53,6 +53,9 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
         public ITemplate DefaultTemplate
@@ -79,6 +82,9 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets or Sets a list of Templates which are allowed for the ContentType
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
@@ -136,19 +142,6 @@ namespace Umbraco.Core.Models
 
             return result;
         }
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if (Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
-
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset

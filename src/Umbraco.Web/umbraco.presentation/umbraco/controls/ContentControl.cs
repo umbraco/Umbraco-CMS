@@ -197,9 +197,13 @@ namespace umbraco.controls
         /// <param name="tabCaption"></param>
         private void LoadPropertyTypes(IContentTypeComposition contentType, TabPage tabPage, Hashtable inTab, int tabId, string tabCaption)
         {
-            var propertyGroups = contentType.CompositionPropertyGroups.Where(x => x.Id == tabId || x.ParentId == tabId);
-            var propertyTypeAliases = propertyGroups.SelectMany(x => x.PropertyTypes.OrderBy(y => y.SortOrder).Select(y => new Tuple<int, string, int>(y.Id, y.Alias, y.SortOrder)));
-            foreach (var items in propertyTypeAliases)
+            var groups = contentType.CompositionPropertyGroups.Where(x => x.Name == tabCaption);
+            var propertyTypes = groups
+                .SelectMany(x => x.PropertyTypes)
+                .OrderBy(x => x.SortOrder)
+                .Select(x => Tuple.Create(x.Id, x.Alias));
+
+            foreach (var items in propertyTypes)
             {
                 var property = _content.getProperty(items.Item2);
                 if (property != null)

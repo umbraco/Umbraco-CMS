@@ -397,6 +397,7 @@
     <key alias="showPageOnSend">Toon pagina bij versturen</key>
     <key alias="size">Formaat</key>
     <key alias="sort">Sorteren</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type om te zoeken...</key>
     <key alias="up">Omhoog</key>
@@ -412,6 +413,8 @@
     <key alias="width">Breedte</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Map</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
 
     <key alias="searchResults">Zoekresultaten</key>
   </area>
@@ -727,6 +730,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="createMatchingTemplate">Maak een bijbehorend template</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sorteren gereed.</key>
     <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.</key>
     <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
@@ -807,8 +812,14 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="grid">
     <key alias="insertControl">Item toevoegen</key>
+    <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Een rij aan de lay-out toevoegen</key>
     <key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
 
     <key alias="clickToEmbed">Klik om een item te embedden</key>
     <key alias="clickToInsertImage">Klik om een afbeelding in te voegen</key>
@@ -915,7 +926,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="cacheBrowser">Cachebrowser</key>
     <key alias="contentRecycleBin">Prullenbak</key>
     <key alias="createdPackages">Gemaakte packages</key>
-    <key alias="datatype">Datatypes</key>
+    <key alias="dataTypes">Datatypes</key>
     <key alias="dictionary">Woordenboek</key>
     <key alias="installedPackages">Geïnstalleerde packages</key>
     <key alias="installSkin">Installeer skin</key>
@@ -925,10 +936,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="macros">Macro's</key>
     <key alias="mediaTypes">Mediatypes</key>
     <key alias="member">Leden</key>
-    <key alias="memberGroup">Ledengroepen</key>
+    <key alias="memberGroups">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
-    <key alias="memberType">Ledentypes</key>
-    <key alias="nodeTypes">Documenttypes</key>
+    <key alias="memberTypes">Ledentypes</key>
+    <key alias="documentTypes">Documenttypes</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Python-bestanden</key>
@@ -985,6 +996,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="usertype">Gebruikerstype</key>
     <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
+    <key alias="change">Wijzig</key>
 
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>

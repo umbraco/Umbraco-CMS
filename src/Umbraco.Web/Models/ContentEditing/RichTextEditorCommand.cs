@@ -10,6 +10,9 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "richtexteditorcommand", Namespace = "")]
     public class RichTextEditorCommand
     {
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
+
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 

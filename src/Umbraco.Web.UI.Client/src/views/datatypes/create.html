@@ -1,0 +1,50 @@
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.DataType.CreateController" ng-cloak>
+
+    <div class="umb-pane" ng-if="!model.creatingFolder">
+        <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+        <ul class="umb-actions umb-actions-child">           
+            <li>
+                <a href="" ng-click="createDataType()">
+
+                    <i class="large icon-autofill"></i>
+
+                    <span class="menu-label">
+                        <localize key="general_new">New</localize>&nbsp;Data type
+                    </span>
+
+                </a>
+            </li>
+            <li>
+                <a href="" ng-click="showCreateFolder()">
+
+                    <i class="large icon-folder"></i>
+
+                    <span class="menu-label">
+                        Folder
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="umb-pane" ng-if="model.creatingFolder">
+        <form novalidate name="createFolderForm"
+              ng-submit="createContainer()"
+              val-form-manager>
+
+            <umb-control-group label="Enter a folder name" hide-label="false">
+                <input type="text" name="folderName" ng-model="model.folderName" class="umb-textstring textstring input-block-level" required />
+            </umb-control-group>
+
+            <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+        </form>
+    </div>
+
+</div>
+
+<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
+    <button class="btn" ng-click="nav.hideDialog(true)">
+        <localize key="buttons_somethingElse">Do something else</localize>
+    </button>
+</div>

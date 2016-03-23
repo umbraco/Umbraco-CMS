@@ -1,0 +1,19 @@
+<div class="umb-property">
+    <ng-form name="propertyForm">
+        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel}" >
+            
+            <val-property-msg property="property"></val-property-msg>
+            
+            <div class="umb-el-wrap">
+                
+                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
+                    {{property.label}}
+                    <small ng-bind-html="property.description"></small>
+                </label>
+
+                <div class="controls" ng-transclude>
+                </div>
+            </div>
+        </div>
+    </ng-form>
+</div>

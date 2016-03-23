@@ -44,6 +44,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                 $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
                 $scope.hasDatetimePickerValue = true;
                 $scope.datetimePickerValue = e.date.format($scope.model.config.format);
+                $scope.model.value = $scope.datetimePickerValue;
             }
             else {
                 $scope.hasDatetimePickerValue = false;
@@ -96,11 +97,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			        });
 
 			    if ($scope.hasDatetimePickerValue) {
-
 			        //assign value to plugin/picker
-			        var dateVal = $scope.model.value ? moment($scope.model.value, $scope.model.config.format) : moment();
+			        var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
+
 			        element.datetimepicker("setValue", dateVal);
-			        $scope.datetimePickerValue = moment($scope.model.value).format($scope.model.config.format);
+			        $scope.datetimePickerValue = dateVal.format($scope.model.config.format);
 			    }
 
 			    element.find("input").bind("blur", function() {

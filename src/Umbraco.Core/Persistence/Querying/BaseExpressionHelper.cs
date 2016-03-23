@@ -128,6 +128,34 @@ namespace Umbraco.Core.Persistence.Querying
                     right = Visit(b.Right);
                 }
             }
+            else if (operand == "=")
+            {
+                // deal with (x == true|false) - most common
+                var constRight = b.Right as ConstantExpression;
+                if (constRight != null && constRight.Type == typeof (bool))
+                    return ((bool) constRight.Value) ? VisitNotNot(b.Left) : VisitNot(b.Left);
+                right = Visit(b.Right);
+
+                // deal with (true|false == x) - why not
+                var constLeft = b.Left as ConstantExpression;
+                if (constLeft != null && constLeft.Type == typeof (bool))
+                    return ((bool) constLeft.Value) ? VisitNotNot(b.Right) : VisitNot(b.Right);
+                left = Visit(b.Left);
+            }
+            else if (operand == "<>")
+            {
+                // deal with (x != true|false) - most common
+                var constRight = b.Right as ConstantExpression;
+                if (constRight != null && constRight.Type == typeof(bool))
+                    return ((bool) constRight.Value) ? VisitNot(b.Left) : VisitNotNot(b.Left);
+                right = Visit(b.Right);
+
+                // deal with (true|false != x) - why not
+                var constLeft = b.Left as ConstantExpression;
+                if (constLeft != null && constLeft.Type == typeof(bool))
+                    return ((bool) constLeft.Value) ? VisitNot(b.Right) : VisitNotNot(b.Right);
+                left = Visit(b.Left);
+            }
             else
             {
                 left = Visit(b.Left);
@@ -152,7 +180,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "COALESCE":
                     return string.Format("{0}({1},{2})", operand, left, right);
                 default:
-                    return left + " " + operand + " " + right;
+                    return "(" + left + " " + operand + " " + right + ")";
             }
         }
 
@@ -231,22 +259,44 @@ namespace Umbraco.Core.Persistence.Querying
             switch (u.NodeType)
             {
                 case ExpressionType.Not:
-                    var o = Visit(u.Operand);
-
-                    //use a Not equal operator instead of <> since we don't know that <> works in all sql servers
-
-                    switch (u.Operand.NodeType)
-                    {
-                        case ExpressionType.MemberAccess:
-                            //In this case it wil be a false property , i.e. x => !Trashed
-                            SqlParameters.Add(true);
-                            return string.Format("NOT ({0} = @0)", o);                            
-                        default:
-                            //In this case it could be anything else, such as: x => !x.Path.StartsWith("-20")
-                            return string.Format("NOT ({0})", o);                            
-                    }
+                    return VisitNot(u.Operand);
                 default:
                     return Visit(u.Operand);
+            }
+        }
+
+        private string VisitNot(Expression exp)
+        {
+            var o = Visit(exp);
+
+            // use a "NOT (...)" syntax instead of "<>" since we don't know whether "<>" works in all sql servers
+            // also, x.StartsWith(...) translates to "x LIKE '...%'" which we cannot "<>" and have to "NOT (...")
+
+            switch (exp.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    // false property , i.e. x => !Trashed
+                    SqlParameters.Add(true);
+                    return string.Format("NOT ({0} = @{1})", o, SqlParameters.Count - 1);
+                default:
+                    // could be anything else, such as: x => !x.Path.StartsWith("-20")
+                    return "NOT (" + o + ")";
+            }
+        }
+
+        private string VisitNotNot(Expression exp)
+        {
+            var o = Visit(exp);
+
+            switch (exp.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    // true property, i.e. x => Trashed
+                    SqlParameters.Add(true);
+                    return string.Format("({0} = @{1})", o, SqlParameters.Count - 1);
+                default:
+                    // could be anything else, such as: x => x.Path.StartsWith("-20")
+                    return o;
             }
         }
 

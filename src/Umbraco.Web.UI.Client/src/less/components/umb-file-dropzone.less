@@ -1,0 +1,129 @@
+
+.umb-file-dropzone-directive{
+
+  // drop zone
+  // tall and small version - animate height
+  .dropzone {
+    height: 400px;
+    width: 100%;
+    padding: 50px 0;
+    border: 1px dashed @grayLight;
+    text-align: center;
+    color: @gray;
+    margin: 0 0 20px 0;
+    position: relative;
+    -webkit-transition: height 0.8s;
+    -moz-transition: height 0.8s;
+    transition: height 0.8s;
+    .illustration {
+      width: 300px;
+    }
+    &.is-small {
+      height: 100px;
+      .illustration {
+        width: 200px;
+      }
+    }
+    &.drag-over {
+      border: 1px dashed @grayDark;
+    }
+  }
+
+
+  // center the content of the drop zone
+  .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+
+  // file select link
+  .file-select {
+    font-size: 15px;
+    color: @blue;
+    cursor: pointer;
+
+    margin-top: 10px;
+
+    &:hover {
+        color: @blueDark;
+        text-decoration: underline;
+    }
+  }
+
+  // uploading / uploaded file list
+  .file-list {
+    list-style: none;
+    margin: 0 0 30px 0;
+    background: @grayLighter;
+    padding: 10px 20px;
+
+    .file {
+      //border-bottom: 1px dashed @orange;
+      display: block;
+      width: 100%;
+      padding: 5px 0;
+      position: relative;
+      border-top: 1px solid @grayLight;
+      &:first-child {
+        border-top: none;
+      }
+
+      &.ng-enter {
+        animation: fadeIn 0.5s;
+      }
+      &.ng-leave {
+        animation: fadeOut 2s;
+      }
+      .file-description {
+        color: @grayDarker;
+        font-size: 12px;
+        width: 100%;
+        display: block;
+      }
+
+      .file-upload-progress {
+        display: block;
+        width: 100%;
+      }
+
+      .file-icon {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+
+        .icon {
+          font-size: 20px;
+          &.ng-enter {
+            animation: fadeIn 0.5s;
+          }
+          &.ng-leave {
+            animation: fadeIn 0.5s;
+          }
+        }
+      }
+    }
+  }
+
+
+  // progress bars
+  // could be moved to its own less file
+  .file-progress {
+    height: 4px;
+    position: relative;
+    padding: 2px;
+
+    .file-progress-indicator {
+      display: block;
+      height: 100%;
+      border-radius: 20px;
+      background-color: @blue;
+      position: relative;
+      overflow: hidden;
+      width: 0;
+    }
+  }
+
+}

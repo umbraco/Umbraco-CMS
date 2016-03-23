@@ -1,0 +1,12 @@
+<div>
+    <span ng-show="!enableLock">{{ alias }}</span>
+    <div ng-show="enableLock">
+    <umb-locked-field
+      locked="locked"
+      ng-model="alias"
+      placeholder-text="placeholderText"
+      server-validation-field="{{serverValidationField}}">
+    </umb-locked-field>
+    </div>
+</div>
+ 

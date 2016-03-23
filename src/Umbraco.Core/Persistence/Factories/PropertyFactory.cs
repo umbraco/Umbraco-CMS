@@ -63,7 +63,9 @@ namespace Umbraco.Core.Persistence.Factories
 
                 //Check if property has an Id and set it, so that it can be updated if it already exists
                 if (property.HasIdentity)
+                {
                     dto.Id = property.Id;
+                }
 
                 if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
                 {
@@ -82,11 +84,21 @@ namespace Umbraco.Core.Persistence.Factories
                         }
                     }
                 }
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && property.Value != null)
+                {
+                    decimal val;
+                    if (decimal.TryParse(property.Value.ToString(), out val))
+                    {
+                        dto.Decimal = val;
+                    }
+                }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
                     DateTime date;
-                    if(DateTime.TryParse(property.Value.ToString(), out date))
+                    if (DateTime.TryParse(property.Value.ToString(), out date))
+                    {
                         dto.Date = date;
+                    }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
                 {

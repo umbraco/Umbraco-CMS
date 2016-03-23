@@ -1,0 +1,49 @@
+<div ng-controller="Umbraco.Editors.MediaType.PermissionsController as vm">
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
+            <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
+        </div>
+        <div class="sub-view-column-right">
+            <label class="checkbox no-indent" >
+                <input type="checkbox" ng-model="model.allowAsRoot" hotkey="alt+shift+r" />
+                <localize key="contentTypeEditor_allowAsRootCheckbox" />
+            </label>
+        </div>
+
+    </div>
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
+            <small><localize key="contentTypeEditor_childNodesDescription" /></small>
+        </div>
+
+        <div class="sub-view-column-right">
+
+            <umb-child-selector
+                    selected-children="vm.selectedChildren"
+                    available-children="vm.mediaTypes"
+                    parent-name="model.name"
+                    parent-icon="model.icon"
+                    parent-id="model.id"
+                    on-add="vm.addChild"
+                    on-remove="vm.removeChild">
+            </umb-child-selector>
+
+            <umb-overlay
+               ng-if="vm.childNodeSelectorOverlay.show"
+               model="vm.childNodeSelectorOverlay"
+               position="target"
+               view="vm.childNodeSelectorOverlay.view">
+            </umb-overlay>
+
+
+        </div>
+
+    </div>
+
+</div>

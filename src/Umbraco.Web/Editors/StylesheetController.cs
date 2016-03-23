@@ -22,8 +22,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// The API controller used for retrieving available stylesheets
     /// </summary>
-    [PluginController("UmbracoApi")]
-    [DisableBrowserCache]
+    [PluginController("UmbracoApi")]    
     public class StylesheetController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<Stylesheet> GetAll()

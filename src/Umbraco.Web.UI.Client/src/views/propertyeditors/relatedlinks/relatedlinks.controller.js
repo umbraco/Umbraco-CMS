@@ -15,17 +15,55 @@
             $scope.currentEditLink = null;
             $scope.hasError = false;
 
-            $scope.internal = function ($event) {
-                $scope.currentEditLink = null;
-                var d = dialogService.contentPicker({ multipicker: false, callback: select });
-                $event.preventDefault();
-            };
-            
-            $scope.selectInternal = function ($event, link) {
+            $scope.internal = function($event) {
 
-                $scope.currentEditLink = link;
-                var d = dialogService.contentPicker({ multipicker: false, callback: select });
-                $event.preventDefault();
+               $scope.currentEditLink = null;
+
+               $scope.contentPickerOverlay = {};
+               $scope.contentPickerOverlay.view = "contentpicker";
+               $scope.contentPickerOverlay.multiPicker = false;
+               $scope.contentPickerOverlay.show = true;
+
+               $scope.contentPickerOverlay.submit = function(model) {
+
+                  select(model.selection[0]);
+
+                  $scope.contentPickerOverlay.show = false;
+                  $scope.contentPickerOverlay = null;
+               };
+
+               $scope.contentPickerOverlay.close = function(oldModel) {
+                  $scope.contentPickerOverlay.show = false;
+                  $scope.contentPickerOverlay = null;
+               };
+
+               $event.preventDefault();
+            };
+
+            $scope.selectInternal = function($event, link) {
+
+               $scope.currentEditLink = link;
+
+               $scope.contentPickerOverlay = {};
+               $scope.contentPickerOverlay.view = "contentpicker";
+               $scope.contentPickerOverlay.multiPicker = false;
+               $scope.contentPickerOverlay.show = true;
+
+               $scope.contentPickerOverlay.submit = function(model) {
+
+                  select(model.selection[0]);
+
+                  $scope.contentPickerOverlay.show = false;
+                  $scope.contentPickerOverlay = null;
+               };
+
+               $scope.contentPickerOverlay.close = function(oldModel) {
+                  $scope.contentPickerOverlay.show = false;
+                  $scope.contentPickerOverlay = null;
+               };
+
+               $event.preventDefault();
+
             };
 
             $scope.edit = function (idx) {
@@ -116,15 +154,7 @@
                 items: '> tr',
                 tolerance: 'pointer',
                 update: function (e, ui) {
-                    // Get the new and old index for the moved element (using the URL as the identifier)
-                    var newIndex = ui.item.index();
-                    var movedLinkUrl = ui.item.attr('data-link');
-                    var originalIndex = getElementIndexByUrl(movedLinkUrl);
-
-                    // Move the element in the model
-                    var movedElement = $scope.model.value[originalIndex];
-                    $scope.model.value.splice(originalIndex, 1);
-                    $scope.model.value.splice(newIndex, 0, movedElement);
+                    
                 }
             };
 
@@ -147,5 +177,5 @@
                     $scope.newInternal = data.id;
                     $scope.newInternalName = data.name;
                 }
-            }            
+            }
         });

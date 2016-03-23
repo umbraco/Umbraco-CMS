@@ -159,6 +159,11 @@ namespace Umbraco.Core
             public const string IntegerAlias = "Umbraco.Integer";
 
             /// <summary>
+            /// Alias for the Decimal datatype.
+            /// </summary>
+            public const string DecimalAlias = "Umbraco.Decimal";
+
+            /// <summary>
             /// Alias for the listview datatype.
             /// </summary>
             public const string ListViewAlias = "Umbraco.ListView";
@@ -310,13 +315,13 @@ namespace Umbraco.Core
             public const string TextboxAlias = "Umbraco.Textbox";
 
             /// <summary>
-            /// Guid for the Textbox multiple datatype.
+            /// Guid for the Textarea datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string TextboxMultiple = "67DB8357-EF57-493E-91AC-936D305E0F2A";
 
             /// <summary>
-            /// Alias for the Textbox multiple datatype.
+            /// Alias for the Textarea datatype.
             /// </summary>
             public const string TextboxMultipleAlias = "Umbraco.TextboxMultiple";
 

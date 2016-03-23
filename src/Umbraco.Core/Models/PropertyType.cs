@@ -9,6 +9,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Defines the type of a <see cref="Property"/> object
     /// </summary>
@@ -32,6 +33,8 @@ namespace Umbraco.Core.Models
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
+            if (dataTypeDefinition == null) throw new ArgumentNullException("dataTypeDefinition");
+
             if(dataTypeDefinition.HasIdentity)
                 _dataTypeDefinitionId = dataTypeDefinition.Id;
 
@@ -218,8 +221,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
+        /// Gets or sets the identifier of the PropertyGroup this PropertyType belongs to.
         /// </summary>
+        /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {
@@ -399,6 +403,9 @@ namespace Umbraco.Core.Models
 
                 //Simple validation using the DatabaseType from the DataTypeDefinition and Type of the passed in value
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
+                    return true;
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Decimal && type == typeof(decimal))
                     return true;
 
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))

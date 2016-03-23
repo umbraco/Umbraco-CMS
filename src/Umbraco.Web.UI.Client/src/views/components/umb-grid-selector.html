@@ -1,0 +1,43 @@
+<div class="umb-grid-selector">
+
+    <div class="umb-grid-selector__items">
+
+        <div class="umb-grid-selector__item -default" ng-if="defaultItem !== null">
+            <div class="umb-grid-selector__item-content">
+                <i class="umb-grid-selector__item-icon {{ defaultItem.icon }}"></i>
+                <div class="umb-grid-selector__item-label">{{ defaultItem.name }}</div>
+                <span class="umb-grid-selector__item-default-label">(<localize key="general_default">Default</localize> {{itemLabel}})</span>
+            </div>
+            <i class="umb-grid-selector__item-remove icon-trash" ng-if="selectedItems.length === 1" ng-click="removeDefaultItem()"></i>
+        </div>
+
+        <div class="umb-grid-selector__item" ng-repeat="selectedItem in selectedItems | filter: { alias:'!'+defaultItem.alias }:true">
+            <div class="umb-grid-selector__item-content">
+                <i class="umb-grid-selector__item-icon {{ selectedItem.icon }}"></i>
+                <div class="umb-grid-selector__item-label">{{ selectedItem.name }}</div>
+                <a href="" class="umb-grid-selector__item-default-label -blue" ng-click="setAsDefaultItem(selectedItem)"><localize key="grid_setAsDefault">Set as default</localize></a>
+            </div>
+            <i class="umb-grid-selector__item-remove icon-trash" ng-click="removeItem(selectedItem)"></i>
+        </div>
+
+        <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+t">
+            <div class="umb-grid-selector__item-content">
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null"><localize key="grid_chooseExtra">Choose extra</localize> {{ itemLabel }}</div>
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null"><localize key="grid_chooseDefault">Choose default</localize> {{ itemLabel }}</div>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="text-center" ng-if="(availableItems | compareArrays:selectedItems:'alias').length === 0">
+        <small><localize key="general_all">Akk</localize> {{itemLabel}}s <localize key="grid_areAdded">are added</localize></small>
+    </div>
+
+    <umb-overlay
+        ng-if="dialogModel.show"
+        model="dialogModel"
+        position="target"
+        view="dialogModel.view">
+    </umb-overlay>
+
+</div>

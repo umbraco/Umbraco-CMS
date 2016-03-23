@@ -49,8 +49,6 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-        [Obsolete("Don't use this, parentId is always -1 for data types")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;
@@ -266,14 +264,6 @@ namespace Umbraco.Core.Models
         IDictionary<string, object> IUmbracoEntity.AdditionalData
         {
             get { return _additionalData; }
-        }
-
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if(Key == default(Guid))
-                Key = Guid.NewGuid();
         }
     }
 }
