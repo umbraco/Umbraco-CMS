@@ -30,7 +30,7 @@ namespace Umbraco.Web.Mvc
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             //ignore anything that is not IRenderController
-            if ((filterContext.Controller is IRenderController) == false)
+            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
                 return;
 
             SetViewContext(filterContext);
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Mvc
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
             //ignore anything that is not IRenderController
-            if ((filterContext.Controller is IRenderController) == false)
+            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
                 return;
 
             SetViewContext(filterContext);
