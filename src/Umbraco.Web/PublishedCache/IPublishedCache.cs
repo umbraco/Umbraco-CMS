@@ -11,9 +11,7 @@ namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
     /// Provides access to cached contents.
-    /// </summary>
-    [UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1153",
-        "We need to create something like the IPublishListener interface to have proper published content storage.")]
+    /// </summary>    
     public interface IPublishedCache
     {
         /// <summary>
