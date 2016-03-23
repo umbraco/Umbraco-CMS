@@ -29,6 +29,8 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Strings;
@@ -182,6 +184,9 @@ namespace Umbraco.Core
             //Data Services/ServiceContext/etc...
             container.RegisterFrom<ServicesCompositionRoot>();
 
+            //ModelMappers
+            container.RegisterFrom<CoreModelMappersCompositionRoot>();
+
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
             container.RegisterSingleton<PluginManager>(factory => PluginManager);
 
@@ -220,22 +225,18 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// This method allows for configuration of model mappers
-        /// </summary>
-        /// <remarks>
-        /// Model mappers MUST be defined on ApplicationEventHandler instances with the interface IMapperConfiguration.
-        /// This allows us to search for less types on startup.
-        /// </remarks>
+        /// This method initializes all of the model mappers registered in the container
+        /// </summary>        
         protected void InitializeModelMappers()
         {
             Mapper.Initialize(configuration =>
+            {
+                //foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
+                foreach (var m in Container.GetAllInstances<ModelMapperConfiguration>())
                 {
-                    //foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
-                    foreach (var m in _appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>().OfType<IMapperConfiguration>())
-                    {
-                        m.ConfigureMappings(configuration, ApplicationContext);
-                    }
-                });
+                    m.ConfigureMappings(configuration, ApplicationContext);
+                }
+            });
         }
 
         /// <summary>

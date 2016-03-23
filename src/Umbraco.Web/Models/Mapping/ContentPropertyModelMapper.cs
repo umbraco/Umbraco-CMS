@@ -12,9 +12,9 @@ namespace Umbraco.Web.Models.Mapping
     /// A mapper which declares how to map content properties. These mappings are shared among media (and probably members) which is 
     /// why they are in their own mapper
     /// </summary>
-    internal class ContentPropertyModelMapper : MapperConfiguration
+    internal class ContentPropertyModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
 

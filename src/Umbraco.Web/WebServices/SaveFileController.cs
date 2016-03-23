@@ -201,6 +201,12 @@ namespace Umbraco.Web.WebServices
             }
         }
 
+        //[HttpPost]
+        //public JsonResult SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
+        //{
+
+        //}
+
         [HttpPost]
         public JsonResult SaveScript(string filename, string oldName, string contents)
         {

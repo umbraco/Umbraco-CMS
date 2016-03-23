@@ -7,7 +7,7 @@ namespace Umbraco.Core
     /// </summary>
     internal static class ModelMapperHelper
     {
-        internal static IMappingExpression<TSource, TSource> SelfMap<TSource>(this IConfiguration config)
+        internal static IMappingExpression<TSource, TSource> SelfMap<TSource>(this IMapperConfiguration config)
         {
             return config.CreateMap<TSource, TSource>();
         }

@@ -8,9 +8,9 @@ using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class SectionModelMapper : MapperConfiguration
+    internal class SectionModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Core.Models.Section, Section>()
                 .ForMember(

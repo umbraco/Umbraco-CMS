@@ -12,9 +12,9 @@ using UmbracoExamine;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class EntityModelMapper : MapperConfiguration
+    internal class EntityModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))

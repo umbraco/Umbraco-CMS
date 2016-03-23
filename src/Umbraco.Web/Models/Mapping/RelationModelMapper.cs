@@ -7,9 +7,9 @@ using RelationType = Umbraco.Web.Models.ContentEditing.RelationType;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RelationModelMapper : MapperConfiguration
+    internal class RelationModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             //FROM IRelationType TO RelationType
             config.CreateMap<IRelationType, RelationType>();

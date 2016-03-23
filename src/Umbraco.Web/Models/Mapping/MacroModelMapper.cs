@@ -14,9 +14,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for macros.
     /// </summary>
-    internal class MacroModelMapper : MapperConfiguration
+    internal class MacroModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             //FROM IMacro TO EntityBasic
             config.CreateMap<IMacro, EntityBasic>()
