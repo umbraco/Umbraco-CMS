@@ -35,32 +35,8 @@ namespace umbraco.cms.businesslogic.template
         public static readonly string UmbracoMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
         private static Hashtable _templateAliases = new Hashtable();      
 
-        #endregion
+        #endregion		
 
-		[Obsolete("Use TemplateFilePath instead")]
-        public string MasterPageFile
-        {
-            get { return TemplateFilePath; }
-        }
-
-		/// <summary>
-		/// Returns the file path for the current template
-		/// </summary>
-	    public string TemplateFilePath
-	    {
-		    get
-		    {
-				switch (ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(TemplateEntity))
-				{
-					case RenderingEngine.Mvc:
-                        return _viewHelper.GetPhysicalFilePath(TemplateEntity);
-					case RenderingEngine.WebForms:
-                        return _masterPageHelper.GetPhysicalFilePath(TemplateEntity);
-					default:
-						throw new ArgumentOutOfRangeException();
-				}	  
-		    }
-	    }
 
         [Obsolete("This is not used at all, do not use this")]
         public static Hashtable TemplateAliases

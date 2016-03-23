@@ -524,16 +524,7 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveAssignedMapperTypes()
         {
             return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
-        } 
-        
-        /// <summary>
-        /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveSqlSyntaxProviders()
-        {
-            return ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
-        }
+        }               
 
         /// <summary>
         /// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
@@ -543,46 +534,7 @@ namespace Umbraco.Core
         {
             get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
             set { _assemblies = value; }
-        }
-
-        /// <summary>
-        /// Used to resolve and create instances of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <param name="cacheResult"></param>
-        /// <param name="specificAssemblies"></param>
-        /// <returns></returns>
-        internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false, bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
-        {
-            var types = ResolveTypes<T>(cacheResult, specificAssemblies);
-            return CreateInstances<T>(types, throwException);
-        }
-
-        /// <summary>
-        /// Used to create instances of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="types"></param>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <returns></returns>
-        internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
-        {
-            return _serviceProvider.CreateInstances<T>(types, _logger.Logger, throwException);
-        }
-
-        /// <summary>
-        /// Used to create an instance of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="type"></param>
-        /// <param name="throwException"></param>
-        /// <returns></returns>
-        internal T CreateInstance<T>(Type type, bool throwException = false)
-        {
-            var instances = CreateInstances<T>(new[] { type }, throwException);
-            return instances.FirstOrDefault();
-        }
+        }     
 
         private IEnumerable<Type> ResolveTypes<T>(
             Func<IEnumerable<Type>> finder,

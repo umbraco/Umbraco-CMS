@@ -14,16 +14,7 @@ namespace Umbraco.Core.Logging
             : base(logger)
         {
             
-        }
-
-        /// <summary>
-        /// Method allowing to change the logger during startup
-        /// </summary>
-        /// <param name="profiler"></param>
-        internal void SetLogger(ILogger profiler)
-        {
-            Value = profiler;
-        }
+        }        
 
         /// <summary>
         /// Gets the current logger

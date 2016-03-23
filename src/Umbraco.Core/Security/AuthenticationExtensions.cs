@@ -169,25 +169,7 @@ namespace Umbraco.Core.Security
         {
             if (http == null) throw new ArgumentNullException("http");
             Logout(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
-        }
-
-        /// <summary>
-        /// This clears the forms authentication cookie for webapi since cookies are handled differently
-        /// </summary>
-        /// <param name="response"></param>
-        [Obsolete("Use OWIN IAuthenticationManager.SignOut instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void UmbracoLogoutWebApi(this HttpResponseMessage response)
-        {
-            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");
-        }
-
-        [Obsolete("Use WebSecurity.SetPrincipalForRequest", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
-        {
-            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");            
-        }
+        }        
 
         /// <summary>
         /// This clears the forms authentication cookie
