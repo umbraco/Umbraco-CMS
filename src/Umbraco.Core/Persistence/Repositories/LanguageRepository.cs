@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
-        {           
+        {
         }
 
         private FullDataSetRepositoryCachePolicyFactory<ILanguage, int> _cachePolicyFactory;
@@ -76,7 +76,12 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<LanguageDto>();
+
+            sql
                .From<LanguageDto>(SqlSyntax);
             return sql;
         }

@@ -87,7 +87,12 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<RelationTypeDto>();
+
+            sql
                .From<RelationTypeDto>(SqlSyntax);
             return sql;
         }

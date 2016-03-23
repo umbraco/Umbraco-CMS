@@ -95,7 +95,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<ContentVersionDto>()
+                    .SelectReference<ContentDto>()
+                    .SelectReference<NodeDto>();
+
+            sql
                 .From<ContentVersionDto>(SqlSyntax)
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)

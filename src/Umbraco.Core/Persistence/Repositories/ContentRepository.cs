@@ -116,7 +116,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 SqlSyntax.GetQuotedColumnName("published"));
 
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<DocumentDto>()
+                    .SelectReference<ContentVersionDto>()
+                    .SelectReference<ContentDto>()
+                    .SelectReference<NodeDto>();
+
+            sql
                 .From<DocumentDto>(SqlSyntax)
                 .InnerJoin<ContentVersionDto>(SqlSyntax)
                 .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)

@@ -148,5 +148,44 @@ namespace Umbraco.Core.Persistence
         {
             return new Sql.SqlJoinClause(sql.Append(new Sql(joinType + table)));
         }
+
+        public static Sql SelectCount(this Sql sql)
+        {
+            return sql.Select("COUNT(*)");
+        }
+
+        public static Sql Select<T>(this Sql sql)
+        {
+            Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
+            var pd = database.PocoDataFactory.ForType(typeof(T));
+            var tableName = pd.TableInfo.TableName;
+            var columns = pd.QueryColumns.Select(x => GetColumn(database.DatabaseType,
+                tableName,
+                x.Value.ColumnName,
+                string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias));
+            return sql.Select(string.Join(", ", columns));
+        }
+
+        public static Sql SelectReference<T>(this Sql sql, string referenceName = null)
+        {
+            Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
+            if (referenceName == null) referenceName = typeof(T).Name;
+            var pd = database.PocoDataFactory.ForType(typeof(T));
+            var tableName = pd.TableInfo.TableName;
+            var columns = pd.QueryColumns.Select(x => GetColumn(database.DatabaseType,
+                tableName,
+                x.Value.ColumnName,
+                string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias,
+                referenceName));
+            return sql.Append(", " + string.Join(", ", columns));
+        }
+
+        private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)
+        {
+            tableName = dbType.EscapeTableName(tableName);
+            columnName = dbType.EscapeSqlIdentifier(columnName);
+            columnAlias = dbType.EscapeSqlIdentifier((referenceName == null ? "" : (referenceName + "__")) + columnAlias);
+            return tableName + "." + columnName + " AS " + columnAlias;
+        }
     }
 }

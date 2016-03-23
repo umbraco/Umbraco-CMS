@@ -283,7 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
-            string orderBy, 
+            string orderBy,
             Direction orderDirection,
             Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
@@ -296,14 +296,32 @@ namespace Umbraco.Core.Persistence.Repositories
             if (query == null) query = Query;
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
-            
-            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery,
             // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
             // So we'll modify the SQL.
+            // fixme.npoco - bah?
+            /* generates
+            SELECT * FROM (SELECT poco_base.*, ROW_NUMBER() OVER (ORDER BY LoginName) poco_rn
+                FROM (
+                    SELECT cmsMember.nodeId ====> MISSING!!! kills ORDER BY above!!!, cmsMember.LoginName
+                        FROM [cmsMember]
+                        INNER JOIN [cmsContentVersion] ON [cmsContentVersion].[ContentId] = [cmsMember].[nodeId]
+                        INNER JOIN [cmsContent] ON [cmsContentVersion].[ContentId] = [cmsContent].[nodeId]
+                        INNER JOIN [cmsContentType] ON [cmsContentType].[nodeId] = [cmsContent].[contentType]
+                        INNER JOIN [umbracoNode] ON [cmsContent].[nodeId] = [umbracoNode].[id]
+                    WHERE (([umbracoNode].[nodeObjectType] = '39EB0F98-B348-42A1-8662-E7EB18487560'))
+                ) poco_base ) poco_paged
+                WHERE poco_rn > 0 AND poco_rn <= 1000
+                ORDER BY poco_rn
+            */
+            /*
             var sqlNodeIds = new Sql(
-                sqlQuery.SQL.Replace("SELECT *", string.Format("SELECT {0}.{1}",nodeIdSelect.Item1, nodeIdSelect.Item2)), 
+                sqlQuery.SQL.Replace("SELECT *", string.Format("SELECT {0}.{1}",nodeIdSelect.Item1, nodeIdSelect.Item2)),
                 sqlQuery.Arguments);
-            
+            */
+            var sqlNodeIds = sqlQuery;
+
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
@@ -315,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
             //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
-            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in 
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
             // the pageResult, then the GetAll will actually return ALL records in the db.
             if (pagedResult.Items.Any())
             {
@@ -323,8 +341,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
-                
-                //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId                
+
+                //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId
                 sqlStringPage = sqlStringPage
                     .Replace("SELECT *",
                         //This ensures we only take the field name of the node id select and not the table name - since the resulting select
@@ -344,9 +362,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
-                    GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),                     
+                    GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),
                     orderDirection, orderBy);
-                
+
                 var content = processQuery(fullQuery)
                     .Cast<TContentBase>()
                     .AsQueryable();
@@ -376,7 +394,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (documentDefs.Any() == false) return new Dictionary<int, PropertyCollection>();
 
-            //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use 
+            //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use
             // the statement to go get the property data for all of the items by using an inner join
             var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
             //now remove everything from an Orderby clause and beyond
@@ -389,13 +407,13 @@ namespace Umbraco.Core.Persistence.Repositories
 FROM cmsPropertyData
 INNER JOIN cmsPropertyType
 ON cmsPropertyData.propertytypeid = cmsPropertyType.id
-INNER JOIN 
+INNER JOIN
 	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
 LEFT OUTER JOIN cmsDataTypePreValues
-ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments); 
+ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments);
 
-            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql); 
+            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql);
 
             //This is a lazy access call to get all prevalue data for the data types that make up all of these properties which we use
             // below if any property requires tag support
@@ -408,19 +426,19 @@ WHERE EXISTS(
     FROM cmsDataTypePreValues b
 	INNER JOIN cmsPropertyType
 	ON b.datatypeNodeId = cmsPropertyType.dataTypeId
-    INNER JOIN 
+    INNER JOIN
 	    (" + string.Format(parsedOriginalSql, "DISTINCT cmsContent.contentType") + @") as docData
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 
-                return Database.Fetch<DataTypePreValueDto>(preValsSql); 
+                return Database.Fetch<DataTypePreValueDto>(preValsSql);
             });
 
             var result = new Dictionary<int, PropertyCollection>();
 
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
 
-            //iterate each definition grouped by it's content type - this will mean less property type iterations while building 
+            //iterate each definition grouped by it's content type - this will mean less property type iterations while building
             // up the property collections
             foreach (var compositionGroup in documentDefs.GroupBy(x => x.Composition))
             {
@@ -431,8 +449,8 @@ WHERE EXISTS(
                     var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
                     var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();                    
-                    
+                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();
+
                     var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
 
                     foreach (var property in newProperties)
@@ -480,7 +498,7 @@ WHERE EXISTS(
                         Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
                     }
                     result[def.Id] = new PropertyCollection(properties);
-                }                
+                }
             }
 
             return result;
@@ -520,6 +538,8 @@ WHERE EXISTS(
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
+                case "PATH":
+                    return "umbracoNode.path";
                 default:
                     //ensure invalid SQL cannot be submitted
                     return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
