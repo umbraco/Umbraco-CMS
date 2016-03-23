@@ -70,9 +70,9 @@ namespace Umbraco.Web.Trees
             var macro = Services.MacroService.GetById(int.Parse(id));
             if (macro == null) return new MenuItemCollection();
 
-            //add delete option for all languages
+            //add delete option for all macros
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                //Since we haven't implemented anything for macros in angular, this needs to be converted to 
                 //use the legacy format
                 .ConvertLegacyMenuItem(new UmbracoEntity
                 {
