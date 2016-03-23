@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $cookieStore, $element, $timeout) {
 
             var dialogOptions = $scope.dialogOptions;
 
@@ -11,7 +11,9 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
 
+            $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
 
+			
             //preload selected item
             $scope.target = undefined;
             if(dialogOptions.currentTarget){
@@ -78,6 +80,7 @@ angular.module("umbraco")
                     });
 
                 $scope.currentFolder = folder;      
+				 document.cookie="umbLastOpenedMediaNodeId=" + folder.id;
             };
             
           
@@ -120,6 +123,28 @@ angular.module("umbraco")
 
             //default root item
             if(!$scope.target){
-                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });  
+              if($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
+
+                  entityResource.getById($scope.lastOpenedNode, "media")
+                     .then(function(node){
+
+                        // make sure that las opened node is on the same path as start node
+                        var nodePath = node.path.split(",");
+
+                        if(nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
+                           $scope.gotoFolder({id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder"});
+                        } else {
+                           $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+                        }
+
+                    }, function (err) {
+                        $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+                    });
+
+               } else {
+
+                  $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+
+               }
             }
         });
