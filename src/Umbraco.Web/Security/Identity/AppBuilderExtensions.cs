@@ -276,15 +276,16 @@ namespace Umbraco.Web.Security.Identity
                 var authOptions = CreateCookieAuthOptions();                
                 app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
 
+                //This middleware must execute at least on PostAuthentication, by default it is on Authorize
+                // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate, 
+                // currently I've had 100% success with ensuring this fires after RoleManagerModule even if this is set
+                // to PostAuthenticate though not sure if that's always a guarantee so by default it's Authorize.
                 if (stage < PipelineStage.PostAuthenticate)
                 {
                     throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
                 }
 
-                //Marks the above middlewares to execute on PostAuthenticate
-                //NOTE: The above middleware needs to execute after the RoleManagerModule executes which is also during PostAuthenticate, 
-                // currently I've had 100% success with ensuring this fires after RoleManagerModule though not sure if that's always a
-                // guarantee.
+                
                 app.UseStageMarker(stage);
             }
 
