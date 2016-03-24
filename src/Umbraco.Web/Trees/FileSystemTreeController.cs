@@ -40,6 +40,8 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            var nodes = new TreeNodeCollection();
+
             string orgPath = "";
             string path = "";
             if (!string.IsNullOrEmpty(id) && id != Constants.System.Root.ToInvariantString())
@@ -53,10 +55,14 @@ namespace Umbraco.Web.Trees
                 path = IOHelper.MapPath(FilePath);
             }
 
+            if (!Directory.Exists(path) && !System.IO.File.Exists(path))
+            {
+                return nodes;
+            }
+
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             DirectoryInfo[] dirInfos = new DirectoryInfo(path).GetDirectories();
 
-            var nodes = new TreeNodeCollection();
             foreach (DirectoryInfo dir in dirInfos)
             {
                 if ((dir.Attributes.HasFlag(FileAttributes.Hidden)) == false)
