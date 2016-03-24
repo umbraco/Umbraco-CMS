@@ -1551,7 +1551,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
