@@ -120,9 +120,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount 
                 ? sql.SelectCount() 
-                : sql.Select<MemberDto>()
-                    .SelectReference<ContentVersionDto>()
-                    .SelectReference<ContentDto>();
+                : sql.Select<MemberDto>(r =>
+                        r.Select<ContentVersionDto>(rr =>
+                            rr.Select<ContentDto>()));
 
             sql
                 .From<MemberDto>(SqlSyntax)
@@ -487,7 +487,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
+            var properties = GetPropertyCollection(new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
 
             media.Properties = properties[dto.NodeId];
 
@@ -703,7 +703,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(docDefs.ToArray());
 
             return dtosWithContentTypes.Select(d => CreateMemberFromDto(
                         d.dto,
@@ -749,7 +749,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new[] { docDef });
 
             member.Properties = properties[dto.ContentVersionDto.NodeId];
 

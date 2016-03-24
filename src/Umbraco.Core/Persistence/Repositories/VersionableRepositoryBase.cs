@@ -264,22 +264,54 @@ namespace Umbraco.Core.Persistence.Repositories
             return sortedSql;
         }
 
+
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
+                Tuple<string, string> nodeIdSelect,
+                Func<List<TDto>, IEnumerable<TEntity>> processQuery,
+                string orderBy,
+                Direction orderDirection,
+                Func<Tuple<string, object[]>> defaultFilter = null)
+            where TContentBase : class, IAggregateRoot, TEntity
+        {
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
+
+            // Get base query
+            var sqlBase = GetBaseQuery(false);
+
+            if (query == null) query = Query;
+            var translator = new SqlTranslator<TEntity>(sqlBase, query);
+            var sqlQuery = translator.Translate();
+
+            var sqlNodeIds = sqlQuery;
+
+            //get sorted and filtered sql
+            var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
+                GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
+                orderDirection, orderBy);
+
+            // Get page of results and total count
+            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+            return processQuery(pagedResult.Items);
+        }
+        
         /// <summary>
-        /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
-        /// </summary>
-        /// <typeparam name="TDto">The type of the d.</typeparam>
-        /// <typeparam name="TContentBase">The 'true' entity type (i.e. Content, Member, etc...)</typeparam>
-        /// <param name="query">The query.</param>
-        /// <param name="pageIndex">Index of the page.</param>
-        /// <param name="pageSize">Size of the page.</param>
-        /// <param name="totalRecords">The total records.</param>
-        /// <param name="nodeIdSelect">The tablename + column name for the SELECT statement fragment to return the node id from the query</param>
-        /// <param name="defaultFilter">A callback to create the default filter to be applied if there is one</param>
-        /// <param name="processQuery">A callback to process the query result</param>
-        /// <param name="orderBy">The order by column</param>
-        /// <param name="orderDirection">The order direction.</param>
-        /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">orderBy</exception>
+         /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
+         /// </summary>
+         /// <typeparam name="TDto">The type of the d.</typeparam>
+         /// <typeparam name="TContentBase">The 'true' entity type (i.e. Content, Member, etc...)</typeparam>
+         /// <param name="query">The query.</param>
+         /// <param name="pageIndex">Index of the page.</param>
+         /// <param name="pageSize">Size of the page.</param>
+         /// <param name="totalRecords">The total records.</param>
+         /// <param name="nodeIdSelect">The tablename + column name for the SELECT statement fragment to return the node id from the query</param>
+         /// <param name="defaultFilter">A callback to create the default filter to be applied if there is one</param>
+         /// <param name="processQuery">A callback to process the query result</param>
+         /// <param name="orderBy">The order by column</param>
+         /// <param name="orderDirection">The order direction.</param>
+         /// <returns></returns>
+         /// <exception cref="System.ArgumentNullException">orderBy</exception>
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
@@ -331,6 +363,8 @@ namespace Umbraco.Core.Persistence.Repositories
             IEnumerable<TEntity> result;
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+            // fixme.npoco - wtf are we doing here?!
 
             //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
             // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
@@ -388,6 +422,48 @@ namespace Umbraco.Core.Persistence.Repositories
             return result;
         }
 
+        protected IDictionary<int, PropertyCollection> GetPropertyCollection(DocumentDefinition[] ddefs)
+        {
+            var versions = ddefs.Select(x => x.Version).ToArray();
+            if (versions.Length == 0) return new Dictionary<int, PropertyCollection>();
+
+            var sql = new Sql()
+                .Select<PropertyDataDto>(r => r.Select<PropertyTypeDto>())
+                .From<PropertyDataDto>(SqlSyntax)
+                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .WhereIn<PropertyDataDto>(SqlSyntax, x => x.VersionId, versions);
+
+            // fixme.npoco - obsolete version LEFT OUTER JOIN to prevalues, why?!
+
+            // fetch by version only, that should be enough, versions are guids and the same guid
+            // should not be reused for two different nodes -- then validate with a Where() just
+            // to be sure -- but we probably can get rid of the validation
+            var allPropertyData = Database
+                .Fetch<PropertyDataDto>(sql)
+                .Where(x => ddefs.Any(y => y.Version == x.VersionId && y.Id == x.NodeId)) // so... probably redundant, but safe
+                .ToList();
+
+            // lazy access to prevalue for data types if any property requires tag support
+            var pre = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
+            {
+                var allPropertyTypes = allPropertyData
+                    .Select(x => x.PropertyTypeDto)
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+
+                var preSql = new Sql()
+                    .Select<DataTypePreValueDto>()
+                    .From<DataTypePreValueDto>(SqlSyntax)
+                    .LeftJoin<PropertyTypeDto>(SqlSyntax).On<DataTypePreValueDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeNodeId, right => right.DataTypeId)
+                    .WhereIn<PropertyTypeDto>(SqlSyntax, x => x.Id, allPropertyTypes);
+
+                return Database.Fetch<DataTypePreValueDto>(preSql);
+            });
+
+            return GetPropertyCollection(ddefs, allPropertyData, pre);
+        }
+
+        [Obsolete("WTF", true)]
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
             Sql docSql,
             IEnumerable<DocumentDefinition> documentDefs)
@@ -396,11 +472,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use
             // the statement to go get the property data for all of the items by using an inner join
-            var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
+            var parsedOriginalSql = "SELECT {0} " +
+                                    docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
             //now remove everything from an Orderby clause and beyond
             if (parsedOriginalSql.InvariantContains("ORDER BY "))
             {
-                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
+                parsedOriginalSql = parsedOriginalSql.Substring(0,
+                    parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }
 
             var propSql = new Sql(@"SELECT cmsPropertyData.*
@@ -434,6 +512,11 @@ WHERE EXISTS(
                 return Database.Fetch<DataTypePreValueDto>(preValsSql);
             });
 
+            return GetPropertyCollection(documentDefs.ToArray(), allPropertyData, allPreValues);
+        }
+
+        protected IDictionary<int, PropertyCollection> GetPropertyCollection(DocumentDefinition[] documentDefs, List<PropertyDataDto> allPropertyData, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
+        {
             var result = new Dictionary<int, PropertyCollection>();
 
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();

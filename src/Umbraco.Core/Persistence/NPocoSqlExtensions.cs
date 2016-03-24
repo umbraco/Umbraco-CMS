@@ -154,7 +154,7 @@ namespace Umbraco.Core.Persistence
             return sql.Select("COUNT(*)");
         }
 
-        public static Sql Select<T>(this Sql sql)
+        public static Sql Select<T>(this Sql sql, Func<RefSql, RefSql> refexpr = null)
         {
             Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
             var pd = database.PocoDataFactory.ForType(typeof(T));
@@ -163,13 +163,27 @@ namespace Umbraco.Core.Persistence
                 tableName,
                 x.Value.ColumnName,
                 string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias));
-            return sql.Select(string.Join(", ", columns));
+            sql = sql.Select(string.Join(", ", columns));
+
+            if (refexpr != null)
+            {
+                var nsql = new RefSql(sql, null);
+                refexpr(nsql);
+            }
+
+            return sql;
         }
 
-        public static Sql SelectReference<T>(this Sql sql, string referenceName = null)
+        public static RefSql Select<T>(this RefSql sql, Func<RefSql, RefSql> refexpr = null)
+        {
+            return sql.Select<T>(null, refexpr);
+        }
+
+        public static RefSql Select<T>(this RefSql sql, string referenceName, Func<RefSql, RefSql> refexpr = null)
         {
             Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
             if (referenceName == null) referenceName = typeof(T).Name;
+            if (sql.Prefix != null) referenceName = sql.Prefix + PocoData.Separator + referenceName;
             var pd = database.PocoDataFactory.ForType(typeof(T));
             var tableName = pd.TableInfo.TableName;
             var columns = pd.QueryColumns.Select(x => GetColumn(database.DatabaseType,
@@ -177,7 +191,27 @@ namespace Umbraco.Core.Persistence
                 x.Value.ColumnName,
                 string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias,
                 referenceName));
-            return sql.Append(", " + string.Join(", ", columns));
+            sql.Sql.Append(", " + string.Join(", ", columns));
+
+            if (refexpr != null)
+            {
+                var nsql = new RefSql(sql.Sql, referenceName);
+                refexpr(nsql);
+            }
+
+            return sql;
+        }
+
+        public class RefSql
+        {
+            public RefSql(Sql sql, string prefix)
+            {
+                Sql = sql;
+                Prefix = prefix;
+            }
+
+            public Sql Sql { get; private set; }
+            public string Prefix { get; private set; }
         }
 
         private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)

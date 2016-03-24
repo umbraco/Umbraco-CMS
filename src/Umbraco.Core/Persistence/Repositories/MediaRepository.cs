@@ -98,9 +98,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentVersionDto>()
-                    .SelectReference<ContentDto>()
-                    .SelectReference<NodeDto>();
+                : sql.Select<ContentVersionDto>(r =>
+                        r.Select<ContentDto>(rr =>
+                            rr.Select<NodeDto>()));
 
             sql
                 .From<ContentVersionDto>(SqlSyntax)
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType) });
+            var properties = GetPropertyCollection(new[] { new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType) });
 
             media.Properties = properties[dto.NodeId];
 
@@ -504,7 +504,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                ProcessQuery, orderBy, orderDirection,
+                ProcessQueryDtos, orderBy, orderDirection,
                 filterCallback);
 
         }
@@ -513,7 +513,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<ContentVersionDto>(sql);
+            return ProcessQueryDtos(dtos);
+        }
 
+        private IEnumerable<IMedia> ProcessQueryDtos(List<ContentVersionDto> dtos)
+        {
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types
@@ -535,7 +539,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.contentType))
                 .ToArray();
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(docDefs);
 
             return dtosWithContentTypes.Select(d => CreateMediaFromDto(
                 d.dto,
@@ -581,7 +585,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new[] { docDef });
 
             media.Properties = properties[dto.NodeId];
 

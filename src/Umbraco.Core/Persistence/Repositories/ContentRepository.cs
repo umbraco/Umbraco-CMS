@@ -119,10 +119,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<DocumentDto>()
-                    .SelectReference<ContentVersionDto>()
-                    .SelectReference<ContentDto>()
-                    .SelectReference<NodeDto>();
+                : sql.Select<DocumentDto>(r =>
+                        r.Select<ContentVersionDto>(rr =>
+                            rr.Select<ContentDto>(rrr =>
+                                rrr.Select<NodeDto>())));
 
             sql
                 .From<DocumentDto>(SqlSyntax)
@@ -893,7 +893,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(docDefs.ToArray());
 
             return dtosWithContentTypes.Select(d => CreateContentFromDto(
                 d.dto,
@@ -959,7 +959,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new[] { docDef });
 
             content.Properties = properties[dto.NodeId];
 
