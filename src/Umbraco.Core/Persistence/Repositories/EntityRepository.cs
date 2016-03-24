@@ -85,11 +85,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //for now treat media differently
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
-                var entities = _work.Database
-                    .FetchMultiple<dynamic, UmbracoPropertyDto>(sql)
-                    .Map(new UmbracoEntityRelator().Map);
-
-                return entities.FirstOrDefault();
+                return _work.Database
+                    .Fetch<dynamic>(sql)
+                    .Select(new UmbracoEntityRelator().Map)
+                    .WhereNotNull()
+                    .FirstOrDefault();
             }
             else
             {
@@ -130,11 +130,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //for now treat media differently
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
-                var entities = _work.Database
-                    .FetchMultiple<dynamic, UmbracoPropertyDto>(sql)
-                    .Map(new UmbracoEntityRelator().Map);
-
-                return entities.FirstOrDefault();
+                return _work.Database
+                    .Fetch<dynamic>(sql)
+                    .Select(new UmbracoEntityRelator().Map)
+                    .WhereNotNull()
+                    .FirstOrDefault();
             }
             else
             {
@@ -187,10 +187,10 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //for now treat media differently
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
-                var entities = _work.Database
-                    .FetchMultiple<dynamic, UmbracoPropertyDto>(sql)
-                    .Map(new UmbracoEntityRelator().Map);
-                return entities;
+                return _work.Database
+                    .Fetch<dynamic>(sql)
+                    .Select(new UmbracoEntityRelator().Map)
+                    .WhereNotNull();
             }
             else
             {
@@ -242,10 +242,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //treat media differently for now
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
-                var entities = _work.Database
-                    .FetchMultiple<dynamic, UmbracoPropertyDto>(mediaSql)
-                    .Map(new UmbracoEntityRelator().Map);
-                return entities;
+                return _work.Database
+                    .Fetch<dynamic>(mediaSql)
+                    .Select(new UmbracoEntityRelator().Map)
+                    .WhereNotNull();
             }
             else
             {
@@ -541,7 +541,7 @@ namespace Umbraco.Core.Persistence.Repositories
             internal UmbracoEntity Current;
             private readonly UmbracoEntityFactory _factory = new UmbracoEntityFactory();
 
-            public UmbracoEntity Map(dynamic a, UmbracoPropertyDto p)
+            public UmbracoEntity Map(dynamic a)
             {
                 // Terminating call.  Since we can return null from this function
                 // we need to be ready for NPoco to callback later with null
@@ -549,18 +549,24 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (a == null)
                     return Current;
 
+                string pPropertyEditorAlias = a.propertyEditorAlias;
+                var pExists = pPropertyEditorAlias != null;
+                string pPropertyAlias = a.propertyTypeAlias;
+                string pNTextValue = a.dataNtext;
+                string pNVarcharValue = a.dataNvarchar;
+
                 // Is this the same UmbracoEntity as the current one we're processing
                 if (Current != null && Current.Key == a.uniqueID)
                 {
-                    if (p != null && p.PropertyAlias.IsNullOrWhiteSpace() == false)
+                    if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
                     {
                         // Add this UmbracoProperty to the current additional data
-                        Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                        Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
                         {
-                            PropertyEditorAlias = p.PropertyEditorAlias,
-                            Value = p.NTextValue.IsNullOrWhiteSpace()
-                                ? p.NVarcharValue
-                                : p.NTextValue.ConvertToJsonIfPossible()
+                            PropertyEditorAlias = pPropertyEditorAlias,
+                            Value = pNTextValue.IsNullOrWhiteSpace()
+                                ? pNVarcharValue
+                                : pNTextValue.ConvertToJsonIfPossible()
                         };
                     }
 
@@ -578,15 +584,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 Current = _factory.BuildEntityFromDynamic(a);
 
-                if (p != null && p.PropertyAlias.IsNullOrWhiteSpace() == false)
+                if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
                 {
                     //add the property/create the prop list if null
-                    Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                    Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
                     {
-                        PropertyEditorAlias = p.PropertyEditorAlias,
-                        Value = p.NTextValue.IsNullOrWhiteSpace()
-                            ? p.NVarcharValue
-                            : p.NTextValue.ConvertToJsonIfPossible()
+                        PropertyEditorAlias = pPropertyEditorAlias,
+                        Value = pNTextValue.IsNullOrWhiteSpace()
+                            ? pNVarcharValue
+                            : pNTextValue.ConvertToJsonIfPossible()
                     };
                 }
 
