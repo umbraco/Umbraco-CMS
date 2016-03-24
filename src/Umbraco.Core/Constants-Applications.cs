@@ -113,6 +113,8 @@
             public const string UserTypes = "userTypes";
 
             public const string Scripts = "scripts";
+
+            //TODO: Fill in the rest! 
         }
 	}
 
