@@ -33,8 +33,6 @@ namespace Umbraco.Web.Trees
 
         protected override void OnRenderFileNode(TreeNode treeNode, FileInfo file)
         {
-            // TODO add open
-
             treeNode.Icon =
                 file.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ?
                 "icon-script" : 
