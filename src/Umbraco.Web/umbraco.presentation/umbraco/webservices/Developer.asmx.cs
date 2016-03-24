@@ -14,22 +14,12 @@ namespace umbraco.webservices
 	[WebService(Namespace="http://umbraco.org/webservices/")]
     public class Developer : UmbracoAuthorizedWebService
 	{
-		
-		[WebMethod]
-		public string BootStrapTidy(string html, string ContextID)
-		{
-            //pretty sure this is legacy and it used to throw an exception so we'll continue to do the same
-            //true = throw if invalid
-		    AuthorizeRequest(true);
-
-			return cms.helpers.xhtml.BootstrapTidy(html);
-		}
 
 		[WebMethod]
 		public XmlNode GetMacros(string Login, string Password)
 		{
 		    if (ValidateCredentials(Login, Password) 
-                && UserHasAppAccess(DefaultApps.developer.ToString(), Login))  
+                && UserHasAppAccess(Constants.Applications.Developer.ToString(), Login))  
 			{
 				var xmlDoc = new XmlDocument();
 				var macros = xmlDoc.CreateElement("macros");
@@ -50,7 +40,7 @@ namespace umbraco.webservices
 		public XmlNode GetMacro(int Id, string Login, string Password)
 		{
 		    if (ValidateCredentials(Login, Password)
-                && UserHasAppAccess(DefaultApps.developer.ToString(), Login)) 
+                && UserHasAppAccess(Constants.Applications.Developer.ToString(), Login)) 
 			{
 				var xmlDoc = new XmlDocument();
 				var macro = xmlDoc.CreateElement("macro");
@@ -60,7 +50,6 @@ namespace umbraco.webservices
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "assembly", m.Assembly));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "type", m.Type));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "xslt", m.Xslt));
 				var properties = xmlDoc.CreateElement("properties");

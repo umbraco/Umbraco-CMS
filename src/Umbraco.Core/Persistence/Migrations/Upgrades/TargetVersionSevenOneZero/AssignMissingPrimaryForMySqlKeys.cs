@@ -18,12 +18,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
         {
         }
 
+
         public override void Up()
         {
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
-                
+
                 //This should be 3 because this table has 3 keys
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) == 0)
                 {

@@ -30,7 +30,6 @@ using System.Runtime.Serialization;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.FaultHandling;
@@ -79,7 +78,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, UmbracoUser.Id);
+            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId());
             var mapped = Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView

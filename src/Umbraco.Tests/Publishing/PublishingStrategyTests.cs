@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Publishing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 using System.Linq;
 
 namespace Umbraco.Tests.Publishing

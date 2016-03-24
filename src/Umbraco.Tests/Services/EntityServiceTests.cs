@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(UmbracoObjectTypes.Document).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll<IContent>().ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(1));
+            Assert.That(entities.Length, Is.EqualTo(1));
             Assert.That(entities.Any(x => x.Trashed), Is.False);
         }
 

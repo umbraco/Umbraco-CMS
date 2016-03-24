@@ -3,20 +3,14 @@ using System.Linq;
 using System.Collections;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using umbraco.DataLayer;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -41,32 +35,8 @@ namespace umbraco.cms.businesslogic.template
         public static readonly string UmbracoMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
         private static Hashtable _templateAliases = new Hashtable();      
 
-        #endregion
+        #endregion		
 
-		[Obsolete("Use TemplateFilePath instead")]
-        public string MasterPageFile
-        {
-            get { return TemplateFilePath; }
-        }
-
-		/// <summary>
-		/// Returns the file path for the current template
-		/// </summary>
-	    public string TemplateFilePath
-	    {
-		    get
-		    {
-				switch (ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(TemplateEntity))
-				{
-					case RenderingEngine.Mvc:
-                        return _viewHelper.GetPhysicalFilePath(TemplateEntity);
-					case RenderingEngine.WebForms:
-                        return _masterPageHelper.GetPhysicalFilePath(TemplateEntity);
-					default:
-						throw new ArgumentOutOfRangeException();
-				}	  
-		    }
-	    }
 
         [Obsolete("This is not used at all, do not use this")]
         public static Hashtable TemplateAliases
@@ -94,15 +64,7 @@ namespace umbraco.cms.businesslogic.template
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.FileService.SaveTemplate(TemplateEntity);
-                //base.Save();
-                FireAfterSave(e);
-            }
+            ApplicationContext.Current.Services.FileService.SaveTemplate(TemplateEntity);
         }
 
         public string GetRawText()
@@ -284,29 +246,27 @@ namespace umbraco.cms.businesslogic.template
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
 
-        public static Template MakeNew(string Name, User u, Template master)
+        public static Template MakeNew(string Name, IUser u, Template master)
         {
             return MakeNew(Name, u, master, null);
         }
         
-        private static Template MakeNew(string name, User u, string design)
+        private static Template MakeNew(string name, IUser u, string design)
         {
             return MakeNew(name, u, null, design);
         }
 
-        public static Template MakeNew(string name, User u)
+        public static Template MakeNew(string name, IUser u)
         {
             return MakeNew(name, u, design: null);
         }
 
-        private static Template MakeNew(string name, User u, Template master, string design)
+        private static Template MakeNew(string name, IUser u, Template master, string design)
         {
             var foundMaster = master == null ? null : ApplicationContext.Current.Services.FileService.GetTemplate(master.Id);
             var template = ApplicationContext.Current.Services.FileService.CreateTemplateWithIdentity(name, design, foundMaster, u.Id);
 
             var legacyTemplate = new Template(template);
-            var e = new NewEventArgs();
-            legacyTemplate.OnNew(e);
 
             return legacyTemplate;
         }
@@ -351,19 +311,13 @@ namespace umbraco.cms.businesslogic.template
 	            throw ex;
             }
 
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
 
-            if (!e.Cancel)
-            {
-                //remove refs from documents
-                SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+            //remove refs from documents
+            SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
 
                 
-                ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
+            ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
 
-                FireAfterDelete(e);
-            }
         }
 
         [Obsolete("This method, doesnt actually do anything, as the file is created when the design is set", false)]
@@ -480,11 +434,11 @@ namespace umbraco.cms.businesslogic.template
                 // test for macro alias
                 if (elementName == "?UMBRACO_MACRO")
                 {
-                    Hashtable tags = helpers.xhtml.ReturnAttributes(match.Value);
+                    var tags = XmlHelper.GetAttributesFromElement(match.Value);
                     if (tags["macroAlias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"].ToString()) + elementAttributes;
+                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"]) + elementAttributes;
                     else if (tags["macroalias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"].ToString()) + elementAttributes;
+                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"]) + elementAttributes;
                 }
                 string newElement = "<" + newElementName + " runat=\"server\" " + elementAttributes.Trim() + ">";
                 if (elementAttributes.EndsWith("/"))
@@ -528,7 +482,7 @@ namespace umbraco.cms.businesslogic.template
             return found == null ? null : new Template(found);
         }
 
-        public static Template Import(XmlNode n, User u)
+        public static Template Import(XmlNode n, IUser u)
         {
             var element = System.Xml.Linq.XElement.Parse(n.OuterXml);
             var templates = ApplicationContext.Current.Services.PackagingService.ImportTemplates(element, u.Id);
@@ -536,92 +490,6 @@ namespace umbraco.cms.businesslogic.template
         }
         
 
-        #region Events
-        //EVENTS
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Template sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(Template sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(Template sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public new static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public new static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-        #endregion
 
     }
 }

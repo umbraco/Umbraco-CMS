@@ -1,23 +1,6 @@
-using System;
-using System.IO;
-using System.Web.Routing;
-using System.Xml;
 using NUnit.Framework;
-using SQLCE4Umbraco;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.cache;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -77,5 +60,14 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
+        {
+            
+
+            base.FreezeResolution();
+        }
     }
 }

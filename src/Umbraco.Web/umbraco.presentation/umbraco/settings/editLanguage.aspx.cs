@@ -1,17 +1,11 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Web.Trees;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.UI;
 
 namespace umbraco.settings
 {
@@ -19,11 +13,11 @@ namespace umbraco.settings
 	/// Summary description for editLanguage.
 	/// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Languages)]
-	public partial class editLanguage : BasePages.UmbracoEnsuredPage
+	public partial class editLanguage : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public editLanguage()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
 	    }
 		protected System.Web.UI.WebControls.TextBox NameTxt;
@@ -32,19 +26,19 @@ namespace umbraco.settings
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			currentLanguage = new cms.businesslogic.language.Language(int.Parse(helper.Request("id")));
+			currentLanguage = new cms.businesslogic.language.Language(int.Parse(Request.GetItemAsString("id")));
            
 
 			// Put user code to initialize the page here
-            Panel1.Text = ui.Text("editlanguage");
-            pp_language.Text = ui.Text("language", "displayName", base.getUser());
+            Panel1.Text = Services.TextService.Localize("editlanguage");
+            pp_language.Text = Services.TextService.Localize("language/displayName");
             if (!IsPostBack) 
 			{
 				updateCultureList();
 
 				ClientTools
 					.SetActiveTreeType(Constants.Trees.Languages)
-					.SyncTree(helper.Request("id"), false);
+					.SyncTree(Request.GetItemAsString("id"), false);
 			}
 			
 		}
@@ -53,7 +47,7 @@ namespace umbraco.settings
 		{
             SortedList sortedCultures = new SortedList();
             Cultures.Items.Clear();
-            Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+            Cultures.Items.Add(new ListItem(Services.TextService.Localize("choose") + "...", ""));
             foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
                 sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
 
@@ -74,7 +68,7 @@ namespace umbraco.settings
 		    currentLanguage.Save();
 			updateCultureList();
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/languageSaved"), "");	
 		}
 
 		#region Web Form Designer generated code
@@ -83,12 +77,12 @@ namespace umbraco.settings
 			Panel1.hasMenu = true;
 			var save = Panel1.Menu.NewButton();
 			save.Click += save_click;
-			save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+			save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
 		    save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 	
-			Panel1.Text = ui.Text("language", "editLanguage");
+			Panel1.Text = Services.TextService.Localize("language/editLanguage");
 
 			InitializeComponent();
 			base.OnInit(e);

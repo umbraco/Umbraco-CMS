@@ -12,7 +12,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -25,7 +25,6 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Settings,
         Constants.Applications.Developer,
         Constants.Applications.Members)]
-    [LegacyBaseTree(typeof(loadMedia))]
     [Tree(Constants.Applications.Media, Constants.Trees.Media)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
@@ -39,7 +38,7 @@ namespace Umbraco.Web.Trees
             {
                 node.MenuUrl = "";
             }
-            node.Name = ui.Text("sections", Constants.Trees.Media);
+            node.Name = Services.TextService.Localize("sections", Constants.Trees.Media);
             return node;
         }
 
@@ -107,9 +106,9 @@ namespace Umbraco.Web.Trees
                 }
 
                 // root actions         
-                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
@@ -124,11 +123,11 @@ namespace Umbraco.Web.Trees
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             //return a normal node menu:
-            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-            menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(item, "media", "media");
-            menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+            menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+            menu.Items.Add<ActionMove>(Services.TextService.Localize("actions", ActionMove.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(item, "media", "media");
+            menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))

@@ -27,7 +27,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
-using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -36,7 +35,6 @@ using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.DataLayer;
-using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
 using Umbraco.Web.umbraco.presentation;
 using Content = umbraco.cms.businesslogic.Content;
@@ -44,7 +42,6 @@ using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 using System.Linq;
 using File = System.IO.File;
-using MacroTypes = umbraco.cms.businesslogic.macro.MacroTypes;
 using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace umbraco
@@ -63,15 +60,10 @@ namespace umbraco
         private readonly StringBuilder _content = new StringBuilder();
         private const string MacrosAddedKey = "macrosAdded";
         public IList<Exception> Exceptions = new List<Exception>();
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         static macro()
         {
-            _xsltSettings = GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium
+            _xsltSettings = SystemUtilities.GetCurrentTrustLevel() > AspNetHostingPermissionLevel.Medium
                 ? XsltSettings.TrustedXslt
                 : XsltSettings.Default;
         }
@@ -175,7 +167,6 @@ namespace umbraco
 
         #endregion
 
-        private const string XsltExtensionsCacheKey = "UmbracoXsltExtensions";
 
         /// <summary>
         /// Creates an empty macro object.
@@ -191,21 +182,6 @@ namespace umbraco
             return Model.Name;
         }
 
-        /// <summary>
-        /// Deletes macro definition from cache.
-        /// </summary>
-        /// <returns>True if succesfull, false if nothing has been removed</returns>
-        [Obsolete("Use DistributedCache.Instance.RemoveMacroCache instead, macro cache will automatically be cleared and shouldn't need to be manually cleared.")]
-        public bool removeFromCache()
-        {
-            if (this.Model != null)
-            {
-                DistributedCache.Instance.RemoveMacroCache(this);
-            }
-
-            //this always returned false... hrm. oh well i guess we leave it like that
-            return false;
-        }
 
         string GetCacheIdentifier(MacroModel model, Hashtable pageElements, int pageId)
         {
@@ -243,11 +219,11 @@ namespace umbraco
             return id.ToString();
         }
 
-        public Control renderMacro(Hashtable attributes, Hashtable pageElements, int pageId)
+        public Control RenderMacro(Hashtable attributes, Hashtable pageElements, int pageId)
         {
             // TODO: Parse attributes
             UpdateMacroModel(attributes);
-            return renderMacro(pageElements, pageId);
+            return RenderMacro(pageElements, pageId);
         }
 
         /// <summary>
@@ -271,12 +247,12 @@ namespace umbraco
         /// <param name="pageElements"></param>
         /// <param name="pageId"></param>
         /// <returns></returns>
-        public Control renderMacro(Hashtable pageElements, int pageId)
+        public Control RenderMacro(Hashtable pageElements, int pageId)
         {
             // Event to allow manipulation of Macro Model
             OnMacroRendering(new MacroRenderingEventArgs(pageElements, pageId));
 
-            var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
+            var macroInfo = (Model.MacroType == MacroTypes.PartialView && Model.Name.IsNullOrWhiteSpace())
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
@@ -284,7 +260,10 @@ namespace umbraco
             {
                 TraceInfo("renderMacro", macroInfo, excludeProfiling: true);
 
-                StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Items[MacrosAddedKey] = HttpContext.Current.GetContextItem<int>(MacrosAddedKey) + 1;
+                }
 
                 // zb-00037 #29875 : parse attributes here (and before anything else)
                 foreach (MacroPropertyModel prop in Model.Properties)
@@ -379,7 +358,7 @@ namespace umbraco
                                         Model.TypeName.StartsWith("~") == false)
                                         Model.TypeName = "~/" + Model.TypeName;
 
-                                    macroControl = loadUserControl(ScriptType, Model, pageElements);
+                                    macroControl = LoadUserControl(ScriptType, Model, pageElements);
                                     break;
                                 }
                                 catch (Exception e)
@@ -410,108 +389,11 @@ namespace umbraco
                                     break;
                                 }
                             }
-
-                        case (int)MacroTypes.CustomControl:
-
-                            using (DisposableTimer.DebugDuration<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
-                            {
-                                try
-                                {
-                                    TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + "), ScriptAssembly: " + Model.TypeAssembly, excludeProfiling: true);
-                                    macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
-                                    break;
-                                }
-                                catch (Exception e)
-                                {
-                                    renderFailed = true;
-                                    Exceptions.Add(e);
-
-                                    LogHelper.WarnWithException<macro>(
-                                        "Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" +
-                                        Model.TypeName + "'", true, e);
-
-                                    // Invoke any error handlers for this macro
-                                    var macroErrorEventArgs = new MacroErrorEventArgs
-                                    {
-                                        Name = Model.Name,
-                                        Alias = Model.Alias,
-                                        ItemKey = Model.TypeAssembly,
-                                        Exception = e,
-                                        Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
-                                    };
-
-                                    var errorMessage = textService.Localize("errors/macroErrorLoadingCustomControl", new[] { Model.TypeAssembly, Model.TypeName });
-                                    macroControl = GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
-                                    //if it is null, then we are supposed to throw the (original) exception
-                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
-                                    if (macroControl == null)
-                                    {
-                                        throw;
-                                    }
-
-                                    break;
-                                }
-                            }
-                        case (int)MacroTypes.XSLT:
+                       
+                        case (int) MacroTypes.Xslt:                            
                             macroControl = LoadMacroXslt(this, Model, pageElements, true);
                             break;
-                        case (int)MacroTypes.Script:
-
-                            //error handler for partial views, is an action because we need to re-use it twice below
-                            Func<Exception, Control> handleMacroScriptError = e =>
-                                {
-                                    LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
-
-                                    // Invoke any error handlers for this macro
-                                    var macroErrorEventArgs =
-                                        new MacroErrorEventArgs
-                                            {
-                                                Name = Model.Name,
-                                                Alias = Model.Alias,
-                                                ItemKey = ScriptFile,
-                                                Exception = e,
-                                                Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
-                                            };
-
-                                    var errorMessage = textService.Localize("errors/macroErrorLoadingMacroEngineScript", new[] { ScriptFile });
-                                    return GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
-                                };
-
-                            using (DisposableTimer.DebugDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
-                            {
-                                try
-                                {
-                                    TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")", excludeProfiling: true);
-                                    ScriptingMacroResult result = loadMacroScript(Model);
-                                    macroControl = new LiteralControl(result.Result);
-                                    if (result.ResultException != null)
-                                    {
-                                        renderFailed = true;
-                                        Exceptions.Add(result.ResultException);
-                                        macroControl = handleMacroScriptError(result.ResultException);
-                                        //if it is null, then we are supposed to throw the exception
-                                        if (macroControl == null)
-                                        {
-                                            throw result.ResultException;
-                                        }
-                                    }
-                                    break;
-                                }
-                                catch (Exception e)
-                                {
-                                    renderFailed = true;
-                                    Exceptions.Add(e);
-
-                                    macroControl = handleMacroScriptError(e);
-                                    //if it is null, then we are supposed to throw the (original) exception
-                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
-                                    if (macroControl == null)
-                                    {
-                                        throw;
-                                    }
-                                    break;
-                                }
-                            }
+                        
                         case (int)MacroTypes.Unknown:
                         default:
                             if (GlobalSettings.DebugMode)
@@ -751,16 +633,14 @@ namespace umbraco
         {
             switch (model.MacroType)
             {
-                case MacroTypes.XSLT:
+                case MacroTypes.Xslt:
                     return string.Concat("~/xslt/", model.Xslt);
-                case MacroTypes.Python:
                 case MacroTypes.Script:
                     return string.Concat("~/macroScripts/", model.ScriptName);
                 case MacroTypes.PartialView:
                     return model.ScriptName; //partial views are saved with the full virtual path
                 case MacroTypes.UserControl:
                     return model.TypeName; //user controls saved with the full virtual path
-                case MacroTypes.CustomControl:
                 case MacroTypes.Unknown:
                 default:
                     return "/" + model.TypeName;
@@ -769,7 +649,7 @@ namespace umbraco
 
         internal static bool MacroIsFileBased(MacroModel model)
         {
-            return model.MacroType != MacroTypes.CustomControl && model.MacroType != MacroTypes.Unknown;
+            return model.MacroType != MacroTypes.Unknown;
         }
 
         /// <summary>
@@ -784,20 +664,17 @@ namespace umbraco
         {
             switch (model.MacroType)
             {
-                case MacroTypes.XSLT:
-                case MacroTypes.Python:
-                case MacroTypes.Script:
+                case MacroTypes.Xslt:
                 case MacroTypes.PartialView:
                     return true;
                 case MacroTypes.UserControl:
-                case MacroTypes.CustomControl:
                 case MacroTypes.Unknown:
                 default:
                     return false;
             }
         }
 
-        public static XslCompiledTransform getXslt(string XsltFile)
+        public static XslCompiledTransform GetXslt(string XsltFile)
         {
             //TODO: SD: Do we really need to cache this??
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
@@ -861,12 +738,6 @@ namespace umbraco
             return macroXslt;
         }
 
-        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
-        public static void unloadXslt(string XsltFile)
-        {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.MacroXsltCacheKey + XsltFile);
-        }
-
         #region LoadMacroXslt
 
         // gets the control for the macro, using GetXsltTransform methods for execution
@@ -927,7 +798,7 @@ namespace umbraco
                 var textService = ApplicationContext.Current.Services.TextService;
                 try
                 {
-                    var xsltFile = getXslt(XsltFile);
+                    var xsltFile = GetXslt(XsltFile);
 
                     using (DisposableTimer.DebugDuration<macro>("Performing transformation"))
                     {
@@ -1018,7 +889,7 @@ namespace umbraco
 
                     // extract the tag and parse it
                     string tag = text.Substring(tagStartPos, (tagEndPos + tagEnd.Length) - tagStartPos);
-                    Hashtable attributes = helper.ReturnAttributes(tag);
+                    Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag));
 
                     // create item with the parameters specified in the tag
                     var item = new Item();
@@ -1362,57 +1233,26 @@ namespace umbraco
         /// </summary>
         /// <param name="macro"></param>
         /// <returns></returns>
-        internal ScriptingMacroResult LoadPartialViewMacro(MacroModel macro)
+		internal PartialViewMacroResult LoadPartialViewMacro(MacroModel macro)
         {
-            var retVal = new ScriptingMacroResult();
-            IMacroEngine engine = null;
+			var retVal = new PartialViewMacroResult();
+			var engine = new PartialViewMacroEngine();
+			
+            var ret = engine.Execute(macro, UmbracoContext.Current.PublishedContentRequest.PublishedContent);
+            
+			retVal.Result = ret;
+			return retVal;
+		}
 
-            engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-            var ret = engine.Execute(macro, GetCurrentNode());
-
-            // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
-            if (engine is IMacroEngineResultStatus)
-            {
-                var result = engine as IMacroEngineResultStatus;
-                if (!result.Success)
-                {
-                    retVal.ResultException = result.ResultException;
-                }
-            }
-            retVal.Result = ret;
-            return retVal;
-        }
-
-        public ScriptingMacroResult loadMacroScript(MacroModel macro)
+        /// <summary>
+        /// Loads a custom or webcontrol using reflection into the macro object
+        /// </summary>
+        /// <param name="fileName">The assembly to load from</param>
+        /// <param name="controlName">Name of the control</param>
+        /// <returns></returns>
+        public Control LoadControl(string fileName, string controlName, MacroModel model)
         {
-            var retVal = new ScriptingMacroResult();
-            string ret = String.Empty;
-            IMacroEngine engine = null;
-            if (!String.IsNullOrEmpty(macro.ScriptCode))
-            {
-                engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
-                ret = engine.Execute(
-                    macro,
-                    GetCurrentNode());
-            }
-            else
-            {
-                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
-                engine = MacroEngineFactory.GetByFilename(path);
-                ret = engine.Execute(macro, GetCurrentNode());
-            }
-
-            // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
-            if (engine is IMacroEngineResultStatus)
-            {
-                var result = engine as IMacroEngineResultStatus;
-                if (!result.Success)
-                {
-                    retVal.ResultException = result.ResultException;
-                }
-            }
-            retVal.Result = ret;
-            return retVal;
+            return LoadControl(fileName, controlName, model, null);
         }
 
         /// <summary>
@@ -1421,18 +1261,7 @@ namespace umbraco
         /// <param name="fileName">The assembly to load from</param>
         /// <param name="controlName">Name of the control</param>
         /// <returns></returns>
-        public Control loadControl(string fileName, string controlName, MacroModel model)
-        {
-            return loadControl(fileName, controlName, model, null);
-        }
-
-        /// <summary>
-        /// Loads a custom or webcontrol using reflection into the macro object
-        /// </summary>
-        /// <param name="fileName">The assembly to load from</param>
-        /// <param name="controlName">Name of the control</param>
-        /// <returns></returns>
-        public Control loadControl(string fileName, string controlName, MacroModel model, Hashtable pageElements)
+        public Control LoadControl(string fileName, string controlName, MacroModel model, Hashtable pageElements)
         {
             Type type;
             Assembly asm;
@@ -1464,7 +1293,6 @@ namespace umbraco
                 return new LiteralControl(string.Format("Unable to create control {0} from assembly {1}",
                                                         controlName, asm.FullName));
 
-            AddCurrentNodeToControl(control);
 
             // Properties
             UpdateControlProperties(control, model);
@@ -1525,7 +1353,7 @@ namespace umbraco
         /// <param name="model"> </param>
         /// <param name="pageElements">The page elements.</param>
         /// <returns></returns>
-        public Control loadUserControl(string fileName, MacroModel model, Hashtable pageElements)
+	    public Control LoadUserControl(string fileName, MacroModel model, Hashtable pageElements)
         {
             Mandate.ParameterNotNullOrEmpty(fileName, "fileName");
             Mandate.ParameterNotNull(model, "model");
@@ -1548,11 +1376,10 @@ namespace umbraco
                 else
                     oControl.ID =
                         string.Format("{0}_{1}", fileName.Substring(slashIndex, fileName.IndexOf(".ascx") - slashIndex),
-                                      StateHelper.GetContextValue<int>(MacrosAddedKey));
+                                      HttpContext.Current.GetContextItem<int>(MacrosAddedKey));
 
                 TraceInfo(LoadUserControlKey, string.Format("Usercontrol added with id '{0}'", oControl.ID));
 
-                AddCurrentNodeToControl(oControl);
                 UpdateControlProperties(oControl, model);
                 return oControl;
             }
@@ -1563,23 +1390,6 @@ namespace umbraco
             }
         }
 
-        private static void AddCurrentNodeToControl(Control control)
-        {
-            var type = control.GetType();
-
-            PropertyInfo currentNodeProperty = type.GetProperty("CurrentNode");
-            if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
-            {
-                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
-            }
-            currentNodeProperty = type.GetProperty("currentNode");
-            if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
-            {
-                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
-            }
-        }
 
         private static void TraceInfo(string category, string message, bool excludeProfiling = false)
         {
@@ -1623,7 +1433,7 @@ namespace umbraco
             }
         }
 
-        public static string renderMacroStartTag(Hashtable attributes, int pageId, Guid versionId)
+        public static string RenderMacroStartTag(Hashtable attributes, int pageId, Guid versionId)
         {
             string div = "<div ";
 
@@ -1658,15 +1468,15 @@ namespace umbraco
             return attributeContents;
         }
 
-        public static string renderMacroEndTag()
+        public static string RenderMacroEndTag()
         {
             return "<!-- endUmbMacro --></div>";
         }
 
-        public static string GetRenderedMacro(int MacroId, page umbPage, Hashtable attributes, int pageId)
+        public static string GetRenderedMacro(int macroId, page umbPage, Hashtable attributes, int pageId)
         {
-            macro m = GetMacro(MacroId);
-            Control c = m.renderMacro(attributes, umbPage.Elements, pageId);
+            macro m = GetMacro(macroId);
+            Control c = m.RenderMacro(attributes, umbPage.Elements, pageId);
             TextWriter writer = new StringWriter();
             var ht = new HtmlTextWriter(writer);
             c.RenderControl(ht);
@@ -1682,7 +1492,7 @@ namespace umbraco
             return result;
         }
 
-        public static string MacroContentByHttp(int PageID, Guid PageVersion, Hashtable attributes)
+        public static string MacroContentByHttp(int pageId, Guid pageVersion, Hashtable attributes)
         {
 
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted)
@@ -1696,7 +1506,7 @@ namespace umbraco
             macro currentMacro = GetMacro(tempAlias);
             if (!currentMacro.DontRenderInEditor)
             {
-                string querystring = "umbPageId=" + PageID + "&umbVersionId=" + PageVersion;
+                string querystring = "umbPageId=" + pageId + "&umbVersionId=" + pageVersion;
                 IDictionaryEnumerator ide = attributes.GetEnumerator();
                 while (ide.MoveNext())
                     querystring += "&umb_" + ide.Key + "=" + HttpContext.Current.Server.UrlEncode((ide.Value ?? string.Empty).ToString());
@@ -1720,9 +1530,12 @@ namespace umbraco
                 //TODO: This is the worst thing ever. This will also not work if people decide to put their own
                 // custom auth system in place.
 
-                HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
-                var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
-                                        HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
+                HttpCookie inCookie = HttpContext.Current.Request.Cookies[UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName];
+                if (inCookie == null) throw new NullReferenceException("No auth cookie found");
+                var cookie = new Cookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
+                    inCookie.Value,
+                    inCookie.Path,
+                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
                 myHttpWebRequest.CookieContainer = new CookieContainer();
                 myHttpWebRequest.CookieContainer.Add(cookie);
 
@@ -1822,65 +1635,6 @@ namespace umbraco
             xslt = xslt.Replace("{0}", namespaceDeclaractions.ToString());
             xslt = xslt.Replace("{1}", namespaceList.ToString());
             return xslt;
-        }
-
-        [Obsolete("Please stop using these as they'll be removed in v4.8")]
-        public static bool TryGetColumnString(IRecordsReader reader, string columnName, out string value)
-        {
-            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
-            {
-                value = reader.GetString(columnName);
-                return true;
-            }
-
-            value = string.Empty;
-            return false;
-        }
-
-        [Obsolete("Please stop using these as they'll be removed in v4.8")]
-        public static bool TryGetColumnInt32(IRecordsReader reader, string columnName, out int value)
-        {
-            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
-            {
-                value = reader.GetInt(columnName);
-                return true;
-            }
-
-            value = -1;
-            return false;
-        }
-
-        [Obsolete("Please stop using these as they'll be removed in v4.8")]
-        public static bool TryGetColumnBool(IRecordsReader reader, string columnName, out bool value)
-        {
-            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
-            {
-                value = reader.GetBoolean(columnName);
-                return true;
-            }
-
-            value = false;
-            return false;
-        }
-
-        private static INode GetCurrentNode()
-        {
-            //Get the current content request
-
-            IPublishedContent content;
-            if (UmbracoContext.Current.IsFrontEndUmbracoRequest)
-            {
-                content = UmbracoContext.Current.PublishedContentRequest != null
-                    ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
-                    : null;
-            }
-            else
-            {
-                var pageId = UmbracoContext.Current.PageId;
-                content = pageId.HasValue ? UmbracoContext.Current.ContentCache.GetById(pageId.Value) : null;
-            }
-
-            return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
         }
 
         #region Events

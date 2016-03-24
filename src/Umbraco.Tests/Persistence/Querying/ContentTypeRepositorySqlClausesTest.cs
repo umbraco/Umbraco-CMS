@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Querying
@@ -13,7 +14,8 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
+            var nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
+            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             var expected = new Sql();
             expected.Select("*")
@@ -27,13 +29,13 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<ContentTypeTemplateDto>()
-                .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<ContentTypeTemplateDto>(x => x.IsDefault == true);
+                .From<ContentTypeTemplateDto>(sqlSyntaxProvider)
+                .RightJoin<ContentTypeDto>(sqlSyntaxProvider)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(sqlSyntaxProvider, left => left.NodeId, right => right.ContentTypeNodeId)
+                .InnerJoin<NodeDto>(sqlSyntaxProvider)
+                .On<ContentTypeDto, NodeDto>(sqlSyntaxProvider, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(sqlSyntaxProvider, x => x.NodeObjectType == nodeObjectType)
+                .Where<ContentTypeTemplateDto>(sqlSyntaxProvider, x => x.IsDefault == true);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -49,7 +51,8 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_Clause()
         {
-            var NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
+            var nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
+            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             var expected = new Sql();
             expected.Select("*")
@@ -64,14 +67,14 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<ContentTypeTemplateDto>()
-                .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<ContentTypeTemplateDto>(x => x.IsDefault)
-                .Where<NodeDto>(x => x.NodeId == 1050);
+                .From<ContentTypeTemplateDto>(sqlSyntaxProvider)
+                .RightJoin<ContentTypeDto>(sqlSyntaxProvider)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(sqlSyntaxProvider, left => left.NodeId, right => right.ContentTypeNodeId)
+                .InnerJoin<NodeDto>(sqlSyntaxProvider)
+                .On<ContentTypeDto, NodeDto>(sqlSyntaxProvider, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(sqlSyntaxProvider, x => x.NodeObjectType == nodeObjectType)
+                .Where<ContentTypeTemplateDto>(sqlSyntaxProvider, x => x.IsDefault)
+                .Where<NodeDto>(sqlSyntaxProvider, x => x.NodeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -87,6 +90,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_PerformQuery_Clause()
         {
+            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
             var expected = new Sql();
             expected.Select("*")
                 .From("[cmsPropertyTypeGroup]")
@@ -95,11 +99,11 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .From<PropertyTypeGroupDto>(sqlSyntaxProvider)
+               .RightJoin<PropertyTypeDto>(sqlSyntaxProvider)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(sqlSyntaxProvider, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(sqlSyntaxProvider)
+               .On<PropertyTypeDto, DataTypeDto>(sqlSyntaxProvider, left => left.DataTypeId, right => right.DataTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -110,14 +114,15 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Verify_AllowedContentTypeIds_Clause()
         {
             var expected = new Sql();
+            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
             expected.Select("*")
                 .From("[cmsContentTypeAllowedContentType]")
                 .Where("([cmsContentTypeAllowedContentType].[Id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
-               .From<ContentTypeAllowedContentTypeDto>()
-               .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == 1050);
+               .From<ContentTypeAllowedContentTypeDto>(sqlSyntaxProvider)
+               .Where<ContentTypeAllowedContentTypeDto>(sqlSyntaxProvider, x => x.Id == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -134,6 +139,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Verify_PropertyGroupCollection_Clause()
         {
             var expected = new Sql();
+            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
             expected.Select("*")
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
@@ -142,12 +148,12 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == 1050);
+               .From<PropertyTypeGroupDto>(sqlSyntaxProvider)
+               .RightJoin<PropertyTypeDto>(sqlSyntaxProvider)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(sqlSyntaxProvider, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(sqlSyntaxProvider)
+               .On<PropertyTypeDto, DataTypeDto>(sqlSyntaxProvider, left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(sqlSyntaxProvider, x => x.ContentTypeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

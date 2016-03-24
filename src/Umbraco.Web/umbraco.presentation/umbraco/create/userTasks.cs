@@ -1,15 +1,11 @@
 using System;
-using System.Data;
 using System.Web.Security;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Security;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -24,7 +20,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.users.ToString(); }
+            get { return Constants.Applications.Users.ToString(); }
         }
 
         public override bool PerformSave()
@@ -74,8 +70,9 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            var u = User.GetUser(ParentID);
-            u.disable();
+            var u = ApplicationContext.Current.Services.UserService.GetUserById(ParentID);
+            u.IsApproved = false;
+            ApplicationContext.Current.Services.UserService.Save(u);
             return true;
         }
     }

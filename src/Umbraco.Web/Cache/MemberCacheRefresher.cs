@@ -6,7 +6,6 @@ using Umbraco.Core.Models.Membership;
 
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core.Persistence.Repositories;
-using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {

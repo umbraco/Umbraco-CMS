@@ -14,6 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
         {
         }
 
+
         public override void Up()
         {
             Execute.Code(UpdatePropertyTypesAndGroupsDo);
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 
         public override void Down()
         {
-            
+
         }
 
         public static string UpdatePropertyTypesAndGroupsDo(Database database)

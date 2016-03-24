@@ -59,8 +59,8 @@ namespace Umbraco.Tests.Services.Importing
             var uBlogsyBasePage = contentTypes.First(x => x.Alias == "uBlogsyBasePage");
             Assert.That(uBlogsyBasePage.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
             Assert.That(uBlogsyBasePage.PropertyTypes.Count(), Is.EqualTo(7));
-            Assert.That(uBlogsyBasePage.PropertyGroups.Count(), Is.EqualTo(3));
-            Assert.That(uBlogsyBasePage.PropertyGroups["Content"].PropertyTypes.Count(), Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups.Count, Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
             Assert.That(uBlogsyBasePage.PropertyGroups["SEO"].PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(uBlogsyBasePage.PropertyGroups["Navigation"].PropertyTypes.Count(), Is.EqualTo(1));
             Assert.That(uBlogsyBasePage.CompositionPropertyTypes.Count(), Is.EqualTo(12));
@@ -293,11 +293,7 @@ namespace Umbraco.Tests.Services.Importing
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
         }
 
-        [Test]
-        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Legacy_Property_Editor_Ids()
-        {
-            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package_LegacyIds);
-        }
+    
 
         private void AssertCheckBoxListTests(string strXml)
         {

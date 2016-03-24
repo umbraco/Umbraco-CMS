@@ -1,22 +1,20 @@
 using System.Xml.Serialization;
 using System.Collections;
 using System;
-using umbraco.BusinessLogic.Utils;
 using System.Xml.Schema;
-using umbraco.interfaces;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
-using System.Text;
-using umbraco.businesslogic.Utils;
-using umbraco.BasePages;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.Utils;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.Trees
 {
 
 	public enum SerializedTreeType
 	{
-		XmlTree,
 		JSONTree,
 		JsTree
 	}
@@ -54,8 +52,6 @@ namespace umbraco.cms.presentation.Trees
 
 			switch (m_TreeType)
 			{
-				case SerializedTreeType.XmlTree:
-					break;
 				case SerializedTreeType.JSONTree:
 					m_JSSerializer.RegisterConverters(new List<JavaScriptConverter>() 
 					{ 
@@ -91,8 +87,6 @@ namespace umbraco.cms.presentation.Trees
 		{
 			switch (type)
 			{
-				case SerializedTreeType.XmlTree:
-					return SerializableData.Serialize(this, typeof(XmlTree));
 				case SerializedTreeType.JsTree:
 					return m_JSSerializer.Serialize(this.treeCollection);
 				case SerializedTreeType.JSONTree:
@@ -200,9 +194,8 @@ namespace umbraco.cms.presentation.Trees
 			xNode.NodeType = bTree.TreeAlias;
 			xNode.Text = BaseTree.GetTreeHeader(bTree.TreeAlias);
 			
-            // By default the action from the trees.config will be used, if none is specified then the apps dashboard will be used.
-            var appTreeItem = umbraco.BusinessLogic.ApplicationTree.getByAlias(bTree.TreeAlias);
-            xNode.Action = appTreeItem == null || String.IsNullOrEmpty(appTreeItem.Action) ? "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app) : "javascript:" + appTreeItem.Action;
+            // The apps dashboard action will be used
+            xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app);
 			
             xNode.IsRoot = true;
 			//generally the tree type and node type are the same but in some cased they are not.
@@ -475,7 +468,7 @@ namespace umbraco.cms.presentation.Trees
 							this.m_action = reader.Value;
 							break;
 						case TreeAttributes.menu:
-							this.m_menu = (!string.IsNullOrEmpty(reader.Value) ? umbraco.BusinessLogic.Actions.Action.FromString(reader.Value) : null);
+							this.m_menu = (!string.IsNullOrEmpty(reader.Value) ? Umbraco.Web._Legacy.Actions.Action.FromString(reader.Value) : null);
 							break;
 						case TreeAttributes.rootSrc:
 							this.m_rootSrc = reader.Value;
@@ -520,7 +513,7 @@ namespace umbraco.cms.presentation.Trees
 			writer.WriteAttributeString(TreeAttributes.text.ToString(), this.m_text);
 			writer.WriteAttributeString(TreeAttributes.iconClass.ToString(), this.m_iconClass);
 			writer.WriteAttributeString(TreeAttributes.action.ToString(), this.m_action);
-			writer.WriteAttributeString(TreeAttributes.menu.ToString(), (this.m_menu != null && this.m_menu.Count > 0 ? umbraco.BusinessLogic.Actions.Action.ToString(this.m_menu) : ""));
+			writer.WriteAttributeString(TreeAttributes.menu.ToString(), (this.m_menu != null && this.m_menu.Count > 0 ? Umbraco.Web._Legacy.Actions.Action.ToString(this.m_menu) : ""));
 			writer.WriteAttributeString(TreeAttributes.rootSrc.ToString(), this.m_rootSrc);
 			writer.WriteAttributeString(TreeAttributes.src.ToString(), this.m_src);
 			writer.WriteAttributeString(TreeAttributes.icon.ToString(), this.m_icon);
@@ -638,7 +631,7 @@ namespace umbraco.cms.presentation.Trees
 				result.Add(XmlTreeNode.TreeAttributes.nodeID.ToString(), node.NodeID);
 
 				//Add the menu as letters.
-				result.Add(XmlTreeNode.TreeAttributes.menu.ToString(), node.Menu != null && node.Menu.Count > 0 ? umbraco.BusinessLogic.Actions.Action.ToString(node.Menu) : "");
+				result.Add(XmlTreeNode.TreeAttributes.menu.ToString(), node.Menu != null && node.Menu.Count > 0 ? Action.ToString(node.Menu) : "");
 
 				return result;
 			}
@@ -717,7 +710,7 @@ namespace umbraco.cms.presentation.Trees
 				//This also needs to be stored in the attributes object with the class above.
 				Dictionary<string, object> metadata = new Dictionary<string, object>();
 				//the menu:
-				metadata.Add("menu", node.Menu == null ? "" : umbraco.BusinessLogic.Actions.Action.ToString(node.Menu));
+				metadata.Add("menu", node.Menu == null ? "" : Action.ToString(node.Menu));
 				//the tree type:
 				metadata.Add("nodeType", node.NodeType);
 				//the data url for child nodes:

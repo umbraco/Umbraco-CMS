@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.CodeAnnotations;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -11,7 +12,7 @@ namespace umbraco
     {        
         public override string AssignedApp
         {
-            get { return DefaultApps.developer.ToString(); }
+            get { return Constants.Applications.Developer.ToString(); }
         }
 
         protected override bool IsPartialViewMacro

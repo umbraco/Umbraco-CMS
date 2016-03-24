@@ -15,6 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         {
         }
 
+
         public override void Up()
         {
             Execute.Code(Update);

@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             //Reading entries from the cmsContentType table in order to update the parentID on the umbracoNode table.

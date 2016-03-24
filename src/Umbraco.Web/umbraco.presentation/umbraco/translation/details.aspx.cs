@@ -1,38 +1,24 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.translation;
 using umbraco.cms.businesslogic.web;
-
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.umbraco.translation {
-    public partial class details : BasePages.UmbracoEnsuredPage {
+    public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 
         public details()
         {
-            CurrentApp = BusinessLogic.DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
 
         }
         protected void closeTask(object sender, EventArgs e) {
             int translationId = int.Parse(Request["id"]);
             Task t = new Task(translationId);
 
-            if (t != null && (t.ParentUser.Id == base.getUser().Id || t.User.Id == base.getUser().Id)) {
+            if (t != null && (t.ParentUser.Id == Security.CurrentUser.Id || t.User.Id == Security.CurrentUser.Id)) {
                 t.Closed = true;
                 t.Save();
                 Response.Redirect("default.aspx");
@@ -49,62 +35,64 @@ namespace umbraco.presentation.umbraco.translation {
             Literal lt = new Literal();
             lt.Text = t.Date.ToLongDateString() + " " + t.Date.ToLongTimeString();
             pp_date.Controls.Add(lt);
-            pp_date.Text = ui.Text("translation","taskOpened");
+            pp_date.Text = Services.TextService.Localize("translation/taskOpened");
 
             lt = new Literal();
             lt.Text = t.ParentUser.Name;
             pp_owner.Controls.Add(lt);
-            pp_owner.Text = ui.Text("translation", "taskAssignedBy");
+            pp_owner.Text = Services.TextService.Localize("translation/taskAssignedBy");
 
-            lt = new Literal();
-            lt.Text = Translation.CountWords(t.Node.Id).ToString();
-            pp_totalWords.Controls.Add(lt);
-            pp_totalWords.Text = ui.Text("translation", "totalWords");
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //lt = new Literal();
+            //lt.Text = Translation.CountWords(t.Node.Id).ToString();
+            //pp_totalWords.Controls.Add(lt);
+            //pp_totalWords.Text = Services.TextService.Localize("translation/totalWords");
 
             lt = new Literal();
             lt.Text = library.ReplaceLineBreaks(t.Comment);
             pp_comment.Controls.Add(lt);
-            pp_comment.Text = ui.Text("comment");
+            pp_comment.Text = Services.TextService.Localize("comment");
 
             lt = new Literal();
-            lt.Text =  "<a target=\"_blank\" href=\"xml.aspx?id=" + t.Id + "\">" + ui.Text("download") + "</a>";
+            lt.Text =  "<a target=\"_blank\" href=\"xml.aspx?id=" + t.Id + "\">" + Services.TextService.Localize("download") + "</a>";
             pp_xml.Controls.Add(lt);
-            pp_xml.Text = ui.Text("translation", "downloadTaskAsXml");
+            pp_xml.Text = Services.TextService.Localize("translation/downloadTaskAsXml");
 
-            pane_details.Text = ui.Text("translation", "details");
-            panel1.Text = ui.Text("translation", "details");
+            pane_details.Text = Services.TextService.Localize("translation/details");
+            panel1.Text = Services.TextService.Localize("translation/details");
 
-            pane_fields.Text = ui.Text("translation", "fields");
-            pane_tasks.Text = ui.Text("translation", "translationOptions");
+            pane_fields.Text = Services.TextService.Localize("translation/fields");
+            pane_tasks.Text = Services.TextService.Localize("translation/translationOptions");
             lt = new Literal();
-            lt.Text = "<a href=\"default.aspx?id=" + t.Id + "\">" + ui.Text("upload") + "</a>";
+            lt.Text = "<a href=\"default.aspx?id=" + t.Id + "\">" + Services.TextService.Localize("upload") + "</a>";
             pp_upload.Controls.Add(lt);
-            pp_upload.Text = ui.Text("translation", "uploadTranslationXml");
+            pp_upload.Text = Services.TextService.Localize("translation/uploadTranslationXml");
 
             if (t.Closed)
                 pp_closeTask.Visible = false;
             else {
-                pp_closeTask.Text = ui.Text("translation", "closeTask");
-                bt_close.Text = ui.Text("close");
+                pp_closeTask.Text = Services.TextService.Localize("translation/closeTask");
+                bt_close.Text = Services.TextService.Localize("close");
             }
 
 
             //Bind page fields
             DataTable pageTable = new DataTable();
-            pageTable.Columns.Add(ui.Text("name"));
-            pageTable.Columns.Add(ui.Text("value"));
+            pageTable.Columns.Add(Services.TextService.Localize("name"));
+            pageTable.Columns.Add(Services.TextService.Localize("value"));
             
             DataRow pageRow = pageTable.NewRow();
-            pageRow[ui.Text("name")] = ui.Text("nodeName");
-            pageRow[ui.Text("value")] = page.Text;
+            pageRow[Services.TextService.Localize("name")] = Services.TextService.Localize("nodeName");
+            pageRow[Services.TextService.Localize("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
-            
-            foreach (PropertyType pt in page.ContentType.PropertyTypes) {
-                pageRow = pageTable.NewRow();
-                pageRow[ui.Text("name")] = pt.Name;
-                pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
-                pageTable.Rows.Add(pageRow);
-            }
+
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //foreach (PropertyType pt in page.ContentType.PropertyTypes) {
+            //    pageRow = pageTable.NewRow();
+            //    pageRow[Services.TextService.Localize("name")] = pt.Name;
+            //    pageRow[Services.TextService.Localize("value")] = page.getProperty(pt.Alias).Value;
+            //    pageTable.Rows.Add(pageRow);
+            //}
             
             dg_fields.DataSource = pageTable;
             dg_fields.DataBind();

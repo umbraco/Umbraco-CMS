@@ -127,7 +127,7 @@ world */p{font-size: 1em;}")]
             var results = StylesheetHelper.ParseRules(css);
 
             // Assert
-            Assert.IsTrue(results.Count() == 0);
+            Assert.IsTrue(results.Any() == false);
         }
     }
 }

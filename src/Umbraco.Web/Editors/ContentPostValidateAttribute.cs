@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Editors
 {

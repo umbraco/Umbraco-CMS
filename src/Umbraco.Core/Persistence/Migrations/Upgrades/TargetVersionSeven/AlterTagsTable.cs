@@ -15,6 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
         }
 
+
         public override void Up()
         {
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     ColumnName = x.Item3,
                     IsUnique = x.Item4
                 }).ToArray();
-            
+
             //add a foreign key to the parent id column too!
 
             //In some cases in very old corrupted db's this will fail, so it means we need to clean the data first
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .ToTable("cmsTags")
                   .PrimaryColumn("id")
                   .OnDelete(Rule.None)
-                  .OnUpdate(Rule.None); 
+                  .OnUpdate(Rule.None);
 
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsTags")) == false)
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 //add an index to tag/group since it's queried often
                 Create.Index("IX_cmsTags").OnTable("cmsTags").OnColumn("tag").Ascending().OnColumn("group").Ascending().WithOptions().NonClustered();
             }
-            
+
         }
 
         public override void Down()

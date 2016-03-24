@@ -25,7 +25,12 @@ namespace Umbraco.Web.Scheduling
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        /// <summary>
+        /// Overridable method to execute when the ApplicationContext is created and other static objects that require initialization have been setup
+        /// </summary>
+        /// <param name="umbracoApplication"></param>
+        /// <param name="applicationContext"></param>
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             if (umbracoApplication.Context == null)
                 return;

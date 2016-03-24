@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Rename.Table("cmsTab").To("cmsPropertyTypeGroup");

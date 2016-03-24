@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
     public class CreateConstraintExpression : MigrationExpressionBase
     {
         public CreateConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ConstraintType constraint) 
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             Constraint = new ConstraintDefinition(constraint);
         }

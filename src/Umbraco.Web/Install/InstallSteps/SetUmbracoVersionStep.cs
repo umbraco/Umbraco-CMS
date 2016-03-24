@@ -7,7 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
-using GlobalSettings = umbraco.GlobalSettings;
+
 
 namespace Umbraco.Web.Install.InstallSteps
 {

@@ -88,5 +88,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "");
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        XElement GetContentXml(int contentId);
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        XElement GetContentPreviewXml(int contentId, Guid version);
     }
 }

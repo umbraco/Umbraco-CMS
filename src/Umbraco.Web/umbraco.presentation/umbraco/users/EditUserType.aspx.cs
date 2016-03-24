@@ -1,21 +1,15 @@
+using Umbraco.Core.Services;
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.BasePages;
 using System.Collections.Generic;
-using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic;
-using umbraco.uicontrols;
+using System.Linq;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Core.IO;
+using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.user
 {
@@ -23,22 +17,22 @@ namespace umbraco.cms.presentation.user
     {
         public EditUserType()
         {
-            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+            CurrentApp = Constants.Applications.Users;
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            pnlUmbraco.Text = umbraco.ui.Text("usertype", base.getUser());
+            pnlUmbraco.Text = Services.TextService.Localize("usertype");
 
             var save = pnlUmbraco.Menu.NewButton();
             save.Click += save_Click;
             save.ID = "save";
-            save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+            save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
 
-            pp_alias.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("alias", base.getUser());
-            pp_name.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("name", base.getUser());
+            pp_alias.Text = Services.TextService.Localize("usertype") + " " + Services.TextService.Localize("alias");
+            pp_name.Text = Services.TextService.Localize("usertype") + " " + Services.TextService.Localize("name");
 
-            pp_rights.Text = umbraco.ui.Text("default", base.getUser()) + " " + umbraco.ui.Text("rights", base.getUser());
+            pp_rights.Text = Services.TextService.Localize("default") + " " + Services.TextService.Localize("rights");
             
             //ensure we have a query string
             if (string.IsNullOrEmpty(Request.QueryString["id"]))
@@ -47,20 +41,19 @@ namespace umbraco.cms.presentation.user
             if (!int.TryParse(Request.QueryString["id"], out m_userTypeID))
                 return;
 
-			if (!IsPostBack)
-			{
-				BindActions();
+            if (!IsPostBack)
+            {
+                BindActions();
 
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<UserTypes>().Tree.Alias)
-					.SyncTree(m_userTypeID.ToString(), false);
-			}
-
+                ClientTools
+                    .SetActiveTreeType(Constants.Trees.UserTypes)
+                    .SyncTree(m_userTypeID.ToString(), false);
+            }
         }
 
         void save_Click(object sender, EventArgs e)
         {
-            UserType userType = CurrentUserType;
+            var userType = CurrentUserType;
             userType.Name = txtUserTypeName.Text;
             string actions = "";
 
@@ -69,10 +62,10 @@ namespace umbraco.cms.presentation.user
                     actions += li.Value;
             }
 
-            userType.DefaultPermissions = actions;
-            userType.Save();
+            userType.Permissions = actions.ToCharArray().Select(x => x.ToString());
+            Services.UserService.SaveUserType(userType);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserTypeSaved", base.getUser()), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editUserTypeSaved"), "");
         }
 
         protected List<IAction> CurrentUserTypeActions
@@ -80,21 +73,21 @@ namespace umbraco.cms.presentation.user
             get
             {
                 if (m_userTypeActions == null)
-                    m_userTypeActions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUserType.DefaultPermissions);
+                    m_userTypeActions = Action.FromString(string.Join("", CurrentUserType.Permissions));
                 return m_userTypeActions;
             }
         }
 
-        protected UserType CurrentUserType
+        protected IUserType CurrentUserType
         {
             get
             {
                 if (m_userType == null)
-                    m_userType = UserType.GetUserType(m_userTypeID);
+                    m_userType = Services.UserService.GetUserTypeById(m_userTypeID);
                 return m_userType;
             }
         }
-        private UserType m_userType;
+        private IUserType m_userType;
         private List<IAction> m_userTypeActions;
         private int m_userTypeID;
 
@@ -104,9 +97,9 @@ namespace umbraco.cms.presentation.user
             txtUserTypeName.Text = CurrentUserType.Name;
             hidUserTypeID.Value = CurrentUserType.Id.ToString();
 
-            foreach (IAction ai in global::umbraco.BusinessLogic.Actions.Action.GetPermissionAssignable()) {
+            foreach (IAction ai in Action.GetPermissionAssignable()) {
 
-                ListItem li = new ListItem(umbraco.ui.Text(ai.Alias, base.getUser()), ai.Letter.ToString());
+                ListItem li = new ListItem(Services.TextService.Localize(ai.Alias), ai.Letter.ToString());
 
                 if(CurrentUserTypeActions.Contains(ai))
                     li.Selected = true;

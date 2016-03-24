@@ -23,9 +23,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaModelMapper : MapperConfiguration
+    internal class MediaModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             //FROM IMedia TO MediaItemDisplay
             config.CreateMap<IMedia, MediaItemDisplay>()

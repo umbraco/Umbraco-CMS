@@ -7,7 +7,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {

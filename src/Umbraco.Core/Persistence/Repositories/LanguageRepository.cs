@@ -8,6 +8,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -19,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {           
         }
 
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //this needs to be sorted since that is the way legacy worked - default language is the first one!!
             //even though legacy didn't sort, it should be by id
-            sql.OrderBy<LanguageDto>(dto => dto.Id, SqlSyntax);
+            sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
 
             
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);

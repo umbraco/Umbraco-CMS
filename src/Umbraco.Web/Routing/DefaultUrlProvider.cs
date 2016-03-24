@@ -19,12 +19,6 @@ namespace Umbraco.Web.Routing
     {
         private readonly IRequestHandlerSection _requestSettings;
 
-        [Obsolete("Use the ctor that specifies the IRequestHandlerSection")]
-        public DefaultUrlProvider()
-            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler)
-        {            
-        }
-
         public DefaultUrlProvider(IRequestHandlerSection requestSettings)
         {
             _requestSettings = requestSettings;

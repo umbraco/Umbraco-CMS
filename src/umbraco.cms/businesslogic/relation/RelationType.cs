@@ -4,9 +4,7 @@ using System.Linq;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
-using umbraco.DataLayer;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.web;
 
@@ -24,12 +22,7 @@ namespace umbraco.cms.businesslogic.relation
 
 		#endregion
 
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
-		#region Constructors
+	    #region Constructors
 
 	    /// <summary>
 	    /// Internal constructor to create a new relation type

@@ -13,16 +13,14 @@ using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using umbraco;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using umbraco.editorControls.tags;
-using umbraco.interfaces;
-using umbraco.MacroEngines;
 using umbraco.uicontrols;
-using Umbraco.Web.BaseRest;
+using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Plugins
 {
@@ -44,7 +42,6 @@ namespace Umbraco.Tests.Plugins
 		    _assemblies = new[]
 			    {
 			        this.GetType().Assembly, 
-			        typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -57,8 +54,6 @@ namespace Umbraco.Tests.Plugins
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-			        typeof(ICultureDictionary).Assembly,
-                    typeof(Tag).Assembly,
                     typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
 			    };
 
@@ -75,8 +70,8 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Find_Classes_Of_Type()
         {
-            var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);            
-            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
+            var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
+            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
             Assert.AreEqual(9, typesFound.Count());
@@ -86,7 +81,8 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typesFound = TypeFinder.FindClassesWithAttribute<RestExtensionAttribute>(_assemblies);
+            var typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
+            //TODO: Fix this with the correct count
             Assert.AreEqual(1, typesFound.Count());
         }
 
@@ -149,18 +145,6 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
-        }
-
-        public class MyTag : ITag
-        {
-            public int Id { get; private set; }
-            public string TagCaption { get; private set; }
-            public string Group { get; private set; }
-        }
-
-        public class MySuperTag : MyTag
-        {
             
         }
 

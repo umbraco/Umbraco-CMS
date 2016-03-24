@@ -2,6 +2,7 @@
 
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Web" %>
+<%@ Import Namespace="Umbraco.Web.Mvc" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -38,20 +39,20 @@
 
         <div class="propertyDiv" data-bind="visible: processStatus() == 'init'">
             <p>
-                <%= umbraco.ui.Text("publish", "publishHelp", PageName, UmbracoUser) %>
+                <%= Services.TextService.Localize("publish/publishHelp", new[] { PageName}) %>
             </p>
 
             <div>
                 <input type="checkbox" id="publishAllCheckBox" data-bind="checked: publishAll" />
                 <label for="publishAllCheckBox">
-                    <%=umbraco.ui.Text("publish", "publishAll", PageName, UmbracoUser) %>
+                    <%=Services.TextService.Localize("publish/publishAll", new[] { PageName}) %>
                 </label>
             </div>
 
             <div id="includeUnpublished">
                 <input type="checkbox" id="includeUnpublishedCheckBox" data-bind="checked: includeUnpublished, attr: { disabled: !publishAll() }" />
                 <label for="includeUnpublishedCheckBox" data-bind="css: { disabled: !publishAll() }">
-                    <%=umbraco.ui.Text("publish", "includeUnpublished") %>
+                    <%=Services.TextService.Localize("publish/includeUnpublished") %>
                 </label>
             </div>
             
@@ -61,17 +62,17 @@
 
          <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar"  data-bind="visible: processStatus() == 'init'">
             <a href="#" class="btn btn-link" data-bind="click: closeDialog">
-                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%>
+                <%=Services.TextService.Localize("general/cancel")%>
             </a>
              <button id="ok" class="btn btn-primary" data-bind="click: startPublish">
-                <%=umbraco.ui.Text("content", "publish", UmbracoUser)%>
+                <%=Services.TextService.Localize("content/publish")%>
             </button>
         </div>
 
         <div id="animDiv" class="propertyDiv" data-bind="visible: processStatus() == 'publishing'">
             <div>
                 <p>
-                    <%=umbraco.ui.Text("publish", "inProgress", UmbracoUser)%>
+                    <%=Services.TextService.Localize("publish/inProgress")%>
                 </p>
                 <cc1:ProgressBar runat="server" ID="ProgBar1" />
                 <br />
@@ -87,7 +88,7 @@
                 </ul>
             </div>
              <p>
-                 <a href='#' class="btn" data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
+                 <a href='#' class="btn" data-bind="click: closeDialog"><%=Services.TextService.Localize("closeThisWindow") %></a>
              </p>
         </div> 
        

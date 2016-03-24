@@ -78,9 +78,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
 
         private static string GetProperty(XPathNodeIterator nodeIterator, string fileProp)
         {
-            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                               ? string.Format(".//data[@alias = '{0}']", fileProp)
-                               : string.Format(".//{0}", fileProp);
+            var xpath = string.Format(".//{0}", fileProp);
 
             var file = string.Empty;
             var selectSingleNode = nodeIterator.Current.SelectSingleNode(xpath);

@@ -27,7 +27,7 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence
 {
-	// Poco's marked [Explicit] require all column properties to be marked
+    // Poco's marked [Explicit] require all column properties to be marked
 	[AttributeUsage(AttributeTargets.Class)]
 	public class ExplicitColumnsAttribute : Attribute
 	{
@@ -964,7 +964,7 @@ namespace Umbraco.Core.Persistence
 					{
 						// Find the property
 						var candidates = from p in types[j].GetProperties() where p.PropertyType == types[i] select p;
-						if (candidates.Count() == 0)
+						if (candidates.Any() == false)
 							continue;
 						if (candidates.Count() > 1)
 							throw new InvalidOperationException(string.Format("Can't auto join {0} as {1} has more than one property of type {0}", types[i], types[j]));
@@ -2365,11 +2365,6 @@ namespace Umbraco.Core.Persistence
 		{
 			_sql = sql;
 			_args = args;
-		}
-
-		public static Sql Builder
-		{
-			get { return new Sql(); }
 		}
 
 		string _sql;

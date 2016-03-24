@@ -67,7 +67,7 @@
                     <br />
 
                     <small>
-                        <%= umbraco.ui.Text("packager", "chooseLocalPackageText") %>
+                        <%= Services.TextService.Localize("packager/chooseLocalPackageText") %>
                     </small>
                 </p>
             </cc1:PropertyPanel>
@@ -297,7 +297,7 @@
         <cc1:Pane ID="pane_uninstalled" runat="server" Text="Package has been uninstalled" Visible="false">
             <cc1:PropertyPanel runat="server">
                
-                <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
+                <p><%= Services.TextService.Localize("packager/packageUninstalledText") %></p>
 
             </cc1:PropertyPanel>
         </cc1:Pane>

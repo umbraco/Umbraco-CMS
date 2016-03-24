@@ -367,7 +367,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<ITemplate>.Builder.Where(x => x.Key == id);
+                var query = repository.Query.Where(x => x.Key == id);
                 return repository.GetByQuery(query).SingleOrDefault();
             }
         }

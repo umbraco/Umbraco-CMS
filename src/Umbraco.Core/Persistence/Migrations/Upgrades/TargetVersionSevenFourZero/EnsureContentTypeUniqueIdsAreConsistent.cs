@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 .From<NodeDto>(SqlSyntax)
                 .InnerJoin<ContentTypeDto>(SqlSyntax)
                 .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+                .WhereIn<NodeDto>(SqlSyntax, x => x.NodeObjectType, objectTypes);
 
             var rows = Context.Database.Fetch<dynamic>(sql);
 

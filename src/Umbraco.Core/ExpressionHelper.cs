@@ -310,11 +310,8 @@ namespace Umbraco.Core
 		/// <remarks></remarks>
 		public static bool IsMethod(Expression expression)
 		{
-			return expression != null && typeof(MethodCallExpression).IsAssignableFrom(expression.GetType());
+			return expression is MethodCallExpression;
 		}
-
-
-
 
 
 		/// <summary>
@@ -325,7 +322,7 @@ namespace Umbraco.Core
 		/// <remarks></remarks>
 		public static bool IsMember(Expression expression)
 		{
-			return expression != null && typeof(MemberExpression).IsAssignableFrom(expression.GetType());
+			return expression is MemberExpression;
 		}
 
 		/// <summary>
@@ -336,7 +333,7 @@ namespace Umbraco.Core
 		/// <remarks></remarks>
 		public static bool IsConstant(Expression expression)
 		{
-			return expression != null && typeof(ConstantExpression).IsAssignableFrom(expression.GetType());
+			return expression is ConstantExpression;
 		}
 
 		/// <summary>
@@ -349,7 +346,7 @@ namespace Umbraco.Core
 		{
 			if (arguments == null) return false;
 			return
-				arguments.Where(x => typeof(ConstantExpression).IsAssignableFrom(x.GetType())).Cast
+				arguments.Where(x => x is ConstantExpression).Cast
 					<ConstantExpression>().Select(x => x.Value).DefaultIfEmpty(null).FirstOrDefault();
 		}
 	}

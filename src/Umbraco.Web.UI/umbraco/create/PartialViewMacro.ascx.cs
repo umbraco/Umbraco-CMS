@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using umbraco.presentation.create;
 
@@ -51,7 +47,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
                     createMacroVal, //apparently we need to pass this value to 'ParentID'... of course! :P then we'll extract it in PartialViewTasks to create it.
                     PartialViewTemplate.SelectedValue + "|||" + FileName.Text);
 
-                BasePage.Current.ClientTools
+                ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ChildNodeCreated()
                     .CloseModalWindow();

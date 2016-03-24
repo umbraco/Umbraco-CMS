@@ -9,6 +9,7 @@ using System.Xml;
 using System.IO;
 using Umbraco.Core.IO;
 using umbraco.presentation.webservices;
+using Umbraco.Web.WebServices;
 
 namespace umbraco.developer
 {
@@ -16,8 +17,8 @@ namespace umbraco.developer
 	/// Summary description for getXsltStatus.
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices")]
-	public class getXsltStatus : System.Web.Services.WebService
-	{
+	public class getXsltStatus : UmbracoAuthorizedWebService
+    {
 		public getXsltStatus()
 		{
 			//CODEGEN: This call is required by the ASP.NET Web Services Designer
@@ -26,9 +27,9 @@ namespace umbraco.developer
 
 		// TODO: Security-check
 		[WebMethod]
-		public XmlDocument FilesFromDirectory(string dir) 
+		public XmlDocument FilesFromDirectory(string dir)
 		{
-            legacyAjaxCalls.Authorize();
+		    AuthorizeRequest(true);
 
 			XmlDocument xd = new XmlDocument();
 			xd.LoadXml("<files/>");

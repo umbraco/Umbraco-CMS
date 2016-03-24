@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.CodeAnnotations;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -11,7 +12,7 @@ namespace umbraco
     {   
         public override string AssignedApp
         {
-            get { return DefaultApps.settings.ToString(); }
+            get { return Constants.Applications.Settings.ToString(); }
         }
     }
 }

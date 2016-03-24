@@ -24,6 +24,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         /// <summary>Regular expression that finds multiline block comments.</summary>
         private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
+        internal MigrationResolver MigrationResolver { get; private set; }
+
         [SetUp]
         public virtual void Initialize()
         {
@@ -31,6 +33,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
+
             DatabaseSpecificSetUp();
         }
 
@@ -55,10 +58,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             var logger = Mock.Of<ILogger>();
+            var sqlHelper = Mock.Of<ISqlSyntaxProvider>();
             var sql = GetSyntaxProvider();
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
                 configuredVersion,
@@ -78,13 +83,15 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 new UpdateCmsContentVersionTable(sql, logger),
                 new UpdateCmsPropertyTypeGroupTable(sql, logger));
 
-            bool upgraded = migrationRunner.Execute(db, provider, true);
+            bool upgraded = migrationRunner.Execute(db, provider, sqlHelper, true);
 
             Assert.That(upgraded, Is.True);
 
-            bool hasTabTable = db.TableExist("cmsTab");
-            bool hasPropertyTypeGroupTable = db.TableExist("cmsPropertyTypeGroup");
-            bool hasAppTreeTable = db.TableExist("umbracoAppTree");
+            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sqlHelper);
+
+            bool hasTabTable = schemaHelper.TableExist("cmsTab");
+            bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
+            bool hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
 
             Assert.That(hasTabTable, Is.False);
             Assert.That(hasPropertyTypeGroupTable, Is.True);
@@ -95,10 +102,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public virtual void TearDown()
         {
             PluginManager.Current = null;
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-            MigrationResolver.Reset();
-            LoggerResolver.Reset();
-
+			
             TestHelper.CleanContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;

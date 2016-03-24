@@ -7,9 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace umbraco.presentation.dialogs {
-    
-    
+using System.Web.UI.WebControls;
+using umbraco.uicontrols;
+
+namespace umbraco.presentation.dialogs
+{
+
+
     public partial class sendToTranslation {
         
         /// <summary>
@@ -19,7 +23,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback;
+        protected Feedback feedback;
         
         /// <summary>
         /// pane_form control.
@@ -28,7 +32,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_form;
+        protected Pane pane_form;
         
         /// <summary>
         /// pp_translator control.
@@ -37,7 +41,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_translator;
+        protected PropertyPanel pp_translator;
         
         /// <summary>
         /// translator control.
@@ -46,7 +50,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList translator;
+        protected DropDownList translator;
         
         /// <summary>
         /// pp_language control.
@@ -55,7 +59,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_language;
+        protected PropertyPanel pp_language;
         
         /// <summary>
         /// language control.
@@ -64,7 +68,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList language;
+        protected DropDownList language;
         
         /// <summary>
         /// defaultLanguage control.
@@ -73,7 +77,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal defaultLanguage;
+        protected Literal defaultLanguage;
         
         /// <summary>
         /// pp_includeSubs control.
@@ -82,7 +86,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_includeSubs;
+        protected PropertyPanel pp_includeSubs;
         
         /// <summary>
         /// includeSubpages control.
@@ -91,7 +95,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox includeSubpages;
+        protected CheckBox includeSubpages;
         
         /// <summary>
         /// pp_comment control.
@@ -100,7 +104,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_comment;
+        protected PropertyPanel pp_comment;
         
         /// <summary>
         /// comment control.
@@ -109,7 +113,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox comment;
+        protected TextBox comment;
         
         /// <summary>
         /// pl_buttons control.
@@ -118,7 +122,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pl_buttons;
+        protected Panel pl_buttons;
         
         /// <summary>
         /// doTranslation control.
@@ -127,6 +131,6 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button doTranslation;
+        protected Button doTranslation;
     }
 }

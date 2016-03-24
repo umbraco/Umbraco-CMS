@@ -57,30 +57,6 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal int SqlCount { get; private set; }
 
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(IDbConnection connection)
-            : this(connection, LoggerResolver.Current.Logger)
-        {
-        }
-
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionString, string providerName)
-            : this(connectionString, providerName, LoggerResolver.Current.Logger)
-        {
-        }
-
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionString, DbProviderFactory provider)
-            : this(connectionString, provider, LoggerResolver.Current.Logger)
-        {
-        }
-
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionStringName)
-            : this(connectionStringName, LoggerResolver.Current.Logger)
-        {
-        }
-
         public UmbracoDatabase(IDbConnection connection, ILogger logger)
             : base(connection)
         {

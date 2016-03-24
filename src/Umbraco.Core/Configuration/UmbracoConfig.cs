@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.BaseRest;
 using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -41,12 +36,6 @@ namespace Umbraco.Core.Configuration
                 SetUmbracoSettings(umbracoSettings);
             }
 
-            if (_baseRestExtensions == null)
-            {
-                var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;                
-                SetBaseRestExtensions(baseRestExtensions);
-            }
-
             if (_dashboardSection == null)
             {
                 var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;                
@@ -58,18 +47,15 @@ namespace Umbraco.Core.Configuration
         /// Constructor - can be used for testing
         /// </summary>
         /// <param name="umbracoSettings"></param>
-        /// <param name="baseRestSettings"></param>
         /// <param name="dashboardSettings"></param>
-        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IBaseRestSection baseRestSettings, IDashboardSection dashboardSettings)
+        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IDashboardSection dashboardSettings)
         {
             SetUmbracoSettings(umbracoSettings);
-            SetBaseRestExtensions(baseRestSettings);
             SetDashboardSettings(dashboardSettings);
         }
 
         private IDashboardSection _dashboardSection;
         private IUmbracoSettingsSection _umbracoSettings;
-        private IBaseRestSection _baseRestExtensions;
         private IGridConfig _gridConfig;
 
         /// <summary>
@@ -119,31 +105,7 @@ namespace Umbraco.Core.Configuration
 
             return _umbracoSettings;
         }
-        
-        /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetBaseRestExtensions(IBaseRestSection value)
-        {
-            _baseRestExtensions = value;
-        }
-
-        /// <summary>
-        /// Gets the IBaseRestSection
-        /// </summary>
-        public IBaseRestSection BaseRestExtensions()
-        {
-            if (_baseRestExtensions == null)
-            {
-                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IBaseRestSection) + " from config file, ensure the web.config and BaseRestExtensions.config files are formatted correctly");
-                LogHelper.Error<UmbracoConfig>("Config error", ex);
-                throw ex;
-            }
-
-            return _baseRestExtensions;
-        }
-
+     
         /// <summary>
         /// Only for testing
         /// </summary>

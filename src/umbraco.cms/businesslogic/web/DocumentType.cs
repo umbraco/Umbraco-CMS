@@ -1,16 +1,15 @@
 using System;
 using System.Collections;
-using System.Text;
 using System.Xml;
 using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -68,66 +67,6 @@ namespace umbraco.cms.businesslogic.web
 
         #region Static Methods
 
-        /// <summary>
-        /// Generates the complete (simplified) XML DTD 
-        /// </summary>
-        /// <returns>The DTD as a string</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetDtd()", false)]
-        public static string GenerateDtd()
-        {
-            StringBuilder dtd = new StringBuilder();
-            // Renamed 'umbraco' to 'root' since the top level of the DOCTYPE should specify the name of the root node for it to be valid;
-            // there's no mention of 'umbraco' anywhere in the schema that this DOCTYPE governs
-            // (Alex N 20100212)
-            dtd.AppendLine("<!DOCTYPE root [ ");
-
-            dtd.AppendLine(GenerateXmlDocumentType());
-            dtd.AppendLine("]>");
-
-            return dtd.ToString();
-        }
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentTypesDtd()", false)]
-        public static string GenerateXmlDocumentType()
-        {
-            StringBuilder dtd = new StringBuilder();
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
-            }
-            else
-            {
-                // TEMPORARY: Added Try-Catch to this call since trying to generate a DTD against a corrupt db
-                // or a broken connection string is not handled yet
-                // (Alex N 20100212)
-                try
-                {
-                    StringBuilder strictSchemaBuilder = new StringBuilder();
-
-                    List<DocumentType> dts = GetAllAsList();
-                    foreach (DocumentType dt in dts)
-                    {
-                        string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
-                        if (safeAlias != null)
-                        {
-                            strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
-                            strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
-                        }
-                    }
-
-                    // Only commit the strong schema to the container if we didn't generate an error building it
-                    dtd.Append(strictSchemaBuilder);
-                }
-                catch (Exception exception)
-                {
-                    LogHelper.Error<DocumentType>("Exception while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
-                }
-
-            }
-            return dtd.ToString();
-
-        }
-
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentType()", false)]
         public new static DocumentType GetByAlias(string Alias)
         {
@@ -143,15 +82,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
-        public static DocumentType MakeNew(User u, string Text)
+        public static DocumentType MakeNew(IUser u, string Text)
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType);
 
-            //event
-            NewEventArgs e = new NewEventArgs();
-            newDt.OnNew(e);
 
             return newDt;
         }
@@ -338,45 +274,6 @@ namespace umbraco.cms.businesslogic.web
             return ids;
         } 
 
-        /// <summary>
-        /// Rebuilds the xml structure for the content item by id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <remarks>
-        /// This is not thread safe
-        /// </remarks>
-        internal override void RebuildXmlStructureForContentItem(int contentId)
-        {
-            var xd = new XmlDocument();
-            try
-            {
-                //create the document in optimized mode! 
-                // (not sure why we wouldn't always do that ?!)
-
-                new Document(true, contentId).XmlGenerate(xd);
-
-                //The benchmark results that I found based contructing the Document object with 'true' for optimized
-                //mode, vs using the normal ctor. Clearly optimized mode is better!
-                /*
-                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when using 
-                 * optimized mode is
-                 * 
-                 * 0.060400555555556
-                 * 
-                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when not
-                 * using optimized mode is
-                 * 
-                 * 0.107037777777778
-                 *                      
-                 * This means that by simply changing this to use optimized mode, it is a 45% improvement!
-                 * 
-                 */
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<DocumentType>("Error generating xml", ee);
-            }
-        }
 
         /// <summary>
         /// Clears all xml structures in the cmsContentXml table for the current content type and any of it's descendant types
@@ -447,23 +344,16 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
         public override void delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (e.Cancel == false)
+            // check that no document types uses me as a master
+            if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
             {
-                // check that no document types uses me as a master
-                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
-                {
-                    throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
-                }
-                
-                ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
-
-                clearTemplates();
-
-                FireAfterDelete(e);
+                throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
             }
+                
+            ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
+
+            clearTemplates();
+
         }
 
         public void clearTemplates()
@@ -504,18 +394,11 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+            var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
+            var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();                
+            ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId.Success ? userId.Result : 0);
 
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);
-
-                base.Save();
-                FireAfterSave(e);
-            }
+            base.Save();
         }
 
         #endregion
@@ -566,94 +449,5 @@ namespace umbraco.cms.businesslogic.web
         }
         #endregion
 
-        #region Events
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(DocumentType sender, SaveEventArgs e);
-        /// <summary>
-        /// The New event handler
-        /// </summary>
-        public delegate void NewEventHandler(DocumentType sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(DocumentType sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-            {
-                var updated = this.ContentType == null
-                                  ? new DocumentType(this.Id)
-                                  : new DocumentType(this.ContentType);
-                AfterSave(updated, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        public static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-        #endregion
     }
 }

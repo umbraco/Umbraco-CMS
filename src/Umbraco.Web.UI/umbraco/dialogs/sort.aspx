@@ -21,7 +21,7 @@
 
           <div id="loading" style="display: none; margin-bottom: 35px;">
                 <div class="notice">
-                    <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
+                    <p><%= Services.TextService.Localize("sort/sortPleaseWait") %></p>
                 </div>
                 
                 <div class="umb-loader-wrapper">
@@ -34,22 +34,22 @@
                     <asp:Literal runat="server" ID="sortDone"></asp:Literal>
                 </p>
                 <p>
-                    <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
+                    <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= Services.TextService.Localize("defaultdialogs/closeThisWindow")%></a>
                 </p>
             </div>
 
             <div id="sortArea">
                 <p class="help">
-                    <%= umbraco.ui.Text("sort", "sortHelp") %>
+                    <%= Services.TextService.Localize("sort/sortHelp") %>
                 </p>
 
                 <div id="sortableFrame">
                     <table id="sortableNodes">
                         <thead>
                             <tr>
-                                <th style="width: 100%"><%= umbraco.ui.Text("general", "name") %></th>
-                                <th class="nowrap" style="display: <%= HideDateColumn ? "none" : "table-cell" %>;"><%= umbraco.ui.Text("sort", "sortCreationDate") %></th>
-                                <th class="nowrap"><%= umbraco.ui.Text("sort", "sortOrder") %></th>
+                                <th style="width: 100%"><%= Services.TextService.Localize("general/name") %></th>
+                                <th class="nowrap" style="display: <%= HideDateColumn ? "none" : "table-cell" %>;"><%= Services.TextService.Localize("sort/sortCreationDate") %></th>
+                                <th class="nowrap"><%= Services.TextService.Localize("sort/sortOrder") %></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,8 +62,8 @@
 
     </div>
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <a id="closeWindowButton" href="#" class="btn btn-link"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
-        <input id="submitButton" type="button" class="btn btn-primary" value="<%=umbraco.ui.Text("save") %>" />
+        <a id="closeWindowButton" href="#" class="btn btn-link"><%=Services.TextService.Localize("general/cancel")%></a>
+        <input id="submitButton" type="button" class="btn btn-primary" value="<%=Services.TextService.Localize("save") %>" />
     </div>
 
     <script type="text/javascript">

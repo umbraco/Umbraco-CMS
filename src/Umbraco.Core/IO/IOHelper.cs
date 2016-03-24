@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Web.Hosting;
+using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -27,7 +28,52 @@ namespace Umbraco.Core.IO
             }
         }
 
-        //helper to try and match the old path to a new virtual one
+	    internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
+	    {
+	        // Unzip
+	        string tempDir = unPackDirectory;
+	        Directory.CreateDirectory(tempDir);
+
+	        using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
+	        {
+                ZipEntry theEntry;
+                while ((theEntry = s.GetNextEntry()) != null)
+                {
+                    string directoryName = Path.GetDirectoryName(theEntry.Name);
+                    string fileName = Path.GetFileName(theEntry.Name);
+
+                    if (fileName != String.Empty)
+                    {
+                        FileStream streamWriter = File.Create(tempDir + Path.DirectorySeparatorChar + fileName);
+
+                        int size = 2048;
+                        byte[] data = new byte[2048];
+                        while (true)
+                        {
+                            size = s.Read(data, 0, data.Length);
+                            if (size > 0)
+                            {
+                                streamWriter.Write(data, 0, size);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        streamWriter.Close();
+
+                    }
+                }
+
+                // Clean up
+                s.Close();
+                if (deleteZipFile)
+                    File.Delete(zipFilePath);
+            }
+	    }
+
+	    //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
             string retval = virtualPath;
@@ -66,33 +112,6 @@ namespace Umbraco.Core.IO
             {
                 return Attempt.Fail(virtualPath, ex);
             }
-        }
-
-	    [Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
-        internal static string ResolveUrlsFromTextString(string text)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
-            {				
-				using (DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
-				{
-					// find all relative urls (ie. urls that contain ~)
-					var tags = ResolveUrlPattern.Matches(text);
-					
-					foreach (Match tag in tags)
-					{						
-						string url = "";
-						if (tag.Groups[1].Success)
-							url = tag.Groups[1].Value;
-
-						if (String.IsNullOrEmpty(url) == false)
-						{
-							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-							text = text.Replace(url, resolvedUrl);
-						}
-					}
-				}
-            }
-            return text;
         }
 
         public static string MapPath(string path, bool useHttpContext)
@@ -206,20 +225,6 @@ namespace Umbraco.Core.IO
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Validates that the current filepath matches one of several directories where the user is allowed to edit a file.
-        /// </summary>
-        /// <param name="filePath">The filepath to validate.</param>
-        /// <param name="validDirs">The valid directories.</param>
-        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
-        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
-        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
-        {
-            if (VerifyEditPath(filePath, validDirs) == false)
-           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-            return true;
         }
 
         /// <summary>

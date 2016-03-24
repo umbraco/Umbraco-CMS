@@ -105,14 +105,14 @@ namespace Umbraco.Tests.Strings
             var name5 = "'em guys-over there, are#goin' a \"little\"bit crazy eh!! :)";
             var name6 = "汉#字*/漢?字";
 
-            var url1 = name1.ToUrlAlias(replacements, true, true, false);
-            var url2 = name2.ToUrlAlias(replacements, true, true, false);
-            var url3 = name3.ToUrlAlias(replacements, true, true, false);
-            var url4 = name4.ToUrlAlias(replacements, true, true, false);
-            var url5 = name5.ToUrlAlias(replacements, true, true, false);
-            var url6 = name6.ToUrlAlias(replacements, true, true, false);
-            var url7 = name6.ToUrlAlias(replacements, true, false, false);
-            var url8 = name6.ToUrlAlias(replacements, true, false, true);
+            var url1 = name1.ToUrlSegment();
+            var url2 = name2.ToUrlSegment();
+            var url3 = name3.ToUrlSegment();
+            var url4 = name4.ToUrlSegment();
+            var url5 = name5.ToUrlSegment();
+            var url6 = name6.ToUrlSegment();
+            var url7 = name6.ToUrlSegment();
+            var url8 = name6.ToUrlSegment();
 
             Assert.AreEqual("home-page", url1);
             Assert.AreEqual("shannons-home-page", url2);
@@ -136,9 +136,9 @@ namespace Umbraco.Tests.Strings
 
             //Act
 
-            var camelCase1 = name1.ConvertCase(StringAliasCaseType.CamelCase);
-            var camelCase2 = name2.ConvertCase(StringAliasCaseType.CamelCase);
-            var camelCase3 = name3.ConvertCase(StringAliasCaseType.CamelCase);
+            var camelCase1 = name1.ToCleanString(CleanStringType.CamelCase);
+            var camelCase2 = name2.ToCleanString(CleanStringType.CamelCase);
+            var camelCase3 = name3.ToCleanString(CleanStringType.CamelCase);
 
             //Assert
 
@@ -160,11 +160,11 @@ namespace Umbraco.Tests.Strings
 
             //Act
 
-            var alias1 = name1.ToUmbracoAlias();
-            var alias2 = name2.ToUmbracoAlias();
-            var alias3 = name3.ToUmbracoAlias();
-            var alias4 = name4.ToUmbracoAlias();
-            var alias5 = name5.ToUmbracoAlias(/*StringAliasCaseType.PascalCase*/);
+            var alias1 = name1.ToSafeAlias();
+            var alias2 = name2.ToSafeAlias();
+            var alias3 = name3.ToSafeAlias();
+            var alias4 = name4.ToSafeAlias();
+            var alias5 = name5.ToSafeAlias(/*StringAliasCaseType.PascalCase*/);
 
             //Assert
 

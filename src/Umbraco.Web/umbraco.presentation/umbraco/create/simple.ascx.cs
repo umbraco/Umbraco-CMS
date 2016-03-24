@@ -1,17 +1,13 @@
-﻿using System.Web;
-using System.Web.UI;
-using ClientDependency.Core;
+﻿using Umbraco.Core.Services;
+using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Web;
 using System;
-using Umbraco.Web.UI.Controls;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using Umbraco.Web;
 using System.Linq;
+using Umbraco.Web._Legacy.UI;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
@@ -24,8 +20,8 @@ namespace umbraco.cms.presentation.create.controls
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sbmt.Text = ui.Text("create");
-            rename.Attributes["placeholder"] = ui.Text("name");
+            sbmt.Text = Services.TextService.Localize("create");
+            rename.Attributes["placeholder"] = Services.TextService.Localize("name");
 
             // Put user code to initialize the page here
         }
@@ -43,13 +39,13 @@ namespace umbraco.cms.presentation.create.controls
 
                     var returnUrl = LegacyDialogHandler.Create(
                         new HttpContextWrapper(Context),
-                        new User(Security.CurrentUser),
+                        Security.CurrentUser,
                         Request.GetItemAsString("nodeType"),
                             nodeId,
                             rename.Text.Trim(),
                             Request.QueryString.AsEnumerable().ToDictionary(x => x.Key, x => (object)x.Value));
 
-                    BasePage.Current.ClientTools
+                    ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ReloadActionNode(false, true)
                     .CloseModalWindow();

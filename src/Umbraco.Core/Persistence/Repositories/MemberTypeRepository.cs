@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -22,8 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
 
-        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
+            sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -71,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -87,9 +88,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isCount)
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                    .From<NodeDto>(SqlSyntax)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
                 return sql;
             }
 
@@ -100,13 +101,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
                 "cmsPropertyTypeGroup.text AS PropertyGroupName",
                 "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
-                .From<NodeDto>()
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<NodeDto>(SqlSyntax)
+                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -114,13 +115,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("DISTINCT(umbracoNode.id)")
-                .From<NodeDto>()
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<NodeDto>(SqlSyntax)
+                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

@@ -1,19 +1,14 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Xml;
-using System.Xml.Xsl;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.BasePages;
 using umbraco.uicontrols;
-using System.Net;
 using umbraco.cms.presentation.Trees;
-using umbraco.cms.helpers;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -33,7 +28,7 @@ namespace umbraco.cms.presentation.developer
 			if (!IsPostBack)
 			{
 				string file = Request.QueryString["file"];
-				string path = DeepLink.GetTreePathFromFilePath(file);
+				string path = BaseTree.GetTreePathFromFilePath(file);
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
 					.SyncTree(path, false);
@@ -49,7 +44,7 @@ namespace umbraco.cms.presentation.developer
 
             SaveButton = UmbracoPanel1.Menu.NewButton();
             SaveButton.ToolTip = "Save Xslt File";
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";

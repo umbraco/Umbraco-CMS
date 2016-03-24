@@ -27,12 +27,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private DictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private IDictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var dictionaryRepository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
-            return dictionaryRepository;
+            return Container.GetInstance<IDatabaseUnitOfWork, IDictionaryRepository>(unitOfWork);
         }
-
 
         [Test]
         public void Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -212,7 +210,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == "Article");
+                var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey == "Article");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -232,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey.StartsWith("Read"));
+                var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey.StartsWith("Read"));
                 var result = repository.Count(query);
 
                 // Assert
@@ -246,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            using (var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork))
             using (var repository = CreateRepository(unitOfWork))
             {
 
@@ -304,7 +302,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
+            var repository = CreateRepository(unitOfWork);
 
             var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNo);

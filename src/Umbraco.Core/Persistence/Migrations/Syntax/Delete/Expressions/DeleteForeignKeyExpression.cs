@@ -8,14 +8,10 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
-        //public DeleteForeignKeyExpression(ISqlSyntaxProvider sqlSyntax)
-        //    : base(sqlSyntax)
-        //{
-        //    ForeignKey = new ForeignKeyDefinition();
-        //}
+
 
         public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {   
             ForeignKey = new ForeignKeyDefinition();
         }

@@ -79,7 +79,7 @@ namespace Umbraco.Web.Scheduling
 
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
-                Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
+                _appContext.Services.AuditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
             }
 
             return true; // repeat

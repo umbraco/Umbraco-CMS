@@ -4,18 +4,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
-using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
-using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
 using Language = umbraco.cms.businesslogic.language.Language;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
@@ -146,27 +141,7 @@ namespace umbraco.cms.businesslogic
             PropertyTypeCache.Clear();
         }
 
-        public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
-        {
-            //propertyTypeAlias needs to be invariant, so we will store uppercase
-            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias.ToUpper());
-
-
-            return PropertyTypeCache.GetOrAdd(
-                key,
-                tuple =>
-                {
-                    // With 4.10 we can't do this via direct SQL as we have content type mixins
-                    var controlId = Guid.Empty;
-                    var ct = GetByAlias(contentTypeAlias);
-                    var pt = ct.getPropertyType(propertyTypeAlias);
-                    if (pt != null)
-                    {
-                        controlId = pt.DataTypeDefinition.DataType.Id;
-                    }
-                    return controlId;
-                });
-        }
+       
 
         /// <summary>
         /// Gets the type of the content.
@@ -209,7 +184,7 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery(
                                       "Insert into cmsContentType (nodeId,alias,icon) values (" + 
                                       nodeId + ",'" +
-                                      (formatAlias ? helpers.Casing.SafeAliasWithForcingCheck(alias) : alias) +
+                                      (formatAlias ? alias.ToSafeAliasWithForcingCheck() : alias) +
                                       "','" + iconUrl + "')");
         }
 
@@ -265,19 +240,7 @@ namespace umbraco.cms.businesslogic
 
         #region Regenerate Xml Structures
 
-        /// <summary>
-        /// Used to rebuild all of the xml structures for content of the current content type in the cmsContentXml table
-        /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        internal void RebuildXmlStructuresForContent()
-        {
-            //Clears all xml structures in the cmsContentXml table for the current content type
-            ClearXmlStructuresForContent();
-            foreach (var i in GetContentIdsForContentType())
-            {
-                RebuildXmlStructureForContentItem(i);
-            }
-        }
+       
 
         /// <summary>
         /// Returns all content ids associated with this content type
@@ -306,25 +269,7 @@ namespace umbraco.cms.businesslogic
             return ids;
         }
 
-        /// <summary>
-        /// Rebuilds the xml structure for the content item by id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <remarks>
-        /// This is not thread safe
-        /// </remarks>
-        internal virtual void RebuildXmlStructureForContentItem(int contentId)
-        {
-            var xd = new XmlDocument();
-            try
-            {
-                new Content(contentId).XmlGenerate(xd);
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<ContentType>("Error generating xml", ee);
-            }
-        }
+      
 
         /// <summary>
         /// Clears all xml structures in the cmsContentXml table for the current content type
@@ -350,7 +295,7 @@ namespace umbraco.cms.businesslogic
             get { return _alias; }
             set
             {
-                _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
+                _alias = value.ToSafeAliasWithForcingCheck();
 
                 // validate if alias is empty
                 if (String.IsNullOrEmpty(_alias))
@@ -909,14 +854,7 @@ namespace umbraco.cms.businesslogic
         {
             return _description;
         }
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        public override void Save()
-        {
-            base.Save();
-        }
-
+  
         /// <summary>
         /// Retrieve a list of all ContentTypes
         /// </summary>
@@ -945,30 +883,6 @@ namespace umbraco.cms.businesslogic
 
         }
 
-        /// <summary>
-        /// Adding a PropertyType to the ContentType, will add a new datafield/Property on all Documents of this Type.
-        /// </summary>
-        /// <param name="dt">The DataTypeDefinition of the PropertyType</param>
-        /// <param name="Alias">The Alias of the PropertyType</param>
-        /// <param name="Name">The userfriendly name</param>
-        public PropertyType AddPropertyType(DataTypeDefinition dt, string Alias, string Name)
-        {
-            PropertyType pt = PropertyType.MakeNew(dt, this, Name, Alias);
-
-            // Optimized call
-            PopulatePropertyData(pt, Id);
-
-            // Inherited content types (document types only)
-            PopulateMasterContentTypes(pt, Id);
-
-            //			foreach (Content c in Content.getContentOfContentType(this)) 
-            //				c.addProperty(pt,c.Version);
-
-            // Remove from cache
-            FlushFromCache(Id);
-
-            return pt;
-        }
 
         /// <summary>
         /// Adding a PropertyType to a Tab, the Tabs are primarily used for making the 
@@ -1342,27 +1256,6 @@ namespace umbraco.cms.businesslogic
             */
         }
 
-        private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
-        {
-            foreach (var docType in DocumentType.GetAllAsList())
-            {
-                //TODO: Check for multiple references (mixins) not causing endless loops!
-                if (docType.MasterContentTypes.Contains(docTypeId))
-                {
-                    PopulatePropertyData(pt, docType.Id);
-                    PopulateMasterContentTypes(pt, docType.Id);
-                }
-            }
-        }
-
-        private static void PopulatePropertyData(PropertyType pt, int contentTypeId)
-        {
-            // NH: PropertyTypeId inserted directly into SQL instead of as a parameter for SQL CE 4 compatibility
-            SqlHelper.ExecuteNonQuery(
-                                      "insert into cmsPropertyData (contentNodeId, versionId, propertyTypeId) select contentId, versionId, " + pt.Id + " from cmsContent inner join cmsContentVersion on cmsContent.nodeId = cmsContentVersion.contentId where contentType = @contentTypeId",
-                                      SqlHelper.CreateParameter("@contentTypeId", contentTypeId));
-        }
-
         #endregion
 
         #region Public TabI Interface
@@ -1422,12 +1315,6 @@ namespace umbraco.cms.businesslogic
             /// Method for moving the tab up
             /// </summary>
             void MoveUp();
-
-            /// <summary>
-            /// Method for retrieving the original, non processed name from the db
-            /// </summary>
-            /// <returns>The original, non processed name from the db</returns>
-            string GetRawCaption();
 
             /// <summary>
             /// Method for moving the tab down

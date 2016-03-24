@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Alter.Table("cmsContentVersion").AddColumn("LanguageLocale").AsString(10).Nullable();

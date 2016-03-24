@@ -41,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 	            _umbracoContext, _logger
 	        };
 	        var ctors = t.GetConstructors();
-	        foreach (var ctor in ctors.OrderByDescending(x => x.GetParameters().Count()))
+	        foreach (var ctor in ctors.OrderByDescending(x => x.GetParameters().Length))
 	        {
 	            var args = new List<object>();
 	            var allParams = ctor.GetParameters().ToArray();

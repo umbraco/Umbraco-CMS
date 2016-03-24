@@ -8,6 +8,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -16,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TagRepository : PetaPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        internal TagRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public TagRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 
@@ -175,7 +176,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.UniqueId == key);
+                .Where<NodeDto>(SqlSyntax, dto => dto.UniqueId == key);
 
             return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
         }
@@ -193,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeId == id);
+                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == id);
 
             return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
         }
@@ -211,13 +212,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<TagDto>(dto => dto.Group == tagGroup);
+                .Where<TagDto>(SqlSyntax, dto => dto.Group == tagGroup);
 
             if (objectType != TaggableObjectTypes.All)
             {
                 var nodeObjectType = GetNodeObjectType(objectType);
                 sql = sql
-                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == nodeObjectType);
             }
 
             return CreateTaggedEntityCollection(
@@ -237,18 +238,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<TagDto>(dto => dto.Tag == tag);
+                .Where<TagDto>(SqlSyntax, dto => dto.Tag == tag);
 
             if (objectType != TaggableObjectTypes.All)
             {
                 var nodeObjectType = GetNodeObjectType(objectType);
                 sql = sql
-                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == nodeObjectType);
             }
 
             if (tagGroup.IsNullOrWhiteSpace() == false)
             {
-                sql = sql.Where<TagDto>(dto => dto.Group == tagGroup);
+                sql = sql.Where<TagDto>(SqlSyntax, dto => dto.Group == tagGroup);
             }
 
             return CreateTaggedEntityCollection(
@@ -279,7 +280,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var nodeObjectType = GetNodeObjectType(objectType);
                 sql = sql
-                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == nodeObjectType);
             }
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
@@ -296,7 +297,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql = ApplyRelationshipJoinToTagsQuery(sql);
 
             sql = sql
-                .Where<NodeDto>(dto => dto.NodeId == contentId);
+                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == contentId);
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
@@ -310,7 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql = ApplyRelationshipJoinToTagsQuery(sql);
 
             sql = sql
-                .Where<NodeDto>(dto => dto.UniqueId == contentId);
+                .Where<NodeDto>(SqlSyntax, dto => dto.UniqueId == contentId);
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
@@ -326,8 +327,8 @@ namespace Umbraco.Core.Persistence.Repositories
             sql = sql
                 .InnerJoin<PropertyTypeDto>(SqlSyntax)
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
-                .Where<NodeDto>(dto => dto.NodeId == contentId)
-                .Where<PropertyTypeDto>(dto => dto.Alias == propertyTypeAlias);
+                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == contentId)
+                .Where<PropertyTypeDto>(SqlSyntax, dto => dto.Alias == propertyTypeAlias);
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
@@ -343,8 +344,8 @@ namespace Umbraco.Core.Persistence.Repositories
             sql = sql
                 .InnerJoin<PropertyTypeDto>(SqlSyntax)
                 .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
-                .Where<NodeDto>(dto => dto.UniqueId == contentId)
-                .Where<PropertyTypeDto>(dto => dto.Alias == propertyTypeAlias);
+                .Where<NodeDto>(SqlSyntax, dto => dto.UniqueId == contentId)
+                .Where<PropertyTypeDto>(SqlSyntax, dto => dto.Alias == propertyTypeAlias);
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
@@ -383,7 +384,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (@group.IsNullOrWhiteSpace() == false)
             {
-                sql = sql.Where<TagDto>(dto => dto.Group == group);
+                sql = sql.Where<TagDto>(SqlSyntax, dto => dto.Group == group);
             }
 
             return sql;

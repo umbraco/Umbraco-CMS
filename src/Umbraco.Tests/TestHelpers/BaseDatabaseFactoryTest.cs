@@ -14,7 +14,9 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -24,6 +26,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -66,51 +69,62 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            base.Initialize();
+        }
 
+        protected override void ConfigureContainer()
+        {
+            base.ConfigureContainer();
+
+            Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+        }
+
+        private CacheHelper _disabledCacheHelper;
+        protected CacheHelper DisabledCache
+        {
+            get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
+        }
+
+        protected override void SetupApplicationContext()
+        {           
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
-
+            
             var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
-                cacheHelper,
+                new ServiceContext(
+                        Container.GetInstance<RepositoryFactory>(),
+                        new PetaPocoUnitOfWorkProvider(dbFactory),
+                        new FileUnitOfWorkProvider(),
+                        new PublishingStrategy(evtMsgs, Logger),
+                        CacheHelper,
+                        Logger,
+                        evtMsgs,
+                        Enumerable.Empty<IUrlSegmentProvider>()),
+                CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true
             };
 
-            base.Initialize();
+            ApplicationContext.Current = _appContext;
 
             using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                _appContext.DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
                 //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
             }
-        }
-
-        protected virtual ISqlSyntaxProvider SqlSyntax
-        {
-            get { return new SqlCeSyntaxProvider(); }
-        }
-
-        protected override void SetupApplicationContext()
-        {
-            ApplicationContext.Current = _appContext;
         }
 
         /// <summary>
@@ -196,6 +210,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
         }
+        
 
         /// <summary>
         /// sets up resolvers before resolution is frozen
@@ -203,20 +218,14 @@ namespace Umbraco.Tests.TestHelpers
         protected override void FreezeResolution()
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
-                new ActivatorServiceProvider(), Logger,
-                () => PluginManager.Current.ResolvePropertyEditors(),
-                ApplicationContext.ApplicationCache.RuntimeCache);
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                new ActivatorServiceProvider(), Logger,
-                () => PluginManager.Current.ResolveDataTypes());
-
-            MappingResolver.Current = new MappingResolver(
-                new ActivatorServiceProvider(), Logger,
-               () => PluginManager.Current.ResolveAssignedMapperTypes());
+                 Container, Logger,
+                 () => PluginManager.Current.ResolvePropertyEditors(),
+                 new ManifestBuilder(
+                     new NullCacheProvider(),
+                     new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider())));
 
             if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(Container, Logger);
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
@@ -245,7 +254,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax);
                 //Create the umbraco database and its base data
-                schemaHelper.CreateDatabaseSchema(false, ApplicationContext);
+                schemaHelper.CreateDatabaseSchema(_appContext);
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
                 // damn db for each test
@@ -275,7 +284,6 @@ namespace Umbraco.Tests.TestHelpers
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
-                SqlSyntaxContext.SqlSyntaxProvider = null;
             }
 
             base.TearDown();
@@ -354,15 +362,13 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
-            var cache = new PublishedContentCache();
-
-            cache.GetXmlDelegate = (context, preview) =>
-                {
-                    var doc = new XmlDocument();
-                    doc.LoadXml(GetXmlContent(templateId));
-                    return doc;
-                };
-
+            var cache = new PublishedContentCache((context, preview) =>
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(GetXmlContent(templateId));
+                return doc;
+            });
+            
             PublishedContentCache.UnitTesting = true;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
@@ -385,11 +391,7 @@ namespace Umbraco.Tests.TestHelpers
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-
-
-            //set the state helper
-            StateHelper.HttpContext = factory.HttpContext;
-
+            
             return factory;
         }
 

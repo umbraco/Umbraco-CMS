@@ -18,7 +18,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Cache;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 using File = System.IO.File;
 
 namespace Umbraco.Core
@@ -46,7 +46,7 @@ namespace Umbraco.Core
         /// <param name="detectChanges"></param>
         /// <param name="serviceProvider"></param>
         /// <param name="runtimeCache"></param>
-        internal PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
+        public PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
             if (runtimeCache == null) throw new ArgumentNullException("runtimeCache");
@@ -494,7 +494,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolveApplicationStartupHandlers()
         {
-            return ResolveTypes<IApplicationStartupHandler>();
+            return ResolveTypes<IApplicationEventHandler>();
         }
 
         /// <summary>
@@ -504,34 +504,7 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveCacheRefreshers()
         {
             return ResolveTypes<ICacheRefresher>();
-        }
-
-        /// <summary>
-        /// Returns all available IPropertyEditorValueConverter
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePropertyEditorValueConverters()
-        {
-            return ResolveTypes<IPropertyEditorValueConverter>();
-        }
-
-        /// <summary>
-        /// Returns all available IDataType in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveDataTypes()
-        {
-            return ResolveTypes<IDataType>();
-        }
-
-        /// <summary>
-        /// Returns all available IMacroGuiRendering in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMacroRenderings()
-        {
-            return ResolveTypes<IMacroGuiRendering>();
-        }
+        }      
 
         /// <summary>
         /// Returns all available IPackageAction in application
@@ -542,14 +515,7 @@ namespace Umbraco.Core
             return ResolveTypes<IPackageAction>();
         }
 
-        /// <summary>
-        /// Returns all available IAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveActions()
-        {
-            return ResolveTypes<IAction>();
-        }
+        
 
         /// <summary>
         /// Returns all mapper types that have a MapperFor attribute defined
@@ -558,16 +524,7 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveAssignedMapperTypes()
         {
             return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
-        } 
-        
-        /// <summary>
-        /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveSqlSyntaxProviders()
-        {
-            return ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
-        }
+        }               
 
         /// <summary>
         /// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
@@ -577,46 +534,7 @@ namespace Umbraco.Core
         {
             get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
             set { _assemblies = value; }
-        }
-
-        /// <summary>
-        /// Used to resolve and create instances of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <param name="cacheResult"></param>
-        /// <param name="specificAssemblies"></param>
-        /// <returns></returns>
-        internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false, bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
-        {
-            var types = ResolveTypes<T>(cacheResult, specificAssemblies);
-            return CreateInstances<T>(types, throwException);
-        }
-
-        /// <summary>
-        /// Used to create instances of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="types"></param>
-        /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
-        /// <returns></returns>
-        internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
-        {
-            return _serviceProvider.CreateInstances<T>(types, _logger.Logger, throwException);
-        }
-
-        /// <summary>
-        /// Used to create an instance of the specified type based on the resolved/cached plugin types
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="type"></param>
-        /// <param name="throwException"></param>
-        /// <returns></returns>
-        internal T CreateInstance<T>(Type type, bool throwException = false)
-        {
-            var instances = CreateInstances<T>(new[] { type }, throwException);
-            return instances.FirstOrDefault();
-        }
+        }     
 
         private IEnumerable<Type> ResolveTypes<T>(
             Func<IEnumerable<Type>> finder,

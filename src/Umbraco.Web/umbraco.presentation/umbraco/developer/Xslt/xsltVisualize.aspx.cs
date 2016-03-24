@@ -9,16 +9,15 @@ using System.Xml;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-    public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
-    {
-        
-		// zb-00004 #29956 : refactor cookies names & handling
-		static global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie cookie
-			= new global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_XSLTVISPG", TimeSpan.FromMinutes(20)); // was "XSLTVisualizerPage"
+    public partial class xsltVisualize : UmbracoEnsuredPage
+    {        
+        private const string XsltVisualizeCookieName = "UMB_XSLTVISPG";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -26,8 +25,8 @@ namespace umbraco.presentation.umbraco.developer.Xslt
             {
                 // Check if cookie exists in the current request.
 				// zb-00004 #29956 : refactor cookies names & handling
-				if (cookie.HasValue)
-                    contentPicker.Value = cookie.GetValue();
+				if (Request.HasCookieValue(XsltVisualizeCookieName))
+                    contentPicker.Value = Request.GetCookieValue(XsltVisualizeCookieName);
             }            
 
         }
@@ -90,7 +89,10 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
             // add cookie with current page
 			// zb-00004 #29956 : refactor cookies names & handling
-			cookie.SetValue(contentPicker.Value);
+			Response.Cookies.Set(new HttpCookie(XsltVisualizeCookieName, contentPicker.Value)
+			{
+			    Expires = DateTime.Now + TimeSpan.FromMinutes(20)
+            });
         }
 
     }

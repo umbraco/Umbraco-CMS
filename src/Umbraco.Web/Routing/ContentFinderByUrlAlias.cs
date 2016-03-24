@@ -19,6 +19,13 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
     public class ContentFinderByUrlAlias : IContentFinder
     {
+        protected ILogger Logger { get; private set; }
+
+        public ContentFinderByUrlAlias(ILogger logger)
+	    {
+	        Logger = logger;
+	    }
+
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
@@ -37,7 +44,7 @@ namespace Umbraco.Web.Routing
 				if (node != null)
 				{					
 					docRequest.PublishedContent = node;
-					LogHelper.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
+					Logger.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
 				}
 			}
 
@@ -124,7 +131,7 @@ namespace Umbraco.Web.Routing
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				var version = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? 0 : 1;
+			    var version = 1;
 				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
 					_xPathStringsValue = new XPathStringsDefinition(version);
 				return _xPathStringsValue;

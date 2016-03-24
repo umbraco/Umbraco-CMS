@@ -17,8 +17,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
     {
         public override void DatabaseSpecificSetUp()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
 
             if (!File.Exists(filePath))

@@ -104,28 +104,12 @@ namespace Umbraco.Tests.Strings
         }
 
         [Test]
-        public void U4_4055_4056()
-        {
-            var settings = SettingsForTests.GenerateMockSettings();
-            var contentMock = Mock.Get(settings.RequestHandler);
-            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
-
-            const string input = "publishedVersion";
-
-            Assert.AreEqual("PublishedVersion", input.ConvertCase(StringAliasCaseType.PascalCase)); // obsolete, use the one below
-            Assert.AreEqual("PublishedVersion", input.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase | CleanStringType.Ascii)); // role, case and code
-        }
-
-        [Test]
         public void U4_4056()
         {
             var settings = SettingsForTests.GenerateMockSettings();
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
@@ -133,7 +117,7 @@ namespace Umbraco.Tests.Strings
             var output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
+            helper = new DefaultShortStringHelper(settings)
                 .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
                 {
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
@@ -411,7 +395,6 @@ namespace Umbraco.Tests.Strings
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             var helper = new DefaultShortStringHelper(settings).WithDefaultConfig();
 

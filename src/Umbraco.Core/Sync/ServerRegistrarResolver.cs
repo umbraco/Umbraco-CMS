@@ -1,20 +1,32 @@
-﻿using Umbraco.Core.ObjectResolution;
+﻿using System;
+using System.Linq.Expressions;
+using LightInject;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// Resolves the IServerRegistrar object.
     /// </summary>
-    public sealed class ServerRegistrarResolver : SingleObjectResolverBase<ServerRegistrarResolver, IServerRegistrar>
+    public sealed class ServerRegistrarResolver : ContainerSingleObjectResolver<ServerRegistrarResolver, IServerRegistrar>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrarResolver"/> class with a registrar.
         /// </summary>
-        /// <param name="factory">An instance of a registrar.</param>
+        /// <param name="value">An instance of a registrar.</param>
         /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
-        internal ServerRegistrarResolver(IServerRegistrar factory)
-            : base(factory)
-        { }
+        public ServerRegistrarResolver(IServerRegistrar value) : base(value)
+        {
+        }
+        internal ServerRegistrarResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+        {
+        }
+
+        internal ServerRegistrarResolver(IServiceContainer container, Func<IServiceFactory, IServerRegistrar> implementationType)
+            : base(container, implementationType)
+        {
+        }
 
         /// <summary>
         /// Sets the registrar.

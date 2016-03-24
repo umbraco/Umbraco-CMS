@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             var e = new UpgradingEventArgs();
@@ -26,6 +27,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 
         public static event EventHandler<UpgradingEventArgs> Upgrading;
 
-        public class UpgradingEventArgs : EventArgs{}
+        public class UpgradingEventArgs : EventArgs { }
     }
 }

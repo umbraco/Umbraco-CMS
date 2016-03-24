@@ -29,12 +29,10 @@ namespace Umbraco.Web.WebServices
         public JsonResult PublishDocument(int documentId, bool publishDescendants, bool includeUnpublished)
         {
             var content = Services.ContentService.GetById(documentId);
-            var doc = new Document(content);
-            //var contentService = (ContentService) Services.ContentService;
+
             if (publishDescendants == false)
             {
-                //var result = contentService.SaveAndPublishInternal(content);
-                var result = doc.SaveAndPublish(UmbracoUser.Id);
+                var result = Services.ContentService.SaveAndPublishWithStatus(content, Security.CurrentUser.Id);
                 return Json(new
                     {
                         success = result.Success,
@@ -43,10 +41,10 @@ namespace Umbraco.Web.WebServices
             }
             else
             {
-                /*var result = ((ContentService) Services.ContentService)
-                    .PublishWithChildrenInternal(content, UmbracoUser.Id, includeUnpublished)
-                    .ToArray();*/
-                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished);
+                var result = Services.ContentService
+                    .PublishWithChildrenWithStatus(content, Security.CurrentUser.Id, includeUnpublished)
+                    .ToArray();
+
                 return Json(new
                     {
                         success = result.All(x => x.Success),
@@ -60,7 +58,7 @@ namespace Umbraco.Web.WebServices
             //if all are successful then just say it was successful
             if (statuses.All(x => ((int) x.StatusType) < 10))
             {
-                return ui.Text("publish", "nodePublishAll", doc.Name, UmbracoUser);
+                return Services.TextService.Localize("publish/nodePublishAll", new[] { doc.Name});
             }
 
             //if they are not all successful the we'll add each error message to the output (one per line)
@@ -81,24 +79,23 @@ namespace Umbraco.Web.WebServices
             {
                 case PublishStatusType.Success:
                 case PublishStatusType.SuccessAlreadyPublished:
-                    return ui.Text("publish", "nodePublish", status.ContentItem.Name, UmbracoUser);
+                    return Services.TextService.Localize("publish/nodePublish", new[] { status.ContentItem.Name});
                 case PublishStatusType.FailedPathNotPublished:
-                    return ui.Text("publish", "contentPublishedFailedByParent", 
-                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
+                    return Services.TextService.Localize("publish/contentPublishedFailedByParent", 
+                                   new [] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) });
                 case PublishStatusType.FailedHasExpired:                    
                 case PublishStatusType.FailedAwaitingRelease:
                 case PublishStatusType.FailedIsTrashed:
                     return "Cannot publish document with a status of " + status.StatusType;
                 case PublishStatusType.FailedCancelledByEvent:
-                    return ui.Text("publish", "contentPublishedFailedByEvent",
-                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
+                    return Services.TextService.Localize("publish/contentPublishedFailedByEvent",
+                                   new [] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) });
                 case PublishStatusType.FailedContentInvalid:
-                    return ui.Text("publish", "contentPublishedFailedInvalid",
+                    return Services.TextService.Localize("publish/contentPublishedFailedInvalid",
                                    new []{
                                        string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), 
                                        string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                                   }, 
-                                   UmbracoUser);  
+                                   });  
                 default:
                     return status.StatusType.ToString();
             }

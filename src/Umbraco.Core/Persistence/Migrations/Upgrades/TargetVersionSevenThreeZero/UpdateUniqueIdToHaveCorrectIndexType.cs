@@ -6,6 +6,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
+    //see: http://issues.umbraco.org/issue/U4-6188, http://issues.umbraco.org/issue/U4-6187
+
     [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
@@ -14,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
         {
         }
 
-        //see: http://issues.umbraco.org/issue/U4-6188, http://issues.umbraco.org/issue/U4-6187
+
         public override void Up()
         {
 

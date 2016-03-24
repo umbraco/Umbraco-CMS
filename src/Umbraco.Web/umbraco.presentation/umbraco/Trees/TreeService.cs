@@ -1,37 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using System.Collections.Specialized;
-using Umbraco.Core.IO;
 using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.Trees
 {
-
-	/// <summary>
-	/// A utility class to aid in creating the URL for returning XML for a tree structure and
-	/// for reading the parameters from the URL when a request is made.
-	/// </summary>
-	public class TreeService : TreeUrlGenerator, ITreeService
+    /// <summary>
+    /// A utility class to aid in creating the URL for returning XML for a tree structure and
+    /// for reading the parameters from the URL when a request is made.
+    /// </summary>
+    public class TreeService : TreeUrlGenerator, ITreeService
 	{
 
 		/// <summary>

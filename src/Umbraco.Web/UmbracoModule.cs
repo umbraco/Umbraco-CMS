@@ -104,13 +104,7 @@ namespace Umbraco.Web
                 return;
             }
 
-			// do not process but remap to handler if it is a base rest request
-			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.OriginalRequestUrl))
-			{
-				httpContext.RemapHandler(new BaseRest.BaseRestHandler());
-				return;
-			}
-
+		
 			// do not process if this request is not a front-end routable page
 		    var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
             //raise event here

@@ -35,23 +35,6 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// Returns an instance of the default controller instance.
-        /// </summary>
-        [Obsolete("This method will be removed in future versions and should not be used to resolve a controller instance, the IControllerFactory is used for that purpose")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IRenderMvcController GetControllerInstance()
-        {
-            //try the dependency resolver, then the activator
-            var instance = DependencyResolver.Current.GetService(Value) ?? Activator.CreateInstance(Value);
-            var result = instance as IRenderMvcController;
-            if (result == null)
-            {
-                throw new InvalidOperationException("Could not create an instance of " + Value + " for the default " + typeof(IRenderMvcController).Name);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Sets the default RenderMvcController type
         /// </summary>
         /// <param name="controllerType"></param>

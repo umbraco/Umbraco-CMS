@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     public class DeleteDefaultConstraintExpression : MigrationExpressionBase
     {
         public DeleteDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

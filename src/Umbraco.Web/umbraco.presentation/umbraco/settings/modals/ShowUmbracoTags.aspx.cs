@@ -9,18 +9,19 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.modal
 {
     /// <summary>
     /// Summary description for ShowUmbracoTags.
     /// </summary>
-    public partial class ShowUmbracoTags : BasePages.UmbracoEnsuredPage
+    public partial class ShowUmbracoTags : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         public ShowUmbracoTags()
         {
-            CurrentApp = DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
         }
 
         public static string alias = "";

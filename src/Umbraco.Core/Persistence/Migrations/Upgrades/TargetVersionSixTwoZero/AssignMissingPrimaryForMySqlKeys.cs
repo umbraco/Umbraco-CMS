@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
-    
+
     //see: http://issues.umbraco.org/issue/U4-4430
     [Migration("7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
@@ -16,12 +16,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         {
         }
 
+
         public override void Up()
         {
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
-                
+
                 //This should be 2 because this table has 2 keys
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsContentTypeAllowedContentType") && x.Item3.InvariantEquals("PRIMARY")) == 0)
                 {

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -12,19 +13,18 @@ namespace Umbraco.Core.Persistence.Mappers
     public sealed class ExternalLoginMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-        public ExternalLoginMapper()
+       
+        public ExternalLoginMapper(ISqlSyntaxProvider sqlSyntax)
+            : base(sqlSyntax)
         {
-            BuildMap();
         }
-
-        #region Overrides of BaseMapper
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
         {
             get { return PropertyInfoCacheInstance; }
         }
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.Id, dto => dto.Id);
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.CreateDate, dto => dto.CreateDate);
@@ -32,8 +32,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.ProviderKey, dto => dto.ProviderKey);
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.UserId, dto => dto.UserId);
         }
-
-        #endregion
     }
 
     [MapperFor(typeof(IUser))]
@@ -42,21 +40,20 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public UserMapper()
-        {
-            BuildMap();
-        }
 
         #region Overrides of BaseMapper
+
+        public UserMapper(ISqlSyntaxProvider sqlSyntax)
+            : base(sqlSyntax)
+        {
+        }
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
         {
             get { return PropertyInfoCacheInstance; }
         }
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<User, UserDto>(src => src.Id, dto => dto.Id);
             CacheMap<User, UserDto>(src => src.Email, dto => dto.Email);

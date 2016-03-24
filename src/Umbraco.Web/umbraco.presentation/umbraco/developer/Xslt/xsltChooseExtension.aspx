@@ -38,7 +38,7 @@ div.code input{border: none; background:#F6F6F9; color: #000; padding: 5px; font
 </cc1:Pane>
 
 <p>
-  <asp:Button ID="bt_insert" OnClientClick="returnResult(); return false;" Enabled="false" runat="server" Text="Insert" /> <em><%= umbraco.ui.Text("or") %></em> <a href="xsltInsertValueOf.aspx"><%= umbraco.ui.Text("cancel") %></a>
+  <asp:Button ID="bt_insert" OnClientClick="returnResult(); return false;" Enabled="false" runat="server" Text="Insert" /> <em><%= Services.TextService.Localize("or") %></em> <a href="xsltInsertValueOf.aspx"><%= Services.TextService.Localize("cancel") %></a>
 </p> 
 
 </asp:Content>

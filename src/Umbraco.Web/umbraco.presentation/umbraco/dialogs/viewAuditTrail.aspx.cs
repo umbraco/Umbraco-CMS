@@ -8,17 +8,21 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
 	/// <summary>
 	/// Summary description for viewAuditTrail.
 	/// </summary>
-	public partial class viewAuditTrail : BasePages.UmbracoEnsuredPage
+	public partial class viewAuditTrail : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public viewAuditTrail()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
 	    }
 	
@@ -26,7 +30,7 @@ namespace umbraco.presentation.umbraco.dialogs
 		{
 			// Put user code to initialize the page here
 			//nodeName.Text = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeID"))).Text;
-			auditLog.DataSource = BusinessLogic.Log.Instance.GetAuditLogItems(int.Parse(UmbracoContext.Current.Request["nodeID"]));
+			auditLog.DataSource = Services.AuditService.GetLogs(int.Parse(Request["nodeID"]));
 			auditLog.DataBind();
 			auditLog.BorderWidth = 0;
 			auditLog.BorderStyle = BorderStyle.None;
@@ -37,10 +41,10 @@ namespace umbraco.presentation.umbraco.dialogs
 			action = action.ToLower();
 			if (action == "new")
 				action = "create";
-			ArrayList actions = BusinessLogic.Actions.Action.GetAll();
-			foreach (interfaces.IAction a in actions)
+			var actions = ActionsResolver.Current.Actions;
+			foreach (var a in actions)
 			{
-			    return ui.Text(action);
+			    return Services.TextService.Localize(action);
             }
             return	action;		
 		}

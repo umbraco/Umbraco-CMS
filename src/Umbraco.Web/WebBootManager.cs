@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
-using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -13,42 +12,41 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
 using Examine.Config;
+using LightInject;
 using Examine.Providers;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.DependencyInjection;
+using Umbraco.Web._Legacy.Actions;
+using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
+using TypeHelper = Umbraco.Core.TypeHelper;
 
 
 namespace Umbraco.Web
@@ -81,32 +79,12 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Creates and returns the service context for the app
-        /// </summary>
-        /// <param name="dbContext"></param>
-        /// <param name="dbFactory"></param>
-        /// <returns></returns>
-        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
-        {
-            //use a request based messaging factory
-            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonHttpContextAccessor());
-            return new ServiceContext(
-                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
-                ApplicationCache,
-                ProfilingLogger.Logger,
-                evtMsgs);
-        }
-
-        /// <summary>
         /// Initialize objects before anything during the boot cycle happens
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
         {
-             //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
+            //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
              // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
              // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
              // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
@@ -114,6 +92,9 @@ namespace Umbraco.Web
             ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
 
             base.Initialize();
+
+            //setup mvc and webapi services
+            SetupMvcAndWebApi();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
@@ -125,21 +106,6 @@ namespace Umbraco.Web
                 //set the max url length for CDF to be the smallest of the max query length, max request length
                 ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
             }
-
-            //set master controller factory
-            ControllerBuilder.Current.SetControllerFactory(
-                new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
-
-            //set the render view engine
-            ViewEngines.Engines.Add(new RenderViewEngine());
-            //set the plugin view engine
-            ViewEngines.Engines.Add(new PluginViewEngine());
-
-            //set model binder
-            ModelBinderProviders.BinderProviders.Add(new RenderModelBinder()); // is a provider
-
-            ////add the profiling action filter
-            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
@@ -181,11 +147,9 @@ namespace Umbraco.Web
         /// <summary>
         /// Ensure the current profiler is the web profiler
         /// </summary>
-        protected override void InitializeProfilerResolver()
+        protected override IProfiler CreateProfiler()
         {
-            base.InitializeProfilerResolver();
-            //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            return new WebProfiler();
         }
 
         /// <summary>
@@ -205,9 +169,6 @@ namespace Umbraco.Web
             CreateRoutes();
 
             base.Complete(afterComplete);
-
-            //Now, startup all of our legacy startup handler
-            ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
             //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
             // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
@@ -315,7 +276,7 @@ namespace Umbraco.Web
             }
 
             //need to get the plugin controllers that are unique to each area (group by)
-            var pluginSurfaceControlleres = pluginControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            var pluginSurfaceControlleres = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace() == false);
             var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
             //loop through each area defined amongst the controllers
             foreach (var g in groupedAreas)
@@ -364,13 +325,57 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Build the core container which contains all core things requird to build an app context
+        /// </summary>
+        internal override void ConfigureCoreServices(ServiceContainer container)
+        {
+            base.ConfigureCoreServices(container);
+
+            //ModelMappers
+            container.RegisterFrom<WebModelMappersCompositionRoot>();
+
+            container.EnablePerWebRequestScope();
+
+            //no need to declare as per request, it's lifetime is already managed as a singleton
+            container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
+            container.RegisterSingleton<IHttpContextAccessor, DefaultHttpContextAccessor>();
+            container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
+            container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());
+            container.RegisterSingleton<IPublishedMediaCache, PublishedMediaCache>();
+
+            //no need to declare as per request, currently we manage it's lifetime as the singleton
+            container.Register<UmbracoContext>(factory => UmbracoContext.Current);
+            container.RegisterSingleton<UmbracoHelper>();
+
+            //Replace services:
+            container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();
+            container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
+            container.RegisterSingleton<ISectionService, SectionService>();
+        }
+
+        /// <summary>
+        /// Called to customize the IoC container
+        /// </summary>
+        /// <param name="container"></param>
+        internal override void ConfigureApplicationServices(ServiceContainer container)
+        {
+            base.ConfigureApplicationServices(container);
+            
+            //IoC setup for LightInject for mvc/webapi
+            Container.EnableMvc();
+            Container.RegisterMvcControllers(PluginManager);            
+            container.EnableWebApi(GlobalConfiguration.Configuration);
+            container.RegisterApiControllers(PluginManager);
+        }
+
+        /// <summary>
         /// Initializes all web based and core resolves
         /// </summary>
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveXsltExtensions());
 
             EditorValidationResolver.Current= new EditorValidationResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveTypes<IEditorValidator>());
 
@@ -402,11 +407,11 @@ namespace Umbraco.Web
                         }
                         catch (Exception e)
                         {
-                            LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        ProfilingLogger.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                             return null;
                         }
                     }
-                    LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                ProfilingLogger.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                     return null;
                 }));
             }
@@ -449,12 +454,16 @@ namespace Umbraco.Web
                     }));
             }
 
+            ActionsResolver.Current = new ActionsResolver(
+                ServiceProvider, ProfilingLogger.Logger,
+                () => PluginManager.ResolveActions());
+
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                ServiceProvider, ProfilingLogger.Logger,
                 PluginManager.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                ServiceProvider, ProfilingLogger.Logger,
                 PluginManager.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -468,15 +477,10 @@ namespace Umbraco.Web
             PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter>();
             PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.ImageCropperValueConverter>();
 
-            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
-                new PublishedCache.XmlPublishedCache.PublishedContentCache(),
-                new PublishedCache.XmlPublishedCache.PublishedMediaCache(ApplicationContext)));
-
-            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector),
-                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
+            PublishedCachesResolver.Current = new PublishedCachesResolver(Container, typeof(PublishedCaches));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                ServiceProvider, ProfilingLogger.Logger,
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
@@ -485,56 +489,71 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                    //typeof(AliasUrlProvider), // not enabled by default
+                Container, ProfilingLogger.Logger,
+                //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)
                 );
 
-            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(
-                // handled by ContentLastChanceFinderByNotFoundHandlers for the time being
-                // soon as we get rid of INotFoundHandler support, we must enable this
-                //new ContentFinderByLegacy404()
-
-                // implement INotFoundHandler support... remove once we get rid of it
-                new ContentLastChanceFinderByNotFoundHandlers());
+            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(Container, typeof(ContentFinderByLegacy404));
 
             ContentFinderResolver.Current = new ContentFinderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                Container, ProfilingLogger.Logger,
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
                 typeof(ContentFinderByPageIdQuery),
                 typeof(ContentFinderByNiceUrl),
                 typeof(ContentFinderByIdPath),
+                typeof(ContentFinderByNiceUrlAndTemplate),
+                typeof(ContentFinderByProfile),
+                typeof(ContentFinderByUrlAlias)
 
-                // these will be handled by ContentFinderByNotFoundHandlers so they can be enabled/disabled
-                // via the config file... soon as we get rid of INotFoundHandler support, we must enable
-                // them here.
-                //typeof (ContentFinderByNiceUrlAndTemplate),
-                //typeof (ContentFinderByProfile),
-                //typeof (ContentFinderByUrlAlias),
-
-                // implement INotFoundHandler support... remove once we get rid of it
-                typeof(ContentFinderByNotFoundHandlers)
             );
 
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container, typeof(SiteDomainHelper));
 
-            // ain't that a bit dirty?
+            // ain't that a bit dirty? YES
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                Container, ProfilingLogger.Logger,
                 PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                ServiceProvider, ProfilingLogger.Logger,
                 PluginManager.ResolveImageUrlProviders());
 
-            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
-                new DefaultCultureDictionaryFactory());
+            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container, typeof(DefaultCultureDictionaryFactory));
         }
 
+        /// <summary>
+        /// Sets up MVC/WebApi services
+        /// </summary>
+        private void SetupMvcAndWebApi()
+        {
+            //don't output the MVC version header (security)
+            MvcHandler.DisableMvcResponseHeader = true;
+
+            //set master controller factory
+            ControllerBuilder.Current.SetControllerFactory(
+                new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
+
+            //set the render view engine
+            ViewEngines.Engines.Add(new RenderViewEngine());
+            //set the plugin view engine
+            ViewEngines.Engines.Add(new PluginViewEngine());
+
+            //set model binder
+            ModelBinderProviders.BinderProviders.Add(new RenderModelBinder()); // is a provider
+
+            ////add the profiling action filter
+            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
+
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector),
+                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
+        }
+        
+        
         /// <summary>
         /// The method used to create indexes on a cold boot
         /// </summary>

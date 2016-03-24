@@ -18,6 +18,7 @@ using Umbraco.Web;
 using Umbraco.Core.PropertyEditors;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Web.UI.Pages;
 using MacroProperty = umbraco.cms.businesslogic.macro.MacroProperty;
 
 namespace umbraco.developer
@@ -25,11 +26,11 @@ namespace umbraco.developer
     /// <summary>
     /// Summary description for assemblyBrowser.
     /// </summary>
-    public partial class assemblyBrowser : BasePages.UmbracoEnsuredPage
+    public partial class assemblyBrowser : UmbracoEnsuredPage
     {
         public assemblyBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
         protected void Page_Load(object sender, EventArgs e)
         {

@@ -10,14 +10,13 @@ using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
 using AutoMapper.Internal;
 using Umbraco.Core.Services;
-using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Defines mappings for content/media/members type mappings
     /// </summary>
-    internal class ContentTypeModelMapper : MapperConfiguration
+    internal class ContentTypeModelMapper : ModelMapperConfiguration
     {
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
 
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
             _propertyEditorResolver = propertyEditorResolver;            
         }
 
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             
             config.CreateMap<PropertyTypeBasic, PropertyType>()

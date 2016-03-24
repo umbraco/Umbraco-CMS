@@ -24,11 +24,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
         }
 
+
         public override void Up()
         {
             //now that the controlId column is renamed and now a string we need to convert
             if (Context == null || Context.Database == null) return;
-            
+
             //var cpt = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerTable(Context.Database);
             //var di = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database);
 
@@ -73,7 +74,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     Delete.ForeignKey(constraint.Item3).OnTable("cmsMacroProperty");
                 }
             }
-            
+
             Alter.Table("cmsMacroProperty").AddColumn("editorAlias").AsString(255).NotNullable().WithDefaultValue("");
 
             //we need to get the data and create the migration scripts before we change the actual schema bits below!

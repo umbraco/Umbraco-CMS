@@ -17,6 +17,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Repeatable textstrings", "multipletextbox", ValueType = "TEXT", Icon="icon-ordered-list", Group="lists")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public MultipleTextStringPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new MultipleTextStringPropertyValueEditor(base.CreateValueEditor());

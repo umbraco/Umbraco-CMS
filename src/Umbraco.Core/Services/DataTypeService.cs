@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
-using umbraco.interfaces;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Services
@@ -193,7 +192,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetByQuery(new Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
+                return repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
             }
         }
 
@@ -219,23 +218,10 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
+                var query = repository.Query.Where(x => x.Key == id);
                 var definitions = repository.GetByQuery(query);
-
                 return definitions.FirstOrDefault();
             }
-        }
-
-        /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
-        /// </summary>
-        /// <param name="id">Id of the DataType control</param>
-        /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
-        public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
-        {
-            var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(id, true);
-            return GetDataTypeDefinitionByPropertyEditorAlias(alias);
         }
 
         /// <summary>
@@ -247,9 +233,8 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
+                var query = repository.Query.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
-
                 return definitions;
             }
         }
@@ -549,27 +534,6 @@ namespace Umbraco.Core.Services
 	        }
 
 	        Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IDataType"/> specified by it's unique ID
-        /// </summary>
-        /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
-        /// <returns><see cref="IDataType"/> object</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        public IDataType GetDataTypeById(Guid id)
-        {
-            return DataTypesResolver.Current.GetById(id);
-        }
-
-        /// <summary>
-        /// Gets a complete list of all registered <see cref="IDataType"/>'s
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        public IEnumerable<IDataType> GetAllDataTypes()
-        {
-            return DataTypesResolver.Current.DataTypes;
         }
 
         private void Audit(AuditType type, string message, int userId, int objectId)

@@ -1,6 +1,8 @@
 using System;
 using System.Configuration;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
@@ -30,7 +32,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
-			var lookup = new ContentFinderByNiceUrl();
+            var lookup = new ContentFinderByNiceUrl(Logger);
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var result = lookup.TryFindContent(docreq);
@@ -56,8 +58,8 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
-			var docreq = new PublishedContentRequest(url, routingContext);			
-			var lookup = new ContentFinderByNiceUrl();
+			var docreq = new PublishedContentRequest(url, routingContext);
+            var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
 			var result = lookup.TryFindContent(docreq);

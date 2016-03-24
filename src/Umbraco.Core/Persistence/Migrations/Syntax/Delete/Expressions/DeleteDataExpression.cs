@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
         
         public DeleteDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

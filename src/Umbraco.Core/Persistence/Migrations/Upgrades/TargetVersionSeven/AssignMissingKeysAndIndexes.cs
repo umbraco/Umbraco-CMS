@@ -19,6 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
         }
 
+
         public override void Up()
         {
 
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 Create.Index("IX_cmsContent").OnTable("cmsContent").OnColumn("nodeId").Ascending().WithOptions().Unique();
             }
 
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer 
+            if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer
                 || Context.CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
     {
 
         public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }

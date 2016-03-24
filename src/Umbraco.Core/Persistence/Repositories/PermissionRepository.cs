@@ -80,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     var sql = new Sql();
                     sql.Select("*")
-                        .From<User2NodePermissionDto>()
+                        .From<User2NodePermissionDto>(_sqlSyntax)
                         .Where(whereBuilder.ToString());
 
                     //ToArray() to ensure it's all fetched from the db once.
@@ -105,9 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select("*")
-               .From<User2NodePermissionDto>()
-               .Where<User2NodePermissionDto>(dto => dto.NodeId == entityId)
-               .OrderBy<User2NodePermissionDto>(dto => dto.NodeId);
+               .From<User2NodePermissionDto>(_sqlSyntax)
+               .Where<User2NodePermissionDto>(_sqlSyntax, dto => dto.NodeId == entityId)
+               .OrderBy<User2NodePermissionDto>(_sqlSyntax, dto => dto.NodeId);
 
             //ToArray() to ensure it's all fetched from the db once.
             var result = _unitOfWork.Database.Fetch<User2NodePermissionDto>(sql).ToArray();
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                _unitOfWork.Database.BulkInsertRecords(toInsert, trans);
+                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, toInsert, trans);
 
                 trans.Complete();
 
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = userId
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
 
                 trans.Complete();
 
@@ -221,7 +221,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = id
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
 
                 trans.Complete();
 
@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = p.UserId
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
 
                 trans.Complete();
 

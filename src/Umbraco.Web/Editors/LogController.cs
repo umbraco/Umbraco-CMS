@@ -8,6 +8,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -21,26 +22,25 @@ namespace Umbraco.Web.Editors
         public IEnumerable<AuditLog> GetEntityLog(int id)
         {
             return Mapper.Map<IEnumerable<AuditLog>>(
-                Log.Instance.GetLogItems(id));
+                Services.AuditService.GetLogs(id));
         }
 
-        public IEnumerable<AuditLog> GetCurrentUserLog(AuditLogType logType, DateTime? sinceDate)
+        public IEnumerable<AuditLog> GetCurrentUserLog(AuditType logType, DateTime? sinceDate)
+        {
+            if (sinceDate == null)
+                sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
+            
+            return Mapper.Map<IEnumerable<AuditLog>>(
+                Services.AuditService.GetUserLogs(Security.CurrentUser.Id, logType, sinceDate.Value));
+        }
+
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate)
         {
             if (sinceDate == null)
                 sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
 
-            var u = new User(Security.CurrentUser);
             return Mapper.Map<IEnumerable<AuditLog>>(
-                Log.Instance.GetLogItems(u, Enum<LogTypes>.Parse(logType.ToString()), sinceDate.Value));
-        }
-
-        public IEnumerable<AuditLog> GetLog(AuditLogType logType, DateTime? sinceDate)
-        {
-            if (sinceDate == null)
-                sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
-
-            return Mapper.Map<IEnumerable<AuditLog>>(
-                Log.Instance.GetLogItems(Enum<LogTypes>.Parse(logType.ToString()), sinceDate.Value));
+                Services.AuditService.GetLogs(logType, sinceDate.Value));
         }
 
     }

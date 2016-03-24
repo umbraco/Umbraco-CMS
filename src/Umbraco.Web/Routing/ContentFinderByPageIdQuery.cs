@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	/// <remarks>
 	/// This is used by library.RenderTemplate and also some of the macro rendering functionality like in
-	/// insertMacro.aspx and macroResultWrapper.aspx
+	/// macroResultWrapper.aspx
 	/// </remarks>
     public class ContentFinderByPageIdQuery : IContentFinder
 	{

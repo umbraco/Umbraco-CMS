@@ -14,6 +14,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -34,8 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
-            : base(work, cache, logger, sqlSyntax)
+        public TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
@@ -74,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                sql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
@@ -123,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<TemplateDto>(SqlSyntax)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<TemplateDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -761,7 +762,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(SqlSyntax, x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

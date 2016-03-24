@@ -1,12 +1,9 @@
 using System;
-using System.Linq;
+using System.Security;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Security;
-using umbraco;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 
@@ -63,7 +60,7 @@ namespace Umbraco.Web.UI.Pages
 
                 if (!Security.ValidateUserApp(CurrentApp))
                 {
-                    var ex = new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
+                    var ex = new SecurityException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                     LogHelper.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
                     throw ex;
                 }
@@ -91,26 +88,7 @@ namespace Umbraco.Web.UI.Pages
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
         protected bool RedirectToUmbraco { get; set; }
-        
-        /// <summary>
-        /// Returns the current user
-        /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        protected User UmbracoUser
-        {
-            get
-            {
-                //throw exceptions if not valid (true)
-                if (!_hasValidated)
-                {
-                    Security.ValidateCurrentUser(true);
-                    _hasValidated = true;
-                }
-                
-                return new User(Security.CurrentUser);
-            }
-        }
-        
+      
         /// <summary>
         /// Used to assign a webforms page's security to a specific tree which will in turn check to see
         /// if the current user has access to the specified tree's registered section

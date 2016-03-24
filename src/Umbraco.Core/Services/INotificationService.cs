@@ -9,7 +9,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -72,6 +71,17 @@ namespace Umbraco.Core.Services
         /// <param name="user"></param>
         /// <param name="entity"></param>
         void DeleteNotifications(IUser user, IEntity entity);
+
+        /// <summary>
+        /// Sets the specific notifications for the user and entity
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="entity"></param>
+        /// <param name="actions"></param>
+        /// <remarks>
+        /// This performs a full replace
+        /// </remarks>
+        IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions);
 
         /// <summary>
         /// Creates a new notification

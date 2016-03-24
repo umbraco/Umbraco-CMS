@@ -3,7 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
-using umbraco.interfaces;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations

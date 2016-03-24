@@ -28,10 +28,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool EnsureUniqueNaming { get; }
 
-        bool TidyEditorContent { get; }
-
-        string TidyCharEncoding { get; }
-
         bool XmlCacheEnabled { get; }
 
         bool ContinouslyUpdateXmlDiskCache { get; }
@@ -41,8 +37,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool EnableSplashWhileLoading { get; }
 
         string PropertyContextHelpOption { get; }
-
-        bool UseLegacyXmlSchema { get; }
 
         bool ForceSafeAliases { get; }
 

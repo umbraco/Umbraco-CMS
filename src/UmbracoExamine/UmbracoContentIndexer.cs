@@ -1,32 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Web;
 using System.Xml.Linq;
 using Examine;
-using Examine.Config;
-using Examine.Providers;
 using Lucene.Net.Documents;
-using Lucene.Net.Index;
 using Umbraco.Core;
-using umbraco.cms.businesslogic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using umbraco.BasePages;
 using IContentService = Umbraco.Core.Services.IContentService;
-using UmbracoExamine.LocalStorage;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
 
@@ -37,10 +25,11 @@ namespace UmbracoExamine
     /// </summary>
     public class UmbracoContentIndexer : BaseUmbracoIndexer
     {
-        private readonly IContentService _contentService;
-        private readonly IMediaService _mediaService;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IUserService _userService;
+        protected IContentService ContentService { get; private set; }
+        protected IMediaService MediaService { get; private set; }
+        protected IDataTypeService DataTypeService { get; private set; }
+        protected IUserService UserService { get; private set; }
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders; 
 
         #region Constructors
 
@@ -50,47 +39,13 @@ namespace UmbracoExamine
         public UmbracoContentIndexer()
             : base()
         {
-            _contentService = ApplicationContext.Current.Services.ContentService;
-            _mediaService = ApplicationContext.Current.Services.MediaService;
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _userService = ApplicationContext.Current.Services.UserService;
+            ContentService = ApplicationContext.Current.Services.ContentService;
+            MediaService = ApplicationContext.Current.Services.MediaService;
+            DataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            UserService = ApplicationContext.Current.Services.UserService;
+            _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
         }
 
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="indexPath"></param>
-        /// <param name="dataService"></param>
-        /// <param name="analyzer"></param>
-        /// <param name="async"></param>
-        [Obsolete("Use the overload that specifies the Umbraco services")]
-        public UmbracoContentIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-            : base(indexerData, indexPath, dataService, analyzer, async)
-        {
-            _contentService = ApplicationContext.Current.Services.ContentService;
-            _mediaService = ApplicationContext.Current.Services.MediaService;
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _userService = ApplicationContext.Current.Services.UserService;
-        }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="dataService"></param>
-        /// <param name="analyzer"></param>
-        /// <param name="async"></param>
-        [Obsolete("Use the overload that specifies the Umbraco services")]
-        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
-            : base(indexerData, luceneDirectory, dataService, analyzer, async)
-        {
-            _contentService = ApplicationContext.Current.Services.ContentService;
-            _mediaService = ApplicationContext.Current.Services.MediaService;
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _userService = ApplicationContext.Current.Services.UserService;
-        }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
@@ -102,6 +57,7 @@ namespace UmbracoExamine
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
         /// <param name="userService"></param>
+        /// <param name="urlSegmentProviders"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
         public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
@@ -109,13 +65,16 @@ namespace UmbracoExamine
             IMediaService mediaService,
             IDataTypeService dataTypeService,
             IUserService userService,
-            Analyzer analyzer, bool async)
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            Analyzer analyzer, 
+            bool async)
             : base(indexerData, luceneDirectory, dataService, analyzer, async)
         {
-            _contentService = contentService;
-            _mediaService = mediaService;
-            _dataTypeService = dataTypeService;
-            _userService = userService;
+            ContentService = contentService;
+            MediaService = mediaService;
+            DataTypeService = dataTypeService;
+            UserService = userService;
+            _urlSegmentProviders = urlSegmentProviders;
         }
 
         #endregion
@@ -372,7 +331,7 @@ namespace UmbracoExamine
                         do
                         {
                             long total;
-                            var descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                            var descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
 
                             //if specific types are declared we need to post filter them
                             //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
@@ -405,7 +364,7 @@ namespace UmbracoExamine
                     do
                     {
                         long total;
-                        var descendants = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
+                        var descendants = MediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
@@ -432,9 +391,10 @@ namespace UmbracoExamine
             foreach (var m in media)
             {
                 var xml = serializer.Serialize(
-                    _mediaService,
-                    _dataTypeService,
-                    _userService,
+                    MediaService,
+                    DataTypeService,
+                    UserService,
+                    _urlSegmentProviders,
                     m);
 
                 //add a custom 'icon' attribute
@@ -454,9 +414,10 @@ namespace UmbracoExamine
             foreach (var c in content)
             {
                 var xml = serializer.Serialize(
-                    _contentService,
-                    _dataTypeService,
-                    _userService,
+                    ContentService,
+                    DataTypeService,
+                    UserService,
+                    _urlSegmentProviders,
                     c);
 
                 //add a custom 'icon' attribute

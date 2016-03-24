@@ -1,18 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.cache;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using System.Runtime.CompilerServices;
 using Language = umbraco.cms.businesslogic.language.Language;
 
 
@@ -90,28 +80,14 @@ namespace umbraco.cms.businesslogic.web
 
         public void Delete()
         {
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
+            ApplicationContext.Current.Services.DomainService.Delete(DomainEntity);
 
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.DomainService.Delete(DomainEntity);
-
-                FireAfterDelete(e);
-            }
         }
 
-        public void Save(){
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+        public void Save()
+        {
+            ApplicationContext.Current.Services.DomainService.Save(DomainEntity);
 
-            if (!e.Cancel) 
-            {
-                if (ApplicationContext.Current.Services.DomainService.Save(DomainEntity))
-                {
-                    FireAfterSave(e);
-                }
-            }
         }
 
         #region Statics
@@ -166,54 +142,12 @@ namespace umbraco.cms.businesslogic.web
                 RootContentId = RootNodeId,
                 LanguageId = LanguageId
             };
-            if (ApplicationContext.Current.Services.DomainService.Save(domain))
-            {
-                var e = new NewEventArgs();
-                var legacyModel = new Domain(domain);
-                legacyModel.OnNew(e);
-            }
-            
+            ApplicationContext.Current.Services.DomainService.Save(domain);
         }
 
         #endregion
 
-        //EVENTS
-        public delegate void SaveEventHandler(Domain sender, SaveEventArgs e);
-        public delegate void NewEventHandler(Domain sender, NewEventArgs e);
-        public delegate void DeleteEventHandler(Domain sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when a macro is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e) {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e) {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+      
 
         #region Pipeline Refactoring
 

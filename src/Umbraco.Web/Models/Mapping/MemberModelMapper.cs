@@ -22,9 +22,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
-    internal class MemberModelMapper : MapperConfiguration
+    internal class MemberModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, MemberDisplay>()
@@ -232,7 +232,7 @@ namespace Umbraco.Web.Models.Mapping
             TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties);
             
             //check if there's an approval field
-            var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
+            var provider = membersProvider as IUmbracoMemberTypeMembershipProvider;
             if (member.HasIdentity == false && provider != null)
             {
                 var approvedField = provider.ApprovedPropertyTypeAlias;

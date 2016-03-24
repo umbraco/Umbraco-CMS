@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -20,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
-            : base(work, cache, logger, sqlSyntax)
+        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver, Guid containerObjectType) 
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
             _containerObjectType = containerObjectType;
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
                     .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
 
-                sql.OrderBy<NodeDto>(x => x.Level, SqlSyntax);
+                sql.OrderBy<NodeDto>(SqlSyntax, x => x.Level);
 
                 return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
             });
@@ -135,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                 .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
 
             if (nodeDto == null) return;
 
@@ -170,7 +171,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // guard against duplicates
             var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                 .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(SqlSyntax, dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto != null)
                 throw new InvalidOperationException("A container with the same name already exists.");
 
@@ -181,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var parentDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                     .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                 if (parentDto == null)
                     throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
@@ -231,14 +232,14 @@ namespace Umbraco.Core.Persistence.Repositories
             // find container to update
             var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                 .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto == null)
                 throw new InvalidOperationException("Could not find container with id " + entity.Id);
 
             // guard against duplicates
             var dupNodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                 .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(SqlSyntax, dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
             if (dupNodeDto != null && dupNodeDto.NodeId != nodeDto.NodeId)
                 throw new InvalidOperationException("A container with the same name already exists.");
 
@@ -252,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     var parent = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                         .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                        .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                     if (parent == null)
                         throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);

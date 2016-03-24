@@ -26,6 +26,21 @@ namespace Umbraco.Core.ObjectResolution
         #region Constructors
 
         /// <summary>
+        /// Hack: This is purely here to allow for the lazy container resolver to be used, we'll need to refactor all of this slowly till we're
+        /// happy with the outcome
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="typeListProducerList"></param>
+        /// <param name="scope"></param>
+        internal LazyManyObjectsResolverBase(ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+            : base(logger, scope)
+        {
+            if (typeListProducerList == null) throw new ArgumentNullException("typeListProducerList");
+            _typeListProducerList.Add(typeListProducerList);
+            Initialize();
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
         /// and an optional lifetime scope.
         /// </summary>
@@ -40,33 +55,10 @@ namespace Umbraco.Core.ObjectResolution
             Initialize();
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : base(scope)
-        {
-            Initialize();
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext)
-            : base(httpContext)
-        {
-            Initialize();
-        }
-
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : this(serviceProvider, logger, scope)
         {
             AddTypes(lazyTypeList);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, lazyTypeList, scope)
-        {
         }
 
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
@@ -75,37 +67,16 @@ namespace Umbraco.Core.ObjectResolution
             _typeListProducerList.Add(typeListProducerList);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, typeListProducerList, scope)
-        {
-        }
-
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext, IEnumerable<Lazy<Type>> lazyTypeList)
             : this(serviceProvider, logger, httpContext)
         {
             AddTypes(lazyTypeList);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Lazy<Type>> lazyTypeList)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext, lazyTypeList)
-        {
-        }
-
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext, Func<IEnumerable<Type>> typeListProducerList)
             : this(serviceProvider, logger, httpContext)
         {
             _typeListProducerList.Add(typeListProducerList);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext, Func<IEnumerable<Type>> typeListProducerList)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext, typeListProducerList)
-        {
         }
 
         #endregion

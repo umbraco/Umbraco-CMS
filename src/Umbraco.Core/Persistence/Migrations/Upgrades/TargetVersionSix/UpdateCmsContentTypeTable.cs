@@ -13,11 +13,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Alter.Table("cmsContentType").AddColumn("isContainer").AsBoolean().NotNullable().WithDefaultValue(0);
 
-            Alter.Table("cmsContentType").AddColumn("allowAtRoot").AsBoolean().NotNullable().WithDefaultValue(0);            
+            Alter.Table("cmsContentType").AddColumn("allowAtRoot").AsBoolean().NotNullable().WithDefaultValue(0);
         }
 
         public override void Down()

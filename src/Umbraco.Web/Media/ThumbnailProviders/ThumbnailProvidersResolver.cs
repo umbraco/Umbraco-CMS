@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.ObjectResolution;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Utils;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    public sealed class ThumbnailProvidersResolver : ManyObjectsResolverBase<ThumbnailProvidersResolver, IThumbnailProvider>
+    public sealed class ThumbnailProvidersResolver : ContainerManyObjectsResolver<ThumbnailProvidersResolver, IThumbnailProvider>
     {
 	    /// <summary>
 	    /// Constructor
 	    /// </summary>
-	    /// <param name="serviceProvider"></param>
+	    /// <param name="container"></param>
 	    /// <param name="logger"></param>
 	    /// <param name="providers"></param>		
-	    internal ThumbnailProvidersResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> providers)
-            : base(serviceProvider, logger, providers)
+	    internal ThumbnailProvidersResolver(IServiceContainer container, ILogger logger, IEnumerable<Type> providers)
+            : base(container, logger, providers)
 		{
 
 		}

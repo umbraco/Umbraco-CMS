@@ -2,14 +2,6 @@
 <%@ Register TagPrefix="umb" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 
-<asp:Content ID="headContent" ContentPlaceHolderID="head" runat="server">
-    <style type="text/css">
-    </style>  
-  
-    <script type="text/javascript">
-    </script>
-</asp:Content>
-
 <asp:Content ID="bodyContent" ContentPlaceHolderID="body" runat="server">
 
 

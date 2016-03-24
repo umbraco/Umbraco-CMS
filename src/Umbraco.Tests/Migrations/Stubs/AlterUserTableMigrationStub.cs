@@ -24,22 +24,4 @@ namespace Umbraco.Tests.Migrations.Stubs
         {
         }
     }
-
-
-    [MigrationAttribute("1.0.0", 0, "Test")]
-    public class DropForeignKeyMigrationStub : MigrationBase
-    {
-        public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
-        public override void Up()
-        {
-            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id");
-        }
-
-        public override void Down()
-        {
-        }
-    }
 }

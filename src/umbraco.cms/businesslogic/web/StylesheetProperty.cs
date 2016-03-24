@@ -1,10 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using umbraco.cms.businesslogic.cache;
-using Umbraco.Core.Models.Rdbms;
-using umbraco.DataLayer;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -84,7 +81,7 @@ namespace umbraco.cms.businesslogic.web
             set { StylesheetProp.Value = value; }
         }
 
-        public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
+        public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, IUser user)
         {
             //we need to create it with a temp place holder!
             var prop = new Umbraco.Core.Models.StylesheetProperty(Text, "#" + Text.ToSafeAlias(), "");
@@ -92,37 +89,19 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetEntity);
 
             var ssp = new StylesheetProperty(sheet.StylesheetEntity, prop);
-            var e = new NewEventArgs();
-            ssp.OnNew(e);
             return ssp;
         }
 
         public override void delete() 
         {
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
+            StylesheetItem.RemoveProperty(Text);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
 
-            if (!e.Cancel) 
-            {
-                
-                StylesheetItem.RemoveProperty(Text);
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
-
-                FireAfterDelete(e);
-            }
         }
 
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (!e.Cancel)
-            {
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
-
-                FireAfterSave(e);
-            }
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
         }
 
         public override string ToString()
@@ -136,85 +115,6 @@ namespace umbraco.cms.businesslogic.web
             web.StyleSheet.ThrowNotSupported<StylesheetProperty>();
             return null;
         }
-
-        // EVENTS
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(StylesheetProperty sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(StylesheetProperty sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(StylesheetProperty sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        new public static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        new public static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before delete].
-        /// </summary>
-        new public static event DeleteEventHandler BeforeDelete;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireBeforeDelete(DeleteEventArgs e) {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        new public static event DeleteEventHandler AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireAfterDelete(DeleteEventArgs e) {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+        
     }
 }

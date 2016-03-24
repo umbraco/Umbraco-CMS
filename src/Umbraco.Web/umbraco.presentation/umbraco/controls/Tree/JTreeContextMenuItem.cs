@@ -1,17 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Web.Script.Serialization;
-using umbraco.interfaces;
-using System.Text.RegularExpressions;
-using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic.Utils;
 using System.Text;
-using umbraco.cms.presentation.Trees;
-using umbraco.BasePages;
-using System.Web.Services;
+using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.Utils;
 
 namespace umbraco.controls.Tree
 {
@@ -45,7 +39,7 @@ namespace umbraco.controls.Tree
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
 			data.Add("id", a.Letter);
-			data.Add("label", ui.Text(a.Alias));
+			data.Add("label", ApplicationContext.Current.Services.TextService.Localize(a.Alias));
 
 			if (a.Icon.StartsWith("."))
 			{
@@ -80,7 +74,7 @@ namespace umbraco.controls.Tree
 			get
 			{
 				List<Type> types = new List<Type>();
-				foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
+				foreach (var a in ActionsResolver.Current.Actions)
 				{
 					types.Add(a.GetType());
 				}

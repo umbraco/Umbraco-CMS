@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 
@@ -17,12 +16,9 @@ using System.ComponentModel;
 using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.workflow;
-using umbraco.cms.businesslogic.Tags;
+using Umbraco.Core.Models.Membership;
 using File = System.IO.File;
-using Media = umbraco.cms.businesslogic.media.Media;
-using Tag = umbraco.cms.businesslogic.Tags.Tag;
-using Notification = umbraco.cms.businesslogic.workflow.Notification;
+
 using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
@@ -36,7 +32,7 @@ namespace umbraco.cms.businesslogic
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
     [Obsolete("Obsolete, This class will eventually be phased out", false)]
-    public class CMSNode : BusinessLogic.console.IconI
+    public class CMSNode 
     {
         #region Private Members
 
@@ -60,33 +56,13 @@ namespace umbraco.cms.businesslogic
 
         #region Private static
 
-        private static readonly string DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.UmbracoClient + "/Tree/treeIcons.css");
+        
         private static readonly List<string> InternalDefaultIconClasses = new List<string>();
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         private static void InitializeIconClasses()
         {
-            StreamReader re = File.OpenText(DefaultIconCssFile);
-            string content = string.Empty;
-            string input = null;
-            while ((input = re.ReadLine()) != null)
-            {
-                content += input.Replace("\n", "") + "\n";
-            }
-            re.Close();
-
-            // parse the classes
-            var m = Regex.Matches(content, "([^{]*){([^}]*)}", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-            foreach (Match match in m)
-            {
-                var groups = match.Groups;
-                var cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
-                if (string.IsNullOrEmpty(cssClass) == false)
-                {
-                    InternalDefaultIconClasses.Add(cssClass);
-                }
-            }
+            
         }
         private const string SqlSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
         private const string SqlDescendants = @"
@@ -294,15 +270,12 @@ namespace umbraco.cms.businesslogic
                 IEnumerable<Permission> permissions = Permission.GetNodePermissions(parent);
                 foreach (Permission p in permissions)
                 {
-                    Permission.MakeNew(User.GetUser(p.UserId), retVal, p.PermissionId);
+                    Permission.MakeNew(ApplicationContext.Current.Services.UserService.GetUserById(p.UserId), retVal, p.PermissionId);
                 }
 
             }
 
-            //event
-            NewEventArgs e = new NewEventArgs();
-            retVal.FireAfterNew(e);
-
+            
             return retVal;
         }
 
@@ -348,12 +321,7 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
-        }
-
-        internal static UmbracoDatabase Database
-        {
-            get { return ApplicationContext.Current.DatabaseContext.Database; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
         #endregion
 
@@ -475,9 +443,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>The CMSNode Xmlrepresentation</returns>
         public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
         {
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, x, Deep);
-            return x;
+            throw new NotSupportedException("DO NOT USE THIS METHOD, THIS NEEDS TO BE REMOVED FROM THE CODEBASE, REFACTOR ANYTHING THAT IS USING THIS IF YOU GET THIS EXCEPTION");
         }
 
         public virtual XmlNode ToPreviewXml(XmlDocument xd)
@@ -515,13 +481,7 @@ order by level,sortOrder";
         /// </summary>
         public virtual void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
-            this.FireBeforeSave(e);
-            if (!e.Cancel)
-            {
-                //In the future there will be SQL stuff happening here... 
-                this.FireAfterSave(e);
-            }
+           
         }
 
         public override string ToString()
@@ -538,126 +498,34 @@ order by level,sortOrder";
             return base.ToString();
         }
 
-        private void Move(CMSNode newParent)
-        {
-            MoveEventArgs e = new MoveEventArgs();
-            FireBeforeMove(e);
 
-            if (!e.Cancel)
-            {
-                //first we need to establish if the node already exists under the newParent node
-                //var isNewParentInPath = (Path.Contains("," + newParent.Id + ","));
-
-                //if it's the same newParent, we can save some SQL calls since we know these wont change.
-                //level and path might change even if it's the same newParent because the newParent could be moving somewhere.
-                if (ParentId != newParent.Id)
-                {
-                    int maxSortOrder = SqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        SqlHelper.CreateParameter("@parentId", newParent.Id));
-
-                    this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;
-                }
-
-                //detect if we have moved, then update the level and path
-                // issue: http://issues.umbraco.org/issue/U4-1579
-                if (this.Path != newParent.Path + "," + this.Id.ToString())
-                {
-                    this.Level = newParent.Level + 1;
-                    this.Path = newParent.Path + "," + this.Id.ToString();
-                }
-
-                //this code block should not be here but since the class structure is very poor and doesn't use 
-                //overrides (instead using shadows/new) for the Children property, when iterating over the children
-                //and calling Move(), the super classes overridden OnMove or Move methods never get fired, so 
-                //we now need to hard code this here :(
-
-                if (Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ",")
-                    || Path.Contains("," + ((int)RecycleBin.RecycleBinType.Media).ToString() + ","))
-                {
-                    //if we've moved this to the recyle bin, we need to update the trashed property
-                    if (!IsTrashed) IsTrashed = true; //don't update if it's not necessary
-                }
-                else
-                {
-                    if (IsTrashed) IsTrashed = false; //don't update if it's not necessary
-                }
-
-                //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
-                if (!IsTrashed && newParent.nodeObjectType == Document._objectType)
-                {
-                    // regenerate the xml of the current document
-                    var movedDocument = new Document(this.Id);
-                    movedDocument.XmlGenerate(new XmlDocument());
-
-                    //regenerate the xml for the newParent node
-                    var parentDocument = new Document(newParent.Id);
-                    parentDocument.XmlGenerate(new XmlDocument());
-
-                }
-                else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
-                {
-                    //regenerate the xml for the newParent node
-                    var m = new Media(newParent.Id);
-                    m.XmlGenerate(new XmlDocument());
-                }
-
-                var children = this.Children;
-                foreach (CMSNode c in children)
-                {
-                    c.Move(this);
-                }
-                
-                FireAfterMove(e);
-            }
-        }
-
-        /// <summary>
-        /// Moves the CMSNode from the current position in the hierarchy to the target
-        /// </summary>
-        /// <param name="NewParentId">Target CMSNode id</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Move() or Umbraco.Core.Services.MediaService.Move()", false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public virtual void Move(int newParentId)
-        {
-            CMSNode parent = new CMSNode(newParentId);
-            Move(parent);
-        }
 
         /// <summary>
         /// Deletes this instance.
         /// </summary>
         public virtual void delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-            if (!e.Cancel)
+            // remove relations
+            var rels = Relations;
+            foreach (relation.Relation rel in rels)
             {
-                // remove relations
-                var rels = Relations;
-                foreach (relation.Relation rel in rels)
-                {
-                    rel.Delete();
-                }
-
-                //removes tasks
-                foreach (Task t in Tasks)
-                {
-                    t.Delete();
-                }
-
-                //remove notifications
-                Notification.DeleteNotifications(this);
-
-                //remove permissions
-                Permission.DeletePermissions(this);
-
-                //removes tag associations (i know the key is set to cascade but do it anyways)
-                Tag.RemoveTagsFromNode(this.Id);
-
-                SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
-                FireAfterDelete(e);
+                rel.Delete();
             }
+
+            //removes tasks
+            foreach (Task t in Tasks)
+            {
+                t.Delete();
+            }
+            
+            //remove permissions
+            Permission.DeletePermissions(this);
+
+            ////removes tag associations (i know the key is set to cascade but do it anyways)
+            //Tag.RemoveTagsFromNode(this.Id);
+
+            SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
         }
 
         /// <summary>
@@ -771,11 +639,11 @@ order by level,sortOrder";
         /// Gets the creator
         /// </summary>
         /// <value>The user.</value>
-        public BusinessLogic.User User
+        public IUser User
         {
             get
             {
-                return BusinessLogic.User.GetUser(_userId);
+                return ApplicationContext.Current.Services.UserService.GetUserById(_userId);
             }
         }
 
@@ -902,7 +770,7 @@ order by level,sortOrder";
         /// The basic recursive tree pattern
         /// </summary>
         /// <value>The children.</value>
-        public virtual BusinessLogic.console.IconI[] Children
+        public virtual CMSNode[] Children
         {
             get
             {
@@ -932,7 +800,7 @@ order by level,sortOrder";
         /// Use with care.
         /// </summary>
         /// <value>The children of all object types.</value>
-        public BusinessLogic.console.IconI[] ChildrenOfAllObjectTypes
+        public CMSNode[] ChildrenOfAllObjectTypes
         {
             get
             {
@@ -980,15 +848,6 @@ order by level,sortOrder";
                 if (Entity != null)
                     Entity.Name = value;
             }
-        }
-
-        /// <summary>
-        /// The menu items used in the tree view
-        /// </summary>
-        [Obsolete("this is not used anywhere")]
-        public virtual BusinessLogic.console.MenuItemI[] MenuItems
-        {
-            get { return new BusinessLogic.console.MenuItemI[0]; }
         }
 
         /// <summary>
@@ -1183,160 +1042,6 @@ order by level,sortOrder";
 
         #endregion
 
-        #region Private Methods
-
-        private void XmlPopulate(XmlDocument xd, XmlNode x, bool Deep)
-        {
-            // attributes
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "id", this.Id.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "key", this.UniqueId.ToString()));
-            if (this.Level > 1)
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "parentID", this.ParentId.ToString()));
-            else
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "level", this.Level.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "writerID", this.User.Id.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "sortOrder", this.sortOrder.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "createDate", this.CreateDateTime.ToString("s")));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "nodeName", this.Text));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "path", this.Path));
-
-            if (Deep)
-            {
-                //store children array here because iterating over an Array property object is very inneficient.
-                var children = this.Children;
-                foreach (Content c in children)
-                    x.AppendChild(c.ToXml(xd, true));
-            }
-        }
-
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Calls the subscribers of a cancelable event handler,
-        /// stopping at the event handler which cancels the event (if any).
-        /// </summary>
-        /// <typeparam name="T">Type of the event arguments.</typeparam>
-        /// <param name="cancelableEvent">The event to fire.</param>
-        /// <param name="sender">Sender of the event.</param>
-        /// <param name="eventArgs">Event arguments.</param>
-        protected virtual void FireCancelableEvent<T>(EventHandler<T> cancelableEvent, object sender, T eventArgs) where T : CancelEventArgs
-        {
-            if (cancelableEvent != null)
-            {
-                foreach (Delegate invocation in cancelableEvent.GetInvocationList())
-                {
-                    invocation.DynamicInvoke(sender, eventArgs);
-                    if (eventArgs.Cancel)
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Occurs before a node is saved.
-        /// </summary>
-        public static event EventHandler<SaveEventArgs> BeforeSave;
-
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            FireCancelableEvent(BeforeSave, this, e);
-        }
-
-        /// <summary>
-        /// Occurs after a node is saved. 
-        /// </summary>
-        public static event EventHandler<SaveEventArgs> AfterSave;
-
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        /// <summary>
-        /// Occurs after a new node is created.
-        /// </summary>
-        public static event EventHandler<NewEventArgs> AfterNew;
-
-        /// <summary>
-        /// Raises the <see cref="E:AfterNew"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterNew(NewEventArgs e)
-        {
-            if (AfterNew != null)
-                AfterNew(this, e);
-        }
-
-        /// <summary>
-        /// Occurs before a node is deleted.
-        /// </summary>
-        public static event EventHandler<DeleteEventArgs> BeforeDelete;
-
-        /// <summary>
-        /// Raises the <see cref="E:BeforeDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            FireCancelableEvent(BeforeDelete, this, e);
-        }
-
-        /// <summary>
-        /// Occurs after a node is deleted.
-        /// </summary>
-        public static event EventHandler<DeleteEventArgs> AfterDelete;
-
-        /// <summary>
-        /// Raises the <see cref="E:AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
-
-        /// <summary>
-        /// Occurs before a node is moved.
-        /// </summary>
-        public static event EventHandler<MoveEventArgs> BeforeMove;
-
-        /// <summary>
-        /// Raises the <see cref="E:BeforeMove"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeMove(MoveEventArgs e)
-        {
-            FireCancelableEvent(BeforeMove, this, e);
-        }
-
-        /// <summary>
-        /// Occurs after a node is moved.
-        /// </summary>
-        public static event EventHandler<MoveEventArgs> AfterMove;
-
-        /// <summary>
-        /// Raises the <see cref="E:AfterMove"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterMove(MoveEventArgs e)
-        {
-            if (AfterMove != null)
-                AfterMove(this, e);
-        }
-
-        #endregion
 
     }
 }

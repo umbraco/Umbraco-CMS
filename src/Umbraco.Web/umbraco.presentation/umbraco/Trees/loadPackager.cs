@@ -1,29 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Utils;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.Trees;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco
 {
@@ -47,7 +29,7 @@ namespace umbraco
         /// Sets the id.
         /// </summary>
         /// <value>The id.</value>
-        public int id
+        public override int id
         {
             set { _id = value; }
         }
@@ -56,7 +38,7 @@ namespace umbraco
         /// Sets the app.
         /// </summary>
         /// <value>The app.</value>
-        public string app
+        public override string app
         {
             set { _app = value; }
         }
@@ -64,7 +46,7 @@ namespace umbraco
         protected override void CreateAllowedActions(ref List<IAction> actions)
         {
             actions.Clear();
-            actions.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
+            actions.Add(ActionRefresh.Instance);
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
@@ -114,7 +96,7 @@ namespace umbraco
                         {
                             xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=installed" + "&rnd=" + Guid.NewGuid();
                             xNode.NodeType = "installedPackages";                            
-                            xNode.Text =  ui.Text("treeHeaders", "installedPackages");
+                            xNode.Text =  Services.TextService.Localize("treeHeaders/installedPackages");
                             xNode.HasChildren = true;
                         }
                         else
@@ -140,7 +122,7 @@ namespace umbraco
                         {
                             xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repositories" + "&rnd=" + Guid.NewGuid();
                             xNode.NodeType = "packagesRepositories";                            
-                            xNode.Text = ui.Text("treeHeaders", "repositories");
+                            xNode.Text = Services.TextService.Localize("treeHeaders/repositories");
                             xNode.HasChildren = true;
                         }
                         */
@@ -162,9 +144,9 @@ namespace umbraco
                         xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=created" + "&rnd=" + Guid.NewGuid();
                         xNode.NodeType = "createdPackages";
                         xNode.Menu.Clear();                        
-                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionNew.Instance);
-                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
-                        xNode.Text = ui.Text("treeHeaders", "createdPackages");
+                        xNode.Menu.Add(ActionNew.Instance);
+                        xNode.Menu.Add(ActionRefresh.Instance);
+                        xNode.Text = Services.TextService.Localize("treeHeaders/createdPackages");
                         xNode.HasChildren = true;
                         xNode.Action = "javascript:void(0);";
                         
@@ -175,7 +157,7 @@ namespace umbraco
                         xNode.NodeType = "uploadPackage";
                         xNode.Icon = "icon-page-up";
                         xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
-                        xNode.Text = ui.Text("treeHeaders", "localPackage");
+                        xNode.Text = Services.TextService.Localize("treeHeaders/localPackage");
                         xNode.Menu.Clear();
                         break;
 
@@ -184,7 +166,7 @@ namespace umbraco
                         xNode.NodeType = "starterKits";
                         xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
                         xNode.Icon = "icon-flash";
-                        xNode.Text = ui.Text("treeHeaders", "installStarterKit");
+                        xNode.Text = Services.TextService.Localize("treeHeaders/installStarterKit");
                         xNode.Menu.Clear();
                         break;
 

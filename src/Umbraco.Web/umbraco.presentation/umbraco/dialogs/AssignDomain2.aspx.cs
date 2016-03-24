@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
-using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 
 namespace umbraco.dialogs
@@ -24,25 +22,26 @@ namespace umbraco.dialogs
 
             if (node == null)
             {
-                feedback.Text = ui.Text("assignDomain", "invalidNode");
+                feedback.Text = Services.TextService.Localize("assignDomain/invalidNode");
                 pane_language.Visible = false;
                 pane_domains.Visible = false;
                 p_buttons.Visible = false;
                 return;
             }
 
-            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
+            var permissions = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            if (permissions.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
             {
-                feedback.Text = ui.Text("assignDomain", "permissionDenied");
+                feedback.Text = Services.TextService.Localize("assignDomain/permissionDenied");
                 pane_language.Visible = false;
                 pane_domains.Visible = false;
                 p_buttons.Visible = false;
                 return;
             }
 
-            pane_language.Title = ui.Text("assignDomain", "setLanguage");
-            pane_domains.Title = ui.Text("assignDomain", "setDomains");
-            prop_language.Text = ui.Text("assignDomain", "language");
+            pane_language.Title = Services.TextService.Localize("assignDomain/setLanguage");
+            pane_domains.Title = Services.TextService.Localize("assignDomain/setDomains");
+            prop_language.Text = Services.TextService.Localize("assignDomain/language");
 
             var nodeDomains = Services.DomainService.GetAssignedDomains(nodeId, true).ToArray();
             var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);

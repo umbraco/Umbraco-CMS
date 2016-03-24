@@ -13,6 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         {
         }
 
+
         public override void Up()
         {
             //up to 500 chars

@@ -9,13 +9,7 @@ namespace umbraco.uicontrols {
 	{
         private string _OnClickCommand = "";
         private string _AltText = "init";
-
-
-        public string ID1 {
-            get { return this.ID; }
-            set { this.ID = value; }
-        }
-
+        
         public string AltText {
             get { return this.AlternateText; }
             set {

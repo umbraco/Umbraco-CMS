@@ -149,7 +149,7 @@ namespace umbraco.cms.businesslogic.propertytype
         /// <value>The SQL helper.</value>
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
     }
 }

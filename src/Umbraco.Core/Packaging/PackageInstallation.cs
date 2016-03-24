@@ -10,7 +10,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
-using umbraco.interfaces;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
@@ -97,7 +96,7 @@ namespace Umbraco.Core.Packaging
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFilePath);
-                return GetPreInstallWarnings(packageFilePath, rootElement);
+                return GetPreInstallWarnings(rootElement);
             }
             catch (Exception e)
             {
@@ -169,7 +168,7 @@ namespace Umbraco.Core.Packaging
                 var documentTypesInstalled = EmptyEnumerableIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
                 installationSummary.ContentTypesInstalled =documentTypesInstalled;
 
-                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
+                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
                 var documentsInstalled = documents != null ? InstallDocuments(documents, userId) 
@@ -328,7 +327,7 @@ namespace Umbraco.Core.Packaging
                     .ToArray();
         }
 
-        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
+        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName) == false)
             {
@@ -425,7 +424,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId);
         }
 
-        private PreInstallWarnings GetPreInstallWarnings(string packagePath, XElement rootElement)
+        private PreInstallWarnings GetPreInstallWarnings(XElement rootElement)
         {
             XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
@@ -447,7 +446,6 @@ namespace Umbraco.Core.Packaging
             
             installWarnings.UnsecureFiles = FindUnsecureFiles(sourceDestination);
             installWarnings.FilesReplaced = FindFilesToBeReplaced(sourceDestination);
-            installWarnings.AssembliesWithLegacyPropertyEditors = FindLegacyPropertyEditors(packagePath, sourceDestination);
             
             return installWarnings;
         }
@@ -456,20 +454,7 @@ namespace Umbraco.Core.Packaging
         {
             return sourceDestination.Where(sd => File.Exists(Path.Combine(FullPathToRoot, sd.Value))).ToArray();
         }
-
-        private IEnumerable<string> FindLegacyPropertyEditors(string packagePath, IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
-        {
-            var dlls = sourceDestinationPair.Where(
-                sd => (Path.GetExtension(sd.Value) ?? string.Empty).Equals(".dll", StringComparison.InvariantCultureIgnoreCase)).Select(sd => sd.Key).ToArray();
-
-            if (dlls.Any() == false) { return new List<string>(); }
-            
-            // Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-            string[] assemblyErrors;
-            IEnumerable<byte[]> assemblyesToScan =_packageExtraction.ReadFilesFromArchive(packagePath, dlls);
-            return PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
-        }
-
+        
         private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
         {
             return sourceDestinationPair.Where(sd => IsFileDestinationUnsecure(sd.Value)).ToArray();

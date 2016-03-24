@@ -1,12 +1,8 @@
 using System;
 using System.Web;
-using System.Xml;
-using System.Xml.XPath;
-using System.Reflection;
-using Umbraco.Core.IO;
 using Umbraco.Web.UI;
-using umbraco.BusinessLogic;
-using umbraco.BasePages;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.create
 {
@@ -24,7 +20,7 @@ namespace umbraco.presentation.create
         {
             LegacyDialogHandler.Delete(
                 new HttpContextWrapper(HttpContext.Current),
-                BasePage.Current.getUser(),
+                UmbracoContext.Current.Security.CurrentUser,
                 NodeType, NodeId, Text);
         }
 
@@ -37,7 +33,7 @@ namespace umbraco.presentation.create
         {
             return LegacyDialogHandler.Create(
                 new HttpContextWrapper(HttpContext.Current),
-                BasePage.Current.getUser(),
+                UmbracoContext.Current.Security.CurrentUser,
                 NodeType, NodeId, Text, TypeId);
         }
     }

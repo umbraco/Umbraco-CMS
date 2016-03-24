@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -15,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TaskRepository : PetaPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public TaskRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 
@@ -146,7 +147,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetGetTasksQuery(assignedUser, ownerUser, taskTypeAlias, includeClosed);
             if (itemId.HasValue)
             {
-                sql.Where<NodeDto>(dto => dto.NodeId == itemId.Value);
+                sql.Where<NodeDto>(SqlSyntax, dto => dto.NodeId == itemId.Value);
             }
 
             var dtos = Database.Fetch<TaskDto, TaskTypeDto>(sql);
@@ -160,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (includeClosed == false)
             {
-                sql.Where<TaskDto>(dto => dto.Closed == false);
+                sql.Where<TaskDto>(SqlSyntax, dto => dto.Closed == false);
             }
             if (taskTypeAlias.IsNullOrWhiteSpace() == false)
             {
@@ -168,11 +169,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             if (ownerUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.ParentUserId == ownerUser.Value);
+                sql.Where<TaskDto>(SqlSyntax, dto => dto.ParentUserId == ownerUser.Value);
             }
             if (assignedUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.UserId == assignedUser.Value);
+                sql.Where<TaskDto>(SqlSyntax, dto => dto.UserId == assignedUser.Value);
             }
             return sql;
         }

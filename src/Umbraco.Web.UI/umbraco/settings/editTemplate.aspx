@@ -6,6 +6,7 @@
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
+<%@ Import Namespace="Umbraco.Web.Mvc" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -34,10 +35,10 @@
                 masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
                 treeSyncPath: '<%=TemplateTreeSyncPath%>',
                 text: {
-                    templateErrorHeader: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateErrorHeader")) %>",
-                    templateSavedHeader: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateSavedHeader")) %>",
-                    templateErrorText: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateErrorText")) %>",
-                    templateSavedText: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateSavedText")) %>"
+                    templateErrorHeader: "<%= HttpUtility.JavaScriptStringEncode(Services.TextService.Localize("speechBubbles/templateErrorHeader")) %>",
+                    templateSavedHeader: "<%= HttpUtility.JavaScriptStringEncode(Services.TextService.Localize("speechBubbles/templateSavedHeader")) %>",
+                    templateErrorText: "<%= HttpUtility.JavaScriptStringEncode(Services.TextService.Localize("speechBubbles/templateErrorText")) %>",
+                    templateSavedText: "<%= HttpUtility.JavaScriptStringEncode(Services.TextService.Localize("speechBubbles/templateSavedText")) %>"
                 }
             });
 
@@ -151,9 +152,9 @@
     <div id="macroMenu" style="width: 285px">
         <asp:Repeater ID="rpt_macros" runat="server">
             <ItemTemplate>
-                <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>"
-                    params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
-                    <%# DataBinder.Eval(Container, "DataItem.macroName")%>
+                <div class="macro" rel="<%# Eval("macroAlias") %>"
+                    params="<%#  DoesMacroHaveSettings(Eval("id").ToString()) %>">
+                    <%# Eval("macroName")%>
                 </div>
             </ItemTemplate>
         </asp:Repeater>

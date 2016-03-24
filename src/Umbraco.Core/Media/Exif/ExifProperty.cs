@@ -27,7 +27,7 @@ namespace Umbraco.Core.Media.Exif
         {
             get
             {
-                if (mName == null || mName.Length == 0)
+                if (string.IsNullOrEmpty(mName))
                     return ExifTagFactory.GetTagName(mTag);
                 else
                     return mName;

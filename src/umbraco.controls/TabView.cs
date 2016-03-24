@@ -48,10 +48,7 @@ namespace umbraco.uicontrols {
             for (int i = 0; i < Tabs.Count; i++)
             {
                 var tabPage = TabPages.ElementAt(i).Value;
-                tabPage.Active = false;
-
-                if (tabPage.ID == ActiveTabId)
-                    tabPage.Active = true;
+                tabPage.Active = false || tabPage.ID == ActiveTabId;
 
                 _tabsHolder.Controls.Add(tabPage);
             }
@@ -125,12 +122,7 @@ namespace umbraco.uicontrols {
 	        set { _status = value; }
 	    }
 
-	    private bool _autoResize = true;
-        public bool AutoResize
-	    {
-	        get { return _autoResize; }
-	        set { _autoResize = value; }
-	    }
+	   
 
         public string ActiveTabId
         {

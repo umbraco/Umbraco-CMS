@@ -8,7 +8,7 @@ using Umbraco.Web.UI;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.user;
-using umbraco.interfaces;
+using Umbraco.Web._Legacy.UI;
 
 namespace Umbraco.Tests.UI
 {
@@ -27,24 +27,23 @@ namespace Umbraco.Tests.UI
             }
         }
 
-        [TestCase(typeof(UserTypeTasks), DefaultApps.users)]
-        [TestCase(typeof(XsltTasks), DefaultApps.developer)]
-        [TestCase(typeof(userTasks), DefaultApps.users)]
-        [TestCase(typeof(templateTasks), DefaultApps.settings)]
-        [TestCase(typeof(StylesheetTasks), DefaultApps.settings)]
-        [TestCase(typeof(stylesheetPropertyTasks), DefaultApps.settings)]
-        [TestCase(typeof(ScriptTasks), DefaultApps.settings)]
-        [TestCase(typeof(MemberGroupTasks), DefaultApps.member)]
-        [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
-        [TestCase(typeof(macroTasks), DefaultApps.developer)]
-        [TestCase(typeof(languageTasks), DefaultApps.settings)]
-        [TestCase(typeof(DLRScriptingTasks), DefaultApps.developer)]
-        [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
-        [TestCase(typeof(PartialViewTasks), DefaultApps.settings)]
-        public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)
+        [TestCase(typeof(UserTypeTasks), Constants.Applications.Users)]
+        [TestCase(typeof(XsltTasks), Constants.Applications.Developer)]
+        [TestCase(typeof(userTasks), Constants.Applications.Users)]
+        [TestCase(typeof(templateTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(StylesheetTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(stylesheetPropertyTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(ScriptTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(MemberGroupTasks), Constants.Applications.Members)]
+        [TestCase(typeof(dictionaryTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(macroTasks), Constants.Applications.Developer)]
+        [TestCase(typeof(languageTasks), Constants.Applications.Settings)]
+        [TestCase(typeof(CreatedPackageTasks), Constants.Applications.Developer)]
+        [TestCase(typeof(PartialViewTasks), Constants.Applications.Settings)]
+        public void Check_Assigned_Apps_For_Tasks(Type taskType, string app)
         {
             var task = (LegacyDialogTask)Activator.CreateInstance(taskType);
-            Assert.AreEqual(task.AssignedApp, app.ToString());
+            Assert.AreEqual(task.AssignedApp, app);
         }
 
     }

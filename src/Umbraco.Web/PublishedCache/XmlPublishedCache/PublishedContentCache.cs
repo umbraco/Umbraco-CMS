@@ -12,16 +12,56 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
+using Umbraco.Web;
 using umbraco;
 using System.Linq;
+using System.Web;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
-using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     internal class PublishedContentCache : IPublishedContentCache
     {
+       /// <summary>
+       /// Constructor
+       /// </summary>
+       /// <param name="getXmlDelegate"></param>
+       /// <remarks>
+       /// Use this ctor for unit tests in order to supply a custom xml result 
+       /// </remarks>
+        public PublishedContentCache(Func<UmbracoContext, bool, XmlDocument> getXmlDelegate)
+       {
+           if (getXmlDelegate == null) throw new ArgumentNullException("getXmlDelegate");
+           _xmlDelegate = getXmlDelegate;
+       }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <remarks>
+        /// Using this ctor will ONLY work in a web/http context
+        /// </remarks>
+        public PublishedContentCache()
+        {
+            _xmlDelegate = ((context, preview) =>
+            {
+                if (preview)
+                {
+                    var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
+                    var previewVal = HttpContext.Current.Request.GetPreviewCookieValue();
+                    previewContent.EnsureInitialized(context.Security.CurrentUser, previewVal, true, () =>
+                    {
+                        if (previewContent.ValidPreviewSet)
+                            previewContent.LoadPreviewset();
+                    });
+                    if (previewContent.ValidPreviewSet)
+                        return previewContent.XmlContent;
+                }
+                return content.Instance.XmlContent;
+            });
+        }
+
         #region Routes cache
 
         private readonly RoutesCache _routesCache = new RoutesCache(!UnitTesting);
@@ -141,7 +181,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
+            if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
                 ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
 
             // assemble the route
@@ -231,7 +271,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				var version = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? 0 : 1;
+			    var version = 1;
 				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
 					_xPathStringsValue = new XPathStringsDefinition(version);
 				return _xPathStringsValue;
@@ -339,46 +379,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         static readonly ConditionalWeakTable<UmbracoContext, PreviewContent> PreviewContentCache
             = new ConditionalWeakTable<UmbracoContext, PreviewContent>();
 
-        private Func<UmbracoContext, bool, XmlDocument> _xmlDelegate;
-
-        /// <summary>
-        /// Gets/sets the delegate used to retrieve the Xml content, generally the setter is only used for unit tests
-        /// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
-        /// </summary>
-        /// <remarks>
-        /// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
-        /// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
-        /// that when run inside of a unit test fails.
-        /// </remarks>
-        internal Func<UmbracoContext, bool, XmlDocument> GetXmlDelegate
-        {
-            get
-            {
-                return _xmlDelegate ?? (_xmlDelegate = (context, preview) =>
-                {
-                    if (preview)
-                    {
-                        var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
-                        previewContent.EnsureInitialized(context.UmbracoUser, StateHelper.Cookies.Preview.GetValue(), true, () =>
-                        {
-                            if (previewContent.ValidPreviewSet)
-                                previewContent.LoadPreviewset();
-                        });
-                        if (previewContent.ValidPreviewSet)
-                            return previewContent.XmlContent;
-                    }
-                    return content.Instance.XmlContent;
-                });
-            }
-            set
-            {
-                _xmlDelegate = value;
-            }
-        }
+        private readonly Func<UmbracoContext, bool, XmlDocument> _xmlDelegate;    
 
         internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
         {
-            return GetXmlDelegate(umbracoContext, preview);
+            return _xmlDelegate(umbracoContext, preview);
         }
 
         #endregion

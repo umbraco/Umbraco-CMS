@@ -1,30 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Configuration;
 using System.Globalization;
-using System.Linq;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 using System.Xml;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using Umbraco.Core.IO;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web;
 
 namespace umbraco.presentation.preview
 {
     //TODO : Migrate this to a new API!
 
+    [Obsolete("Get rid of this!!!")]
     public class PreviewContent
     {
         // zb-00004 #29956 : refactor cookies names & handling
@@ -45,7 +36,7 @@ namespace umbraco.presentation.preview
         private readonly object _initLock = new object();
         private bool _initialized = true;
 
-        public void EnsureInitialized(User user, string previewSet, bool validate, Action initialize)
+        public void EnsureInitialized(IUser user, string previewSet, bool validate, Action initialize)
         {
             lock (_initLock)
             {
@@ -67,14 +58,14 @@ namespace umbraco.presentation.preview
         {
             ValidPreviewSet = UpdatePreviewPaths(previewSet, true);
         }
-        public PreviewContent(User user, Guid previewSet, bool validate)
+        public PreviewContent(IUser user, Guid previewSet, bool validate)
         {
             _userId = user.Id;
             ValidPreviewSet = UpdatePreviewPaths(previewSet, validate);
         }
 
 
-        public void PrepareDocument(User user, Document documentObject, bool includeSubs)
+        public void PrepareDocument(IUser user, Document documentObject, bool includeSubs)
         {
             _userId = user.Id;
 
@@ -214,26 +205,24 @@ namespace umbraco.presentation.preview
 
         public void ActivatePreviewCookie()
         {
-            // zb-00004 #29956 : refactor cookies names & handling
-            StateHelper.Cookies.Preview.SetValue(PreviewSet.ToString());
+            HttpContext.Current.Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, PreviewSet.ToString()));
         }
 
         public static void ClearPreviewCookie()
         {
-            // zb-00004 #29956 : refactor cookies names & handling
-            if (UmbracoContext.Current.UmbracoUser != null)
+            if (UmbracoContext.Current.Security.CurrentUser != null)
             {
-                if (StateHelper.Cookies.Preview.HasValue)
+                if (HttpContext.Current.Request.HasPreviewCookie())
                 {
 
                     DeletePreviewFile(
-                        UmbracoContext.Current.UmbracoUser.Id,
+                        UmbracoContext.Current.Security.CurrentUser.Id,
                         new FileInfo(GetPreviewsetPath(
-                            UmbracoContext.Current.UmbracoUser.Id,
-                            new Guid(StateHelper.Cookies.Preview.GetValue()))));
+                            UmbracoContext.Current.Security.CurrentUser.Id,
+                            new Guid(HttpContext.Current.Request.GetPreviewCookieValue()))));
                 }
             }
-            StateHelper.Cookies.Preview.Clear();
+            HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
         }
     }
 }

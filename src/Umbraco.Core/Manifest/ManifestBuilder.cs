@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -42,7 +43,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.GridEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetGridEditors(manifest.GridEditors));
+                                editors.AddRange(_parser.GetGridEditors(manifest.GridEditors));
                             }
 
                         }
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.PropertyEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));
+                                    editors.AddRange(_parser.GetPropertyEditors(manifest.PropertyEditors));    
                             }
 
                         }
@@ -92,7 +93,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.ParameterEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));
+                                editors.AddRange(_parser.GetParameterEditors(manifest.ParameterEditors));    
                             }
                         }
                         return editors;

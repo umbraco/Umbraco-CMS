@@ -14,6 +14,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -30,11 +31,11 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly DataTypePreValueRepository _preValRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
-            IContentTypeRepository contentTypeRepository)
-            : base(work, cache, logger, sqlSyntax)
+            IContentTypeRepository contentTypeRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);            
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
@@ -82,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public override void Delete(IDataTypeDefinition entity)
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+            var query = QueryFactory.Create<PropertyType>().Where(x => x.DataTypeDefinitionId == entity.Id);
 
             //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
@@ -119,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .From<DataTypeDto>(SqlSyntax)
                .InnerJoin<NodeDto>(SqlSyntax)
                .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -274,6 +275,8 @@ AND umbracoNode.id <> @id",
 
         #endregion
 
+      
+        
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
             var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
@@ -361,7 +364,7 @@ AND umbracoNode.id <> @id",
 
             //update all descendants from the original path, update in order of level
             var descendants = this.GetByQuery(
-                new Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(origPath + ",")));
+                Query.Where(type => type.Path.StartsWith(origPath + ",")));
 
             var lastParent = toMove;
             foreach (var descendant in descendants.OrderBy(x => x.Level))
@@ -386,8 +389,8 @@ AND umbracoNode.id <> @id",
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
                 var sql = new Sql().Select("*")
                                    .From<DataTypePreValueDto>(SqlSyntax)
-                                   .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
+                                   .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
+                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -479,7 +482,7 @@ AND umbracoNode.id <> @id",
             var sql = new Sql();
             sql.Select("*")
                .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
@@ -519,8 +522,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
             }
 

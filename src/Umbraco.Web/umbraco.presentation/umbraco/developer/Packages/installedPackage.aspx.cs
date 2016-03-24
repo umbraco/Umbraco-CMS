@@ -1,36 +1,29 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using Umbraco.Core.IO;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.cms.presentation.Trees;
-using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Umbraco.Web.UI.Pages;
+using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.presentation.developer.packages
 {
-    public partial class installedPackage : BasePages.UmbracoEnsuredPage
+    public partial class installedPackage : UmbracoEnsuredPage
     {
         public installedPackage()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
 
         private cms.businesslogic.packager.InstalledPackage _pack;
@@ -199,35 +192,35 @@ namespace umbraco.presentation.developer.packages
                     //removing failing files from the uninstall manifest
                     SyncLists(_pack.Data.DictionaryItems, tempList);
 
+                    //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
+                    //foreach (var str in _pack.Data.DataTypes)
+                    //{
+                    //    var tId = 0;
 
-                    foreach (var str in _pack.Data.DataTypes)
-                    {
-                        var tId = 0;
+                    //    if (int.TryParse(str, out tId))
+                    //    {
+                    //        try
+                    //        {
+                    //            var dtd = new cms.businesslogic.datatype.DataTypeDefinition(tId);
 
-                        if (int.TryParse(str, out tId))
-                        {
-                            try
-                            {
-                                var dtd = new cms.businesslogic.datatype.DataTypeDefinition(tId);
+                    //            if (dtd != null)
+                    //            {
+                    //                var li = new ListItem(dtd.Text, dtd.Id.ToString());
+                    //                li.Selected = true;
 
-                                if (dtd != null)
-                                {
-                                    var li = new ListItem(dtd.Text, dtd.Id.ToString());
-                                    li.Selected = true;
-
-                                    dataTypes.Items.Add(li);
-                                }
-                                else
-                                {
-                                    tempList.Add(str);
-                                }
-                            }
-                            catch
-                            {
-                                tempList.Add(str);
-                            }
-                        }
-                    }
+                    //                dataTypes.Items.Add(li);
+                    //            }
+                    //            else
+                    //            {
+                    //                tempList.Add(str);
+                    //            }
+                    //        }
+                    //        catch
+                    //        {
+                    //            tempList.Add(str);
+                    //        }
+                    //    }
+                    //}
 
                     //removing failing files from the uninstall manifest
                     SyncLists(_pack.Data.DataTypes, tempList);
@@ -333,7 +326,7 @@ namespace umbraco.presentation.developer.packages
                         .Where(x => x.Data.Id != _pack.Data.Id &&  string.Equals(x.Data.Name, _pack.Data.Name, StringComparison.OrdinalIgnoreCase))
                         .OrderBy(x => Version.TryParse(x.Data.Version, out v) ? v : new Version());
 
-                    if (packageVersionHistory != null && packageVersionHistory.Count() > 0)
+                    if (packageVersionHistory != null && packageVersionHistory.Any())
                     {
                         rptr_versions.DataSource = packageVersionHistory;
                         rptr_versions.DataBind();
@@ -362,7 +355,7 @@ namespace umbraco.presentation.developer.packages
 
         protected void delPack(object sender, EventArgs e)
         {
-            _pack.Delete(UmbracoUser.Id);
+            _pack.Delete(Security.CurrentUser.Id);
             pane_uninstalled.Visible = true;
             pane_uninstall.Visible = false;
         }
@@ -400,7 +393,7 @@ namespace umbraco.presentation.developer.packages
                         var found = ApplicationContext.Services.FileService.GetTemplate(nId);
                         if (found != null)
                         {
-                            ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, UmbracoUser.Id);
+                            ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.CurrentUser.Id);
                         }
                         _pack.Data.Templates.Remove(nId.ToString());
                     }
@@ -478,21 +471,23 @@ namespace umbraco.presentation.developer.packages
                 }
             }
 
-            //Remove Data types
-            foreach (ListItem li in dataTypes.Items)
-            {
-                if (li.Selected)
-                {
-                    int nId;
+            //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
 
-                    if (int.TryParse(li.Value, out nId))
-                    {
-                        var dtd = new cms.businesslogic.datatype.DataTypeDefinition(nId);
-                        dtd.delete();
-                        _pack.Data.DataTypes.Remove(nId.ToString());
-                    }
-                }
-            }
+            ////Remove Data types
+            //foreach (ListItem li in dataTypes.Items)
+            //{
+            //    if (li.Selected)
+            //    {
+            //        int nId;
+
+            //        if (int.TryParse(li.Value, out nId))
+            //        {
+            //            var dtd = new cms.businesslogic.datatype.DataTypeDefinition(nId);
+            //            dtd.delete();
+            //            _pack.Data.DataTypes.Remove(nId.ToString());
+            //        }
+            //    }
+            //}
 
             _pack.Save();
 
@@ -547,7 +542,7 @@ namespace umbraco.presentation.developer.packages
                     }
                 }
                 _pack.Save();
-                _pack.Delete(UmbracoUser.Id);
+                _pack.Delete(Security.CurrentUser.Id);
 
                 pane_uninstalled.Visible = true;
                 pane_uninstall.Visible = false;
@@ -601,32 +596,32 @@ namespace umbraco.presentation.developer.packages
         {
             base.OnInit(e);
 
-            Panel1.Text = ui.Text("treeHeaders", "installedPackages");
-            pane_meta.Text = ui.Text("packager", "packageMetaData");
-            pp_name.Text = ui.Text("packager", "packageName");
-            pp_version.Text = ui.Text("packager", "packageVersion");
-            pp_author.Text = ui.Text("packager", "packageAuthor");
-            pp_repository.Text = ui.Text("packager", "packageRepository");
-            pp_documentation.Text = ui.Text("packager", "packageDocumentation");
-            pp_readme.Text = ui.Text("packager", "packageReadme");
-            hl_docLink.Text = ui.Text("packager", "packageDocumentation");
-            lb_demoLink.Text = ui.Text("packager", "packageDemonstration");
+            Panel1.Text = Services.TextService.Localize("treeHeaders/installedPackages");
+            pane_meta.Text = Services.TextService.Localize("packager/packageMetaData");
+            pp_name.Text = Services.TextService.Localize("packager/packageName");
+            pp_version.Text = Services.TextService.Localize("packager/packageVersion");
+            pp_author.Text = Services.TextService.Localize("packager/packageAuthor");
+            pp_repository.Text = Services.TextService.Localize("packager/packageRepository");
+            pp_documentation.Text = Services.TextService.Localize("packager/packageDocumentation");
+            pp_readme.Text = Services.TextService.Localize("packager/packageReadme");
+            hl_docLink.Text = Services.TextService.Localize("packager/packageDocumentation");
+            lb_demoLink.Text = Services.TextService.Localize("packager/packageDemonstration");
 
-            pane_versions.Text = ui.Text("packager", "packageVersionHistory");
-            pane_noItems.Text = ui.Text("packager", "packageNoItemsHeader");
+            pane_versions.Text = Services.TextService.Localize("packager/packageVersionHistory");
+            pane_noItems.Text = Services.TextService.Localize("packager/packageNoItemsHeader");
 
-            pane_uninstall.Text = ui.Text("packager", "packageUninstallHeader");
-            bt_deletePackage.Text = ui.Text("packager", "packageUninstallHeader");
-            bt_confirmUninstall.Text = ui.Text("packager", "packageUninstallConfirm");
+            pane_uninstall.Text = Services.TextService.Localize("packager/packageUninstallHeader");
+            bt_deletePackage.Text = Services.TextService.Localize("packager/packageUninstallHeader");
+            bt_confirmUninstall.Text = Services.TextService.Localize("packager/packageUninstallConfirm");
 
-            pane_uninstalled.Text = ui.Text("packager", "packageUninstalledHeader");
+            pane_uninstalled.Text = Services.TextService.Localize("packager/packageUninstalledHeader");
 
-            var general = Panel1.NewTabPage(ui.Text("packager", "packageName"));
+            var general = Panel1.NewTabPage(Services.TextService.Localize("packager/packageName"));
             general.Controls.Add(pane_meta);
             general.Controls.Add(pane_versions);
 
 
-            var uninstall = Panel1.NewTabPage(ui.Text("packager", "packageUninstallHeader"));
+            var uninstall = Panel1.NewTabPage(Services.TextService.Localize("packager/packageUninstallHeader"));
             uninstall.Controls.Add(pane_noItems);
             uninstall.Controls.Add(pane_uninstall);
             uninstall.Controls.Add(pane_uninstalled);

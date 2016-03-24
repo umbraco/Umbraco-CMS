@@ -1,30 +1,26 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {
     /// <summary>
     /// Summary description for cruds.
     /// </summary>
-    public partial class cruds : BasePages.UmbracoEnsuredPage
+    public partial class cruds : UmbracoEnsuredPage
     {
 
         public cruds()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
         }
 
@@ -33,7 +29,7 @@ namespace umbraco.dialogs
         
         protected void Page_Load(object sender, EventArgs e)
         {
-            Button1.Text = ui.Text("update");
+            Button1.Text = Services.TextService.Localize("update");
             pane_form.Text = "Set permissions for the page " + _node.Text;
         }
 
@@ -59,18 +55,19 @@ namespace umbraco.dialogs
                 var permissionRow = new HtmlTableRow();
                 var label = new HtmlTableCell
                     {
-                        InnerText = ui.Text("actions", a.Alias)
+                        InnerText = Services.TextService.Localize("actions", a.Alias)
                     };
                 permissionRow.Cells.Add(label);
                 _permissions.Add(a.Alias, permissionRow);
             }
 
             ht.Rows.Add(names);
-            
-            foreach (var u in BusinessLogic.User.getAll())
+
+            int totalUsers;
+            foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
             {
                 // Not disabled users and not system account
-                if (u.Disabled == false && u.Id > 0)
+                if (u.IsApproved && u.Id > 0)
                 {
                     var hc = new HtmlTableCell("th")
                         {
@@ -90,7 +87,9 @@ namespace umbraco.dialogs
 
                         if (a.CanBePermissionAssigned == false) continue;
 
-                        if (u.GetPermissions(_node.Path).IndexOf(a.Letter) > -1)
+                        var permission = Services.UserService.GetPermissions(u, _node.Path);
+
+                        if (permission.AssignedPermissions.Contains(a.Letter.ToString(), StringComparer.Ordinal))
                         {
                             chk.Checked = true;
                         }
@@ -118,9 +117,10 @@ namespace umbraco.dialogs
         {
             //get non disabled, non admin users and project to a dictionary, 
             // the string (value) portion will store the array of chars = their permissions
-            var usersPermissions = BusinessLogic.User.getAll()
-                                                .Where(user => user.Disabled == false && user.Id > 0)
-                                                .ToDictionary(user => user, user => "");
+            int totalUsers;
+            var usersPermissions = Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
+                .Where(user => user.IsApproved && user.Id > 0)
+                .ToDictionary(user => user, user => "");
             
             //iterate over each row which equals:
             // * a certain permission and the user's who will be allowed/denied that permission
@@ -160,9 +160,9 @@ namespace umbraco.dialogs
             }
 
             // Update feedback message
-            //FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + ui.Text("rights") + " " + ui.Text("ok") + "</div>";
+            //FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok") + "</div>";
             feedback1.type = uicontrols.Feedback.feedbacktype.success;
-            feedback1.Text = ui.Text("rights") + " " + ui.Text("ok");
+            feedback1.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok");
             PlaceHolder1.Visible = false;
             panel_buttons.Visible = false;
 

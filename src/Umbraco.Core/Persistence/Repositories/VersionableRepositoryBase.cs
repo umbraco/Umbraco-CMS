@@ -22,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -30,8 +31,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
-            : base(work, cache, logger, sqlSyntax)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _contentSection = contentSection;
         }
@@ -47,9 +48,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
+                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
             foreach (var dto in dtos)
@@ -117,21 +118,21 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(x => x.Path.Contains(pathMatch));
+                    .From<NodeDto>(SqlSyntax)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch));
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentDto>()
-                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>()
-                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(x => x.Path.Contains(pathMatch))
-                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>(SqlSyntax)
+                    .InnerJoin<ContentDto>(SqlSyntax)
+                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch))
+                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -143,21 +144,21 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(x => x.ParentId == parentId);
+                    .From<NodeDto>(SqlSyntax)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId);
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentDto>()
-                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>()
-                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(x => x.ParentId == parentId)
-                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>(SqlSyntax)
+                    .InnerJoin<ContentDto>(SqlSyntax)
+                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId)
+                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -174,19 +175,19 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                    .From<NodeDto>(SqlSyntax)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentDto>()
-                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>()
-                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>(SqlSyntax)
+                    .InnerJoin<ContentDto>(SqlSyntax)
+                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax)
+                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -294,7 +295,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Get base query
             var sqlBase = GetBaseQuery(false);
 
-            if (query == null) query = new Query<TEntity>();
+            if (query == null) query = Query;
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
             

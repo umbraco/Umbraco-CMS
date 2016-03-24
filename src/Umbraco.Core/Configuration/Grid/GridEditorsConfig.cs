@@ -32,6 +32,8 @@ namespace Umbraco.Core.Configuration.Grid
             {
                 Func<List<GridEditor>> getResult = () =>
                 {
+                    var parser = new ManifestParser(_logger, _appPlugins, _runtimeCache);
+
                     var editors = new List<GridEditor>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
                     if (File.Exists(gridConfig))
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Configuration.Grid
                         {
                             var arr = JArray.Parse(File.ReadAllText(gridConfig));
                             //ensure the contents parse correctly to objects
-                            var parsed = ManifestParser.GetGridEditors(arr);
+                            var parsed = parser.GetGridEditors(arr);
                             editors.AddRange(parsed);
                         }
                         catch (Exception ex)
@@ -49,7 +51,7 @@ namespace Umbraco.Core.Configuration.Grid
                         }
                     }
 
-                    var parser = new ManifestParser(_appPlugins, _runtimeCache);
+                    
                     var builder = new ManifestBuilder(_runtimeCache, parser);
                     foreach (var gridEditor in builder.GridEditors)
                     {

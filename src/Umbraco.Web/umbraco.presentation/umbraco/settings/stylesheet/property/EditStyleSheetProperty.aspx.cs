@@ -15,17 +15,19 @@ using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
     /// <summary>
     /// Summary description for EditStyleSheetProperty.
     /// </summary>
-    public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
+    public partial class EditStyleSheetProperty : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public EditStyleSheetProperty()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
 
@@ -48,12 +50,12 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
             if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
 
-            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheetproperty");
 
             var bt = Panel1.Menu.NewButton();
             bt.Click += SaveClick;
-            bt.Text = ui.Text("save");
-            bt.ToolTip = ui.Text("save");
+            bt.Text = Services.TextService.Localize("save");
+            bt.ToolTip = Services.TextService.Localize("save");
             bt.ButtonType = uicontrols.MenuButtonType.Primary;
             bt.ID = "save";
         }
@@ -97,7 +99,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             Services.FileService.SaveStylesheet(_sheet);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editStylesheetPropertySaved"), "");
         }
 
 

@@ -519,7 +519,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -536,7 +536,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetContentType(id);
                 if (found == null) return Enumerable.Empty<IContentType>();
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -551,7 +551,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -568,7 +568,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetContentType(id);
                 if (found == null) return false;
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -618,7 +618,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Count(Query<IContentType>.Builder);
+                return repository.Count(repository.Query);
             }
         }
 
@@ -626,7 +626,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Count(Query<IMediaType>.Builder);
+                return repository.Count(repository.Query);
             }
         }
 
@@ -926,7 +926,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -943,7 +943,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetMediaType(id);
                 if (found == null) return Enumerable.Empty<IMediaType>();
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -958,7 +958,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -975,7 +975,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetMediaType(id);
                 if (found == null) return false;
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -1306,35 +1306,27 @@ namespace Umbraco.Core.Services
         public string GetContentTypesDtd()
         {
             var dtd = new StringBuilder();
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
+            try
             {
-                dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
-            }
-            else
-            {
-                try
-                {
-                    var strictSchemaBuilder = new StringBuilder();
+                var strictSchemaBuilder = new StringBuilder();
 
-                    var contentTypes = GetAllContentTypes();
-                    foreach (ContentType contentType in contentTypes)
+                var contentTypes = GetAllContentTypes();
+                foreach (ContentType contentType in contentTypes)
+                {
+                    string safeAlias = contentType.Alias.ToSafeAlias();
+                    if (safeAlias != null)
                     {
-                        string safeAlias = contentType.Alias.ToUmbracoAlias();
-                        if (safeAlias != null)
-                        {
-                            strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
-                            strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
-                        }
+                        strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
+                        strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
                     }
-
-                    // Only commit the strong schema to the container if we didn't generate an error building it
-                    dtd.Append(strictSchemaBuilder);
-                }
-                catch (Exception exception)
-                {
-                    LogHelper.Error<ContentTypeService>("Error while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
                 }
 
+                // Only commit the strong schema to the container if we didn't generate an error building it
+                dtd.Append(strictSchemaBuilder);
+            }
+            catch (Exception exception)
+            {
+                LogHelper.Error<ContentTypeService>("Error while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
             }
             return dtd.ToString();
         }

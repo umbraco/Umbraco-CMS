@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -13,12 +12,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
 using Umbraco.Core.Configuration;
-using Property = umbraco.cms.businesslogic.property.Property;
+using Umbraco.Web;
 
 namespace umbraco
 {
@@ -82,11 +78,13 @@ namespace umbraco
 				document.User.Name, document.Creator.Name, document.CreateDateTime, document.UpdateDate,
 				document.Path, document.Version, docParentId);
 
-			foreach (Property prop in document.GenericProperties)
-			{
-				string value = prop.Value != null ? prop.Value.ToString() : String.Empty;
-				_elements.Add(prop.PropertyType.Alias, value);
-			}
+            //TODO: Get this working again - Actually get rid of the 'page' class all together
+
+            //foreach (Property prop in document.GenericProperties)
+            //{
+            //    string value = prop.Value != null ? prop.Value.ToString() : String.Empty;
+            //    _elements.Add(prop.PropertyType.Alias, value);
+            //}
 
 			_template = document.Template;
 		}
@@ -164,11 +162,11 @@ namespace umbraco
 		                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
 		            _elements.Add("template", _template.ToString());
 		        }
-		        else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
+		        else if (HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate) != String.Empty)
 		        {
 		            _template =
 		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
+		                    HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate).ToLower());
 		            _elements.Add("template", _template.ToString());
 		        }
 		    }

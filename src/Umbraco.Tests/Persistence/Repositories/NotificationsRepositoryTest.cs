@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repo = new NotificationsRepository(unitOfWork);
+            var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
             var node = new NodeDto {CreateDate = DateTime.Now, Level = 1, NodeObjectType = Guid.Parse(Constants.ObjectTypes.ContentItem), ParentId = -1, Path = "-1,123", SortOrder = 1, Text = "hello", Trashed = false, UniqueId = Guid.NewGuid(), UserId = 0};
             var result = unitOfWork.Database.Insert(node);
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repo = new NotificationsRepository(unitOfWork);
+            var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
             var userDto = new UserDto { ContentStartId = -1, Email = "test" , Login = "test" , MediaStartId = -1, Password = "test" , Type = 1, UserName = "test" , UserLanguage = "en" };
             unitOfWork.Database.Insert(userDto);
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repo = new NotificationsRepository(unitOfWork);
+            var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
             
             var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Guid.Parse(Constants.ObjectTypes.ContentItem), ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = 0 };
             unitOfWork.Database.Insert(node1);
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repo = new NotificationsRepository(unitOfWork);
+            var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
             var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Guid.Parse(Constants.ObjectTypes.ContentItem), ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = 0 };
             unitOfWork.Database.Insert(node1);
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repo = new NotificationsRepository(unitOfWork);
+            var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
             var userDto = new UserDto { ContentStartId = -1, Email = "test", Login = "test", MediaStartId = -1, Password = "test", Type = 1, UserName = "test", UserLanguage = "en" };
             unitOfWork.Database.Insert(userDto);

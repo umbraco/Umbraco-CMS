@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
 
             var result = txtService.GetAllStoredValues(culture);
 
-            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(4, result.Count);
             Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
             Assert.AreEqual("testArea1/testKey2", result.ElementAt(1).Key);
             Assert.AreEqual("testArea2/blah1", result.ElementAt(2).Key);

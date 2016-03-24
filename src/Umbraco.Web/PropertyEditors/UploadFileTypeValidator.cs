@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 if (ValidateFileExtension(fileName) == false)
                 {
-                    yield return new ValidationResult(ui.Text("errors", "dissallowedMediaType"),
+                    yield return new ValidationResult(ApplicationContext.Current.Services.TextService.Localize("errors/dissallowedMediaType"),
                                                       new[]
                                                           {
                                                               //we only store a single value for this editor so the 'member' or 'field' 

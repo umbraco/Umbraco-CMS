@@ -17,8 +17,8 @@ namespace Umbraco.Core.Sync
         private readonly ServerRole _serverRole;
         private readonly string _umbracoApplicationUrl;
 
-        public ConfigServerRegistrar()
-            : this(UmbracoConfig.For.UmbracoSettings().DistributedCall)
+        public ConfigServerRegistrar(IUmbracoSettingsSection settings)
+            : this(settings.DistributedCall)
         { }
 
         // for tests

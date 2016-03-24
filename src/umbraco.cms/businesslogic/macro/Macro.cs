@@ -37,7 +37,7 @@ namespace umbraco.cms.businesslogic.macro
 
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
 		/// <summary>
@@ -87,17 +87,6 @@ namespace umbraco.cms.businesslogic.macro
 		{
             get { return MacroEntity.Name; }
             set { MacroEntity.Name = value; }
-		}
-
-		/// <summary>
-		/// If the macro is a wrapper for a custom control, this is the assemly name from which to load the macro
-		/// 
-		/// specified like: /bin/mydll (without the .dll extension)
-		/// </summary>
-		public string Assembly
-		{
-            get { return MacroEntity.ControlAssembly; }
-            set { MacroEntity.ControlAssembly = value; }
 		}
 
 		/// <summary>
@@ -221,34 +210,16 @@ namespace umbraco.cms.businesslogic.macro
 	    /// </summary>
 	    public virtual void Save()
 	    {
-	        //event
-	        var e = new SaveEventArgs();
-	        FireBeforeSave(e);
-
-	        if (e.Cancel == false)
-	        {
-	            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
-
-	            FireAfterSave(e);
-	        }
-	    }
+            ApplicationContext.Current.Services.MacroService.Save(MacroEntity);
+        }
 
 	    /// <summary>
 		/// Deletes the current macro
 		/// </summary>
 		public void Delete() 
 		{
-            //event
-            var e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-		    if (e.Cancel == false)
-		    {
-		        ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
-
-		        FireAfterDelete(e);
-		    }
-		}
+            ApplicationContext.Current.Services.MacroService.Delete(MacroEntity);
+        }
 
         //TODO: Fix this, this should wrap a new API!
 
@@ -268,13 +239,12 @@ namespace umbraco.cms.businesslogic.macro
             try
             {
                 m.Alias = alias;
-                m.Assembly = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptAssembly"));
                 m.Type = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
                 m.Xslt = XmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
                 m.RefreshRate = int.Parse(XmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
 
                 // we need to validate if the usercontrol is missing the tilde prefix requirement introduced in v6
-                if (string.IsNullOrEmpty(m.Assembly) && string.IsNullOrEmpty(m.Type) == false && m.Type.StartsWith("~") == false)
+                if (string.IsNullOrEmpty(m.Type) == false && m.Type.StartsWith("~") == false)
                 {
                     m.Type = "~/" + m.Type;
                 }
@@ -391,10 +361,6 @@ namespace umbraco.cms.businesslogic.macro
 
             var newMacro = new Macro(macro);
            
-            //fire new event
-            var e = new NewEventArgs();
-            newMacro.OnNew(e);
-            
             return newMacro;
 		}
 
@@ -440,27 +406,24 @@ namespace umbraco.cms.businesslogic.macro
                     });
         }
 
-        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
+        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType)
         {
             if (string.IsNullOrEmpty(xslt) == false)
-                return MacroTypes.XSLT;
+                return MacroTypes.Xslt;
 	        
 			if (string.IsNullOrEmpty(scriptFile) == false)
 			{
-				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
-				//a partial view macro, not a script macro
-				//we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
-				return (scriptFile.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-				        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
-					       ? MacroTypes.PartialView
-					       : MacroTypes.Script;
-			}
+                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
+                //a partial view macro, not a script macro
+                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
+                return (scriptFile.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+                        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
+                           ? MacroTypes.PartialView
+                           : MacroTypes.Script;
+            }
 
 	        if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))
 		        return MacroTypes.UserControl;
-	        
-			if (string.IsNullOrEmpty(scriptType) == false && !string.IsNullOrEmpty(scriptAssembly))
-		        return MacroTypes.CustomControl;
 
 	        return MacroTypes.Unknown;
         }
@@ -494,45 +457,7 @@ namespace umbraco.cms.businesslogic.macro
         #endregion
 
 
-        //Macro events
-
-        //Delegates
-        public delegate void SaveEventHandler(Macro sender, SaveEventArgs e);
-        public delegate void NewEventHandler(Macro sender, NewEventArgs e);
-        public delegate void DeleteEventHandler(Macro sender, DeleteEventArgs e);
-
-        /// <summary>
-        /// Occurs when a macro is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e) {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e) {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e) {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
+       
 		#endregion
 	}
 }

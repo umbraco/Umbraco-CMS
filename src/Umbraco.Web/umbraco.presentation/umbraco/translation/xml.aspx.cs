@@ -20,13 +20,13 @@ using Umbraco.Core.IO;
 
 namespace umbraco.presentation.translation
 {
-    public partial class xml : BasePages.UmbracoEnsuredPage
+    public partial class xml : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         private readonly XmlDocument _xd = new XmlDocument();
 
         public xml()
         {
-            CurrentApp = DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -39,7 +39,7 @@ namespace umbraco.presentation.translation
             if (int.TryParse(Request["id"], out pageId))
             {
                 var t = new Task(pageId);
-                if (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id)
+                if (t.User.Id == Security.CurrentUser.Id || t.ParentUser.Id == Security.CurrentUser.Id)
                 {
                     XmlNode x = CreateTaskNode(t, _xd);
                     root.AppendChild(x);
@@ -54,7 +54,7 @@ namespace umbraco.presentation.translation
                 var nodes = new SortedList();
                 int totalWords = 0;
 
-                foreach (Task t in Task.GetTasks(base.getUser(), false))
+                foreach (Task t in Task.GetTasks(Security.CurrentUser, false))
                 {
                     if (!nodes.ContainsKey(t.Node.Path))
                     {
@@ -69,8 +69,7 @@ namespace umbraco.presentation.translation
                 while (ide.MoveNext())
                 {
                     var x = (XmlElement)ide.Value;
-                    var parentXpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
-                        "//* [@isDoc and @id = '" + x.SelectSingleNode("//* [@isDoc]").Attributes.GetNamedItem("parentID").Value + "']";
+                    var parentXpath = "//* [@isDoc and @id = '" + x.SelectSingleNode("//* [@isDoc]").Attributes.GetNamedItem("parentID").Value + "']";
                     var parent = _xd.SelectSingleNode(parentXpath);
 
                     if (parent == null)
@@ -97,7 +96,8 @@ namespace umbraco.presentation.translation
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Id", t.Id.ToString()));
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Date", t.Date.ToString("s")));
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "NodeId", t.Node.Id.ToString()));
-            xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(XmlHelper.AddCDataNode(xd, "Comment", t.Comment));
             string protocol = GlobalSettings.UseSSL ? "https" : "http";
             xTask.AppendChild(XmlHelper.AddTextNode(xd, "PreviewUrl", protocol + "://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));

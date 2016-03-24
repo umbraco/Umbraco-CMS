@@ -25,8 +25,6 @@ namespace Umbraco.Tests.Plugins
     public class TypeHelperTests
     {
 
-   
-
 
         class Base<T> { }
 

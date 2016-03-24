@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -14,10 +13,9 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.Services
@@ -48,7 +46,7 @@ namespace Umbraco.Tests.Services
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(SqlSyntax, Container);
 			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
 		    var evtMsgs = new TransientMessagesFactory();
 		    ApplicationContext.Services = new ServiceContext(
@@ -58,12 +56,21 @@ namespace Umbraco.Tests.Services
                 new PublishingStrategy(evtMsgs, Logger), 
                 cacheHelper, 
                 Logger,
-                evtMsgs);
+                evtMsgs,
+                Enumerable.Empty<IUrlSegmentProvider>());
 
 			CreateTestData();
 		}
 
-		[TearDown]
+        protected override void ConfigureContainer()
+        {
+            base.ConfigureContainer();
+
+            //replace some services
+            Container.Register<IDatabaseFactory>(factory => _dbFactory);
+        }
+
+        [TearDown]
 		public override void TearDown()
 		{
 			_error = null;

@@ -12,8 +12,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 {
     public class DatabaseSchemaResult
     {
-        public DatabaseSchemaResult()
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+
+        public DatabaseSchemaResult(ISqlSyntaxProvider sqlSyntax)
         {
+            _sqlSyntax = sqlSyntax;
             Errors = new List<Tuple<string, string>>();
             TableDefinitions = new List<TableDefinition>();
             ValidTables = new List<string>();
@@ -177,7 +180,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 sb.AppendLine(" ");
             }
 
-            if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider)
+            if (_sqlSyntax is MySqlSyntaxProvider)
             {
                 sb.AppendLine("Please note that the constraints could not be validated because the current dataprovider is MySql.");
             }

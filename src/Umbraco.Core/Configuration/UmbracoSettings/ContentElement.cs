@@ -72,30 +72,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationProperty("TidyEditorContent")]
-        internal InnerTextConfigurationElement<bool> TidyEditorContent
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                      (InnerTextConfigurationElement<bool>)this["TidyEditorContent"],
-                    //set the default
-                      false);
-            }
-        }
-
-        [ConfigurationProperty("TidyCharEncoding")]
-        internal InnerTextConfigurationElement<string> TidyCharEncoding
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<string>(
-                          (InnerTextConfigurationElement<string>)this["TidyCharEncoding"],
-                            //set the default
-                          "UTF8");
-            }
-        }
-
         [ConfigurationProperty("XmlCacheEnabled")]
         internal InnerTextConfigurationElement<bool> XmlCacheEnabled
         {
@@ -156,17 +132,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationProperty("UseLegacyXmlSchema")]
-        internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["UseLegacyXmlSchema"],
-                    //set the default
-                          false); 
-            }
-        }
         
         [ConfigurationProperty("ForceSafeAliases")]
         internal InnerTextConfigurationElement<bool> ForceSafeAliases
@@ -345,17 +310,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.EnsureUniqueNaming
         {
             get { return EnsureUniqueNaming; }
-        }
-
-        bool IContentSection.TidyEditorContent
-        {
-            get { return TidyEditorContent; }
-        }
-
-        string IContentSection.TidyCharEncoding
-        {
-            get { return TidyCharEncoding; }
-        }
+        }    
 
         bool IContentSection.XmlCacheEnabled
         {
@@ -380,11 +335,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.PropertyContextHelpOption
         {
             get { return PropertyContextHelpOption; }
-        }
-
-        bool IContentSection.UseLegacyXmlSchema
-        {
-            get { return UseLegacyXmlSchema; }
         }
 
         bool IContentSection.ForceSafeAliases

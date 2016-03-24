@@ -8,6 +8,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -20,9 +21,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
-        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax)
-            : base(work, cache, logger, syntax)
+        private readonly IMappingResolver _mappingResolver;
+
+        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, syntax, mappingResolver)
         {
+            _mappingResolver = mappingResolver;
         }
 
         private IRepositoryCachePolicyFactory<IDictionaryItem, int> _cachePolicyFactory;
@@ -47,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
-                .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+                .OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
             if (dto == null)
@@ -79,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
-            sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+            sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
             
             return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
                 .Select(x => ConvertFromDto(x));
@@ -237,7 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 return uniqueIdRepo.Get(uniqueId);
             }
@@ -245,7 +249,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(string key)
         {
-            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 return keyRepo.Get(key);
             }
@@ -253,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
         
         private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == null);
+            var query = Query.Where(x => x.ParentId == null);
             return GetByQuery(query);
         }
 
@@ -269,12 +273,12 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select(@group =>
                     {
                         var sqlClause = GetBaseQuery(false)
-                            .Where<DictionaryDto>(x => x.Parent != null)
+                            .Where<DictionaryDto>(SqlSyntax, x => x.Parent != null)
                             .Where(string.Format("{0} IN (@parentIds)", SqlSyntax.GetQuotedColumnName("parent")), new { parentIds = @group });
 
-                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>.Builder);
+                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query);
                         var sql = translator.Translate();
-                        sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+                        sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
                         return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
                             .Select(x => ConvertFromDto(x));
@@ -293,8 +297,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _dictionaryRepository = dictionaryRepository;
             }
@@ -350,8 +354,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _dictionaryRepository = dictionaryRepository;
             }

@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = new DataTypeDefinition(9, Guid.NewGuid())
+            var dtd = new DataTypeDefinition(9, Guid.NewGuid().ToString())
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var dtd = new DataTypeDefinition(9, Guid.NewGuid())
+            var dtd = new DataTypeDefinition(9, Guid.NewGuid().ToString())
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,

@@ -1,7 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Events;
 using Umbraco.Core.Sync;
-using umbraco.interfaces;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache

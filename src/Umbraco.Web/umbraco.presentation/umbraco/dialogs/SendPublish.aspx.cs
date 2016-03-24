@@ -10,8 +10,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Web;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.dialogs
 {
@@ -19,11 +20,11 @@ namespace umbraco.dialogs
 	/// Runs all action handlers for the ActionToPublish action for the document with
     /// the corresponding document id passed in by query string
 	/// </summary>
-	public partial class SendPublish : BasePages.UmbracoEnsuredPage
+	public partial class SendPublish : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public SendPublish()
 	    {
-	        CurrentApp = DefaultApps.content.ToString();
+	        CurrentApp = Constants.Applications.Content.ToString();
 	    }
 
 		protected void Page_Load(object sender, EventArgs e)

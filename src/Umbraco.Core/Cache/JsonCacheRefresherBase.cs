@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.Sync;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Cache
 {

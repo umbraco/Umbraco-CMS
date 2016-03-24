@@ -1,6 +1,5 @@
 using System;
 using System.Web;
-using System.Web.Security;
 using System.Web.Services;
 using System.ComponentModel;
 using System.Web.Script.Services;
@@ -14,14 +13,11 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Web;
-using Umbraco.Web.Cache;
 using Umbraco.Web.WebServices;
-
-using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
-using umbraco.BasePages;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web._Legacy.UI;
 
 
 namespace umbraco.presentation.webservices
@@ -35,20 +31,8 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
-        private User _currentUser;
-
-        [WebMethod]
-        public bool ValidateUser(string username, string password)
-        {
-            if (ValidateCredentials(username, password))
-            {
-                var u = new BusinessLogic.User(username);
-                BasePage.doLogin(u);
-                return true;
-            }
-            return false;
-        }
-
+        private IUser _currentUser;
+        
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
@@ -72,21 +56,21 @@ namespace umbraco.presentation.webservices
             {
                  LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, 0, nodeId);
             }
             else if (int.TryParse(nodeId, out intNodeId) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, intNodeId, alias);
             }
             else
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    UmbracoUser,
+                    Security.CurrentUser,
                     nodeType, 0, nodeId);
             }
         }
@@ -109,7 +93,7 @@ namespace umbraco.presentation.webservices
                     case "media":
                     case "mediaRecycleBin":
                         //ensure user has access to media
-                        AuthorizeRequest(DefaultApps.media.ToString(), true);
+                        AuthorizeRequest(Constants.Applications.Media.ToString(), true);
 
                         new Media(intNodeId).delete(true);
                         break;
@@ -117,7 +101,7 @@ namespace umbraco.presentation.webservices
                     case "contentRecycleBin":
                     default:
                         //ensure user has access to content
-                        AuthorizeRequest(DefaultApps.content.ToString(), true);
+                        AuthorizeRequest(Constants.Applications.Content.ToString(), true);
 
                         new Document(intNodeId).delete(true);
                         break;
@@ -133,9 +117,13 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DisableUser(int userId)
         {
-            AuthorizeRequest(DefaultApps.users.ToString(), true);
+            AuthorizeRequest(Constants.Applications.Users.ToString(), true);
 
-            BusinessLogic.User.GetUser(userId).disable();
+            var user = Services.UserService.GetUserById(userId);
+            if (user == null) return;
+
+            user.IsApproved = false;
+            Services.UserService.Save(user);
         }
 
         [WebMethod]
@@ -182,41 +170,14 @@ namespace umbraco.presentation.webservices
         {
             AuthorizeRequest(true);
 
-            return Application[helper.Request("key")].ToString();
+            return Application[Context.Request.GetItemAsString("key")].ToString();
         }
-
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        [WebMethod]
-        [ScriptMethod]
-        public void RenewUmbracoSession()
-        {
-            AuthorizeRequest(true);
-
-            BasePage.RenewLoginTimeout();
-
-        }
-
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        [WebMethod]
-        [ScriptMethod]
-        public int GetSecondsBeforeUserLogout()
-        {
-            //TODO: Change this to not throw an exception otherwise we end up with JS errors all the time when recompiling!!
-
-            AuthorizeRequest(true);
-            var timeout = BasePage.GetTimeout(true);
-            var timeoutDate = new DateTime(timeout);
-            var currentDate = DateTime.Now;
-            
-            return (int) timeoutDate.Subtract(currentDate).TotalSeconds;
-
-        }
-
+        
         [WebMethod]
         [ScriptMethod]
         public string TemplateMasterPageContentContainer(int templateId, int masterTemplateId)
         {
-            AuthorizeRequest(DefaultApps.settings.ToString(), true);
+            AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
             return new cms.businesslogic.template.Template(templateId).GetMasterContentElement(masterTemplateId);
         }
 
@@ -227,30 +188,24 @@ namespace umbraco.presentation.webservices
             switch (fileType)
             {
                 case "xslt":
-                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Developer.ToString(), true);
                     return SaveXslt(fileName, fileContents, ignoreDebug);
                 case "python":
-                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Developer.ToString(), true);
                     return "true";
                 case "css":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveCss(fileName, fileContents, fileID);
                 case "script":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveScript(fileName, fileContents);
                 case "template":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
                 default:
                     throw new ArgumentException(String.Format("Invalid fileType passed: '{0}'", fileType));
             }
 
-        }
-
-        public string Tidy(string textToTidy)
-        {
-            AuthorizeRequest(true);
-            return library.Tidy(helper.Request("StringToTidy"), true);
         }
 
         private static string SaveCss(string fileName, string fileContents, int fileId)
@@ -456,16 +411,5 @@ namespace umbraco.presentation.webservices
 	        return retVal;
         }
 
-        [Obsolete("You should use the AuthorizeRequest methods on the base class of UmbracoAuthorizedWebService and ensure you inherit from that class for umbraco asmx web services")]
-        public static void Authorize()
-        {
-            // check for secure connection
-            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
-                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
-
-            if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-                throw new Exception("Client authorization failed. User is not logged in");
-
-        }
     }
 }

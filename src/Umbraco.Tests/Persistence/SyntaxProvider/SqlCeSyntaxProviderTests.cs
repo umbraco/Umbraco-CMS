@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
                             .From<ContentXmlDto>(sqlSyntax)
                             .InnerJoin<NodeDto>(sqlSyntax)
                             .On<ContentXmlDto, NodeDto>(sqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+                            .Where<NodeDto>(sqlSyntax, dto => dto.NodeObjectType == mediaObjectType);
             
             var sqlOutput = sqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
 
@@ -50,7 +50,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var type = typeof (NodeDto);
-            var definition = DefinitionFactory.GetTableDefinition(type);
+            var definition = DefinitionFactory.GetTableDefinition(type, sqlSyntax);
 
             string create = sqlSyntax.Format(definition);
             string primaryKey = sqlSyntax.FormatPrimaryKey(definition);

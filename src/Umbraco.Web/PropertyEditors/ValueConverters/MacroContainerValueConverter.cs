@@ -17,6 +17,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MacroContainerValueConverter : PropertyValueConverterBase
     {
+        private readonly UmbracoContext _umbracoContext;
+
+        public MacroContainerValueConverter(UmbracoContext umbracoContext)
+        {
+            _umbracoContext = umbracoContext;
+        }
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
@@ -26,17 +33,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-        static string RenderMacros(string source, bool preview)
+        string RenderMacros(string source, bool preview)
         {
             // save and set for macro rendering
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-            UmbracoContext.Current.InPreviewMode = preview;
+            var inPreviewMode = _umbracoContext.InPreviewMode;
+            _umbracoContext.InPreviewMode = preview;
 
             var sb = new StringBuilder();
 
             try
             {
-                var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+                var umbracoHelper = new UmbracoHelper(_umbracoContext);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found
@@ -50,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             finally
             {
                 // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;
+                _umbracoContext.InPreviewMode = inPreviewMode;
             }
 
             return sb.ToString();

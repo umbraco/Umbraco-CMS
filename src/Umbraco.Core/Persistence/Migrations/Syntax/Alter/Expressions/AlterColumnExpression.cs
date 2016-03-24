@@ -6,29 +6,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterColumnExpression : MigrationExpressionBase
     {
-        //public AlterColumnExpression(ISqlSyntaxProvider sqlSyntax)
-        //    : base(sqlSyntax)
-        //{
-        //    Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
-        //}
 
         public AlterColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
         }
 
-        //[Obsolete("Use the constructor specifying an ISqlSyntaxProvider instead")]
-        //public AlterColumnExpression()
-        //    : this(SqlSyntaxContext.SqlSyntaxProvider)
-        //{
-        //}
-
-        //[Obsolete("Use the constructor specifying an ISqlSyntaxProvider instead")]
-        //public AlterColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-        //    : this(current, databaseProviders, SqlSyntaxContext.SqlSyntaxProvider)
-        //{
-        //}
 
         
 
@@ -38,17 +22,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 
         public override string ToString()
         {
-            //string columnNameFormat = string.Format("{0} {1}",
-            //    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Column.Name),
-            //    SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
 
             return string.Format(SqlSyntax.AlterColumn,
                                 SqlSyntax.GetQuotedTableName(TableName),
                                 SqlSyntax.Format(Column));
 
-            //return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AlterColumn,
-            //                     SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-            //                     SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Column.Name));
         }
     }
 }

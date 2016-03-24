@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// </summary>
         public DatabaseSchemaResult ValidateSchema()
         {
-            var result = new DatabaseSchemaResult();
+            var result = new DatabaseSchemaResult(_sqlSyntaxProvider);
 
             //get the db index defs
             result.DbIndexDefinitions = _sqlSyntaxProvider.GetDefinedIndexes(_database)
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             foreach (var item in OrderedTables.OrderBy(x => x.Key))
             {
-                var tableDefinition = DefinitionFactory.GetTableDefinition(item.Value);
+                var tableDefinition = DefinitionFactory.GetTableDefinition(item.Value, _sqlSyntaxProvider);
                 result.TableDefinitions.Add(tableDefinition);
             }
 

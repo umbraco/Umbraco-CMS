@@ -7,13 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteColumnExpression : MigrationExpressionBase
     {
-        //public DeleteColumnExpression()
-        //{
-        //    ColumnNames = new List<string>();
-        //}
 
         public DeleteColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             ColumnNames = new List<string>();
         }

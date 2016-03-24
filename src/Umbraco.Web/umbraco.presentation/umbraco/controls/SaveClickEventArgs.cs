@@ -12,18 +12,19 @@ using Umbraco.Core.IO;
 using umbraco.presentation;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Web.UI;
 
 namespace umbraco.controls
 {
     public class SaveClickEventArgs : EventArgs
     {
         public string Message { get; set; }
-        public BasePages.BasePage.speechBubbleIcon IconType { get; set; }
+        public SpeechBubbleIcon IconType { get; set; }
 
         public SaveClickEventArgs(string message)
         {
             Message = message;
-            IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
+            IconType = SpeechBubbleIcon.Success;
         }
     }
 }

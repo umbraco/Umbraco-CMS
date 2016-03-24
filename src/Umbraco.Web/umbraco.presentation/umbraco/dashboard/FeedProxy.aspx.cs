@@ -1,16 +1,16 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Mime;
+using Umbraco.Core.IO;
 
 namespace dashboardUtilities
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Mime;
-    using umbraco;
-    using umbraco.BasePages;
-    using umbraco.BusinessLogic;
-    using Umbraco.Core.IO;
+    
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
@@ -26,7 +26,7 @@ namespace dashboardUtilities
                         Uri requestUri;
                         if (Uri.TryCreate(url, UriKind.Absolute, out requestUri))
                         {
-                            var feedProxyXml = xmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+                            var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
                             if (feedProxyXml != null 
                                 && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
                                 && requestUri.Port == 80)

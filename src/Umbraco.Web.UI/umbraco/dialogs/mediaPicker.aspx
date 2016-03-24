@@ -87,11 +87,11 @@
     </asp:Panel>
     <br />
     <p>
-        <input type="submit" value="<%# umbraco.ui.Text("treepicker")%>" style="width: 60px;
+        <input type="submit" value="<%# Services.TextService.Localize("treepicker")%>" style="width: 60px;
             color: gray" disabled="disabled" id="submitbutton" />
         <em id="orcopy">
-            <%# umbraco.ui.Text("or") %></em> <a href="javascript:cancel();" style="color: blue"
+            <%# Services.TextService.Localize("or") %></em> <a href="javascript:cancel();" style="color: blue"
                 id="cancelbutton">
-                <%#umbraco.ui.Text("cancel") %></a>
+                <%#Services.TextService.Localize("cancel") %></a>
     </p>
 </asp:Content>

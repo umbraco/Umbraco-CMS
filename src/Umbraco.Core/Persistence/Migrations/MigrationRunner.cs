@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Migrations
@@ -20,6 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
+        private readonly IMigrationResolver _resolver;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
         private readonly SemVersion _currentVersion;
@@ -27,36 +29,16 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly string _productName;
         private readonly IMigration[] _migrations;
 
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
-            : this(LoggerResolver.Current.Logger, currentVersion, targetVersion, productName)
+        public MigrationRunner(IMigrationResolver resolver, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
         {
-        }
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
-            : this(logger, currentVersion, targetVersion, productName, null)
-        {
-        }
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
-            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
-        {
-            
-        }
-
-        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
-        {
+            if (resolver == null) throw new ArgumentNullException("resolver");
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
             if (logger == null) throw new ArgumentNullException("logger");
             if (currentVersion == null) throw new ArgumentNullException("currentVersion");
             if (targetVersion == null) throw new ArgumentNullException("targetVersion");
             Mandate.ParameterNotNullOrEmpty(productName, "productName");
 
+            _resolver = resolver;
             _migrationEntryService = migrationEntryService;
             _logger = logger;
             _currentVersion = currentVersion;
@@ -70,21 +52,11 @@ namespace Umbraco.Core.Persistence.Migrations
         /// Executes the migrations against the database.
         /// </summary>
         /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
-        /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
-        /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, bool isUpgrade = true)
-        {
-            return Execute(database, database.GetDatabaseProvider(), isUpgrade);
-        }
-
-        /// <summary>
-        /// Executes the migrations against the database.
-        /// </summary>
-        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
         /// <param name="databaseProvider"></param>
+        /// <param name="sqlSyntaxProvider"></param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
+        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, ISqlSyntaxProvider sqlSyntaxProvider, bool isUpgrade = true)
         {
             _logger.Info<MigrationRunner>("Initializing database migrations");
 
@@ -103,7 +75,7 @@ namespace Umbraco.Core.Persistence.Migrations
             }
 
             //Loop through migrations to generate sql
-            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, isUpgrade);
+            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, sqlSyntaxProvider, isUpgrade);
 
             try
             {
@@ -188,13 +160,18 @@ namespace Umbraco.Core.Persistence.Migrations
         protected virtual IMigration[] FindMigrations()
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return _migrations ?? MigrationResolver.Current.Migrations.ToArray();
+            return _migrations ?? _resolver.Migrations.ToArray();
         }
 
-        internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
+        internal MigrationContext InitializeMigrations(
+            List<IMigration> migrations, 
+            Database database, 
+            DatabaseProviders databaseProvider, 
+            ISqlSyntaxProvider sqlSyntax,
+            bool isUpgrade = true)
         {
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider, database, _logger);
+            var context = new MigrationContext(databaseProvider, database, _logger, sqlSyntax);
 
             foreach (var migration in migrations)
             {

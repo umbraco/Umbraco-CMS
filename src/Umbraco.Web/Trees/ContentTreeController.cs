@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
@@ -13,11 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
-using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -31,7 +24,6 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Settings,
         Constants.Applications.Developer,
         Constants.Applications.Members)]
-    [LegacyBaseTree(typeof(loadContent))]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
@@ -46,7 +38,7 @@ namespace Umbraco.Web.Trees
             {
                 node.MenuUrl = "";
             }
-            node.Name = ui.Text("sections", Constants.Trees.Content);
+            node.Name = Services.TextService.Localize("sections/"+ Constants.Trees.Content);
             return node;
         }
 
@@ -131,14 +123,13 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                //TODO: Use the new services to get permissions
-                var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
-                    UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
-                                        .Select(x => new MenuItem(x));
+                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
+                var nodeActions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
+                    .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "content", "content");
+                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "content", "content");
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -149,8 +140,8 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                menu.Items.Add<ActionRePublish>(ui.Text("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 
                 return menu;
             }
@@ -177,7 +168,7 @@ namespace Umbraco.Web.Trees
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
-                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, ui.Text("actions", ActionRestore.Instance.Alias)));
+                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, Services.TextService.Localize("actions", ActionRestore.Instance.Alias)));
             }
             else
             {
@@ -218,28 +209,28 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
-            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
             
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
-            menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias), true);
-            menu.Items.Add<ActionCopy>(ui.Text("actions", ActionCopy.Instance.Alias));
-            menu.Items.Add<ActionChangeDocType>(ui.Text("actions", ActionChangeDocType.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionMove>(Services.TextService.Localize("actions", ActionMove.Instance.Alias), true);
+            menu.Items.Add<ActionCopy>(Services.TextService.Localize("actions", ActionCopy.Instance.Alias));
+            menu.Items.Add<ActionChangeDocType>(Services.TextService.Localize("actions", ActionChangeDocType.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
-            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
 
-            menu.Items.Add<ActionRollback>(ui.Text("actions", ActionRollback.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionAudit>(ui.Text("actions", ActionAudit.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionPublish>(ui.Text("actions", ActionPublish.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionToPublish>(ui.Text("actions", ActionToPublish.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionAssignDomain>(ui.Text("actions", ActionAssignDomain.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionRights>(ui.Text("actions", ActionRights.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionProtect>(ui.Text("actions", ActionProtect.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionRollback>(Services.TextService.Localize("actions", ActionRollback.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionAudit>(Services.TextService.Localize("actions", ActionAudit.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionPublish>(Services.TextService.Localize("actions", ActionPublish.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionToPublish>(Services.TextService.Localize("actions", ActionToPublish.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionAssignDomain>(Services.TextService.Localize("actions", ActionAssignDomain.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionRights>(Services.TextService.Localize("actions", ActionRights.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionProtect>(Services.TextService.Localize("actions", ActionProtect.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
             
-            menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionSendToTranslate>(ui.Text("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionNotify>(Services.TextService.Localize("actions", ActionNotify.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionSendToTranslate>(Services.TextService.Localize("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
             return menu;
         }

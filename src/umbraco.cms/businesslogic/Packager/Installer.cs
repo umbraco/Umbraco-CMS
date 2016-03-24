@@ -9,14 +9,10 @@ using Umbraco.Core;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Packaging;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.propertytype;
-using umbraco.BusinessLogic;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
-using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -74,11 +70,6 @@ namespace umbraco.cms.businesslogic.packager
         /// List each assembly reference error
         /// </summary>
         public List<string> BinaryFileErrors { get { return _binaryFileErrors; } }
-
-        /// <summary>
-        /// Indicates that the package contains legacy property editors
-        /// </summary>
-        public bool ContainsLegacyPropertyEditors { get; private set; }
 
         public bool ContainsStyleSheeConflicts { get; private set; }
         public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
@@ -303,14 +294,17 @@ namespace umbraco.cms.businesslogic.packager
                 //bool saveNeeded = false;
 
                 // Get current user, with a fallback
-                var currentUser = new User(0);
-                if (string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID) == false)
-                {
-                    if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
-                    {
-                        currentUser = User.GetCurrent();
-                    }
-                }
+                var currentUser = ApplicationContext.Current.Services.UserService.GetUserById(0);
+
+                //TODO: Need to migrate this class/code/logic so that we can replicate this functionality, until then everything will be installed by ADMIN
+
+                //if (string.IsNullOrEmpty(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID) == false)
+                //{
+                //    if (Umbraco.Web.UI.Pages.UmbracoEnsuredPage.ValidateUserContextID(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID))
+                //    {
+                //        currentUser = User.GetCurrent();
+                //    }
+                //}
 
                 //Xml as XElement which is used with the new PackagingService
                 var rootElement = Config.DocumentElement.GetXElement();
@@ -438,12 +432,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                 }
                 #endregion
-
-                // Trigger update of Apps / Trees config.
-                // (These are ApplicationStartupHandlers so just instantiating them will trigger them)
-                new ApplicationRegistrar();
-                new ApplicationTreeRegistrar();
-
+                
                 insPack.Save();
 
                 OnPackageBusinessLogicInstalled(insPack);
@@ -516,21 +505,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-            if (ContainsUnsecureFiles)
-            {
-                //Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-                string[] assemblyErrors;
-                var assembliesWithReferences = PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(tempDir, out assemblyErrors).ToArray();
-                if (assemblyErrors.Any())
-                {
-                    ContainsBinaryFileErrors = true;
-                    BinaryFileErrors.AddRange(assemblyErrors);
-                }
-                if (assembliesWithReferences.Any())
-                {
-                    ContainsLegacyPropertyEditors = true;
-                }
-            }
+          
 
             //this will check for existing macros with the same alias
             //since we will not overwrite on import it's a good idea to inform the user what will be overwritten

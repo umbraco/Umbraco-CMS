@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
-        protected DbTypes<TSyntax> DbTypeMap = new DbTypes<TSyntax>();
+        protected DbTypes DbTypeMap = new DbTypes();
         protected void InitColumnTypeMap()
         {
             DbTypeMap.Set<string>(DbType.String, StringColumnDefinition);

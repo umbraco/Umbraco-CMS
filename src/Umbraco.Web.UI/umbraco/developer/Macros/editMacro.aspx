@@ -82,12 +82,6 @@
                     <asp:PlaceHolder ID="assemblyBrowserUserControl" runat="server"></asp:PlaceHolder>
         </cc1:PropertyPanel>
 
-        <cc1:PropertyPanel runat="server" Text="Razor script">
-             <asp:TextBox ID="macroPython" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    <asp:DropDownList ID="pythonFiles" runat="server">
-                    </asp:DropDownList>
-        </cc1:PropertyPanel>
-
         <asp:PlaceHolder runat="server" Visible="false">
               <asp:TextBox ID="macroAssembly" runat="server" CssClass="guiInputText"></asp:TextBox>
                     (Assembly)<br />
@@ -129,16 +123,16 @@
                     <thead>
                         <tr>
                             <th>
-                                <%=umbraco.ui.Text("general", "alias",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/alias")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "name",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/name")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "type",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/type")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "sort",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/sort")%>
                             </th>
                             <th></th>
                         </tr>

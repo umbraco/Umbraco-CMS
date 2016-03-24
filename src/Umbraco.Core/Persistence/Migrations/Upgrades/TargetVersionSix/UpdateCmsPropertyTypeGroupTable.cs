@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Alter.Table("cmsPropertyTypeGroup").AddColumn("parentGroupId").AsInt16().Nullable();
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         public override void Down()
         {
             Delete.ForeignKey().FromTable("cmsPropertyTypeGroup").ForeignColumn("parentGroupId").ToTable("cmsPropertyTypeGroup").PrimaryColumn("id");
-            
+
             Delete.Column("parentGroupId").FromTable("cmsPropertyTypeGroup");
         }
     }

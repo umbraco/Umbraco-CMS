@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Linq;
 using System.Web.UI.WebControls;
@@ -12,12 +13,12 @@ namespace umbraco.presentation.umbraco.dialogs
 	/// <summary>
 	/// Summary description for importDocumentType.
 	/// </summary>
-	public class importDocumentType : BasePages.UmbracoEnsuredPage
+	public class importDocumentType : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public importDocumentType()
 	    {
 
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
 	    }
 		protected Literal FeedBackMessage;
@@ -39,8 +40,8 @@ namespace umbraco.presentation.umbraco.dialogs
 		{
 			if (!IsPostBack) 
 			{
-				submit.Text = ui.Text("import");
-				import.Text = ui.Text("import");
+				submit.Text = Services.TextService.Localize("import");
+				import.Text = Services.TextService.Localize("import");
 			} 
 		}
 
@@ -72,7 +73,7 @@ namespace umbraco.presentation.umbraco.dialogs
             var xd = new XmlDocument();
             xd.Load(tempFile.Value);
 
-		    var userId = base.getUser().Id;
+		    var userId = Security.GetUserId();
 
             var element = XElement.Parse(xd.InnerXml);
 		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);

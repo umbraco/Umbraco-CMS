@@ -35,18 +35,7 @@ namespace UmbracoExamine
 				return _libraryType;
 			}
 		}
-
-		internal static XPathNodeIterator GetXmlNodeById(string id)
-		{
-			var meth = LibraryType.GetMethod("GetXmlNodeById", BindingFlags.Public | BindingFlags.Static);
-			return (XPathNodeIterator)meth.Invoke(null, new object[] { id });
-		}
-
-		internal static XPathNodeIterator GetMember(int id)
-		{
-			var meth = LibraryType.GetMethod("GetMember", BindingFlags.Public | BindingFlags.Static);
-			return (XPathNodeIterator)meth.Invoke(null, new object[] { id });
-		}
+        
 
 		internal static XPathNodeIterator GetXmlNodeByXPath(string xpathQuery)
 		{

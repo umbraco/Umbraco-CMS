@@ -1,6 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="editstylesheet.aspx.cs" AutoEventWireup="True"
     Inherits="Umbraco.Web.UI.Umbraco.Settings.Stylesheet.EditStyleSheet" ValidateRequest="False" %>
 <%@ Import Namespace="Umbraco.Core" %>
+<%@ Import Namespace="Umbraco.Web.Mvc" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>

@@ -19,14 +19,13 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
-using umbraco.scripting;
 using umbraco.DataLayer;
 using Umbraco.Core.IO;
 using Language = umbraco.cms.businesslogic.language.Language;
@@ -34,7 +33,6 @@ using Media = umbraco.cms.businesslogic.media.Media;
 using Member = umbraco.cms.businesslogic.member.Member;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 using Relation = umbraco.cms.businesslogic.relation.Relation;
-using UmbracoContext = umbraco.presentation.UmbracoContext;
 
 namespace umbraco
 {
@@ -71,19 +69,9 @@ namespace umbraco
         /// </summary>
         public static DateTime PublishStart;
         private page _page;
-        private static readonly object libraryCacheLock = new object();
 
         #endregion
-
-        #region Properties
-
-        protected static ISqlHelper SqlHelper
-        {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
-        }
-
-        #endregion
-
+        
         #region Constructors
 
         /// <summary>
@@ -107,56 +95,7 @@ namespace umbraco
             _page = page;
         }
 
-        #endregion
-
-        #region Python Helper functions
-
-        /// <summary>
-        /// Executes the given python script and returns the standardoutput.
-        /// The Globals known from python macros are not accessible in this context.
-        /// Neither macro or page nor the globals known from python macros are 
-        /// accessible in this context. Only stuff we initialized in site.py
-        /// can be used.
-        /// </summary>
-        /// <param name="file">The filename of the python script including the extension .py</param>
-        /// <returns>Returns the StandardOutput</returns>
-        public static string PythonExecuteFile(string file)
-        {
-            try
-            {
-                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + file);
-                object res = python.executeFile(path);
-                return res.ToString();
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
-
-        /// <summary>
-        /// Executes the given python expression and returns the standardoutput.
-        /// The Globals known from python macros are not accessible in this context.
-        /// Neighter macro or page nor the globals known from python macros are 
-        /// accessible in this context. Only stuff we initialized in site.py
-        /// can be used.
-        /// </summary>
-        /// <param name="expression">Python expression to execute</param>
-        /// <returns>Returns the StandardOutput</returns>
-        public static string PythonExecute(string expression)
-        {
-            try
-            {
-                object res = python.execute(expression);
-                return res.ToString();
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
-
-        #endregion
+        #endregion       
 
         #region Publish Helper Methods
 
@@ -262,29 +201,8 @@ namespace umbraco
                 xd.LoadXml(string.Format("<error>Could not convert JSON to XML. Error: {0}</error>", ex));
                 return xd.CreateNavigator().Select("/error");
             }
-        }
-
-        /// <summary>
-        /// Add a session variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value</param>
-        public static void setSession(string key, string value)
-        {
-            if (HttpContext.Current.Session != null)
-                HttpContext.Current.Session[key] = value;
-        }
-
-        /// <summary>
-        /// Add a cookie variable to the current user
-        /// </summary>
-        /// <param name="key">The Key of the variable</param>
-        /// <param name="value">The Value of the variable</param>
-        public static void setCookie(string key, string value)
-        {
-            StateHelper.SetCookieValue(key, value);
-        }
-
+        }        
+        
         /// <summary>
         /// Returns a string with a friendly url from a node.
         /// IE.: Instead of having /482 (id) as an url, you can have
@@ -533,7 +451,8 @@ namespace umbraco
             var serialized = serializer.Serialize(
                 ApplicationContext.Current.Services.MediaService, 
                 ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.UserService,                
+                ApplicationContext.Current.Services.UserService,      
+                UrlSegmentProviderResolver.Current.Providers,
                 media, 
                 deep);
             return serialized;
@@ -624,9 +543,19 @@ namespace umbraco
         {
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<roles/>");
-            foreach (string role in Access.GetAccessingMembershipRoles(documentId, path))
-                xd.DocumentElement.AppendChild(xmlHelper.addTextNode(xd, "role", role));
+            foreach (string role in GetAccessingMembershipRoles(documentId, path))
+                xd.DocumentElement.AppendChild(XmlHelper.AddTextNode(xd, "role", role));
             return xd.CreateNavigator().Select(".");
+        }
+
+        private static string[] GetAccessingMembershipRoles(int documentId, string path)
+        {
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            if (entry == null) return new string[] { };
+
+            var memberGroupRoleRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType);
+            return memberGroupRoleRules.Select(x => x.RuleValue).ToArray();
+
         }
 
         /// <summary>
@@ -1211,7 +1140,7 @@ namespace umbraco
             xd.LoadXml("<values/>");
             foreach (string id in values)
             {
-                XmlNode node = xmlHelper.addTextNode(xd, "value", id);
+                XmlNode node = XmlHelper.AddTextNode(xd, "value", id);
                 xd.DocumentElement.AppendChild(node);
             }
             XPathNavigator xp = xd.CreateNavigator();
@@ -1275,16 +1204,15 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
+            foreach (var dr in ApplicationContext.Current.DatabaseContext.Database.Query<dynamic>(
+                "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
+                new { dataTypeId = DataTypeId }))
             {
-                while (dr.Read())
-                {
-                    XmlNode n = xmlHelper.addTextNode(xd, "preValue", dr.GetString("value"));
-                    n.Attributes.Append(xmlHelper.addAttribute(xd, "id", dr.GetInt("id").ToString()));
-                    xd.DocumentElement.AppendChild(n);
-                }
+                XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
+                xd.DocumentElement.AppendChild(n);
             }
+          
             XPathNavigator xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
@@ -1298,8 +1226,9 @@ namespace umbraco
         {
             try
             {
-                return SqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
-                                                       SqlHelper.CreateParameter("@id", Id));
+                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                    "select [value] from cmsDataTypePreValues where id = @id",
+                    new {id = Id});
             }
             catch
             {
@@ -1335,22 +1264,22 @@ namespace umbraco
                     try
                     {
                         if (languageId != 0)
-                            xe = xmlHelper.addTextNode(xd, "DictionaryItem", item.Value(languageId));
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value(languageId));
                         else
-                            xe = xmlHelper.addTextNode(xd, "DictionaryItem", item.Value());
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value());
                     }
                     catch
                     {
-                        xe = xmlHelper.addTextNode(xd, "DictionaryItem", string.Empty);
+                        xe = XmlHelper.AddTextNode(xd, "DictionaryItem", string.Empty);
                     }
-                    xe.Attributes.Append(xmlHelper.addAttribute(xd, "key", item.key));
+                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.key));
                     xd.DocumentElement.AppendChild(xe);
                 }
             }
             catch (Exception ee)
             {
                 xd.DocumentElement.AppendChild(
-                    xmlHelper.addTextNode(xd, "Error", ee.ToString()));
+                    XmlHelper.AddTextNode(xd, "Error", ee.ToString()));
             }
 
             XPathNavigator xp = xd.CreateNavigator();
@@ -1417,9 +1346,7 @@ namespace umbraco
         // only difference is that the UmbracoContext way will check if its in preview mode.
         private static XmlDocument GetThreadsafeXmlDocument()
         {
-            return UmbracoContext.Current != null
-                       ? UmbracoContext.Current.GetXml()
-                       : content.Instance.XmlContent;
+            return content.Instance.XmlContent;
         }
 
         /// <summary>
@@ -1533,10 +1460,10 @@ namespace umbraco
         public static string QueryForNode(string id)
         {
             string XPathQuery = string.Empty;
-            if (UmbracoContext.Current.GetXml().GetElementById(id) != null)
+            if (content.Instance.XmlContent.GetElementById(id) != null)
             {
                 string[] path =
-                    UmbracoContext.Current.GetXml().GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
+                    content.Instance.XmlContent.GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
                 for (int i = 1; i < path.Length; i++)
                 {
                     if (i > 1)
@@ -1726,7 +1653,7 @@ namespace umbraco
         public static string RequestCookies(string key)
         {
             // zb-00004 #29956 : refactor cookies handling
-            var value = StateHelper.GetCookieValue(key);
+            var value = HttpContext.Current.Request.GetCookieValue(key);
             return value ?? "";
         }
 
@@ -1836,12 +1763,12 @@ namespace umbraco
             foreach (Relation r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
-                n.AppendChild(xmlHelper.addCDataNode(xd, "comment", r.Comment));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "typeId", r.RelType.Id.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "typeName", r.RelType.Name));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "createDate", r.CreateDate.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "parentId", r.Parent.Id.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "childId", r.Child.Id.ToString()));
+                n.AppendChild(XmlHelper.AddCDataNode(xd, "comment", r.Comment));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeId", r.RelType.Id.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeName", r.RelType.Name));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", r.CreateDate.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "parentId", r.Parent.Id.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "childId", r.Child.Id.ToString()));
 
                 // Append the node that isn't the one we're getting the related nodes from
                 if (NodeId == r.Child.Id)
@@ -1896,18 +1823,6 @@ namespace umbraco
                 return string.Empty;
         }
 
-
-
-        /// <summary>
-        /// Cleans the spified string with tidy
-        /// </summary>
-        /// <param name="StringToTidy">The string to tidy.</param>
-        /// <param name="LiveEditing">if set to <c>true</c> [Live Editing].</param>
-        /// <returns></returns>
-        public static string Tidy(string StringToTidy, bool LiveEditing)
-        {
-            return cms.helpers.xhtml.TidyHtml(StringToTidy);
-        }
 
         
 

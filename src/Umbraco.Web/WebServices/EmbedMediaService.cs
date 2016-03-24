@@ -7,18 +7,16 @@ using System.Web.Script.Serialization;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Media;
-using umbraco.BusinessLogic;
-using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
 {
-    [RestExtension("EmbedMediaService")]
+    //TODO: Convert this to MVC and see if we still need it
+
     public class EmbedMediaService
     {
-        [RestExtensionMethod(ReturnXml = false)]
         public static string Embed()
         {
-            var currentUser = User.GetCurrent();
+            var currentUser = UmbracoContext.Current.Security.CurrentUser;
 
             if (currentUser == null)
                 throw new UnauthorizedAccessException("You must be logged in to use this service");

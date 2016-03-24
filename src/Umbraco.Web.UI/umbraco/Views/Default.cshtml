@@ -12,7 +12,7 @@
 @using Umbraco.Web.Editors
 @using umbraco
 
-@inherits System.Web.Mvc.WebViewPage
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
 @{
     var isDebug = false;
@@ -28,7 +28,6 @@
 
     Html
         .RequiresCss("assets/css/umbraco.css", "Umbraco")
-        .RequiresCss("tree/treeicons.css", "UmbracoClient")
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
@@ -37,7 +36,7 @@
 
 <html lang="en">
 <head>
-    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">

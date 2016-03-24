@@ -1,15 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Web;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.BasePages;
-using umbraco.BusinessLogic.Utils;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.workflow;
-using umbraco.interfaces;
+using Umbraco.Core._Legacy.PackageActions;
 
 
 namespace umbraco.cms.businesslogic.packager

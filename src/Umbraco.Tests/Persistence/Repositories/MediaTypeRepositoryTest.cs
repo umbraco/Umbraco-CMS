@@ -28,12 +28,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
+            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);            
         }
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.MediaTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver, Constants.ObjectTypes.MediaTypeContainerGuid);
+
         }
 
         [Test]
@@ -69,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.Move(contentType, container1).ToArray();
                 unitOfWork.Commit();
 
-                Assert.AreEqual(2, result.Count());
+                Assert.AreEqual(2, result.Length);
 
                 //re-get
                 contentType = repository.Get(contentType.Id);

@@ -14,9 +14,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Configure's model mappings for Data types
     /// </summary>
-    internal class DataTypeModelMapper : MapperConfiguration
+    internal class DataTypeModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
 
@@ -99,7 +99,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(definition => definition.Path, expression => expression.Ignore())
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
                 .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
-                .ForMember(x => x.ControlId, expression => expression.Ignore())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())
                 .ForMember(x => x.Level, expression => expression.Ignore())
                 .ForMember(x => x.SortOrder, expression => expression.Ignore())

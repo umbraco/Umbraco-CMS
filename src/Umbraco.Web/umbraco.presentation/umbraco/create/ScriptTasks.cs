@@ -1,10 +1,7 @@
-using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
-using umbraco.BasePages;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -70,7 +67,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.settings.ToString(); }
+            get { return Constants.Applications.Settings; }
         }
     }
 }

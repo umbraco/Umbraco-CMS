@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,12 +27,9 @@ namespace Umbraco.Tests
 	public class LibraryTests : BaseRoutingTest
 	{
         public override void Initialize()
-		{
-            // required so we can access property.Value
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
-            
+        {
             base.Initialize();
-
+            
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we
@@ -52,7 +50,20 @@ namespace Umbraco.Tests
 			UmbracoContext.Current = routingContext.UmbracoContext;
 		}
 
-		public override void TearDown()
+	    /// <summary>
+	    /// sets up resolvers before resolution is frozen
+	    /// </summary>
+	    protected override void FreezeResolution()
+	    {
+            // required so we can access property.Value
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                Container,
+                Logger);
+
+	        base.FreezeResolution();
+	    }
+
+	    public override void TearDown()
 		{
 			base.TearDown();
 			UmbracoContext.Current = null;
@@ -151,7 +162,7 @@ namespace Umbraco.Tests
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var umbracoXML = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
 
-            string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+            string xpath = "./{0}";
 			if (umbracoXML.GetElementById(nodeId.ToString()) != null)
 				if (
 					",id,parentID,level,writerID,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"

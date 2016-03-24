@@ -1,25 +1,17 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Xml;
-using System.Xml.XPath;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages {
-    public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {
+    public partial class BrowseRepository : UmbracoEnsuredPage {
 
         public BrowseRepository()
         {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
 
         }
 
@@ -29,7 +21,7 @@ namespace umbraco.presentation.developer.packages {
             if (!cms.businesslogic.packager.Settings.HasFileAccess(ref ex)) {
                 fb.Style.Add("margin-top", "7px");
                 fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
-                fb.Text = "<strong>" + ui.Text("errors", "filePermissionsError") + ":</strong><br/>" + ex.Message;
+                fb.Text = "<strong>" + Services.TextService.Localize("errors/filePermissionsError") + ":</strong><br/>" + ex.Message;
             }
 
             string category = Request.CleanForXss("category");
@@ -50,14 +42,14 @@ namespace umbraco.presentation.developer.packages {
 
             iframeGen.Text =
                 string.Format(
-                    "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>",
+                    "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&dotnetVersion={11}&trustLevel={12}\"></iframe>",
                     url, repoGuid, category, Request.ServerVariables["SERVER_NAME"],
                     Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                     IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid,
                     UmbracoVersion.Current.Major,
                     UmbracoVersion.Current.Minor,
                     UmbracoVersion.Current.Build,
-                    UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema.ToString(), Environment.Version,
+                    Environment.Version,
                     Umbraco.Core.SystemUtilities.GetCurrentTrustLevel());
         }
 

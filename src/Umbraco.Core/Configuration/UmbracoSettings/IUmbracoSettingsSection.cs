@@ -12,7 +12,6 @@
 
         IDeveloperSection Developer { get; }
 
-        IViewStateMoverModuleSection ViewStateMoverModule { get; }
 
         ILoggingSection Logging { get; }
 
@@ -23,11 +22,8 @@
         IRepositoriesSection PackageRepositories { get; }
 
         IProvidersSection Providers { get; }
-
-        IHelpSection Help { get; }
-
+        
         IWebRoutingSection WebRouting { get; }
 
-        IScriptingSection Scripting { get; }
     }
 }

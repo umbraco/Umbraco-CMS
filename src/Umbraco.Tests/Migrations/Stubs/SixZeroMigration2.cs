@@ -11,6 +11,7 @@ namespace Umbraco.Tests.Migrations.Stubs
         {
         }
 
+
         public override void Up()
         {
             Alter.Table("umbracoUser").AddColumn("secondEmail").AsString(255);

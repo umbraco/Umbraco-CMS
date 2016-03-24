@@ -5,21 +5,20 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:8)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadMediaTypes))]
     public class MediaTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

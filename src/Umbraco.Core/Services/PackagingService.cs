@@ -21,6 +21,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Content = Umbraco.Core.Models.Content;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -41,6 +42,7 @@ namespace Umbraco.Core.Services
         private readonly IEntityService _entityService;
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
@@ -58,7 +60,8 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider)
+            IDatabaseUnitOfWorkProvider uowProvider, 
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             _logger = logger;
             _contentService = contentService;
@@ -71,6 +74,7 @@ namespace Umbraco.Core.Services
             _entityService = entityService;
             _repositoryFactory = repositoryFactory;
             _uowProvider = uowProvider;
+            _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
@@ -86,7 +90,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             if (raiseEvents)
             {
@@ -95,7 +99,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_contentService, _dataTypeService, _userService, content, deep);
+            var xml = exporter.Serialize(_contentService, _dataTypeService, _userService, _urlSegmentProviders, content, deep);
 
             if (raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
@@ -161,11 +165,8 @@ namespace Umbraco.Core.Services
         {
             var contents = new List<IContent>();
             foreach (var root in roots)
-            {
-                bool isLegacySchema = root.Name.LocalName.ToLowerInvariant().Equals("node");
-                string contentTypeAlias = isLegacySchema
-                                              ? root.Attribute("nodeTypeAlias").Value
-                                              : root.Name.LocalName;
+            {                
+                var contentTypeAlias = root.Name.LocalName;
 
                 if (_importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
@@ -173,26 +174,24 @@ namespace Umbraco.Core.Services
                     _importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId, isLegacySchema);
+                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId);
                 contents.Add(content);
 
                 var children = from child in root.Elements()
                                where (string)child.Attribute("isDoc") == ""
                                select child;
                 if (children.Any())
-                    contents.AddRange(CreateContentFromXml(children, content, isLegacySchema));
+                    contents.AddRange(CreateContentFromXml(children, content));
             }
             return contents;
         }
 
-        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, bool isLegacySchema)
+        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent)
         {
             var list = new List<IContent>();
             foreach (var child in children)
             {
-                string contentTypeAlias = isLegacySchema
-                                              ? child.Attribute("nodeTypeAlias").Value
-                                              : child.Name.LocalName;
+                string contentTypeAlias = child.Name.LocalName;
 
                 if (_importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
@@ -201,7 +200,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int), isLegacySchema);
+                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int));
                 list.Add(content);
 
                 //Recursive call
@@ -211,19 +210,20 @@ namespace Umbraco.Core.Services
                                     select grand;
 
                 if (grandChildren.Any())
-                    list.AddRange(CreateContentFromXml(grandChildren, content, isLegacySchema));
+                    list.AddRange(CreateContentFromXml(grandChildren, content));
             }
 
             return list;
         }
 
-        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId, bool isLegacySchema)
+        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId)
         {
             var id = element.Attribute("id").Value;
             var level = element.Attribute("level").Value;
             var sortOrder = element.Attribute("sortOrder").Value;
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
+            //TODO: Shouldn't we be using this value???
             var template = element.Attribute("template").Value;
 
             var properties = from property in element.Elements()
@@ -244,7 +244,7 @@ namespace Umbraco.Core.Services
 
             foreach (var property in properties)
             {
-                string propertyTypeAlias = isLegacySchema ? property.Attribute("alias").Value : property.Name.LocalName;
+                string propertyTypeAlias = property.Name.LocalName;
                 if (content.HasProperty(propertyTypeAlias))
                 {
                     var propertyValue = property.Value;
@@ -681,9 +681,7 @@ namespace Umbraco.Core.Services
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
 
-                //we'll check if it is a GUID (legacy id for a property editor)
-                var legacyPropertyEditorId = Guid.Empty;
-                Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId);
+                
                 //get the alias as a string for use below
                 var propertyEditorAlias = property.Element("Type").Value.Trim();
 
@@ -692,17 +690,7 @@ namespace Umbraco.Core.Services
 
                 if (dataTypeDefinition == null)
                 {
-                    var dataTypeDefinitions = legacyPropertyEditorId != Guid.Empty
-                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId)
-                                                  : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
-                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
-                    {
-                        dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
-                    }
-                }
-                else if (legacyPropertyEditorId != Guid.Empty && dataTypeDefinition.ControlId != legacyPropertyEditorId)
-                {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
+                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
@@ -795,7 +783,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+                var query = repository.Query.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query).ToArray();
 
                 if (types.Any() == false)
@@ -887,10 +875,7 @@ namespace Umbraco.Core.Services
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-
-                Guid legacyPropertyEditorId;
-                Guid.TryParse(dataTypeElement.Attribute("Id").Value, out legacyPropertyEditorId);
-
+                
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
@@ -906,30 +891,15 @@ namespace Umbraco.Core.Services
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
                                            : DataTypeDatabaseType.Ntext;
 
-                    //check if the Id was a GUID, that means it is referenced using the legacy property editor GUID id
-                    if (legacyPropertyEditorId != Guid.Empty)
+                    //the Id field is actually the string property editor Alias
+                    var dataTypeDefinition = new DataTypeDefinition(dataTypeElement.Attribute("Id").Value.Trim())
                     {
-                        var dataTypeDefinition = new DataTypeDefinition(-1, legacyPropertyEditorId)
-                        {
-                            Key = dataTypeDefinitionId,
-                            Name = dataTypeDefinitionName,
+                        Key = dataTypeDefinitionId,
+                        Name = dataTypeDefinitionName,
                             DatabaseType = databaseType,
                             ParentId = parentId
-                        };
-                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
-                    }
-                    else
-                    {
-                        //the Id field is actually the string property editor Alias
-                        var dataTypeDefinition = new DataTypeDefinition(dataTypeElement.Attribute("Id").Value.Trim())
-                        {
-                            Key = dataTypeDefinitionId,
-                            Name = dataTypeDefinitionName,
-                            DatabaseType = databaseType,
-                            ParentId = parentId
-                        };
-                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
-                    }
+                    };
+                    dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
 
                 }
                 else
@@ -1458,7 +1428,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
         public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             if (raiseEvents)
             {
@@ -1467,7 +1437,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_mediaService, _dataTypeService, _userService, media, deep);
+            var xml = exporter.Serialize(_mediaService, _dataTypeService, _userService, _urlSegmentProviders, media, deep);
 
             if (raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);
@@ -1565,7 +1535,7 @@ namespace Umbraco.Core.Services
                 var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
 
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
-                var template = existingTemplate ?? new Template(path, templateName, alias);
+                var template = existingTemplate ?? new Template(templateName, alias);
                 template.Content = design;
                 if (masterElement != null && string.IsNullOrEmpty((string)masterElement) == false)
                 {

@@ -10,11 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
-    {
-        public PartialViewRepository(IUnitOfWork work)
-			: this(work, new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"))
-        {
-        }
+    {      
 
         public PartialViewRepository(IUnitOfWork work, IFileSystem fileSystem) : base(work, fileSystem)
         {

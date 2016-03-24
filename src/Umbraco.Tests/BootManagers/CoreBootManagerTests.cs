@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,7 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
-using umbraco.interfaces;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
@@ -21,23 +22,12 @@ namespace Umbraco.Tests.BootManagers
     [TestFixture]
     public class CoreBootManagerTests : BaseUmbracoConfigurationTest
     {
-
-        private TestApp _testApp;
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-            _testApp = new TestApp();            
-        }
-
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-
-            _testApp = null;
             ResolverCollection.ResetAll();
+            TestApplicationEventHandler.Reset();
         }
 
      
@@ -49,6 +39,16 @@ namespace Umbraco.Tests.BootManagers
             protected override IBootManager GetBootManager()
             {
                 return new TestBootManager(this, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            }
+
+            private ILogger _logger;
+
+            /// <summary>
+            /// Returns the logger instance for the application - this will be used throughout the entire app
+            /// </summary>
+            public override ILogger Logger
+            {
+                get { return _logger ?? (_logger = Mock.Of<ILogger>()); }
             }
         }
 
@@ -62,67 +62,34 @@ namespace Umbraco.Tests.BootManagers
             {
             }
 
-            /// <summary>
-            /// Creates and returns the application context singleton
-            /// </summary>
-            /// <param name="dbContext"></param>
-            /// <param name="serviceContext"></param>
-            protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+            internal override void ConfigureCoreServices(ServiceContainer container)
             {
-                var appContext = base.CreateApplicationContext(dbContext, serviceContext);
-
-                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
-                dbContextMock.Setup(x => x.CanConnect).Returns(true);
-                appContext.DatabaseContext = dbContextMock.Object;
-
-                return appContext;
-            }
-
-            protected override void InitializeApplicationEventsResolver()
-            {
-                //create an empty resolver so we can add our own custom ones (don't type find)
-                ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-                    new ActivatorServiceProvider(), ProfilingLogger.Logger,
-                    new Type[]
-                    {
-                        typeof(LegacyStartupHandler),
-                        typeof(TestApplicationEventHandler)
-                    })
-                    {
-                        CanResolveBeforeFrozen = true
-                    };
-            }
-            
-            protected override void InitializeLoggerResolver()
-            {                
-            }
-            
-            protected override void InitializeProfilerResolver()
-            {
+                base.ConfigureCoreServices(container);
+                container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
+                container.Register<DatabaseContext>(factory => new DatabaseContext(
+                    factory.GetInstance<IDatabaseFactory>(),
+                    factory.GetInstance<ILogger>(),
+                    factory.GetInstance<SqlSyntaxProviders>()), new PerContainerLifetime());
             }
         }
-
-        /// <summary>
-        /// Test legacy startup handler
-        /// </summary>
-        public class LegacyStartupHandler : IApplicationStartupHandler
-        {
-            public static bool Initialized = false;
-
-            public LegacyStartupHandler()
-            {
-                Initialized = true;
-            }
-        }
-
+        
         /// <summary>
         /// test event handler
         /// </summary>
-        public class TestApplicationEventHandler : IApplicationEventHandler
+        public class TestApplicationEventHandler : DisposableObject, IApplicationEventHandler
         {
+            public static void Reset()
+            {
+                Initialized = false;
+                Starting = false;
+                Started = false;
+                Disposed = false;
+            }
+
             public static bool Initialized = false;
             public static bool Starting = false;
             public static bool Started = false;
+            public static bool Disposed = false;
 
             public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
             {
@@ -138,40 +105,63 @@ namespace Umbraco.Tests.BootManagers
             {
                 Started = true;
             }
+
+            protected override void DisposeResources()
+            {
+                Disposed = true;
+            }
+        }
+
+        [Test]
+        public void Disposes_App_Startup_Handlers_After_Startup()
+        {
+            using (var app = new TestApp())
+            {
+                app.StartApplication(app, new EventArgs());
+                
+                Assert.IsTrue(TestApplicationEventHandler.Disposed);
+            }
         }
 
         [Test]
         public void Handle_IApplicationEventHandler_Objects_Outside_Web_Context()
         {
-            _testApp.StartApplication(_testApp, new EventArgs());
+            using (var app = new TestApp())
+            {
+                app.StartApplication(app, new EventArgs());
 
-            Assert.IsTrue(TestApplicationEventHandler.Initialized);
-            Assert.IsTrue(TestApplicationEventHandler.Starting);
-            Assert.IsTrue(TestApplicationEventHandler.Started);
+                Assert.IsTrue(TestApplicationEventHandler.Initialized);
+                Assert.IsTrue(TestApplicationEventHandler.Starting);
+                Assert.IsTrue(TestApplicationEventHandler.Started);
+            }
         }
 
         [Test]
-        public void Ensure_Legacy_Startup_Handlers_Not_Started_Until_Complete()
+        public void Raises_Starting_Events()
         {
-            EventHandler starting = (sender, args) =>
+            using (var app = new TestApp())
+            {
+                EventHandler starting = (sender, args) =>
                 {
                     Assert.IsTrue(TestApplicationEventHandler.Initialized);
                     Assert.IsTrue(TestApplicationEventHandler.Starting);
-                    Assert.IsFalse(LegacyStartupHandler.Initialized);
+                    Assert.IsFalse(TestApplicationEventHandler.Started);
                 };
-            EventHandler started = (sender, args) =>
+                EventHandler started = (sender, args) =>
                 {
+                    Assert.IsTrue(TestApplicationEventHandler.Initialized);
+                    Assert.IsTrue(TestApplicationEventHandler.Starting);
                     Assert.IsTrue(TestApplicationEventHandler.Started);
-                    Assert.IsTrue(LegacyStartupHandler.Initialized);
                 };
-            TestApp.ApplicationStarting += starting;
-            TestApp.ApplicationStarted += started;
 
-            _testApp.StartApplication(_testApp, new EventArgs());
+                app.ApplicationStarting += starting;
+                app.ApplicationStarted += started;
 
-            TestApp.ApplicationStarting -= starting;
-            TestApp.ApplicationStarting -= started;
+                app.StartApplication(app, new EventArgs());
 
+                app.ApplicationStarting -= starting;
+                app.ApplicationStarting -= started;
+            }
         }
 
     }

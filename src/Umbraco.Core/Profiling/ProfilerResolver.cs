@@ -5,6 +5,9 @@ namespace Umbraco.Core.Profiling
     /// <summary>
     /// A resolver exposing the current profiler
     /// </summary>
+    /// <remarks>
+    /// NOTE: This is a 'special' resolver in that it gets initialized before most other things, it cannot use IoC so it cannot implement ContainerObjectResolverBase
+    /// </remarks>
     internal class ProfilerResolver : SingleObjectResolverBase<ProfilerResolver, IProfiler>
     {
         /// <summary>

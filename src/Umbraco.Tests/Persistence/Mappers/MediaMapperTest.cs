@@ -10,11 +10,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new MediaMapper().Map("Id");
+            string column = new MediaMapper(new SqlCeSyntaxProvider()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -23,11 +20,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Trashed_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new MediaMapper().Map("Trashed");
+            string column = new MediaMapper(new SqlCeSyntaxProvider()).Map("Trashed");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[trashed]"));
@@ -36,11 +30,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_UpdateDate_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new MediaMapper().Map("UpdateDate");
+            string column = new MediaMapper(new SqlCeSyntaxProvider()).Map("UpdateDate");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionDate]"));
@@ -49,11 +40,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Version_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
+            
             // Act
-            string column = new MediaMapper().Map("Version");
+            string column = new MediaMapper(new SqlCeSyntaxProvider()).Map("Version");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionId]"));

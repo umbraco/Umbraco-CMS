@@ -1,30 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Text;
 using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
+
 using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace umbraco
 {
@@ -41,7 +24,7 @@ namespace umbraco
             // if we're using 3rd party membership providers we should use the Role terminology
             if (!Member.IsUsingUmbracoRoles())
             {
-                rootNode.Text = ui.Text("memberRoles");
+                rootNode.Text = Services.TextService.Localize("memberRoles");
             }
             rootNode.NodeType = "initmemberGroup";
             rootNode.NodeID = "init";

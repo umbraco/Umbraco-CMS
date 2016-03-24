@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             //Conditional Create-column for Sql Ce databases

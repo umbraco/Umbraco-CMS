@@ -41,7 +41,7 @@
   <add application="settings" alias="scripts" title="Scripts" type="umbraco.loadScripts, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
-  <add application="settings" alias="dictionary" title="Dictionary" type="umbraco.loadDictionary, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="6" 
+  <add application="settings" alias="dictionary" title="Dictionary" type="Umbraco.Web.Trees.DictionaryTreeController, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="6" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   <add alias="dictionary" application="settings"

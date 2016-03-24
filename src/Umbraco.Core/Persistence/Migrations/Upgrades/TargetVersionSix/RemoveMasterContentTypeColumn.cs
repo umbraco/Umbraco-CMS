@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             //NOTE Don't think we can remove this column yet as it seems to be used by some starterkits

@@ -6,12 +6,11 @@ using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Tests.Services
 {
@@ -56,9 +55,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Length);
+            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Length);
+            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Length);
         }
 
         [Test]

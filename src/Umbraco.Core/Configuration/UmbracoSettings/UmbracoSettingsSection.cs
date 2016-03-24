@@ -37,11 +37,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (DeveloperElement)this["developer"]; }
         }
 
-        [ConfigurationProperty("viewstateMoverModule")]
-        internal ViewstateMoverModuleElement ViewstateMoverModule
-        {
-            get { return (ViewstateMoverModuleElement)this["viewstateMoverModule"]; }
-        }
 
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
@@ -110,24 +105,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ProvidersElement)this["providers"]; }
         }
 
-        [ConfigurationProperty("help")]
-        internal HelpElement Help
-        {
-            get { return (HelpElement)this["help"]; }
-        }
-
         [ConfigurationProperty("web.routing")]
         internal WebRoutingElement WebRouting
         {
             get { return (WebRoutingElement)this["web.routing"]; }
         }
 
-        [ConfigurationProperty("scripting")]
-        internal ScriptingElement Scripting
-        {
-            get { return (ScriptingElement)this["scripting"]; }
-        }
-        
         IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
@@ -151,11 +134,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IDeveloperSection IUmbracoSettingsSection.Developer
         {
             get { return Developer; }
-        }
-
-        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
-        {
-            get { return ViewstateMoverModule; }
         }
 
         ILoggingSection IUmbracoSettingsSection.Logging
@@ -183,19 +161,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Providers; }
         }
 
-        IHelpSection IUmbracoSettingsSection.Help
-        {
-            get { return Help; }
-        }
-
         IWebRoutingSection IUmbracoSettingsSection.WebRouting
         {
             get { return WebRouting; }
         }
 
-        IScriptingSection IUmbracoSettingsSection.Scripting
-        {
-            get { return Scripting; }
-        }
     }
 }

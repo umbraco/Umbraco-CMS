@@ -1,15 +1,8 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using ClientDependency.Core;
-using umbraco.IO;
 
 
 namespace umbraco.uicontrols
@@ -34,13 +27,6 @@ namespace umbraco.uicontrols
             MenuIcon icon = new MenuIcon();
             Icons.Add(icon);
             return icon;
-        }
-
-        internal MenuSplitButton NewSplitButton()
-        {
-            var menu = new MenuSplitButton();
-            Icons.Add(menu);
-            return menu;
         }
 
         public MenuButton NewButton(int index = -1)

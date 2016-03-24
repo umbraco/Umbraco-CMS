@@ -9,11 +9,13 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using umbraco.BasePages;
 using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
 using System.Linq;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -24,7 +26,7 @@ namespace umbraco.cms.presentation.developer
 	{
 		public editMacro()
 		{
-			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+			CurrentApp = Constants.Applications.Developer.ToString();
 		}
 
 		protected PlaceHolder Buttons;
@@ -68,9 +70,6 @@ namespace umbraco.cms.presentation.developer
 				// Load xslt files from default dir
 				PopulateXsltFiles();
 
-				// Load razor script files from default dir
-                PopulateMacroScriptFiles();
-
 				// Load usercontrols
 				PopulateUserControls(IOHelper.MapPath(SystemDirectories.UserControls));
 				userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
@@ -89,7 +88,6 @@ namespace umbraco.cms.presentation.developer
 			macroName.Text = macro.Name;
 			macroAlias.Text = macro.Alias;
 			macroXslt.Text = macro.XsltPath;
-			macroPython.Text = macro.ScriptPath;
 		    cachePeriod.Text = macro.CacheDuration.ToInvariantString();
 			macroRenderContent.Checked = macro.DontRender == false;
 			macroEditor.Checked = macro.UseInEditor;
@@ -123,7 +121,6 @@ namespace umbraco.cms.presentation.developer
 			macro.ControlAssembly = macroAssemblyValue;
 			macro.ControlType = macroTypeValue;
 			macro.XsltPath = macroXslt.Text;
-			macro.ScriptPath = macroPython.Text;
 		}
 
 		private static void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
@@ -153,31 +150,7 @@ namespace umbraco.cms.presentation.developer
 			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
 		}
 
-		private static void GetMacroScriptFilesFromDir(string orgPath, string path, ArrayList files)
-		{
-			var dirInfo = new DirectoryInfo(path);
-			if (dirInfo.Exists == false)
-				return;
-
-			var fileInfo = dirInfo.GetFiles("*.*").Where(f => f.Name.ToLowerInvariant() != "web.config".ToLowerInvariant());
-			foreach (var file in fileInfo)
-				files.Add(path.Replace(orgPath, string.Empty) + file.Name);
-
-			// Populate subdirectories
-			var dirInfos = dirInfo.GetDirectories();
-			foreach (var dir in dirInfos)
-				GetMacroScriptFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
-		}
-
-        private void PopulateMacroScriptFiles()
-		{
-			var razors = new ArrayList();
-			var razorDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
-			GetMacroScriptFilesFromDir(razorDir, razorDir, razors);
-			pythonFiles.DataSource = razors;
-			pythonFiles.DataBind();
-			pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
-		}
+		
 
 		public void deleteMacroProperty(object sender, EventArgs e)
 		{
@@ -234,7 +207,7 @@ namespace umbraco.cms.presentation.developer
 			var macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
 			var macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
 			
-			if (macroPropertyAliasNew.Text != ui.Text("general", "new", UmbracoUser) + " " + ui.Text("general", "alias", UmbracoUser))
+			if (macroPropertyAliasNew.Text != Services.TextService.Localize("general/new") + " " + Services.TextService.Localize("general/alias"))
 			{
                 if (_macro.Properties.ContainsKey(macroPropertyAliasNew.Text.Trim()))
                 {
@@ -308,7 +281,7 @@ namespace umbraco.cms.presentation.developer
 
             var save = TabView1.Menu.NewButton();
             save.ButtonType = MenuButtonType.Primary;
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.ID = "save";
             save.Click += Save_Click;
 	    }
@@ -356,7 +329,7 @@ namespace umbraco.cms.presentation.developer
 
             Services.MacroService.Save(_macro);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Macro saved", "");
 
             // Check for assemblyBrowser
             if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)
@@ -498,24 +471,6 @@ namespace umbraco.cms.presentation.developer
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
 		protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowser;
-
-		/// <summary>
-		/// macroPython control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.TextBox macroPython;
-
-		/// <summary>
-		/// pythonFiles control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.DropDownList pythonFiles;
 
 		/// <summary>
 		/// Pane1_3 control.

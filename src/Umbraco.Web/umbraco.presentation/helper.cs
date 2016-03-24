@@ -10,48 +10,22 @@ using Umbraco.Core.Profiling;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
+using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco
 {
     /// <summary>
     /// Summary description for helper.
     /// </summary>
+    [Obsolete("This needs to be removed, do not use")]
     public class helper
     {
         public static bool IsNumeric(string Number)
         {
             int result;
             return int.TryParse(Number, out result);
-        }
-
-        public static User GetCurrentUmbracoUser()
-        {
-            return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
-        }
-
-		[Obsolete("This method has been superceded. Use the extension method for HttpRequest or HttpRequestBase method: GetItemAsString instead.")]
-        public static string Request(string text)
-		{
-			if (HttpContext.Current == null)
-				return string.Empty;
-
-            if (HttpContext.Current.Request[text.ToLower()] != null)
-				if (HttpContext.Current.Request[text] != string.Empty)
-					return HttpContext.Current.Request[text];
-            
-            return String.Empty;
-        }
-
-		[Obsolete("Has been superceded by Umbraco.Core.XmlHelper.GetAttributesFromElement")]
-        public static Hashtable ReturnAttributes(String tag)
-		{
-			var h = new Hashtable();
-            foreach(var i in Umbraco.Core.XmlHelper.GetAttributesFromElement(tag))
-            {
-            	h.Add(i.Key, i.Value);
-            }
-			return h;
-		}
+        }        
 
         public static String FindAttribute(IDictionary attributes, String key)
         {
@@ -130,9 +104,9 @@ namespace umbraco
                                 attributeValue = HttpContext.Current.Request[keyName];
                                 break;
                             case "%":
-                                attributeValue = StateHelper.GetSessionValue<string>(keyName);
-                                if (String.IsNullOrEmpty(attributeValue))
-                                    attributeValue = StateHelper.GetCookieValue(keyName);
+                                attributeValue = HttpContext.Current.Session[keyName] != null ? HttpContext.Current.Session[keyName].ToString() : null;
+                                if (string.IsNullOrEmpty(attributeValue))
+                                    attributeValue = HttpContext.Current.Request.GetCookieValue(keyName);
                                 break;
                             case "#":
                                 if (pageElements[keyName] != null)
@@ -149,7 +123,7 @@ namespace umbraco
                                 {
                                     // reset attribute value in case no value has been found on parents
                                     attributeValue = String.Empty;
-                                    XmlDocument umbracoXML = presentation.UmbracoContext.Current.GetXml();
+                                    XmlDocument umbracoXML = global::umbraco.content.Instance.XmlContent;
 
                                     String[] splitpath = (String[])pageElements["splitpath"];
                                     for (int i = 0; i < splitpath.Length - 1; i++)
@@ -157,7 +131,7 @@ namespace umbraco
                                         XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
                                         if (element == null)
                                             continue;
-                                        string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "{0}";
+                                        string xpath = "{0}";
                                         XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
                                             keyName));
                                         if (currentNode != null && currentNode.FirstChild != null &&
@@ -188,16 +162,5 @@ namespace umbraco
             return attributeValue;
         }
 
-        [UmbracoWillObsolete("We should really obsolete that one.")]
-        public static string SpaceCamelCasing(string text)
-        {
-            return text.SplitPascalCasing().ToFirstUpperInvariant();
-        }
-
-        [Obsolete("Use umbraco.presentation.UmbracContext.Current.GetBaseUrl()")]
-        public static string GetBaseUrl(HttpContext Context)
-        {
-            return Context.Request.Url.GetLeftPart(UriPartial.Authority);
-        }
     }
 }

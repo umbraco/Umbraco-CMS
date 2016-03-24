@@ -1,4 +1,5 @@
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -6,6 +7,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DecimalAlias, "Decimal", "decimal", "decimal", IsParameterEditor = true)]
     public class DecimalPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public DecimalPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         /// <summary>
         /// Overridden to ensure that the value is validated
         /// </summary>
@@ -53,5 +61,7 @@ namespace Umbraco.Web.PropertyEditors
                 });
             }
         }
+
+        
     }
 }

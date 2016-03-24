@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multinode Treepicker", "contentpicker", Group="pickers", Icon="icon-page-add")]
     public class MultiNodeTreePickerPropertyEditor : PropertyEditor
     {
-        public MultiNodeTreePickerPropertyEditor()
+        public MultiNodeTreePickerPropertyEditor(ILogger logger) : base(logger)
         {
             _internalPreValues = new Dictionary<string, object>
             {

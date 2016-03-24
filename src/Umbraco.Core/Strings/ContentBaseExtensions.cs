@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -10,30 +11,19 @@ namespace Umbraco.Core.Strings
     /// </summary>
     internal static class ContentBaseExtensions
     {
-        /// <summary>
-        /// Gets the url segment providers.
-        /// </summary>
-        /// <remarks>This is so that unit tests that do not initialize the resolver do not
-        /// fail and fall back to defaults. When running the whole Umbraco, CoreBootManager
-        /// does initialise the resolver.</remarks>
-        private static IEnumerable<IUrlSegmentProvider> UrlSegmentProviders
-        {
-            get
-            {
-                return UrlSegmentProviderResolver.HasCurrent
-                           ? UrlSegmentProviderResolver.Current.Providers
-                           : new IUrlSegmentProvider[] { new DefaultUrlSegmentProvider() };
-            }
-        }
 
         /// <summary>
         /// Gets the default url segment for a specified content.
         /// </summary>
         /// <param name="content">The content.</param>
+        /// <param name="urlSegmentProviders"></param>
         /// <returns>The url segment.</returns>
-        public static string GetUrlSegment(this IContentBase content)
+        public static string GetUrlSegment(this IContentBase content, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
-            var url = UrlSegmentProviders.Select(p => p.GetUrlSegment(content)).First(u => u != null);
+            if (content == null) throw new ArgumentNullException("content");
+            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
+
+            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content)).FirstOrDefault(u => u != null);
             url = url ?? new DefaultUrlSegmentProvider().GetUrlSegment(content); // be safe
             return url;
         }
@@ -43,10 +33,15 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
+        /// <param name="urlSegmentProviders"></param>
         /// <returns>The url segment.</returns>
-        public static string GetUrlSegment(this IContentBase content, CultureInfo culture)
+        public static string GetUrlSegment(this IContentBase content, CultureInfo culture, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
-            var url = UrlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).First(u => u != null);
+            if (content == null) throw new ArgumentNullException("content");
+            if (culture == null) throw new ArgumentNullException("culture");
+            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
+
+            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);
             url = url ?? new DefaultUrlSegmentProvider().GetUrlSegment(content, culture); // be safe
             return url;
         }

@@ -11,23 +11,24 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.Controls;
 using umbraco;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic.template;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using umbraco.uicontrols;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.UI.Umbraco.Settings.Views
 {
-	public partial class EditView : global::umbraco.BasePages.UmbracoEnsuredPage
+	public partial class EditView : UmbracoEnsuredPage
 	{
 		private Template _template;
 		public MenuButton SaveButton;
 
 		public EditView()
 		{
-			CurrentApp = global::umbraco.BusinessLogic.DefaultApps.settings.ToString();
+			CurrentApp = Constants.Applications.Settings;
 		}
 
 		/// <summary>
@@ -88,7 +89,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 				//configure screen for editing a template
 				if (_template != null)
 				{
-					MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
+					MasterTemplate.Items.Add(new ListItem(Services.TextService.Localize("none"), "0"));
 					var selectedTemplate = string.Empty;
 
 					foreach (var t in Template.GetAllAsList())
@@ -157,7 +158,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
                 //TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
 
-                TemplateTreeSyncPath = DeepLink.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
+                TemplateTreeSyncPath = BaseTree.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
 			}
 			else
 			{
@@ -165,32 +166,32 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			}
 			
 			Panel1.hasMenu = true;
-            var editor = Panel1.NewTabPage(ui.Text("template"));
+            var editor = Panel1.NewTabPage(Services.TextService.Localize("template"));
             editor.Controls.Add(Pane8);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane7);
 
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
 
-			Panel1.Text = ui.Text("edittemplate");
-			pp_name.Text = ui.Text("name", base.getUser());
-			pp_alias.Text = ui.Text("alias", base.getUser());
-			pp_masterTemplate.Text = ui.Text("mastertemplate", base.getUser());
+			Panel1.Text = Services.TextService.Localize("edittemplate");
+			pp_name.Text = Services.TextService.Localize("name");
+			pp_alias.Text = Services.TextService.Localize("alias");
+			pp_masterTemplate.Text = Services.TextService.Localize("mastertemplate");
 
 			// Editing buttons
             MenuIconI umbField = editorSource.Menu.NewIcon();
-			umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
+			umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", ui.Text("template", "insertPageField"), 640, 550);
-			umbField.AltText = ui.Text("template", "insertPageField");
+					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", Services.TextService.Localize("template/insertPageField"), 640, 550);
+			umbField.AltText = Services.TextService.Localize("template/insertPageField");
 
 
 			// TODO: Update icon
@@ -199,7 +200,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			umbDictionary.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-                    editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY&mvcView=true", ui.Text("template", "insertDictionaryItem"),
+                    editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY&mvcView=true", Services.TextService.Localize("template/insertDictionaryItem"),
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 
@@ -211,7 +212,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             editorSource.Menu.InsertNewControl(macroSplitButton, 40);
 
             MenuIconI umbTemplateQueryBuilder = editorSource.Menu.NewIcon();
-            umbTemplateQueryBuilder.ImageURL = UmbracoPath + "/images/editor/inshtml.gif";
+            umbTemplateQueryBuilder.ImageURL = SystemDirectories.Umbraco + "/images/editor/inshtml.gif";
             umbTemplateQueryBuilder.OnClickCommand = "editViewEditor.openQueryModal()";
             umbTemplateQueryBuilder.AltText = "Open query builder";
 
@@ -254,22 +255,22 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             editorSource.Menu.InsertSplitter();
 
             MenuIconI umbRenderBody = editorSource.Menu.NewIcon();
-            umbRenderBody.ImageURL = UmbracoPath + "/images/editor/renderbody.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbRenderBody.ImageURL = SystemDirectories.Umbraco + "/images/editor/renderbody.gif";
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbRenderBody.AltText = "Insert @RenderBody()";
 
             umbRenderBody.OnClickCommand = "editViewEditor.insertRenderBody()";
 
             MenuIconI umbSection = editorSource.Menu.NewIcon();
-            umbSection.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpagePlaceHolder.gif";
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbSection.AltText = "Insert Section";
 
             umbSection.OnClickCommand = "editViewEditor.openSnippetModal('section')";
 
             MenuIconI umbRenderSection = editorSource.Menu.NewIcon();
-            umbRenderSection.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbRenderSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpageContent.gif";
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbRenderSection.AltText = "Insert @RenderSection";
 
             umbRenderSection.OnClickCommand = "editViewEditor.openSnippetModal('rendersection')";

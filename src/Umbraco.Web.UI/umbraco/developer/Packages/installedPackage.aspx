@@ -2,7 +2,7 @@
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
-        function toggleDiv(id, gotoDiv) {
+        function toggleDiv(id) {
             var div = document.getElementById(id);
 
             if (div.style.display == "none")
@@ -77,7 +77,7 @@
     
             <cc2:PropertyPanel runat="server">
               <p>
-                  <%= umbraco.ui.Text("packager", "packageUpgradeText") %>
+                  <%= Services.TextService.Localize("packager/packageUpgradeText") %>
               </p>
             </cc2:PropertyPanel>
     
@@ -95,7 +95,7 @@
             <cc2:Pane ID="pane_noItems" Visible="false" runat="server" Text="Uninstaller doesn't contain any items">
                 <div class="guiDialogNormal" style="margin: 10px">
 
-                    <%= umbraco.ui.Text("packager", "packageNoItemsText") %>
+                    <%= Services.TextService.Localize("packager/packageNoItemsText") %>
 
                     <p>
                         <asp:Button ID="bt_deletePackage" OnClick="delPack" runat="server" Text="Remove uninstaller" />
@@ -107,7 +107,7 @@
             
             <cc2:Pane ID="pane_uninstall" runat="server" Text="Uninstall items installed by this package">
                 <p>
-                    <%= umbraco.ui.Text("packager", "packageUninstallText") %>
+                    <%= Services.TextService.Localize("packager/packageUninstallText") %>
                 </p>
 
                 <cc2:PropertyPanel runat="server" Text="Document Types" ID="pp_docTypes">

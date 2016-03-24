@@ -5,10 +5,11 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -16,7 +17,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Members, Constants.Trees.MemberTypes, null, sortOrder:2  )]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadMemberTypes))]
     public class MemberTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -37,14 +37,14 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<CreateChildEntity, ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
             else
             {
                 //delete member type
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
             }
 
             return menu;

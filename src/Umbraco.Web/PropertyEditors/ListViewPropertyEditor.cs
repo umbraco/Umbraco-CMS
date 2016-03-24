@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -7,6 +8,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
     public class ListViewPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public ListViewPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new ListViewPreValueEditor();

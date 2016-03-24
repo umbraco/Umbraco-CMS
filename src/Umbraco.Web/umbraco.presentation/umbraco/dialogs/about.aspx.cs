@@ -2,13 +2,14 @@ using System;
 using System.Globalization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.dialogs
 {
 	/// <summary>
 	/// Summary description for about.
 	/// </summary>
-	public partial class about : BasePages.UmbracoEnsuredPage
+	public partial class about : UmbracoEnsuredPage
 	{
 
 		protected void Page_Load(object sender, EventArgs e)

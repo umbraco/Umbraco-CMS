@@ -10,7 +10,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
-using GlobalSettings = umbraco.GlobalSettings;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 
@@ -435,22 +434,7 @@ namespace Umbraco.Web
                 }
             }
         }
-
-        /// <summary>
-        /// Gets the current logged in Umbraco user (editor).
-        /// </summary>
-        /// <value>The Umbraco user object or null</value>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        public User UmbracoUser
-        {
-            get
-            {
-                var user = Security.CurrentUser;
-                return user == null ? null : new User(user);
-            }
-
-        }
-
+        
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>

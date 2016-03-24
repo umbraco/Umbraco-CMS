@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.propertytype;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.developer
 {
@@ -19,7 +20,7 @@ namespace umbraco.developer
 	/// Summary description for xsltInsertValueOf.
 	/// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-	public partial class xsltInsertValueOf : BasePages.UmbracoEnsuredPage
+	public partial class xsltInsertValueOf : UmbracoEnsuredPage
 	{
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -37,10 +38,8 @@ namespace umbraco.developer
 		    {
                 if (!existingGenProps.Contains("," + pt.Alias + ","))
                 {
-                    if(UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-                        preValuesSource.Add(string.Format("data [@alias = '{0}']", pt.Alias));
-                    else
-                        preValuesSource.Add(pt.Alias);
+                    preValuesSource.Add(pt.Alias);
+                        
 
                     existingGenProps += pt.Alias + ",";
                 }

@@ -3,15 +3,18 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LogModelMapper : MapperConfiguration
+    internal class LogModelMapper : ModelMapperConfiguration
     {
-        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
+        public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<LogItem, AuditLog>()
-                  .ForMember(log => log.LogType, expression => expression.MapFrom(item => Enum<AuditLogType>.Parse(item.LogType.ToString())));
+            config.CreateMap<AuditItem, AuditLog>()
+                .ForMember(log => log.NodeId, expression => expression.Ignore())
+                .ForMember(log => log.Timestamp, expression => expression.MapFrom(item => item.CreateDate))
+                .ForMember(log => log.LogType, expression => expression.MapFrom(item => item.AuditType.ToString()));
         }
     }
 }

@@ -4,18 +4,13 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
-using umbraco.cms.businesslogic.Files;
-using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -24,8 +19,16 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
     {
-        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSettings;
+
+        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
+            : base(wrapped)
         {
+            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
+            if (contentSettings == null) throw new ArgumentNullException("contentSettings");
+            _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings;
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors
 
             var newValue = new List<string>();
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = _mediaFileSystem;
 
             if (clear)
             {
@@ -111,7 +114,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                        var subfolder = _contentSettings.UploadAllowDirectories
                                             ? currentPersistedFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                             : currentPersistedFile.Substring(currentPersistedFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -120,7 +123,7 @@ namespace Umbraco.Web.PropertyEditors
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
                                                  : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                        var fileName = _contentSettings.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)
                                            : numberedFolder + "-" + name;
 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.developer
 {
@@ -13,7 +14,7 @@ namespace umbraco.developer
     /// Summary description for xsltChooseExtension.
     /// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-	public partial class xsltChooseExtension : BasePages.UmbracoEnsuredPage
+	public partial class xsltChooseExtension : UmbracoEnsuredPage
 	{
 
 		protected void Page_Load(object sender, System.EventArgs e)

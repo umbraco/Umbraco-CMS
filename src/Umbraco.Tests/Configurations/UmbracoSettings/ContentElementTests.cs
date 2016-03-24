@@ -107,21 +107,8 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.EnsureUniqueNaming == true);
         }
-        [Test]
-        public void TidyEditorContent()
-        {
-            Assert.IsTrue(SettingsSection.Content.TidyEditorContent == false);
-        }
-        [Test]
-        public virtual void TidyCharEncoding()
-        {
-            Assert.IsTrue(SettingsSection.Content.TidyCharEncoding == "Raw");
-        }
-        [Test]
-        public void UseLegacyXmlSchema()
-        {
-            Assert.IsTrue(SettingsSection.Content.UseLegacyXmlSchema == false);
-        }
+        
+   
         [Test]
         public void ForceSafeAliases()
         {

@@ -207,10 +207,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             if (key == string.Empty)
             {
-                if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-                    fileByteArray = this.Webservice.fetchPackage(packageGuid);
-                else
-                    fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);
+                fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);
             }
             else
             {

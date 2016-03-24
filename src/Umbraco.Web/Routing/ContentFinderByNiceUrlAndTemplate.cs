@@ -14,6 +14,11 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByNiceUrlAndTemplate : ContentFinderByNiceUrl
     {
+        public ContentFinderByNiceUrlAndTemplate(ILogger logger)
+            : base(logger)
+        {
+        }
+
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
@@ -37,7 +42,7 @@ namespace Umbraco.Web.Routing
                 var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
                 if (template != null)
                 {
-                    LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
+                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
@@ -47,12 +52,12 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
+                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
                 }
             }
             else
             {
-                LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("No template in path \"/\"");
+                Logger.Debug<ContentFinderByNiceUrlAndTemplate>("No template in path \"/\"");
             }
 
             return node != null;

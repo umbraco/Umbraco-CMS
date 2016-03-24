@@ -1,13 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-using System.Runtime.CompilerServices;
-
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.task
 {
@@ -83,15 +78,15 @@ namespace umbraco.cms.businesslogic.task
         }
 	
 
-        private User _parentUser;
+        private IUser _parentUser;
 
         /// <summary>
         /// Gets or sets the parent user.
         /// </summary>
         /// <value>The parent user.</value>
-        public User ParentUser
+        public IUser ParentUser
         {
-            get { return _parentUser ?? (_parentUser = new User(TaskEntity.OwnerUserId)); }
+            get { return _parentUser ?? (_parentUser = ApplicationContext.Current.Services.UserService.GetUserById(TaskEntity.OwnerUserId)); }
             set
             {
                 _parentUser = value;
@@ -119,15 +114,15 @@ namespace umbraco.cms.businesslogic.task
             set { TaskEntity.CreateDate = value; }
         }
 	
-        private User _user;
+        private IUser _user;
 
         /// <summary>
         /// Gets or sets the user.
         /// </summary>
         /// <value>The user.</value>
-        public User User
+        public IUser User
         {
-            get { return _user ?? (_user = new User(TaskEntity.AssigneeUserId)); }
+            get { return _user ?? (_user = ApplicationContext.Current.Services.UserService.GetUserById(TaskEntity.AssigneeUserId)); }
             set
             {
                 _user = value;
@@ -141,7 +136,7 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The SQL helper.</value>
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
 
         #endregion
@@ -238,7 +233,7 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetTasks(User User, bool IncludeClosed) 
+        public static Tasks GetTasks(IUser User, bool IncludeClosed) 
         {
             var result = new Tasks();
             var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(assignedUser:User.Id, includeClosed:IncludeClosed);
@@ -256,7 +251,7 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetOwnedTasks(User User, bool IncludeClosed) 
+        public static Tasks GetOwnedTasks(IUser User, bool IncludeClosed) 
         {
             var result = new Tasks();
             var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(ownerUser:User.Id, includeClosed: IncludeClosed);

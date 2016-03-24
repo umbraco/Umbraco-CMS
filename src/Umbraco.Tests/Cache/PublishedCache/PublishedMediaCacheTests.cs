@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+
 using System.Linq;
 using System.Xml;
 using Examine;
+using LightInject;
+using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -22,15 +27,18 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	{
         protected override void FreezeResolution()
         {
+            var container = new ServiceContainer();
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
         }
         
+        //NOTE: This is "Without_Examine" too
         [Test]
 		public void Get_Root_Docs()
 		{
-			var user = new User(0);
-			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+            var user = ServiceContext.UserService.GetUserById(0);
+            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
 			var mRoot1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot1", mType, user, -1);
 			var mRoot2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot2", mType, user, -1);
 			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot1.Id);
@@ -47,8 +55,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		[Test]
 		public void Get_Item_Without_Examine()
 		{
-			var user = new User(0);
-			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+            var user = ServiceContext.UserService.GetUserById(0);
+            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
 			var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
 			var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));

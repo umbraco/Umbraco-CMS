@@ -10,13 +10,16 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages {
-    public partial class SubmitPackage : BasePages.UmbracoEnsuredPage {
+    public partial class SubmitPackage : UmbracoEnsuredPage {
 
         public SubmitPackage()
         {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
 
         }
         private cms.businesslogic.packager.PackageInstance pack;
@@ -24,7 +27,7 @@ namespace umbraco.presentation.developer.packages {
 
         protected void Page_Load(object sender, EventArgs e) {
 
-            if(!String.IsNullOrEmpty(helper.Request("id"))){
+            if(!String.IsNullOrEmpty(Request.GetItemAsString("id"))){
 
                 if (!IsPostBack) {
                     dd_repositories.Items.Clear();
@@ -46,7 +49,7 @@ namespace umbraco.presentation.developer.packages {
                         publicRepoHelp.Style.Clear();
 
                     } else if (repos.Count == 0) {
-                        Response.Redirect("editpackage.aspx?id=" + helper.Request("id"));
+                        Response.Redirect("editpackage.aspx?id=" + Request.GetItemAsString("id"));
                     } else {
 
                         foreach (cms.businesslogic.packager.repositories.Repository repo in repos) {
@@ -60,7 +63,7 @@ namespace umbraco.presentation.developer.packages {
                     }
                 }
 
-                createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(helper.Request("id")));
+                createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.GetItemAsString("id")));
                 pack = createdPackage.Data;
 
                 if (pack.Url != "") {

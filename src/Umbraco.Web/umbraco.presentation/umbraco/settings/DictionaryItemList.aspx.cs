@@ -6,7 +6,7 @@ using Umbraco.Core;
 namespace umbraco.presentation.settings {
 
     [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
-    public partial class DictionaryItemList : BasePages.UmbracoEnsuredPage {
+    public partial class DictionaryItemList : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
         
 
         private readonly cms.businesslogic.language.Language[] _languages = cms.businesslogic.language.Language.getAll;

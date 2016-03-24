@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Sync;
@@ -20,10 +21,12 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
+            var container = new ServiceContainer();
+
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new TestServerRegistrar());
             ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new TestServerMessenger());
+                container, factory => new TestServerMessenger());
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
                 new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
             Resolution.Freeze();

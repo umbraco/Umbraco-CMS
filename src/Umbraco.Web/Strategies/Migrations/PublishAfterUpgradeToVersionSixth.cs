@@ -6,8 +6,8 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.UnitOfWork;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -18,6 +18,13 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </summary>
     public class PublishAfterUpgradeToVersionSixth : MigrationStartupHander
     {
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+
+        public PublishAfterUpgradeToVersionSixth(ISqlSyntaxProvider sqlSyntax)
+        {
+            _sqlSyntax = sqlSyntax;
+        }
+
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
@@ -27,15 +34,15 @@ namespace Umbraco.Web.Strategies.Migrations
             {
                 var sql = new Sql();
                 sql.Select("*")
-                    .From<DocumentDto>()
-                    .InnerJoin<ContentVersionDto>()
-                    .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
-                    .InnerJoin<ContentDto>()
-                    .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<NodeDto>()
-                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
-                    .Where<NodeDto>(x => x.Path.StartsWith("-1"));
+                    .From<DocumentDto>(_sqlSyntax)
+                    .InnerJoin<ContentVersionDto>(_sqlSyntax)
+                    .On<DocumentDto, ContentVersionDto>(_sqlSyntax, left => left.VersionId, right => right.VersionId)
+                    .InnerJoin<ContentDto>(_sqlSyntax)
+                    .On<ContentVersionDto, ContentDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<NodeDto>(_sqlSyntax)
+                    .On<ContentDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(_sqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<NodeDto>(_sqlSyntax, x => x.Path.StartsWith("-1"));
 
                 var dtos = e.MigrationContext.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
                 var toUpdate = new List<DocumentDto>();

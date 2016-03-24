@@ -1,29 +1,21 @@
+using Umbraco.Core.Services;
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-
-using System.Web.Security;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
+using Umbraco.Core;
+using Umbraco.Web.UI;
 
 namespace umbraco.presentation.members
 {
 	/// <summary>
 	/// Summary description for EditMemberGroup.
 	/// </summary>
-	public partial class EditMemberGroup : BasePages.UmbracoEnsuredPage
+	public partial class EditMemberGroup : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public EditMemberGroup()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+            CurrentApp = Constants.Applications.Members.ToString();
 
 	    }
 
@@ -67,7 +59,7 @@ namespace umbraco.presentation.members
 			_memberGroup.Text = NameTxt.Text;
             memberGroupName.Value = NameTxt.Text;
             _memberGroup.Save();
-            this.ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberGroupSaved", base.getUser()),"");
+            this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editMemberGroupSaved"),"");
 
             ClientTools
                 .RefreshTree(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias);
@@ -84,11 +76,11 @@ namespace umbraco.presentation.members
 			base.OnInit(e);
 			Panel1.hasMenu = true;
 			save = Panel1.Menu.NewButton();
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.Click += new EventHandler(save_click);
             save.ButtonType = MenuButtonType.Primary;
 
-			Panel1.Text = ui.Text("membergroup");
+			Panel1.Text = Services.TextService.Localize("membergroup");
 		}
 		
 		/// <summary>

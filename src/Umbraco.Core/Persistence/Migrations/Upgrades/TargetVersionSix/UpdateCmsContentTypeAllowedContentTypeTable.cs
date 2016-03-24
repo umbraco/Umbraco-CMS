@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Alter.Table("cmsContentTypeAllowedContentType").AddColumn("sortOrder").AsInt16().NotNullable().WithDefaultValue(1);

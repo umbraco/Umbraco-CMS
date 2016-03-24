@@ -2,10 +2,7 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Web.Security;
-using umbraco.BasePages;
 
 namespace Umbraco.Web.Install
 {

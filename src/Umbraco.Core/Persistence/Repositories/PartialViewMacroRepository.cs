@@ -7,11 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PartialViewMacroRepository : PartialViewRepository 
     {
-        public PartialViewMacroRepository(IUnitOfWork work)
-            : this(work, new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"))
-        {
-        }
-
+        
         public PartialViewMacroRepository(IUnitOfWork work, IFileSystem fileSystem)
             : base(work, fileSystem)
         {

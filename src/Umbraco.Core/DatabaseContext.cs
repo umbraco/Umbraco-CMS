@@ -30,21 +30,9 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
-        private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
-
-        [Obsolete("Use the constructor specifying all dependencies instead")]
-        public DatabaseContext(IDatabaseFactory factory)
-            : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
-            {
-                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
-                new SqlCeSyntaxProvider(), 
-                new SqlServerSyntaxProvider()
-            }))
-        {
-        }
 
         /// <summary>
         /// Default constructor
@@ -74,7 +62,6 @@ namespace Umbraco.Core
         {
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
-            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
             _factory = factory;
             _logger = logger;
             _configured = true;
@@ -446,8 +433,6 @@ namespace Umbraco.Core
                     throw new InvalidOperationException("No " + typeof(ISqlSyntaxProvider) + " specified or no " + typeof(SqlSyntaxProviders) + " instance specified");
                 }
                 
-                SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-                
                 _configured = true;
             }
             catch (Exception e)
@@ -511,7 +496,7 @@ namespace Umbraco.Core
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
-                return new DatabaseSchemaResult();
+                return new DatabaseSchemaResult(SqlSyntax);
 
             if (_result == null)
             {
@@ -603,7 +588,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService)
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, IMigrationResolver migrationResolver)
         {
             try
             {
@@ -663,10 +648,10 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationResolver, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
 
-                var upgraded = runner.Execute(database, true);
-
+                var upgraded = runner.Execute(database, DatabaseProvider, SqlSyntax, true);
+                
                 if (upgraded == false)
                 {
                     throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");

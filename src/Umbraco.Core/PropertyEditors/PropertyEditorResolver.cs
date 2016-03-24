@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
@@ -16,32 +17,14 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// This resolver will contain any property editors defined in manifests as well!
     /// </remarks>
-    public class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorResolver, PropertyEditor>
+    public class PropertyEditorResolver : ContainerLazyManyObjectsResolver<PropertyEditorResolver, PropertyEditor>
     {
-        public PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, IRuntimeCacheProvider runtimeCache)
-            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
+        private readonly ManifestBuilder _builder;
+
+        internal PropertyEditorResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
+            : base(container, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
-        	var builder = new ManifestBuilder(
-                runtimeCache,
-                new ManifestParser(new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), runtimeCache));
-
-            _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
-        }
-
-        [Obsolete("Use the ctor specifying all dependencies instead")]
-        public PropertyEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
-            : base(typeListProducerList, ObjectLifetimeScope.Application)
-        {
-            var builder = new ManifestBuilder(
-                ApplicationContext.Current.ApplicationCache.RuntimeCache,
-                new ManifestParser(new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), ApplicationContext.Current.ApplicationCache.RuntimeCache));
-
-            _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
-        }
-
-        internal PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
-            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
-        {
+            _builder = builder;
             _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
         }
 

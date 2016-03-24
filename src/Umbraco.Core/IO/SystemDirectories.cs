@@ -95,29 +95,7 @@ namespace Umbraco.Core.IO
                 return IOHelper.ReturnPath("umbracoMediaPath", "~/media");
             }
         }
-
-		//have changed to internal so nobody uses this anymore since this is a new class.
-        [Obsolete("Please use MacroScripts instead!", true)]
-        internal static string Python
-        {
-            get
-            {
-                return MacroScripts;
-            }
-        }
-
-        public static string MacroScripts
-        {
-            get
-            {
-                // for legacy we test for the python path first, but else we use the new default location
-                string tempPath = IOHelper.ReturnPath("umbracoPythonPath", "") == String.Empty
-                                      ? IOHelper.ReturnPath("umbracoMacroScriptPath", "~/macroScripts")
-                                      : IOHelper.ReturnPath("umbracoPythonPath", "~/python");
-                return tempPath;
-            }
-        }
-
+        
         public static string Scripts
         {
             get

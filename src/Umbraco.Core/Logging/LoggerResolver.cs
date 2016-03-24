@@ -2,22 +2,19 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Logging
 {
+    /// <summary>
+    /// The logger resolver
+    /// </summary>
+    /// <remarks>
+    /// NOTE: This is a 'special' resolver in that it gets initialized before most other things, it cannot use IoC so it cannot implement ContainerObjectResolverBase
+    /// </remarks>
     public sealed class LoggerResolver : SingleObjectResolverBase<LoggerResolver, ILogger>
     {
         public LoggerResolver(ILogger logger)
             : base(logger)
         {
             
-        }
-
-        /// <summary>
-        /// Method allowing to change the logger during startup
-        /// </summary>
-        /// <param name="profiler"></param>
-        internal void SetLogger(ILogger profiler)
-        {
-            Value = profiler;
-        }
+        }        
 
         /// <summary>
         /// Gets the current logger

@@ -13,7 +13,7 @@ using umbraco.cms.presentation.Trees;
 namespace umbraco.dialogs
 {
 	[Obsolete("Use the TreeControl instead. This does however get used by the TreeService when requesting the tree init url.")]
-	public partial class treePicker : BasePages.UmbracoEnsuredPage
+	public partial class treePicker : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 		protected override void OnLoad(EventArgs e)
 		{

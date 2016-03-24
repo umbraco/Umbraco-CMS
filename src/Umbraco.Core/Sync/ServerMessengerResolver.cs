@@ -1,20 +1,24 @@
-﻿using Umbraco.Core.ObjectResolution;
+﻿using System;
+using System.Linq.Expressions;
+using LightInject;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// Resolves the IServerMessenger object.
     /// </summary>
-    public sealed class ServerMessengerResolver : SingleObjectResolverBase<ServerMessengerResolver, IServerMessenger>
+    public sealed class ServerMessengerResolver : ContainerSingleObjectResolver<ServerMessengerResolver, IServerMessenger>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ServerMessengerResolver"/> class with a messenger.
-        /// </summary>
-        /// <param name="factory">An instance of a messenger.</param>
-        /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
-        internal ServerMessengerResolver(IServerMessenger factory)
-            : base(factory)
-        { }
+        internal ServerMessengerResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+        {
+        }
+
+        internal ServerMessengerResolver(IServiceContainer container, Func<IServiceFactory, IServerMessenger> implementationType)
+            : base(container, implementationType)
+        {
+        }
 
         /// <summary>
         /// Sets the messenger.

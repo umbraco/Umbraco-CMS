@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -23,7 +23,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -90,7 +90,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="DataAttributes.cs" />
-    <Compile Include="DatePicker\DateTimePicker.cs" />
     <Compile Include="FieldDropDownList.cs" />
     <Compile Include="MenuButton.cs" />
     <Compile Include="MenuSplitButton.cs" />
@@ -103,11 +102,8 @@
     </Compile>
     <Compile Include="TreePicker\SimpleContentPicker.cs" />
     <Compile Include="TreePicker\SimpleMediaPicker.cs" />
-    <Compile Include="TreeUrlGenerator.cs" />
-    <Compile Include="UmbracoClientDependencyLoader.cs" />
     <Compile Include="CodeArea.cs" />
     <Compile Include="feedback.cs" />
-    <Compile Include="helper.cs" />
     <Compile Include="MenuButtonI.cs" />
     <Compile Include="MenuIcon.cs" />
     <Compile Include="MenuIconClass.cs" />
@@ -122,10 +118,6 @@
     <Compile Include="TabView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Name>umbraco.businesslogic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
       <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
@@ -137,10 +129,6 @@
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
-      <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,22 +1,14 @@
-using System;
-using System.Data;
-using System.Web.Security;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
     public class macroTasks : LegacyDialogTask
     {
         
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
         
         public override bool PerformSave()
         {
@@ -43,7 +35,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.developer.ToString(); }
+            get { return Constants.Applications.Developer.ToString(); }
         }
     }
 }

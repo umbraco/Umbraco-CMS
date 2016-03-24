@@ -6,8 +6,8 @@ using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {

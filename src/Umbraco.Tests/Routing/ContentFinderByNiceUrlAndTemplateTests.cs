@@ -1,4 +1,6 @@
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
@@ -12,7 +14,7 @@ namespace Umbraco.Tests.Routing
 	{
         Template CreateTemplate(string alias)
         {
-            var template = new Template(alias, alias, alias);
+            var template = new Template(alias, alias);
             template.Content = ""; // else saving throws with a dirty internal error
             ApplicationContext.Services.FileService.SaveTemplate(template);
             return template;
@@ -30,7 +32,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
-			var lookup = new ContentFinderByNiceUrlAndTemplate();
+            var lookup = new ContentFinderByNiceUrlAndTemplate(Logger);
 
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
 

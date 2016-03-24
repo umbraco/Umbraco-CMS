@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of an <see cref="EntityContainer"/> class.
         /// </summary>
-        internal EntityContainer(int id, Guid uniqueId, int parentId, string path, int level, int sortOrder, Guid containedObjectType, string name, int userId)
+        public EntityContainer(int id, Guid uniqueId, int parentId, string path, int level, int sortOrder, Guid containedObjectType, string name, int userId)
             : this(containedObjectType)
         {
             Id = id;

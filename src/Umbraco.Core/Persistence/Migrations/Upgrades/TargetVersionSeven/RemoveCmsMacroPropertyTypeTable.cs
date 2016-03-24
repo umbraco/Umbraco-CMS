@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
         }
 
+
         public override void Up()
         {
             Delete.Table("cmsMacroPropertyType");

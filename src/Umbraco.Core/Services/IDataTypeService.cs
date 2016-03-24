@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -79,29 +78,6 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Id of the user issueing the deletion</param>
         void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0);
-
-        /// <summary>
-        /// Gets the <see cref="IDataType"/> specified by it's unique ID
-        /// </summary>
-        /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
-        /// <returns><see cref="IDataType"/> object</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        IDataType GetDataTypeById(Guid id);
-        
-        /// <summary>
-        /// Gets a complete list of all registered <see cref="IDataType"/>'s
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        IEnumerable<IDataType> GetAllDataTypes();
-
-        /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
-        /// </summary>
-        /// <param name="id">Id of the DataType control</param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
-        IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id);
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its control Id

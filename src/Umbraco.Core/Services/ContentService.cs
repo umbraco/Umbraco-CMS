@@ -20,6 +20,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -32,6 +33,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -44,15 +46,18 @@ namespace Umbraco.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IPublishingStrategy publishingStrategy,
             IDataTypeService dataTypeService,
-            IUserService userService)
+            IUserService userService,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             _publishingStrategy = publishingStrategy;
             _dataTypeService = dataTypeService;
             _userService = userService;
+            _urlSegmentProviders = urlSegmentProviders;
         }
 
         public int CountPublished(string contentTypeAlias = null)
@@ -254,7 +259,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -308,7 +313,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -358,7 +363,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Key == key);
+                var query = repository.Query.Where(x => x.Key == key);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -373,7 +378,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -384,7 +389,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var contents = repository.GetByPublishedVersion(query);
 
                 return contents;
@@ -400,7 +405,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Level == level && !x.Path.StartsWith(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = repository.Query.Where(x => x.Level == level && !x.Path.StartsWith(Constants.System.RecycleBinContent.ToInvariantString()));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -475,7 +480,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
@@ -491,15 +496,13 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-
-                var query = Query<IContent>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.ParentId == id);
+                    repository.Query.Where(x => x.ParentId == id);
                 }
                 long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
                 totalChildren = Convert.ToInt32(total);
                 return contents;
             }
@@ -524,7 +527,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
 
-                var query = Query<IContent>.Builder;
+                var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -544,15 +547,13 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-
-                var query = Query<IContent>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                    repository.Query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
                 totalChildren = Convert.ToInt32(total);
                 return contents;
             }
@@ -576,7 +577,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
 
-                var query = Query<IContent>.Builder;
+                var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -598,7 +599,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == parentId && x.Name.Contains(name));
+                var query = repository.Query.Where(x => x.ParentId == parentId && x.Name.Contains(name));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -630,7 +631,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 var pathMatch = content.Path + ",";
-                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
+                var query = repository.Query.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -693,7 +694,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == Constants.System.Root);
+                var query = repository.Query.Where(x => x.ParentId == Constants.System.Root);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -708,7 +709,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
+                var query = repository.Query.Where(x => x.Trashed == false);
                 return repository.GetByPublishedVersion(query);
             }
         }
@@ -721,7 +722,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
+                var query = repository.Query.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -736,7 +737,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+                var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -751,7 +752,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = repository.Query.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -774,7 +775,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var count = repository.Count(query);
                 return count;
             }
@@ -789,7 +790,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == true && x.Id == id && x.Trashed == false);
+                var query = repository.Query.Where(x => x.Published == true && x.Id == id && x.Trashed == false);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -1102,7 +1103,7 @@ namespace Umbraco.Core.Services
 
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         }
                     }
                     else
@@ -1112,7 +1113,7 @@ namespace Umbraco.Core.Services
                             content.WriterId = userId;
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         }
                     }
 
@@ -1240,7 +1241,7 @@ namespace Umbraco.Core.Services
                 {
                     var repository = RepositoryFactory.CreateContentRepository(uow);
                     //NOTE What about content that has the contenttype as part of its composition?
-                    var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
+                    var query = repository.Query.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
                     if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
@@ -1250,7 +1251,7 @@ namespace Umbraco.Core.Services
                     {
                         //Look for children of current content and move that to trash before the current content is deleted
                         var c = content;
-                        var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+                        var childQuery = repository.Query.Where(x => x.Path.StartsWith(c.Path));
                         var children = repository.GetByQuery(childQuery);
 
                         foreach (var child in children)
@@ -1479,7 +1480,7 @@ namespace Umbraco.Core.Services
 
                     repository.AddOrUpdate(copy);
                     //add or update a preview
-                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     uow.Commit();
 
 
@@ -1566,7 +1567,7 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(content);
                 //add or update a preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -1633,13 +1634,13 @@ namespace Umbraco.Core.Services
 
                         repository.AddOrUpdate(content);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     foreach (var content in shouldBePublished)
                     {
                         //Create and Save ContentXml DTO
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     uow.Commit();
@@ -1662,6 +1663,35 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Returns the persisted content's XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public XElement GetContentXml(int contentId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetContentXml(contentId);
+            }
+        }
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public XElement GetContentPreviewXml(int contentId, Guid version)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetContentPreviewXml(contentId, version);
+            }
+        }
+
+        /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
         /// <param name="contentTypeIds">
@@ -1674,7 +1704,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 repository.RebuildXmlStructures(
-                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, content),
+                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content),
                     contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
 
                 uow.Commit();
@@ -1695,7 +1725,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Trashed == false);
+                var query = repository.Query.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Trashed == false);
                 var contents = repository.GetByPublishedVersion(query);
 
                 return contents;
@@ -1764,7 +1794,7 @@ namespace Umbraco.Core.Services
                     // change how this method calls "Save" as it needs to save using an internal method
                     using (var uow = UowProvider.GetUnitOfWork())
                     {
-                        var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, content);
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content);
 
                         var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToDataString() };
                         var exists =
@@ -1842,7 +1872,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Consider creating a Path query instead of recursive method:
-                //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
+                //var query = repository.Query.Where(x => x.Path.StartsWith(content.Path));
 
                 var updated = new List<IContent>();
                 var list = new List<IContent>();
@@ -1869,9 +1899,9 @@ namespace Umbraco.Core.Services
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         //add or update the published xml
-                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         updated.Add(item.Result.ContentItem);
                     }
 
@@ -1999,12 +2029,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                     if (published)
                     {
                         //Content Xml
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     uow.Commit();
@@ -2072,7 +2102,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                     uow.Commit();
                 }
@@ -2170,7 +2200,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+                var query = repository.Query.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query);
 
                 if (types.Any() == false)

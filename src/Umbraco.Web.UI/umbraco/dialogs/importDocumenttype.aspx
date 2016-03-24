@@ -12,7 +12,7 @@
           <asp:Panel ID="Wizard" runat="server" Visible="True">
             <p>
             <span class="guiDialogNormal">
-              <%=umbraco.ui.Text("importDocumentTypeHelp")%>
+              <%=Services.TextService.Localize("importDocumentTypeHelp")%>
             </span>
             </p>
             
@@ -21,18 +21,18 @@
             </p>
             
             
-            <asp:Button ID="submit" runat="server"></asp:Button> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+            <asp:Button ID="submit" runat="server"></asp:Button> <em><%= Services.TextService.Localize("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= Services.TextService.Localize("cancel") %></a>
           </asp:Panel>
           
           
           <asp:Panel ID="Confirm" runat="server" Visible="False">
             <strong>
-              <%=umbraco.ui.Text("name")%>
+              <%=Services.TextService.Localize("name")%>
               :</strong>
             <asp:Literal ID="dtName" runat="server"></asp:Literal>
             <br />
             <strong>
-              <%=umbraco.ui.Text("alias")%>
+              <%=Services.TextService.Localize("alias")%>
               :</strong>
             <asp:Literal ID="dtAlias" runat="server"></asp:Literal>
             <br />

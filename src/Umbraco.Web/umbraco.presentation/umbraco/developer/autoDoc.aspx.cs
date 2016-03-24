@@ -10,17 +10,19 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Linq;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.developer
 {
 	/// <summary>
 	/// Summary description for autoDoc.
 	/// </summary>
-	public partial class autoDoc : BasePages.UmbracoEnsuredPage
+	public partial class autoDoc : UmbracoEnsuredPage
 	{
 	    public autoDoc()
 	    {
-	        CurrentApp = DefaultApps.developer.ToString();
+	        CurrentApp = Constants.Applications.Developer.ToString();
 	    }
 
 		protected void Page_Load(object sender, EventArgs e)

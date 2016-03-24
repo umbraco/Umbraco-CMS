@@ -146,9 +146,10 @@ namespace Umbraco.Core.Services
                     IsLockedOut = false,
                     IsApproved = true
                 };
-                //adding default sections content and media
-                user.AddAllowedSection("content");
-                user.AddAllowedSection("media");
+                //adding default sections content, media + translation
+                user.AddAllowedSection(Constants.Applications.Content);
+                user.AddAllowedSection(Constants.Applications.Media);
+                user.AddAllowedSection(Constants.Applications.Translation);
 
                 if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
                     return user;
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
+                var query = repository.Query.Where(x => x.Email.Equals(email));
                 var user = repository.GetByQuery(query).FirstOrDefault();
 
                 return user;
@@ -218,7 +219,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
+                var query = repository.Query.Where(x => x.Username.Equals(username));
                 var user = repository.GetByQuery(query).FirstOrDefault();
                 return user;
             }
@@ -376,7 +377,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = new Query<IUser>();
+                var query = repository.Query;
 
                 switch (matchType)
                 {
@@ -417,7 +418,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = new Query<IUser>();
+                var query = repository.Query;
 
                 switch (matchType)
                 {
@@ -463,7 +464,7 @@ namespace Umbraco.Core.Services
                 switch (countType)
                 {
                     case MemberCountType.All:
-                        query = new Query<IUser>();
+                        query = repository.Query;
                         return repository.Count(query);
                     case MemberCountType.Online:
                         throw new NotImplementedException();
@@ -476,12 +477,12 @@ namespace Umbraco.Core.Services
                         //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:
                         query =
-                            Query<IUser>.Builder.Where(
+                            repository.Query.Where(
                                 x => x.IsLockedOut);
                         return repository.GetCountByQuery(query);
                     case MemberCountType.Approved:
                         query =
-                            Query<IUser>.Builder.Where(
+                            repository.Query.Where(
                                 x => x.IsApproved);
                         return repository.GetCountByQuery(query);
                     default:
@@ -599,7 +600,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
+                var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Alias == alias);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -627,7 +628,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUserType>.Builder.Where(x => x.Name == name);
+                var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Name == name);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -747,11 +748,24 @@ namespace Umbraco.Core.Services
                 var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
                 foreach (var id in missingIds)
                 {
-                    result.Add(
-                        new EntityPermission(
-                            user.Id,
-                            id,
-                            user.DefaultPermissions.ToArray()));
+                    if (id == -1 && user.DefaultPermissions.Any() == false)
+                    {
+                        // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
+                        result.Add(
+                            new EntityPermission(
+                                user.Id,
+                                id,
+                                user.DefaultPermissions.ToArray()));
+                    }
+                    else
+                    {
+                        //use the user's user type permissions
+                        result.Add(
+                           new EntityPermission(
+                               user.Id,
+                               id,
+                               user.DefaultPermissions.ToArray()));
+                    }                    
                 }
 
                 return result;

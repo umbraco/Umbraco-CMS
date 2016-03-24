@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Umbraco.Core.ObjectResolution
 {
-	/// <summary>
+    /// <summary>
 	/// The base class for all single-object resolvers.
 	/// </summary>
 	/// <typeparam name="TResolver">The type of the concrete resolver class.</typeparam>
@@ -86,7 +86,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Gets a value indicating whether the resolved object instance is null.
 		/// </summary>
-		public bool HasValue
+		public virtual bool HasValue
 		{
 			get { return _value != null; }
 		}
@@ -98,7 +98,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="ArgumentNullException">value is set to null, but cannot be null (<c>CanBeNull</c> is <c>false</c>).</exception>
 		/// <exception cref="InvalidOperationException">value is read and is null, but cannot be null (<c>CanBeNull</c> is <c>false</c>),
 		/// or value is set (read) and resolution is (not) frozen.</exception>
-		protected TResolved Value
+		protected virtual TResolved Value
 		{
 			get
 			{

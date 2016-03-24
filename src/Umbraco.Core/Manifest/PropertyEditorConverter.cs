@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 
@@ -13,9 +14,16 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class PropertyEditorConverter : JsonCreationConverter<PropertyEditor>
     {
+        private readonly ILogger _logger;
+
+        public PropertyEditorConverter(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         protected override PropertyEditor Create(Type objectType, JObject jObject)
         {
-            return new PropertyEditor();
+            return new PropertyEditor(_logger);
         }
 
         protected override void Deserialize(JObject jObject, PropertyEditor target, JsonSerializer serializer)

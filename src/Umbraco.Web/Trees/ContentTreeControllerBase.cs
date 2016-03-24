@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -13,8 +14,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using System.Globalization;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -186,7 +187,7 @@ namespace Umbraco.Web.Trees
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
-                        ui.GetText("general", "recycleBin"),
+                        Services.TextService.Localize("general/recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
@@ -234,8 +235,8 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
-                menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
+                menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
             return PerformGetMenuForNode(id, queryStrings);
@@ -266,10 +267,11 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var actions = global::umbraco.BusinessLogic.Actions.Action.FromString(UmbracoUser.GetPermissions(dd.Path));
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
+            var actions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission);
 
             // A user is allowed to delete their own stuff
-            if (dd.CreatorId == UmbracoUser.Id && actions.Contains(ActionDelete.Instance) == false)
+            if (dd.CreatorId == Security.CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
 
             return actions.Select(x => new MenuItem(x));

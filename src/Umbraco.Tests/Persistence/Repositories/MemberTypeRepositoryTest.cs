@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
+            return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);            
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.That(sut.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);

@@ -34,11 +34,16 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
-using Action = umbraco.BusinessLogic.Actions.Action;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+    public class BackOfficeModel
+    {
+        public string Path { get; set; }
+    }
+
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
@@ -71,8 +76,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }));
         }
 
         /// <summary>
@@ -85,7 +90,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel { Path = GlobalSettings.Path}),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -122,8 +127,7 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+            var parser = GetManifestParser();
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
 
@@ -146,8 +150,7 @@ namespace Umbraco.Web.Editors
         {
             Func<JArray> getResult = () =>
             {
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-                var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+                var parser = GetManifestParser();
                 var initJs = new JsInitialization(parser);
                 var initCss = new CssInitialization(parser);
                 var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());
@@ -455,6 +458,13 @@ namespace Umbraco.Web.Editors
             //Add errors and redirect for it to be displayed
             TempData["ExternalSignInError"] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
+
+        private ManifestParser GetManifestParser()
+        {
+            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
+            var parser = new ManifestParser(Logger, plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+            return parser;
         }
 
         /// <summary>

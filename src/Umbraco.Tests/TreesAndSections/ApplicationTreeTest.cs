@@ -4,7 +4,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
-using ApplicationTree = umbraco.BusinessLogic.ApplicationTree;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TreesAndSections
 {

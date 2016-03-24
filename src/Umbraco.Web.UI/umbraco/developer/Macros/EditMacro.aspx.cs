@@ -37,7 +37,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
                 (macro.ScriptPath.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
                 || (Regex.IsMatch(macro.ScriptPath, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled))))
 			{
-				macroPython.Text = "";
                 SelectedPartialView.Text = macro.ScriptPath;
 			}
 		}

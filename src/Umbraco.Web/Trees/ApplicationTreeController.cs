@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
             //find all tree definitions that have the current application alias
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
 
-            if (appTrees.Count() == 1 || string.IsNullOrEmpty(tree) == false )
+            if (appTrees.Length == 1 || string.IsNullOrEmpty(tree) == false )
             {
                 var apptree = string.IsNullOrEmpty(tree) == false 
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Trees
             }
 
             var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
-            multiTree.Name = ui.Text("sections", application);
+            multiTree.Name = Services.TextService.Localize("sections/"+ application);
             return multiTree;
         }
 

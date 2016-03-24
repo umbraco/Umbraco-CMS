@@ -27,6 +27,9 @@ using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco.BusinessLogic;
 using System.Linq;
+using LightInject;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -50,6 +53,17 @@ namespace Umbraco.Tests.PublishedContent
             base.TearDown();
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;
+        }
+
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
+        {
+            var container = new ServiceContainer();
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
+
+            base.FreezeResolution();
         }
 
         /// <summary>
@@ -278,7 +292,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -302,7 +316,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Descendants_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -326,7 +340,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void DescendantsOrSelf_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -352,7 +366,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Parent_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -377,7 +391,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ancestors_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -396,7 +410,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void AncestorsOrSelf_Without_Examine()
         {
-            var user = new User(0);
+            var user = ServiceContext.UserService.GetUserById(0);
             var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
             var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
 
@@ -413,55 +427,11 @@ namespace Umbraco.Tests.PublishedContent
                 new[] { mSubChild1.Id, mChild1.Id, mRoot.Id }));
         }
 
-        [Test]
-        public void Convert_From_Legacy_Xml()
-        {
-            var config = SettingsForTests.GenerateMockSettings();
-
-            var contentMock = Mock.Get(config.Content);
-            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
-
-            SettingsForTests.ConfigureSettings(config);
-
-            var nodeId = 2112;
-
-            var xml = XElement.Parse(@"<node id=""2112"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd39"" parentID=""2222"" level=""3"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""1"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Sam's Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112"">
-				<data alias=""umbracoFile""><![CDATA[/media/1234/blah.pdf]]></data>
-				<data alias=""umbracoWidth"">115</data>
-				<data alias=""umbracoHeight"">268</data>
-				<data alias=""umbracoBytes"">10726</data>
-				<data alias=""umbracoExtension"">jpg</data>
-				<node id=""3113"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd33"" parentID=""2112"" level=""4"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""2"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Another Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112,3113"">
-					<data alias=""umbracoFile""><![CDATA[/media/1234/blah.pdf]]></data>
-					<data alias=""umbracoWidth"">115</data>
-					<data alias=""umbracoHeight"">268</data>
-					<data alias=""umbracoBytes"">10726</data>
-					<data alias=""umbracoExtension"">jpg</data>
-				</node>
-			</node>");
-            var node = xml.DescendantsAndSelf("node").Single(x => (int) x.Attribute("id") == nodeId);
-
-            var publishedMedia = new PublishedMediaCache(ApplicationContext);
-
-            var nav = node.CreateNavigator();
-
-            var converted = publishedMedia.CreateFromCacheValues(
-                publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/node"), nodeId));
-
-            Assert.AreEqual(nodeId, converted.Id);
-            Assert.AreEqual(3, converted.Level);
-            Assert.AreEqual(1, converted.SortOrder);
-            Assert.AreEqual("Sam's Umbraco Image", converted.Name);
-            Assert.AreEqual("-1,1111,2222,2112", converted.Path);
-        }
 
         [Test]
         public void Convert_From_Standard_Xml()
         {
             var config = SettingsForTests.GenerateMockSettings();
-
-            var contentMock = Mock.Get(config.Content);
-            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
 
             SettingsForTests.ConfigureSettings(config);
 

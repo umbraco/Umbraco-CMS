@@ -9,8 +9,7 @@
 .gridItem{border-color: #D9D7D7;}
 </style>
 
-<umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" />
-<umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
+
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -22,7 +21,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("action")%>&nbsp;&nbsp;
+                      <%=Services.TextService.Localize("action")%>&nbsp;&nbsp;
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -32,17 +31,18 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("user")%>
+                      <%=Services.TextService.Localize("user")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
-                    <%# umbraco.BusinessLogic.User.GetUser(int.Parse(DataBinder.Eval(Container.DataItem, "UserId", "{0}"))).Name%>
+                    <%--TODO: N+1 !!!!!!!!!!!!--%>
+                    <%# Services.UserService.GetUserById(int.Parse(DataBinder.Eval(Container.DataItem, "UserId", "{0}"))).Name%>
                   </ItemTemplate>
                 </asp:TemplateColumn>
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("date")%>
+                      <%=Services.TextService.Localize("date")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -52,7 +52,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("comment")%>
+                      <%=Services.TextService.Localize("comment")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>

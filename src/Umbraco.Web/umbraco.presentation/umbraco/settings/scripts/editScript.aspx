@@ -22,14 +22,14 @@
 
         function submitSucces(t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>');
+                top.UmbSpeechBubble.ShowMessage('error', '<%= Services.TextService.Localize("speechBubbles/fileErrorHeader") %>', '<%= Services.TextService.Localize("speechBubbles/fileErrorText") %>');
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', '<%= umbraco.ui.Text("speechBubbles", "fileSavedHeader") %>', '')
+                top.UmbSpeechBubble.ShowMessage('save', '<%= Services.TextService.Localize("speechBubbles/fileSavedHeader") %>', '')
             }
         }
         function submitFailure(t) {
-            top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>')
+            top.UmbSpeechBubble.ShowMessage('error', '<%= Services.TextService.Localize("speechBubbles/fileErrorHeader") %>', '<%= Services.TextService.Localize("speechBubbles/fileErrorText") %>')
         }    
     </script>
 </asp:Content>

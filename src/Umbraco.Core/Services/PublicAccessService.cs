@@ -105,13 +105,6 @@ namespace Umbraco.Core.Services
             return Attempt.If(result != null, result);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use AddRule instead, this method will be removed in future versions")]
-        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string ruleValue)
-        {
-            return AddRule(content, ruleType, ruleValue);
-        }
-
         /// <summary>
         /// Adds a rule
         /// </summary>

@@ -9,17 +9,16 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
     /// <summary>
     /// All ITree's should inherit from BaseTree.
     /// </summary>
-    public abstract class BaseTree : ITree, ITreeService //, IApplicationEventHandler
+    public abstract class BaseTree : ITreeService //, IApplicationEventHandler
     {
 
         public BaseTree(string application)
@@ -28,7 +27,23 @@ namespace umbraco.cms.presentation.Trees
         }
 
         protected const string FolderIcon = "icon-folder";
-        protected const string FolderIconOpen = "icon-folder";        
+        protected const string FolderIconOpen = "icon-folder";
+
+
+        internal static string GetTreePathFromFilePath(string filePath)
+        {
+            List<string> treePath = new List<string>();
+            treePath.Add("-1");
+            treePath.Add("init");
+            string[] pathPaths = filePath.Split('/');
+            pathPaths.Reverse();
+            for (int p = 0; p < pathPaths.Length; p++)
+            {
+                treePath.Add(string.Join("/", pathPaths.Take(p + 1).ToArray()));
+            }
+            string sPath = string.Join(",", treePath.ToArray());
+            return sPath;
+        }
 
         /// <summary>
         /// Returns the node definition of the root node for this tree
@@ -158,20 +173,6 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="Javascript"></param>
         public abstract void RenderJS(ref StringBuilder Javascript);
-
-        /// <summary>
-        /// This will call the new Render method which works using a typed XmlTree object instead of the untyped XmlDocument object.
-        /// This can still be overriden but is only for backwards compatibility.
-        /// </summary>
-        /// <param name="Tree"></param>
-        [Obsolete("Use the other Render method instead")]
-        public virtual void Render(ref XmlDocument Tree)
-        {
-            //call our render method by passing in the XmlTree instead of the XmlDocument
-            Render(ref m_xTree);
-            //now that we have an XmlTree object filled, we'll serialize it back to the XmlDocument of the ITree
-			Tree.LoadXml(m_xTree.ToString(SerializedTreeType.XmlTree));			
-        }
 
         /// <summary>
         /// Classes need to override thid method to create the nodes for the XmlTree
@@ -401,50 +402,7 @@ namespace umbraco.cms.presentation.Trees
 			this.Render(ref xTree);            
 
 			return xTree.ToString();
-		}
-
-        /// <summary>
-        /// Returns a boolean value indicating if the ITree passed in is an extension of BaseTree.
-        /// This is used to preserve backwards compatibility previous to version 5.
-        /// </summary>
-        /// <param name="tree"></param>
-        /// <returns></returns>
-        public static bool IsBaseTree(ITree tree)
-        {
-            return typeof(BaseTree).IsAssignableFrom(tree.GetType());
-        }
-
-        /// <summary>
-        /// Converts an ITree into a BaseTree. This is used for Legacy trees that don't inherit from BaseTree already.
-        /// </summary>
-        /// <param name="tree"></param>
-        /// <param name="alias"></param>
-        /// <param name="appAlias"></param>
-        /// <param name="iconClosed"></param>
-        /// <param name="iconOpened"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static BaseTree FromITree(ITree tree, string alias, string appAlias, string iconClosed, string iconOpened, string action)
-        {
-            TreeService treeSvc = new TreeService(null, alias, null, null, TreeDialogModes.none, appAlias);
-            //create the generic XmlTreeNode and fill it with the properties from the db          
-			NullTree nullTree = new NullTree(appAlias);
-            XmlTreeNode node = XmlTreeNode.CreateRoot(nullTree);
-            node.Text = BaseTree.GetTreeHeader(alias);;
-            node.Action = action;
-            node.Source = treeSvc.GetServiceUrl();
-            node.Icon = iconClosed;
-            node.OpenIcon = iconOpened;
-            node.NodeType = "init" + alias;
-			node.NodeType = alias;
-            node.NodeID = "init";
-            node.Menu = BaseTree.GetDefaultRootNodeActions();
-
-            //convert the tree to a LegacyTree
-            LegacyTree bTree = new LegacyTree(tree, appAlias, node);
-
-            return bTree;
-        }
+		} 
 
         /// <summary>
         /// Returns the default actions for a root node
@@ -467,12 +425,12 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public static string GetTreeHeader(string alias)
         {
-            string treeCaption = ui.Text(alias);
+            string treeCaption = ApplicationContext.Current.Services.TextService.Localize(alias);
             //this is a hack. the tree header title should be in the language files, however, if it is not, we're just
             //going to make it equal to what is specified in the db.
             if (treeCaption.Length > 0 && treeCaption.Substring(0, 1) == "[")
             {
-                ApplicationTree tree = ApplicationTree.getByAlias(alias);
+                var tree = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(alias);
                 if (tree != null)
                     return tree.Title.SplitPascalCasing().ToFirstUpperInvariant();
             }
@@ -559,14 +517,6 @@ namespace umbraco.cms.presentation.Trees
                     AfterTreeRender(sender.Select(x => new Media(x, false)).ToArray(), e);
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns true if there are subscribers to either BeforeTreeRender or AfterTreeRender
-        /// </summary>
-        internal bool HasEntityBasedEventSubscribers
-        {
-            get { return BeforeTreeRender != null || AfterTreeRender != null; }
         }
 
         /// <summary>

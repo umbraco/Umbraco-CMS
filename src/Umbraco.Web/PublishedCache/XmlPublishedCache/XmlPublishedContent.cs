@@ -348,7 +348,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    var parent = _xmlNode == null ? null : _xmlNode.ParentNode;            
             if (parent == null) return;
 
-		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
+		    if (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null)
 		        _parent = (new XmlPublishedContent(parent, _isPreviewing, true)).CreateModel();
 		}
 
@@ -387,15 +387,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
 		            _writerId = int.Parse(_xmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-		        {
-		            if (_xmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
-		                _docTypeAlias = _xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
-		        }
-		        else
-		        {
-		            _docTypeAlias = _xmlNode.Name;
-		        }
+                _docTypeAlias = _xmlNode.Name;
 
 		        if (_xmlNode.Attributes.GetNamedItem("nodeType") != null)
 		            _docTypeId = int.Parse(_xmlNode.Attributes.GetNamedItem("nodeType").Value);
@@ -414,7 +406,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
 		    // load data
-            var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+            var dataXPath = "* [not(@isDoc)]";
 		    var nodes = _xmlNode.SelectNodes(dataXPath);
 
 		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
@@ -423,9 +415,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (nodes != null)
                 foreach (XmlNode n in nodes)
                 {
-                    var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                        ? n.Attributes.GetNamedItem("alias").Value
-                        : n.Name;
+                    var alias = n.Name;
                     propertyNodes[alias.ToLowerInvariant()] = n;
                 }
 
@@ -446,7 +436,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        if (_xmlNode == null) return;
 
             // load children
-            var childXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+            var childXPath = "* [@isDoc]";
             var nav = _xmlNode.CreateNavigator();
             var expr = nav.Compile(childXPath);
             expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);

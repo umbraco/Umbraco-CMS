@@ -123,7 +123,7 @@ namespace umbraco
             {
                 var content = "";
 
-                var umbracoXml = presentation.UmbracoContext.Current.GetXml();
+                var umbracoXml = global::umbraco.content.Instance.XmlContent;
 
                 var splitpath = (String[])elements["splitpath"];
                 for (int i = 0; i < splitpath.Length - 1; i++)
@@ -133,7 +133,7 @@ namespace umbraco
                     if (element == null)
                         continue;
 
-                    var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+                    var xpath = "./{0}";
                     var currentNode = element.SelectSingleNode(string.Format(xpath, _fieldName));
 
                     //continue if all is null

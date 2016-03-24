@@ -3,7 +3,6 @@ using System.Web;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.interfaces;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations

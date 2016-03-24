@@ -1,16 +1,11 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.UI;
 
 namespace umbraco.settings
 {
@@ -18,7 +13,7 @@ namespace umbraco.settings
 	/// Summary description for EditDictionaryItem.
 	/// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
-	public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
+	public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    
 		protected LiteralControl keyTxt = new LiteralControl();
@@ -32,19 +27,19 @@ namespace umbraco.settings
 
 			// Put user code to initialize the page here
 			Panel1.hasMenu = true;
-			Panel1.Text = ui.Text("editdictionary") + ": " + currentItem.key;
+			Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.key;
 			
             uicontrols.Pane p = new uicontrols.Pane();
 
 			var save = Panel1.Menu.NewButton();
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.Click += save_Click;
-			save.ToolTip = ui.Text("save");
+			save.ToolTip = Services.TextService.Localize("save");
             save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 
             Literal txt = new Literal();
-            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";
+            txt.Text = "<p>" + Services.TextService.Localize("dictionaryItem/description", new[] { currentItem.key }) + "</p><br/>";
             p.addProperty(txt);
 			
 			foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
@@ -67,8 +62,8 @@ namespace umbraco.settings
 			{
 			    var path = BuildPath(currentItem);
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDictionary>().Tree.Alias)
-					.SyncTree(path, false);
+					.SetActiveTreeType(Constants.Trees.Dictionary)
+                    .SyncTree(path, false);
 			}
 
 
@@ -92,7 +87,7 @@ namespace umbraco.settings
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/dictionaryItemSaved"), "");	
 		}
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -118,26 +113,5 @@ namespace umbraco.settings
 		{    
 		}
 		#endregion
-
-
-
-		private class languageTextbox : TextBox 
-		{
-			
-			private int _languageid;
-			public int languageid 
-			{				
-				set {_languageid = value;}
-				get {return _languageid;}
-			}
-			public languageTextbox(int languageId) : base() {
-				this.TextMode = TextBoxMode.MultiLine;
-				this.Rows = 10;
-				this.Columns = 40;
-				this.Attributes.Add("style", "margin: 3px; width: 98%;");
-		
-				this.languageid = languageId;
-			}
-		}
 	}
 }

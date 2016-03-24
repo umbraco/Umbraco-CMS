@@ -39,9 +39,9 @@ namespace Umbraco.Web.WebServices
             
             var subQuery = new Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>()
-                .InnerJoin<DocumentDto>()
-                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
+                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
+                .InnerJoin<DocumentDto>(DatabaseContext.SqlSyntax)
+                .On<DocumentDto, ContentXmlDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId);
 
             var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
 
@@ -55,10 +55,10 @@ namespace Umbraco.Web.WebServices
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
             var subQuery = new Sql()
                 .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
+                .InnerJoin<NodeDto>(DatabaseContext.SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(DatabaseContext.SqlSyntax, dto => dto.NodeObjectType == mediaObjectType);
             var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
 
             return totalXml == total;
@@ -71,10 +71,10 @@ namespace Umbraco.Web.WebServices
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
             var subQuery = new Sql()
                 .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
+                .InnerJoin<NodeDto>(DatabaseContext.SqlSyntax)
+                .On<ContentXmlDto, NodeDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(DatabaseContext.SqlSyntax, dto => dto.NodeObjectType == memberObjectType);
             var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
 
             return totalXml == total;

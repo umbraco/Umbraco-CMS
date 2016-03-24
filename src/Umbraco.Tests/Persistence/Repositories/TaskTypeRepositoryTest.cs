@@ -18,8 +18,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var taskType = new TaskType("asdfasdf");
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
-            using (var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
                 var created = DateTime.Now;
                 var task = new Task(taskType)

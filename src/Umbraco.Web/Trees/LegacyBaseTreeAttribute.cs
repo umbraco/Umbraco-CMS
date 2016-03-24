@@ -12,6 +12,7 @@ namespace Umbraco.Web.Trees
     /// on the new tree which legacy tree to load (it won't actually render using the new tree)
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
+    [Obsolete("Remove this in v8, it should no longer be necessary!")]
     internal sealed class LegacyBaseTreeAttribute : Attribute
     {
         public Type BaseTreeType { get; private set; }

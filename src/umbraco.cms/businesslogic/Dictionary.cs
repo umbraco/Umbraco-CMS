@@ -26,7 +26,7 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database")]
         protected static ISqlHelper SqlHelper
         {
-            get { return Application.SqlHelper; }
+            get { return LegacySqlHelper.SqlHelper; }
         }
         
         /// <summary>
@@ -292,7 +292,7 @@ namespace umbraco.cms.businesslogic
                         foreach (XmlNode xn in values)
                         {
                             string cA = xn.Attributes["LanguageCultureAlias"].Value;
-                            string keyValue = xmlHelper.GetNodeValue(xn);
+                            string keyValue = XmlHelper.GetNodeValue(xn);
 
                             Language valueLang = Language.GetByCultureCode(cA);
 

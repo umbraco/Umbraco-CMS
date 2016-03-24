@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -62,6 +63,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Will usually only be filled if the ScriptFile is a Usercontrol</remarks>
         [DataMember]
+        [Obsolete("This is no longer used, we should remove it in v8, CustomControl macros are gone")]
         string ControlAssembly { get; set; }
 
         /// <summary>

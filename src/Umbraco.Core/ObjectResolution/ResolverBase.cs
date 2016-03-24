@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using LightInject;
 
 namespace Umbraco.Core.ObjectResolution
 {

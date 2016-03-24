@@ -26,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository)
-            : base(work, cacheHelper, logger, sqlSyntax)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository, IMappingResolver mappingResolver)
+            : base(work, cacheHelper, logger, sqlSyntax, mappingResolver)
         {
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)").From<UserDto>();
+                sql.Select("COUNT(*)").From<UserDto>(SqlSyntax);
             }
             else
             {
@@ -96,13 +96,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery(string columns)
+        private Sql GetBaseQuery(string columns)
         {
             var sql = new Sql();
             sql.Select(columns)
-                      .From<UserDto>()
-                      .LeftJoin<User2AppDto>()
-                      .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                      .From<UserDto>(SqlSyntax)
+                      .LeftJoin<User2AppDto>(SqlSyntax)
+                      .On<UserDto, User2AppDto>(SqlSyntax, left => left.Id, right => right.UserId);
             return sql;
         }
 
@@ -275,8 +275,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
 
             sql.Select("COUNT(*)")
-                .From<UserDto>()
-                .Where<UserDto>(x => x.UserName == username);
+                .From<UserDto>(SqlSyntax)
+                .Where<UserDto>(SqlSyntax, x => x.UserName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (orderBy == null) throw new ArgumentNullException("orderBy");
 
             var sql = new Sql();
-            sql.Select("*").From<UserDto>();
+            sql.Select("*").From<UserDto>(SqlSyntax);
 
             Sql resultQuery;
             if (query != null)
@@ -339,7 +339,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
-            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
+            var mapper = QueryFactory.MappingResolver.ResolveMapperByType(typeof(IUser));
             var mappedField = mapper.Map(expressionMember.Name);
             if (mappedField.IsNullOrWhiteSpace())
             {

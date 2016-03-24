@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
         }
 
+
         public override void Up()
         {
             Create.Table("cmsContentType2ContentType")
@@ -19,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 
             Create.PrimaryKey("PK_cmsContentType2ContentType")
                   .OnTable("cmsContentType2ContentType")
-                  .Columns(new[] {"parentContentTypeId", "childContentTypeId"});
+                  .Columns(new[] { "parentContentTypeId", "childContentTypeId" });
         }
 
         public override void Down()

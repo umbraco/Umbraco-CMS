@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
         public ILogger Logger { get; private set; }
-        
+
         protected MigrationBase(ISqlSyntaxProvider sqlSyntax, ILogger logger)
         {
             SqlSyntax = sqlSyntax;
@@ -47,12 +47,12 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public ICreateBuilder Create
         {
-            get { return new CreateBuilder(Context, SqlSyntax); }
+            get { return new CreateBuilder(Context); }
         }
 
         public IDeleteBuilder Delete
         {
-            get { return new DeleteBuilder(Context, SqlSyntax); }
+            get { return new DeleteBuilder(Context); }
         }
 
         public IExecuteBuilder Execute

@@ -15,12 +15,13 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
 	public class ContentFinderByIdPath : IContentFinder
     {
+	    private readonly ILogger _logger;
 	    private readonly IWebRoutingSection _webRoutingSection;
 
-	    public ContentFinderByIdPath()
+	    public ContentFinderByIdPath(ILogger logger)
             : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
 	    {
-	        
+	        _logger = logger;
 	    }
 
 	    public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
@@ -53,13 +54,13 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-					LogHelper.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
+					_logger.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
                     node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
 						docRequest.PublishedContent = node;
-						LogHelper.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContent.Id);
+						_logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContent.Id);
                     }
                     else
                     {
@@ -69,7 +70,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				LogHelper.Debug<ContentFinderByIdPath>("Not a node id");
+				_logger.Debug<ContentFinderByIdPath>("Not a node id");
 
             return node != null;
         }

@@ -9,16 +9,17 @@ using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer.SqlHelpers;
 using umbraco.BusinessLogic;
 using Examine;
+using Umbraco.Core;
 
 namespace umbraco.presentation.members
 {
 
 
-    public partial class search : BasePages.UmbracoEnsuredPage
+    public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public search()
         {
-            CurrentApp = DefaultApps.member.ToString();
+            CurrentApp = Constants.Applications.Members.ToString();
         }
     }
 }

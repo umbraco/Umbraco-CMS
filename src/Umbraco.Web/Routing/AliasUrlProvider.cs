@@ -94,18 +94,12 @@ namespace Umbraco.Web.Routing
         {
             get
             {
+                //TODO: The ContentFinderResolver instance should be injected in ctor with DI instead of using singleton!
+
                 // finder
                 if (ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>())
                     return true;
 
-                // handler wrapped into a finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandler<global::umbraco.SearchForAlias>>())
-                    return true;
-
-                // handler wrapped into special finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
-                    && NotFoundHandlerHelper.IsNotFoundHandlerEnabled<global::umbraco.SearchForAlias>())
-                    return true;
 
                 // anything else, we can't detect
                 return false;

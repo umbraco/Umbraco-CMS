@@ -1,11 +1,9 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Xml;
-using Umbraco.Core.Logging;
 using System.Linq;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.member
@@ -49,25 +47,6 @@ namespace umbraco.cms.businesslogic.member
 
         #region Regenerate Xml Structures
 
-        /// <summary>
-        /// Rebuilds the xml structure for the member item by id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <remarks>
-        /// This is not thread safe
-        /// </remarks>
-        internal override void RebuildXmlStructureForContentItem(int contentId)
-        {
-            var xd = new XmlDocument();
-            try
-            {
-                new Member(contentId).XmlGenerate(xd);
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<MemberType>("Error generating xml", ee);
-            }
-        }
 
         #endregion
 
@@ -124,78 +103,19 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		public override void delete() 
 		{
-            var e = new DeleteEventArgs();
+		    ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
 
-            FireBeforeDelete(e);
-
-            if (e.Cancel == false) {
-
-                ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
-
-                // delete all documents of this type
-                FireAfterDelete(e);
-            }
-        }
+		}
 
         /// <summary>
         /// Used to persist object changes to the database
         /// </summary>
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (e.Cancel == false)
-            {
-                ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
-                base.Save();
-                FireAfterSave(e);
-            }
+            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
+            base.Save();
         }
-        
-        public XmlElement ToXml(XmlDocument xd)
-        {
-            XmlElement root = xd.CreateElement("MemberType");
-
-            var info = xd.CreateElement("Info");
-            root.AppendChild(info);
-            info.AppendChild(xmlHelper.addTextNode(xd, "Name", this.Text));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Alias", this.Alias));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Icon", this.IconUrl));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Thumbnail", this.Thumbnail));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Description", this.Description));
-
-            XmlElement pts = xd.CreateElement("GenericProperties");
-            foreach (PropertyType pt in this.PropertyTypes)
-            {
-                XmlElement ptx = xd.CreateElement("GenericProperty");
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Name", pt.Name));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Alias", pt.Alias));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
-
-                //Datatype definition guid was added in v4 to enable datatype imports
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
-
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Validation", pt.ValidationRegExp));
-                ptx.AppendChild(xmlHelper.addCDataNode(xd, "Description", pt.Description));
-                pts.AppendChild(ptx);
-            }
-            root.AppendChild(pts);
-
-            // tabs
-            XmlElement tabs = xd.CreateElement("Tabs");
-            foreach (TabI t in getVirtualTabs.ToList())
-            {
-                XmlElement tabx = xd.CreateElement("Tab");
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
-                tabs.AppendChild(tabx);
-            }
-            root.AppendChild(tabs);
-            return root;
-        }
+       
 
         #endregion
 
@@ -216,9 +136,9 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="Text">The name of the MemberType</param>
         /// <param name="u">Creator of the MemberType</param>
-        public static MemberType MakeNew(User u, string Text)
+        public static MemberType MakeNew(IUser u, string Text)
         {
-            var alias = helpers.Casing.SafeAliasWithForcingCheck(Text);
+            var alias = Text.ToSafeAliasWithForcingCheck();
             //special case, if it stars with an underscore, we have to re-add it for member types
             if (Text.StartsWith("_")) alias = "_" + alias;
             var mt = new Umbraco.Core.Models.MemberType(-1)
@@ -230,8 +150,6 @@ namespace umbraco.cms.businesslogic.member
             };
             ApplicationContext.Current.Services.MemberTypeService.Save(mt);
             var legacy = new MemberType(mt);
-            var e = new NewEventArgs();
-            legacy.OnNew(e);
             return legacy;
         }
 
@@ -270,59 +188,5 @@ namespace umbraco.cms.businesslogic.member
 
         #endregion
 
-        #region Events
-
-        /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(MemberType sender, SaveEventArgs e);
-        /// <summary>
-        /// The new event handler
-        /// </summary>
-        public delegate void NewEventHandler(MemberType sender, NewEventArgs e);
-        /// <summary>
-        /// The delete event handler
-        /// </summary>
-        public delegate void DeleteEventHandler(MemberType sender, DeleteEventArgs e);
-
-
-        /// <summary>
-        /// Occurs when a language is saved.
-        /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-                BeforeSave(this, e);
-        }
-
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-                AfterSave(this, e);
-        }
-
-        public static event NewEventHandler New;
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
-        {
-            if (BeforeDelete != null)
-                BeforeDelete(this, e);
-        }
-
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        } 
-        #endregion
 	}
 }

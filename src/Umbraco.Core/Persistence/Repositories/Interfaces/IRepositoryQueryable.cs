@@ -14,6 +14,16 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IRepositoryQueryable<in TId, TEntity> : IRepository<TId, TEntity>
     {
         /// <summary>
+        /// Returns a query instance
+        /// </summary>
+        Query<TEntity> Query { get; }
+
+        /// <summary>
+        /// Returns a query factory instance
+        /// </summary>
+        QueryFactory QueryFactory { get; }
+
+        /// <summary>
         /// Gets all entities of the specified type and query
         /// </summary>
         /// <param name="query"></param>

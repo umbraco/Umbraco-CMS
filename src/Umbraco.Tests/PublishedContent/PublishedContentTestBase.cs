@@ -41,7 +41,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             if (PropertyValueConvertersResolver.HasCurrent == false)
                 PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                    new ActivatorServiceProvider(), Logger,
+                    Container, Logger,
                     new[]
                         {
                             typeof(DatePickerValueConverter),

@@ -8,7 +8,7 @@ using Moq;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using umbraco;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -17,8 +17,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
-using umbraco.editorControls;
-using umbraco.MacroEngines;
 using umbraco.uicontrols;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
@@ -42,7 +40,6 @@ namespace Umbraco.Tests.Plugins
             _manager.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly, 
-			        typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -55,9 +52,7 @@ namespace Umbraco.Tests.Plugins
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-			        typeof(ICultureDictionary).Assembly,
-					typeof(UmbracoContext).Assembly,
-					typeof(BaseDataType).Assembly
+					typeof(UmbracoContext).Assembly
 			    };
         }
 
@@ -279,14 +274,6 @@ namespace Umbraco.Tests.Plugins
         }
 
         [Test]
-        public void Resolves_Attributed_Trees()
-        {
-            var trees = _manager.ResolveAttributedTrees();
-            // commit 6c5e35ec2cbfa31be6790d1228e0c2faf5f55bc8 brings the count down to 14
-            Assert.AreEqual(14, trees.Count());
-        }
-
-        [Test]
         public void Resolves_Actions()
         {
             var actions = _manager.ResolveActions();
@@ -299,35 +286,7 @@ namespace Umbraco.Tests.Plugins
             var trees = _manager.ResolveTrees();
             Assert.AreEqual(39, trees.Count());
         }
-
-        [Test]
-        public void Resolves_Applications()
-        {
-            var apps = _manager.ResolveApplications();
-            Assert.AreEqual(7, apps.Count());
-        }
-
-        [Test]
-        public void Resolves_DataTypes()
-        {
-            var types = _manager.ResolveDataTypes();
-            Assert.AreEqual(35, types.Count());
-        }
-
-        [Test]
-        public void Resolves_RazorDataTypeModels()
-        {
-            var types = _manager.ResolveRazorDataTypeModels();
-            Assert.AreEqual(2, types.Count());
-        }
-
-        [Test]
-        public void Resolves_RestExtensions()
-        {
-            var types = _manager.ResolveRestExtensions();
-            Assert.AreEqual(3, types.Count());
-        }
-
+        
         [Test]
         public void Resolves_XsltExtensions()
         {
@@ -360,13 +319,6 @@ namespace Umbraco.Tests.Plugins
      
         [XsltExtension("Blah.Blah")]
         public class MyXsltExtension
-        {
-
-        }
-
-
-        [Umbraco.Web.BaseRest.RestExtension("Blah")]
-        public class MyRestExtesion
         {
 
         }

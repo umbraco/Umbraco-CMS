@@ -1172,6 +1172,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="templates">テンプレート</key>
     <key alias="xslt">XSLT ファイル</key>
     <key alias="analytics">アナリティクス</key>
+    <key alias="userTypes">ユーザータイプ</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>

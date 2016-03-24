@@ -43,12 +43,6 @@ namespace Umbraco.Core.Models
             _masterTemplateId = new Lazy<int>(() => -1);
         }
 
-        [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
-        public Template(string path, string name, string alias)
-            : this(name, alias)
-        {            
-        }
-
         [DataMember]
         public Lazy<int> MasterTemplateId
         {
@@ -109,14 +103,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        public bool IsMasterTemplate { get; internal set; }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions, use the IFileSystem DetermineRenderingEngine method instead")]
-        public RenderingEngine GetTypeOfRenderingEngine()
-        {
-            //Hack! TODO: Remove this method entirely
-            return ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(this);
-        }
+        public bool IsMasterTemplate { get; internal set; }        
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {

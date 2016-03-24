@@ -1,25 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml;
-using System.IO;
-using System.Collections;
-using System.Web.UI.WebControls;
-using System.Data.SqlClient;
-using System.Data;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.Security;
-using umbraco;
-using umbraco.BusinessLogic;
-using System.Web;
-using umbraco.BusinessLogic.Actions;
-using umbraco.DataLayer;
-using umbraco.cms.businesslogic;
-using umbraco.interfaces;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.user
 {
@@ -28,9 +14,9 @@ namespace umbraco.cms.presentation.user
     /// </summary>    
     public class UserPermissions
     {
-        readonly User _user;
+        readonly IUser _user;
 
-        public UserPermissions(User user)
+        public UserPermissions(IUser user)
         {
             _user = user;
         }
@@ -50,8 +36,9 @@ namespace umbraco.cms.presentation.user
             var lstNoPermissions = new List<int>();
             foreach (var nodeId in nodeIDs)
             {
-                var nodeActions = UmbracoContext.Current.UmbracoUser.GetPermissions(GetNodePath(nodeId));
-                var lstActions = BusinessLogic.Actions.Action.FromString(nodeActions);
+                var nodeActions = ApplicationContext.Current.Services.UserService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, GetNodePath(nodeId));
+                
+                var lstActions = Action.FromEntityPermission(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
                     lstNoPermissions.Add(nodeId);
             }
@@ -104,8 +91,9 @@ namespace umbraco.cms.presentation.user
             if (path != "")
             {
                 //get the user and their permissions
-                string permissions = _user.GetPermissions(path);
-                return umbraco.BusinessLogic.Actions.Action.FromString(permissions);
+
+                var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(_user, path);
+                return Action.FromEntityPermission(permissions);
             }
             return null;
         }

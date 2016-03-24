@@ -1,16 +1,12 @@
 using System;
-using System.Data;
 using System.IO;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core.FileResources;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -95,7 +91,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<XsltTasks>(string.Format("Could not remove XSLT file {0} - User {1}", Alias, UmbracoEnsuredPage.CurrentUser.Id), ex);
+                LogHelper.Error<XsltTasks>(string.Format("Could not remove XSLT file {0} - User {1}", Alias, UmbracoContext.Current.Security.GetUserId()), ex);
             }
             return true;
         }
@@ -109,7 +105,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.developer.ToString(); }
+            get { return Constants.Applications.Developer.ToString(); }
         }
     }
 }

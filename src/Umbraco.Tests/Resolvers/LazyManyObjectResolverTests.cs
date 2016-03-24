@@ -171,11 +171,7 @@ namespace Umbraco.Tests.Resolvers
 
 		private sealed class LazyResolver : LazyManyObjectsResolverBase<LazyResolver, ITestInterface>
 		{
-			public LazyResolver(IServiceProvider serviceProvider, ILogger logger)
-                : base(serviceProvider, logger, ObjectLifetimeScope.Transient)
-			{ }
-
-			public LazyResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> values)
+		    public LazyResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> values)
 				:base (serviceProvider, logger, values, ObjectLifetimeScope.Transient)
 			{ }
 

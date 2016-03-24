@@ -15,7 +15,7 @@ using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
-    public partial class search : BasePages.UmbracoEnsuredPage
+    public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         protected override void OnInit(EventArgs e)
@@ -58,8 +58,8 @@ namespace umbraco.presentation.dialogs
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = (CurrentApp == Constants.Applications.Members)
-                ? UmbracoContext.Current.InternalMemberSearchProvider
-                : UmbracoContext.Current.InternalSearchProvider;
+                ? ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
+                : ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
 
             //create some search criteria, make everything combined to be 'And' and only search the current app
             var criteria = internalSearcher.CreateSearchCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
@@ -79,11 +79,11 @@ namespace umbraco.presentation.dialogs
                     operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
-                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
+                if (Security.CurrentUser.StartContentId > 0)
                 {
                     //TODO: This is not correct! This will not filter out seearches 'from' this node, this
                     // query is meant to search 'for' a specific node.
-                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                    operation = operation.And().Id(Security.CurrentUser.StartContentId);
                 }
 
                 results = internalSearcher.Search(operation.Compile());
@@ -106,7 +106,7 @@ namespace umbraco.presentation.dialogs
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "title", r.Fields["nodeName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "author", r.Fields["writerName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "changeDate", r.Fields["updateDate"]));
-                x.Attributes.Append(xmlHelper.addAttribute(result, "type", r.Fields["nodeTypeAlias"]));
+                x.Attributes.Append(XmlHelper.AddAttribute(result, "type", r.Fields["nodeTypeAlias"]));
                 result.DocumentElement.AppendChild(x);
             }
 

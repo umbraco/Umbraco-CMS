@@ -10,6 +10,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -25,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _templateRepository = templateRepository;
         }
@@ -134,7 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                .LeftJoin<ContentTypeTemplateDto>(SqlSyntax)
                .On<ContentTypeTemplateDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
         }
@@ -178,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         protected override void PersistDeletedItem(IContentType entity)
         {
-            var query = Query<IContentType>.Builder.Where(x => x.ParentId == entity.Id);
+            var query = Query.Where(x => x.ParentId == entity.Id);
             var children = GetByQuery(query);
             foreach (var child in children)
             {
@@ -198,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
                 .InnerJoin<ContentTypeDto>(SqlSyntax)
                 .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
-                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+                .Where<ContentTypeDto>(SqlSyntax, dto => dto.NodeId == entity.Id);
 
             //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
             Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));

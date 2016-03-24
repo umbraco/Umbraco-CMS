@@ -7,17 +7,21 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using UmbracoExamine.Config;
 using System.Collections.Generic;
 using Examine;
 using System.IO;
 using UmbracoExamine.DataServices;
 using Lucene.Net.Analysis;
+using Directory = Lucene.Net.Store.Directory;
+using IContentService = Umbraco.Core.Services.IContentService;
+using IMediaService = Umbraco.Core.Services.IMediaService;
 
 namespace UmbracoExamine
 {
    
-	/// <summary>
+    /// <summary>
     /// Custom indexer for members
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoContentIndexer
@@ -26,53 +30,49 @@ namespace UmbracoExamine
         private readonly IMemberService _memberService;
         private readonly IDataTypeService _dataTypeService;
 
-	    /// <summary>
-	    /// Default constructor
-	    /// </summary>
-	    public UmbracoMemberIndexer() : base()
-	    {
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public UmbracoMemberIndexer()
+            : base()
+        {
             _memberService = ApplicationContext.Current.Services.MemberService;
-	    }
-
-	    /// <summary>
-	    /// Constructor to allow for creating an indexer at runtime
-	    /// </summary>
-	    /// <param name="indexerData"></param>
-	    /// <param name="indexPath"></param>
-	    /// <param name="dataService"></param>
-	    /// <param name="analyzer"></param>
-	    [Obsolete("Use the overload that specifies the Umbraco services")]
-	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-	        : base(indexerData, indexPath, dataService, analyzer, async)
-	    {
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _memberService = ApplicationContext.Current.Services.MemberService;
-	    }
+        }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
         /// <param name="indexerData"></param>
-        /// <param name="indexPath"></param>
-        /// <param name="dataService"></param>
-        /// <param name="dataTypeService"></param>
+        /// <param name="luceneDirectory"></param>
         /// <param name="memberService"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="urlSegmentProviders"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
-	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
-            IDataTypeService dataTypeService,
+        public UmbracoMemberIndexer(
+            IIndexCriteria indexerData,
+            Directory luceneDirectory,
             IMemberService memberService,
-            Analyzer analyzer, bool async)
-	        : base(indexerData, indexPath, dataService, analyzer, async)
-	    {
-            _dataTypeService = dataTypeService;
+            IDataService dataService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            Analyzer analyzer,
+            bool async) :
+            base(indexerData, luceneDirectory, dataService, contentService, mediaService, dataTypeService, userService, urlSegmentProviders, analyzer, async)
+        {
+            if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
-	    }
+        }
 
-	    
-
-	    /// <summary>
+        /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
         /// </summary>
         /// <param name="indexSet"></param>
@@ -108,7 +108,7 @@ namespace UmbracoExamine
 	        return indexerData;
         }
 
-	    /// <summary>
+        /// <summary>
         /// The supported types for this indexer
         /// </summary>
         protected override IEnumerable<string> SupportedTypes
@@ -119,12 +119,12 @@ namespace UmbracoExamine
             }
         }
 
-	    /// <summary>
-	    /// Reindex all members
-	    /// </summary>
-	    /// <param name="type"></param>
-	    protected override void PerformIndexAll(string type)
-	    {
+        /// <summary>
+        /// Reindex all members
+        /// </summary>
+        /// <param name="type"></param>
+        protected override void PerformIndexAll(string type)
+        {
             //This only supports members
             if (SupportedTypes.Contains(type) == false)
                 return;
@@ -135,10 +135,10 @@ namespace UmbracoExamine
             IMember[] members;
 
             if (IndexerData.IncludeNodeTypes.Any())
-	        {
+            {
                 //if there are specific node types then just index those
                 foreach (var nodeType in IndexerData.IncludeNodeTypes)
-	            {
+                {
                     do
                     {
                         long total;
@@ -148,10 +148,10 @@ namespace UmbracoExamine
 
                         pageIndex++;
                     } while (members.Length == pageSize);
-	            }
-	        }
-	        else
-	        {
+                }
+            }
+            else
+            {
                 //no node types specified, do all members
                 do
                 {
@@ -171,18 +171,18 @@ namespace UmbracoExamine
             return members.Select(member => serializer.Serialize(_dataTypeService, member));
         }
 
-	    protected override XDocument GetXDocument(string xPath, string type)
-	    {
-	        throw new NotSupportedException();
-	    }
-        
+        protected override XDocument GetXDocument(string xPath, string type)
+        {
+            throw new NotSupportedException();
+        }
+
         protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
         {
             var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
             //adds the special path property to the index
             fields.Add("__key", allValuesForIndexing["__key"]);
-            
+
             return fields;
 
         }
@@ -210,13 +210,6 @@ namespace UmbracoExamine
             
             if (e.Fields.ContainsKey(IconFieldName) == false)
                 e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
-        }
-
-        private static XElement GetMemberItem(int nodeId)
-        {
-			//TODO: Change this so that it is not using the LegacyLibrary, just serialize manually!
-            var nodes = LegacyLibrary.GetMember(nodeId);
-            return XElement.Parse(nodes.Current.OuterXml);
         }
     }
 }

@@ -1,30 +1,20 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
-using System.Linq;
-using umbraco.cms.helpers;
 using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
-    public partial class editScript : BasePages.UmbracoEnsuredPage
+    public partial class editScript : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public editScript()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
         protected System.Web.UI.HtmlControls.HtmlForm Form1;
@@ -63,14 +53,14 @@ namespace umbraco.cms.presentation.settings.scripts
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + script.VirtualPath + "\">" + script.VirtualPath + "</a>";
             editorSource.Text = script.Content;
-            ScriptTreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+            ScriptTreeSyncPath = BaseTree.GetTreePathFromFilePath(filename);
 
             // name derives from filename, clean for xss
             NameTxt.Text = filename.CleanForXss('\\', '/');
 
-            Panel1.Text = ui.Text("editscript", base.getUser());
-            pp_name.Text = ui.Text("name", base.getUser());
-            pp_path.Text = ui.Text("path", base.getUser());
+            Panel1.Text = Services.TextService.Localize("editscript");
+            pp_name.Text = Services.TextService.Localize("name");
+            pp_path.Text = Services.TextService.Localize("path");
 
             if (IsPostBack == false)
             {
@@ -93,15 +83,15 @@ namespace umbraco.cms.presentation.settings.scripts
                 editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
 
 
-            var editor = Panel1.NewTabPage(ui.Text("settings","script"));
+            var editor = Panel1.NewTabPage(Services.TextService.Localize("settings/script"));
             editor.Controls.Add(Pane7);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane8);
 
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
@@ -111,28 +101,23 @@ namespace umbraco.cms.presentation.settings.scripts
                 // Editing buttons
                 Panel1.Menu.InsertSplitter();
                 uicontrols.MenuIconI umbField = Panel1.Menu.NewIcon();
-                umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
-                umbField.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
-                umbField.AltText = ui.Text("template", "insertPageField");
+                umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
+                umbField.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", Services.TextService.Localize("template/insertPageField"), 640, 550);
+                umbField.AltText = Services.TextService.Localize("template/insertPageField");
 
                 // TODO: Update icon
                 uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
-                umbDictionary.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
+                umbDictionary.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", Services.TextService.Localize("template/insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
-
-                uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-                umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
-                umbMacro.AltText = ui.Text("template", "insertMacro");
-                umbMacro.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
-
+                
                 // Help
                 Panel1.Menu.InsertSplitter();
 
                 uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
-                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
-                helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
-                helpIcon.AltText = ui.Text("template", "quickGuide");
+                helpIcon.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", Services.TextService.Localize("template/quickGuide"), 600, 580);
+                helpIcon.ImageURL = SystemDirectories.Umbraco + "/images/editor/help.png";
+                helpIcon.AltText = Services.TextService.Localize("template/quickGuide");
 
             }
 

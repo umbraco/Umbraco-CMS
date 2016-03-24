@@ -16,6 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
         }
 
+
         public override void Up()
         {
             //now that the controlId column is renamed and now a string we need to convert

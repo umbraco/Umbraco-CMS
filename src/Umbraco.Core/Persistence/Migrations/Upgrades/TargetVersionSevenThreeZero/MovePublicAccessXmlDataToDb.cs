@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 if (dataExists.Any()) return;
             }
 
-            var xmlFile = IOHelper.MapPath(SystemFiles.AccessXml);
+            var xmlFile = IOHelper.MapPath(SystemDirectories.Data + "/access.config");
             
             if (File.Exists(xmlFile) == false) return;
 

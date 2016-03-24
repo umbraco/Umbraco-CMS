@@ -12,23 +12,25 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.presentation.translation
 {
-    public partial class preview : BasePages.UmbracoEnsuredPage
+    public partial class preview : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public string originalUrl = "";
         public string translatedUrl = "";
 
         public preview()
         {
-            CurrentApp = DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             
-            var taskId = int.Parse(helper.Request("id"));
+            var taskId = int.Parse(Request.GetItemAsString("id"));
 
             var t = new Task(taskId);
             var translated = new Document(t.Node.Id);

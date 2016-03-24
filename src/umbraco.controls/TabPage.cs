@@ -16,7 +16,6 @@ namespace umbraco.uicontrols {
         // Ensure that a TabPage cannot be instatiated outside 
         // this assembly -> New instances of a tabpage can only be retrieved through the tabview
         private bool _hasMenu = true;
-        private readonly ScrollingMenu _menu = new ScrollingMenu();
         protected LiteralControl ErrorHeaderControl = new LiteralControl();
         private LiteralControl _closeButtonControl = new LiteralControl();
         private readonly ValidationSummary _vs = new ValidationSummary();

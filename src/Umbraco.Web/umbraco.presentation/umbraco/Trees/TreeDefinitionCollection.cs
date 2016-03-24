@@ -1,21 +1,8 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Threading;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web;
-using umbraco.interfaces;
-using umbraco.BusinessLogic.Utils;
 using umbraco.BusinessLogic;
-using umbraco.BasePages;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -45,7 +32,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="tree"></param>
         /// <returns></returns>
-        public TreeDefinition FindTree(ITree tree)
+        public TreeDefinition FindTree(BaseTree tree)
         {
 			EnsureTreesRegistered();
 
@@ -63,7 +50,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TreeDefinition FindTree<T>() where T : ITree
+        public TreeDefinition FindTree<T>() where T : BaseTree
         {
 			EnsureTreesRegistered();
 
@@ -109,7 +96,7 @@ namespace umbraco.cms.presentation.Trees
 			EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower())
+            	tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower())
             	);
         }
 
@@ -123,7 +110,7 @@ namespace umbraco.cms.presentation.Trees
 			EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
+            	tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
             	);
         }
 
@@ -154,11 +141,8 @@ namespace umbraco.cms.presentation.Trees
 
                         var foundITrees = PluginManager.Current.ResolveTrees();
 
-                        var objTrees = ApplicationTree.getAll();
-                        var appTrees = new List<ApplicationTree>();
-                        appTrees.AddRange(objTrees);
-
-                        var apps = Application.getAll();
+                        var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetAll().ToList();
+                        var apps = ApplicationContext.Current.Services.SectionService.GetSections().ToList();
 
                         foreach (var type in foundITrees)
                         {
@@ -173,15 +157,8 @@ namespace umbraco.cms.presentation.Trees
                             var appTreesForType = appTrees.FindAll(
                                 tree =>
                                 {
-                                    //match the type on assembly qualified name if the assembly attribute is empty or if the
-                                    // tree type contains a comma (meaning it is assembly qualified)
-                                    if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
-                                    {
-                                        return tree.GetRuntimeType() == type;
-                                    }
-
-                                    //otherwise match using legacy match rules
-                                    return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));
+                                    //match the type on assembly qualified name
+                                    return tree.GetRuntimeType() == type;
                                 }
                                 );
 
@@ -189,7 +166,7 @@ namespace umbraco.cms.presentation.Trees
                             {
                                 //find the Application object whos name is the same as our appTree ApplicationAlias
                                 var app = apps.Find(
-                                    a => (a.alias == appTree.ApplicationAlias)
+                                    a => (a.Alias == appTree.ApplicationAlias)
                                     );
 
                                 var def = new TreeDefinition(type, appTree, app);

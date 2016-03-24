@@ -15,7 +15,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-    public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
+    public abstract class DynamicDocumentTestsBase<TDocument> : PublishedContentTestBase
 	{
         private IUmbracoSettingsSection _umbracoSettings;
 
@@ -29,9 +29,6 @@ namespace Umbraco.Tests.PublishedContent
             //generate new mock settings and assign so we can configure in individual tests
             _umbracoSettings = SettingsForTests.GenerateMockSettings();
             SettingsForTests.ConfigureSettings(_umbracoSettings);
-
-            var scriptingMock = Mock.Get(_umbracoSettings.Scripting);
-            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -235,7 +232,7 @@ namespace Umbraco.Tests.PublishedContent
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
-			Assert.IsTrue(result.GetType() == typeof(DynamicNull) || result.GetType() == typeof(umbraco.MacroEngines.DynamicNull));
+			Assert.IsTrue(result.GetType() == typeof(DynamicNull));
 			//Assert.AreEqual(typeof(DynamicNull), result.GetType());
 		}
 
@@ -259,7 +256,7 @@ namespace Umbraco.Tests.PublishedContent
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
-			Assert.IsTrue(result.GetType() == typeof (DynamicNull) || result.GetType() == typeof (umbraco.MacroEngines.DynamicNull));
+			Assert.IsTrue(result.GetType() == typeof (DynamicNull));
 			//Assert.AreEqual(typeof (DynamicNull), result.GetType());
 		}
 
