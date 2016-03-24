@@ -125,7 +125,6 @@
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
     <Compile Include="DeletePolicyTracker.cs" />
-    <Compile Include="ExamineHelper.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LocalStorage\AzureLocalStorageDirectory.cs" />

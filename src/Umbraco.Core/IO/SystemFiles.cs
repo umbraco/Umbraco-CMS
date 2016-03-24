@@ -11,15 +11,6 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-        [Obsolete("This file is no longer used and should not be accessed!")]
-        public static string AccessXml
-        {
-            get
-            {
-                return SystemDirectories.Data + "/access.config";
-            }
-        }
-
         public static string CreateUiXml
         {
             get
@@ -71,11 +62,6 @@ namespace Umbraco.Core.IO
                 return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
             }
         }
-
-        [Obsolete("Use GlobalSettings.ContentCacheXmlStoredInCodeGen instead")]
-        internal static bool ContentCacheXmlStoredInCodeGen
-        {
-            get { return GlobalSettings.ContentCacheXmlStoredInCodeGen; }
-        }
+        
     }
 }

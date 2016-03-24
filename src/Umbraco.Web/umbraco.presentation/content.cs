@@ -552,26 +552,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        /// <summary>
-        /// Adds a task to the xml cache file persister
-        /// </summary>
-        //private void QueueXmlForPersistence()
-        //{
-        //    _persisterTask = _persisterTask.Touch();
-        //}
-
-        internal DateTime GetCacheFileUpdateTime()
-        {
-            //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
-
-            if (File.Exists(GetUmbracoXmlDiskFileName()))
-            {
-                return new FileInfo(GetUmbracoXmlDiskFileName()).LastWriteTimeUtc;
-            }
-
-            return DateTime.MinValue;
-        }
-
+      
         #endregion
 
         #region Configuration
@@ -597,12 +578,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             get { return XmlFileEnabled && UmbracoConfig.For.UmbracoSettings().Content.XmlContentCheckForDiskChanges; }
         }
-
-        // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
-        }        
+        
 
         // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
         // for audit purposes - false by default, not in umbracoSettings.config

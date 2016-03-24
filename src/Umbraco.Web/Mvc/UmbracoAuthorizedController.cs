@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -18,6 +17,7 @@ namespace Umbraco.Web.Mvc
 	/// authorization of each method can use this attribute instead of inheriting from this controller.
 	/// </remarks>
 	[UmbracoAuthorize]
+    [DisableBrowserCache]
     public abstract class UmbracoAuthorizedController : UmbracoController
 	{
 

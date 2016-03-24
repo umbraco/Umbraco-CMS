@@ -15,14 +15,7 @@ namespace umbraco.uicontrols
 
         public string OnClientClick { get; set; }    
 
-        public void AddLink(HtmlAnchor link)
-        {
-            if(HtmlAnchors == null)
-                HtmlAnchors = new List<HtmlAnchor>();
-
-            HtmlAnchors.Add(link);
-        }
-
+       
         protected override void Render(System.Web.UI.HtmlTextWriter writer)
         {
             writer.Write("</div>");

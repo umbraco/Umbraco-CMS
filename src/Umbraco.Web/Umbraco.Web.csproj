@@ -317,7 +317,6 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
-    <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
     <Compile Include="Cache\ICacheRefresher.cs" />
     <Compile Include="DefaultHttpContextAccessor.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
@@ -394,6 +393,7 @@
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
+    <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
     <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />
@@ -951,7 +951,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\UmbLoginController.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
@@ -1150,7 +1149,6 @@
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
-    <Compile Include="WebApi\WebApiHelper.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
@@ -1282,7 +1280,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\ReadOnlyRelation.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs">
       <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1659,7 +1656,6 @@
     </Compile>
     <Compile Include="WebServices\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
-    <Compile Include="_Legacy\Utils\EncodedStringWriter.cs" />
     <Compile Include="_Legacy\Utils\JSONSerializer.cs" />
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>

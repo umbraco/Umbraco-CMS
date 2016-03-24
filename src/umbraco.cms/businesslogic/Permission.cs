@@ -135,32 +135,7 @@ namespace umbraco.BusinessLogic
     {
         private int? _userId;
         private readonly int[] _nodeIds;
-
-        internal UserPermission(int userId)
-        {
-            _userId = userId;
-        }
-
-        internal UserPermission(int userId, IEnumerable<int> nodeIds)
-        {
-            _userId = userId;
-            _nodeIds = nodeIds.ToArray();
-        }
-
-        internal UserPermission(IUser user, CMSNode node, char[] permissionKeys)
-        {
-            User = user;
-            Nodes = new[] { node };
-            PermissionKeys = permissionKeys;
-        }
-
-        internal UserPermission(IUser user, IEnumerable<CMSNode> nodes, char[] permissionKeys)
-        {
-            User = user;
-            Nodes = nodes;
-            PermissionKeys = permissionKeys;
-        }
-
+        
         internal int UserId
         {
             get

@@ -16,17 +16,7 @@ namespace Umbraco.Core
 		
 		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
 		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-        
-        /// <summary>
-        /// Checks if the method is actually overriding a base method
-        /// </summary>
-        /// <param name="m"></param>
-        /// <returns></returns>
-        public static bool IsOverride(MethodInfo m)
-        {
-            return m.GetBaseDefinition().DeclaringType != m.DeclaringType;
-        }
-
+       
         /// <summary>
         /// Find all assembly references that are referencing the assignTypeFrom Type's assembly found in the assemblyList
         /// </summary>
@@ -167,24 +157,7 @@ namespace Umbraco.Core
             if (implementation == null) throw new ArgumentNullException("implementation");
             return IsTypeAssignableFrom<TContract>(implementation.GetType());
         }
-
-		/// <summary>
-		/// A method to determine whether <paramref name="implementation"/> represents a value type.
-		/// </summary>
-		/// <param name="implementation">The implementation.</param>
-		public static bool IsValueType(Type implementation)
-		{
-		    return implementation.IsValueType || implementation.IsPrimitive;
-		}
-
-		/// <summary>
-		/// A method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
-		/// </summary>
-		/// <param name="implementation">The implementation.</param>
-		public static bool IsImplicitValueType(Type implementation)
-		{
-		    return IsValueType(implementation) || implementation.IsEnum || implementation == typeof (string);
-		}
+	
 
 		/// <summary>
 		/// Returns (and caches) a PropertyInfo from a type
@@ -210,21 +183,6 @@ namespace Umbraco.Core
 						return x.Name.InvariantEquals(name);
 					});
 		}        
-
-		/// <summary>
-		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
-		/// </summary>
-		/// <param name="type">The source.</param>
-		/// <returns></returns>
-		public static FieldInfo[] CachedDiscoverableFields(Type type)
-		{
-			return GetFieldsCache.GetOrAdd(
-				type,
-				x => type
-				     	.GetFields(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => !y.IsInitOnly)
-				     	.ToArray());
-		}
 
 		/// <summary>
 		/// Gets (and caches) <see cref="PropertyInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.

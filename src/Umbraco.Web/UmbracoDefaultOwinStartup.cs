@@ -59,7 +59,7 @@ namespace Umbraco.Web
             app
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.PostAuthenticate);
+                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize);
         }
 
         protected virtual ApplicationContext ApplicationContext

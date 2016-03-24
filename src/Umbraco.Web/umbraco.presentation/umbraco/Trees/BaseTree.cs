@@ -520,14 +520,6 @@ namespace umbraco.cms.presentation.Trees
         }
 
         /// <summary>
-        /// Returns true if there are subscribers to either BeforeTreeRender or AfterTreeRender
-        /// </summary>
-        internal bool HasEntityBasedEventSubscribers
-        {
-            get { return BeforeTreeRender != null || AfterTreeRender != null; }
-        }
-
-        /// <summary>
         /// Event that is raised once actions are assigned to nodes
         /// </summary>
         public static event EventHandler<NodeActionsEventArgs> NodeActionsCreated;
