@@ -175,6 +175,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Sets the specific notifications for the user and entity
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="entity"></param>
+        /// <param name="actions"></param>
+        /// <remarks>
+        /// This performs a full replace
+        /// </remarks>
+        public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
+            return repository.SetNotifications(user, entity, actions);
+        }
+
+        /// <summary>
         /// Creates a new notification
         /// </summary>
         /// <param name="user"></param>

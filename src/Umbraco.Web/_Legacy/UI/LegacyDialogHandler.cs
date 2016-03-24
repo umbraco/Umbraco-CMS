@@ -128,30 +128,6 @@ namespace Umbraco.Web._Legacy.UI
             return true;
         }
 
-        /// <summary>
-        /// Checks if the user has access to launch the ITask that matches the node type based on the app assigned
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="umbracoUser"></param>
-        /// <param name="nodeType"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If the ITask doesn't implement LegacyDialogTask then we will return 'true' since we cannot validate
-        /// the application assigned.
-        /// 
-        /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
-        /// </remarks>
-        internal static bool UserHasDeleteAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
-        {
-            var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
-            var dialogTask = task as LegacyDialogTask;
-            if (dialogTask != null)
-            {
-                return dialogTask.ValidateUserForApplication();
-            }
-            return true;
-        }
-
         public static void Delete(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);

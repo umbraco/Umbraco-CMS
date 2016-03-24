@@ -971,10 +971,6 @@ namespace Umbraco.Core.Xml.XPath
             ParameterNavigator
         };
 
-        // gets the state
-        // for unit tests only
-        internal State InternalState { get { return _state; } }
-
         // represents the XPathNavigator state
         internal class State
         {

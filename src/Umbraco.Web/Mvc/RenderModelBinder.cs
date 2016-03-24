@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -35,7 +37,7 @@ namespace Umbraco.Web.Mvc
             {
                 model = base.BindModel(controllerContext, bindingContext);
                 if (model == null) return null;
-            }           
+            }
 
             //if for any reason the model is not either IRenderModel or IPublishedContent, then we return since those are the only
             // types this binder is dealing with.
@@ -140,17 +142,31 @@ namespace Umbraco.Web.Mvc
 	        msg.Append(sourceType.FullName);
 	        msg.Append(" to model");
 	        if (modelContent) msg.Append(" content");
-	        msg.Append(" type");
+	        msg.Append(" type ");
+            msg.Append(modelType.FullName);
+            msg.Append(".");
 
-	        if (sourceType.FullName == modelType.FullName)
+            // compare FullName for the time being because when upgrading ModelsBuilder,
+            // Umbraco does not know about the new attribute type - later on, can compare
+            // on type directly (ie after v7.4.2).
+	        var sourceAttr = sourceType.Assembly.CustomAttributes.FirstOrDefault(x =>
+                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
+	        var modelAttr = modelType.Assembly.CustomAttributes.FirstOrDefault(x =>
+                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
+
+            // bah.. names are App_Web_all.generated.cs.8f9494c4.jjuvxz55 so they ARE different, fuck!
+            // we cannot compare purely on type.FullName 'cos we might be trying to map Sub to Main = fails!
+            if (sourceAttr != null && modelAttr != null
+                && sourceType.Assembly.GetName().Version.Revision != modelType.Assembly.GetName().Version.Revision)
 	        {
-	            msg.Append(". Same type name but different assemblies.");
-	        }
-	        else
-	        {
-	            msg.Append(" ");
-                msg.Append(modelType.FullName);
-                msg.Append(".");
+	            msg.Append(" Types come from two PureLive assemblies with different versions,");
+                msg.Append(" this usually indicates that the application is in an unstable state.");
+                msg.Append(" The application is restarting now, reload the page and it should work.");
+                var context = HttpContext.Current;
+                if (context == null)
+                    AppDomain.Unload(AppDomain.CurrentDomain);
+                else
+                    ApplicationContext.Current.RestartApplicationPool(new HttpContextWrapper(context));
             }
 
 	        throw new ModelBindingException(msg.ToString());
@@ -158,9 +174,15 @@ namespace Umbraco.Web.Mvc
 
         public IModelBinder GetBinder(Type modelType)
         {
-            return TypeHelper.IsTypeAssignableFrom<IRenderModel>(modelType) || TypeHelper.IsTypeAssignableFrom<IPublishedContent>(modelType)
-                ? this
-                : null;            
+            // can bind to RenderModel (exact type match)
+            if (modelType == typeof(RenderModel)) return this;
+
+            // can bind to RenderModel<TContent> (exact generic type match)
+            if (modelType.IsGenericType && modelType.GetGenericTypeDefinition() == typeof(RenderModel<>)) return this;
+
+            // can bind to TContent where TContent : IPublishedContent (any IPublishedContent implementation)
+            if (typeof(IPublishedContent).IsAssignableFrom(modelType)) return this;
+            return null;
         }
     }
 }

@@ -274,15 +274,7 @@ namespace umbraco.cms.presentation.user
             lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
-        protected override void OnPreRender(EventArgs e)
-        {
-            base.OnPreRender(e);
-
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/CMSNode.asmx"));
-            //      ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-        }
-
+     
         /// <summary>
         /// This handles changing the password
         /// </summary>

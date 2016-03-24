@@ -41,15 +41,14 @@ namespace umbraco.cms.presentation.user
             if (!int.TryParse(Request.QueryString["id"], out m_userTypeID))
                 return;
 
-			if (!IsPostBack)
-			{
-				BindActions();
+            if (!IsPostBack)
+            {
+                BindActions();
 
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<UserTypes>().Tree.Alias)
-					.SyncTree(m_userTypeID.ToString(), false);
-			}
-
+                ClientTools
+                    .SetActiveTreeType(Constants.Trees.UserTypes)
+                    .SyncTree(m_userTypeID.ToString(), false);
+            }
         }
 
         void save_Click(object sender, EventArgs e)

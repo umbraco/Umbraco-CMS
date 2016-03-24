@@ -13,5 +13,6 @@ namespace Umbraco.Core.Persistence.Repositories
         int DeleteNotifications(IUser user, IEntity entity);
         IEnumerable<Notification> GetEntityNotifications(IEntity entity);
         IEnumerable<Notification> GetUserNotifications(IUser user);
+        IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions);
     }
 }

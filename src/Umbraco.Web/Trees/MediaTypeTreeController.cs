@@ -16,7 +16,7 @@ using Umbraco.Web._Legacy.Actions;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:8)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MediaTypeTreeController : TreeController

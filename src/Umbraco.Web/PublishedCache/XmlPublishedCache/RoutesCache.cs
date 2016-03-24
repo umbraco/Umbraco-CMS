@@ -39,15 +39,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="args"></param>
         private void ResolutionFrozen(object s, EventArgs args)
         {
-            // content - whenever the entire XML cache is rebuilt (from disk cache or from database)
-            //  we must clear the cache entirely
-            global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
 
             // document - whenever a document is updated in, or removed from, the XML cache
             //  we must clear the cache - at the moment, we clear the entire cache
             global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
             global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
-
+            
             // fixme - should refactor once content events are refactored
             // the content class needs to be refactored - at the moment 
             // content.XmlContentInternal setter does not trigger any event

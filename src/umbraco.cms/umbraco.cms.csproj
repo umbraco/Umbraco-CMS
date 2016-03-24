@@ -119,8 +119,8 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System">
@@ -164,8 +164,6 @@
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\LegacySqlHelper.cs" />
-    <Compile Include="businesslogic\macro\IMacroEngine.cs" />
-    <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
     <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
@@ -178,11 +176,7 @@
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\CMSModuleI.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\CMSNode.cs">
@@ -197,7 +191,6 @@
     <Compile Include="businesslogic\Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\events\EventArgs.cs" />
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -247,7 +240,6 @@
     <Compile Include="businesslogic\propertytype\propertytype.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\RecycleBin.cs" />
     <Compile Include="businesslogic\relation\Relation.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -272,9 +264,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\web\StylesheetProperty.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\workflow\Notification.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

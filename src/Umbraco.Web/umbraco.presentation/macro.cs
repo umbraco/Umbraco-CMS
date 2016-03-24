@@ -1236,9 +1236,8 @@ namespace umbraco
 		internal PartialViewMacroResult LoadPartialViewMacro(MacroModel macro)
         {
 			var retVal = new PartialViewMacroResult();
-			IMacroEngine engine = null;
+			var engine = new PartialViewMacroEngine();
 			
-			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
             var ret = engine.Execute(macro, UmbracoContext.Current.PublishedContentRequest.PublishedContent);
             
 			retVal.Result = ret;

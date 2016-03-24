@@ -7,15 +7,12 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
 using System.Linq;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
 using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
-using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace Umbraco.Web.Cache
 {
@@ -79,10 +76,6 @@ namespace Umbraco.Web.Cache
 
             //Bind to permission events
 
-            //TODO: Wrap legacy permissions so we can get rid of this
-            Permission.New += PermissionNew;
-            Permission.Updated += PermissionUpdated;
-            Permission.Deleted += PermissionDeleted;
             PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
 
             //Bind to template events
@@ -511,22 +504,7 @@ namespace Umbraco.Web.Cache
             var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
             userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
         }
-
-        static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
-        static void PermissionUpdated(UserPermission sender, SaveEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
-        static void PermissionNew(UserPermission sender, NewEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
+        
         static void UserServiceSavedUser(IUserService sender, SaveEventArgs<IUser> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserCache(x.Id));

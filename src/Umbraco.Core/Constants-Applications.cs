@@ -107,6 +107,11 @@
 
             public const string Languages = "languages";
 
+            /// <summary>
+            /// alias for the user types tree.
+            /// </summary>
+            public const string UserTypes = "userTypes";
+
             //TODO: Fill in the rest!
         }
 	}

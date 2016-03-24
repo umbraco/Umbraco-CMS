@@ -5,11 +5,11 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function updateLoginId() {
-            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
+            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl("content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 	    if (treePicker != undefined) {
 	        document.getElementById("loginId").value = treePicker;
 	        if (treePicker > 0) {
-	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateLoginTitle);
+	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=Security.CurrentUser.Id%>', treePicker, updateLoginTitle);
 					} else
 					    document.getElementById("loginTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }
@@ -20,11 +20,11 @@
             }
 
             function updateErrorId() {
-                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
+                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl("content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 			    if (treePicker != undefined) {
 			        document.getElementById("errorId").value = treePicker;
 			        if (treePicker > 0) {
-			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateErrorTitle);
+			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=Security.CurrentUser.Id%>', treePicker, updateErrorTitle);
 					} else
 					    document.getElementById("errorTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }

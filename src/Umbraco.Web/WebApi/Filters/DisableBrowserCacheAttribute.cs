@@ -13,6 +13,9 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
 {
+    /// <summary>
+    /// Ensures that the request is not cached by the browser
+    /// </summary>
     public class DisableBrowserCacheAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
@@ -21,23 +24,16 @@ namespace Umbraco.Web.WebApi.Filters
 
             base.OnActionExecuted(actionExecutedContext);
 
-            //TODO: This should all work without issue! BUT it doesn't, i have a feeling this might be fixed
-            // in the next webapi version. ASP.Net is overwriting the cachecontrol all the time, some docs are here:
-            // http://stackoverflow.com/questions/11547618/output-caching-for-an-apicontroller-mvc4-web-api
-            // and I've checked the source code so doing this should cause it to write the headers we want but it doesnt.
-            //So I've reverted to brute force on the HttpContext.
-            //actionExecutedContext.Response.Headers.CacheControl = new CacheControlHeaderValue()
-            //{
-            //    NoCache = true,
-            //    NoStore = true,
-            //    MaxAge = new TimeSpan(0),
-            //    MustRevalidate = true
-            //};
-
-            HttpContext.Current.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            HttpContext.Current.Response.Cache.SetMaxAge(TimeSpan.Zero);
-            HttpContext.Current.Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
-            HttpContext.Current.Response.Cache.SetNoStore();
+            //NOTE: Until we upgraded to WebApi 2, this didn't work correctly and we had to revert to using
+            // HttpContext.Current responses. I've changed this back to what it should be now since it works
+            // and now with WebApi2, the HttpContext.Current responses dont! Anyways, all good now.
+            actionExecutedContext.Response.Headers.CacheControl = new CacheControlHeaderValue()
+            {
+                NoCache = true,
+                NoStore = true,
+                MaxAge = new TimeSpan(0),
+                MustRevalidate = true
+            };
 
             actionExecutedContext.Response.Headers.Pragma.Add(new NameValueHeaderValue("no-cache"));
             if (actionExecutedContext.Response.Content != null)

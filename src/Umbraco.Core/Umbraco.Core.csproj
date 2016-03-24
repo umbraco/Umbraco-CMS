@@ -37,8 +37,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -48,8 +48,8 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="LightInject, Version=4.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LightInject.4.0.3\lib\net46\LightInject.dll</HintPath>
+    <Reference Include="LightInject, Version=4.0.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.4.0.8\lib\net46\LightInject.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -88,8 +88,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
@@ -174,9 +174,9 @@
     <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
+    <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
@@ -225,7 +225,6 @@
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\CustomBooleanTypeConverter.cs" />
     <Compile Include="Configuration\UmbracoSettings\DeveloperElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
@@ -253,8 +252,6 @@
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LinkElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LinksCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\LogTypeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
@@ -281,13 +278,13 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
-    <Compile Include="ControlExtensions.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\CoreModelMappersCompositionRoot.cs" />
     <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />
     <Compile Include="DependencyInjection\ServicesCompositionRoot.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -362,7 +359,6 @@
     <Compile Include="Models\IMigrationEntry.cs" />
     <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
-    <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
@@ -542,7 +538,6 @@
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\ImageHelper.cs" />
     <Compile Include="Media\MediaSubfolderCounter.cs" />
-    <Compile Include="ModelMapperHelper.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
@@ -593,7 +588,6 @@
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />
     <Compile Include="Packaging\Models\PackageAction.cs" />
-    <Compile Include="Packaging\PackageBuilding.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
@@ -671,7 +665,6 @@
     <Compile Include="Models\ILanguage.cs" />
     <Compile Include="Models\IMacro.cs" />
     <Compile Include="Models\IMacroProperty.cs" />
-    <Compile Include="Models\IMacroPropertyType.cs" />
     <Compile Include="Models\ITag.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtended.cs" />
@@ -679,13 +672,11 @@
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\MacroProperty.cs" />
     <Compile Include="Models\MacroPropertyCollection.cs" />
-    <Compile Include="Models\MacroPropertyTypeBaseTypes.cs" />
     <Compile Include="Models\MacroTypes.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWrapped.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyType.cs" />
-    <Compile Include="Models\Mapping\IMapperConfiguration.cs" />
-    <Compile Include="Models\Mapping\MapperConfiguration.cs" />
+    <Compile Include="Models\Mapping\ModelMapperConfiguration.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
@@ -710,7 +701,6 @@
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\User.cs" />
-    <Compile Include="Models\Membership\UserGroup.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PublishedItemType.cs" />
@@ -743,7 +733,6 @@
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
-    <Compile Include="Persistence\Factories\UserSectionFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -1094,7 +1083,6 @@
     <Compile Include="Dynamics\DynamicQueryableGetMemberBinder.cs" />
     <Compile Include="Dynamics\DynamicXml.cs" />
     <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
-    <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\PropertyResultType.cs" />
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -1185,7 +1173,6 @@
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
-    <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
@@ -1356,7 +1343,6 @@
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
-    <Compile Include="IO\FileSystemProviderConstants.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />

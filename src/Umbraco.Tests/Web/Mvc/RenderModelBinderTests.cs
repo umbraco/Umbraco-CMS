@@ -20,17 +20,21 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var binder = new RenderModelBinder();
             var found = binder.GetBinder(typeof (IPublishedContent));
-            Assert.IsNotNull(found);
-            found = binder.GetBinder(typeof(IRenderModel));
-            Assert.IsNotNull(found);
+            Assert.IsNotNull(found);            
             found = binder.GetBinder(typeof(RenderModel));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(DynamicPublishedContent));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(MyContent));
             Assert.IsNotNull(found);
+            found = binder.GetBinder(typeof(RenderModel<MyContent>));
+            Assert.IsNotNull(found);
 
             found = binder.GetBinder(typeof(MyOtherContent));
+            Assert.IsNull(found);
+            found = binder.GetBinder(typeof(MyCustomRenderModel));
+            Assert.IsNull(found);            
+            found = binder.GetBinder(typeof(IRenderModel));
             Assert.IsNull(found);
         }
 
@@ -142,6 +146,16 @@ namespace Umbraco.Tests.Web.Mvc
             Assert.AreEqual(content, result);
         }
 
+        public class MyCustomRenderModel : RenderModel
+        {           
+            public MyCustomRenderModel(IPublishedContent content, CultureInfo culture) : base(content, culture)
+            {
+            }            
+            public MyCustomRenderModel(IPublishedContent content) : base(content)
+            {
+            }
+        }
+        
         public class MyOtherContent
         {
             

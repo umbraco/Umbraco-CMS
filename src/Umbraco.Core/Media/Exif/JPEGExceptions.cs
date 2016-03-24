@@ -2,24 +2,6 @@
 
 namespace Umbraco.Core.Media.Exif
 {
-    /// <summary>
-    /// The exception that is thrown when the format of the image file
-    /// could not be understood.
-    /// </summary>
-    internal class UnknownImageFormatException : Exception
-    {
-        public UnknownImageFormatException()
-            : base("Unkown image format.")
-        {
-            ;
-        }
-
-        public UnknownImageFormatException(string message)
-            : base(message)
-        {
-            ;
-        }
-    }
 
     /// <summary>
     /// The exception that is thrown when the format of the image file
