@@ -115,7 +115,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                     //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
                     //use the legacy format
-                    .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
+                    .ConvertLegacyFileSystemMenuItem("", TreeAlias, queryStrings.GetValue<string>("application"));
 
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(
