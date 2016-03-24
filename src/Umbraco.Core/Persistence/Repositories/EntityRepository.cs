@@ -87,8 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
                 return _work.Database
                     .Fetch<dynamic>(sql)
-                    .Select(new UmbracoEntityRelator().Map)
-                    .WhereNotNull()
+                    .Transform(new UmbracoEntityRelator().MapAll)
                     .FirstOrDefault();
             }
             else
@@ -132,8 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
                 return _work.Database
                     .Fetch<dynamic>(sql)
-                    .Select(new UmbracoEntityRelator().Map)
-                    .WhereNotNull()
+                    .Transform(new UmbracoEntityRelator().MapAll)
                     .FirstOrDefault();
             }
             else
@@ -189,8 +187,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
                 return _work.Database
                     .Fetch<dynamic>(sql)
-                    .Select(new UmbracoEntityRelator().Map)
-                    .WhereNotNull();
+                    .Transform(new UmbracoEntityRelator().MapAll);
             }
             else
             {
@@ -244,8 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
                 return _work.Database
                     .Fetch<dynamic>(mediaSql)
-                    .Select(new UmbracoEntityRelator().Map)
-                    .WhereNotNull();
+                    .Transform(new UmbracoEntityRelator().MapAll);
             }
             else
             {
@@ -541,6 +537,21 @@ namespace Umbraco.Core.Persistence.Repositories
             internal UmbracoEntity Current;
             private readonly UmbracoEntityFactory _factory = new UmbracoEntityFactory();
 
+            public IEnumerable<IUmbracoEntity> MapAll(IEnumerable<dynamic> input)
+            {
+                UmbracoEntity entity;
+
+                foreach (var x in input)
+                {
+                    entity = Map(x);
+                    if (entity != null) yield return entity;
+                }
+
+                entity = Map((dynamic) null);
+                if (entity != null) yield return entity;
+            }
+
+            // must be called one last time with null in order to return the last one!
             public UmbracoEntity Map(dynamic a)
             {
                 // Terminating call.  Since we can return null from this function

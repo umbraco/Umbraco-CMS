@@ -343,7 +343,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = repository.Query.Where(x => x.ParentId == parentId);
-                var contents = repository.GetByQuery(query, objectTypeId);
+                var contents = repository.GetByQuery(query, objectTypeId).ToList(); // run within using!
 
                 return contents;
             }
