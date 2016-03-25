@@ -327,6 +327,7 @@
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
+    <Compile Include="Trees\UsersTreeController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -1554,7 +1555,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />

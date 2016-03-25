@@ -852,6 +852,7 @@
     <key alias="templates">Sidmallar</key>
     <key alias="xslt">XSLT-filer</key>
     <key alias="userTypes">Användartyper</key>
+    <key alias="users">Användare</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny uppdatering tillgänglig</key>
