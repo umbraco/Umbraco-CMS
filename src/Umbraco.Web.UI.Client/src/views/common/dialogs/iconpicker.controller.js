@@ -7,13 +7,14 @@ angular.module("umbraco")
             	$scope.icons = icons;
             });
 
-			$scope.submitClass = function(icon){
-				if($scope.color)
-				{
+            $scope.submitClass = function (icon) {
+				if($scope.color) {
 					$scope.submit(icon + " " + $scope.color);
-				}else{
-					$scope.submit(icon);	
+				}
+                else {
+					$scope.submit(icon);
 				}
 			};
+
 		}
 	);
