@@ -28,6 +28,11 @@ namespace Umbraco.Web.Trees
             get { return "developer/xslt/editXslt.aspx?file={0}"; }
         }
 
+        protected override bool EnableCreateOnFolder
+        {
+            get { return false; }
+        }
+
         protected override void OnRenderFileNode(TreeNode treeNode, FileInfo file)
         {
             treeNode.Icon = "icon-code";

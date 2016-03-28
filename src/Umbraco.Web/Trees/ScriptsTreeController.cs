@@ -27,6 +27,11 @@ namespace Umbraco.Web.Trees
             get { return "settings/scripts/editScript.aspx?file={0}"; }
         }
 
+        protected override bool EnableCreateOnFolder
+        {
+            get { return true; }
+        }
+
         protected override void OnRenderFolderNode(TreeNode treeNode)
         {
         }

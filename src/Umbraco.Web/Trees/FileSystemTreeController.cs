@@ -21,6 +21,7 @@ namespace Umbraco.Web.Trees
         protected abstract string FilePath { get; }
         protected abstract IEnumerable<string> FileSearchPattern { get; }
         protected abstract string EditFormUrl { get; }
+        protected abstract bool EnableCreateOnFolder { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
@@ -58,6 +59,11 @@ namespace Umbraco.Web.Trees
             if (!Directory.Exists(path) && !System.IO.File.Exists(path))
             {
                 return nodes;
+            }
+
+            if (System.IO.File.Exists(path))
+            {
+                return GetTreeNodesForFile(path, id, queryStrings);
             }
 
             DirectoryInfo dirInfo = new DirectoryInfo(path);
@@ -104,10 +110,18 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
+        protected virtual TreeNodeCollection GetTreeNodesForFile(string path, string id, FormDataCollection queryStrings)
+        {
+            return new TreeNodeCollection();
+        }
+        
+
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
 
             var menu = new MenuItemCollection();
+            
+            OnBeforeRenderMenu(menu, id, queryStrings);
 
             if (id == Constants.System.Root.ToInvariantString())
             {
@@ -115,7 +129,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                     //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
                     //use the legacy format
-                    .ConvertLegacyFileSystemMenuItem("", TreeAlias, queryStrings.GetValue<string>("application"));
+                    .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
 
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(
@@ -127,11 +141,15 @@ namespace Umbraco.Web.Trees
             
             if (Directory.Exists(IOHelper.MapPath(FilePath + "/" + id)))
             {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
-                    //use the legacy format
-                    .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
+                if (EnableCreateOnFolder)
+                {
+                    //Create the normal create action
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
+                        //Since we haven't implemented anything for file systems in angular, this needs to be converted to 
+                        //use the legacy format
+                        .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder",
+                            queryStrings.GetValue<string>("application"));
+                }
 
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(
@@ -144,7 +162,18 @@ namespace Umbraco.Web.Trees
                 .ConvertLegacyFileSystemMenuItem(
                     id, TreeAlias, queryStrings.GetValue<string>("application"));
 
+            OnAfterRenderMenu(menu, id, queryStrings);
+
             return menu;
+        }
+
+        protected virtual void OnBeforeRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
+        {
+        }
+
+        protected virtual void OnAfterRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
+        {
+            
         }
     }
 }

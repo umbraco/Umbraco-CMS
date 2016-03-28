@@ -327,6 +327,7 @@
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
+    <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
@@ -1551,8 +1552,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
@@ -1758,7 +1757,9 @@
     <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
+    <Content Include="umbraco.presentation\umbraco\translation\default.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />

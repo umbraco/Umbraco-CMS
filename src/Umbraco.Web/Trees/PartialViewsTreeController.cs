@@ -36,6 +36,11 @@ namespace Umbraco.Web.Trees
             get { return "Settings/Views/EditView.aspx?treeType=partialViews&file={0}"; }
         }
 
+        protected override bool EnableCreateOnFolder
+        {
+            get { return true; }
+        }
+
         protected override void OnRenderFileNode(TreeNode treeNode, FileInfo file)
         {
             treeNode.Icon = "icon-article";
