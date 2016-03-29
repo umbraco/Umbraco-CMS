@@ -184,16 +184,17 @@ namespace Umbraco.Web.Editors
 			int pageSize = 0,
 			string orderBy = "SortOrder",
 			Direction orderDirection = Direction.Ascending,
-			bool orderBySystemField = true,
+			int? orderBySystemField = 2,
 			string filter = "")
 	{
+	 var orderBySystemFieldBool = orderBySystemField == 1 || orderBySystemField == 2;
 	 long totalChildren;
 	 IContent[] children;
 	 if (pageNumber > 0 && pageSize > 0)
 	 {
 		children = Services.ContentService
 		 .GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren
-		 , orderBy, orderDirection, orderBySystemField, filter).ToArray();
+		 , orderBy, orderDirection, orderBySystemFieldBool, filter).ToArray();
 	 }
 	 else
 	 {
@@ -219,18 +220,18 @@ namespace Umbraco.Web.Editors
 	 return HasPermission(permissionToCheck, nodeId);
 	}
 
-        /// <summary>
-        /// Returns permissions for all nodes passed in for the current user
-        /// </summary>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-        {
-            return Services.UserService
-                .GetPermissions(Security.CurrentUser, nodeIds)
-                .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
-        }
+	/// <summary>
+	/// Returns permissions for all nodes passed in for the current user
+	/// </summary>
+	/// <param name="nodeIds"></param>
+	/// <returns></returns>
+	[HttpPost]
+	public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+	{
+	 return Services.UserService
+			 .GetPermissions(Security.CurrentUser, nodeIds)
+			 .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
+	}
 
 	[HttpGet]
 	public bool HasPermission(string permissionToCheck, int nodeId)
