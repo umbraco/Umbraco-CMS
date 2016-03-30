@@ -41,7 +41,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
+            
             _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
             if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
@@ -70,9 +70,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             prStyles.Attributes["style"] = _stylesheetproperty.Value;
 
-            var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Path
-                        //needs a double escape to work with JS
-                        .Replace("\\", "\\\\").TrimEnd(".css"), _stylesheetproperty.Name);
+            var path = _sheet.Path.Replace('\\', '/');
+            var nodePath = string.Format(BaseTree.GetTreePathFromFilePath(path) +
+                        ",{0}_{1}", path, _stylesheetproperty.Name);
 
             ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)

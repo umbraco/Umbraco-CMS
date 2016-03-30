@@ -106,6 +106,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             treeService.clearCache();
                         });
                     },
+                    childNodeCreated: function() {
+                        //no-op, just needs to be here for legacy reasons
+                    },
                     reloadActionNode: function () {
                         angularHelper.safeApply($rootScope, function() {
                             var currentMenuNode = appState.getMenuState("currentNode");
