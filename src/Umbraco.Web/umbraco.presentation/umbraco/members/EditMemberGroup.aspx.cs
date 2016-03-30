@@ -33,7 +33,7 @@ namespace umbraco.presentation.members
             if (!IsPostBack)
 			{
                 ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias)
+                    .SetActiveTreeType(Constants.Trees.MemberGroups)
                     .SyncTree(_memberGroupId, false);
 			}
 
@@ -62,7 +62,7 @@ namespace umbraco.presentation.members
             this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editMemberGroupSaved"),"");
 
             ClientTools
-                .RefreshTree(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias);
+                .RefreshTree(Constants.Trees.MemberGroups);
             
 		}
 

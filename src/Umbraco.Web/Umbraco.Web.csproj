@@ -328,6 +328,8 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
+    <Compile Include="Trees\MemberGroupTreeController.cs" />
+    <Compile Include="Trees\MemberTypeAndGroupTreeControllerBase.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
@@ -1530,7 +1532,6 @@
       <DependentUpon>xml.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
