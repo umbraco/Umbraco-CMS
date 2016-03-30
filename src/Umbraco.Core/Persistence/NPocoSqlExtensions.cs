@@ -37,12 +37,12 @@ namespace Umbraco.Core.Persistence
             return sql.Where(fieldExpression + " IN (@values)", new {@values = values});
         }
 
-        public static Sql OrderBy<TColumn>(this Sql sql, ISqlSyntaxProvider sqlSyntax, Expression<Func<TColumn, object>> columnMember)
+        public static Sql OrderBy<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
 
-            var type = typeof(TColumn);
+            var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
@@ -54,12 +54,12 @@ namespace Umbraco.Core.Persistence
             return sql.OrderBy(syntax);
         }
 
-        public static Sql OrderByDescending<TColumn>(this Sql sql, ISqlSyntaxProvider sqlSyntax, Expression<Func<TColumn, object>> columnMember)
+        public static Sql OrderByDescending<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
 
-            var type = typeof(TColumn);
+            var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence
             return sql.OrderBy(syntax);
         }
 
-        public static Sql GroupBy<TColumn>(this Sql sql, ISqlSyntaxProvider sqlProvider, Expression<Func<TColumn, object>> columnMember)
+        public static Sql GroupBy<T>(this Sql sql, ISqlSyntaxProvider sqlProvider, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
