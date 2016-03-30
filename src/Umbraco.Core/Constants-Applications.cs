@@ -114,7 +114,13 @@
             /// </summary>
             public const string UserTypes = "userTypes";
 
-            //TODO: Fill in the rest!
+            public const string Scripts = "scripts";
+
+            public const string PartialViews = "partialViews";
+
+            public const string PartialViewMacros = "partialViewMacros";
+
+            //TODO: Fill in the rest! 
         }
 	}
 
