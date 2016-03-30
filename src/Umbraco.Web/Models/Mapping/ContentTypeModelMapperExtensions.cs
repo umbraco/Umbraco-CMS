@@ -75,6 +75,33 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
+        public static void AfterMapMediaTypeSaveToEntity<TSource, TDestination>(
+            TSource source, TDestination dest,
+            ApplicationContext applicationContext)
+            where TSource : MediaTypeSave
+            where TDestination : IContentTypeComposition
+        {
+            //sync compositions
+            var current = dest.CompositionAliases().ToArray();
+            var proposed = source.CompositeContentTypes;
+
+            var remove = current.Where(x => proposed.Contains(x) == false);
+            var add = proposed.Where(x => current.Contains(x) == false);
+
+            foreach (var rem in remove)
+            {
+                dest.RemoveContentType(rem);
+            }
+
+            foreach (var a in add)
+            {
+                //TODO: Remove N+1 lookup
+                var addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
+                if (addCt != null)
+                    dest.AddContentType(addCt);
+            }
+        }
+
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TPropertyTypeSource, TDestination, TPropertyTypeDestination>(
             this IMappingExpression<TSource, TDestination> mapping)
             where TSource : ContentTypeSave<TPropertyTypeSource>

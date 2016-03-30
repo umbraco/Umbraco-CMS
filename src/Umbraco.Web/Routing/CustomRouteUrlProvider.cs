@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
             if (umbracoContext.HttpContext.Request.RequestContext == null) return null;
             if (umbracoContext.HttpContext.Request.RequestContext.RouteData == null) return null;
             if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens == null) return null;
-            if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens.ContainsKey("umbraco-custom-route") == false) return null;
+            if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens.ContainsKey(Umbraco.Core.Constants.Web.CustomRouteDataToken) == false) return null;
             //ok so it's a custom route with published content assigned, check if the id being requested for is the same id as the assigned published content
             return id == umbracoContext.PublishedContentRequest.PublishedContent.Id 
                 ? umbracoContext.PublishedContentRequest.PublishedContent.Url 

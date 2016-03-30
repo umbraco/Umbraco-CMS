@@ -37,7 +37,10 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(RuntimeCache));
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), 
+                    //allow this cache to expire
+                    expires:true));
             }
         }
 
@@ -51,27 +54,29 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+                //NOTE: This logic should never be executed according to our cache policy
+                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository)
+                    .Where(x => ids.Contains(x.Id));
             }
-            else
-            {
-                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
-            }
+
+            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository);
         }
 
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
-            var sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.Text, SqlSyntax);
+            var sql = translator.Translate();                
 
             var dtos = Database.Fetch<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql);
-            return dtos.Any()
-                ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
-                : Enumerable.Empty<IContentType>();
+
+            return
+                //This returns a lookup from the GetAll cached looup
+                (dtos.Any()
+                    ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
+                    : Enumerable.Empty<IContentType>())
+                    //order the result by name
+                    .OrderBy(x => x.Name);
         }
         
         /// <summary>
@@ -182,6 +187,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 PersistDeletedItem((IEntity)child);
             }
 
+            //Before we call the base class methods to run all delete clauses, we need to first 
+            // delete all of the property data associated with this document type. Normally this will
+            // be done in the ContentTypeService by deleting all associated content first, but in some cases
+            // like when we switch a document type, there is property data left over that is linked
+            // to the previous document type. So we need to ensure it's removed.
+            var sql = new Sql().Select("DISTINCT cmsPropertyData.propertytypeid")
+                .From<PropertyDataDto>(SqlSyntax)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
+                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+
+            //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
+            Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));
+
             base.PersistDeletedItem(entity);
         }
 
@@ -284,9 +305,6 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 return GetAll();
-                //var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                //var allIds = Database.Fetch<int>(sql).ToArray();
-                //return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
         }
 

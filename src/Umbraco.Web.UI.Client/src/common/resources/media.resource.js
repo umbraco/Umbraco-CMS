@@ -22,6 +22,15 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        getRecycleBin: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaApiBaseUrl",
+                       "GetRecycleBin")),
+               'Failed to retrieve data for media recycle bin');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaResource#sort

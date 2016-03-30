@@ -1,11 +1,14 @@
-﻿/**
+/**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbItemSorter
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
 * @function
 * @element ANY
 * @restrict E
 * @description A re-usable directive for sorting items
 **/
+
 function umbItemSorter(angularHelper) {
     return {
         scope: {

@@ -9,6 +9,12 @@ namespace Umbraco.Core.Security
 {
     public class BackOfficeClaimsIdentityFactory : ClaimsIdentityFactory<BackOfficeIdentityUser, int>
     {
+        public BackOfficeClaimsIdentityFactory()
+        {
+            SecurityStampClaimType = Constants.Security.SessionIdClaimType;
+            UserNameClaimType = ClaimTypes.Name;
+        }
+
         /// <summary>
         /// Create a ClaimsIdentity from a user
         /// </summary>
@@ -20,7 +26,7 @@ namespace Umbraco.Core.Security
 
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
                 //set a new session id
-                new UserData(Guid.NewGuid().ToString("N"))
+                new UserData
                 {
                     Id = user.Id,
                     Username = user.UserName,
@@ -29,7 +35,8 @@ namespace Umbraco.Core.Security
                     Culture = user.Culture,
                     Roles = user.Roles.Select(x => x.RoleId).ToArray(),
                     StartContentNode = user.StartContentId,
-                    StartMediaNode = user.StartMediaId
+                    StartMediaNode = user.StartMediaId,
+                    SessionId = user.SecurityStamp
                 });
 
             return umbracoIdentity;

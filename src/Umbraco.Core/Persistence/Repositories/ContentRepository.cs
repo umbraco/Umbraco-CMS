@@ -156,7 +156,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
                                "DELETE FROM umbracoAccess WHERE nodeId = @Id",
-                                "DELETE FROM umbracoNode WHERE id = @Id"
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -689,8 +689,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public int CountPublished()
         {
             var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
-                .Where<DocumentDto>(x => x.Published == true)
-                .Where<DocumentDto>(x => x.Newest == true);
+                .Where<DocumentDto>(x => x.Published == true);
             return Database.ExecuteScalar<int>(sql);
         }
 

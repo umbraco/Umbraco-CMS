@@ -20,6 +20,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
         
         /// <summary>
         /// The editor view to render for this parameter

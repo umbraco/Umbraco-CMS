@@ -1,35 +1,54 @@
 /**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbContentName 
-* @restrict E
-* @function
-* @description 
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
+@ngdoc directive
+@name umbraco.directives.directive:umbLockedField
+@restrict E
+@scope
+
+@description
+Use this directive to render a value with a lock next to it. When the lock is clicked the value gets unlocked and can be edited.
+
+<h3>Markup example</h3>
+<pre>
+	<div ng-controller="My.Controller as vm">
+
+		<umb-locked-field
+			ng-model="vm.value"
+			placeholder-text="'Click to unlock...'">
+		</umb-locked-field>
+
+	</div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+	(function () {
+		"use strict";
+
+		function Controller() {
+
+			var vm = this;
+			vm.value = "My locked text";
+
+        }
+
+		angular.module("umbraco").controller("My.Controller", Controller);
+
+	})();
+</pre>
+
+@param {string} ngModel (<code>binding</code>): The locked text.
+@param {boolean=} locked (<code>binding</code>): <Code>true</code> by default. Set to <code>false</code> to unlock the text.
+@param {string=} placeholderText (<code>binding</code>): If ngModel is empty this text will be shown.
+@param {string=} regexValidation (<code>binding</code>): Set a regex expression for validation of the field.
+@param {string=} serverValidationField (<code>attribute</code>): Set a server validation field.
 **/
+
 (function() {
 	'use strict';
 
 	function LockedFieldDirective($timeout, localizationService) {
 
 	    function link(scope, el, attr, ngModelCtrl) {
-            
-	        //watch the ngModel so we can manually update the textbox view value when it changes
-	        // this ensures that the normal flow (i.e. a user editing the text box) occurs so that
-            // the parsers, validators and viewchangelisteners execute
-	        scope.$watch("ngModel", function (newValue, oldValue) {
-	            if (newValue !== oldValue) {
-	                //Hack: in order for the pipeline to execute for setViewValue, the underlying $modelValue cannot
-	                // match the value being set with the newValue, so we'll se it to undefined first.
-	                // We could avoid this hack by setting the ngModel of the lockedField input field to a custom
-	                // scope object, but that would mean we'd have to watch that value too in order to set the outer
-                    // ngModelCtrl.$modelValue. It's seems like less overhead to just do this and not have 2x watches.
-	                scope.lockedFieldForm.lockedField.$modelValue = undefined;
-                    scope.lockedFieldForm.lockedField.$setViewValue(newValue);
-                    scope.lockedFieldForm.lockedField.$render();
-                }
-	        });
-	        
-			var input = el.find('.umb-locked-field__input');
 
 			function activate() {
 
@@ -57,35 +76,13 @@
 
 			scope.lock = function() {
 				scope.locked = true;
-				input.unbind("blur");
 			};
 
 			scope.unlock = function() {
 				scope.locked = false;
-				autoFocusField();
 			};
 
-			function autoFocusField() {
-
-				var onBlurHandler = function() {
-					scope.$apply(function(){
-						scope.lock();
-					});
-				};
-
-				$timeout(function() {
-					input.focus();
-					input.select();
-					input.on("blur", onBlurHandler);
-				});
-
-			}
-
 			activate();
-
-			scope.$on('$destroy', function() {
-				input.unbind('blur');
-			});
 
 		}
 

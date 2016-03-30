@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>
-    [PluginController("UmbracoApi")]    
+    [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
     public abstract class ContentTypeControllerBase : UmbracoAuthorizedJsonController
     {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         protected ContentTypeControllerBase()
             : this(UmbracoContext.Current)
-        {            
+        {
         }
 
         /// <summary>
@@ -61,17 +61,17 @@ namespace Umbraco.Web.Editors
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
-        /// <param name="contentTypeId"></param>        
+        /// <param name="contentTypeId"></param>
         /// <returns></returns>
-        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
-            UmbracoObjectTypes type, 
+        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId,
+            UmbracoObjectTypes type,
             string[] filterContentTypes,
             string[] filterPropertyTypes)
         {
             IContentTypeComposition source = null;
 
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
-            
+
             IContentTypeComposition[] allContentTypes;
 
             switch (type)
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Editors
                 })
                 .ToList();
         }
-        
+
 
         protected string TranslateItem(string text)
         {
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Editors
             Action<TContentTypeSave> beforeCreateNew = null)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
-            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
 
             if (ModelState.IsValid == false)
             {
-                throw CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
 
             //filter out empty properties
@@ -187,10 +187,10 @@ namespace Umbraco.Web.Editors
             {
                 group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
             }
-            
+
             if (ctId > 0)
             {
-                //its an update to an existing content type     
+                //its an update to an existing content type
 
                 //This mapping will cause a lot of content type validation to occur which we need to deal with
                 try
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Editors
                 {
                     beforeCreateNew(contentTypeSave);
                 }
-                
+
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
@@ -227,12 +227,12 @@ namespace Umbraco.Web.Editors
                 }
 
                 //save as new
-                
+
                 TContentType newCt = null;
                 try
                 {
                     //This mapping will cause a lot of content type validation to occur which we need to deal with
-                    newCt = Mapper.Map<TContentType>(contentTypeSave);                    
+                    newCt = Mapper.Map<TContentType>(contentTypeSave);
                 }
                 catch (Exception ex)
                 {
@@ -260,9 +260,9 @@ namespace Umbraco.Web.Editors
                 return newCt;
             }
         }
-        
+
         /// <summary>
-        /// Change the sort order for media
+        /// Move
         /// </summary>
         /// <param name="move"></param>
         /// <param name="getContentType"></param>
@@ -293,7 +293,52 @@ namespace Umbraco.Web.Editors
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
                 case MoveOperationStatusType.FailedCancelledByEvent:
-                    //returning an object of INotificationModel will ensure that any pending 
+                    //returning an object of INotificationModel will ensure that any pending
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                case MoveOperationStatusType.FailedNotAllowedByPath:
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    return Request.CreateValidationErrorResponse(notificationModel);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Move
+        /// </summary>
+        /// <param name="move"></param>
+        /// <param name="getContentType"></param>
+        /// <param name="doCopy"></param>
+        /// <returns></returns>
+        protected HttpResponseMessage PerformCopy<TContentType>(
+            MoveOrCopy move,
+            Func<int, TContentType> getContentType,
+            Func<TContentType, int, Attempt<OperationStatus<TContentType, MoveOperationStatusType>>> doCopy)
+            where TContentType : IContentTypeComposition
+        {
+            var toMove = getContentType(move.Id);
+            if (toMove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var result = doCopy(toMove, move.ParentId);
+            if (result.Success)
+            {
+                var copy = result.Result.Entity;
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(copy.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
+
+            switch (result.Result.StatusType)
+            {
+                case MoveOperationStatusType.FailedParentNotFound:
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                case MoveOperationStatusType.FailedCancelledByEvent:
+                    //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
@@ -312,14 +357,14 @@ namespace Umbraco.Web.Editors
         /// <param name="composition"></param>
         /// <returns></returns>
         private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, IContentTypeComposition composition)
-            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
             var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
             if (validateAttempt == false)
             {
-                //if it's not successful then we need to return some model state for the property aliases that 
+                //if it's not successful then we need to return some model state for the property aliases that
                 // are duplicated
                 var invalidPropertyAliases = validateAttempt.Result.Distinct();
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidPropertyAliases);
@@ -340,7 +385,7 @@ namespace Umbraco.Web.Editors
         /// <param name="invalidPropertyAliases"></param>
         /// <returns></returns>
         private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyAliases)
-            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
             foreach (var propertyAlias in invalidPropertyAliases)
@@ -369,8 +414,8 @@ namespace Umbraco.Web.Editors
         private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(
             Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
             where TContentType : class, IContentTypeComposition
-            where TContentTypeDisplay : ContentTypeCompositionDisplay 
-            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
@@ -385,7 +430,7 @@ namespace Umbraco.Web.Editors
             if (invalidCompositionException != null)
             {
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
-                return CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
             return null;
         }
@@ -395,12 +440,14 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <typeparam name="TContentTypeDisplay"></typeparam>
         /// <typeparam name="TContentType"></typeparam>
+        /// <typeparam name="TContentTypeSave"></typeparam>
         /// <param name="ctId"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
-        private HttpResponseException CreateModelStateValidationException<TContentTypeDisplay, TContentType>(int ctId, ContentTypeSave contentTypeSave, TContentType ct)
+        private HttpResponseException CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeSave : ContentTypeSave
         {
             TContentTypeDisplay forDisplay;
             if (ctId > 0)
@@ -429,7 +476,7 @@ namespace Umbraco.Web.Editors
                     (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
             }
         }
-        
+
 
     }
 }

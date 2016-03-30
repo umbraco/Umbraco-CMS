@@ -139,8 +139,11 @@ h5.-black {
 }
 
 /* LABELS*/
-.umb-control-group label.control-label {
-  text-align: left
+.umb-control-group label.control-label, .umb-control-group .control-label {
+  text-align: left;
+}
+.umb-control-group label.control-label > div > label {
+  padding-left: 0;
 }
 .umb-control-group label .help-block,
 .umb-control-group label small {
@@ -150,7 +153,7 @@ h5.-black {
   padding-top: 5px;
 }
 .umb-nolabel .controls {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .controls-row {
@@ -159,11 +162,15 @@ h5.-black {
 }
 
 .umb-user-panel .controls-row {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .controls-row label {
-  display: inline-block
+  display: inline-block;
+}
+
+.controls-row > div > label {
+  padding-left: 0;
 }
 
 .block-form .controls-row {
@@ -171,10 +178,24 @@ h5.-black {
    padding-top: 0;
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel .controls {
-  padding: 0px;
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls {
+  padding: 0;
   border: none;
-  margin: 0px !important;
+  margin: 0 !important;
+}
+
+.controls-row > .vertical-align-items {
+  display: flex;
+  align-items: center;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+  margin-left: 0;
 }
 
 .thumbnails .selected {

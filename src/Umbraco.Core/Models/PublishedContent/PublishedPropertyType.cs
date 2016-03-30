@@ -164,6 +164,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         private void InitializeConverters()
         {
+            //TODO: Look at optimizing this method, it gets run for every property type for the document being rendered at startup,
+            // every precious second counts!
+
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();            
             var defaultConvertersWithAttributes = PropertyValueConvertersResolver.Current.DefaultConverters;
 
@@ -230,13 +233,13 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 _sourceCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Source);
                 _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Object);
-                _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.XPath);
+                _xpathCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.XPath);
             }
             else
             {
                 _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
                 _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
-                _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
+                _xpathCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
             }
             if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
             if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;

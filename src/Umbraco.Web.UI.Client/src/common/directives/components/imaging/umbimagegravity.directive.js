@@ -1,10 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbCropsy
+* @name umbraco.directives.directive:umbImageGravity
 * @restrict E
 * @function
 * @description
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
 	.directive('umbImageGravity', function ($timeout, localizationService, $log) {
@@ -14,7 +13,8 @@ angular.module("umbraco.directives")
 				templateUrl: 'views/components/imaging/umb-image-gravity.html',
 				scope: {
 					src: '=',
-					center: "="
+					center: "=",
+					onImageLoaded: "="
 				},
 				link: function(scope, element, attrs) {
 
@@ -25,6 +25,8 @@ angular.module("umbraco.directives")
 						left: 0,
 						top: 0
 					};
+
+					scope.loaded = false;
 
 					//elements
 					var $viewport = element.find(".viewport");
@@ -42,6 +44,19 @@ angular.module("umbraco.directives")
 						};
 					};
 
+					scope.setFocalPoint = function(event) {
+
+						scope.$emit("imageFocalPointStart");
+
+						var offsetX = event.offsetX - 10;
+						var offsetY = event.offsetY - 10;
+
+						calculateGravity(offsetX, offsetY);
+
+						lazyEndEvent();
+
+					};
+
 					var setDimensions = function(){
 						scope.dimensions.width = $image.width();
 						scope.dimensions.height = $image.height();
@@ -54,9 +69,9 @@ angular.module("umbraco.directives")
 						}
 					};
 
-					var calculateGravity = function(){
-						scope.dimensions.left = $overlay[0].offsetLeft;
-						scope.dimensions.top =  $overlay[0].offsetTop;
+					var calculateGravity = function(offsetX, offsetY){
+						scope.dimensions.left = offsetX;
+						scope.dimensions.top =  offsetY;
 
 						scope.center.left =  (scope.dimensions.left+10) / scope.dimensions.width;
 						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
@@ -80,7 +95,9 @@ angular.module("umbraco.directives")
 						},
 						stop: function() {
 							scope.$apply(function(){
-								calculateGravity();
+								var offsetX = $overlay[0].offsetLeft;
+								var offsetY = $overlay[0].offsetTop;
+								calculateGravity(offsetX, offsetY);
 							});
 
 							lazyEndEvent();
@@ -91,8 +108,26 @@ angular.module("umbraco.directives")
 					$image.load(function(){
 						$timeout(function(){
 							setDimensions();
+							scope.loaded = true;
+							scope.onImageLoaded();
 						});
 					});
+
+					$(window).on('resize.umbImageGravity', function(){
+                        scope.$apply(function(){
+                            $timeout(function(){
+                                setDimensions();
+                            });
+							var offsetX = $overlay[0].offsetLeft;
+							var offsetY = $overlay[0].offsetTop;
+                            calculateGravity(offsetX, offsetY);
+                        });
+                    });
+
+					scope.$on('$destroy', function() {
+						$(window).off('.umbImageGravity');
+					});
+
 				}
 			};
 		});

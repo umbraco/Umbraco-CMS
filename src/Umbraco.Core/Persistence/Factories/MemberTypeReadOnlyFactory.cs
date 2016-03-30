@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Factories
                     Name = typeDto.Name,
                     SortOrder = typeDto.SortOrder,
                     ValidationRegExp = typeDto.ValidationRegExp,
-                    PropertyGroupId = new Lazy<int>(() => default(int)),
+                    PropertyGroupId = null,
                     CreateDate = dto.CreateDate,
                     UpdateDate = dto.CreateDate
                 };

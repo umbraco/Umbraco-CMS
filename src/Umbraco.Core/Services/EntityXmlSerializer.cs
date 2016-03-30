@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http.Formatting;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
@@ -268,11 +267,15 @@ namespace Umbraco.Core.Services
                 structure.Add(new XElement("MediaType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties");
+            var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in mediaType.PropertyTypes)
             {
                 var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
+                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
+                    ? null
+                    : mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
@@ -382,14 +385,14 @@ namespace Umbraco.Core.Services
                 structure.Add(new XElement("DocumentType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties");
+            var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
 
-                var propertyGroup = propertyType.PropertyGroupId == null
-                                                ? null
-                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
+                    ? null
+                    : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),

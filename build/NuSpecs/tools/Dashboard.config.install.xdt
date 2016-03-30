@@ -77,4 +77,8 @@
   <section alias="uGoLiveDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="Remove" />
   
   <section alias="ExamineManagement" xdt:Locator="Match(alias)" xdt:Transform="Remove" />
+    
+  <section alias="StartupDashboardSection">
+	<tab caption="Change Password" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
+  </section>
 </dashBoard>

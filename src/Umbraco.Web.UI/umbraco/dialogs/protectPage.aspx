@@ -5,30 +5,30 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function updateLoginId() {
-            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			
+            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 	    if (treePicker != undefined) {
 	        document.getElementById("loginId").value = treePicker;
 	        if (treePicker > 0) {
 	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateLoginTitle);
-					} else 
+					} else
 					    document.getElementById("loginTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
                 }
             }
-						
+
             function updateLoginTitle(result) {
                 document.getElementById("loginTitle").innerHTML = "<strong>" + result + "</strong> &nbsp;";
             }
 
             function updateErrorId() {
-                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			
+                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 			    if (treePicker != undefined) {
 			        document.getElementById("errorId").value = treePicker;
 			        if (treePicker > 0) {
 			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateErrorTitle);
-					} else 
+					} else
 					    document.getElementById("errorTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
                 }
-            }			
+            }
             function updateErrorTitle(result) {
                 document.getElementById("errorTitle").innerHTML = "<strong>" + result + "</strong> &nbsp;";
             }
@@ -49,7 +49,7 @@
                     document.getElementById("pagesForm").style.display = "none";
                 }
             }
-			
+
             function togglePages() {
                 document.getElementById("pagesForm").style.display = "block";
             }
@@ -81,34 +81,37 @@
 
     <cc1:Feedback ID="feedback" runat="server" />
 
-    <asp:Panel ID="p_mode" runat="server">
-        
+    <asp:Panel ID="p_mode" runat="server" CssClass="pa-umb-overlay">
+
         <div class="umg-dialog-body">
 
             <cc1:Pane ID="pane_chooseMode" runat="server" Text="Choose how to restict access to this page">
 
-                <asp:RadioButton GroupName="mode" ID="rb_simple" runat="server" Style="float: left; margin: 10px;" Checked="true" />
+            <div class="pa-select-type">
+                <asp:RadioButton GroupName="mode" ID="rb_simple" runat="server" Checked="true" />
 
-                <div style="float: right;">
-                    <h4 style="padding-top: 0px;"><%= umbraco.ui.Text("publicAccess", "paSimple", base.getUser())%></h4>
-                    <p><%= umbraco.ui.Text("publicAccess", "paSimpleHelp", base.getUser())%></p>
-                </div>
+                <label for="body_rb_simple">
+                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paSimple", base.getUser())%></h4>
+                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paSimpleHelp", base.getUser())%></p>
+                </label>
+            </div>
 
-                <br style="clear: both;" />
 
-                <asp:RadioButton GroupName="mode" ID="rb_advanced" runat="server" Style="float: left; margin: 10px;" />
+            <div class="pa-select-type">
+                <asp:RadioButton GroupName="mode" ID="rb_advanced" runat="server"/>
 
-                <div style="float: left; padding-left: 10px;">
-                    <h4 style="padding-top: 0px;"><%= umbraco.ui.Text("publicAccess", "paAdvanced", base.getUser())%></h4>
-                    <p><%= umbraco.ui.Text("publicAccess", "paAdvancedHelp", base.getUser())%></p>
+                <label for="body_rb_advanced">
+                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paAdvanced", base.getUser())%></h4>
+                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paAdvancedHelp", base.getUser())%></p>
 
                     <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
                         <p>
                             <%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%>
                         </p>
                     </asp:Panel>
+                </label>
+            </div>
 
-                </div>
             </cc1:Pane>
         </div>
 
@@ -119,20 +122,24 @@
     </asp:Panel>
 
 
-    <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Single user protection">
-        <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
-            <p><%= umbraco.ui.Text("publicAccess", "paSetLogin", UmbracoUser)%></p>
-            <asp:CustomValidator runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
-               <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
-            </asp:CustomValidator>
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel Text="Login" ID="pp_login" runat="server">
-            <asp:TextBox ID="simpleLogin" runat="server" Width="150px"></asp:TextBox>
-            <asp:Label runat="server" ID="SimpleLoginLabel" Visible="False"></asp:Label>
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel Text="Password" ID="pp_pass" runat="server">
-            <asp:TextBox ID="simplePassword" runat="server" Width="150px"></asp:TextBox>
-        </cc1:PropertyPanel>
+    <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Set the login and password for this page" CssClass="pa-umb-overlay">
+
+        <div class="pa-form">
+            <cc1:PropertyPanel Text="Login" ID="pp_login" runat="server">
+                <asp:TextBox ID="simpleLogin" runat="server" Width="250px"></asp:TextBox>
+                <asp:Label runat="server" ID="SimpleLoginLabel" Visible="False"></asp:Label>
+            </cc1:PropertyPanel>
+        </div>
+
+        <div class="pa-form">
+            <cc1:PropertyPanel Text="Password" ID="pp_pass" runat="server">
+                <asp:TextBox ID="simplePassword" runat="server" Width="250px"></asp:TextBox>
+            </cc1:PropertyPanel>
+        </div>
+
+        <asp:CustomValidator CssClass="pa-validation-message error" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+           <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
+        </asp:CustomValidator>
     </cc1:Pane>
 
     <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
@@ -144,27 +151,29 @@
         </cc1:PropertyPanel>
     </cc1:Pane>
 
-    <asp:Panel ID="p_buttons" runat="server" Visible="false">
+    <asp:Panel ID="p_buttons" runat="server" Visible="false" CssClass="pa-umb-overlay">
         <cc1:Pane runat="server" ID="pane_pages" Text="Select the pages that contain login form and error messages">
-            <cc1:PropertyPanel runat="server" ID="pp_loginPage">
-                <asp:PlaceHolder ID="ph_loginpage" runat="server" />
-                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_loginPage" ForeColor="Red" />
-                <br />
-                <small>
+
+            <cc1:PropertyPanel runat="server" ID="pp_loginPage" CssClass="pa-select-pages">
+                <small class="umb-detail">
                     <%=umbraco.ui.Text("paLoginPageHelp")%>
                 </small>
-                <br />
-                <br />
+                <div class="pa-choose-page">
+                    <asp:PlaceHolder ID="ph_loginpage" runat="server" />
+                </div>
+
+                <asp:CustomValidator ErrorMessage="Please pick a login page" runat="server" ID="cv_loginPage" ForeColor="Red" />
             </cc1:PropertyPanel>
 
-            <cc1:PropertyPanel runat="server" ID="pp_errorPage">
-                <asp:PlaceHolder ID="ph_errorpage" runat="server" />
-                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_errorPage"  ForeColor="Red" />
-                <br />
-                <small>
+
+            <cc1:PropertyPanel runat="server" ID="pp_errorPage" CssClass="pa-select-pages">
+                <small class="umb-detail">
                     <%=umbraco.ui.Text("paErrorPageHelp")%>
                 </small>
-                <br />
+                <div class="pa-choose-page">
+                    <asp:PlaceHolder ID="ph_errorpage" runat="server" />
+                </div>
+                <asp:CustomValidator ErrorMessage="Please pick an error page" runat="server" ID="cv_errorPage"  ForeColor="Red" />
             </cc1:PropertyPanel>
 
         </cc1:Pane>

@@ -8,7 +8,7 @@
  * 
  */
 
-function ContentRecycleBinController($scope, $routeParams, dataTypeResource, navigationService, localizationService) {
+function ContentRecycleBinController($scope, $routeParams, contentResource, navigationService, localizationService) {
 
     //ensures the list view doesn't actually load until we query for the list view config
     // for the section
@@ -16,17 +16,23 @@ function ContentRecycleBinController($scope, $routeParams, dataTypeResource, nav
     $scope.page.name = "Recycle Bin";
     $scope.page.nameLocked = true;
 
+    //ensures the list view doesn't actually load until we query for the list view config
+    // for the section
     $scope.listViewPath = null;
 
     $routeParams.id = "-20";
-    dataTypeResource.getById(-95).then(function (result) {
-        _.each(result.preValues, function (i) {
-            $scope.model.config[i.key] = i.value;
+    contentResource.getRecycleBin().then(function (result) {
+        //we'll get the 'content item' for the recycle bin, we know that it will contain a single tab and a 
+        // single property, so we'll extract that property (list view) and use it's data.
+        var listproperty = result.tabs[0].properties[0];
+
+        _.each(listproperty.config, function (val, key) {
+            $scope.model.config[key] = val;
         });
         $scope.listViewPath = 'views/propertyeditors/listview/listview.html';
     });
 
-    $scope.model = { config: { entityType: $routeParams.section } };
+    $scope.model = { config: { entityType: $routeParams.section, layouts: [] } };
 
     // sync tree node
     navigationService.syncTree({ tree: "content", path: ["-1", $routeParams.id], forceReload: false });
@@ -35,11 +41,11 @@ function ContentRecycleBinController($scope, $routeParams, dataTypeResource, nav
 
     function localizePageName() {
 
-       var pageName = "general_recycleBin";
+        var pageName = "general_recycleBin";
 
-       localizationService.localize(pageName).then(function(value) {
-          $scope.page.name = value;
-       });
+        localizationService.localize(pageName).then(function (value) {
+            $scope.page.name = value;
+        });
 
     }
 }

@@ -9,11 +9,39 @@
     color: @white;
     position: absolute;
     z-index: 10000;
-    top: 0px;
-    left: 0px;
-    margin: 0 !Important;
+    top: 0;
+    left: 0;
+    margin: 0 !important;
     padding: 0;
     border-radius: 0;
+}
+
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+       only screen and (min-resolution: 144dpi)
+{
+    .login-overlay {
+        background-image: url(../img/application/logo@2x.png) !important;
+    }
+}
+
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min-resolution: 192dpi)
+{
+    .login-overlay {
+        background-image: url(../img/application/logo@2x.png) !important;
+    }
+}
+
+
+@media only screen and (-webkit-min-device-pixel-ratio: 3),
+       only screen and (min-resolution: 3dppx),
+       only screen and (min-resolution: 350dpi)
+{
+    .login-overlay {
+        background-image: url(../img/application/logo@3x.png) !important;
+    }
 }
 
 .login-overlay .umb-modalcolumn {
@@ -62,7 +90,7 @@
 }
 
 #hrOr hr {
-    margin: 0px;
+    margin: 0;
     border: none;
     background-color: @gray;
     height: 1px;

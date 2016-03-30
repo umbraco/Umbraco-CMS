@@ -27,5 +27,22 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "locked")]
         [ReadOnly(true)]
         public bool Locked { get; set; }
+
+        /// <summary>
+        /// This is required for the UI editor to know if this particular property belongs to 
+        /// an inherited item or the current item.
+        /// </summary>        
+        [DataMember(Name = "contentTypeId")]
+        [ReadOnly(true)]
+        public int ContentTypeId { get; set; }
+
+        /// <summary>
+        /// This is required for the UI editor to know which content type name this property belongs
+        /// to based on the property inheritance structure
+        /// </summary>
+        [DataMember(Name = "contentTypeName")]
+        [ReadOnly(true)]
+        public string ContentTypeName { get; set; }
+
     }
 }

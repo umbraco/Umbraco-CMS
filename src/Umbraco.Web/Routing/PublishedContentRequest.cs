@@ -21,6 +21,15 @@ namespace Umbraco.Web.Routing
 	public class PublishedContentRequest
 	{
 	    private bool _readonly;
+	    private bool _readonlyUri;
+
+        /// <summary>
+        /// Triggers before the published content request is prepared.
+        /// </summary>
+        /// <remarks>When the event triggers, no preparation has been done. It is still possible to
+        /// modify the request's Uri property, for example to restore its original, public-facing value
+        /// that might have been modified by an in-between equipement such as a load-balancer.</remarks>
+	    public static event EventHandler<EventArgs> Preparing;
 
 		/// <summary>
 		/// Triggers once the published content request has been prepared, but before it is processed.
@@ -34,6 +43,10 @@ namespace Umbraco.Web.Routing
 		// because in order to keep things clean and separated,
 		// the content request is just a data holder
 		private readonly PublishedContentRequestEngine _engine;
+
+        // the cleaned up uri
+        // the cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.
+        private Uri _uri;
 
 	    /// <summary>
 	    /// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
@@ -102,13 +115,23 @@ namespace Umbraco.Web.Routing
 		    _readonly = __readonly;
 		}
 
+        /// <summary>
+        /// Triggers the Preparing event.
+        /// </summary>
+	    internal void OnPreparing()
+	    {
+	        var handler = Preparing;
+            if (handler != null) handler(this, EventArgs.Empty);
+	        _readonlyUri = true;
+	    }
+
 		/// <summary>
 		/// Triggers the Prepared event.
 		/// </summary>
 		internal void OnPrepared()
 		{
-			if (Prepared != null)
-				Prepared(this, EventArgs.Empty);
+            var handler = Prepared;
+            if (handler != null) handler(this, EventArgs.Empty);
 
 		    if (HasPublishedContent == false)
                 Is404 = true; // safety
@@ -120,7 +143,18 @@ namespace Umbraco.Web.Routing
 		/// Gets or sets the cleaned up Uri used for routing.
 		/// </summary>
 		/// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
-		public Uri Uri { get; private set; }
+		public Uri Uri {
+		    get
+		    {
+		        return _uri;
+		    }
+		    set
+		    {
+                if (_readonlyUri)
+                    throw new InvalidOperationException("Cannot modify Uri after Preparing has triggered.");
+		        _uri = value;
+		    }
+        }
 
         private void EnsureWriteable()
         {
@@ -166,7 +200,8 @@ namespace Umbraco.Web.Routing
         /// preserve or reset the template, if any.</remarks>
         public void SetInternalRedirectPublishedContent(IPublishedContent content)
         {
-            EnsureWriteable();
+		    if (content == null) throw new ArgumentNullException("content");
+		    EnsureWriteable();
 
             // unless a template has been set already by the finder,
             // template should be null at that point. 

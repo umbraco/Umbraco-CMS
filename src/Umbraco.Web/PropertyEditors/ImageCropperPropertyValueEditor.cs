@@ -16,6 +16,8 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;
 
@@ -29,6 +31,23 @@ namespace Umbraco.Web.PropertyEditors
         public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
         { }
 
+        /// <summary>
+        /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
+        /// </summary>
+           
+        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        {
+            var val = base.ConvertDbToEditor(property, propertyType, dataTypeService);
+
+            var json = val as JObject;
+            if (json != null)
+            {
+                ImageCropperValueConverter.MergePreValues(json, dataTypeService, propertyType.DataTypeDefinitionId);
+                return json;
+            }
+
+            return val;
+        }
         /// <summary>
         /// Converts the value received from the editor into the value can be stored in the database.
         /// </summary>

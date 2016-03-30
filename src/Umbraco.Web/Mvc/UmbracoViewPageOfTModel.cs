@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -26,24 +27,13 @@ namespace Umbraco.Web.Mvc
             get
             {
                 //we should always try to return the context from the data tokens just in case its a custom context and not 
-                //using the UmbracoContext.Current.
-                //we will fallback to the singleton if necessary.
-                if (ViewContext.RouteData.DataTokens.ContainsKey("umbraco-context"))
-                {
-                    return (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
-                }
-                //next check if it is a child action and see if the parent has it set in data tokens
-                if (ViewContext.IsChildAction)
-                {
-                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey("umbraco-context"))
-                    {
-                        return (UmbracoContext)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
-                    }
-                }
-
-                //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
-                //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
-                return UmbracoContext.Current;
+                //using the UmbracoContext.Current, we will fallback to the singleton if necessary.
+                var umbCtx = ViewContext.GetUmbracoContext()
+                    //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
+                    //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
+                    ?? UmbracoContext.Current;
+                
+                return umbCtx;
             }
         }
 
@@ -65,16 +55,16 @@ namespace Umbraco.Web.Mvc
                 //we should always try to return the object from the data tokens just in case its a custom object and not 
                 //using the UmbracoContext.Current.
                 //we will fallback to the singleton if necessary.
-                if (ViewContext.RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                if (ViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
                 {
-                    return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+                    return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
                 }
                 //next check if it is a child action and see if the parent has it set in data tokens
                 if (ViewContext.IsChildAction)
                 {
-                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
                     {
-                        return (PublishedContentRequest)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+                        return (PublishedContentRequest)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
                     }
                 }
 
@@ -130,10 +120,9 @@ namespace Umbraco.Web.Mvc
             base.InitializePage();
             if (ViewContext.IsChildAction == false)
             {
-                if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
-                {
-                    ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
-                }
+                //always ensure the special data token is set - this is used purely for partial view macros that contain forms 
+                // and mostly just when rendered within the RTE
+                ViewContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = ViewContext;                
             }
 
         }
@@ -147,8 +136,10 @@ namespace Umbraco.Web.Mvc
             // map the view data (may change its type, may set model to null)
             viewData = MapViewDataDictionary(viewData, typeof (TModel));
 
-            // bind the model (use context culture as default)
-            var culture = UmbracoContext.PublishedContentRequest.Culture;
+            var culture = CultureInfo.CurrentCulture;
+            // bind the model (use context culture as default, if available)
+            if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
+                culture = UmbracoContext.PublishedContentRequest.Culture;
             viewData.Model = RenderModelBinder.BindModel(viewDataModel, typeof (TModel), culture);
 
             // set the view data

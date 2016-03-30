@@ -41,6 +41,16 @@ namespace Umbraco.Core
                 ToCSharpEscapeChars[escape[0]] = escape[1];
         }
 
+        /// <summary>
+        /// Removes new lines and tabs
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        internal static string StripWhitespace(this string txt)
+        {
+            return Regex.Replace(txt, @"\s", string.Empty);
+        }
+
         internal static string StripFileExtension(this string fileName)
         {
             //filenames cannot contain line breaks

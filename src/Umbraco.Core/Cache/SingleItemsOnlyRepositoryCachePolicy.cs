@@ -18,7 +18,7 @@ namespace Umbraco.Core.Cache
         
         protected override void SetCacheAction(TId[] ids, TEntity[] entityCollection)
         {            
-            //do nothing
+            //no-op
         }
     }
 }

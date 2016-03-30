@@ -7,7 +7,16 @@
                 'Failed to generate.')
             .then(function (result) {
                 $scope.generating = false;
+                $scope.dashboard = result;
             });
+    };
+
+    $scope.reload = function () {
+        $scope.ready = false;
+        modelsBuilderResource.getDashboard().then(function (result) {
+            $scope.dashboard = result;
+            $scope.ready = true;
+        });
     };
 
     function init() {

@@ -25,7 +25,7 @@
     <key alias="protect">Public access</key>
     <key alias="publish">Publish</key>
     <key alias="unpublish">Unpublish</key>
-    <key alias="refreshNode">Reload nodes</key>
+    <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
@@ -265,6 +265,7 @@
     <key alias="selectContent">Select content</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="noIconsFound">No icons were found</key>
 
     <key alias="noMacroParams">There are no parameters for this macro</key>
 
@@ -374,6 +375,7 @@
     <key alias="alias">Alias</key>
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
+    <key alias="back">Back</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
@@ -926,6 +928,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fileSavedHeader">File saved</key>
     <key alias="fileSavedText">File saved without any errors</key>
     <key alias="languageSaved">Language saved</key>
+    <key alias="mediaTypeSavedHeader">Media Type saved</key>
+    <key alias="memberTypeSavedHeader">Member Type saved</key>
     <key alias="pythonErrorHeader">Python script not saved</key>
     <key alias="pythonErrorText">Python script could not be saved due to error</key>
     <key alias="pythonSavedHeader">Python script saved</key>
@@ -1051,7 +1055,9 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="yesDelete">Yes, delete</key>
 
       <key alias="movedUnderneath">was moved underneath</key>
+      <key alias="copiedUnderneath">was copied underneath</key>
       <key alias="folderToMove">Select the folder to move</key>
+      <key alias="folderToCopy">Select the folder to copy</key>
       <key alias="structureBelow">to in the tree structure below</key>
 
       <key alias="allDocumentTypes">All Document types</key>
@@ -1193,7 +1199,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="newPassword">Change Your Password</key>
+    <key alias="newPassword">New password</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
@@ -1207,6 +1213,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediastartnode">Start Node in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
+    <key alias="oldPassword">Old password</key>
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>

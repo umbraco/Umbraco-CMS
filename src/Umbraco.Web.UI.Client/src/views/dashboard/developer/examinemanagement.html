@@ -166,17 +166,17 @@
 
                             <div class="row form-search">
                                 <div class="span8 input-append">
-                                    <input type="text" class="search-query" ng-model="searcher.searchText" />
+                                    <input type="text" class="search-query" ng-model="searcher.searchText" no-dirty-check />
                                     <button type="submit" class="btn btn-info" ng-click="search(searcher)" ng-disabled="searcher.isProcessing">Search</button>
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="{{searcher.name}}-textSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" />
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" no-dirty-check />
                                     Text Search
                                 </label>
                                 <label for="{{searcher.name}}-luceneSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" />
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" no-dirty-check />
                                     Lucene Search
                                 </label>
                             </div>

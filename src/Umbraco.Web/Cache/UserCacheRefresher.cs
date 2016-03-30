@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
                 userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
 
             if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
+                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
             
             base.Remove(id);
         }

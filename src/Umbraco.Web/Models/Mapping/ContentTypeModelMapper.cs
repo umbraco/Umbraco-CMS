@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((source) => new MediaType(source.ParentId))                
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                    ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
                 });
 
             config.CreateMap<MemberTypeSave, IMemberType>()
@@ -152,9 +152,9 @@ namespace Umbraco.Web.Models.Mapping
                     //default listview
                     dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Content";
 
-                    if (string.IsNullOrEmpty(source.Name) == false)
+                    if (string.IsNullOrEmpty(source.Alias) == false)
                     {
-                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
+                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Alias;
                         if (applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
                             dest.ListViewEditorName = name;
                     }
@@ -255,12 +255,16 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.Editor, expression => expression.Ignore())
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             config.CreateMap<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>()
                 .ForMember(g => g.Editor, expression => expression.Ignore())
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion

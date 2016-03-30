@@ -1,8 +1,409 @@
 /**
- * @ngdoc directive
- * @name umbraco.directives.directive:umbProperty
- * @restrict E
- **/
+@ngdoc directive
+@name umbraco.directives.directive:umbOverlay
+@restrict E
+@scope
+
+@description
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+
+        <button type="button" ng-click="vm.openOverlay()"></button>
+
+        <umb-overlay
+            ng-if="vm.overlay.show"
+            model="vm.overlay"
+            view="vm.overlay.view"
+            position="right">
+        </umb-overlay>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+
+            vm.openOverlay = openOverlay;
+
+            function openOverlay() {
+
+                vm.overlay = {
+                    view: "mediapicker",
+                    show: true,
+                    submit: function(model) {
+
+                        vm.overlay.show = false;
+                        vm.overlay = null;
+                    },
+                    close: function(oldModel) {
+                        vm.overlay.show = false;
+                        vm.overlay = null;
+                    }
+                }
+
+            };
+
+        }
+
+        angular.module("umbraco").controller("My.Controller", Controller);
+    })();
+</pre>
+
+<h1>General Options</h1>
+Lorem ipsum dolor sit amet..
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>model.title</td>
+        <td>String</td>
+        <td>Set the title of the overlay.</td>
+    </tr>
+    <tr>
+        <td>model.subTitle</td>
+        <td>String</td>
+        <td>Set the subtitle of the overlay.</td>
+    </tr>
+    <tr>
+        <td>model.submitButtonLabel</td>
+        <td>String</td>
+        <td>Set an alternate submit button text</td>
+    </tr>
+    <tr>
+        <td>model.submitButtonLabelKey</td>
+        <td>String</td>
+        <td>Set an alternate submit button label key for localized texts</td>
+    </tr>
+    <tr>
+        <td>model.hideSubmitButton</td>
+        <td>Boolean</td>
+        <td>Hides the submit button</td>
+    </tr>
+    <tr>
+        <td>model.closeButtonLabel</td>
+        <td>String</td>
+        <td>Set an alternate close button text</td>
+    </tr>
+    <tr>
+        <td>model.closeButtonLabelKey</td>
+        <td>String</td>
+        <td>Set an alternate close button label key for localized texts</td>
+    </tr>
+    <tr>
+        <td>model.show</td>
+        <td>Boolean</td>
+        <td>Show/hide the overlay</td>
+    </tr>
+    <tr>
+        <td>model.submit</td>
+        <td>Function</td>
+        <td>Callback function when the overlay submits. Returns the overlay model object</td>
+    </tr>
+    <tr>
+        <td>model.close</td>
+        <td>Function</td>
+        <td>Callback function when the overlay closes. Returns a copy of the overlay model object before being modified</td>
+    </tr>
+</table>
+
+
+<h1>Content Picker</h1>
+Opens a content picker.</br>
+<strong>view: </strong>contentpicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>model.multiPicker</td>
+        <td>Boolean</td>
+        <td>Pick one or multiple items</td>
+    </tr>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>model.selection</td>
+        <td>Array</td>
+        <td>Array of content objects</td>
+    </tr>
+</table>
+
+
+<h1>Icon Picker</h1>
+Opens an icon picker.</br>
+<strong>view: </strong>iconpicker
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>model.icon</td>
+        <td>String</td>
+        <td>The icon class</td>
+    </tr>
+</table>
+
+<h1>Item Picker</h1>
+Opens an item picker.</br>
+<strong>view: </strong>itempicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.availableItems</td>
+            <td>Array</td>
+            <td>Array of available items</td>
+        </tr>
+        <tr>
+            <td>model.selectedItems</td>
+            <td>Array</td>
+            <td>Array of selected items. When passed in the selected items will be filtered from the available items.</td>
+        </tr>
+        <tr>
+            <td>model.filter</td>
+            <td>Boolean</td>
+            <td>Set to false to hide the filter</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>model.selectedItem</td>
+        <td>Object</td>
+        <td>The selected item</td>
+    </tr>
+</table>
+
+<h1>Macro Picker</h1>
+Opens a media picker.</br>
+<strong>view: </strong>macropicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.dialogData</td>
+            <td>Object</td>
+            <td>Object which contains array of allowedMacros. Set to <code>null</code> to allow all.</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.macroParams</td>
+            <td>Array</td>
+            <td>Array of macro params</td>
+        </tr>
+        <tr>
+            <td>model.selectedMacro</td>
+            <td>Object</td>
+            <td>The selected macro</td>
+        </tr>
+    </tbody>
+</table>
+
+<h1>Media Picker</h1>
+Opens a media picker.</br>
+<strong>view: </strong>mediapicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.multiPicker</td>
+            <td>Boolean</td>
+            <td>Pick one or multiple items</td>
+        </tr>
+        <tr>
+            <td>model.onlyImages</td>
+            <td>Boolean</td>
+            <td>Only display files that have an image file-extension</td>
+        </tr>
+        <tr>
+            <td>model.disableFolderSelect</td>
+            <td>Boolean</td>
+            <td>Disable folder selection</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.selectedImages</td>
+            <td>Array</td>
+            <td>Array of selected images</td>
+        </tr>
+    </tbody>
+</table>
+
+<h1>Member Group Picker</h1>
+Opens a member group picker.</br>
+<strong>view: </strong>membergrouppicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.multiPicker</td>
+            <td>Boolean</td>
+            <td>Pick one or multiple items</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.selectedMemberGroup</td>
+            <td>String</td>
+            <td>The selected member group</td>
+        </tr>
+        <tr>
+            <td>model.selectedMemberGroups (multiPicker)</td>
+            <td>Array</td>
+            <td>The selected member groups</td>
+        </tr>
+    </tbody>
+</table>
+
+<h1>Member Picker</h1>
+Opens a member picker. </br>
+<strong>view: </strong>memberpicker
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.multiPicker</td>
+            <td>Boolean</td>
+            <td>Pick one or multiple items</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>Returns</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.selection</td>
+            <td>Array</td>
+            <td>Array of selected members/td>
+        </tr>
+    </tbody>
+</table>
+
+<h1>YSOD</h1>
+Opens an overlay to show a custom YSOD. </br>
+<strong>view: </strong>ysod
+<table>
+    <thead>
+        <tr>
+            <th>Param</th>
+            <th>Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>model.error</td>
+            <td>Object</td>
+            <td>Error object</td>
+        </tr>
+    </tbody>
+</table>
+
+@param {object} model Overlay options.
+@param {string} view Path to view or one of the default view names.
+@param {string} position The overlay position ("left", "right", "center": "target").
+**/
 
 (function() {
    'use strict';

@@ -131,6 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(EntityContainer entity)
         {
+            EnsureContainerType(entity);
+
             var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
                 .From<NodeDto>(SqlSyntax)
                 .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
@@ -160,6 +162,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(EntityContainer entity)
         {
+            EnsureContainerType(entity);
+
             entity.Name = entity.Name.Trim();
             Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
 
@@ -219,6 +223,8 @@ namespace Umbraco.Core.Persistence.Repositories
         //
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
+            EnsureContainerType(entity);
+
             entity.Name = entity.Name.Trim();
             Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
 
@@ -267,6 +273,14 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = nodeDto.Level;
             entity.SortOrder = 0;
             entity.ResetDirtyProperties();
+        }
+
+        private void EnsureContainerType(EntityContainer entity)
+        {
+            if (entity.ContainerObjectType != NodeObjectTypeId)
+            {
+                throw new InvalidOperationException("The container type does not match the repository object type");
+            }
         }
     }
 }
