@@ -44,7 +44,7 @@ namespace umbraco.cms.presentation.developer
 			if (IsPostBack == false)
 			{
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
+					.SetActiveTreeType(Constants.Trees.Macros)
                     .SyncTree("-1,init," + _macro.Id, false);
 
                 string tempMacroAssembly = _macro.ControlAssembly ?? "";
@@ -292,7 +292,7 @@ namespace umbraco.cms.presentation.developer
             Page.Validate();
 
             ClientTools
-                .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
+                .SetActiveTreeType(Constants.Trees.Macros)
                 .SyncTree("-1,init," + _macro.Id.ToInvariantString(), true); //true forces the reload
 
             var tempMacroAssembly = macroAssembly.Text;
