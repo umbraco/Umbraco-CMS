@@ -115,14 +115,7 @@
       <delete assembly="umbraco" type="stylesheetPropertyTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initdictionary">
-    <header>Dictionary editor egenskab</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="dictionaryTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="DictionaryItem">
+  <nodeType alias="dictionary">
     <header>Dictionary editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
