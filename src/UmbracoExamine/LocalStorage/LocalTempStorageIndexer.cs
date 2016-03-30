@@ -68,6 +68,8 @@ namespace UmbracoExamine.LocalStorage
             if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorageDir.GetType() + " specified");
             TempPath = tempPath.FullName;
 
+            throw new NotSupportedException("Fix the local storage stuff!");
+
             switch (localStorageType)
             {
                 case LocalStorageType.Sync:
@@ -126,13 +128,13 @@ namespace UmbracoExamine.LocalStorage
                     }
 
                     break;
-                case LocalStorageType.LocalOnly:
-                    if (Directory.Exists(TempPath) == false)
-                    {
-                        Directory.CreateDirectory(TempPath);
-                    }
-                    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(TempPath));
-                    break;
+                //case LocalStorageType.LocalOnly:
+                //    if (Directory.Exists(TempPath) == false)
+                //    {
+                //        Directory.CreateDirectory(TempPath);
+                //    }
+                //    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(TempPath));
+                //    break;
                 default:
                     throw new ArgumentOutOfRangeException("localStorageType");
             }
@@ -324,10 +326,10 @@ namespace UmbracoExamine.LocalStorage
                         var basePath = IOHelper.MapPath(configuredPath);
 
                         var commit = Snapshotter.Snapshot();
-                        var allSnapshotFiles = commit.GetFileNames()
+                        var allSnapshotFiles = commit.FileNames
                             .Concat(new[]
                             {
-                                commit.GetSegmentsFileName(), 
+                                commit.SegmentsFileName, 
                                 //we need to manually include the segments.gen file
                                 "segments.gen"
                             })

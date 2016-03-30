@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
 			var result = new SearchResult()
 				{
-					Id = 1234,
+					LongId = 1234,
 					Score = 1
 				};
 			result.Fields.Add("__IndexType", "media");

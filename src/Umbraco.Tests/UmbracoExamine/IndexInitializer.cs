@@ -91,24 +91,37 @@ namespace Umbraco.Tests.UmbracoExamine
 
             if (analyzer == null)
             {
-                analyzer = new StandardAnalyzer(Version.LUCENE_29);
+                analyzer = new StandardAnalyzer(Version.LUCENE_30);
             }
 
-		    var indexSet = new IndexSet();
-            var indexCriteria = indexSet.ToIndexCriteria(dataService, UmbracoContentIndexer.IndexFieldPolicies);
-
-		    var i = new UmbracoContentIndexer(indexCriteria,
-		                                      luceneDir, //custom lucene directory
-                                              dataService,
-                                              contentService,
-                                              mediaService,
-                                              dataTypeService,
-                                              userService,
-                                              new[] { new DefaultUrlSegmentProvider() },
-		                                      analyzer,
-		                                      false);
+		    //var indexSet = new IndexSet();
+      //      var indexCriteria = indexSet.ToIndexCriteria(dataService, UmbracoContentIndexer.IndexFieldPolicies);
+            
+		    //var i = new UmbracoContentIndexer(indexCriteria,
+		    //                                  luceneDir, //custom lucene directory
+      //                                        dataService,
+      //                                        contentService,
+      //                                        mediaService,
+      //                                        dataTypeService,
+      //                                        userService,
+      //                                        new[] { new DefaultUrlSegmentProvider() },
+		    //                                  analyzer,
+		    //                                  false);
 
 			//i.IndexSecondsInterval = 1;
+
+		    var i = new UmbracoContentIndexer(
+		        new[]
+		        {
+		            new FieldDefinition("", FieldDefinitionTypes.FullText)
+		        },
+		        luceneDir,
+                analyzer,
+                contentService,
+                mediaService,
+                dataTypeService,
+                userService,
+                new[] { new DefaultUrlSegmentProvider() });
 
 			i.IndexingError += IndexingError;
 

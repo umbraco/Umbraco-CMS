@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine;
+using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using UmbracoExamine;
+using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -30,22 +36,27 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Protected_Content_Not_Indexed()
 		{
 
-			var protectedQuery = new BooleanQuery();
-			protectedQuery.Add(
-				new BooleanClause(
-					new TermQuery(new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content)),
-					BooleanClause.Occur.MUST));
+            using (var luceneDir = new RAMDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var searcher = indexer.GetSearcher().GetSearcher())
+            {
+                var protectedQuery = new BooleanQuery();
+                protectedQuery.Add(
+                    new BooleanClause(
+                        new TermQuery(new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content)),
+                        Occur.MUST));
 
-			protectedQuery.Add(
-				new BooleanClause(
-					new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
-					BooleanClause.Occur.MUST));
+                protectedQuery.Add(
+                    new BooleanClause(
+                        new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
+                        Occur.MUST));
 
-			var collector = new AllHitsCollector(false, true);
-			var s = _searcher.GetSearcher();
-			s.Search(protectedQuery, collector);
+                var collector = TopScoreDocCollector.Create(int.MaxValue, true);
+                
+                searcher.Search(protectedQuery, collector);
 
-			Assert.AreEqual(0, collector.Count, "Protected node should not be indexed");
+                Assert.AreEqual(0, collector.TotalHits, "Protected node should not be indexed");
+            }
 
 		}
 
@@ -142,8 +153,6 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
 			var s = (IndexSearcher)_searcher.GetSearcher();
 
-            
-
 			//first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
 			
 			var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
@@ -197,30 +206,29 @@ namespace Umbraco.Tests.UmbracoExamine
 
 	    private readonly TestMediaService _mediaService = new TestMediaService();
 
-		private static UmbracoExamineSearcher _searcher;
-		private static UmbracoContentIndexer _indexer;
+		//private static UmbracoExamineSearcher _searcher;
+		//private static UmbracoContentIndexer _indexer;
 
 		#endregion
 
 		#region Initialize and Cleanup
 
-		private Lucene.Net.Store.Directory _luceneDir;
+		//private Lucene.Net.Store.Directory _luceneDir;
 
 		public override void TestTearDown()
 		{
             base.TestTearDown();
-			_luceneDir.Dispose();
-            UmbracoExamineSearcher.DisableInitializationCheck = null;
-            BaseUmbracoIndexer.DisableInitializationCheck = null;
+			//_luceneDir.Dispose();            
 		}
 
 		public override void TestSetup()
 		{
             base.TestSetup();
-			_luceneDir = new RAMDirectory();
-			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
-			_indexer.RebuildIndex();
-			_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
+			//_luceneDir = new RAMDirectory();
+
+   //         _indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
+			//_indexer.RebuildIndex();
+			//_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
 		}
 
 

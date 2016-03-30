@@ -12,8 +12,11 @@ using UmbracoExamine.DataServices;
 using Examine;
 using System.IO;
 using System.Xml.Linq;
+using Examine.LuceneEngine.Faceting;
+using Examine.LuceneEngine.Indexing;
 using Lucene.Net.Store;
 using UmbracoExamine.LocalStorage;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace UmbracoExamine
 {
@@ -34,31 +37,34 @@ namespace UmbracoExamine
         {
         }
 
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="indexPath"></param>
-        /// <param name="dataService"></param>
-        /// <param name="analyzer"></param>
-        protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-            : base(indexerData, indexPath, analyzer, async)
+        protected BaseUmbracoIndexer(IEnumerable<FieldDefinition> fieldDefinitions, Directory luceneDirectory, Analyzer defaultAnalyzer, FacetConfiguration facetConfiguration = null, IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, facetConfiguration, indexValueTypes)
         {
-            DataService = dataService;
         }
 
-		protected BaseUmbracoIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
-			: base(indexerData, luceneDirectory, analyzer, async)
-		{
-			DataService = dataService;
-		}
+  //      /// <summary>
+  //      /// Constructor to allow for creating an indexer at runtime
+  //      /// </summary>
+  //      /// <param name="indexerData"></param>
+  //      /// <param name="indexPath"></param>
+  //      /// <param name="dataService"></param>
+  //      /// <param name="analyzer"></param>
+  //      [Obsolete("Do not use the ctor using IIndexCriteria, it is obsolete")]
+  //      protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
+  //          : base(indexerData, indexPath, analyzer, async)
+  //      {
+  //          DataService = dataService;
+  //      }
+
+  //      [Obsolete("Do not use the ctor using IIndexCriteria, it is obsolete")]
+		//protected BaseUmbracoIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
+		//	: base(indexerData, luceneDirectory, analyzer, async)
+		//{
+		//	DataService = dataService;
+		//}
 
         #endregion
-
-        /// <summary>
-        /// Used for unit tests
-        /// </summary>
-        internal static bool? DisableInitializationCheck = null;
+        
         private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
         private BaseLuceneSearcher _internalTempStorageSearcher = null;
 
@@ -89,6 +95,7 @@ namespace UmbracoExamine
         /// </summary>
         public bool SupportUnpublishedContent { get; protected set; }
 
+        //TODO: Probably get rid of this right ?
         /// <summary>
         /// The data service used for retreiving and submitting data to the cms
         /// </summary>
@@ -176,35 +183,7 @@ namespace UmbracoExamine
         }
 
         #endregion
-
-        /// <summary>
-        /// Used to aquire the internal searcher
-        /// </summary>
-        private readonly object _internalSearcherLocker = new object();
-
-        protected override BaseSearchProvider InternalSearcher
-        {
-            get
-            {
-                //if temp local storage is configured use that, otherwise return the default
-                if (UseTempStorage)
-                {
-                    if (_internalTempStorageSearcher == null)
-                    {
-                        lock (_internalSearcherLocker)
-                        {
-                            if (_internalTempStorageSearcher == null)
-                            {
-                                _internalTempStorageSearcher = new LuceneSearcher(GetIndexWriter(), IndexingAnalyzer);
-                            }
-                        }
-                    }
-                    return _internalTempStorageSearcher;
-                }
-
-                return base.InternalSearcher;
-            }
-        }
+      
         
         public override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
@@ -216,21 +195,7 @@ namespace UmbracoExamine
 
             return base.GetLuceneDirectory();
 
-        }
-
-        protected override IndexWriter CreateIndexWriter()
-        {
-            //if temp local storage is configured use that, otherwise return the default
-            if (UseTempStorage)
-            {
-                var directory = GetLuceneDirectory();
-                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
-                    DeletePolicyTracker.Current.GetPolicy(directory),
-                    IndexWriter.MaxFieldLength.UNLIMITED);
-            }
-
-            return base.CreateIndexWriter();
-        }
+        }        
 
         ///// <summary>
         ///// Override to check if we can actually initialize.
@@ -306,18 +271,14 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected bool CanInitialize()
         {
-            //check the DisableInitializationCheck and ensure that it is not set to true
-            if (!DisableInitializationCheck.HasValue || !DisableInitializationCheck.Value)
+            //We need to check if we actually can initialize, if not then don't continue
+            if (ApplicationContext.Current == null
+                || !ApplicationContext.Current.IsConfigured
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
             {
-                //We need to check if we actually can initialize, if not then don't continue
-                if (ApplicationContext.Current == null
-                    || !ApplicationContext.Current.IsConfigured
-                    || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
-                {
-                    return false;
-                }    
+                return false;
             }
-            
+
             return true;
         }
 

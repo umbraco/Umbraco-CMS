@@ -133,12 +133,7 @@ namespace UmbracoExamine
         }
 
         #endregion
-
-        /// <summary>
-        /// Used for unit tests
-        /// </summary>
-        internal static bool? DisableInitializationCheck = null;
-
+        
         /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
@@ -146,16 +141,12 @@ namespace UmbracoExamine
 
         protected bool CanInitialize()
         {
-            //check the DisableInitializationCheck and ensure that it is not set to true
-            if (!DisableInitializationCheck.HasValue || !DisableInitializationCheck.Value)
+            //We need to check if we actually can initialize, if not then don't continue
+            if (ApplicationContext.Current == null
+                || !ApplicationContext.Current.IsConfigured
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
             {
-                //We need to check if we actually can initialize, if not then don't continue
-                if (ApplicationContext.Current == null
-                    || !ApplicationContext.Current.IsConfigured
-                    || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
-                {
-                    return false;
-                }
+                return false;
             }
             return true;
         }
@@ -168,8 +159,10 @@ namespace UmbracoExamine
         /// <returns></returns>
         public override ISearchCriteria CreateSearchCriteria(string type, BooleanOperation defaultOperation)
         {
-            var criteria = base.CreateSearchCriteria(type, defaultOperation) as LuceneSearchCriteria;
-            criteria.NodeTypeAliasField = UmbracoContentIndexer.NodeTypeAliasFieldName;
+            throw new NotImplementedException("Fix strongly typed CreateSearchCriteria");
+
+            var criteria = base.CreateSearchCriteria(type, defaultOperation) as LuceneSearchCriteria; 
+            //criteria.NodeTypeAliasField = UmbracoContentIndexer.NodeTypeAliasFieldName;
             return criteria;
         }
 
@@ -185,56 +178,49 @@ namespace UmbracoExamine
                 .Where(x => x != UmbracoContentIndexer.NodeTypeAliasFieldName)
                 .ToArray();
         }
-
-        protected override IndexReader OpenNewReader()
-        {
-            var directory = GetLuceneDirectory();
-            return IndexReader.Open(
-                directory, 
-                //DeletePolicyTracker.Current.GetPolicy(directory), 
-                true);
-        }
-
+        
         protected override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
-            //local temp storage is not enabled, just return the default
-            if (_localTempPath == null) return base.GetLuceneDirectory();
+            throw new NotImplementedException("Fix local storage stuff");
 
-            //local temp storage is enabled, configure the local directory instance
-            if (_localTempDirectory == null)
-            {
-                lock (Locker)
-                {
-                    if (_localTempDirectory == null)
-                    {
-                        switch (_localStorageType)
-                        {
-                            case LocalStorageType.Sync:
-                                var fsDir = base.GetLuceneDirectory() as FSDirectory;
-                                if (fsDir != null)
-                                {
-                                    _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
-                                        new DirectoryInfo(_localTempPath),
-                                        fsDir);
-                                }
-                                else
-                                {
-                                    return base.GetLuceneDirectory();
-                                }
-                                break;
-                            case LocalStorageType.LocalOnly:
-                                _localTempDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(_localTempPath));
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
+            ////local temp storage is not enabled, just return the default
+            //if (_localTempPath == null) return base.GetLuceneDirectory();
+
+            ////local temp storage is enabled, configure the local directory instance
+            //if (_localTempDirectory == null)
+            //{
+            //    lock (Locker)
+            //    {
+            //        if (_localTempDirectory == null)
+            //        {
+            //            switch (_localStorageType)
+            //            {
+            //                case LocalStorageType.Sync:
+            //                    var fsDir = base.GetLuceneDirectory() as FSDirectory;
+            //                    if (fsDir != null)
+            //                    {
+            //                        _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
+            //                            new DirectoryInfo(_localTempPath),
+            //                            fsDir);
+            //                    }
+            //                    else
+            //                    {
+            //                        return base.GetLuceneDirectory();
+            //                    }
+            //                    break;
+            //                case LocalStorageType.LocalOnly:
+            //                    _localTempDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(_localTempPath));
+            //                    break;
+            //                default:
+            //                    throw new ArgumentOutOfRangeException();
+            //            }
 
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
 
-            return _localTempDirectory;
+            //return _localTempDirectory;
         }
     }
 }

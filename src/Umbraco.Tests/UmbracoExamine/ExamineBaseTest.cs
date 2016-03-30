@@ -13,8 +13,6 @@ namespace Umbraco.Tests.UmbracoExamine
         [SetUp]
         public virtual void TestSetup()
         {
-            UmbracoExamineSearcher.DisableInitializationCheck = true;
-            BaseUmbracoIndexer.DisableInitializationCheck = true;
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             Resolution.Freeze();
@@ -23,9 +21,6 @@ namespace Umbraco.Tests.UmbracoExamine
         [TearDown]
         public virtual void TestTearDown()
         {
-            UmbracoExamineSearcher.DisableInitializationCheck = null;
-            BaseUmbracoIndexer.DisableInitializationCheck = null;
-
             //reset all resolvers
             ResolverCollection.ResetAll();
             //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)

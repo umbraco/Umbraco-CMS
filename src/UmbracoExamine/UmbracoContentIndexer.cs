@@ -12,8 +12,11 @@ using Umbraco.Core.Strings;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
+using Examine.LuceneEngine.Faceting;
+using Examine.LuceneEngine.Indexing;
 using UmbracoExamine.Config;
 using Lucene.Net.Analysis;
+using Lucene.Net.Store;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
@@ -46,29 +49,18 @@ namespace UmbracoExamine
             _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
         }
 
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="dataService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="userService"></param>
-        /// <param name="urlSegmentProviders"></param>
-        /// <param name="analyzer"></param>
-        /// <param name="async"></param>
-        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
+        public UmbracoContentIndexer(
+            IEnumerable<FieldDefinition> fieldDefinitions, 
+            Directory luceneDirectory, 
+            Analyzer defaultAnalyzer, 
             IContentService contentService, 
-            IMediaService mediaService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            Analyzer analyzer, 
-            bool async)
-            : base(indexerData, luceneDirectory, dataService, analyzer, async)
+            IMediaService mediaService, 
+            IDataTypeService dataTypeService, 
+            IUserService userService, 
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
+            FacetConfiguration facetConfiguration = null, 
+            IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null) 
+            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, facetConfiguration, indexValueTypes)
         {
             ContentService = contentService;
             MediaService = mediaService;
@@ -77,11 +69,41 @@ namespace UmbracoExamine
             _urlSegmentProviders = urlSegmentProviders;
         }
 
+        ///// <summary>
+        ///// Constructor to allow for creating an indexer at runtime
+        ///// </summary>
+        ///// <param name="indexerData"></param>
+        ///// <param name="luceneDirectory"></param>
+        ///// <param name="dataService"></param>
+        ///// <param name="contentService"></param>
+        ///// <param name="mediaService"></param>
+        ///// <param name="dataTypeService"></param>
+        ///// <param name="userService"></param>
+        ///// <param name="urlSegmentProviders"></param>
+        ///// <param name="analyzer"></param>
+        ///// <param name="async"></param>
+        //public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
+        //    IContentService contentService, 
+        //    IMediaService mediaService,
+        //    IDataTypeService dataTypeService,
+        //    IUserService userService,
+        //    IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+        //    Analyzer analyzer, 
+        //    bool async)
+        //    : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        //{
+        //    ContentService = contentService;
+        //    MediaService = mediaService;
+        //    DataTypeService = dataTypeService;
+        //    UserService = userService;
+        //    _urlSegmentProviders = urlSegmentProviders;
+        //}
+
         #endregion
 
         #region Constants & Fields
 
-        
+
 
         /// <summary>
         /// Used to store the path of a content object
@@ -279,27 +301,29 @@ namespace UmbracoExamine
         /// <param name="nodeId">ID of the node to delete</param>
         public override void DeleteFromIndex(string nodeId)
         {
-            //find all descendants based on path
-            var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
-            var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
-            var c = InternalSearcher.CreateSearchCriteria();
-            var filtered = c.RawQuery(rawQuery);
-            var results = InternalSearcher.Search(filtered);
+            throw new NotImplementedException("Fix DeleteFromIndex!");
 
-            DataService.LogService.AddVerboseLog(int.Parse(nodeId), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.Count()));
+            ////find all descendants based on path
+            //var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
+            //var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
+            //var c = InternalSearcher.CreateSearchCriteria();
+            //var filtered = c.RawQuery(rawQuery);
+            //var results = InternalSearcher.Search(filtered);
 
-            //need to create a delete queue item for each one found
-            foreach (var r in results)
-            {
-                EnqueueIndexOperation(new IndexOperation()
-                    {
-                        Operation = IndexOperationType.Delete,
-                        Item = new IndexItem(null, "", r.Id.ToString())
-                    });
-                //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
-            }
+            //DataService.LogService.AddVerboseLog(int.Parse(nodeId), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.Count()));
 
-            base.DeleteFromIndex(nodeId);
+            ////need to create a delete queue item for each one found
+            //foreach (var r in results)
+            //{
+            //    EnqueueIndexOperation(new IndexOperation()
+            //        {
+            //            Operation = IndexOperationType.Delete,
+            //            Item = new IndexItem(null, "", r.Id.ToString())
+            //        });
+            //    //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
+            //}
+
+            //base.DeleteFromIndex(nodeId);
         }
         #endregion
 
