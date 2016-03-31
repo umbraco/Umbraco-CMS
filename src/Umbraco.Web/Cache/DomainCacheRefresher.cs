@@ -28,6 +28,12 @@ namespace Umbraco.Web.Cache
             get { return "Domain cache refresher"; }
         }
 
+        public override void RefreshAll()
+        {
+            ClearCache();
+            base.RefreshAll();
+        }
+
         public override void Refresh(int id)
         {
             ClearCache();
