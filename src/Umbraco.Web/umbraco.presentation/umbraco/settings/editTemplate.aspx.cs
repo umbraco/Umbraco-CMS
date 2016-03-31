@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
@@ -194,8 +195,15 @@ namespace umbraco.cms.presentation.settings
 
 		private void LoadMacros()
 		{
-			var macroRenderings =
-				DatabaseContext.Database.Fetch<TempMacroClass>("select id, macroAlias, macroName from cmsMacro order by macroName");
+		    ;
+		    var macroRenderings =
+		        Services.MacroService.GetAll()
+		            .Select(x => new TempMacroClass()
+		            {
+		                id = x.Id,
+		                macroAlias = x.Alias,
+		                macroName = x.Name
+		            });
 
 			rpt_macros.DataSource = macroRenderings;
 			rpt_macros.DataBind();

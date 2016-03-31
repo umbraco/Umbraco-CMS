@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditRelationType.aspx.cs" Inherits="umbraco.cms.presentation.developer.RelationTypes.EditRelationType" MasterPageFile="../../masterpages/umbracoPage.Master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="umbraco.cms.presentation.developer.RelationTypes.EditRelationType" MasterPageFile="../../masterpages/umbracoPage.Master" %>
 <%@ Register TagPrefix="umb" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ID="headContent" ContentPlaceHolderID="head" runat="server">
