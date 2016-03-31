@@ -267,7 +267,7 @@
 
     <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
     <key alias="exceptionDetail">例外の詳細</key>
-    <key alias="stracktrace">スタックトレース</key>
+    <key alias="stacktrace">スタックトレース</key>
 
     <key alias="linkYour">次をリンク:</key>
     <key alias="unLinkYour">次をリンク解除:</key>
