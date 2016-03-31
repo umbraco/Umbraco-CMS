@@ -190,20 +190,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var actions = {
                     openDashboard : function(section){
                         navService.changeSection(section);
-                    },
-                    actionDisable: function () {
-                        localizationService.localize("defaultdialogs_confirmdisable").then(function (txtConfirmDisable) {
-                            var currentMenuNode = UmbClientMgr.mainTree().getActionNode();
-                            if (currentMenuNode) {
-                                if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
-                                    angularHelper.safeApply($rootScope, function () {
-                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
-                                            UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
-                                        });
-                                    });
-                                }
-                            }
-                        });
                     }
                 };
 

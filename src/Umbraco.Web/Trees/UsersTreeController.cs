@@ -87,16 +87,11 @@ namespace Umbraco.Web.Trees
             if (id == "0")
                 return menu;
 
-            // Disable user
-            menu.Items.Add<ActionDisable>(
-                Services.TextService.Localize("actions", ActionDisable.Instance.Alias), 
-                false,
-                new Dictionary<string, object>
-                {
-                    {MenuItem.JsActionKey, ActionDisable.Instance.JsFunctionName}
-                }
-            );
-
+            menu.Items.Add(new DisableUser()
+            {
+                Name = Services.TextService.Localize("actions", "disable")
+            });
+            
             return menu;
         }
     }

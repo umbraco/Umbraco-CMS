@@ -326,6 +326,7 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
@@ -340,7 +341,6 @@
     <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
     <Compile Include="_Legacy\Actions\ActionCopy.cs" />
     <Compile Include="_Legacy\Actions\ActionDelete.cs" />
-    <Compile Include="_Legacy\Actions\ActionDisable.cs" />
     <Compile Include="_Legacy\Actions\ActionEmptyTranscan.cs" />
     <Compile Include="_Legacy\Actions\ActionExport.cs" />
     <Compile Include="_Legacy\Actions\ActionImport.cs" />
