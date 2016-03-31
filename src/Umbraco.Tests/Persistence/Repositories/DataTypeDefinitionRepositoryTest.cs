@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IMappingResolver>(), Constants.ObjectTypes.DataTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver, Constants.ObjectTypes.DataTypeContainerGuid);
         }
 
         [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
