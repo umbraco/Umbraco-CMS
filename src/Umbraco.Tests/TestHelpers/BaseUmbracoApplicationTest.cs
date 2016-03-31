@@ -241,7 +241,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("Umbraco.Core"),
                         Assembly.Load("umbraco"),
                         Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("businesslogic"),
                         Assembly.Load("cms"),
                         Assembly.Load("controls"),
                     }
