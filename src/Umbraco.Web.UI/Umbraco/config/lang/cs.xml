@@ -964,6 +964,7 @@
     <key alias="templates">Šablony</key>
     <key alias="xslt">XSLT soubory</key>
     <key alias="userTypes">Typy Uživatelů</key>
+    <key alias="users">Uživatelé</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nová aktualizace je připrvena</key>

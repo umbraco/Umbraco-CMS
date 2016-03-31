@@ -1159,7 +1159,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="memberRoles">役割</key>
     <key alias="memberTypes">メンバーの種類</key>
     <key alias="documentTypes">ドキュメントタイプ</key>
-	<key alias="relationTypes">関連タイプ</key>
+	  <key alias="relationTypes">関連タイプ</key>
     <key alias="packager">パッケージ</key>
     <key alias="packages">パッケージ</key>
     <key alias="python">Python ファイル</key>
@@ -1173,6 +1173,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="xslt">XSLT ファイル</key>
     <key alias="analytics">アナリティクス</key>
     <key alias="userTypes">ユーザータイプ</key>
+    <key alias="users">ユーザー</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>
