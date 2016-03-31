@@ -318,6 +318,7 @@
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
@@ -328,6 +329,8 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
+    <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MemberGroupSave.cs" />
     <Compile Include="Trees\MemberGroupTreeController.cs" />
     <Compile Include="Trees\MemberTypeAndGroupTreeControllerBase.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
@@ -1454,13 +1457,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
-      <DependentUpon>EditMemberGroup.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.designer.cs">
-      <DependentUpon>EditMemberGroup.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1741,9 +1737,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

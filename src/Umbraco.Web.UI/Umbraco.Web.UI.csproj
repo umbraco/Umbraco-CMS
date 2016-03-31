@@ -612,7 +612,9 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
-    <Content Include="Umbraco\Config\Lang\en_us.xml" />
+    <Content Include="Umbraco\Config\Lang\en_us.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />
     <Content Include="Umbraco\Config\Lang\pl.xml" />
@@ -858,9 +860,6 @@
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
-    <Content Include="Umbraco\Members\EditMemberGroup.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
     <Content Include="Umbraco\Settings\editTemplate.aspx" />
