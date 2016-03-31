@@ -318,6 +318,16 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="HealthCheck\HealthCheckAction.cs" />
+    <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
+    <Compile Include="HealthCheck\HealthCheckContext.cs" />
+    <Compile Include="HealthCheck\HealthCheckController.cs" />
+    <Compile Include="HealthCheck\HealthCheckResolver.cs" />
+    <Compile Include="HealthCheck\HealthCheck.cs" />
+    <Compile Include="HealthCheck\HealthCheckStatus.cs" />
+    <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
+    <Compile Include="HealthCheck\StatusResultType.cs" />
+    <Compile Include="HealthCheck\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
