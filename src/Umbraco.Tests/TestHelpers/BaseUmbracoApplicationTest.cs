@@ -193,9 +193,14 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual void SetupCacheHelper()
+        private void SetupCacheHelper()
         {
-            CacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            CacheHelper = CreateCacheHelper();
+        }
+
+        protected virtual CacheHelper CreateCacheHelper()
+        {
+            return CacheHelper.CreateDisabledCacheHelper();
         }
 
         /// <summary>
