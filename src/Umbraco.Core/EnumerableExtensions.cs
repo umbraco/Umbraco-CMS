@@ -312,5 +312,16 @@ namespace Umbraco.Core
         {
             return transform(source);
         }
+
+        /// <summary>
+        /// Gets a null IEnumerable as an empty IEnumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T> items)
+        {
+            return items ?? Enumerable.Empty<T>();
+        }
     }
 }

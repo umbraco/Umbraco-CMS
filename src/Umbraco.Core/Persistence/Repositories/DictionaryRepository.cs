@@ -232,7 +232,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var entity = factory.BuildEntity(dto);
 
             var list = new List<IDictionaryTranslation>();
-            foreach (var textDto in dto.LanguageTextDtos)
+            foreach (var textDto in dto.LanguageTextDtos.EmptyNull())
             {                
                 if (textDto.LanguageId <= 0)
                     continue;

@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
                 return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), 
+                    RuntimeCache, GetEntityId, () => PerformGetAll(),
                     //allow this cache to expire
                     expires:true));
             }
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
-            var sql = translator.Translate();                
+            var sql = translator.Translate();
 
             var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
 
@@ -133,10 +133,10 @@ namespace Umbraco.Core.Persistence.Repositories
             sql = isCount
                 ? sql.SelectCount()
                 : sql.Select<ContentTypeDto>(r =>
-                        r.Select<NodeDto>(rr => 
+                        r.Select<NodeDto>(rr =>
                             rr.Select<ContentTypeTemplateDto>()));
-    
-            sql.Select(isCount ? "COUNT(*)" : "*")
+
+            sql
                .From<ContentTypeDto>(SqlSyntax)
                .InnerJoin<NodeDto>(SqlSyntax)
                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 PersistDeletedItem((IEntity)child);
             }
 
-            //Before we call the base class methods to run all delete clauses, we need to first 
+            //Before we call the base class methods to run all delete clauses, we need to first
             // delete all of the property data associated with this document type. Normally this will
             // be done in the ContentTypeService by deleting all associated content first, but in some cases
             // like when we switch a document type, there is property data left over that is linked

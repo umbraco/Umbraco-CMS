@@ -122,7 +122,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 ? sql.SelectCount() 
                 : sql.Select<MemberDto>(r =>
                         r.Select<ContentVersionDto>(rr =>
-                            rr.Select<ContentDto>()));
+                            rr.Select<ContentDto>(rrr =>
+                                rrr.Select<NodeDto>())));
 
             sql
                 .From<MemberDto>(SqlSyntax)
