@@ -114,6 +114,11 @@
             /// </summary>
             public const string UserTypes = "userTypes";
 
+            /// <summary>
+            /// alias for the users tree.
+            /// </summary>
+            public const string Users = "users";
+
             public const string Scripts = "scripts";
 
             public const string PartialViews = "partialViews";

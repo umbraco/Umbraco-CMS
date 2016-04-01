@@ -743,6 +743,7 @@ Miłego dnia!]]></key>
     <key alias="templates">Szablony</key>
     <key alias="xslt">Pliki XSLT</key>
     <key alias="userTypes">Typy Użytkowników</key>
+    <key alias="users">Użytkowników</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Aktualizacja jest gotowa</key>

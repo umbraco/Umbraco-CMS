@@ -2,6 +2,7 @@
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" ValidateRequest="false" %>
 <%@ Import Namespace="umbraco" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">

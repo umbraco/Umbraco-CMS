@@ -1,11 +1,12 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true" CodeBehind="installedPackage.aspx.cs" Inherits="umbraco.presentation.developer.packages.installedPackage" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function toggleDiv(id) {
             var div = document.getElementById(id);
 
-            if (div.style.display == "none")
+            if (div.style.display === "none")
                 div.style.display = "block";
 
             else
@@ -13,7 +14,7 @@
         }
 
         function openDemo(link, id) {
-            UmbClientMgr.openModalWindow("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, link.innerHTML, true, 750, 550)
+            UmbClientMgr.openModalWindow("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, link.innerHTML, true, 750, 550);
         }
 
     </script>
@@ -159,7 +160,7 @@
                     //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
                     // but it works and maintains query strings
 
-                    var umbPath = "<%=umbraco.GlobalSettings.Path%>";
+                    var umbPath = "<%=GlobalSettings.Path%>";
                     setTimeout(function () {
                         var mainWindow = UmbClientMgr.mainWindow();
 

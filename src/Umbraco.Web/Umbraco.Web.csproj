@@ -331,12 +331,14 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
+    <Compile Include="Trees\UsersTreeController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -344,7 +346,6 @@
     <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
     <Compile Include="_Legacy\Actions\ActionCopy.cs" />
     <Compile Include="_Legacy\Actions\ActionDelete.cs" />
-    <Compile Include="_Legacy\Actions\ActionDisable.cs" />
     <Compile Include="_Legacy\Actions\ActionEmptyTranscan.cs" />
     <Compile Include="_Legacy\Actions\ActionExport.cs" />
     <Compile Include="_Legacy\Actions\ActionImport.cs" />
@@ -1299,13 +1300,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.cs">
-      <DependentUpon>MemberSearch.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.designer.cs">
-      <DependentUpon>MemberSearch.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\preview\PreviewContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
@@ -1470,20 +1464,6 @@
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.designer.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\search.aspx.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\search.aspx.designer.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.cs">
-      <DependentUpon>ViewMembers.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.designer.cs">
-      <DependentUpon>ViewMembers.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1558,7 +1538,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
@@ -1655,7 +1634,6 @@
     </Compile>
     <Compile Include="WebServices\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
-    <Compile Include="_Legacy\Utils\JSONSerializer.cs" />
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
@@ -1677,9 +1655,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
@@ -1705,7 +1680,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
@@ -1731,7 +1705,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
