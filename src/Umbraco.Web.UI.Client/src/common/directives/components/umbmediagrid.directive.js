@@ -118,6 +118,13 @@ Use this directive to generate a thumbnail grid of media items.
                     var item = scope.items[i];
                     setItemData(item);
                     setOriginalSize(item, itemMaxHeight);
+
+                    // remove non images when onlyImages is set to true
+                    if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                        scope.items.splice(i, 1);
+                        i--;
+                    }
+
                 }
 
                 if (scope.items.length > 0) {
@@ -265,7 +272,8 @@ Use this directive to generate a thumbnail grid of media items.
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
-                itemMinHeight: "@"
+                itemMinHeight: "@",
+                onlyImages: "@"
             },
             link: link
         };
