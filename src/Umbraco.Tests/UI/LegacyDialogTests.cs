@@ -27,7 +27,6 @@ namespace Umbraco.Tests.UI
             }
         }
 
-        [TestCase(typeof(UserTypeTasks), Constants.Applications.Users)]
         [TestCase(typeof(XsltTasks), Constants.Applications.Developer)]
         [TestCase(typeof(userTasks), Constants.Applications.Users)]
         [TestCase(typeof(templateTasks), Constants.Applications.Settings)]
