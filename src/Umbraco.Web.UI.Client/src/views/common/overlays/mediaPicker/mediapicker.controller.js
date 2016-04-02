@@ -20,7 +20,7 @@ angular.module("umbraco")
                 $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
             }
             else {
-                $scope.acceptedFileTypes = "*.*";
+                $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.disallowedUploadFiles).replace(/\./g, "!.");
             }
             $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
