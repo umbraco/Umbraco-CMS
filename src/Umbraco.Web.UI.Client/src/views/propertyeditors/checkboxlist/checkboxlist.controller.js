@@ -8,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             var vals = _.values($scope.model.config.items);
             var keys = _.keys($scope.model.config.items);
             for (var i = 0; i < vals.length; i++) {
-                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
+                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value });
             }
 
             //ensure the items are sorted by the provided sort order
@@ -28,9 +28,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 $scope.model.value = [];
             }
 
-            console.log($scope.model.value);
             for (var i = 0; i < $scope.model.config.items.length; i++) {
-                console.log($scope.model.config.items[i].id);
                 var isChecked = _.contains($scope.model.value, $scope.model.config.items[i].id);
                 $scope.selectedItems.push({
                     checked: isChecked,
