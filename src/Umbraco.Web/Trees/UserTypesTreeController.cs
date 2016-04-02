@@ -34,9 +34,7 @@ namespace Umbraco.Web.Trees
                         queryStrings,
                         userType.Name,
                         "icon-users",
-                        false,
-                        "/" + queryStrings.GetValue<string>("application") + "/framed/"
-                        + Uri.EscapeDataString("users/EditUserType.aspx?id=" + userType.Id)));
+                        false));
             }
 
             return nodes;

@@ -318,6 +318,7 @@
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\UserTypeController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
@@ -326,6 +327,10 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\ContentEditing\PermissionDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeSave.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />

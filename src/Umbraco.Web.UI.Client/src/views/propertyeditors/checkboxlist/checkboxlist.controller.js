@@ -1,14 +1,14 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
     function($scope) {
-        
-        if (angular.isObject($scope.model.config.items)) {
+
+        if (!angular.isArray($scope.model.config.items)) {
             
             //now we need to format the items in the dictionary because we always want to have an array
             var newItems = [];
             var vals = _.values($scope.model.config.items);
             var keys = _.keys($scope.model.config.items);
             for (var i = 0; i < vals.length; i++) {
-                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value });
+                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
             }
 
             //ensure the items are sorted by the provided sort order
@@ -28,15 +28,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 $scope.model.value = [];
             }
 
+            console.log($scope.model.value);
             for (var i = 0; i < $scope.model.config.items.length; i++) {
+                console.log($scope.model.config.items[i].id);
                 var isChecked = _.contains($scope.model.value, $scope.model.config.items[i].id);
                 $scope.selectedItems.push({
                     checked: isChecked,
                     key: $scope.model.config.items[i].id,
-                    val: $scope.model.config.items[i].value
+                    val: $scope.model.config.items[i].value,
+                    localize: $scope.model.config.items[i].localize
                 });
             }
-
         }
 
         setupViewModel();

@@ -148,9 +148,9 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                         ? "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page
                         : "/content/content/edit/" + data.parentId;
                 }
-
+               
                 init($scope.content);
-
+                console.log($scope.content);
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors

@@ -5,8 +5,9 @@
             <label class="checkbox">
                 <input type="checkbox" name="checkboxlist"
                        value="{{item.key}}"
-                       ng-model="item.checked" />
-                {{item.val}}
+                       ng-model="item.checked"/>
+                <span ng-hide="!item.localize"><localize key="{{item.val}}" /></span>
+                <span ng-hide="item.localize">{{item.val}}</span>
             </label>
         </li>
     </ul>

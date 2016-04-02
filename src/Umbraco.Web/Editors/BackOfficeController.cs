@@ -267,6 +267,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetMembershipProviderConfig())
                             },
                             {
+                                "userTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserTypeController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(
                                     controller => controller.DeleteLegacyItem(null, null, null))
                             },
