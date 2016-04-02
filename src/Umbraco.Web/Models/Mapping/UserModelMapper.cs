@@ -53,7 +53,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
 
-            config.CreateMap<IUserType, UserTypeDisplay>();
+            config.CreateMap<IUserType, UserTypeDisplay>()
+                .ForMember(type => type.Path, opt => opt.MapFrom(_ => "-1," + _.Id));
 
         } 
      

@@ -15,6 +15,9 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             Notifications = new List<Notification>();
         }
+        
+        [DataMember(Name = "path")]
+        public string Path { get; set; }
 
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }

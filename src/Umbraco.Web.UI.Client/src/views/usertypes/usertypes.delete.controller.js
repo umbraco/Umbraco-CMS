@@ -6,21 +6,21 @@
  * @description
  * The controller for deleting content
  */
-function UserTypesDeleteController($scope, memberResource, treeService, navigationService, editorState, $location, $routeParams) {
+function UserTypesDeleteController($scope, userTypeResource, treeService, navigationService, editorState, $location, $routeParams) {
 
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
 
-        memberResource.deleteByKey($scope.currentNode.id).then(function () {
+        userTypeResource.deleteById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
             treeService.removeNode($scope.currentNode);
 
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
-            if (editorState.current && editorState.current.key == $scope.currentNode.id) {
-                $location.path("/member/member/list/" + ($routeParams.listName ? $routeParams.listName : 'all-members'));
+            if (editorState.current && editorState.current.id == $scope.currentNode.id) {
+                $location.path("/users");
             }
 
             navigationService.hideMenu();

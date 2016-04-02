@@ -93,7 +93,8 @@ namespace Umbraco.Web.Editors
 
             var id = saveModel.Id;
             var userType = id > 0 ? 
-                ApplicationContext.Services.UserService.GetUserTypeById(id) : new UserType();
+                ApplicationContext.Services.UserService.GetUserTypeById(id) : 
+                new UserType(saveModel.Name, saveModel.Name);
             if (userType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -104,7 +105,7 @@ namespace Umbraco.Web.Editors
             ApplicationContext.Services.UserService.SaveUserType(userType);
 
             var display = Mapper.Map<IUserType, UserTypeDisplay>(userType);
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/memberGroupSaved"), string.Empty);
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/editUserTypeSaved"), string.Empty);
             return display;
         }
     }

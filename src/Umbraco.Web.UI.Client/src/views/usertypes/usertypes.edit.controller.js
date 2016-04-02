@@ -23,8 +23,6 @@ function UserTypesEditController($scope, $routeParams, $location, $q, $window, l
         userTypeResource.getScaffold()
             .then(function (data) {
                 init(data);
-                
-
             });
     }
     else {
@@ -36,7 +34,6 @@ function UserTypesEditController($scope, $routeParams, $location, $q, $window, l
             var items = [];
             for (var i in permissions) {
                 var permission = permissions[i];
-                console.log(permission.key)
                 items.push({ "id": permission.key, "value": "actions_" + permission.name, localize: true });
             }
             $scope.content = data;
@@ -56,9 +53,9 @@ function UserTypesEditController($scope, $routeParams, $location, $q, $window, l
             //set a shared state
             editorState.set($scope.content);
 
-            /*navigationService.syncTree({ tree: "userTypes", path: data.path }).then(function (syncArgs) {
-                    //$scope.page.menu.currentNode = syncArgs.node;
-                });*/
+            navigationService.syncTree({ tree: "userTypes", path: data.path }).then(function (syncArgs) {
+                    $scope.page.menu.currentNode = syncArgs.node;
+                });
 
             $scope.page.loading = false;
         });
@@ -96,9 +93,9 @@ function UserTypesEditController($scope, $routeParams, $location, $q, $window, l
                     //share state
                     editorState.set($scope.content);
 
-                    /*navigationService.syncTree({ tree: "memberGroups", path: data.path, forceReload: true }).then(function (syncArgs) {
+                    navigationService.syncTree({ tree: "userTypes", path: data.path, forceReload: true }).then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
-                    });*/
+                    });
 
                     $scope.page.saveButtonState = "success";
 
