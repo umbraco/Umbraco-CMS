@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<LogDto>();
+                : sql.Select<LogDto>(Database);
 
             sql
                 .From<LogDto>(SqlSyntax);

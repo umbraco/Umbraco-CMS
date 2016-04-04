@@ -154,10 +154,9 @@ namespace Umbraco.Core.Persistence
             return sql.Select("COUNT(*)");
         }
 
-        public static Sql Select<T>(this Sql sql, Func<RefSql, RefSql> refexpr = null)
+        public static Sql Select<T>(this Sql sql, IDatabase database, Func<RefSql, RefSql> refexpr = null)
         {
-            Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
-            var pd = database.PocoDataFactory.ForType(typeof(T));
+            var pd = database.PocoDataFactory.ForType(typeof (T));
             var tableName = pd.TableInfo.TableName;
             var columns = pd.QueryColumns.Select(x => GetColumn(database.DatabaseType,
                 tableName,
@@ -167,7 +166,7 @@ namespace Umbraco.Core.Persistence
 
             if (refexpr != null)
             {
-                var nsql = new RefSql(sql, null);
+                var nsql = new RefSql(sql, database, null);
                 refexpr(nsql);
             }
 
@@ -181,12 +180,11 @@ namespace Umbraco.Core.Persistence
 
         public static RefSql Select<T>(this RefSql sql, string referenceName, Func<RefSql, RefSql> refexpr = null)
         {
-            Database database = ApplicationContext.Current.DatabaseContext.Database; // fixme.npoco
-            if (referenceName == null) referenceName = typeof(T).Name;
+            if (referenceName == null) referenceName = typeof (T).Name;
             if (sql.Prefix != null) referenceName = sql.Prefix + PocoData.Separator + referenceName;
-            var pd = database.PocoDataFactory.ForType(typeof(T));
+            var pd = sql.Database.PocoDataFactory.ForType(typeof (T));
             var tableName = pd.TableInfo.TableName;
-            var columns = pd.QueryColumns.Select(x => GetColumn(database.DatabaseType,
+            var columns = pd.QueryColumns.Select(x => GetColumn(sql.Database.DatabaseType,
                 tableName,
                 x.Value.ColumnName,
                 string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias,
@@ -195,7 +193,7 @@ namespace Umbraco.Core.Persistence
 
             if (refexpr != null)
             {
-                var nsql = new RefSql(sql.Sql, referenceName);
+                var nsql = new RefSql(sql.Sql, sql.Database, referenceName);
                 refexpr(nsql);
             }
 
@@ -204,13 +202,15 @@ namespace Umbraco.Core.Persistence
 
         public class RefSql
         {
-            public RefSql(Sql sql, string prefix)
+            public RefSql(Sql sql, IDatabase database, string prefix)
             {
                 Sql = sql;
+                Database = database;
                 Prefix = prefix;
             }
 
             public Sql Sql { get; private set; }
+            public IDatabase Database { get; private set; }
             public string Prefix { get; private set; }
         }
 

@@ -295,7 +295,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return processQuery(pagedResult.Items);
         }
-        
+
         /// <summary>
          /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
          /// </summary>
@@ -428,7 +428,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (versions.Length == 0) return new Dictionary<int, PropertyCollection>();
 
             var sql = new Sql()
-                .Select<PropertyDataDto>(r => r.Select<PropertyTypeDto>())
+                .Select<PropertyDataDto>(Database, r => r.Select<PropertyTypeDto>())
                 .From<PropertyDataDto>(SqlSyntax)
                 .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
                 .WhereIn<PropertyDataDto>(SqlSyntax, x => x.VersionId, versions);
@@ -452,7 +452,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .ToList();
 
                 var preSql = new Sql()
-                    .Select<DataTypePreValueDto>()
+                    .Select<DataTypePreValueDto>(Database)
                     .From<DataTypePreValueDto>(SqlSyntax)
                     .LeftJoin<PropertyTypeDto>(SqlSyntax).On<DataTypePreValueDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeNodeId, right => right.DataTypeId)
                     .WhereIn<PropertyTypeDto>(SqlSyntax, x => x.Id, allPropertyTypes);

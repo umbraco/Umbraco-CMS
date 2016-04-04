@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<MigrationDto>();
+                : sql.Select<MigrationDto>(Database);
 
             sql
                 .From<MigrationDto>(SqlSyntax);

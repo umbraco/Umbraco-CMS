@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<LanguageDto>();
+                : sql.Select<LanguageDto>(Database);
 
             sql
                .From<LanguageDto>(SqlSyntax);

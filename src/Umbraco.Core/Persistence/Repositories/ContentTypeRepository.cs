@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeDto>(r =>
+                : sql.Select<ContentTypeDto>(Database, r =>
                         r.Select<NodeDto>(rr =>
                             rr.Select<ContentTypeTemplateDto>()));
 

@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<NodeDto>();
+                : sql.Select<NodeDto>(Database);
 
             sql
                 .From<NodeDto>(SqlSyntax)
