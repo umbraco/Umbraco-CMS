@@ -26,6 +26,8 @@ namespace Umbraco.Core.Persistence
 
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
+        private readonly RetryPolicy _connectionRetryPolicy;
+        private readonly RetryPolicy _commandRetryPolicy;
         private bool _enableCount;
 
         /// <summary>
@@ -66,19 +68,23 @@ namespace Umbraco.Core.Persistence
         // used by DefaultDatabaseFactory
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
-        public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
+        public UmbracoDatabase(string connectionString, string providerName, ILogger logger, RetryPolicy connectionRetryPolicy, RetryPolicy commandRetryPolicy)
             : base(connectionString, providerName, DefaultIsolationLevel)
         {
             _logger = logger;
+            _connectionRetryPolicy = connectionRetryPolicy;
+            _commandRetryPolicy = commandRetryPolicy;
             EnableSqlTrace = false;
         }
 
         // used by DefaultDatabaseFactory
         // creates one instance per request
-        public UmbracoDatabase(string connectionStringName, ILogger logger)
+        public UmbracoDatabase(string connectionStringName, ILogger logger, RetryPolicy connectionRetryPolicy, RetryPolicy commandRetryPolicy)
             : base(connectionStringName, DefaultIsolationLevel)
         {
             _logger = logger;
+            _connectionRetryPolicy = connectionRetryPolicy;
+            _commandRetryPolicy = commandRetryPolicy;
             EnableSqlTrace = false;
         }
 
@@ -90,12 +96,8 @@ namespace Umbraco.Core.Persistence
             connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
 
             // wrap the connection with a retrying connection
-            // fixme.npoco - inject policies, do not recompute all the time!
-            var connectionString = connection.ConnectionString ?? string.Empty;
-            var conRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
-            var cmdRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);
-            if (conRetryPolicy != null || cmdRetryPolicy != null)
-                connection = new RetryDbConnection(connection, conRetryPolicy, cmdRetryPolicy);
+            if (_connectionRetryPolicy != null || _commandRetryPolicy != null)
+                connection = new RetryDbConnection(connection, _connectionRetryPolicy, _commandRetryPolicy);
 
             return connection;
         }

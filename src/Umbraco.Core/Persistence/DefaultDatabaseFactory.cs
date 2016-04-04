@@ -1,9 +1,11 @@
 using System;
+using System.Configuration;
 using System.Web;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence
@@ -21,8 +23,10 @@ namespace Umbraco.Core.Persistence
 	    private readonly string _connectionStringName;
 	    private readonly ILogger _logger;
 	    private readonly DatabaseFactory _databaseFactory;
+        private readonly RetryPolicy _connectionRetryPolicy;
+        private readonly RetryPolicy _commandRetryPolicy;
 
-	    public string ConnectionString { get; private set; }
+        public string ConnectionString { get; private set; }
         public string ProviderName { get; private set; }
 
         //very important to have ThreadStatic:
@@ -42,24 +46,34 @@ namespace Umbraco.Core.Persistence
 		{
 	        Mandate.ParameterNotNullOrEmpty(connectionStringName, "connectionStringName");
 			_connectionStringName = connectionStringName;
-		}
 
-	    /// <summary>
-	    /// Constructor accepting custom connectino string and provider name
-	    /// </summary>
-	    /// <param name="connectionString">Connection String to use with Database</param>
-	    /// <param name="providerName">Database Provider for the Connection String</param>
-	    /// <param name="logger"></param>
-	    public DefaultDatabaseFactory(string connectionString, string providerName, ILogger logger)
+            if (ConfigurationManager.ConnectionStrings[connectionStringName] == null)
+                throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+            var connectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+
+            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
+            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);
+        }
+
+        /// <summary>
+        /// Constructor accepting custom connectino string and provider name
+        /// </summary>
+        /// <param name="connectionString">Connection String to use with Database</param>
+        /// <param name="providerName">Database Provider for the Connection String</param>
+        /// <param name="logger"></param>
+        public DefaultDatabaseFactory(string connectionString, string providerName, ILogger logger)
             : this(logger)
 		{
 	        Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
 			Mandate.ParameterNotNullOrEmpty(providerName, "providerName");
 			ConnectionString = connectionString;
 			ProviderName = providerName;
-		}
 
-	    private DefaultDatabaseFactory(ILogger logger)
+            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
+            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);
+        }
+
+        private DefaultDatabaseFactory(ILogger logger)
 	    {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
@@ -79,8 +93,8 @@ namespace Umbraco.Core.Persistence
 	    private UmbracoDatabase CreateDatabaseInstance()
 	    {
 	        return string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
-                ? new UmbracoDatabase(ConnectionString, ProviderName, _logger)
-                : new UmbracoDatabase(_connectionStringName, _logger);
+                ? new UmbracoDatabase(ConnectionString, ProviderName, _logger, _connectionRetryPolicy, _commandRetryPolicy)
+                : new UmbracoDatabase(_connectionStringName, _logger, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
 		public UmbracoDatabase CreateDatabase()
