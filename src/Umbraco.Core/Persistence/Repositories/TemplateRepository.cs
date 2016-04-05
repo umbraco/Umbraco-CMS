@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<TemplateDto>(sql);
@@ -118,20 +118,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,ITemplate>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<TemplateDto>(Database, r =>
+                : sql.Select<TemplateDto>(r =>
                         r.Select<NodeDto>());
 
             sql
-                .From<TemplateDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TemplateDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .From<TemplateDto>()
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
@@ -341,11 +342,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIdsSql = new Sql()
+            var childIdsSql = Sql()
                 .Select("nodeId,alias,parentID")
-                .From<TemplateDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TemplateDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .From<TemplateDto>()
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
                 //lookup axis's
                 .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
@@ -769,7 +770,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(SqlSyntax, x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

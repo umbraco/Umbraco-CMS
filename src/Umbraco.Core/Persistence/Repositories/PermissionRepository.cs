@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Web.Caching;
 using NPoco;
@@ -79,9 +80,9 @@ namespace Umbraco.Core.Persistence.Repositories
                         whereBuilder.Append(")");
                     }
 
-                    var sql = new Sql();
-                    sql.Select("*")
-                        .From<User2NodePermissionDto>(_sqlSyntax)
+                    var sql = new Sql().For(_sqlSyntax, _unitOfWork.Database)
+                        .SelectAll()
+                        .From<User2NodePermissionDto>()
                         .Where(whereBuilder.ToString());
 
                     //ToArray() to ensure it's all fetched from the db once.
@@ -104,11 +105,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<User2NodePermissionDto>(_sqlSyntax)
-               .Where<User2NodePermissionDto>(_sqlSyntax, dto => dto.NodeId == entityId)
-               .OrderBy<User2NodePermissionDto>(_sqlSyntax, dto => dto.NodeId);
+            var sql = new Sql().For(_sqlSyntax, _unitOfWork.Database)
+                .SelectAll()
+                .From<User2NodePermissionDto>()
+                .Where<User2NodePermissionDto>(dto => dto.NodeId == entityId)
+                .OrderBy<User2NodePermissionDto>(dto => dto.NodeId);
 
             //ToArray() to ensure it's all fetched from the db once.
             var result = _unitOfWork.Database.Fetch<User2NodePermissionDto>(sql).ToArray();

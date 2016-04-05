@@ -87,9 +87,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
                             return uow.Database.ExecuteScalar<int?>(
-                                new Sql().Select("id")
-                                    .From<NodeDto>(RepositoryFactory.SqlSyntax)
-                                    .Where<NodeDto>(RepositoryFactory.SqlSyntax, dto => dto.UniqueId == key));
+                                new Sql().For(RepositoryFactory.SqlSyntax, uow.Database)
+                                    .Select("id")
+                                    .From<NodeDto>()
+                                    .Where<NodeDto>(dto => dto.UniqueId == key));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -128,9 +129,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                             return uow.Database.ExecuteScalar<Guid?>(
-                                new Sql().Select("uniqueID")
-                                    .From<NodeDto>(RepositoryFactory.SqlSyntax)
-                                    .Where<NodeDto>(RepositoryFactory.SqlSyntax, dto => dto.NodeId == id));
+                                new Sql().For(RepositoryFactory.SqlSyntax, uow.Database)
+                                    .Select("uniqueID")
+                                    .From<NodeDto>()
+                                    .Where<NodeDto>(dto => dto.NodeId == id));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -493,7 +495,10 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = new Sql().Select("nodeObjectType").From<NodeDto>(RepositoryFactory.SqlSyntax).Where<NodeDto>(RepositoryFactory.SqlSyntax, x => x.NodeId == id);
+                var sql = new Sql().For(RepositoryFactory.SqlSyntax, uow.Database)
+                    .Select("nodeObjectType")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeId == id);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
@@ -509,7 +514,10 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = new Sql().Select("nodeObjectType").From<NodeDto>(RepositoryFactory.SqlSyntax).Where<NodeDto>(RepositoryFactory.SqlSyntax, x => x.UniqueId == key);
+                var sql = new Sql().For(RepositoryFactory.SqlSyntax, uow.Database)
+                    .Select("nodeObjectType")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.UniqueId == key);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);

@@ -84,16 +84,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,RelationType>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<RelationTypeDto>(Database);
+                : sql.Select<RelationTypeDto>();
 
             sql
-               .From<RelationTypeDto>(SqlSyntax);
+               .From<RelationTypeDto>();
+
             return sql;
         }
 

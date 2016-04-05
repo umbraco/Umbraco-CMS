@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
             List<MigrationDto> migrations = null;
             Execute.Code(db =>
             {
-                migrations = Context.Database.Fetch<MigrationDto>(new Sql().Select("*").From<MigrationDto>(SqlSyntax));
+                migrations = Context.Database.Fetch<MigrationDto>(Sql().SelectAll().From<MigrationDto>());
                 return string.Empty;
             });
             Delete.FromTable("umbracoMigration").AllRows();

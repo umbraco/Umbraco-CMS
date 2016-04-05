@@ -59,11 +59,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select("*").From<TaskTypeDto>(SqlSyntax);
-            return sql;
+            return Sql().SelectAll().From<TaskTypeDto>();
         }
 
         protected override string GetBaseWhereClause()

@@ -87,28 +87,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IUser>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            if (isCount)
-            {
-                sql.Select("COUNT(*)").From<UserDto>(SqlSyntax);
-            }
-            else
-            {
-                return GetBaseQuery("*");
-            }
-            return sql;
+            return isCount ? Sql().SelectCount().From<UserDto>() : GetBaseQuery("*");
         }
 
-        private Sql GetBaseQuery(string columns)
+        private UmbracoSql GetBaseQuery(string columns)
         {
-            var sql = new Sql();
-            sql.Select(columns)
-                      .From<UserDto>(SqlSyntax)
-                      .LeftJoin<User2AppDto>(SqlSyntax)
-                      .On<UserDto, User2AppDto>(SqlSyntax, left => left.Id, right => right.UserId);
-            return sql;
+            return Sql()
+                .Select(columns)
+                .From<UserDto>()
+                .LeftJoin<User2AppDto>()
+                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
         }
 
 
@@ -277,11 +267,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool Exists(string username)
         {
-            var sql = new Sql();
-
-            sql.Select("COUNT(*)")
-                .From<UserDto>(SqlSyntax)
-                .Where<UserDto>(SqlSyntax, x => x.UserName == username);
+            var sql = Sql()
+                .SelectCount()
+                .From<UserDto>()
+                .Where<UserDto>(x => x.UserName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -328,10 +317,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
         {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
+            if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
-            var sql = new Sql();
-            sql.Select("*").From<UserDto>(SqlSyntax);
+            var sql = Sql()
+                .SelectAll()
+                .From<UserDto>();
 
             Sql resultQuery;
             if (query != null)

@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotImplementedException();
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
             throw new NotImplementedException();
         }

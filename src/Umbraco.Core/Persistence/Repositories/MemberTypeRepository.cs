@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
+            sql.OrderByDescending<NodeDto>(x => x.NodeId);
 
             var dtos = Database
                 .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
@@ -73,8 +73,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMemberType>(sqlSubquery, query);
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
+                .OrderBy<NodeDto>(x => x.SortOrder);
 
             var dtos = Database
                 .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
@@ -84,47 +84,47 @@ namespace Umbraco.Core.Persistence.Repositories
             return BuildFromDtos(dtos);
         }
         
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-
             if (isCount)
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
-                return sql;
+                return Sql()
+                    .SelectCount()
+                    .From<NodeDto>()
+                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
-                "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
-                "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
-                "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
-                "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
-                "cmsPropertyTypeGroup.text AS PropertyGroupName",
-                "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql()
+                .Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
+                    "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
+                    "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
+                    "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
+                    "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
+                    "cmsPropertyTypeGroup.text AS PropertyGroupName",
+                    "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
-        protected Sql GetSubquery()
+        protected UmbracoSql GetSubquery()
         {
-            var sql = new Sql()
+            var sql = Sql()
                 .Select("DISTINCT(umbracoNode.id)")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

@@ -19,8 +19,8 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_StartsWith_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql();
-            sql.Select("*");
+            var sql = new Sql().For(SqlSyntax, null);
+            sql.SelectAll();
             sql.From("umbracoNode");
 
             var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith("-1"));
@@ -46,8 +46,8 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ParentId_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql();
-            sql.Select("*");
+            var sql = new Sql().For(SqlSyntax, null);
+            sql.SelectAll();
             sql.From("umbracoNode");
 
             var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.ParentId == -1);
@@ -73,8 +73,8 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ContentTypeAlias_Query_For_IContentType()
         {
             // Arrange
-            var sql = new Sql();
-            sql.Select("*");
+            var sql = new Sql().For(SqlSyntax, null);
+            sql.SelectAll();
             sql.From("umbracoNode");
 
             var query = new Query<IContentType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "umbTextpage");
@@ -103,16 +103,16 @@ namespace Umbraco.Tests.Persistence.Querying
             var id = 1046;
             var nodeObjectTypeId = new Guid(Constants.ObjectTypes.Document);
 
-            var sql = new Sql();
-            sql.Select("*")
-                .From<DocumentDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax)
-                .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == nodeObjectTypeId);
+            var sql = new Sql().For(SqlSyntax, null);
+            sql.SelectAll()
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
 
             var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
 

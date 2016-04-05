@@ -91,20 +91,21 @@ namespace Umbraco.Core.Persistence.Repositories
                 : Enumerable.Empty<IMediaType>();
         }       
         
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeDto>(Database, r =>
+                : sql.Select<ContentTypeDto>(r =>
                         r.Select<NodeDto>());
 
             sql
-                .From<ContentTypeDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>( left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 

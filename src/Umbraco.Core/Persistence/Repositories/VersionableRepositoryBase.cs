@@ -42,16 +42,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<TEntity> GetAllVersions(int id)
         {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<ContentVersionDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            var sql = Sql()
+                .SelectAll()
+                .From<ContentVersionDto>()
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dtos = Database.Fetch<ContentVersionDto>(sql);
             return dtos.Select(x => GetByVersion(x.VersionId));
@@ -112,25 +112,27 @@ namespace Umbraco.Core.Persistence.Repositories
             var pathMatch = parentId == -1
                 ? "-1,"
                 : "," + parentId + ",";
-            var sql = new Sql();
+
+            var sql = Sql()
+                .SelectCount()
+                .From<NodeDto>();
+
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch));
+                sql
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch));
             }
             else
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch))
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                sql
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch))
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -138,25 +140,26 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
-            var sql = new Sql();
+            var sql = Sql()
+                .SelectCount()
+                .From<NodeDto>();
+
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId);
+                sql
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId);
             }
             else
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId)
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                sql
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -169,23 +172,24 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public int Count(string contentTypeAlias = null)
         {
-            var sql = new Sql();
+            var sql = Sql()
+                .SelectCount()
+                .From<NodeDto>();
+
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                sql
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
             else
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                sql
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -230,10 +234,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
+        private UmbracoSql GetFilteredSqlForPagedResults(UmbracoSql sql, Func<Tuple<string, object[]>> defaultFilter = null)
         {
             //copy to var so that the original isn't changed
-            var filteredSql = new Sql(sql.SQL, sql.Arguments);
+            var filteredSql = new UmbracoSql(sql.SqlContext, sql.SQL, sql.Arguments);
             // Apply filter
             if (defaultFilter != null)
             {
@@ -243,25 +247,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return filteredSql;
         }
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
+        private UmbracoSql GetSortedSqlForPagedResults(UmbracoSql sql, Direction orderDirection, string orderBy)
         {
-            //copy to var so that the original isn't changed
-            var sortedSql = new Sql(sql.SQL, sql.Arguments);
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                if (orderDirection == Direction.Ascending)
-                {
-                    sortedSql.OrderBy(orderByParams);
-                }
-                else
-                {
-                    sortedSql.OrderByDescending(orderByParams);
-                }
-                return sortedSql;
-            }
-            return sortedSql;
+            // copy to var so that the original isn't changed
+            var sortedSql = new UmbracoSql(sql.SqlContext, sql.SQL, sql.Arguments);
+
+            // apply order according to parameters, if any
+            if (string.IsNullOrEmpty(orderBy)) return sortedSql;
+            var orderByParams = new object[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+
+            return orderDirection == Direction.Ascending
+                ? sortedSql.OrderBy(orderByParams)
+                : sortedSql.OrderByDescending(orderByParams);
         }
 
 
@@ -273,7 +270,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
         {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
+            if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // Get base query
             var sqlBase = GetBaseQuery(false);
@@ -320,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
         {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
+            if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // Get base query
             var sqlBase = GetBaseQuery(false);
@@ -385,7 +382,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //We need to make this an inner join on the paged query
                 var splitQuery = sqlQuery.SQL.Split(new[] {"WHERE "}, StringSplitOptions.None);
-                var withInnerJoinSql = new Sql(splitQuery[0])
+                var withInnerJoinSql = Sql()
+                    .Append(splitQuery[0])
                     .Append("INNER JOIN (")
                     //join the paged query with the paged query arguments
                     .Append(sqlStringPage, args)
@@ -427,11 +425,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var versions = ddefs.Select(x => x.Version).ToArray();
             if (versions.Length == 0) return new Dictionary<int, PropertyCollection>();
 
-            var sql = new Sql()
-                .Select<PropertyDataDto>(Database, r => r.Select<PropertyTypeDto>())
-                .From<PropertyDataDto>(SqlSyntax)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                .WhereIn<PropertyDataDto>(SqlSyntax, x => x.VersionId, versions);
+            var sql = Sql()
+                .Select<PropertyDataDto>(r => r.Select<PropertyTypeDto>())
+                .From<PropertyDataDto>()
+                .LeftJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .WhereIn<PropertyDataDto>(x => x.VersionId, versions);
 
             // fixme.npoco - obsolete version LEFT OUTER JOIN to prevalues, why?!
 
@@ -451,11 +449,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     .DistinctBy(x => x.Id)
                     .ToList();
 
-                var preSql = new Sql()
-                    .Select<DataTypePreValueDto>(Database)
-                    .From<DataTypePreValueDto>(SqlSyntax)
-                    .LeftJoin<PropertyTypeDto>(SqlSyntax).On<DataTypePreValueDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeNodeId, right => right.DataTypeId)
-                    .WhereIn<PropertyTypeDto>(SqlSyntax, x => x.Id, allPropertyTypes);
+                var preSql = Sql()
+                    .Select<DataTypePreValueDto>()
+                    .From<DataTypePreValueDto>()
+                    .LeftJoin<PropertyTypeDto>().On<DataTypePreValueDto, PropertyTypeDto>(left => left.DataTypeNodeId, right => right.DataTypeId)
+                    .WhereIn<PropertyTypeDto>(x => x.Id, allPropertyTypes);
 
                 return Database.Fetch<DataTypePreValueDto>(preSql);
             });

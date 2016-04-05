@@ -94,28 +94,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select(x => Get(x.Id));
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            if (isCount)
-            {
-                sql.Select("COUNT(*)").From<MacroDto>(SqlSyntax);
-            }
-            else
-            {
-                return GetBaseQuery();
-            }
-            return sql;
+            return isCount ? Sql().SelectCount().From<MacroDto>() : GetBaseQuery();
         }
 
-        private Sql GetBaseQuery()
+        private UmbracoSql GetBaseQuery()
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<MacroDto>(SqlSyntax)
-               .LeftJoin<MacroPropertyDto>(SqlSyntax)
-               .On<MacroDto, MacroPropertyDto>(SqlSyntax, left => left.Id, right => right.Macro);
-            return sql;
+            return Sql()
+                .SelectAll()
+                .From<MacroDto>()
+                .LeftJoin<MacroPropertyDto>()
+                .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
         }
 
         protected override string GetBaseWhereClause()

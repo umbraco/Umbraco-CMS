@@ -64,16 +64,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<MigrationDto>(sql).Select(x => factory.BuildEntity(x));
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<MigrationDto>(Database);
+                : sql.Select<MigrationDto>();
 
             sql
-                .From<MigrationDto>(SqlSyntax);
+                .From<MigrationDto>();
+
             return sql;
         }
 
@@ -125,9 +126,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var versionString = version.ToString();
 
-            var sql = new Sql().Select("*")
-                .From<MigrationDto>(SqlSyntax)
-                .Where<MigrationDto>(SqlSyntax, x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
+            var sql = Sql().SelectAll()
+                .From<MigrationDto>()
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
 
             var result = Database.FirstOrDefault<MigrationDto>(sql);
 

@@ -1331,8 +1331,10 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void Can_Save_Lazy_Content()
-        {	        
-	        var unitOfWork = NPocoUnitOfWorkProvider.CreateUnitOfWork(Logger);
+        {
+            var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger);
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory);
+            var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 

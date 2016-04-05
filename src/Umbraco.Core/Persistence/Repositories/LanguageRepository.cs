@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //this needs to be sorted since that is the way legacy worked - default language is the first one!!
             //even though legacy didn't sort, it should be by id
-            sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
+            sql.OrderBy<LanguageDto>(dto => dto.Id);
 
 
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
@@ -73,16 +73,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,Language>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<LanguageDto>(Database);
+                : sql.Select<LanguageDto>();
 
             sql
-               .From<LanguageDto>(SqlSyntax);
+               .From<LanguageDto>();
             return sql;
         }
 

@@ -64,15 +64,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-       protected override Sql GetBaseQuery(bool isCount)
+       protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<AccessDto>(SqlSyntax)
-                .LeftJoin<AccessRuleDto>(SqlSyntax)
-                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
-
-            return sql;
+            return Sql()
+                .SelectAll()
+                .From<AccessDto>()
+                .LeftJoin<AccessRuleDto>()
+                .On<AccessDto, AccessRuleDto>(left => left.Id, right => right.AccessId);
         }
 
         protected override string GetBaseWhereClause()

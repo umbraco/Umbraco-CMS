@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
                     .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
 
-                sql.OrderBy<NodeDto>(SqlSyntax, x => x.Level);
+                sql.OrderBy<NodeDto>(x => x.Level);
 
                 return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
             });
@@ -102,17 +102,14 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
-            {
-                sql.Select("COUNT(*)").From<NodeDto>(SqlSyntax);
-            }
+                sql.SelectCount();
             else
-            {
-                sql.Select("*").From<NodeDto>(SqlSyntax);
-            }
+                sql.SelectAll();
+            sql.From<NodeDto>();
             return sql;
         }
 
@@ -135,15 +132,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             EnsureContainerType(entity);
 
-            var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
+            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
 
             if (nodeDto == null) return;
 
             // move children to the parent so they are not orphans
-            var childDtos = Database.Fetch<NodeDto>(new Sql().Select("*")
-                .From<NodeDto>(SqlSyntax)
+            var childDtos = Database.Fetch<NodeDto>(Sql().SelectAll()
+                .From<NodeDto>()
                 .Where("parentID=@parentID AND (nodeObjectType=@containedObjectType OR nodeObjectType=@containerObjectType)",
                     new
                     {
@@ -170,9 +167,9 @@ namespace Umbraco.Core.Persistence.Repositories
             Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
 
             // guard against duplicates
-            var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto != null)
                 throw new InvalidOperationException("A container with the same name already exists.");
 
@@ -181,9 +178,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var path = "-1";
             if (entity.ParentId > -1)
             {
-                var parentDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                var parentDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                    .From<NodeDto>()
+                    .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                 if (parentDto == null)
                     throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
@@ -231,16 +228,16 @@ namespace Umbraco.Core.Persistence.Repositories
             Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
 
             // find container to update
-            var nodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
+            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto == null)
                 throw new InvalidOperationException("Could not find container with id " + entity.Id);
 
             // guard against duplicates
-            var dupNodeDto = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+            var dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
             if (dupNodeDto != null && dupNodeDto.NodeId != nodeDto.NodeId)
                 throw new InvalidOperationException("A container with the same name already exists.");
 
@@ -252,9 +249,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 nodeDto.Path = "-1";
                 if (entity.ParentId > -1)
                 {
-                    var parent = Database.FirstOrDefault<NodeDto>(new Sql().Select("*")
-                        .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                    var parent = Database.FirstOrDefault<NodeDto>( Sql().SelectAll()
+                        .From<NodeDto>()
+                        .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                     if (parent == null)
                         throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);

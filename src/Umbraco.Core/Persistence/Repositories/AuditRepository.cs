@@ -64,16 +64,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(x => new AuditItem(x.NodeId, x.Comment, Enum<AuditType>.Parse(x.Header), x.UserId)).ToArray();
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<LogDto>(Database);
+                : sql.Select<LogDto>();
 
             sql
-                .From<LogDto>(SqlSyntax);
+                .From<LogDto>();
+
             return sql;
         }
 

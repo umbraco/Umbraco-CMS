@@ -57,11 +57,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<TEntity> PerformGetAll(params TId[] ids)
         {
-            var sql = new Sql().From<TEntity>(SqlSyntax);
+            var sql = Sql().From<TEntity>();
 
             if (ids.Any())
             {
-                sql.Where(GetWhereInClauseForGetAll(), new { ids = ids });
+                sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
             }
             
             return Database.Fetch<TDto>(sql).Select(ConvertToEntity);

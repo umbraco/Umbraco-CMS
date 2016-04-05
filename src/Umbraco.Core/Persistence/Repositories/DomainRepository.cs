@@ -58,19 +58,19 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method");
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)").From<DomainDto>(SqlSyntax);
+                sql.SelectCount().From<DomainDto>();
             }
             else
             {
                 sql.Select("umbracoDomains.*, umbracoLanguage.languageISOCode")
-                    .From<DomainDto>(SqlSyntax)
-                    .LeftJoin<LanguageDto>(SqlSyntax)
-                    .On<DomainDto, LanguageDto>(SqlSyntax, dto => dto.DefaultLanguage, dto => dto.Id);
+                    .From<DomainDto>()
+                    .LeftJoin<LanguageDto>()
+                    .On<DomainDto, LanguageDto>(dto => dto.DefaultLanguage, dto => dto.Id);
             }
             
             return sql;

@@ -61,30 +61,20 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            if (isCount)
-            {
-                sql.Select("COUNT(*)").From<TaskDto>(SqlSyntax);
-            }
-            else
-            {
-                return GetBaseQuery();
-            }
-            return sql;
+            return isCount ? Sql().SelectCount().From<TaskDto>() : GetBaseQuery();
         }
 
-        private Sql GetBaseQuery()
+        private UmbracoSql GetBaseQuery()
         {
-            var sql = new Sql();
-            sql.Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
-                .From<TaskDto>(SqlSyntax)
-                .InnerJoin<TaskTypeDto>(SqlSyntax)
-                .On<TaskDto, TaskTypeDto>(SqlSyntax, left => left.TaskTypeId, right => right.Id)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TaskDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
-            return sql;
+            return Sql()
+                .Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
+                .From<TaskDto>()
+                .InnerJoin<TaskTypeDto>()
+                .On<TaskDto, TaskTypeDto>(left => left.TaskTypeId, right => right.Id)
+                .InnerJoin<NodeDto>()
+                .On<TaskDto, NodeDto>(left => left.NodeId, right => right.NodeId);
         }
 
         protected override string GetBaseWhereClause()
@@ -148,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetGetTasksQuery(assignedUser, ownerUser, taskTypeAlias, includeClosed);
             if (itemId.HasValue)
             {
-                sql.Where<NodeDto>(SqlSyntax, dto => dto.NodeId == itemId.Value);
+                sql.Where<NodeDto>(dto => dto.NodeId == itemId.Value);
             }
 
             var dtos = Database.Fetch<TaskDto>(sql);
@@ -156,13 +146,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        private Sql GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
+        private UmbracoSql GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
             var sql = GetBaseQuery(false);
 
             if (includeClosed == false)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.Closed == false);
+                sql.Where<TaskDto>(dto => dto.Closed == false);
             }
             if (taskTypeAlias.IsNullOrWhiteSpace() == false)
             {
@@ -170,11 +160,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             if (ownerUser.HasValue)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.ParentUserId == ownerUser.Value);
+                sql.Where<TaskDto>(dto => dto.ParentUserId == ownerUser.Value);
             }
             if (assignedUser.HasValue)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.UserId == assignedUser.Value);
+                sql.Where<TaskDto>(dto => dto.UserId == assignedUser.Value);
             }
             return sql;
         }

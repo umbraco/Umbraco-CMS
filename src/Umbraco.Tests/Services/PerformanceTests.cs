@@ -287,8 +287,8 @@ namespace Umbraco.Tests.Services
             DatabaseContext.Database.BulkInsertRecords(SqlSyntax, nodes);
 
             //re-get the nodes with ids
-            var sql = new Sql();
-            sql.Select("*").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == customObjectType);
+            var sql = new Sql().For(SqlSyntax, DatabaseContext.Database);
+            sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
             nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
 
             //create the cmsContent data, each with a new content type id (so we can query on it later if needed)

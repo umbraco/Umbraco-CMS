@@ -93,17 +93,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
         {
-            var sqlClause = new Sql();
-            sqlClause.Select("*")
-               .From<PropertyTypeGroupDto>(SqlSyntax)
-               .RightJoin<PropertyTypeDto>(SqlSyntax)
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId);
+            var sqlClause = Sql()
+                .SelectAll()
+                .From<PropertyTypeGroupDto>()
+                .RightJoin<PropertyTypeDto>()
+                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
             return Database
                 .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
@@ -270,13 +270,13 @@ AND umbracoNode.id <> @id",
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
                 //Find Content based on the current ContentType
-                var sql = new Sql();
-                sql.Select("*")
-                   .From<ContentDto>(SqlSyntax)
-                   .InnerJoin<NodeDto>(SqlSyntax)
-                   .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                   .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
-                   .Where<ContentDto>(SqlSyntax, x => x.ContentTypeId == entity.Id);
+                var sql = Sql()
+                    .SelectAll()
+                    .From<ContentDto>()
+                    .InnerJoin<NodeDto>()
+                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
 
                 var contentDtos = Database.Fetch<ContentDto>(sql);
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
@@ -292,13 +292,13 @@ AND umbracoNode.id <> @id",
                         {
                             var nodeId = contentDto.NodeId;
                             var propertyTypeId = propertyType.Id;
-                            var propertySql = new Sql().Select("cmsPropertyData.id")
-                                                       .From<PropertyDataDto>(SqlSyntax)
-                                                       .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                                                       .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax,
-                                                           left => left.PropertyTypeId, right => right.Id)
-                                                       .Where<PropertyDataDto>(SqlSyntax, x => x.NodeId == nodeId)
-                                                       .Where<PropertyTypeDto>(SqlSyntax, x => x.Id == propertyTypeId);
+                            var propertySql = Sql()
+                                .Select("cmsPropertyData.id")
+                                .From<PropertyDataDto>()
+                                .InnerJoin<PropertyTypeDto>()
+                                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                                .Where<PropertyDataDto>(x => x.NodeId == nodeId)
+                                .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
 
                             //Finally delete the properties that match our criteria for removing a ContentType from the composition
                             Database.Delete<PropertyDataDto>(new Sql("WHERE id IN (" + propertySql.SQL + ")", propertySql.Arguments));
@@ -422,12 +422,12 @@ AND umbracoNode.id <> @id",
 
         protected IEnumerable<ContentTypeSort> GetAllowedContentTypeIds(int id)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<ContentTypeAllowedContentTypeDto>(SqlSyntax)
-               .LeftJoin<ContentTypeDto>(SqlSyntax)
-               .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(SqlSyntax, left => left.AllowedId, right => right.NodeId)
-               .Where<ContentTypeAllowedContentTypeDto>(SqlSyntax, x => x.Id == id);
+            var sql = Sql()
+                .SelectAll()
+                .From<ContentTypeAllowedContentTypeDto>()
+                .LeftJoin<ContentTypeDto>()
+                .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
+                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql);
             return allowedContentTypeDtos.Select(x => new ContentTypeSort(new Lazy<int>(() => x.AllowedId), x.SortOrder, x.ContentTypeDto.Alias)).ToList();
@@ -435,15 +435,15 @@ AND umbracoNode.id <> @id",
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id, DateTime createDate, DateTime updateDate)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<PropertyTypeGroupDto>(SqlSyntax)
-               .LeftJoin<PropertyTypeDto>(SqlSyntax)
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
-               .LeftJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeGroupDto>(SqlSyntax, x => x.ContentTypeNodeId == id)
-               .OrderBy<PropertyTypeGroupDto>(SqlSyntax, x => x.Id);
+            var sql = Sql()
+                .SelectAll()
+                .From<PropertyTypeGroupDto>()
+                .LeftJoin<PropertyTypeDto>()
+                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+                .LeftJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
+                .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
 
             var dtos = Database
@@ -456,12 +456,12 @@ AND umbracoNode.id <> @id",
 
         protected PropertyTypeCollection GetPropertyTypeCollection(int id, DateTime createDate, DateTime updateDate)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<PropertyTypeDto>(SqlSyntax)
-               .InnerJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(SqlSyntax, x => x.ContentTypeId == id);
+            var sql = Sql()
+                .SelectAll()
+                .From<PropertyTypeDto>()
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
 
             var dtos = Database.Fetch<PropertyTypeDto>(sql);
 
@@ -531,11 +531,11 @@ AND umbracoNode.id <> @id",
             //we cannot try to assign a data type of it's empty
             if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
-                var sql = new Sql()
-                    .Select("*")
-                    .From<DataTypeDto>(SqlSyntax)
+                var sql = Sql()
+                    .SelectAll()
+                    .From<DataTypeDto>()
                     .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
-                    .OrderBy<DataTypeDto>(SqlSyntax, typeDto => typeDto.DataTypeId);
+                    .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
                 var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
                 //we cannot assign a data type if one was not found
                 if (datatype != null)

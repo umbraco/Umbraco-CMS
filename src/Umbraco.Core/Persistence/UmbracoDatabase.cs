@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence
         // used by DefaultDatabaseFactory
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
-        public UmbracoDatabase(string connectionString, string providerName, ILogger logger, RetryPolicy connectionRetryPolicy, RetryPolicy commandRetryPolicy)
+        public UmbracoDatabase(string connectionString, string providerName, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, providerName, DefaultIsolationLevel)
         {
             _logger = logger;
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence
 
         // used by DefaultDatabaseFactory
         // creates one instance per request
-        public UmbracoDatabase(string connectionStringName, ILogger logger, RetryPolicy connectionRetryPolicy, RetryPolicy commandRetryPolicy)
+        public UmbracoDatabase(string connectionStringName, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionStringName, DefaultIsolationLevel)
         {
             _logger = logger;

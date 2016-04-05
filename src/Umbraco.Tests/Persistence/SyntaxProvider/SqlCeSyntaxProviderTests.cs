@@ -24,12 +24,12 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql()
+            var subQuery = new Sql().For(sqlSyntax, null)
                             .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>(sqlSyntax)
-                            .InnerJoin<NodeDto>(sqlSyntax)
-                            .On<ContentXmlDto, NodeDto>(sqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(sqlSyntax, dto => dto.NodeObjectType == mediaObjectType);
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
             
             var sqlOutput = sqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
 

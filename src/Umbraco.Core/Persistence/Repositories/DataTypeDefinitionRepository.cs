@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
@@ -114,20 +114,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,DataTypeDefinition>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<DataTypeDto>(Database, r =>
+                : sql.Select<DataTypeDto>(r =>
                         r.Select<NodeDto>());
 
             sql
-               .From<DataTypeDto>(SqlSyntax)
-               .InnerJoin<NodeDto>(SqlSyntax)
-               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+               .From<DataTypeDto>()
+               .InnerJoin<NodeDto>()
+               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -394,10 +394,11 @@ AND umbracoNode.id <> @id",
             if (dataType.HasIdentity)
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
-                var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>(SqlSyntax)
-                                   .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
+                var sql = Sql()
+                    .SelectAll()
+                    .From<DataTypePreValueDto>()
+                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
+                    .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -486,10 +487,10 @@ AND umbracoNode.id <> @id",
         {
 
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
@@ -550,7 +551,7 @@ AND umbracoNode.id <> @id",
                 throw new NotImplementedException();
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override UmbracoSql GetBaseQuery(bool isCount)
             {
                 throw new NotImplementedException();
             }

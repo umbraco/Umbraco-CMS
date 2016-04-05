@@ -19,50 +19,42 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax { get; }
 
-        private readonly QueryFactory _queryFactory;
         /// <summary>
         /// Returns the Query factory
         /// </summary>
-        public override QueryFactory QueryFactory
-        {
-            get { return _queryFactory; }
-        }
+        public override QueryFactory QueryFactory { get; }
 
         /// <summary>
         /// Used to create a new query instance
         /// </summary>
         /// <returns></returns>
-        public override Query<TEntity> Query
-        {
-            get { return QueryFactory.Create<TEntity>(); }
-        }
+        public override Query<TEntity> Query => QueryFactory.Create<TEntity>();
 
-        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        protected NPocoRepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger)
         {
-            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
+            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
             SqlSyntax = sqlSyntax;
-            _queryFactory = new QueryFactory(SqlSyntax, mappingResolver);
+            QueryFactory = new QueryFactory(SqlSyntax, mappingResolver);
         }
 
         /// <summary>
 		/// Returns the database Unit of Work added to the repository
 		/// </summary>
-		protected internal new IDatabaseUnitOfWork UnitOfWork
-		{
-			get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
-		}
+		protected internal new IDatabaseUnitOfWork UnitOfWork => (IDatabaseUnitOfWork) base.UnitOfWork;
 
-		protected UmbracoDatabase Database
+        protected UmbracoDatabase Database => UnitOfWork.Database;
+
+        protected UmbracoSql Sql()
         {
-            get { return UnitOfWork.Database; }
+            return new Sql().For(SqlSyntax, Database);
         }
 
         #region Abstract Methods
 
-        protected abstract Sql GetBaseQuery(bool isCount);
+        protected abstract UmbracoSql GetBaseQuery(bool isCount);
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }
@@ -97,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected virtual TId GetEntityId(TEntity entity)
+        protected virtual new TId GetEntityId(TEntity entity)
         {
             return (TId)(object)entity.Id;
         }

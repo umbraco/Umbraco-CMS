@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using NPoco;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -15,15 +9,10 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly PocoData _pd;
 
-        public PocoToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntaxProvider)
-            : base(sqlSyntaxProvider)
+        public PocoToSqlExpressionHelper(SqlContext sqlContext)
+            : base(sqlContext.SqlSyntax)
         {
-            // fixme.npoco - this sort-of will work but there HAS to be a better way!
-
-            if (ApplicationContext.Current != null && ApplicationContext.Current.DatabaseContext != null)
-                _pd = ApplicationContext.Current.DatabaseContext.Database.PocoDataFactory.ForType(typeof (T));
-            else // this is a hack - hopefully only for tests
-                _pd = new PocoDataFactory(new MapperCollection { new PocoMapper() }).ForType(typeof (T));
+            _pd = sqlContext.PocoDataFactory.ForType(typeof (T));
         }
 
         protected override string VisitMemberAccess(MemberExpression m)

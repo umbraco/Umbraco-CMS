@@ -113,10 +113,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
         {
-            var sql = new Sql().Select("cmsContentType.alias")
-                .From<ContentTypeDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentTypeDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
+            var sql = new Sql()
+                .For(SqlSyntax, Database)
+                .Select("cmsContentType.alias")
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId);
 
             if (objectTypes.Any())
             {
@@ -126,23 +128,23 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<string>(sql);
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeDto>(Database, r =>
+                : sql.Select<ContentTypeDto>(r =>
                         r.Select<NodeDto>(rr =>
                             rr.Select<ContentTypeTemplateDto>()));
 
             sql
-               .From<ContentTypeDto>(SqlSyntax)
-               .InnerJoin<NodeDto>(SqlSyntax)
-               .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-               .LeftJoin<ContentTypeTemplateDto>(SqlSyntax)
-               .On<ContentTypeTemplateDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<ContentTypeTemplateDto>()
+                .On<ContentTypeTemplateDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
         }
@@ -200,13 +202,15 @@ namespace Umbraco.Core.Persistence.Repositories
             // be done in the ContentTypeService by deleting all associated content first, but in some cases
             // like when we switch a document type, there is property data left over that is linked
             // to the previous document type. So we need to ensure it's removed.
-            var sql = new Sql().Select("DISTINCT cmsPropertyData.propertytypeid")
-                .From<PropertyDataDto>(SqlSyntax)
-                .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
-                .InnerJoin<ContentTypeDto>(SqlSyntax)
-                .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
-                .Where<ContentTypeDto>(SqlSyntax, dto => dto.NodeId == entity.Id);
+            var sql = new Sql()
+                .For(SqlSyntax, Database)
+                .Select("DISTINCT cmsPropertyData.propertytypeid")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentTypeDto, PropertyTypeDto>(dto => dto.NodeId, dto => dto.ContentTypeId)
+                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
             //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
             Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));

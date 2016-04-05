@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -110,7 +111,8 @@ namespace Umbraco.Tests.Persistence.Querying
             //mysql escapes backslashes, so we'll test with that
             var sqlSyntax = new MySqlSyntaxProvider(Mock.Of<ILogger>());
             Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
-            var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>(sqlSyntax);
+            var sqlContext = new SqlContext(sqlSyntax, null);
+            var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>(sqlContext);
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Console.WriteLine("Poco to Sql ExpressionHelper: \n" + result);

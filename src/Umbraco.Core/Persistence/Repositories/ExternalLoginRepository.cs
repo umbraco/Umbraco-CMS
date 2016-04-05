@@ -123,17 +123,14 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
-            {
-                sql.Select("COUNT(*)").From<ExternalLoginDto>(SqlSyntax);
-            }
+                sql.SelectCount();
             else
-            {
-                sql.Select("*").From<ExternalLoginDto>(SqlSyntax);
-            }
+                sql.SelectAll();
+            sql.From<ExternalLoginDto>();
             return sql;
         }
 
