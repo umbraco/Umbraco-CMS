@@ -214,10 +214,11 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "");
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -233,10 +234,11 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "");
         
         /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id

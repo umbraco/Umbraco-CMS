@@ -150,6 +150,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
            layouts: $scope.model.config.layouts,
            activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
         },
+        orderBySystemField: true,
         allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
         allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
         allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
@@ -160,15 +161,24 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function(e, i) {
 
+        //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
+        // to do that, we'd need to update the base query for content to include the content type alias column
+        // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
+        if (e.alias != "contentTypeAlias") {
+            e.allowSorting = true;
+        }
+
+        // Another special case for lasted edited data/update date for media, again this field isn't available on the base table so we can't sort by it
+        if (e.isSystem && $scope.entityType == "media") {
+            e.allowSorting = e.alias != 'updateDate';
+        }
+
+        // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
+        if (e.isSystem && $scope.entityType == "member") {
+            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        }
+
         if (e.isSystem) {
-
-            //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
-            // to do that, we'd need to update the base query for content to include the content type alias column
-            // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
-            if (e.alias != "contentTypeAlias") {
-                e.allowSorting = true;
-            }
-
             //localize the header
             var key = getLocalizedKey(e.alias);
             localizationService.localize(key).then(function (v) {
