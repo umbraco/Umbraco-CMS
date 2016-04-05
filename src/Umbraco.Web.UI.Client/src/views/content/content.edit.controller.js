@@ -190,6 +190,15 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
                     $scope.page.buttonGroupState = "success";
 
+                }, function (err) {
+                    $scope.page.buttonGroupState = "error";
+                    $scope.busy = false;
+                    //show any notifications
+                    if (angular.isArray(err.data.notifications)) {
+                        for (var i = 0; i < err.data.notifications.length; i++) {
+                            notificationsService.showNotification(err.data.notifications[i]);
+                        }
+                    }
                 });
         }
 
