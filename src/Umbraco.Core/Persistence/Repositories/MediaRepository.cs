@@ -469,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            
+
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types

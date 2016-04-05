@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         [SetUp]
         public override void Initialize()
-        {           
+        {
             base.Initialize();
 
             CreateTestData();
@@ -51,12 +51,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 var mediaType = mediaTypeRepository.Get(1032);
-                
+
                 for (var i = 0; i < 100; i++)
                 {
                     var image = MockedMedia.CreateMediaImage(mediaType, -1);
                     repository.AddOrUpdate(image);
-                }                
+                }
                 unitOfWork.Commit();
 
                 //delete all xml                 
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var imageMediaType = mediaTypeRepository.Get(1032);
                 var fileMediaType = mediaTypeRepository.Get(1033);
                 var folderMediaType = mediaTypeRepository.Get(1031);
-                
+
                 for (var i = 0; i < 30; i++)
                 {
                     var image = MockedMedia.CreateMediaImage(imageMediaType, -1);
@@ -103,12 +103,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
-                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] {1032, 1033});
+                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] { 1032, 1033 });
 
                 Assert.AreEqual(62, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
             }
         }
-        
+
         [Test]
         public void Can_Perform_Add_On_MediaRepository()
         {
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var media = repository.Get(NodeDto.NodeIdSeed + 1);
-                bool dirty = ((ICanBeDirty) media).IsDirty();
+                bool dirty = ((ICanBeDirty)media).IsDirty();
 
                 // Assert
                 Assert.That(dirty, Is.False);

@@ -322,7 +322,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  GetQuotedColumnName(foreignKey.ForeignColumns.First()),
                                  GetQuotedTableName(foreignKey.PrimaryTable),
                                  GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
-                                 FormatCascade("DELETE", foreignKey.OnDelete), 
+                                 FormatCascade("DELETE", foreignKey.OnDelete),
                                  FormatCascade("UPDATE", foreignKey.OnUpdate));
         }
 
@@ -331,7 +331,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var sb = new StringBuilder();
             foreach (var column in columns)
             {
-                sb.Append(Format(column) +",\n");
+                sb.Append(Format(column) + ",\n");
             }
             return sb.ToString().TrimEnd(",\n");
         }
@@ -431,11 +431,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return GetSpecialDbType(column.DbType);
             }
 
-            Type type = column.Type.HasValue 
+            Type type = column.Type.HasValue
                 ? DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key
                 : column.PropertyType;
 
-            if (type == typeof (string))
+            if (type == typeof(string))
             {
                 var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
                 return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);

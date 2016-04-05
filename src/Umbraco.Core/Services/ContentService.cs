@@ -231,7 +231,7 @@ namespace Umbraco.Core.Services
         public IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
-            var content = new Content(name, parentId, contentType);            
+            var content = new Content(name, parentId, contentType);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
@@ -884,7 +884,7 @@ namespace Umbraco.Core.Services
             {
                 var originalPath = content.Path;
 
-                if (Trashing.IsRaisedEventCancelled(                  
+                if (Trashing.IsRaisedEventCancelled(
                   new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
                   this))
                 {
@@ -1000,7 +1000,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         public bool UnPublish(IContent content, int userId = 0)
         {
-            return ((IContentServiceOperations) this).UnPublish(content, userId).Success;
+            return ((IContentServiceOperations)this).UnPublish(content, userId).Success;
         }
 
         /// <summary>
@@ -1121,7 +1121,7 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                if (Deleting.IsRaisedEventCancelled(                  
+                if (Deleting.IsRaisedEventCancelled(
                   new DeleteEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
@@ -1146,10 +1146,10 @@ namespace Umbraco.Core.Services
                 {
                     repository.Delete(content);
                     uow.Commit();
-                    
+
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
                     Deleted.RaiseEvent(args, this);
-                    
+
                     //remove any flagged media files
                     repository.DeleteMediaFiles(args.MediaFilesToDelete);
                 }
@@ -1328,7 +1328,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void MoveToRecycleBin(IContent content, int userId = 0)
         {
-            ((IContentServiceOperations) this).MoveToRecycleBin(content, userId);
+            ((IContentServiceOperations)this).MoveToRecycleBin(content, userId);
         }
 
         /// <summary>
@@ -1632,7 +1632,7 @@ namespace Umbraco.Core.Services
                 //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
                 _publishingStrategy.PublishingFinalized(shouldBePublished, false);
             }
-            
+
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1880,13 +1880,13 @@ namespace Umbraco.Core.Services
                 content = newest;
 
             var evtMsgs = EventMessagesFactory.Get();
-               
+
             var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
             if (published == null)
             {
                 return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs)); // already unpublished
             }
-            
+
             var unpublished = _publishingStrategy.UnPublish(content, userId);
             if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
 
@@ -2024,7 +2024,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(                  
+                if (Saving.IsRaisedEventCancelled(
                   new SaveEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
