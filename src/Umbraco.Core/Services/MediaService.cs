@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
-        
+
         public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
@@ -395,7 +395,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string filter = "")
         {
             long total;
             var result = GetPagedChildren(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
@@ -424,7 +424,7 @@ namespace Umbraco.Core.Services
             {
                 var query = Query<IMedia>.Builder;
                 query.Where(x => x.ParentId == id);
-                
+
                 var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return medias;
@@ -433,7 +433,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
         {
             long total;
             var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
@@ -708,7 +708,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public void MoveToRecycleBin(IMedia media, int userId = 0)
         {
-            ((IMediaServiceOperations) this).MoveToRecycleBin(media, userId);
+            ((IMediaServiceOperations)this).MoveToRecycleBin(media, userId);
         }
 
         /// <summary>
@@ -725,7 +725,7 @@ namespace Umbraco.Core.Services
             //TODO: IT would be much nicer to mass delete all in one trans in the repo level!
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (Deleting.IsRaisedEventCancelled(                
+            if (Deleting.IsRaisedEventCancelled(
                 new DeleteEventArgs<IMedia>(media, evtMsgs), this))
             {
                 return OperationStatus.Cancelled(evtMsgs);
@@ -1006,7 +1006,7 @@ namespace Umbraco.Core.Services
             ((IMediaServiceOperations)this).Delete(media, userId);
         }
 
-        
+
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
@@ -1062,7 +1062,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Delete, "Delete Media by version performed by user", userId, -1);
         }
-    
+
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
@@ -1071,7 +1071,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
         {
-            ((IMediaServiceOperations)this).Save (media, userId, raiseEvents);
+            ((IMediaServiceOperations)this).Save(media, userId, raiseEvents);
         }
 
         /// <summary>

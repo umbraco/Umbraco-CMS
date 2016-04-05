@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
                     new Tuple<string, string>("cmsDocument", "nodeId"),
                     ProcessQuery, "Path", Direction.Ascending, true);
-                
+
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();

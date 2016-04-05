@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "");
 
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "");
-        
+
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
-        
+
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the Member</param>
         /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         bool Exists(int id);
-        
+
         /// <summary>
         /// Gets a Member by the unique key
         /// </summary>
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Services
         /// <param name="ids">Optional list of Member Ids</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         IEnumerable<IMember> GetAllMembers(params int[] ids);
-        
+
         /// <summary>
         /// Delete Members of the specified MemberType id
         /// </summary>

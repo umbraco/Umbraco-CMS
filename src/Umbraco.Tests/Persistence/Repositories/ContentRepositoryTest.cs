@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create 100 non published
                 for (var i = 0; i < 100; i++)
-                {                    
+                {
                     var c1 = MockedContent.CreateSimpleContent(contentType1);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (var i = 0; i < 30; i++)
                 {
                     //These will be non-published so shouldn't show up
-                    var c1 = MockedContent.CreateSimpleContent(contentType1);                 
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
-                
+
             }
         }
 
@@ -299,7 +299,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
-                
+
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
@@ -520,7 +520,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {                
+            {
                 var result = repository.GetAll().ToArray();
                 foreach (var content in result)
                 {
