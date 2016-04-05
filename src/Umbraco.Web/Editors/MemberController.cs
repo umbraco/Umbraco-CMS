@@ -78,6 +78,7 @@ namespace Umbraco.Web.Editors
             int pageSize = 100,
             string orderBy = "Name",
             Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
             string filter = "",
             string memberTypeAlias = null)
         {
@@ -90,6 +91,7 @@ namespace Umbraco.Web.Editors
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
                 long totalRecords;
+                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
                 var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {

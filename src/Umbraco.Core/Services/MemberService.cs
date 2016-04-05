@@ -289,7 +289,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending, true);
             }
         }
 
@@ -340,7 +340,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Email", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize,  out totalRecords, "Email", Direction.Ascending, true);
             }
         }
 
@@ -391,7 +391,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
@@ -688,14 +688,14 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
             {
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "")
         {
             long total;
             var result = GetAll(Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, memberTypeAlias, filter);
@@ -711,10 +711,10 @@ namespace Umbraco.Core.Services
             {
                 if (memberTypeAlias == null)
                 {
-                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);    
                 }
                 var query = new Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);    
             }
         }
 
