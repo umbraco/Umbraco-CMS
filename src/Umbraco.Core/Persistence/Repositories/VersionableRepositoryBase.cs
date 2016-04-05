@@ -271,9 +271,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
                 // from most recent content version for the given order by field
-                var sortedInt = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataInt");
-                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertDateToOrderableString, "dataDate");
-                var sortedString = string.Format(SqlSyntaxContext.SqlSyntaxProvider.IsNull, "dataNvarchar", "''");
+                var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
+                var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
+                var sortedString = string.Format(SqlSyntax.IsNull, "dataNvarchar", "''");
 
                 var orderBySql = string.Format(@"ORDER BY (
  	                SELECT CASE
@@ -296,41 +296,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (orderDirection == Direction.Descending)
                 {
                     sortedSql.Append(" DESC");
-                }
-                }
+                } 
             }
-            else 
-            { 
-                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
-                // from most recent content version for the given order by field
-                var sortedInt = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataInt");
-                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertDateToOrderableString, "dataDate");
-                var sortedString = string.Format(SqlSyntaxContext.SqlSyntaxProvider.IsNull, "dataNvarchar", "''");
-
-                var orderBySql = string.Format(@"ORDER BY (
-	                SELECT CASE
-		                WHEN dataInt Is Not Null THEN {0}
-		                WHEN dataDate Is Not Null THEN {1}
-		                ELSE {2}
-	                END 
-	                FROM cmsContent c
-	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
-		                SELECT Max(VersionDate)
-		                FROM cmsContentVersion
-		                WHERE ContentId = c.nodeId
-	                )
-	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
-		                AND cpd.versionId = cv.VersionId
-	                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
-	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDate, sortedString);
-
-                sortedSql.Append(orderBySql, orderBy);
-                if (orderDirection == Direction.Descending)
-                {
-                    sortedSql.Append(" DESC");
-                }
-            }
-
+            
             return sortedSql;
         }
 

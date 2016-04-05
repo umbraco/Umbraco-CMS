@@ -695,7 +695,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "")
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
         {
             long total;
             var result = GetAll(Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, memberTypeAlias, filter);

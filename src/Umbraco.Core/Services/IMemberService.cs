@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "");
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
 
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
