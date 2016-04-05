@@ -164,6 +164,7 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
             
+            //Added check for publish permissions before adding releaseDate and expireDate
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -173,19 +174,19 @@ namespace Umbraco.Web.Models.Mapping
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 },
-                new ContentPropertyDisplay
+                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                },
+                    View =  display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View  //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                } ,
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    View = display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View  //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                 },
                 new ContentPropertyDisplay
                 {
