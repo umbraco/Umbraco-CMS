@@ -487,22 +487,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-
-                var query = Query<IContent>.Builder;
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    query.Where(x => x.ParentId == id);
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
+            long total;
+            var result = GetPagedChildren(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -541,22 +529,10 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-
-                var query = Query<IContent>.Builder;
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
+            long total;
+            var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -570,9 +546,8 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
-        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>        
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");

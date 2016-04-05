@@ -183,7 +183,7 @@ namespace Umbraco.Web.Editors
             bool orderBySystemField = true,
             string filter = "")
         {
-            int totalChildren;
+            long totalChildren;
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {

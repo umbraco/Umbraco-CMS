@@ -91,8 +91,7 @@ namespace Umbraco.Web.Editors
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
                 long totalRecords;
-                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
-                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
+                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();                
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);

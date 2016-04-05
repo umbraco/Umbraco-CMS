@@ -142,8 +142,7 @@ namespace UmbracoExamine
                     do
                     {
                         long total;
-                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, nodeType).ToArray();
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
+                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, nodeType).ToArray();                        
 
                         AddNodesToIndex(GetSerializedMembers(members), type);
 

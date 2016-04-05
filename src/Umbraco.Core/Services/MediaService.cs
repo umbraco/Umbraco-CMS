@@ -397,19 +397,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IMedia>.Builder;
-                query.Where(x => x.ParentId == id);
-                
-                long total;
-                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-
-                totalChildren = Convert.ToInt32(total);
-                return medias;
-            }
+            long total;
+            var result = GetPagedChildren(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -444,22 +435,10 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
-            {
-
-                var query = Query<IMedia>.Builder;
-                //if the id is -1, then just get all
-                if (id != -1)
-                {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
+            long total;
+            var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -474,8 +453,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
-        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");

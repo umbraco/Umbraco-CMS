@@ -234,7 +234,6 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
                 //NOTE: This is an important call, we cannot simply make a call to:
                 //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
                 // because that method is used to query 'latest' content items where in this case we don't necessarily
@@ -242,7 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
                 var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
                     new Tuple<string, string>("cmsDocument", "nodeId"),
-                    ProcessQuery, "Path", Direction.Ascending);
+                    ProcessQuery, "Path", Direction.Ascending, true);
                 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
