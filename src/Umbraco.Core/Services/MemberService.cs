@@ -704,7 +704,13 @@ namespace Umbraco.Core.Services
         }
 
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "")
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+        {
+            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+        }
+
+        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateMemberRepository(uow))
