@@ -184,17 +184,16 @@ namespace Umbraco.Web.Editors
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
-                int? orderBySystemField = 2,
+                bool orderBySystemField = true,
                 string filter = "")
-        {
-            var orderBySystemFieldBool = orderBySystemField == 1 || orderBySystemField == 2;
+        {            
             long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
                 children = Services.ContentService
                  .GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren
-                 , orderBy, orderDirection, orderBySystemFieldBool, filter).ToArray();
+                 , orderBy, orderDirection, orderBySystemField, filter).ToArray();
             }
             else
             {
