@@ -1,6 +1,6 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService) {
+        function ($rootScope, $scope, dialogService, iconHelper) {
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -13,6 +13,7 @@
             $scope.newNewWindow = false;
             $scope.newInternal = null;
             $scope.newInternalName = '';
+            $scope.newInternalIcon = null;
             $scope.addExternal = true;
             $scope.currentEditLink = null;
             $scope.hasError = false;
@@ -108,6 +109,7 @@
                             this.edit = false;
                             this.isInternal = true;
                             this.internalName = $scope.newInternalName;
+                            this.internalIcon = $scope.newInternalIcon;
                             this.type = "internal";
                             this.title = $scope.newCaption;
                         };
@@ -118,7 +120,7 @@
                     $scope.newNewWindow = false;
                     $scope.newInternal = null;
                     $scope.newInternalName = '';
-
+                    $scope.newInternalIcon = null;
                 }
                 $event.preventDefault();
             };
@@ -223,10 +225,12 @@
                 if ($scope.currentEditLink != null) {
                     $scope.currentEditLink.internal = data.id;
                     $scope.currentEditLink.internalName = data.name;
+                    $scope.currentEditLink.internalIcon = iconHelper.convertFromLegacyIcon(data.icon);
                     $scope.currentEditLink.link = data.id;
                 } else {
                     $scope.newInternal = data.id;
                     $scope.newInternalName = data.name;
+                    $scope.newInternalIcon = iconHelper.convertFromLegacyIcon(data.icon);
                 }
             }
         });
