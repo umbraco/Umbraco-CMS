@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[umbracoNode]").On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e"));
 
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<ContentTypeDto>()
                 .InnerJoin<NodeDto>()

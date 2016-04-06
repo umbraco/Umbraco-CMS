@@ -19,11 +19,11 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_StartsWith_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith("-1"));
+            var query = new Query<IContent>(SqlContext.SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith("-1"));
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -46,11 +46,11 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ParentId_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.ParentId == -1);
+            var query = new Query<IContent>(SqlContext.SqlSyntax, MappingResolver).Where(x => x.ParentId == -1);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -73,11 +73,11 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ContentTypeAlias_Query_For_IContentType()
         {
             // Arrange
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContentType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "umbTextpage");
+            var query = new Query<IContentType>(SqlContext.SqlSyntax, MappingResolver).Where(x => x.Alias == "umbTextpage");
 
             // Act
             var translator = new SqlTranslator<IContentType>(sql, query);
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var id = 1046;
             var nodeObjectTypeId = new Guid(Constants.ObjectTypes.Document);
 
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>()
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
 
-            var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
+            var query = new Query<IContent>(SqlContext.SqlSyntax, MappingResolver).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);

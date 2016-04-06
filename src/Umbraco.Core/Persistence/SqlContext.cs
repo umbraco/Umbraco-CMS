@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -7,6 +8,10 @@ namespace Umbraco.Core.Persistence
     {
         public SqlContext(ISqlSyntaxProvider sqlSyntax, IPocoDataFactory pocoDataFactory, DatabaseType databaseType)
         {
+            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
+            if (pocoDataFactory == null) throw new ArgumentNullException(nameof(pocoDataFactory));
+            if (databaseType == null) throw new ArgumentNullException(nameof(databaseType));
+
             SqlSyntax = sqlSyntax;
             PocoDataFactory = pocoDataFactory;
             DatabaseType = databaseType;
@@ -14,6 +19,9 @@ namespace Umbraco.Core.Persistence
 
         public SqlContext(ISqlSyntaxProvider sqlSyntax, IDatabaseConfig database)
         {
+            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
+            if (database == null) throw new ArgumentNullException(nameof(database));
+
             SqlSyntax = sqlSyntax;
             PocoDataFactory = database.PocoDataFactory;
             DatabaseType = database.DatabaseType;

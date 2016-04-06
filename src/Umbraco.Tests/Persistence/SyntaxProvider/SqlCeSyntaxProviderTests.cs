@@ -21,17 +21,15 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [Test]
         public void Can_Generate_Delete_SubQuery_Statement()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
-
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql().For(sqlSyntax, null)
+            var subQuery = new Sql().For(SqlContext)
                             .Select("DISTINCT cmsContentXml.nodeId")
                             .From<ContentXmlDto>()
                             .InnerJoin<NodeDto>()
                             .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                             .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
             
-            var sqlOutput = sqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+            var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
 
             Assert.AreEqual(@"DELETE FROM [cmsContentXml] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentXml.nodeId
 FROM [cmsContentXml]
@@ -48,15 +46,13 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void Can_Generate_Create_Table_Statement()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
-
             var type = typeof (NodeDto);
-            var definition = DefinitionFactory.GetTableDefinition(type, sqlSyntax);
+            var definition = DefinitionFactory.GetTableDefinition(type, SqlContext.SqlSyntax);
 
-            string create = sqlSyntax.Format(definition);
-            string primaryKey = sqlSyntax.FormatPrimaryKey(definition);
-            var indexes = sqlSyntax.Format(definition.Indexes);
-            var keys = sqlSyntax.Format(definition.ForeignKeys);
+            string create = SqlContext.SqlSyntax.Format(definition);
+            string primaryKey = SqlContext.SqlSyntax.FormatPrimaryKey(definition);
+            var indexes = SqlContext.SqlSyntax.Format(definition.Indexes);
+            var keys = SqlContext.SqlSyntax.Format(definition.ForeignKeys);
 
             Console.WriteLine(create);
             Console.WriteLine(primaryKey);
@@ -143,7 +139,6 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
                 TableName = "TheTable",
                 SchemaName = "dbo"
             };
-        }
-        
+        }        
     }
 }

@@ -372,7 +372,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private UmbracoSql ApplyGroupFilterToTagsQuery(UmbracoSql sql, string group)
         {
-            if (@group.IsNullOrWhiteSpace() == false)
+            if (group.IsNullOrWhiteSpace() == false)
             {
                 sql = sql.Where<TagDto>(dto => dto.Group == group);
             }
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private UmbracoSql ApplyGroupByToTagsQuery(UmbracoSql sql)
         {
-            return sql.GroupBy(new[] { "cmsTags.id", "cmsTags.tag", "cmsTags." + SqlSyntax.GetQuotedColumnName("group") + @"" });
+            return sql.GroupBy("cmsTags.id", "cmsTags.tag", "cmsTags." + SqlSyntax.GetQuotedColumnName("group") + @"");
         }
 
         private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)

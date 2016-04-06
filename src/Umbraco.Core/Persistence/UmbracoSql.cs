@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence
 
         public new UmbracoSql GroupBy(params object[] columns)
         {
-            Append("GROUP BY ", string.Join(", ", columns));
+            Append("GROUP BY " + string.Join(", ", columns));
             return this;
         }
 

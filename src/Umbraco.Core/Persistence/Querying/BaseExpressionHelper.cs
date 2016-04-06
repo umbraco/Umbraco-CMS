@@ -580,11 +580,11 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// Logic that is shared with the expression helpers
     /// </summary>
-    internal class BaseExpressionHelper
+    internal abstract class BaseExpressionHelper
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
-        public BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
+        protected BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
         {
             SqlSyntax = sqlSyntax;
         }

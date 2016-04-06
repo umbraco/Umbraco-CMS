@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"));
 
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>()
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
-            var expected = new Sql().For(SqlSyntax, null);
+            var expected = new Sql().For(SqlContext);
             expected.SelectAll()
                 .From("[cmsDocument]")
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
                 .Where("([umbracoNode].[id] = @0)", 1050);
 
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>()
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .Where("([cmsContentVersion].[VersionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"))
                 .OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
-            var sql = new Sql().For(SqlSyntax, null); ;
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>()
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Where("([cmsPropertyData].[contentNodeId] = @0)", 1050);
             expected.Where("([cmsPropertyData].[versionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
 
-            var sql = new Sql().For(SqlSyntax, null);
+            var sql = new Sql().For(SqlContext);
             sql.SelectAll()
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
