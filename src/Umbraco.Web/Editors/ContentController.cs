@@ -8,6 +8,7 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -30,6 +31,7 @@ using Umbraco.Core.Dynamics;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
@@ -77,12 +79,35 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns an item to be used to display the recycle bin for content
+        /// </summary>
+        /// <returns></returns>
+        public ContentItemDisplay GetRecycleBin()
+        {
+            var display = new ContentItemDisplay
+            {
+                Id = Constants.System.RecycleBinContent,
+                Alias = "recycleBin",
+                ParentId = -1,
+                Name = Services.TextService.Localize("general/recycleBin"),
+                ContentTypeAlias = "recycleBin",
+                CreateDate = DateTime.Now,
+                IsContainer = true,
+                Path = "-1," + Constants.System.RecycleBinContent
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+
+            return display;
+        }
+
+        /// <summary>
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        [EnsureUserPermissionForContent("id")]        
+        [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));            
@@ -189,6 +214,19 @@ namespace Umbraco.Web.Editors
         public bool GetHasPermission(string permissionToCheck, int nodeId)
         {
            return HasPermission(permissionToCheck, nodeId);
+        }
+
+        /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            return Services.UserService
+                .GetPermissions(Security.CurrentUser, nodeIds)
+                .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
         }
 
         [HttpGet]
@@ -328,9 +366,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
         
-
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>

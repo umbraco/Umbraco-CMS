@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Caching;
-using System.Web.UI;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -16,6 +13,7 @@ namespace Umbraco.Core.Models.PublishedContent
     public class PublishedContentType
     {
         private readonly PublishedPropertyType[] _propertyTypes;
+        private readonly HashSet<string> _compositionAliases;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -27,6 +25,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             Id = contentType.Id;
             Alias = contentType.Alias;
+            _compositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => new PublishedPropertyType(this, x))
                 .ToArray();
@@ -34,10 +33,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+        internal PublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
         {
             Id = id;
             Alias = alias;
+            _compositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = propertyTypes.ToArray();
             foreach (var propertyType in _propertyTypes)
                 propertyType.ContentType = this;
@@ -45,8 +45,8 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // create detached content type - ie does not match anything in the DB
-        internal PublishedContentType(string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this (0, alias, propertyTypes)
+        internal PublishedContentType(string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+            : this(0, alias, compositionAliases, propertyTypes)
         { }
 
         private void InitializeIndexes()
@@ -63,6 +63,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int Id { get; private set; }
         public string Alias { get; private set; }
+        public HashSet<string> CompositionAliases { get { return _compositionAliases; } }
 
         #endregion
 
@@ -98,10 +99,60 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #endregion
 
-        
+        #region Cache
+
+        // these methods are called by ContentTypeCacheRefresher and DataTypeCacheRefresher
+
+        internal static void ClearAll()
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
+            // ok and faster to do it by types, assuming noone else caches PublishedContentType instances
+            //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>();
+        }
+
+        internal static void ClearContentType(int id)
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
+
+            // we don't support "get all" at the moment - so, cheating
+            var all = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItemsByKeySearch<PublishedContentType>("PublishedContentType_").ToArray();
+
+            // the one we want to clear
+            var clr = all.FirstOrDefault(x => x.Id == id);
+            if (clr == null) return;
+
+            // those that have that one in their composition aliases
+            // note: CompositionAliases contains all recursive aliases
+            var oth = all.Where(x => x.CompositionAliases.InvariantContains(clr.Alias)).Select(x => x.Id);
+
+            // merge ids
+            var ids = oth.Concat(new[] { clr.Id }).ToArray();
+
+            // clear them all at once
+            // we don't support "clear many at once" at the moment - so, cheating
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
+                (key, value) => ids.Contains(value.Id));
+        }
+
+        internal static void ClearDataType(int id)
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
+            // there is no recursion to handle here because a PublishedContentType contains *all* its
+            // properties ie both its own properties and those that were inherited (it's based upon an
+            // IContentTypeComposition) and so every PublishedContentType having a property based upon
+            // the cleared data type, be it local or inherited, will be cleared.
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
+                (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
+        }
+
         public static PublishedContentType Get(PublishedItemType itemType, string alias)
         {
-            var type = CreatePublishedContentType(itemType, alias);
+            var key = string.Format("PublishedContentType_{0}_{1}",
+                itemType.ToString().ToLowerInvariant(), alias.ToLowerInvariant());
+
+            var type = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItem<PublishedContentType>(key,
+                () => CreatePublishedContentType(itemType, alias));
 
             return type;
         }
@@ -134,8 +185,21 @@ namespace Umbraco.Core.Models.PublishedContent
             return new PublishedContentType(contentType);
         }
 
-        // for unit tests
-        internal static Func<string, PublishedContentType> GetPublishedContentTypeCallback { get; set; }
-        
+        // for unit tests - changing the callback must reset the cache obviously
+        private static Func<string, PublishedContentType> _getPublishedContentTypeCallBack;
+        internal static Func<string, PublishedContentType> GetPublishedContentTypeCallback
+        {
+            get { return _getPublishedContentTypeCallBack; }
+            set
+            {
+                // see note above
+                //ClearAll();
+                ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheByKeySearch("PublishedContentType_");
+
+                _getPublishedContentTypeCallBack = value;
+            }
+        }
+
+        #endregion
     }
 }

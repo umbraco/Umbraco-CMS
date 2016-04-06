@@ -30,18 +30,18 @@ angular.module("umbraco")
             var pendingChangeEvent = eventsService.on("valFormManager.pendingChanges", function (e, args) {
                 //one time listener, remove the event
                 pendingChangeEvent();
-                $scope.closeOverLay();
+                $scope.model.close();
             });
 
 
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
-            $scope.closeOverLay();
+            $scope.model.close();
             $location.path("/logout");
         };
 
         $scope.gotoHistory = function (link) {
             $location.path(link);
-            $scope.closeOverLay();
+            $scope.model.close();
         };
 
         //Manually update the remaining timeout seconds
@@ -147,6 +147,9 @@ angular.module("umbraco")
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                     $scope.changePasswordButtonState = "success";
+                    $timeout(function() {
+                        $scope.togglePasswordFields();
+                    }, 2000);
 
                 }, function (err) {
 

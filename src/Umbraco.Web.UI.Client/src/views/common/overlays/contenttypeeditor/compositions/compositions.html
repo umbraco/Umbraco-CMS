@@ -32,7 +32,7 @@
         <li class="umb-checkbox-list__item"
 
             ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm"
-            ng-class="{'-disabled': compositeContentType.allowed===false, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
+            ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
 
             <div class="umb-checkbox-list__item-checkbox"
                  ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
@@ -41,7 +41,7 @@
                        checklist-model="model.compositeContentTypes"
                        checklist-value="compositeContentType.contentType.alias"
                        ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                       ng-disabled="compositeContentType.allowed===false"/>
+                       ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited"/>
             </div>
 
             <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">

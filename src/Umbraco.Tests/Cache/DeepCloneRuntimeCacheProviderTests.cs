@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Clones_List()
         {
-            var original = new DeepCloneableList<DeepCloneableListTests.TestClone>();
+            var original = new DeepCloneableList<DeepCloneableListTests.TestClone>(ListCloneBehavior.Always);
             original.Add(new DeepCloneableListTests.TestClone());
             original.Add(new DeepCloneableListTests.TestClone());
             original.Add(new DeepCloneableListTests.TestClone());

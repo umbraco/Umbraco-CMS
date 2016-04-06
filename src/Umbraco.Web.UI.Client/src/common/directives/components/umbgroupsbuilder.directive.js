@@ -1,9 +1,12 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
 
     function link(scope, el, attr, ctrl) {
+
+        var validationTranslated = "";
+        var tabNoSortOrderTranslated = "";
 
       scope.sortingMode = false;
       scope.toolbar = [];
@@ -25,6 +28,16 @@
           // add init tab
           addInitGroup(scope.model.groups);
 
+          activateFirstGroup(scope.model.groups);
+
+          // localize texts
+          localizationService.localize("validation_validation").then(function(value) {
+              validationTranslated = value;
+          });
+
+          localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function(value) {
+              tabNoSortOrderTranslated = value;
+          });
       }
 
       function setSortingOptions() {
@@ -142,14 +155,14 @@
 
             return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
                 _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
-                    //reset first 
+                    //reset first
                     current.allowed = true;
                     //see if this list item is found in the response (allowed) list
                     var found = _.find(filteredAvailableCompositeTypes, function (f) {
                         return current.contentType.alias === f.contentType.alias;
                     });
 
-                    //allow if the item was  found in the response (allowed) list - 
+                    //allow if the item was  found in the response (allowed) list -
                     // and ensure its set to allowed if it is currently checked,
                     // DO not allow if it's a locked content type.
                     current.allowed = scope.model.lockedCompositeContentTypes.indexOf(current.contentType.alias) === -1 &&
@@ -170,7 +183,7 @@
       }
 
         function setupAvailableContentTypesModel(result) {
-            scope.compositionsDialogModel.availableCompositeContentTypes = result;            
+            scope.compositionsDialogModel.availableCompositeContentTypes = result;
             //iterate each one and set it up
             _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
                 //enable it if it's part of the selected model
@@ -202,13 +215,30 @@
 
       scope.toggleSortingMode = function(tool) {
 
-         scope.sortingMode = !scope.sortingMode;
+          if (scope.sortingMode === true) {
 
-         if(scope.sortingMode === true) {
-            scope.sortingButtonKey = "general_reorderDone";
-         } else {
-            scope.sortingButtonKey = "general_reorder";
-         }
+              var sortOrderMissing = false;
+
+              for (var i = 0; i < scope.model.groups.length; i++) {
+                  var group = scope.model.groups[i];
+                  if (group.tabState !== "init" && group.sortOrder === undefined) {
+                      sortOrderMissing = true;
+                      group.showSortOrderMissing = true;
+                      notificationsService.error(validationTranslated + ": " + group.name + " " + tabNoSortOrderTranslated);
+                  }
+              }
+
+              if (!sortOrderMissing) {
+                  scope.sortingMode = false;
+                  scope.sortingButtonKey = "general_reorder";
+              }
+
+          } else {
+
+              scope.sortingMode = true;
+              scope.sortingButtonKey = "general_reorderDone";
+
+          }
 
       };
 
@@ -248,7 +278,7 @@
                 // submit overlay if no compositions has been removed
                 // or the action has been confirmed
                 } else {
-                    
+
                     // make sure that all tabs has an init property
                     if (scope.model.groups.length !== 0) {
                       angular.forEach(scope.model.groups, function(group) {
@@ -394,8 +424,12 @@
         }
       };
 
-      scope.changeSortOrderValue = function() {
-        scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
+      scope.changeSortOrderValue = function(group) {
+
+          if (group.sortOrder !== undefined) {
+              group.showSortOrderMissing = false;
+          }
+          scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
       };
 
       function addInitGroup(groups) {
@@ -420,6 +454,15 @@
         }
 
         return groups;
+      }
+
+      function activateFirstGroup(groups) {
+          if (groups && groups.length > 0) {
+              var firstGroup = groups[0];
+              if(!firstGroup.tabState || firstGroup.tabState === "inActive") {
+                  firstGroup.tabState = "active";
+              }
+          }
       }
 
       /* ---------- PROPERTIES ---------- */

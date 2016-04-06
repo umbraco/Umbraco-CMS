@@ -55,7 +55,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             var deferred = $q.defer();
 
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
+            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage, action: args.action })) {
 
                 args.scope.busy = true;
 

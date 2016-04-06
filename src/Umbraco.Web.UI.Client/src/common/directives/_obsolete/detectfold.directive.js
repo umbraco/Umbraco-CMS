@@ -1,9 +1,12 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbPanel
+* @name umbraco.directives.directive:detectFold
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
 * @description This is used for the editor buttons to ensure they are displayed correctly if the horizontal overflow of the editor
- * exceeds the height of the window
+* exceeds the height of the window
 **/
+
 angular.module("umbraco.directives.html")
 	.directive('detectFold', function ($timeout, $log, windowResizeListener) {
 	    return {

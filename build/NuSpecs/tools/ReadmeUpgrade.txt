@@ -10,6 +10,7 @@
 
 Don't forget to build!
 
+
 We've done our best to transform your configuration files but in case something is not quite right: remember we
 backed up your files in App_Data\NuGetBackup so you can find the original files before they were transformed.
 

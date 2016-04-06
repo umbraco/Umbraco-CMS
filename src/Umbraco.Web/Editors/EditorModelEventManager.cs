@@ -5,9 +5,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors
 {
-    public abstract class EditorModelEventArgs : EventArgs
+    public class EditorModelEventArgs : EventArgs
     {
-        protected EditorModelEventArgs(object model, UmbracoContext umbracoContext)
+        public EditorModelEventArgs(object model, UmbracoContext umbracoContext)
         {
             Model = model;
             UmbracoContext = umbracoContext;
@@ -19,6 +19,12 @@ namespace Umbraco.Web.Editors
 
     public sealed class EditorModelEventArgs<T> : EditorModelEventArgs
     {
+        public EditorModelEventArgs(EditorModelEventArgs baseArgs)
+            : base(baseArgs.Model, baseArgs.UmbracoContext)
+        {
+            Model = (T)baseArgs.Model;
+        }
+
         public EditorModelEventArgs(T model, UmbracoContext umbracoContext)
             : base(model, umbracoContext)
         {
@@ -65,19 +71,19 @@ namespace Umbraco.Web.Editors
             var contentItemDisplay = e.Model as ContentItemDisplay;
             if (contentItemDisplay != null)
             {
-                OnSendingContentModel(sender, (EditorModelEventArgs<ContentItemDisplay>) e);
+                OnSendingContentModel(sender, new EditorModelEventArgs<ContentItemDisplay>(e));
             }
 
             var mediaItemDisplay = e.Model as MediaItemDisplay;
             if (mediaItemDisplay != null)
             {
-                OnSendingMediaModel(sender, (EditorModelEventArgs<MediaItemDisplay>)e);
+                OnSendingMediaModel(sender, new EditorModelEventArgs<MediaItemDisplay>(e));
             }
 
             var memberItemDisplay = e.Model as MemberDisplay;
             if (memberItemDisplay != null)
             {
-                OnSendingMemberModel(sender, (EditorModelEventArgs<MemberDisplay>)e);
+                OnSendingMemberModel(sender, new EditorModelEventArgs<MemberDisplay>(e));
             }
         }
         

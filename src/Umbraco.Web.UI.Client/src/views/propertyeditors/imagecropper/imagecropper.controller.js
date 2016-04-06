@@ -5,6 +5,7 @@ angular.module('umbraco')
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
 
         var config = angular.copy($scope.model.config);
+        $scope.imageIsLoaded = false;
 
         //move previously saved value to the editor
         if ($scope.model.value) {
@@ -71,6 +72,10 @@ angular.module('umbraco')
             }
         };
 
+        $scope.imageLoaded = function() {
+            $scope.imageIsLoaded = true;
+        };
+
         //on image selected, update the cropper
         $scope.$on("filesSelected", function (ev, args) {
             $scope.model.value = config;
@@ -116,7 +121,7 @@ angular.module('umbraco')
                 if (property.value.src) {
 
                     if (thumbnail === true) {
-                        return property.value.src + "?width=500&mode=max";
+                        return property.value.src + "?width=500&mode=max&animationprocessmode=first";
                     }
                     else {
                         return property.value.src;

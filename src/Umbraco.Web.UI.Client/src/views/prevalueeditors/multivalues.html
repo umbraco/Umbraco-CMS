@@ -1,13 +1,13 @@
 <div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.MultiValuesController">
     <div class="control-group">
-        <input name="newItem" type="text" ng-model="newItem" val-highlight="hasError" />
-        <button class="btn btn-small" ng-click="add($event)">Add</button>
+        <input name="newItem" type="text" ng-model="newItem" val-highlight="{{hasError}}" />
+        <button class="btn" ng-click="add($event)">Add</button>
     </div>
     <div ui-sortable="sortableOptions">
         <div class="control-group" ng-repeat="item in model.value">
             <i class="icon icon-navigation handle"></i>
             <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
-            <button class="btn btn-small btn-danger" ng-click="remove(item, $event)">Remove</button>
+            <button class="btn btn-danger" ng-click="remove(item, $event)">Remove</button>
         </div>
     </div>
 </div>

@@ -193,14 +193,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
         {
-            var properties = contentType.PropertyTypes.ToList();
-            while (contentType.ParentId > -1 && contentType.CompositionAliases().Any())
-            {
-                contentType = Services.ContentTypeService.GetContentType(contentType.ParentId);
-                properties.AddRange(contentType.PropertyTypes);
-            }
-
-            return properties.OrderBy(x => x.Name);
+            return contentType.CompositionPropertyTypes;
         }
 
         private void DisplayNotAvailable()
@@ -263,7 +256,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 ClientTools.SyncTree(_content.Path, true);
                 
                 // Reload the page if the content was already being viewed
-                ClientTools.ReloadContentFrameUrlIfPathLoaded("/editContent.aspx?id=" + _content.Id);
+                ClientTools.ReloadLocation();
 
                 // Display success message
                 SuccessMessage.Text = global::umbraco.ui.Text("changeDocType", "successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");

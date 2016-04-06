@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Persistence.Migrations;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -41,9 +42,20 @@ namespace Umbraco.Web.Strategies.Migrations
 
         private void MigrationRunner_Migrated(MigrationRunner sender, Core.Events.MigrationEventArgs e)
         {
-            AfterMigration(sender, e);
+            if (TargetProductNames.Length == 0 || TargetProductNames.Contains(e.ProductName))
+            {
+                AfterMigration(sender, e);
+            }
         }
 
         protected abstract void AfterMigration(MigrationRunner sender, Core.Events.MigrationEventArgs e);
+
+        /// <summary>
+        /// Override to specify explicit target product names
+        /// </summary>
+        /// <remarks>
+        /// Leaving empty will run for all migration products
+        /// </remarks>
+        public virtual string[] TargetProductNames { get { return new string[] {}; } }
     }
 }

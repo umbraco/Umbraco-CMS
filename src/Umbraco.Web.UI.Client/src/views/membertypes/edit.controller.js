@@ -60,6 +60,7 @@
                 //Models builder mode:
                 vm.page.defaultButton = {
                     hotKey: "ctrl+s",
+                    hotKeyWhenHidden: true,
                     labelKey: "buttons_save",
                     letter: "S",
                     type: "submit",
@@ -67,21 +68,55 @@
                 };
                 vm.page.subButtons = [{
                     hotKey: "ctrl+g",
-                    labelKey: "buttons_generateModels",
+                    hotKeyWhenHidden: true,
+                    labelKey: "buttons_saveAndGenerateModels",
                     letter: "G",
                     handler: function () {
 
                         vm.page.saveButtonState = "busy";
-                        notificationsService.info("Building models", "this can take abit of time, don't worry");
 
-                        contentTypeHelper.generateModels().then(function (result) {
-                            vm.page.saveButtonState = "init";
-                            //clear and add success
-                            notificationsService.success("Models Generated");
-                        }, function () {
-                            notificationsService.error("Models could not be generated");
-                            vm.page.saveButtonState = "error";
+                        vm.save().then(function (result) {
+
+                            vm.page.saveButtonState = "busy";
+
+                            localizationService.localize("modelsBuilder_buildingModels").then(function (headerValue) {
+                                localizationService.localize("modelsBuilder_waitingMessage").then(function(msgValue) {
+                                    notificationsService.info(headerValue, msgValue);
+                                });
+                            });
+
+                            contentTypeHelper.generateModels().then(function (result) {
+
+                                if (result.success) { 
+
+                                    //re-check model status
+                                    contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
+                                        vm.page.modelsBuilder = statusResult;
+                                    });
+
+                                    //clear and add success
+                                    vm.page.saveButtonState = "init";
+                                    localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {
+                                        notificationsService.success(value);
+                                    });
+
+                                } else {
+                                    vm.page.saveButtonState = "error";
+                                    localizationService.localize("modelsBuilder_modelsExceptionInUlog").then(function(value) {
+                                        notificationsService.error(value);
+                                    });
+                                }
+
+                            }, function () {
+                                vm.page.saveButtonState = "error";
+                                localizationService.localize("modelsBuilder_modelsGeneratedError").then(function(value) {
+                                    notificationsService.error(value);
+                                });
+                            });
+
+
                         });
+
                     }
                 }];
             }
@@ -129,8 +164,39 @@
                     // type when server side validation fails - as opposed to content where we are capable of saving the content
                     // item if server side validation fails
                     redirectOnFailure: false,
-                    //no-op for rebind callback... we don't really need to rebind for content types
-                    rebindCallback: angular.noop
+                    // we need to rebind... the IDs that have been created!
+                    rebindCallback: function (origContentType, savedContentType) {
+                        vm.contentType.id = savedContentType.id;
+                        vm.contentType.groups.forEach(function (group) {
+                            if (!group.name) return;
+
+                            var k = 0;
+                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
+                                k++;
+                            if (k == savedContentType.groups.length) {
+                                group.id = 0;
+                                return;
+                            }
+
+                            var savedGroup = savedContentType.groups[k];
+                            if (!group.id) group.id = savedGroup.id;
+
+                            group.properties.forEach(function (property) {
+                                if (property.id || !property.alias) return;
+
+                                k = 0;
+                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                                    k++;
+                                if (k == savedGroup.properties.length) {
+                                    property.id = 0;
+                                    return;
+                                }
+
+                                var savedProperty = savedGroup.properties[k];
+                                property.id = savedProperty.id;
+                            });
+                        });
+                    }
                 }).then(function (data) {
                     //success
                     syncTreeNode(vm.contentType, data.path);

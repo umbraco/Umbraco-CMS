@@ -21,6 +21,7 @@ function packageHelper(assetsService, treeService, eventsService, $templateCache
 }
 angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
+//TODO: I believe this is obsolete
 function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
         /** sets the image's url, thumbnail and if its a folder */
@@ -319,7 +320,6 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         }
     };
 }
-
 angular.module("umbraco.services").factory("umbPhotoFolderHelper", umbPhotoFolderHelper);
 
 /**

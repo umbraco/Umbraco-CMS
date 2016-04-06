@@ -1,6 +1,6 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbContentName
+* @name umbraco.directives.directive:umbFileDropzone
 * @restrict E
 * @function
 * @description

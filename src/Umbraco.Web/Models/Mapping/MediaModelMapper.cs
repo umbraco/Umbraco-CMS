@@ -10,6 +10,7 @@ using AutoMapper;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.ProfilingLogger.Logger));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Alias, expression => expression.Ignore());
         }
 
-        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
+        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger)
         {
 			// Adapted from ContentModelMapper
 			//map the IsChildOfListView (this is actually if it is a descendant of a list view!)
@@ -137,35 +138,18 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            var helper = new UmbracoHelper(UmbracoContext.Current);
-            var mediaItem = helper.TypedMedia(media.Id);
-            if (mediaItem != null)
+            var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
+
+            if (links.Any())
             {
-                var crops = new List<string>();
-                var autoFillProperties = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.ToArray();
-                if (autoFillProperties.Any())
+                var link = new ContentPropertyDisplay
                 {
-                    foreach (var field in autoFillProperties)
-                    {
-                        var crop = mediaItem.GetCropUrl(field.Alias, string.Empty);
-                        if (string.IsNullOrWhiteSpace(crop) == false)
-                            crops.Add(crop.Split('?')[0]);
-                    }
-
-                    if (crops.Any())
-                    {
-                        var link = new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = localizedText.Localize("media/urls"),
-                            // don't add the querystring, split on the "?" will also work if there is no "?"
-                            Value = string.Join(",", crops),
-                            View = "urllist"
-                        };
-
-                        genericProperties.Add(link);
-                    }
-                }
+                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("media/urls"),
+                    Value = string.Join(",", links),
+                    View = "urllist"
+                };
+                genericProperties.Add(link);
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties);

@@ -75,6 +75,7 @@
                                    ng-disabled="tab.inherited"
                                    umb-auto-focus
                                    umb-auto-resize
+                                   on-focus="activateGroup(tab)"
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
 
@@ -84,7 +85,13 @@
                         </div>
                     </ng-form>
 
-                    <input type="number" class="umb-group-builder__group-sort-value" ng-if="sortingMode" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue()" />
+                    <ng-form name="groupSortOrderForm">
+                        <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
+                            <input name="groupSortOrder" type="number" class="umb-group-builder__group-sort-value" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
+                            <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
+                            <div class="umb-validation-label -arrow-left" ng-if="!tab.showSortOrderMissing" val-msg-for="groupSortOrder" val-toggle-msg="required"><localize key="required"></localize></div>
+                        </div>
+                    </ng-form>
 
                     <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
                         <i class="icon icon-merge"></i>
@@ -100,10 +107,18 @@
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
 
-                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited && !property.locked}" ng-repeat="property in tab.properties">
+                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
-                        <a href="" class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="addProperty(property, tab)" focus-when="{{property.focus}}">
+                        <a href=""
+                            class="umb-group-builder__property -placeholder"
+                            ng-if="property.propertyState=='init' && !sortingMode"
+                            ng-class="{'-placeholder': property.propertyState=='init'}"
+                            hotkey="alt+shift+p"
+                            hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
+                            ng-click="addProperty(property, tab)"
+                            on-focus="activateGroup(tab)"
+                            focus-when="{{property.focus}}">
 
                             <div class="umb-group-builder__property-meta">
                                 <div class="umb-group-builder__placeholder-box -input-small"></div>
@@ -123,7 +138,7 @@
 
                         </a>
 
-                        <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited && !property.locked, '-sortable-locked': sortingMode && (property.inherited || property.locked)}">
+                        <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
                             <!-- property meta text -->
                             <div class="umb-group-builder__property-meta" ng-class="{'-full-width': sortingMode}">
@@ -169,7 +184,7 @@
                                 </ng-form>
 
                                 <div ng-if="sortingMode">
-                                    <i class="icon icon-navigation" ng-if="!property.inherited && !property.locked"></i>
+                                    <i class="icon icon-navigation" ng-if="!property.inherited"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
                                     <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
                                 </div>
@@ -225,8 +240,6 @@
                                         preview="true">
                                     </umb-property-editor>
                                 </ng-form>
-
-                                <div class="umb-group-builder__property-preview-background"></div>
 
                             </div>
 

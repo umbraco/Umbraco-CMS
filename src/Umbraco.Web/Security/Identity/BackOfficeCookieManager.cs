@@ -73,6 +73,16 @@ namespace Umbraco.Web.Security.Identity
         /// </remarks>
         internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
+            if (_umbracoContextAccessor.Value.Application.IsConfigured == false
+                && _umbracoContextAccessor.Value.Application.DatabaseContext.IsDatabaseConfigured == false)
+            {
+                //Do not authenticate the request if we don't have a db and we are not configured - since we will never need
+                // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
+                // when people have older invalid cookies on the same domain since our user managers might attempt to lookup a user
+                // and we don't even have a db.
+                return false;
+            }
+
             var request = ctx.Request;
             var httpCtx = ctx.TryGetHttpContext();
             
@@ -91,9 +101,7 @@ namespace Umbraco.Web.Security.Identity
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
-                || request.Uri.IsInstallerRequest()
-                //detect in preview
-                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+                || request.Uri.IsInstallerRequest()                
                 //check for base
                 || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
             {

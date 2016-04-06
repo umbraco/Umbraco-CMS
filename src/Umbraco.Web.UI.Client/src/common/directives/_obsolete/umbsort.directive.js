@@ -1,20 +1,24 @@
 /**
- * @ngdoc directive
- * @name umbraco.directives.directive:umbSort
- * @element div
- * @function
- *
- * @description
- * Resize div's automatically to fit to the bottom of the screen, as an optional parameter an y-axis offset can be set
- * So if you only want to scale the div to 70 pixels from the bottom you pass "70"
- *
- * @example
-   <example module="umbraco.directives">
-     <file name="index.html">
-         <div umb-sort="70" class="input-block-level"></div>
-     </file>
-   </example>
- */
+* @ngdoc directive
+* @name umbraco.directives.directive:umbSort
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
+*
+* @element div
+* @function
+*
+* @description
+* Resize div's automatically to fit to the bottom of the screen, as an optional parameter an y-axis offset can be set
+* So if you only want to scale the div to 70 pixels from the bottom you pass "70"
+*
+* @example
+* <example module="umbraco.directives">
+*     <file name="index.html">
+*         <div umb-sort="70" class="input-block-level"></div>
+*     </file>
+* </example>
+**/
+
 angular.module("umbraco.directives")
   .value('umbSortContextInternal',{})
   .directive('umbSort', function($log,umbSortContextInternal) {
@@ -165,4 +169,4 @@ angular.module("umbraco.directives")
              }
           };
 
-        });
+        });
