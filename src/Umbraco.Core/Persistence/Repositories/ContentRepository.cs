@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //we only want the newest ones with this method
             sql.Where<DocumentDto>(x => x.Newest);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
         }
 
         #endregion
@@ -251,9 +251,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 // because that method is used to query 'latest' content items where in this case we don't necessarily
                 // want latest content items because a pulished content item might not actually be the latest.
                 // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
-                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
-                    new Tuple<string, string>("cmsDocument", "nodeId"),
-                    ProcessQuery, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out total,
+                    MapQueryDtos, "Path", Direction.Ascending);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -783,26 +782,14 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-
-            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is
-            // what we always require for a paged result, so we'll ensure it's included in the filter
-
-            var args = new List<object>();
-            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
-
+            var filterSql = Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter.IsNullOrWhiteSpace() == false)
-            {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
-            }
+                filterSql.Append("AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
 
-            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
-
-            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
-                filterCallback);
-
+            return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
+                MapQueryDtos,
+                orderBy, orderDirection,
+                filterSql);
         }
 
         /// <summary>
@@ -859,11 +846,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IContent> ProcessQuery(Sql sql)
+        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos)
         {
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto>(sql);
-
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();
 

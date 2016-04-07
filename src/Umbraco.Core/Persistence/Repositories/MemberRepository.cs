@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<MemberDto>(sql));
 
         }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments)
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(baseQuery);
+                return MapQueryDtos(Database.Fetch<MemberDto>(baseQuery));
             }
             else
             {
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return ProcessQuery(sql);
+                return MapQueryDtos(Database.Fetch<MemberDto>(sql));
             }
 
         }
@@ -579,7 +579,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<MemberDto>(sql));
 
         }
 
@@ -625,21 +625,14 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
-            {
-                sbWhere.Append("AND ((umbracoNode. " + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
-                                "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
-                args.Add("%" + filter + "%");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
-            }
+            var filterSql = filter.IsNullOrWhiteSpace()
+                ? null
+                : Sql().Append("AND ((umbracoNode. " + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0) " +
+                        "OR (cmsMember.LoginName LIKE @0))", "%" + filter + "%");
 
-            return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsMember", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
-                filterCallback);
+            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+                MapQueryDtos, orderBy, orderDirection,
+                filterSql);
         }
 
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
@@ -678,11 +671,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetEntityPropertyNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> ProcessQuery(Sql sql)
+        private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos)
         {
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<MemberDto>(sql);
-
             var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
 
             //content types

@@ -493,31 +493,23 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
-            {
-                sbWhere.Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
-            }
+            var filterSql = filter.IsNullOrWhiteSpace()
+                ? null
+                : Sql().Append("AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
 
-            return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsContentVersion", "contentId"),
-                ProcessQueryDtos, orderBy, orderDirection,
-                filterCallback);
-
+            return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
+                MapQueryDtos, orderBy, orderDirection,
+                filterSql);
         }
 
         private IEnumerable<IMedia> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<ContentVersionDto>(sql);
-            return ProcessQueryDtos(dtos);
+            return MapQueryDtos(dtos);
         }
 
-        private IEnumerable<IMedia> ProcessQueryDtos(List<ContentVersionDto> dtos)
+        private IEnumerable<IMedia> MapQueryDtos(List<ContentVersionDto> dtos)
         {
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
