@@ -40,6 +40,15 @@ namespace Umbraco.Core
                 yield return temp.Take(count);
         }
 
+        public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(this IEnumerable<TSource> source, Func<IEnumerable<TSource>, IEnumerable<TResult>> selector, int groupSize)
+        {
+            // don't want to use a SelectMany(x => x) here - isn't this better?
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var resultGroup in source.InGroupsOf(groupSize).Select(selector))
+                foreach (var result in resultGroup)
+                    yield return result;
+        }
+
         /// <summary>The distinct by.</summary>
         /// <param name="source">The source.</param>
         /// <param name="keySelector">The key selector.</param>
