@@ -123,7 +123,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 : sql.Select<DocumentDto>(r =>
                         r.Select<ContentVersionDto>(rr =>
                             rr.Select<ContentDto>(rrr =>
-                                rrr.Select<NodeDto>())));
+                                rrr.Select<NodeDto>()))
+                         .Select<DocumentPublishedReadOnlyDto>(tableAlias: "cmsDocument2"));
 
             sql
                 .From<DocumentDto>()
@@ -253,7 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
                     new Tuple<string, string>("cmsDocument", "nodeId"),
                     ProcessQuery, "Path", Direction.Ascending);
-                
+
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();

@@ -120,9 +120,6 @@ namespace Umbraco.Core.Persistence
             return sql.LeftJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql.UmbracoSqlJoinClause LeftOuterJoin(this UmbracoSql sql, string table) { return sql.Join("LEFT OUTER JOIN ", table); }
-        public static UmbracoSql.UmbracoSqlJoinClause RightJoin(this UmbracoSql sql, string table) { return sql.Join("RIGHT JOIN ", table); }
-
         public static UmbracoSql.UmbracoSqlJoinClause LeftOuterJoin<T>(this UmbracoSql sql)
         {
             var type = typeof(T);
@@ -141,7 +138,7 @@ namespace Umbraco.Core.Persistence
             return sql.RightJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql On<TLeft, TRight>(this UmbracoSql.UmbracoSqlJoinClause clause, 
+        public static UmbracoSql On<TLeft, TRight>(this UmbracoSql.UmbracoSqlJoinClause clause,
             Expression<Func<TLeft, object>> leftMember, Expression<Func<TRight, object>> rightMember,
             params object[] args)
         {
@@ -194,18 +191,27 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
-        public static RefSql Select<T>(this RefSql refSql, Func<RefSql, RefSql> refexpr = null)
-        {
-            return refSql.Select<T>(null, refexpr);
-        }
-
-        public static RefSql Select<T>(this RefSql refSql, string referenceName, Func<RefSql, RefSql> refexpr = null)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="refSql"></param>
+        /// <param name="refexpr"></param>
+        /// <param name="referenceName">The name of the DTO reference.</param>
+        /// <param name="tableAlias">The name of the table alias.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <para>Select&lt;Foo>() produces: [foo].[value] AS [Foo_Value]</para>
+        /// <para>With tableAlias: [tableAlias].[value] AS [Foo_Value]</para>
+        /// <para>With referenceName: [foo].[value] AS [referenceName_Value]</para>
+        /// </remarks>
+        public static RefSql Select<T>(this RefSql refSql, Func<RefSql, RefSql> refexpr = null, string referenceName = null, string tableAlias = null)
         {
             if (referenceName == null) referenceName = typeof (T).Name;
             if (refSql.Prefix != null) referenceName = refSql.Prefix + PocoData.Separator + referenceName;
             var pd = refSql.Sql.SqlContext.PocoDataFactory.ForType(typeof (T));
 
-            var tableName = pd.TableInfo.TableName;
+            var tableName = tableAlias ?? pd.TableInfo.TableName;
             var columns = pd.QueryColumns.Select(x => GetColumn(refSql.Sql.SqlContext.DatabaseType,
                 tableName,
                 x.Value.ColumnName,

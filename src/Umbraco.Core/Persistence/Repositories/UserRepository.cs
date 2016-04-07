@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return Sql().SelectCount().From<UserDto>();
 
             return Sql()
-                .Select<UserDto>(r => r.Select<User2AppDto>("User2AppDtos"))
+                .Select<UserDto>(r => r.Select<User2AppDto>(referenceName: "User2AppDtos"))
                 .From<UserDto>()
                 .LeftJoin<User2AppDto>()
                 .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);

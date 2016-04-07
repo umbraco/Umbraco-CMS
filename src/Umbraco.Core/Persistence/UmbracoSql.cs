@@ -98,5 +98,7 @@ namespace Umbraco.Core.Persistence
 
         public new UmbracoSqlJoinClause InnerJoin(string table) { return Join("INNER JOIN ", table); }
         public new UmbracoSqlJoinClause LeftJoin(string table) { return Join("LEFT JOIN ", table); }
+        public UmbracoSqlJoinClause LeftOuterJoin(string table) { return Join("LEFT OUTER JOIN ", table); }
+        public UmbracoSqlJoinClause RightJoin(string table) { return Join("RIGHT JOIN ", table); }
     }
 }
