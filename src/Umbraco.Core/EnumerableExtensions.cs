@@ -20,9 +20,24 @@ namespace Umbraco.Core
             if (groupSize <= 0)
                 throw new ArgumentException("Must be greater than zero.", "groupSize");
 
-            return source
-                .Select((x, i) => Tuple.Create(i / groupSize, x))
-                .GroupBy(t => t.Item1, t => t.Item2);
+
+            // following code derived from MoreLinq and does not allocate bazillions of tuples
+
+            T[] temp = null;
+            var count = 0;
+
+            foreach (var item in source)
+            {
+                if (temp == null) temp = new T[groupSize];
+                temp[count++] = item;
+                if (count != groupSize) continue;
+                yield return temp/*.Select(x => x)*/;
+                temp = null;
+                count = 0;
+            }
+
+            if (temp != null && count > 0)
+                yield return temp.Take(count);
         }
 
         /// <summary>The distinct by.</summary>
@@ -287,7 +302,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// The logic for this is taken from:
         /// http://stackoverflow.com/questions/4576723/test-whether-two-ienumerablet-have-the-same-values-with-the-same-frequencies
-        /// 
+        ///
         /// There's a few answers, this one seems the best for it's simplicity and based on the comment of Eamon
         /// </remarks>
         public static bool UnsortedSequenceEqual<T>(this IEnumerable<T> source, IEnumerable<T> other)
