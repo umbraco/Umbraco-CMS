@@ -1,9 +1,9 @@
-<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Content.CreateController">
+<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Content.CreateController" ng-cloak>
 	
 	<div class="umb-pane">
 	<h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
 
-	<p class="abstract" ng-hide="allowedTypes">
+	<p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
 		<localize key="create_noDocumentTypes" />
 	</p>
 

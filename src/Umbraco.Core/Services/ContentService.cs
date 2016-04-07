@@ -910,7 +910,7 @@ namespace Umbraco.Core.Services
                   new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 var moveInfo = new List<MoveEventInfo<IContent>>
@@ -957,7 +957,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1080,7 +1080,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IContent>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
             using (new WriteLock(Locker))
@@ -1124,7 +1124,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1147,7 +1147,7 @@ namespace Umbraco.Core.Services
                   new DeleteEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 //Make sure that published content is unpublished before being deleted
@@ -1178,7 +1178,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1227,6 +1227,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
         {
+            //TODO: This currently this is called from the ContentTypeService but that needs to change, 
+            // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
+            // This method will recursively go lookup every content item, check if any of it's descendants are
+            // of a different type, move them to the recycle bin, then permanently delete the content items. 
+            // The main problem with this is that for every content item being deleted, events are raised...
+            // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -1709,6 +1716,7 @@ namespace Umbraco.Core.Services
             }
         }
 
+        //TODO: All of this needs to be moved to the repository
         private void PerformMove(IContent content, int parentId, int userId, ICollection<MoveEventInfo<IContent>> moveInfo)
         {
             //add a tracking item to use in the Moved event
@@ -1977,6 +1985,10 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
+                    if (published == false)
+                    {
+                        content.ChangePublishedState(PublishedState.Saved);
+                    }
                     //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
                     if (content.HasIdentity == false)
                     {
@@ -2038,7 +2050,7 @@ namespace Umbraco.Core.Services
                   new SaveEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
 
@@ -2070,7 +2082,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -2118,6 +2130,22 @@ namespace Umbraco.Core.Services
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
                 return PublishStatusType.FailedPathNotPublished;
+            }
+            else if (content.ExpireDate.HasValue && content.ExpireDate.Value > DateTime.MinValue && DateTime.Now > content.ExpireDate.Value)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' has expired and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedHasExpired;
+            }
+            else if (content.ReleaseDate.HasValue && content.ReleaseDate.Value > DateTime.MinValue && content.ReleaseDate.Value > DateTime.Now)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedAwaitingRelease;
             }
 
             return PublishStatusType.Success;

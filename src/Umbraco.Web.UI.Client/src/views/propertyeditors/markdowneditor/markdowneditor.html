@@ -1,7 +1,15 @@
-<div ng-controller="Umbraco.PropertyEditors.MarkdownEditorController" class="wmd-panel">
-    <div id="wmd-button-bar-{{model.alias}}"></div>
-    
-    <textarea ng-model="model.value" class="wmd-input" id="wmd-input-{{model.alias}}"></textarea>
-    
-    <div ng-show="model.config.preview" id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
-</div> 
+<div class="wmd-panel" ng-controller="Umbraco.PropertyEditors.MarkdownEditorController">
+   <div id="wmd-button-bar-{{model.alias}}"></div>
+
+   <textarea class="wmd-input" id="wmd-input-{{model.alias}}" ng-model="model.value"></textarea>
+
+   <div class="wmd-panel wmd-preview" id="wmd-preview-{{model.alias}}" ng-show="model.config.preview"></div>
+
+   <umb-overlay
+      ng-if="mediaPickerOverlay.show"
+      model="mediaPickerOverlay"
+      position="right"
+      view="mediaPickerOverlay.view">
+   </umb-overlay>
+
+</div>

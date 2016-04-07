@@ -1,0 +1,207 @@
+.umb-overlay {
+    position: fixed;
+    overflow: hidden;
+    background: white;
+    z-index: 996660;
+    animation: fadeIn 0.2s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.umb-overlay__form {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    height: 100%;
+}
+
+.umb-overlay .umb-overlay-header {
+    background: @grayLighter;
+    border-bottom: 1px solid @grayLight;
+    padding: 10px;
+    margin-top: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+
+.umb-overlay .umb-overlay__title {
+    font-size: @fontSizeLarge;
+    color: @black;
+    font-weight: bold;
+
+    margin: 7px 0;
+}
+
+.umb-overlay .umb-overlay__subtitle {
+    font-size: @fontSizeSmall;
+    color: @gray;
+}
+
+.umb-overlay .umb-overlay-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    height: auto;
+}
+
+.umb-overlay .umb-overlay-drawer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 31px;
+    padding: 10px 20px;
+    margin: 0;
+
+    background: @grayLighter;
+    border-top: 1px solid @grayLight;
+}
+
+.umb-overlay .umb-overlay-drawer.-auto-height {
+    flex-basis: auto;
+}
+
+.umb-overlay .umb-overlay-drawer .umb-overlay-drawer__align-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+/* ---------- OVERLAY CENTER ---------- */
+.umb-overlay.umb-overlay-center {
+    position: absolute;
+    width: 600px;
+    height: 500px;
+    top: 10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-header {
+    text-align: center;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-container {
+    padding: 20px;
+}
+
+/* ---------- OVERLAY TARGET ---------- */
+.umb-overlay.umb-overlay-target {
+    width: 400px;
+    height: 400px;
+    box-sizing: border-box;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-header {
+    text-align: center;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-container {
+    padding: 10px;
+}
+
+/* ---------- OVERLAY RIGHT ---------- */
+.umb-overlay.umb-overlay-right {
+    width: 500px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+}
+
+.umb-overlay.umb-overlay-right .umb-overlay-header {
+    flex-basis: 100px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.umb-overlay.umb-overlay-right .umb-overlay-container {
+    padding: 20px;
+}
+
+/* ---------- OVERLAY LEFT ---------- */
+.umb-overlay.umb-overlay-left {
+    width: 500px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+    margin-left: 80px;
+}
+
+.umb-overlay.umb-overlay-left .umb-overlay-header {
+    flex-basis: 100px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.umb-overlay.umb-overlay-left .umb-overlay-container {
+    padding: 20px;
+}
+
+@media (max-width: 767px) {
+    .umb-overlay.umb-overlay-left {
+        margin-left: 60px;
+    }
+}
+
+/* ---------- OVERLAY ITEM DETAILS ---------- */
+.umb-overlay__item-details {
+    position: absolute;
+    left: 0;
+    bottom: 51px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    border-bottom: 1px solid @grayLight;
+    background: @grayLighter;
+}
+
+.umb-overlay__item-details-title-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.umb-overlay__item-details-icon {
+    font-size: 16px;
+    margin-right: 10px;
+    vertical-align: middle;
+    color: #999;
+}
+
+.umb-overlay__item-details-title {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.umb-overlay__item-details-description {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+/*ensures dialogs doesnt have side-by-side labels*/
+.umb-overlay .control-label,
+.umb-overlay .form-horizontal .control-label,
+.form-horizontal .umb-overlay .control-label
+ {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    float: none;
+}
+
+
+.umb-overlay .controls-row,
+.umb-overlay .form-horizontal .controls,
+.form-horizontal .umb-overlay .controls {
+    margin-left: 0 !important;
+}

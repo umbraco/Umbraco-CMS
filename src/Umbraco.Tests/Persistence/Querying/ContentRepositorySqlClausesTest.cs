@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
                 .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
                 .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"));
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"));
 
             var sql = new Sql();
             sql.Select("*")
@@ -56,8 +56,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
                 .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
                 .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
-                .Where("[umbracoNode].[id] = @0", 1050);
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
+                .Where("([umbracoNode].[id] = @0)", 1050);
 
             var sql = new Sql();
             sql.Select("*")
@@ -94,9 +94,9 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
                 .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
                 .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
-                .Where("[umbracoNode].[id] = @0", 1050)
-                .Where("[cmsContentVersion].[VersionId] = @0", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"))
+                .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
+                .Where("([umbracoNode].[id] = @0)", 1050)
+                .Where("([cmsContentVersion].[VersionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"))
                 .OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var sql = new Sql();
@@ -133,8 +133,8 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*");
             expected.From("[cmsPropertyData]");
             expected.InnerJoin("[cmsPropertyType]").On("[cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id]");
-            expected.Where("[cmsPropertyData].[contentNodeId] = @0", 1050);
-            expected.Where("[cmsPropertyData].[versionId] = @0", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
+            expected.Where("([cmsPropertyData].[contentNodeId] = @0)", 1050);
+            expected.Where("([cmsPropertyData].[versionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
 
             var sql = new Sql();
             sql.Select("*")

@@ -393,6 +393,7 @@
     <key alias="showPageOnSend">Mostrar página al enviar</key>
     <key alias="size">Tamaño</key>
     <key alias="sort">Ordenar</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Tipo</key>
     <key alias="typeToSearch">Tipo que buscar...</key>
     <key alias="up">Arriba</key>
@@ -407,6 +408,8 @@
     <key alias="welcome">Bienvenido...</key>
     <key alias="width">Ancho</key>
     <key alias="yes">Si</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Color de fondo</key>
@@ -644,6 +647,8 @@
     <key alias="createMatchingTemplate">Crear template correspondiente</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Ordenación completa.</key>
     <key alias="sortHelp">Arrastra las diferentes páginas debajo para colocarlas como deberían estar. O haz click en las cabeceras de las columnas para ordenar todas las páginas</key>
     <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.<br/>
@@ -717,14 +722,20 @@
   </area>
   <area alias="grid">
     <key alias="insertControl">Insertar control</key>
+    <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Añade más filas</key>
-    <key alias="addElement"><![CDATA[Para empezar, haz click en <i class="icon icon-add blue"></i> y añade tu primer contenido]]></key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
 
     <key alias="gridLayouts">Plantillas de Grid</key>
     <key alias="gridLayoutsDetail">Las plantillas son el área de trabajo para el editor de grids, normalmente sólo necesitas una o dos plantillas diferentes</key>
     <key alias="addGridLayout">Añadir plantilla de grid</key>
     <key alias="addGridLayoutDetail">Ajusta la plantilla configurando la anchura de las columnas y añadiendo más secciones</key>
-    
+
     <key alias="rowConfigurations">Configuraciones de filas</key>
     <key alias="rowConfigurationsDetail">Las filas son celdas predefinidas que se disponen horizontalmente</key>
     <key alias="addRowConfiguration">Añade una configuración de fila</key>
@@ -732,7 +743,7 @@
 
     <key alias="columns">Columnas</key>
     <key alias="columnsDetails">Número total de columnas en la plantilla del grid</key>
-    
+
     <key alias="settings">Configuración</key>
     <key alias="settingsDetails">Configura qué ajustes pueden cambiar los editores</key>
 
@@ -814,7 +825,7 @@
     <key alias="cacheBrowser">Caché del navegador</key>
     <key alias="contentRecycleBin">Papelera de reciclaje</key>
     <key alias="createdPackages">Paquetes creados</key>
-    <key alias="datatype">Tipos de datos</key>
+    <key alias="dataTypes">Tipos de datos</key>
     <key alias="dictionary">Diccionario</key>
     <key alias="installedPackages">Paquetes instalados</key>
     <key alias="installSkin">Instalar skin</key>
@@ -824,10 +835,10 @@
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de medios</key>
     <key alias="member">Miembros</key>
-    <key alias="memberGroup">Grupos de miembros</key>
+    <key alias="memberGroups">Grupos de miembros</key>
     <key alias="memberRoles">Roles</key>
-    <key alias="memberType">Tipos de miembros</key>
-    <key alias="nodeTypes">Tipos de documento</key>
+    <key alias="memberTypes">Tipos de miembros</key>
+    <key alias="documentTypes">Tipos de documento</key>
     <key alias="packager">Paquetes</key>
     <key alias="packages">Paquetes</key>
     <key alias="python">Ficheros Python</key>

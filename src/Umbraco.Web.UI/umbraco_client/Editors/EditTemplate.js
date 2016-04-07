@@ -9,12 +9,12 @@
         _openMacroModal: function(alias) {
             
             var self = this;
-
+           
             UmbClientMgr.openAngularModalWindow({
                 template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "WebForms",
-                    selectedAlias: alias
+                    macroData: { macroAlias: alias }
                 },
                 callback: function(data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.editorClientId);

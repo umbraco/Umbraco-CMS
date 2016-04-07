@@ -1,5 +1,5 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
-    
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -10,72 +10,89 @@
                 <td></td>
             </tr>
         </thead>
-        <tbody ui-sortable="sortableOptions">
-            <tr ng-repeat="link in model.value" data-link="{{link.link}}">
-                <td style="width: 20px"><i class="icon icon-navigation handle"></i></td>
-                <td style="word-wrap:break-word; word-break: break-all">
+        <tbody ui-sortable="sortableOptions" ng-model="model.value">
+            <tr ng-repeat="link in model.value" data-link="{{link.link}}" ng-class="{ 'unsortable': model.value.length <= 1 }">
+                <td class="col-sort"><i class="icon icon-navigation handle" ng-show="canSort()"></i></td>
+                <td class="col-caption">
                     <span ng-show="!link.edit">{{link.caption}}</span>
-                    <input type="text" ng-model="link.caption" ng-show="link.edit" />
+                    <div class="control-wrapper">
+                        <input type="text" ng-model="link.caption" ng-show="link.edit" />
+                    </div>
                 </td>
-                <td style="word-wrap:break-word; word-break: break-all">
+                <td class="col-link">
                     <div ng-show="!link.edit">
+                        <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>
                         <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
-                            <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName">
-
-                        </a>
+                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName"></a>
                     </div>
                     <div ng-show="link.edit">
                         <div ng-show="!link.isInternal">
-                            <input type="text" ng-model="link.link" /><br />
-                            <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
-                        </div>
+                                <div class="control-wrapper">
+                                    <input type="text" ng-model="link.link" />
+                                </div>
+                                <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                            </div>
 
                         <div ng-show="link.isInternal">
+                            <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>
                             <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)"><localize key="choose">Choose</localize></a><br />
                             <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
                         </div>
                     </div>
                 </td>
-                <td>
+                <td class="col-newwindow">
                     <span ng-show="!link.edit">{{link.newWindow}}</span>
                     <input type="checkbox" ng-model="link.newWindow" ng-show="link.edit" />
                 </td>
-                <td>
-
+                <td class="col-actions">
                     <div class="btn-group" ng-show="!link.edit">
                         <button type="button" class="btn btn-default" ng-click="edit($index)"><localize key="edit">Edit</localize></button>
                         <button type="button" class="btn btn-default" ng-click="delete($index)"><localize key="delete">Delete</localize></button>
                     </div>
-                    <div class="btn-group" ng-show="link.edit">
+                    <div class="btn-group" ng-show="link.edit" style="margin-left: 0;">
                         <button type="button" class="btn btn-default" ng-click="saveEdit($index)"><localize key="buttons_save">Save</localize></button>
                     </div>
-
                 </td>
             </tr>
         </tbody>
-        <tfoot>
+        <tfoot ng-show="canAdd()">
             <tr>
-                    <td></td>
-                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="hasError" /></td>
-                    <td>
-                        <div ng-show="addExternal">
+                <td class="col-sort"></td>
+                <td class="col-caption">
+                    <div class="control-wrapper">
+                        <input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder" val-highlight="hasError" />
+                    </div>
+                </td>
+                <td class="col-link">
+                    <div ng-show="addExternal">
+                        <div class="control-wrapper">
                             <input type="text" ng-model="newLink" localize="placeholder" placeholder="@relatedlinks_externalLinkPlaceholder" />
-                            <br /> <localize key="or">or</localize>
-                            <a href="#" ng-click="switch($event)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
                         </div>
+                        <localize key="or">or</localize>
+                        <a href="#" ng-click="switch($event)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                    </div>
 
-                        <div ng-show="!addExternal">
-                            <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)"><localize key="choose">Choose</localize></a><br />
-                            <localize key="or">or</localize> <a href="#" ng-click="switch($event)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
-                        </div>
-                    </td>
-                    <td><input type="checkbox" ng-model="newNewWindow" /> </td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-default" ng-click="add($event)"><localize key="general_add">Add</localize></button>
-                        </div>
-                    </td>
+                    <div ng-show="!addExternal">
+                        <i class="icon {{newInternalIcon}}" ng-show="newInternalIcon"></i>
+                        <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)"><localize key="choose">Choose</localize></a><br />
+                        <localize key="or">or</localize> <a href="#" ng-click="switch($event)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
+                    </div>
+                </td>
+                <td class="col-newwindow"><input type="checkbox" ng-model="newNewWindow" /></td>
+                <td class="col-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-default" ng-click="add($event)" ng-disabled="newCaption == '' || !canAdd()" ng-show="canAdd()"><localize key="general_add">Add</localize></button>
+                    </div>
+                </td>
             </tr>
         </tfoot>
     </table>
+
+   <umb-overlay
+      ng-if="contentPickerOverlay.show"
+      model="contentPickerOverlay"
+      view="contentPickerOverlay.view"
+      position="right">
+   </umb-overlay>
+
 </div>

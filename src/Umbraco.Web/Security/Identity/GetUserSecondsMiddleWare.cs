@@ -24,7 +24,6 @@ namespace Umbraco.Web.Security.Identity
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly ISecuritySection _security;
         private readonly ILogger _logger;
-        private const int PersistentLoginSlidingMinutes = 30;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
@@ -44,14 +43,10 @@ namespace Umbraco.Web.Security.Identity
         {
             var request = context.Request;
             var response = context.Response;
-
-            var rootPath = context.Request.PathBase.HasValue
-                ? context.Request.PathBase.Value.EnsureStartsWith("/").EnsureEndsWith("/")
-                : "/";
-
+            
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    string.Format("{0}{1}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", rootPath, GlobalSettings.UmbracoMvcArea)))
+                    string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)
@@ -88,7 +83,8 @@ namespace Umbraco.Web.Security.Identity
                                 if (timeRemaining < timeElapsed)
                                 {
                                     ticket.Properties.IssuedUtc = currentUtc;
-                                    ticket.Properties.ExpiresUtc = currentUtc.AddMinutes(PersistentLoginSlidingMinutes);
+                                    var timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
+                                    ticket.Properties.ExpiresUtc = currentUtc.Add(timeSpan);
 
                                     var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
 

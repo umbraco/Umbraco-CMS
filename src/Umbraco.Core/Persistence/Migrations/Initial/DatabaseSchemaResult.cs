@@ -119,6 +119,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 2, 5);
             }
 
+            //if the error is for umbracoDeployChecksum it must be the previous version to 7.4 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoDeployChecksum"))))
+            {
+                return new Version(7, 3, 4);
+            }
+
             return UmbracoVersion.Current;
         }
 

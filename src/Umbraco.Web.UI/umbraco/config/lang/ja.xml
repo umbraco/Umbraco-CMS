@@ -52,10 +52,10 @@
     <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
     <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
     <key alias="orEdit">ドメインの編集</key>
-    <key alias="domainHelp"><![CDATA[例: "example.com", "www.example.com", "example.com:8080" または "https://www.example.com/". ]]></key>
-    <key alias="inherit">Inherit</key>
+    <key alias="domainHelp"><![CDATA[有効なドメイン名は、"example.com"、"www.example.com"、"example.com:8080"、"https://www.example.com/" などです。ドメインで 1 レベル パスがサポートされます。ただし、それらは回避する必要があります。代わりに上記のカルチャ設定を使用してください。]]></key>
+    <key alias="inherit">継承</key>
     <key alias="setLanguage">カルチャの割り当て</key>
-    <key alias="setLanguageHelp"><![CDATA[現在のノード以下のカルチャを設定します。親ノードのカルチャを継承します。]]></key>
+    <key alias="setLanguageHelp"><![CDATA[現在のノードの下のノードのカルチャを設定または親ノードからカルチャを継承。以下のドメインが適用されない場合、現在のノードにも適用します。]]></key>
     <key alias="setDomains">ドメイン割り当て</key>
   </area>
   <area alias="auditTrails">
@@ -67,7 +67,7 @@
     <key alias="somethingElse">その他のアクション</key>
     <key alias="bold">太字</key>
     <key alias="deindent">インデント解除</key>
-    <key alias="formFieldInsert">フィールドから挿入</key>
+    <key alias="formFieldInsert">フォーム フィールドの挿入</key>
     <key alias="graphicHeadline">グラフィックヘッドラインの挿入</key>
     <key alias="htmlEdit">HTMLの編集</key>
     <key alias="indent">インデント</key>
@@ -86,11 +86,13 @@
     <key alias="save">保存</key>
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
+	<key alias="saveListView">リスト ビューの保存</key>
     <key alias="showPage">プレビュー</key>
     <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
     <key alias="styleChoose">スタイルの選択</key>
     <key alias="styleShow">スタイルの表示</key>
     <key alias="tableInsert">表の挿入</key>
+	<key alias="generateModels">モデルを生成</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">ドキュメントタイプを変更するには、まず有効なドキュメントタイプのリストから選択します</key>
@@ -104,10 +106,10 @@
     <key alias="mapToProperty">割り当てるプロパティ</key>
     <key alias="newTemplate">新しいテンプレート</key>
     <key alias="newType">新しいドキュメントタイプ</key>
-    <key alias="none">None</key>
+    <key alias="none">なし</key>
     <key alias="selectedContent">コンテント</key>
     <key alias="selectNewDocType">ドキュメントタイプを変更する</key>
-    <key alias="successMessage">プロパティが以下のように割り当てられました</key>
+    <key alias="successMessage">選択コンテンツのドキュメント タイプは、[新しいタイプ] に変更され、以下のプロパティがマップされました。</key>
     <key alias="to">から</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">1つ以上のプロパティを割り当てられませんでした。プロパティが定義が重複しています</key>
     <key alias="validDocTypesNote">有効なドキュメントタイプのみが表示されます</key>
@@ -125,11 +127,12 @@
     <key alias="createDate">作成日時</key>
     <key alias="createDateDesc" version="7.0">このドキュメントが作成された日時</key>
     <key alias="documentType">ドキュメントタイプ</key>
-    <key alias="editing">変種中</key>
+    <key alias="editing">編集中</key>
     <key alias="expireDate">公開終了日時</key>
     <key alias="itemChanged">このページは公開後変更されています</key>
     <key alias="itemNotPublished">このページは公開されていません</key>
     <key alias="lastPublished">公開日時</key>
+	<key alias="noItemsToShow">表示するアイテムはありません</key>
     <key alias="listViewNoItems" version="7.1.5">リストに表示するアイテムはありません</key>
     <key alias="mediatype">メディアタイプ</key>
     <key alias="mediaLinks">メディアの項目へのリンク</key>
@@ -165,6 +168,10 @@
   <area alias="media">
     <key alias="clickToUpload">クリックしてアップロードする</key>
     <key alias="dropFilesHere">ファイルをここへドロップ..</key>
+	<key alias="urls">メディアへリンク</key>
+    <key alias="orClickHereToUpload">またはクリックしてファイルを選択</key>
+    <key alias="onlyAllowedFiles">使用可能なファイル タイプ</key>
+    <key alias="maxFileSize">ファイルの最大サイズ</key>
   </area>
     <area alias="member">
     <key alias="createNewMember">メンバーの新規作成</key>
@@ -176,6 +183,7 @@
     <key alias="updateData">型とタイトルを選んでください</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[利用可能なドキュメントタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[利用可能なメディアタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"media types"</strong>.]]></key>
+	<key alias="documentTypeWithoutTemplate">テンプレートなしのドキュメント タイプ</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">ウェブサイトを参照する</key>
@@ -224,8 +232,8 @@
     <key alias="sitereindexed">サイトは再インデックスされました</key>
     <key alias="siterepublished">ウェブサイトのキャッシュがリフレッシュされました。 公開されているコンテンツはリフレッシュされましたが、非公開のコンテンツは非公開のままです。</key>
     <key alias="siterepublishHelp">ウェブサイトのキャッシュがリフレッシュされます。 公開されているコンテンツはリフレッシュされますが、非公開のコンテンツは非公開のままです。</key>
-    <key alias="tableColumns">行数</key>
-    <key alias="tableRows">列数</key>
+    <key alias="tableColumns">列数</key>
+    <key alias="tableRows">行数</key>
     <key alias="templateContentAreaHelp"><![CDATA[<strong>プレースホルダにidを設定</strong>して、子テンプレートからもこのテンプレートをコンテントに入れられるようにできます。
       IDは<code>&lt;asp:content /&gt;</code>エレメントとして用います。]]></key>
     <key alias="templateContentPlaceHolderHelp"><![CDATA[このリストから<strong>プレースホルダのidを選択</strong>してください。
@@ -233,6 +241,41 @@
     <key alias="thumbnailimageclickfororiginal">クリックすると画像がフルサイズで表示されます</key>
     <key alias="treepicker">項目の選択</key>
     <key alias="viewCacheItem">キャッシュされている項目の表示</key>
+	<key alias="createFolder">フォルダーの作成...</key>
+
+    <key alias="relateToOriginalLabel">オリジナルに関連付ける</key>
+    <key alias="theFriendliestCommunity">フレンドリーなコミュニティ</key>
+
+    <key alias="linkToPage">ページへリンク</key>
+
+    <key alias="openInNewWindow">リンク ドキュメントを新しいウィンドウまたはタブで開く</key>
+    <key alias="openInFullBody">リンク ドキュメントをウィンドウ全文表示で開く</key>
+    <key alias="openInParentFrame">親フレームでリンク ドキュメントを開く</key>
+
+    <key alias="linkToMedia">メディアへリンク</key>
+
+    <key alias="selectMedia">メディアの選択</key>
+    <key alias="selectIcon">アイコンの選択</key>
+    <key alias="selectItem">アイテムの選択</key>
+    <key alias="selectLink">リンクの選択</key>
+    <key alias="selectMacro">マクロの選択</key>
+    <key alias="selectContent">コンテンツの選択</key>
+    <key alias="selectMember">メンバーの選択</key>
+    <key alias="selectMemberGroup">メンバー グループの選択</key>
+
+    <key alias="noMacroParams">このマクロのパラメーターはありません</key>
+
+    <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
+    <key alias="exceptionDetail">例外の詳細</key>
+    <key alias="stacktrace">スタックトレース</key>
+    <key alias="innerException">Inner Exception</key>
+
+    <key alias="linkYour">次をリンク:</key>
+    <key alias="unLinkYour">次をリンク解除:</key>
+
+    <key alias="account">アカウント</key>
+
+    <key alias="selectEditor">エディターの選択</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -245,20 +288,22 @@
     <key alias="password">パスワードを入力...</key>
     <key alias="nameentity">%0%と命名します...</key>
     <key alias="entername">ここに名称を入力してください...</key>
+	<key alias="label">ラベル...</key>
+    <key alias="enterDescription">説明を入力してください...</key>
     <key alias="search">検索する...</key>
     <key alias="filter">条件で絞り込む...</key>
-    <key alias="enterTags">タグを追加します...</key>
+    <key alias="enterTags">入力してタグを追加 (各タグの後に Enter を押してください)...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">ルートノードとして許可する</key>
     <key alias="allowAtRootDesc" version="7.2">これを有効にするとコンテンツとメディアツリーのルートレベルに作成することができます</key>
     <key alias="allowedchildnodetypes">子ノードとして許可するタイプ</key>
-    <key alias="contenttypecompositions">Document Type Compositions</key>
+    <key alias="contenttypecompositions">ドキュメント タイプ構成</key>
     <key alias="create">新規作成</key>
-    <key alias="deletetab">削除</key>
+    <key alias="deletetab">タブの削除</key>
     <key alias="description">説明</key>
-    <key alias="newtab">新規見出し</key>
-    <key alias="tab">見出し</key>
+    <key alias="newtab">新しいタブ</key>
+    <key alias="tab">タブ</key>
     <key alias="thumbnail">サムネイル</key>
     <key alias="hasListView">リストビューを有効にする</key>
     <key alias="hasListViewDesc" version="7.2">子ノードをツリーに表示せずにリストビューに表示します</key>
@@ -270,8 +315,8 @@
   <area alias="editdatatype">
     <key alias="addPrevalue">値の前に追加</key>
     <key alias="dataBaseDatatype">データベースのデータ型</key>
-    <key alias="guid">データ型のGUID</key>
-    <key alias="renderControl">対応させるコントロール</key>
+    <key alias="guid">プロパティ エディター GUID</key>
+    <key alias="renderControl">プロパティ エディター</key>
     <key alias="rteButtons">ボタン</key>
     <key alias="rteEnableAdvancedSettings">高度な設定を有効にする</key>
     <key alias="rteEnableContextMenu">コンテキストメニューを有効にする</key>
@@ -294,10 +339,17 @@
     <key alias="errorRegExpWithoutTab">%0% は正しい書式ではありません</key>
   </area>
   <area alias="errors">
+	<key alias="receivedErrorFromServer">サーバー エラーが発生しました</key>
     <key alias="dissallowedMediaType">指定されたファイルタイプは管理者のみに許可されます</key>
     <key alias="codemirroriewarning">注意! CodeMirrorが設定で有効化されていますが、 Internet Explorerでは不安定なので無効化してください。</key>
     <key alias="contentTypeAliasAndNameNotNull">新しいプロパティ型のエイリアスと名前の両方を設定してください！</key>
     <key alias="filePermissionsError">特定のファイルまたはフォルタの読み込み/書き込みアクセスに問題があります</key>
+	<key alias="macroErrorLoadingPartialView">Partial View スクリプトの読み込みエラー (ファイル: %0%)</key>
+    <key alias="macroErrorLoadingUsercontrol">userControl の読み込みエラー '%0%'</key>
+    <key alias="macroErrorLoadingCustomControl">customControl の読み込みエラー (アセンブリ: %0%, タイプ: '%1%')</key>
+    <key alias="macroErrorLoadingMacroEngineScript">MacroEngine スクリプトの読み込みエラー (ファイル: %0%)</key>
+    <key alias="macroErrorParsingXSLTFile">XSLT ファイル解析エラー: %0%</key>
+    <key alias="macroErrorReadingXSLTFile">XSLT ファイル読み込みエラー: %0%</key>
     <key alias="missingTitle">タイトルを入力してください</key>
     <key alias="missingType">型を選択してください</key>
     <key alias="pictureResizeBiggerThanOrg">元画像より大きくしようとしていますが、本当によろしいのですか？</key>
@@ -318,6 +370,7 @@
     <key alias="actions">アクション選択</key>
     <key alias="add">追加</key>
     <key alias="alias">エイリアス</key>
+	<key alias="all">すべて</key>
     <key alias="areyousure">確かですか?</key>
     <key alias="border">枠線</key>
     <key alias="by">または</key>
@@ -355,6 +408,7 @@
     <key alias="innerMargin">内側の余白</key>
     <key alias="insert">挿入</key>
     <key alias="install">インストール</key>
+	<key alias="invalid">無効</key>
     <key alias="justify">位置揃え</key>
     <key alias="language">言語</key>
     <key alias="layout">レイアウト</key>
@@ -394,6 +448,7 @@
     <key alias="showPageOnSend">送信後にページを表示</key>
     <key alias="size">サイズ</key>
     <key alias="sort">並べ替え</key>
+    <key alias="submit">送信</key>
     <key alias="type">型</key>
     <key alias="typeToSearch">検索...</key>
     <key alias="up">上</key>
@@ -410,7 +465,46 @@
     <key alias="yes">はい</key>
     <key alias="folder">フォルダー</key>
     <key alias="searchResults">検索結果</key>
+    <key alias="reorder">順序変更</key>
+    <key alias="reorderDone">順序変更終了</key>
+	<key alias="preview">プレビュー</key>
+    <key alias="changePassword">パスワードの変更</key>
+    <key alias="to">-&gt;　</key>
+    <key alias="listView">リスト ビュー</key>
+    <key alias="saving">保存...</key>
+    <key alias="current">現在</key>
+    <key alias="move">移動</key>
+    <key alias="embed">埋め込み</key>
   </area>
+
+  <area alias="colors">
+    <key alias="black">ブラック</key>
+    <key alias="green">グリーン</key>
+    <key alias="yellow">イエロー</key>
+    <key alias="orange">オレンジ</key>
+    <key alias="blue">ブルー</key>
+    <key alias="red">レッド</key>
+  </area>
+
+  <area alias="shortcuts">
+      <key alias="addTab">タブの追加</key>
+      <key alias="addProperty">プロパティの追加</key>
+      <key alias="addEditor">エディターの追加</key>
+      <key alias="addTemplate">テンプレートの追加</key>
+      <key alias="addChildNode">子ノードの追加</key>
+      <key alias="addChild">子の追加</key>
+
+      <key alias="editDataType">データ タイプの編集</key>
+
+      <key alias="navigateSections">セクションの移動</key>
+
+      <key alias="shortcut">ショートカット</key>
+      <key alias="showShortcuts">ショートカットの表示</key>
+
+      <key alias="toggleListView">リスト ビューの切り替え</key>
+      <key alias="toggleAllowAsRoot">ルートとして許可に切り替え</key>
+  </area>
+
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
     <key alias="bold">太字</key>
@@ -444,7 +538,7 @@
       <strong>アップグレード</strong>ボタンを押すとUmbraco %0% 用にデータベースをアップグレードします。</p>
       <p>
       心配ありません。 - コンテントが消える事はありませんし、後で続けることもできます。
-      </p>    
+      </p>
       ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[データベースはバージョン %0% 用にアップグレードされました。<br /><strong>次へ</strong>
       を押して続行してください。]]></key>
@@ -490,7 +584,7 @@
     ]]></key>
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。 
+        ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。
         (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
@@ -504,8 +598,8 @@
     <key alias="runwaySimpleSite">簡単なウェブサイトから始めたい</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway"(≈滑走路)は幾つかの基本的なテンプレートから簡単なウェブサイトを用意します。このインストーラーは自動的にRnwayをセットアップできますが、 
-        これを編集したり、拡張したり、削除する事も簡単にできます。もしUmbracoを完璧に使いこなせるならばこれは不要です。とはいえ、 
+      "Runway"(≈滑走路)は幾つかの基本的なテンプレートから簡単なウェブサイトを用意します。このインストーラーは自動的にRnwayをセットアップできますが、
+        これを編集したり、拡張したり、削除する事も簡単にできます。もしUmbracoを完璧に使いこなせるならばこれは不要です。とはいえ、
         Runwayを使う事は、手間なく簡単にUmbracoを始める為には良い選択肢です。
         Runwayをインストールすれば、必要に応じてRunwayによる基本的な構成のページをRunwayのモジュールから選択できます。
         </p>
@@ -549,17 +643,16 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="renewSession">作業を保存して今すぐ更新</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super sunday</key>
-    <key alias="greeting1">Happy manic monday </key>
-    <key alias="greeting2">Happy tubular tuesday</key>
-    <key alias="greeting3">Happy wonderful wednesday</key>
-    <key alias="greeting4">Happy thunder thursday</key>
-    <key alias="greeting5">Happy funky friday</key>
-    <key alias="greeting6">Happy caturday</key>
+    <key alias="greeting0">ハッピー スーパー日曜日</key>
+    <key alias="greeting1">ハッピー マニアック月曜日</key>
+    <key alias="greeting2">ハッピー最高の火曜日</key>
+    <key alias="greeting3">ハッピー ワンダフル水曜日</key>
+    <key alias="greeting4">ハッピー サンダー木曜日</key>
+    <key alias="greeting5">ハッピー ファンキー金曜日</key>
+    <key alias="greeting6">ハッピー土曜日</key>
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="topText">Umbraco にようこそ。ユーザー名とパスワードを入力してください:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">ダッシュボード</key>
@@ -576,6 +669,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="noNodeSelected">まだノードが選択されていません。'ok'をクリックする前に上のリストでノードを選択してください。</key>
     <key alias="notAllowedByContentType">現在のノードは、ドキュメントタイプの設定により選択されたノードの子になることはできません。</key>
     <key alias="notAllowedByPath">ノードは、自分のサブページには移動できません</key>
+	<key alias="notAllowedAtRoot">現在のノードはルートにできません。</key>
     <key alias="notValid">子ドキュメントで権限がないので、その操作はできません。</key>
     <key alias="relateToOriginal">コピーしたものを元と関係づける</key>
   </area>
@@ -599,7 +693,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
 			<div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -611,7 +705,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 
@@ -627,8 +721,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
          パッケージを選択できます。Umbracoのパッケージは概ね".zip"ないしは".umb"といった拡張子です。
       ]]></key>
     <key alias="packageAuthor">作成者</key>
-    <key alias="packageDemonstration">文書</key>
-    <key alias="packageDocumentation">文書</key>
+    <key alias="packageDemonstration">デモ</key>
+    <key alias="packageDocumentation">ヘルプ</key>
     <key alias="packageMetaData">パッケージのメタデータ</key>
     <key alias="packageName">パッケージ名</key>
     <key alias="packageNoItemsHeader">パッケージには何も含まれません</key>
@@ -682,6 +776,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <![CDATA[
       %0% ページは公開がスケジュールされているため、公開されませんでした。
     ]]></key>
+	<key alias="contentPublishedFailedExpired"><![CDATA[
+      アイテムの有効期限が切れているため %0% を公開できません。
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %1% のプロパティがバリデーション定義に違反したため、%0% は公開できませんでした。
     ]]></key>
@@ -707,21 +804,13 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="noColors">設定済みの色はありません。</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">外部リンクを追加</key>
-    <key alias="addInternal">内部リンクを追加</key>
-    <key alias="addlink">追加</key>
-    <key alias="caption">タイトル</key>
-    <key alias="captionPlaceholder">キャプション表示を入力</key>
-    <key alias="chooseInternal">内部リンクを選択</key>
     <key alias="enterExternal">外部リンクを入力</key>
-    <key alias="externalLinkPlaceholder">リンクを入力</key>
-    <key alias="internalPage">内部ページ</key>
-    <key alias="link">リンク</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">下に移動</key>
-    <key alias="modeUp">上に移動</key>
-    <key alias="newWindow">新規ウィンドウで開く</key>
-    <key alias="removeLink">リンクを削除</key>
+	<key alias="chooseInternal">内部リンクを選択</key>
+	<key alias="caption">キャプション</key>
+	<key alias="link">リンク</key>
+	<key alias="newWindow">新規ウィンドウで開く</key>
+	<key alias="captionPlaceholder">キャプションを入力</key>
+	<key alias="externalLinkPlaceholder">リンクを入力</key>
   </area>
   <area alias="imagecropper">
     <key alias="reset">リセット</key>
@@ -780,13 +869,18 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
     <key alias="masterDocumentType">マスタードキュメントタイプ</key>
     <key alias="createMatchingTemplate">テンプレートを作成する</key>
+	<key alias="addIcon">アイコンの追加</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">ソートが完了しました。</key>
     <key alias="sortHelp">上下にアイテムをドラッグするなどして適当に配置したり、列のヘッダーをクリックしてコレクション全体をソートできます</key>
     <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。<br/> <br/> 並び替え中はウィンドウを閉じないでください。]]></key>
   </area>
   <area alias="speechBubbles">
+	<key alias="validationFailedHeader">検証</key>
+	<key alias="validationFailedMessage">アイテムを保存する前に検証エラーを修正してください。</key>
     <key alias="operationFailedHeader">失敗しました</key>
     <key alias="invalidUserPermissionsText">不十分なユーザー権限により操作を完了できませんでした</key>
     <key alias="operationCancelledHeader">キャンセルされました</key>
@@ -844,6 +938,11 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="partialViewSavedText">部分ビューをエラーなしで保存しました!</key>
     <key alias="partialViewErrorHeader">部分ビューは保存されていません</key>
     <key alias="partialViewErrorText">ファイルを保存するときにエラーが発生しました。</key>
+	<key alias="scriptSavedHeader">スクリプト ビューが保存されました</key>
+    <key alias="scriptSavedText">スクリプト ビューが正しく保存されました</key>
+    <key alias="scriptErrorHeader">スクリプト ビューが保存されていません</key>
+    <key alias="scriptErrorText">ファイルの保存でエラーが発生しました。</key>
+    <key alias="cssErrorText">ファイルの保存でエラーが発生しました。</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">CSSシンタックスを使用 例: h1, .redHeader, .blueTex</key>
@@ -857,7 +956,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="edittemplate">テンプレートの編集</key>
     <key alias="insertContentArea">コンテンツ領域の挿入</key>
     <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
-    <key alias="insertDictionaryItem">dictionary item の挿入</key>
+    <key alias="insertDictionaryItem">ディクショナリ アイテムを挿入</key>
     <key alias="insertMacro">マクロの挿入</key>
     <key alias="insertPageField">umbraco ページフィールドの挿入</key>
     <key alias="mastertemplate">マスターテンプレート</key>
@@ -867,8 +966,14 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
   <area alias="grid">
     <key alias="insertControl">挿入するアイテムを選択する</key>
-    <key alias="addRows">ここからレイアウトを選択します</key>
-    <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> 最初の要素を追加します]]></key>
+    <key alias="addLayout">レイアウトを選択</key>
+    <key alias="addRows">行の追加</key>
+    <key alias="addElement">コンテンツの追加</key>
+    <key alias="dropElement">コンテンツのドロップ</key>
+    <key alias="settingsApplied">適用される設定</key>
+
+    <key alias="contentNotAllowed">このコンテンツはここでは許可されていません</key>
+    <key alias="contentAllowed">このコンテンツはここに使用できます</key>
 
     <key alias="clickToEmbed">クリックして埋め込む</key>
     <key alias="clickToInsertImage">クリックして画像を挿入する</key>
@@ -899,6 +1004,66 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
     <key alias="allowAllEditors">すべてのエディタを許可する</key>
     <key alias="allowAllRowConfigurations">すべての行の構成を許可する</key>
+	<key alias="setAsDefault">デフォルトとして設定</key>
+    <key alias="chooseExtra">追加を選択</key>
+    <key alias="chooseDefault">デフォルトの選択</key>
+    <key alias="areAdded">追加されました</key>
+  </area>
+
+  <area alias="contentTypeEditor">
+
+    <key alias="compositions">構成</key>
+    <key alias="noTabs">タブが追加されていません</key>
+    <key alias="addNewTab">新しいタブの追加</key>
+    <key alias="addAnotherTab">他のタブの追加</key>
+    <key alias="inheritedFrom">次から継承:</key>
+    <key alias="addProperty">プロパティの追加</key>
+    <key alias="requiredLabel">必要なラベル</key>
+
+    <key alias="enableListViewHeading">リスト ビューの有効化</key>
+    <key alias="enableListViewDescription">並べ替えと検索が可能な子のリストを表示するコンテンツ アイテムを設定します。子はツリーに表示されません。</key>
+
+    <key alias="allowedTemplatesHeading">利用可能なテンプレート</key>
+    <key alias="allowedTemplatesDescription">このタイプのコンテンツで使用できるテンプレート エディターを選択してください</key>
+
+    <key alias="allowAsRootHeading">ルートとして許可</key>
+    <key alias="allowAsRootDescription">コンテンツ ツリーのルートでこのタイプのコンテンツをエディターで作成することを許可</key>
+    <key alias="allowAsRootCheckbox">はい - ルートでこのタイプのコンテンツを許可</key>
+
+    <key alias="childNodesHeading">許可された子ノード タイプ</key>
+    <key alias="childNodesDescription">このタイプの下部コンテンツに指定タイプのコンテンツを作成することを許可</key>
+
+    <key alias="chooseChildNode">子ノードの選択</key>
+
+    <key alias="compositionsDescription">既存ドキュメント タイプのタブとプロパティを継承。新しいタブを現在のドキュメント タイプに追加、または同じ名前のタブがある場合はマージされます。</key>
+    <key alias="compositionInUse">このコンテンツ タイプが構成で使用されるため、自身を構成することはできません。</key>
+    <key alias="noAvailableCompositions">構成に使用できるコンテンツ タイプはありません。</key>
+
+    <key alias="availableEditors">使用可能なエディター</key>
+    <key alias="reuse">再利用</key>
+    <key alias="editorSettings">エディター設定</key>
+
+    <key alias="configuration">設定</key>
+
+    <key alias="yesDelete">削除します</key>
+
+    <key alias="movedUnderneath">下部に移動しました。</key>
+    <key alias="folderToMove">以下のツリー構造へ移動する</key>
+    <key alias="structureBelow">フォルダーを選択します</key>
+
+    <key alias="allDocumentTypes">すべてのドキュメント タイプ</key>
+    <key alias="allDocuments">すべてのドキュメント</key>
+    <key alias="allMediaItems">すべてのメディア アイテム</key>
+
+    <key alias="usingThisDocument">このドキュメント タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+    <key alias="usingThisMedia">このメディア タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+    <key alias="usingThisMember">このメンバー タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+
+    <key alias="andAllDocuments">およびこのタイプを使用したすべてのドキュメント</key>
+    <key alias="andAllMediaItems">およびこのタイプを使用したこのメディア アイテム</key>
+    <key alias="andAllMembers">およびこのタイプを使用したすべてのメンバー</key>
+
+    <key alias="thisEditorUpdateSettings">このエディターを使用すると新しい設定で更新されます</key>
   </area>
 
   <area alias="templateEditor">
@@ -917,7 +1082,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="insertedAfter">フィールドの値の後ろに追加される</key>
     <key alias="insertedBefore">フィールドの値の前に追加される</key>
     <key alias="lowercase">小文字変換</key>
-    <key alias="none">None</key>
+    <key alias="none">なし</key>
     <key alias="postContent">フィールド値の後ろ追加</key>
     <key alias="preContent">フィールド値の前に追加</key>
     <key alias="recursive">再帰的</key>
@@ -981,7 +1146,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="cacheBrowser">キャッシュの参照</key>
     <key alias="contentRecycleBin">ごみ箱</key>
     <key alias="createdPackages">パッケージの作成</key>
-    <key alias="datatype">データ型</key>
+    <key alias="dataTypes">データ型</key>
     <key alias="dictionary">ディクショナリ</key>
     <key alias="installedPackages">インストール済のパッケージ</key>
     <key alias="installSkin">スキンのインストール</key>
@@ -991,10 +1156,11 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="macros">マクロ</key>
     <key alias="mediaTypes">メディアタイプ</key>
     <key alias="member">メンバー</key>
-    <key alias="memberGroup">メンバーのグループ</key>
+    <key alias="memberGroups">メンバーのグループ</key>
     <key alias="memberRoles">役割</key>
-    <key alias="memberType">メンバーの種類</key>
-    <key alias="nodeTypes">ドキュメントタイプ</key>
+    <key alias="memberTypes">メンバーの種類</key>
+    <key alias="documentTypes">ドキュメントタイプ</key>
+	<key alias="relationTypes">関連タイプ</key>
     <key alias="packager">パッケージ</key>
     <key alias="packages">パッケージ</key>
     <key alias="python">Python ファイル</key>
@@ -1053,8 +1219,17 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="userTypes">ユーザーの種類</key>
     <key alias="writer">投稿者</key>
     <key alias="translator">翻訳者</key>
+	<key alias="change">変更</key>
     <key alias="yourProfile" version="7.0">あなたのプロフィール</key>
     <key alias="yourHistory" version="7.0">あなたの最新の履歴</key>
     <key alias="sessionExpires" version="7.0">セッションの期限</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">検証</key>
+    <key alias="validateAsEmail">メールで検証</key>
+    <key alias="validateAsNumber">数値で検証</key>
+    <key alias="validateAsUrl">URL で検証</key>
+    <key alias="enterCustomValidation">... またはカスタム検証を入力</key>
+    <key alias="fieldIsMandatory">必須フィールドです</key>
   </area>
 </language>

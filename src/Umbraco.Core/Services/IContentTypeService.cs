@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Services
 {
@@ -10,11 +11,49 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        int CountContentTypes();
+        int CountMediaTypes();
+
+        /// <summary>
+        /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
+        /// </summary>
+        /// <param name="compo"></param>
+        /// <returns></returns>
+        Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
+
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+
+        EntityContainer GetContentTypeContainer(int containerId);
+        EntityContainer GetContentTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetContentTypeContainers(int[] containerIds);
+        IEnumerable<EntityContainer> GetContentTypeContainers(IContentType contentType);
+        IEnumerable<EntityContainer> GetContentTypeContainers(string folderName, int level);
+        EntityContainer GetMediaTypeContainer(int containerId);
+        EntityContainer GetMediaTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(int[] containerIds);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType);
+        Attempt<OperationStatus> DeleteMediaTypeContainer(int folderId, int userId = 0);
+        Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0);
+
         /// <summary>
         /// Gets all property type aliases.
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        /// <summary>
+        /// Gets all content type aliases
+        /// </summary>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
 
         /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
@@ -249,5 +288,10 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(Guid id);
+
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId);
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
+        Attempt<OperationStatus<IMediaType, MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId);
+        Attempt<OperationStatus<IContentType, MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId);
     }
 }

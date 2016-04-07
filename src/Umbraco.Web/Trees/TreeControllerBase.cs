@@ -18,6 +18,18 @@ namespace Umbraco.Web.Trees
     [AngularJsonOnlyConfiguration]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController
     {
+        protected TreeControllerBase()
+        {
+        }
+
+        protected TreeControllerBase(UmbracoContext umbracoContext) : base(umbracoContext)
+        {
+        }
+
+        protected TreeControllerBase(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>

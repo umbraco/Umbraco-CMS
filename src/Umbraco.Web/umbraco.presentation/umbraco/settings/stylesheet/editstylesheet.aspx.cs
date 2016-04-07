@@ -60,7 +60,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
             editorSource.Text = stylesheet.Content;
-            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename).TrimEnd(".css");
 
             // name derives from path, without the .css extension, clean for xss
             NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');

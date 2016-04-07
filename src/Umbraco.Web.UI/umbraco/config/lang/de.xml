@@ -393,6 +393,7 @@
     <key alias="showPageOnSend">Seite beim Senden anzeigen</key>
     <key alias="size">Größe</key>
     <key alias="sort">Sortieren</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Durchsuchen ...</key>
     <key alias="up">nach oben</key>
@@ -409,6 +410,8 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Ordner</key>
     <key alias="searchResults">Suchergebnisse</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Hintergrundfarbe</key>
@@ -731,6 +734,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sortierreihenfolge</key>
+    <key alias="sortCreationDate">Erstellungsdatum</key>
     <key alias="sortDone">Sortierung abgeschlossen.</key>
     <key alias="sortHelp">Ziehen Sie die Elemente an ihre gewünschte neue Position.</key>
     <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>
@@ -822,6 +827,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
     <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
     <key alias="placeholderImageCaption">Beschriftung ...</key>
@@ -917,7 +923,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="cacheBrowser">Zwischenspeicher</key>
     <key alias="contentRecycleBin">Papierkorb</key>
     <key alias="createdPackages">Erstellte Pakete</key>
-    <key alias="datatype">Datentypen</key>
+    <key alias="dataTypes">Datentypen</key>
     <key alias="dictionary">Wörterbuch</key>
     <key alias="installedPackages">Installierte Pakete</key>
     <key alias="installSkin">Design-Skin installieren</key>
@@ -927,10 +933,10 @@ Ihr freundlicher Umbraco-Robot
     <key alias="macros">Makros</key>
     <key alias="mediaTypes">Medientypen</key>
     <key alias="member">Mitglieder</key>
-    <key alias="memberGroup">Mitgliedergruppen</key>
+    <key alias="memberGroups">Mitgliedergruppen</key>
     <key alias="memberRoles">Mitgliederrollen</key>
-    <key alias="memberType">Mitglieder-Typen</key>
-    <key alias="nodeTypes">Dokumenttypen</key>
+    <key alias="memberTypes">Mitglieder-Typen</key>
+    <key alias="documentTypes">Dokumententypen</key>
     <key alias="packager">Pakete</key>
     <key alias="packages">Pakete</key>
     <key alias="python">Python-Dateien</key>

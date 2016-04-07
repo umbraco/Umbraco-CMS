@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -14,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -65,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
@@ -159,29 +161,40 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
+                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-
+            
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
                 {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/documentType"),
+                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                },
+                 new ContentPropertyDisplay
+                {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                },
+                    //Not editible for people without publish permission (U4-287)
+                    View =  display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    //TODO: Fix up hard coded datepicker
+                } ,
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    //Not editible for people without publish permission (U4-287)
+                    View = display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = "Template", //TODO: localize this?
+                    Label = localizedText.Localize("template/template"),
                     Value = display.TemplateAlias,
                     View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
                     Config = new Dictionary<string, object>
@@ -198,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            TabsAndPropertiesResolver.MapGenericProperties(content, display, properties.ToArray(),
+            TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
@@ -212,7 +225,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
-                        var docTypeLink = string.Format("#/settings/framed/settings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                        var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
 
                         //Replace the doc type property
                         var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
@@ -283,35 +296,9 @@ namespace Umbraco.Web.Models.Mapping
                     source.HasIdentity ? source.Id : source.ParentId)
                     .FirstOrDefault();
 
-                if (permissions == null)
-                {
-                    return Enumerable.Empty<char>();
-                }
-
-                var result = new List<char>();
-
-                //can they publish ?
-                if (permissions.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionPublish.Instance.Letter);
-                }
-                //can they send to publish ?
-                if (permissions.AssignedPermissions.Contains(ActionToPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionToPublish.Instance.Letter);
-                }
-                //can they save ?
-                if (permissions.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionUpdate.Instance.Letter);
-                }
-                //can they create ?
-                if (permissions.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
-                {
-                    result.Add(ActionNew.Instance.Letter);
-                }
-
-                return result;
+                return permissions == null
+                    ? Enumerable.Empty<char>()
+                    : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
             }
         }
 

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Security;
@@ -96,6 +98,8 @@ namespace Umbraco.Core.Security
 
             }
             _userService.Save(member);
+
+            if (member.Id == 0) throw new DataException("Could not create the user, check logs for details");
 
             //re-assign id
             user.Id = member.Id;

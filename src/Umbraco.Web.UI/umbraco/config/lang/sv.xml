@@ -378,6 +378,7 @@
     <key alias="showPageOnSend">Vilken sida skall visas när formuläret är skickat</key>
     <key alias="size">Storlek</key>
     <key alias="sort">Sortera</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Skriv</key>
     <key alias="typeToSearch">Skriv för att söka...</key>
     <key alias="up">Upp</key>
@@ -392,6 +393,8 @@
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
@@ -649,6 +652,8 @@
     <key alias="createMatchingTemplate">Skapa matchande mall</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
     <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.<br/><br/>Stäng inte fönstret under tiden sidorna sorteras.]]></key>
@@ -729,8 +734,13 @@
   </area>
   <area alias="grid">
     <key alias="insertControl">Lägg till</key>
+    <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
-    <key alias="addElement"><![CDATA[Klicka på <i class="icon icon-add blue"></i> nedan för att lägga till ditt första element]]></key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="stylesApplied">Styles applied</key>
+    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
+    <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
     <key alias="clickToInsertImage">Klicka för att lägga till bild</key>
     <key alias="placeholderImageCaption">Bildtext...</key>
@@ -816,7 +826,7 @@
     <key alias="cacheBrowser">Cacha webbläsare</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>
-    <key alias="datatype">Datatyper</key>
+    <key alias="dataTypes">Datatyper</key>
     <key alias="dictionary">Ordbok</key>
     <key alias="installedPackages">Installerade paket</key>
     <key alias="installSkin">Installera skin</key>
@@ -826,10 +836,10 @@
     <key alias="macros">Makron</key>
     <key alias="mediaTypes">Mediatyper</key>
     <key alias="member">Medlem</key>
-    <key alias="memberGroup">Medlemsgrupper</key>
+    <key alias="memberGroups">Medlemsgrupper</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberType">Medlemstyper</key>
-    <key alias="nodeTypes">Dokumenttyper</key>
+    <key alias="memberTypes">Medlemstyper</key>
+    <key alias="documentTypes">Dokumenttyper</key>
     <key alias="packager">Paket</key>
     <key alias="packages">Paket</key>
     <key alias="python">Python-filer</key>

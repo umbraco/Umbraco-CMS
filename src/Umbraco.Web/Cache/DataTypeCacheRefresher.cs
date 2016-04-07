@@ -92,27 +92,22 @@ namespace Umbraco.Web.Cache
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
             
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMedia>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMediaType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMember>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMemberType>();
+            ClearAllIsolatedCacheByEntityType<IContent>();
+            ClearAllIsolatedCacheByEntityType<IContentType>();
+            ClearAllIsolatedCacheByEntityType<IMedia>();
+            ClearAllIsolatedCacheByEntityType<IMediaType>();
+            ClearAllIsolatedCacheByEntityType<IMember>();
+            ClearAllIsolatedCacheByEntityType<IMemberType>();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             payloads.ForEach(payload =>
             {
-                //clear both the Id and Unique Id cache since we cache both in the legacy classes :(
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
-                    string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.Id));                
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
-                    string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.UniqueId));
-
                 //clears the prevalue cache
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
-                    string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
-
+                var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+                if (dataTypeCache)
+                    dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
+                
                 PublishedContentType.ClearDataType(payload.Id);
             });
 

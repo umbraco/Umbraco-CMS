@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -20,23 +21,18 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {
-            //Custom cache options for better performance
-            _cacheOptions = new RepositoryCacheOptions
-            {
-                GetAllCacheAllowZeroCount = true,
-                GetAllCacheValidateCount = false
-            };
+        {           
         }
 
-        private readonly RepositoryCacheOptions _cacheOptions;
-
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
+        private FullDataSetRepositoryCachePolicyFactory<ILanguage, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<ILanguage, int> CachePolicyFactory
         {
-            get { return _cacheOptions; }
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ILanguage, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+            }
         }
 
         #region Overrides of RepositoryBase<int,Language>
@@ -159,13 +155,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            //use the underlying GetAll which will force cache all domains
+            //use the underlying GetAll which will force cache all languages
             return GetAll().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            //use the underlying GetAll which will force cache all domains
+            //use the underlying GetAll which will force cache all languages
             return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 

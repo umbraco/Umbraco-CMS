@@ -16,10 +16,10 @@
 
         <div class="imagecropper clearfix">
 
-            <div ng-if="currentCrop" style="float:left;" class="clearfix">
-                <div style="position: relative; margin-bottom: 10px; width: 492px; border: 1px solid #f8f8f8;">
+            <div ng-if="currentCrop" style="float:left; max-width: 100%;" class="clearfix">
+                <div class="umb-cropper__container">
 
-                    <i ng-click="done()" style="opacity: 0.5; position: absolute; top: 3px; right: 3px" class="icon icon-delete btn-round"></i>
+                    <i ng-click="done()" class="icon icon-delete btn-round umb-close-cropper"></i>
 
                     <div>
                         <umb-image-crop height="{{currentCrop.height}}"
@@ -27,7 +27,8 @@
                                         crop="currentCrop.coordinates"
                                         center="model.value.focalPoint"
                                         max-size="450"
-                                        src="imageSrc" />
+                                        src="imageSrc">
+                        </umb-image-crop>
                     </div>
 
                     <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
@@ -36,30 +37,36 @@
                     </a>
                 </div>
             </div>
+
             <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
-                <umb-image-gravity src="imageSrc"
-                                   center="model.value.focalPoint" />
+                <umb-image-gravity
+                    src="imageSrc"
+                    center="model.value.focalPoint"
+                    on-image-loaded="imageLoaded">
+                </umb-image-gravity>
+                <a href class="btn btn-link btn-crop-delete" ng-show="imageIsLoaded" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
             </div>
 
-            <ul class="umb-sortable-thumbnails cropList clearfix" ng-class="{'many':model.value.crops.length >= 4}">
-                <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}">
-                    <a href title="{{value.alias}}: {{value.width}}px x {{value.height}}px" ng-click="crop(value)">
-                        <umb-image-thumbnail center="model.value.focalPoint"
-                                             crop="value.coordinates"
-                                             src="imageSrc"
-                                             height="{{value.height}}"
-                                             width="{{value.width}}"
-                                             max-size="75"></umb-image-thumbnail>
+            <ul class="umb-sortable-thumbnails cropList clearfix">
+                <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
+
+                    <umb-image-thumbnail center="model.value.focalPoint"
+                                         crop="value.coordinates"
+                                         src="imageSrc"
+                                         height="{{value.height}}"
+                                         width="{{value.width}}"
+                                         max-size="75">
+                     </umb-image-thumbnail>
+
+                    <div class="crop-information">
                         <span class="crop-name crop-text">{{value.alias}}</span>
                         <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
-
-                    </a>
+                    </div>
                 </li>
             </ul>
 
 
         </div>
-        <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
 
     </div>
 </div>

@@ -1,0 +1,123 @@
+<div ng-controller="Umbraco.Overlays.UserController">
+
+    <div class="umb-control-group" ng-if="!showPasswordFields">
+
+       <h5><localize key="user_yourProfile" /></h5>
+
+       <p class="muted">
+           <small>
+               <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
+           </small>
+       </p>
+
+        <umb-button
+            type="link"
+            href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
+            action="model.close()"
+            button-style="primary"
+            label="Edit"
+            label-key="general_edit"
+            ng-if="canEditProfile">
+       </umb-button>
+
+        <umb-button
+            type="button"
+            action="togglePasswordFields()"
+            label="Change password"
+            label-key="general_changePassword"
+            button-style="success">
+       </umb-button>
+
+        <umb-button
+            type="button"
+            action="logout()"
+            shortcut="ctrl+shift+l"
+            button-style="warning"
+            label="Log out"
+            label-key="general_logout">
+        </umb-button>
+
+    </div>
+
+    <div class="umb-control-group external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
+
+        <h5>
+            <localize key="defaultdialogs_externalLoginProviders">External login providers</localize>
+        </h5>
+
+        <div ng-repeat="login in externalLoginProviders">
+
+            <form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
+                  action="{{externalLinkLoginFormAction}}">
+
+                <button class="btn btn-block btn-social"
+                        ng-class="login.properties.SocialStyle"
+                        id="{{login.authType}}"
+                        name="provider"
+                        value="{{login.authType}}">
+                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                    <localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
+                </button>
+            </form>
+
+            <button ng-if="login.linkedProviderKey != undefined"
+                    ng-click="unlink($event, login.authType, login.linkedProviderKey)"
+                    class="btn btn-block btn-social"
+                    ng-class="login.properties.SocialStyle"
+                    id="{{login.authType}}"
+                    name="provider"
+                    value="{{login.authType}}">
+                <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="umb-control-group" ng-if="!showPasswordFields">
+        <h5><localize key="user_yourHistory" /></h5>
+        <ul class="umb-tree">
+            <li ng-repeat="item in history | orderBy:'time':true">
+                <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
+                    <i class="{{item.icon}}"></i> {{item.name}}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-show="showPasswordFields">
+
+       <h5>
+           <localize key="general_changePassword">Change password</localize>
+       </h5>
+
+       <form
+          name="passwordForm"
+          class="block-form"
+          ng-submit="changePassword()"
+          novalidate
+          val-form-manager>
+
+          <umb-editor model="changePasswordModel"></umb-editor>
+
+           <umb-button
+               type="button"
+               action="togglePasswordFields()"
+               label="Back"
+               label-key="general_back"
+               button-style="cancel">
+          </umb-button>
+
+           <umb-button
+               type="submit"
+               label="Change password"
+               label-key="general_changePassword"
+               state="changePasswordButtonState"
+               button-style="success">
+           </umb-button>
+
+       </form>
+
+    </div>
+
+</div>

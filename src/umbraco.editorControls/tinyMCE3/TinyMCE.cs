@@ -164,13 +164,8 @@ namespace umbraco.editorControls.tinyMCE3
                                     foreach (StylesheetProperty p in s.Properties)
                                     {
                                         if (styles != string.Empty)
-                                        {
                                             styles += ";";
-                                        }
-                                        if (p.Alias.StartsWith("."))
-                                            styles += p.Text + "=" + p.Alias;
-                                        else
-                                            styles += p.Text + "=" + p.Alias;
+                                        styles += p.Text + "=" + p.Alias;
                                     }
 
                                     cssFiles += ",";

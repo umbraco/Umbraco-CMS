@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security.Identity
@@ -17,10 +20,19 @@ namespace Umbraco.Web.Security.Identity
     internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly string[] _explicitPaths;
+        private readonly string _getRemainingSecondsPath;
 
         public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor)
+            : this(umbracoContextAccessor, null)
+        {
+            
+        }
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
+            _explicitPaths = explicitPaths == null ? null : explicitPaths.ToArray();
+            _getRemainingSecondsPath = string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path);
         }
 
         /// <summary>
@@ -61,18 +73,35 @@ namespace Umbraco.Web.Security.Identity
         /// </remarks>
         internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
+            if (_umbracoContextAccessor.Value.Application.IsConfigured == false
+                && _umbracoContextAccessor.Value.Application.DatabaseContext.IsDatabaseConfigured == false)
+            {
+                //Do not authenticate the request if we don't have a db and we are not configured - since we will never need
+                // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
+                // when people have older invalid cookies on the same domain since our user managers might attempt to lookup a user
+                // and we don't even have a db.
+                return false;
+            }
+
             var request = ctx.Request;
             var httpCtx = ctx.TryGetHttpContext();
             
+            //check the explicit paths
+            if (_explicitPaths != null)
+            {
+                return _explicitPaths.Any(x => x.InvariantEquals(request.Uri.AbsolutePath));
+            }
+            
+            //check user seconds path
+            if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
+
             if (//check the explicit flag
                 (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)
+                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)                
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
-                || request.Uri.IsInstallerRequest()
-                //detect in preview
-                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+                || request.Uri.IsInstallerRequest()                
                 //check for base
                 || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
             {

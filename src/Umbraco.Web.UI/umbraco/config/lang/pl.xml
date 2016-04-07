@@ -307,6 +307,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="showPageOnSend">Pokaż stronę "wyślij"</key>
     <key alias="size">Rozmiar</key>
     <key alias="sort">Sortuj</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Szukaj</key>
     <key alias="up">W górę</key>
@@ -321,6 +322,8 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="welcome">Witaj...</key>
     <key alias="width">Szerokość</key>
     <key alias="yes">Tak</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Kolor tła</key>
@@ -544,6 +547,8 @@ Miłego dnia!]]></key>
     <key alias="tabs">Zakładki</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortowanie zakończone.</key>
     <key alias="sortHelp">Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności, lub kliknij na nagłówku kolumny aby posortować całą kolekcję elementów</key>
     <key alias="sortPleaseWait"><![CDATA[Proszę czekać. Trwa sortowanie elementów.<br/><br/>Nie zamykaj tego okna podczas sortowania]]></key>
@@ -614,6 +619,45 @@ Miłego dnia!]]></key>
     <key alias="quickGuide">Szybki przewodnik po tagach szablonu Umbraco</key>
     <key alias="template">Szablon</key>
   </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+  </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Pole alternatywne</key>
     <key alias="alternativeText">Tekst alternatywny</key>
@@ -673,7 +717,7 @@ Miłego dnia!]]></key>
     <key alias="cacheBrowser">Cache przeglądarki</key>
     <key alias="contentRecycleBin">Kosz</key>
     <key alias="createdPackages">Utworzone pakiety</key>
-    <key alias="datatype">Typy danych</key>
+    <key alias="dataTypes">Typy danych</key>
     <key alias="dictionary">Słownik</key>
     <key alias="installedPackages">Zainstalowane pakiety</key>
     <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
@@ -683,10 +727,10 @@ Miłego dnia!]]></key>
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy mediów</key>
     <key alias="member">Członkowie</key>
-    <key alias="memberGroup">Grupy członków</key>
+    <key alias="memberGroups">Grupy członków</key>
     <key alias="memberRoles">Role</key>
-    <key alias="memberType">Typ członka</key>
-    <key alias="nodeTypes">Typy dokumentów</key>
+    <key alias="memberTypes">Typ członka</key>
+    <key alias="documentTypes">Typy dokumentów</key>
     <key alias="packager">Pakiety</key>
     <key alias="packages">Pakiety</key>
     <key alias="python">Pliki Python</key>

@@ -8,7 +8,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Cache;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Services
@@ -84,7 +83,7 @@ namespace Umbraco.Core.Services
                                         // based on the ApplicationTreeRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
                                         // currently because of the legacy assemblies and types not in the Core.
 
-                                        //Get all the trees not registered in the config
+                                        //Get all the trees not registered in the config (those not matching by alias casing will be detected as "unregistered")
                                         var unregistered = _allAvailableTrees
                                             .Where(x => list.Any(l => l.Alias == x.Alias) == false)
                                             .ToArray();
@@ -93,19 +92,46 @@ namespace Umbraco.Core.Services
 
                                         if (hasChanges == false) return false;
 
-                                        //add the unregistered ones to the list and re-save the file if any changes were found
+                                        //add or edit the unregistered ones and re-save the file if any changes were found
                                         var count = 0;
                                         foreach (var tree in unregistered)
                                         {
-                                            doc.Root.Add(new XElement("add",
-                                                new XAttribute("initialize", tree.Initialize),
-                                                new XAttribute("sortOrder", tree.SortOrder),
-                                                new XAttribute("alias", tree.Alias),
-                                                new XAttribute("application", tree.ApplicationAlias),
-                                                new XAttribute("title", tree.Title),
-                                                new XAttribute("iconClosed", tree.IconClosed),
-                                                new XAttribute("iconOpen", tree.IconOpened),
-                                                new XAttribute("type", tree.Type)));
+                                            var existingElement = doc.Root.Elements("add").SingleOrDefault(x =>
+                                                string.Equals(x.Attribute("alias").Value, tree.Alias,
+                                                    StringComparison.InvariantCultureIgnoreCase) &&
+                                                string.Equals(x.Attribute("application").Value, tree.ApplicationAlias,
+                                                    StringComparison.InvariantCultureIgnoreCase));
+                                            if (existingElement != null)
+                                            {
+                                                existingElement.SetAttributeValue("alias", tree.Alias);
+                                            }
+                                            else
+                                            {
+                                                if (tree.Title.IsNullOrWhiteSpace())
+                                                {
+                                                    doc.Root.Add(new XElement("add",
+                                                        new XAttribute("initialize", tree.Initialize),
+                                                        new XAttribute("sortOrder", tree.SortOrder),
+                                                        new XAttribute("alias", tree.Alias),
+                                                        new XAttribute("application", tree.ApplicationAlias),                                                        
+                                                        new XAttribute("iconClosed", tree.IconClosed),
+                                                        new XAttribute("iconOpen", tree.IconOpened),
+                                                        new XAttribute("type", tree.Type)));
+                                                }
+                                                else
+                                                {
+                                                    doc.Root.Add(new XElement("add",
+                                                    new XAttribute("initialize", tree.Initialize),
+                                                    new XAttribute("sortOrder", tree.SortOrder),
+                                                    new XAttribute("alias", tree.Alias),
+                                                    new XAttribute("application", tree.ApplicationAlias),
+                                                    new XAttribute("title", tree.Title),
+                                                    new XAttribute("iconClosed", tree.IconClosed),
+                                                    new XAttribute("iconOpen", tree.IconOpened),
+                                                    new XAttribute("type", tree.Type)));
+                                                }
+                                                
+                                            }
                                             count++;
                                         }
 
@@ -124,11 +150,7 @@ namespace Umbraco.Core.Services
                             }
                         }
                     }
-
-
                     return list;
-
-
                 }, new TimeSpan(0, 10, 0));
         }
 
@@ -315,7 +337,7 @@ namespace Umbraco.Core.Services
 
                         //remove the cache now that it has changed  SD: I'm leaving this here even though it
                         // is taken care of by events as well, I think unit tests may rely on it being cleared here.
-                        _cache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+                        _cache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
                     }
                 }
             }
@@ -351,13 +373,15 @@ namespace Umbraco.Core.Services
                     {
                         list.Add(new ApplicationTree(
                                      addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
-                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
-                                     addElement.Attribute("application").Value,
-                                     addElement.Attribute("alias").Value,
-                                     addElement.Attribute("title").Value,
-                                     addElement.Attribute("iconClosed").Value,
-                                     addElement.Attribute("iconOpen").Value,
-                                     addElement.Attribute("type").Value));
+                                     addElement.Attribute("sortOrder") != null 
+                                        ? Convert.ToByte(addElement.Attribute("sortOrder").Value) 
+                                        : (byte)0,
+                                     (string)addElement.Attribute("application"),
+                                     (string)addElement.Attribute("alias"),
+                                     (string)addElement.Attribute("title"),
+                                     (string)addElement.Attribute("iconClosed"),
+                                     (string)addElement.Attribute("iconOpen"),
+                                     (string)addElement.Attribute("type")));
                     }
                 }
 

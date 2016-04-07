@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Events;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
@@ -22,6 +23,8 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
+            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+
             var target73 = new Version(7, 3, 0);
 
             if (e.ConfiguredVersion <= target73)

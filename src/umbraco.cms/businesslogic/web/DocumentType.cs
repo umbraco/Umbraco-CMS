@@ -475,7 +475,10 @@ namespace umbraco.cms.businesslogic.web
         public XmlElement ToXml(XmlDocument xd)
         {
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, ContentType);
+            var xml = exporter.Serialize(
+                ApplicationContext.Current.Services.DataTypeService,
+                ApplicationContext.Current.Services.ContentTypeService,
+                ContentType);
 
             //convert the Linq to Xml structure to the old .net xml structure
             var xNode = xml.GetXmlNode();
@@ -538,7 +541,10 @@ namespace umbraco.cms.businesslogic.web
         protected override void setupNode()
         {
             var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
-            SetupNode(contentType);
+            
+            // If it's null, it's probably a folder
+            if (contentType != null)
+                SetupNode(contentType);
         }
 
         #endregion

@@ -42,6 +42,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        getRecycleBin: function() {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetRecycleBin")),
+               'Failed to retrieve data for content recycle bin');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#sort
@@ -498,6 +507,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "HasPermission",
                         [{ permissionToCheck: permission },{ nodeId: id }])),
                 'Failed to check permission for item ' + id);
+        },
+
+        getPermissions: function (nodeIds) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetPermissions"),
+                    nodeIds),
+                'Failed to get permissions');
         },
 
         /**

@@ -4,6 +4,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -12,15 +13,17 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </summary>
     /// <remarks>
     /// This cannot execute as part of a db migration since we need access to the services/repos.
-    /// 
-    /// This will execute for specific versions - 
-    /// 
+    ///
+    /// This will execute for specific versions -
+    ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
     public class RebuildMediaXmlCacheAfterUpgrade : MigrationStartupHander
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
+            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+
             var target70 = new Version(7, 0, 0);
 
             if (e.ConfiguredVersion <= target70)

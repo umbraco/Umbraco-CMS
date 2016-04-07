@@ -309,6 +309,7 @@
     <key alias="showPageOnSend">전송된 페이지보기</key>
     <key alias="size">사이즈</key>
     <key alias="sort">정렬</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">타입</key>
     <key alias="typeToSearch">검색유형...</key>
     <key alias="up">위로</key>
@@ -323,6 +324,8 @@
     <key alias="welcome">환영합니다...</key>
     <key alias="width">너비</key>
     <key alias="yes">예</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">배경색</key>
@@ -628,6 +631,8 @@
     <key alias="tabs">색인</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">정렬 완료</key>
     <key alias="sortHelp">다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다</key>
     <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다<br/><br/>정렬하는 동안 이 창을 닫지 마십시오]]></key>
@@ -697,6 +702,45 @@
     <key alias="mastertemplate">마스터 템플릿</key>
     <key alias="quickGuide">Umbraco 템플릿태그 퀵가이드</key>
     <key alias="template">템플릿</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">대체 필드</key>
@@ -777,7 +821,7 @@
     <key alias="cacheBrowser">캐시 브라우저</key>
     <key alias="contentRecycleBin">휴지통</key>
     <key alias="createdPackages">생성된 패키지</key>
-    <key alias="datatype">데이터 타입</key>
+    <key alias="dataTypes">데이터 타입</key>
     <key alias="dictionary">사전</key>
     <key alias="installedPackages">설치된 패키지</key>
     <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
@@ -787,10 +831,10 @@
     <key alias="macros">매크로</key>
     <key alias="mediaTypes">미디어 타입</key>
     <key alias="member">구성원</key>
-    <key alias="memberGroup">구성원 그룹</key>
+    <key alias="memberGroups">구성원 그룹</key>
     <key alias="memberRoles">역할</key>
-    <key alias="memberType">구성원 유형</key>
-    <key alias="nodeTypes">문서 타입</key>
+    <key alias="memberTypes">구성원 유형</key>
+    <key alias="docuemntTypes">문서 타입</key>
     <key alias="packager">패키지</key>
     <key alias="packages">패키지</key>
     <key alias="python">Python 파일</key>

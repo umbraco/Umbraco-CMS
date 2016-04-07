@@ -23,8 +23,8 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent)
             : this(parent, null)
-		{
-		}
+        {
+        }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
             : base(parent, alias)
@@ -37,16 +37,21 @@ namespace Umbraco.Core.Models
                 x => x.ContentTypeComposition);
 
         /// <summary>
-        /// List of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType
+        /// Gets or sets the content types that compose this content type.
         /// </summary>
         [DataMember]
         public IEnumerable<IContentTypeComposition> ContentTypeComposition
         {
             get { return _contentTypeComposition; }
+            set
+            {
+                _contentTypeComposition = value.ToList();
+                OnPropertyChanged(ContentTypeCompositionSelector);
+            }
         }
 
         /// <summary>
-        /// Returns a list of <see cref="PropertyGroup"/> objects from the composition
+        /// Gets the property groups for the entire composition.
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> CompositionPropertyGroups
@@ -59,7 +64,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Returns a list of <see cref="PropertyType"/> objects from the composition
+        /// Gets the property types for the entire composition.
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyType> CompositionPropertyTypes
@@ -72,10 +77,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Adds a new ContentType to the list of composite ContentTypes
+        /// Adds a content type to the composition.
         /// </summary>
-        /// <param name="contentType"><see cref="ContentType"/> to add</param>
-        /// <returns>True if ContentType was added, otherwise returns False</returns>
+        /// <param name="contentType">The content type to add.</param>
+        /// <returns>True if the content type was added, otherwise false.</returns>
         public bool AddContentType(IContentTypeComposition contentType)
         {
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
@@ -94,13 +99,7 @@ namespace Umbraco.Core.Models
                         .Select(p => p.Alias)).ToList();
 
                 if (conflictingPropertyTypeAliases.Any())
-                    throw new InvalidCompositionException
-                          {
-                              AddedCompositionAlias = contentType.Alias,
-                              ContentTypeAlias = Alias,
-                              PropertyTypeAlias =
-                                  string.Join(", ", conflictingPropertyTypeAliases)
-                          };
+                    throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
                 OnPropertyChanged(ContentTypeCompositionSelector);
@@ -110,10 +109,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Removes a ContentType with the supplied alias from the the list of composite ContentTypes
+        /// Removes a content type with a specified alias from the composition.
         /// </summary>
-        /// <param name="alias">Alias of a <see cref="ContentType"/></param>
-        /// <returns>True if ContentType was removed, otherwise returns False</returns>
+        /// <param name="alias">The alias of the content type to remove.</param>
+        /// <returns>True if the content type was removed, otherwise false.</returns>
         public bool RemoveContentType(string alias)
         {
             if (ContentTypeCompositionExists(alias))
@@ -123,10 +122,10 @@ namespace Umbraco.Core.Models
                     return false;
 
                 RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
-                
+
                 //If the ContentType we are removing has Compositions of its own these needs to be removed as well
                 var compositionIdsToRemove = contentTypeComposition.CompositionIds().ToList();
-                if(compositionIdsToRemove.Any())
+                if (compositionIdsToRemove.Any())
                     RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
                 OnPropertyChanged(ContentTypeCompositionSelector);
@@ -163,31 +162,44 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Adds a PropertyGroup.
-        /// This method will also check if a group already exists with the same name and link it to the parent.
         /// </summary>
         /// <param name="groupName">Name of the PropertyGroup to add</param>
         /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
         public override bool AddPropertyGroup(string groupName)
         {
-            if (PropertyGroups.Any(x => x.Name == groupName))
-                return false;
+            return AddAndReturnPropertyGroup(groupName) != null;
+        }
 
-            var propertyGroup = new PropertyGroup {Name = groupName, SortOrder = 0};
+        private PropertyGroup AddAndReturnPropertyGroup(string name)
+        {
+            // ensure we don't have it already
+            if (PropertyGroups.Any(x => x.Name == name))
+                return null;
 
-            if (CompositionPropertyGroups.Any(x => x.Name == groupName))
+            // create the new group
+            var group = new PropertyGroup { Name = name, SortOrder = 0 };
+
+            // check if it is inherited - there might be more than 1 but we want the 1st, to
+            // reuse its sort order - if there are more than 1 and they have different sort
+            // orders... there isn't much we can do anyways
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name == name);
+            if (inheritGroup == null)
             {
-                var firstGroup = CompositionPropertyGroups.First(x => x.Name == groupName && x.ParentId.HasValue == false);
-                propertyGroup.SetLazyParentId(new Lazy<int?>(() => firstGroup.Id));
+                // no, just local, set sort order
+                var lastGroup = PropertyGroups.LastOrDefault();
+                if (lastGroup != null)
+                    group.SortOrder = lastGroup.SortOrder + 1;
+            }
+            else
+            {
+                // yes, inherited, re-use sort order
+                group.SortOrder = inheritGroup.SortOrder;
             }
 
-            if (PropertyGroups.Any())
-            {
-                var last = PropertyGroups.Last();
-                propertyGroup.SortOrder = last.SortOrder + 1;
-            }
+            // add
+            PropertyGroups.Add(group);
 
-            PropertyGroups.Add(propertyGroup);
-            return true;
+            return group;
         }
 
         /// <summary>
@@ -198,39 +210,22 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
         {
-            if (propertyType.HasIdentity == false)
-            {
-                propertyType.Key = Guid.NewGuid();
-            }
+            // ensure no duplicate alias - over all composition properties
+            if (PropertyTypeExists(propertyType.Alias))
+                return false;
 
-            if (PropertyTypeExists(propertyType.Alias) == false)
-            {
-                if (PropertyGroups.Contains(propertyGroupName))
-                {
-                    propertyType.PropertyGroupId = new Lazy<int>(() => PropertyGroups[propertyGroupName].Id);
-                    PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
-                }
-                else
-                {
-                    //If the PropertyGroup doesn't already exist we create a new one 
-                    var propertyTypes = new List<PropertyType> { propertyType };
-                    var propertyGroup = new PropertyGroup(new PropertyTypeCollection(propertyTypes)) { Name = propertyGroupName, SortOrder = 1 };
-                    //and check if its an inherited PropertyGroup, which exists in the composition
-                    if (CompositionPropertyGroups.Any(x => x.Name == propertyGroupName))
-                    {
-                        var parentPropertyGroup = CompositionPropertyGroups.First(x => x.Name == propertyGroupName && x.ParentId.HasValue == false);
-                        propertyGroup.SortOrder = parentPropertyGroup.SortOrder;
-                        //propertyGroup.ParentId = parentPropertyGroup.Id;
-                        propertyGroup.SetLazyParentId(new Lazy<int?>(() => parentPropertyGroup.Id));
-                    }
+            // get and ensure a group local to this content type
+            var group = PropertyGroups.Contains(propertyGroupName)
+                ? PropertyGroups[propertyGroupName]
+                : AddAndReturnPropertyGroup(propertyGroupName);
+            if (group == null)
+                return false;
 
-                    PropertyGroups.Add(propertyGroup);
-                }
+            // add property to group
+            propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);
+            group.PropertyTypes.Add(propertyType);
 
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         /// <summary>

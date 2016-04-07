@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(memberType2);
                 unitOfWork.Commit();
 
-                var result = repository.GetAll(memberType1.Key, memberType2.Key);
+                var result = ((IReadRepository<Guid, IMemberType>)repository).GetAll(memberType1.Key, memberType2.Key);
 
                 //there are 3 because of the Member type created for init data
                 Assert.AreEqual(2, result.Count());

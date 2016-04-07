@@ -1,0 +1,5 @@
+<ul class="nav nav-tabs umb-nav-tabs">
+  <li ng-class="{'tab-error': tabHasError}" ng-repeat="tab in model" val-tab>
+    <a data-toggle="tab" href="#tab{{tab.id}}">{{ tab.label }}</a>
+  </li>
+</ul>

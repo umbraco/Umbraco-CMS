@@ -34,10 +34,14 @@ h5{
   margin-top: 15px;
 }
 
+h5.-border-bottom {
+	border-bottom: 1px solid #ECECEC;
+	padding-bottom: 5px;
+}
 
-
-
-
+h5.-black {
+	color: @black;
+}
 
 /* MISC FORM ELEMENTS */
 .umb-form-actions {
@@ -119,6 +123,11 @@ h5{
   margin-bottom: 15px !important;
 }
 
+.umb-control-group.-no-border {
+  border: none;
+}
+
+
 /*COMPACT MODE */
 .compact .umb-pane{margin: 0px 0px 15px 0px;}
 .compact .umb-control-group {
@@ -143,8 +152,11 @@ h5{
 }
 
 /* LABELS*/
-.umb-control-group label.control-label {
-  text-align: left
+.umb-control-group label.control-label, .umb-control-group .control-label {
+  text-align: left;
+}
+.umb-control-group label.control-label > div > label {
+  padding-left: 0;
 }
 .umb-control-group label .help-block,
 .umb-control-group label small {
@@ -154,7 +166,7 @@ h5{
   padding-top: 5px;
 }
 .umb-nolabel .controls {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .controls-row {
@@ -163,17 +175,40 @@ h5{
 }
 
 .umb-user-panel .controls-row {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .controls-row label {
-  display: inline-block
+  display: inline-block;
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row  {
-  padding: 0px;
+.controls-row > div > label {
+  padding-left: 0;
+}
+
+.block-form .controls-row {
+   margin-left: 0;
+   padding-top: 0;
+}
+
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls {
+  padding: 0;
   border: none;
-  margin: 0px !important;
+  margin: 0 !important;
+}
+
+.controls-row > .vertical-align-items {
+  display: flex;
+  align-items: center;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+  margin-left: 0;
 }
 
 .thumbnails .selected {
@@ -205,30 +240,9 @@ h5{
   left: 2px
 }
 
-.umb-dashboard-control a{text-decoration: underline;}
-
 .umb-dashboard-control
   iframe{ position: absolute; display: block; width: 99%; height: 99%; overflow: auto !important;}
 
-
-/* NOTIFICATIONS */
-.umb-notification ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 100px;
-  padding-right: 20px;
-  position: relative;
-}
-.umb-notification li {
-  padding: 5px 30px 5px 20px;
-  text-shadow: none;
-  font-size: 12px;
-  margin: auto;
-  margin-top: 5px;
-  border: none;
-  border-radius: 5;
-  position: relative;
-}
 
 /* TABLE */
 .umb-table {
@@ -545,6 +559,9 @@ height:1px;
 
 }
 
+.umb-loader-wrapper.-bottom {
+	bottom: 0;
+}
 
 // Helpers
 
@@ -599,4 +616,13 @@ input[type=checkbox]:checked + .input-label--small {
 	font-size: @fontSizeLarge;
 	font-weight: bold;
 	line-height: 20px;
+}
+
+
+// Datepicker styles
+.bootstrap-datetimepicker-widget,
+.bootstrap-datetimepicker-widget td,
+.bootstrap-datetimepicker-widget th,
+.bootstrap-datetimepicker-widget td span {
+	border-radius: 0 !important;
 }

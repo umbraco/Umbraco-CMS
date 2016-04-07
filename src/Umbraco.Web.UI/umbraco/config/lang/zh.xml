@@ -349,6 +349,7 @@
     <key alias="showPageOnSend">在发送时预览</key>
     <key alias="size">大小</key>
     <key alias="sort">排序</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">类型</key>
     <key alias="typeToSearch">输入内容开始查找…</key>
     <key alias="up">上</key>
@@ -363,6 +364,8 @@
     <key alias="welcome">欢迎…</key>
     <key alias="width">宽</key>
     <key alias="yes">是</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -695,6 +698,8 @@
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">排序完成。</key>
     <key alias="sortHelp">上下拖拽项目或单击列头进行排序</key>
     <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…<br/><br/>请不要关闭窗口]]></key>
@@ -772,6 +777,45 @@
     <key alias="mastertemplate">母版</key>
     <key alias="quickGuide">模板标签快速指南</key>
     <key alias="template">模板</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">替代字段</key>
@@ -851,7 +895,7 @@
     <key alias="cacheBrowser">缓存浏览</key>
     <key alias="contentRecycleBin">回收站</key>
     <key alias="createdPackages">创建扩展包</key>
-    <key alias="datatype">数据类型</key>
+    <key alias="dataTypes">数据类型</key>
     <key alias="dictionary">字典</key>
     <key alias="installedPackages">已安装的扩展包</key>
     <key alias="installSkin">安装皮肤</key>
@@ -861,10 +905,10 @@
     <key alias="macros">宏</key>
     <key alias="mediaTypes">媒体类型</key>
     <key alias="member">会员</key>
-    <key alias="memberGroup">会员组</key>
+    <key alias="memberGroups">会员组</key>
     <key alias="memberRoles">角色</key>
-    <key alias="memberType">会员类型</key>
-    <key alias="nodeTypes">文档类型</key>
+    <key alias="memberTypes">会员类型</key>
+    <key alias="documentTypes">文档类型</key>
     <key alias="packager">扩展包</key>
     <key alias="packages">扩展包</key>
     <key alias="python">Python文件</key>

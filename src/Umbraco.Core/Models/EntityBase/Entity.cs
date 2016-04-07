@@ -62,9 +62,9 @@ namespace Umbraco.Core.Models.EntityBase
         {
             get
             {
+                // if an entity does NOT have a UniqueId yet, assign one now
                 if (_key == Guid.Empty)
-                    return _id.ToGuid();
-
+                    _key = Guid.NewGuid();
                 return _key;
             }
             set
@@ -136,6 +136,7 @@ namespace Umbraco.Core.Models.EntityBase
         {
             _hasIdentity = false;
             _id = default(int);
+            _key = Guid.Empty;
         }
 
         /// <summary>
@@ -242,6 +243,7 @@ namespace Umbraco.Core.Models.EntityBase
         {
             //Memberwise clone on Entity will work since it doesn't have any deep elements
             // for any sub class this will work for standard properties as well that aren't complex object's themselves.
+            var ignored = this.Key; // ensure that 'this' has a key, before cloning
             var clone = (Entity)MemberwiseClone();
             //ensure the clone has it's own dictionaries
             clone.ResetChangeTrackingCollections();

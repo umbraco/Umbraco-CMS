@@ -1,2 +1,3 @@
-﻿<textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="10" class="umb-editor umb-textarea textstring" val-server="value"></textarea>
+﻿<textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="10" class="umb-editor umb-textarea textstring" val-server="value" ng-required="model.validation.mandatory"></textarea>
+<span class="help-inline" val-msg-for="textarea" val-toggle-msg="required">Required</span>
 <span class="help-inline" val-msg-for="textarea" val-toggle-msg="valServer"></span>

@@ -41,6 +41,16 @@ namespace Umbraco.Core
                 ToCSharpEscapeChars[escape[0]] = escape[1];
         }
 
+        /// <summary>
+        /// Removes new lines and tabs
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        internal static string StripWhitespace(this string txt)
+        {
+            return Regex.Replace(txt, @"\s", string.Empty);
+        }
+
         internal static string StripFileExtension(this string fileName)
         {
             //filenames cannot contain line breaks
@@ -1368,6 +1378,30 @@ namespace Umbraco.Core
                 return writer.ToString().Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
             }
             */
+        }
+
+        public static string EscapeRegexSpecialCharacters(this string text)
+        {
+            var regexSpecialCharacters = new Dictionary<string, string>
+            {
+                {".", @"\."},
+                {"(", @"\("},
+                {")", @"\)"},
+                {"]", @"\]"},
+                {"[", @"\["},
+                {"{", @"\{"},
+                {"}", @"\}"},
+                {"?", @"\?"},
+                {"!", @"\!"},
+                {"$", @"\$"},
+                {"^", @"\^"},
+                {"+", @"\+"},
+                {"*", @"\*"},
+                {"|", @"\|"},
+                {"<", @"\<"},
+                {">", @"\>"}
+            };
+            return ReplaceMany(text, regexSpecialCharacters);
         }
 
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)

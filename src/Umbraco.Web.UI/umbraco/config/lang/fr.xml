@@ -380,6 +380,7 @@
     <key alias="showPageOnSend">Afficher la page à l'envoi</key>
     <key alias="size">Taille</key>
     <key alias="sort">Trier</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Rechercher...</key>
     <key alias="up">Haut</key>
@@ -396,6 +397,8 @@
     <key alias="yes">Oui</key>
     <key alias="folder">Dossier</key>
     <key alias="searchResults">Résultats de recherche</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -755,6 +758,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="createMatchingTemplate">Créer le template correspondant</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Tri achevé.</key>
     <key alias="sortHelp">Faites glisser les différents éléments ci-dessous vers le haut ou le bas pour définir comment ils doivent être triés. Ou cliquez sur les entêtes de colonne pour trier la collection complète d'éléments</key>
     <key alias="sortPleaseWait"><![CDATA[Veuillez patienter. Les éléments sont en cours de tri, cela peut prendre un moment.<br/> <br/> Ne fermez pas cette fenêtre durant le tri.]]></key>
@@ -832,6 +837,45 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mastertemplate">Modèle master</key>
     <key alias="quickGuide">Guide rapide aux tags des modèles Umbraco</key>
     <key alias="template">Modèle</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choisissez le type de contenu</key>
+    <key alias="chooseLayout">Choisissez une mise en page</key>
+    <key alias="addRows">Ajouter une ligne</key>
+    <key alias="addElement">Ajouter du contenu</key>
+    <key alias="dropElement">Contenu goutte</key>
+    <key alias="settingsApplied">Paramètres appliqués</key>
+
+    <key alias="contentNotAllowed">Ce contenu est pas autorisée ici</key>
+    <key alias="contentAllowed">Ce contenu est permis ici</key>
+
+    <key alias="clickToEmbed">Cliquez pour intégrer</key>
+    <key alias="clickToInsertImage">Cliquez pour insérer l'image</key>
+    <key alias="placeholderImageCaption">Légende de l'image...</key>
+    <key alias="placeholderWriteHere">Ecrire ici...</key>
+
+    <key alias="gridLayouts">Layouts Grid</key>
+    <key alias="gridLayoutsDetail">Layouts sont la superficie totale de travail pour l'éditeur de grille, en général, vous avez seulement besoin d'une ou deux configurations différentes</key>
+    <key alias="addGridLayout">Ajouter Grid Layout</key>
+    <key alias="addGridLayoutDetail">Ajustez la mise en page en définissant la largeur des colonnes et ajouter des sections supplémentaires</key>
+    <key alias="rowConfigurations">Configurations des lignes</key>
+    <key alias="rowConfigurationsDetail">Les lignes sont des cellules prédéfinies disposées horizontalement</key>
+    <key alias="addRowConfiguration">Ajouter une configuration de la ligne</key>
+    <key alias="addRowConfigurationDetail">Ajustez la ligne en réglant la largeur des cellules et en ajoutant des cellules supplémentaires</key>
+
+    <key alias="columns">Colonnes</key>
+    <key alias="columnsDetails">Nombre total combiné de colonnes dans la configuration de la grille</key>
+
+    <key alias="settings">Paramètres</key>
+    <key alias="settingsDetails">Configurer quels paramètres éditeurs peuvent changer</key>
+
+    <key alias="styles">Modes</key>
+    <key alias="stylesDetails">Configurer ce style éditeurs peuvent changer</key>
+
+    <key alias="settingDialogDetails">Les réglages seulement économiser si la configuration du json saisi est valide</key>
+
+    <key alias="allowAllEditors">Autoriser tous les éditeurs</key>
+    <key alias="allowAllRowConfigurations">Autoriser toutes les configurations de lignes</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Champ alternatif</key>
@@ -915,7 +959,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="cacheBrowser">Navigateur de cache</key>
     <key alias="contentRecycleBin">Corbeille</key>
     <key alias="createdPackages">Packages créés</key>
-    <key alias="datatype">Typesde données</key>
+    <key alias="dataTypes">Typesde données</key>
     <key alias="dictionary">Dictionnaire</key>
     <key alias="installedPackages">Packages installés</key>
     <key alias="installSkin">Installer un skin</key>
@@ -925,10 +969,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Types de médias</key>
     <key alias="member">Membres</key>
-    <key alias="memberGroup">Groupes de membres</key>
+    <key alias="memberGroups">Groupes de membres</key>
     <key alias="memberRoles">Rôles</key>
-    <key alias="memberType">Types de membres</key>
-    <key alias="nodeTypes">Types de documents</key>
+    <key alias="memberTypes">Types de membres</key>
+    <key alias="documentTypes">Types de documents</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Fichiers Python</key>

@@ -175,8 +175,8 @@
     <!-- Copy SQL CE -->
     <ItemGroup>
       <SQLCE4Files
-     Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*"
-     Exclude="..\src\packages\SqlServerCE.4.0.0.0\lib\**\*;..\src\packages\SqlServerCE.4.0.0.0\**\*.nu*"
+     Include="..\src\packages\SqlServerCE.4.0.0.1\**\*.*"
+     Exclude="..\src\packages\SqlServerCE.4.0.0.1\lib\**\*;..\src\packages\SqlServerCE.4.0.0.1\**\*.nu*"
 		/>
     </ItemGroup>
 

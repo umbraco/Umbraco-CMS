@@ -1,18 +1,30 @@
-param($rootPath, $toolsPath, $package, $project)
+param($installPath, $toolsPath, $package, $project)
+
+Write-Host "installPath:" "${installPath}"
+Write-Host "toolsPath:" "${toolsPath}"
+
+Write-Host " "
 
 if ($project) {
 	$dateTime = Get-Date -Format yyyyMMdd-HHmmss
-	$backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
+
+	# Create paths and list them
+	$projectPath = (Get-Item $project.Properties.Item("FullPath").Value).FullName
+	Write-Host "projectPath:" "${projectPath}"		
+	$backupPath = Join-Path $projectPath "App_Data\NuGetBackup\$dateTime"
+	Write-Host "backupPath:" "${backupPath}"		
 	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	$projectDestinationPath = Split-Path $project.FullName -Parent
-	
+	Write-Host "copyLogsPath:" "${copyLogsPath}"			
+	$umbracoBinFolder = Join-Path $projectPath "bin"
+	Write-Host "umbracoBinFolder:" "${umbracoBinFolder}"		
+
 	# Create backup folder and logs folder if it doesn't exist yet
 	New-Item -ItemType Directory -Force -Path $backupPath
 	New-Item -ItemType Directory -Force -Path $copyLogsPath
 	
 	# After backing up, remove all umbraco dlls from bin folder in case dll files are included in the VS project
 	# See: http://issues.umbraco.org/issue/U4-4930
-	$umbracoBinFolder = Join-Path $projectDestinationPath "bin"
+	
 	if(Test-Path $umbracoBinFolder) {
 		$umbracoBinBackupPath = Join-Path $backupPath "bin"
 		
@@ -20,7 +32,7 @@ if ($project) {
 		
 		robocopy $umbracoBinFolder $umbracoBinBackupPath /e /LOG:$copyLogsPath\UmbracoBinBackup.log
 		
-		# Delete files Umbraco brings in
+		# Delete files Umbraco ships with
 		if(Test-Path $umbracoBinFolder\businesslogic.dll) { Remove-Item $umbracoBinFolder\businesslogic.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\cms.dll) { Remove-Item $umbracoBinFolder\cms.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\controls.dll) { Remove-Item $umbracoBinFolder\controls.dll -Force -Confirm:$false }
@@ -36,16 +48,18 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\umbraco.DataLayer.dll) { Remove-Item $umbracoBinFolder\umbraco.DataLayer.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.editorControls.dll) { Remove-Item $umbracoBinFolder\umbraco.editorControls.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.MacroEngines.dll) { Remove-Item $umbracoBinFolder\umbraco.MacroEngines.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Umbraco.ModelsBuilder.dll) { Remove-Item $umbracoBinFolder\Umbraco.ModelsBuilder.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Umbraco.ModelsBuilder.AspNet.dll) { Remove-Item $umbracoBinFolder\Umbraco.ModelsBuilder.AspNet.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.providers.dll) { Remove-Item $umbracoBinFolder\umbraco.providers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.Web.UI.dll) { Remove-Item $umbracoBinFolder\Umbraco.Web.UI.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UmbracoExamine.dll) { Remove-Item $umbracoBinFolder\UmbracoExamine.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll) { Remove-Item $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll -Force -Confirm:$false }
 		
 		# Delete files Umbraco depends upon
-		$amd64Folder = Join-Path $projectDestinationPath "bin\amd64"
+		$amd64Folder = Join-Path $umbracoBinFolder "amd64"
 		if(Test-Path $amd64Folder) { Remove-Item $amd64Folder -Force -Recurse -Confirm:$false }
-		$x86Folder = Join-Path $projectDestinationPath "bin\x86"
-		if(Test-Path $x86Folder) { Remove-Item $x86Folder -Force -Recurse -Confirm:$false }		
+		$x86Folder = Join-Path $umbracoBinFolder "x86"
+		if(Test-Path $x86Folder) { Remove-Item $x86Folder -Force -Recurse -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\AutoMapper.dll) { Remove-Item $umbracoBinFolder\AutoMapper.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\AutoMapper.Net4.dll) { Remove-Item $umbracoBinFolder\AutoMapper.Net4.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\ClientDependency.Core.dll) { Remove-Item $umbracoBinFolder\ClientDependency.Core.dll -Force -Confirm:$false }
@@ -59,6 +73,8 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\Lucene.Net.dll) { Remove-Item $umbracoBinFolder\Lucene.Net.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll) { Remove-Item $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.CodeAnalysis.dll) { Remove-Item $umbracoBinFolder\Microsoft.CodeAnalysis.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Host.SystemWeb.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Host.SystemWeb.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Security.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Security.dll -Force -Confirm:$false }
@@ -72,6 +88,8 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\Newtonsoft.Json.dll) { Remove-Item $umbracoBinFolder\Newtonsoft.Json.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Owin.dll) { Remove-Item $umbracoBinFolder\Owin.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Semver.dll) { Remove-Item $umbracoBinFolder\Semver.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\System.Collections.Immutable.dll) { Remove-Item $umbracoBinFolder\System.Collections.Immutable.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\System.Reflection.Metadata.dll) { Remove-Item $umbracoBinFolder\System.Reflection.Metadata.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Extensions.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Extensions.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Formatting.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Formatting.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Primitives.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Primitives.dll -Force -Confirm:$false }	
@@ -82,6 +100,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\System.Web.Razor.dll) { Remove-Item $umbracoBinFolder\System.Web.Razor.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.WebPages.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.WebPages.Deployment.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.Deployment.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\System.Web.WebPages.Razor.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.Razor.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\System.Web.WebPages.Razor.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.Razor.dll -Force -Confirm:$false }		
 	}
 }

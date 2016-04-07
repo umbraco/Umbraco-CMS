@@ -1,6 +1,6 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService) {
 
-    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
+    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
     // we want. NOTE: This is just a safety check since when we scaffold an empty model on the server we remove
     // the list view tab entirely when it's new.
@@ -11,7 +11,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     //Now we need to check if this is for media, members or content because that will depend on the resources we use
     var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
-    
+
     //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
     if (($scope.model.config.entityType && $scope.model.config.entityType === "member") || (appState.getSectionState("currentSection") === "member")) {
         $scope.entityType = "member";
@@ -20,7 +20,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         getListResultsCallback = contentResource.getPagedResults;
         deleteItemCallback = contentResource.deleteByKey;
         getIdCallback = function(selected) {
-            return selected.key;
+            var selectedKey = getItemKey(selected.id);
+            return selectedKey;
         };
         createEditUrlCallback = function(item) {
             return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;
@@ -31,12 +32,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if (($scope.model.config.entityType && $scope.model.config.entityType === "media") || (appState.getSectionState("currentSection") === "media")) {
             $scope.entityType = "media";
             contentResource = $injector.get('mediaResource');
-            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
+            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;
         }
         else {
             $scope.entityType = "content";
             contentResource = $injector.get('contentResource');
-            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;            
+            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
         }
         getListResultsCallback = contentResource.getChildren;
         deleteItemCallback = contentResource.deleteById;
@@ -51,12 +52,91 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     $scope.pagination = [];
     $scope.isNew = false;
     $scope.actionInProgress = false;
+    $scope.selection = [];
+    $scope.folders = [];
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
     };
+    
+    $scope.currentNodePermissions = {}
+
+    //Just ensure we do have an editorState
+    if (editorState.current) {
+        //Fetch current node allowed actions for the current user
+        //This is the current node & not each individual child node in the list
+        var currentUserPermissions = editorState.current.allowedActions;
+
+        //Create a nicer model rather than the funky & hard to remember permissions strings
+        $scope.currentNodePermissions = {
+            "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+            "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+            "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+            "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+            "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+            "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+        };
+    }
+
+    //when this is null, we don't check permissions
+    $scope.buttonPermissions = null;
+
+    //When we are dealing with 'content', we need to deal with permissions on child nodes.
+    // Currently there is no real good way to 
+    if ($scope.entityType === "content") {
+
+        var idsWithPermissions = null;
+
+        $scope.buttonPermissions = {
+            canCopy: true,
+            canCreate: true,
+            canDelete: true,
+            canMove: true,
+            canPublish: true,
+            canUnpublish: true
+        };
+
+        $scope.$watch(function() {
+            return $scope.selection.length;
+        }, function(newVal, oldVal) {
+
+            if ((idsWithPermissions == null && newVal > 0) || (idsWithPermissions != null)) {
+                
+                //get all of the selected ids
+                var ids = _.map($scope.selection, function(i) {
+                    return i.id.toString();
+                });
+
+                //remove the dictionary items that don't have matching ids
+                var filtered = {};
+                _.each(idsWithPermissions, function (value, key, list) {
+                    if (_.contains(ids, key)) {
+                        filtered[key] = value;
+                    }
+                });
+                idsWithPermissions = filtered;
+
+                //find all ids that we haven't looked up permissions for
+                var existingIds = _.keys(idsWithPermissions);
+                var missingLookup = _.map(_.difference(ids, existingIds), function (i) {
+                    return Number(i);
+                });
+
+                if (missingLookup.length > 0) {
+                    contentResource.getPermissions(missingLookup).then(function(p) {
+                        $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
+                    });
+                }
+                else {
+                    $scope.buttonPermissions = listViewHelper.getButtonPermissions({}, idsWithPermissions);
+                }
+            }
+        });
+
+    }
 
     $scope.options = {
+        displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: '',
@@ -66,14 +146,20 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
             { alias: 'updater', header: 'Last edited by', isSystem: 1 }
         ],
-        allowBulkPublish: true,
-        allowBulkUnpublish: true,
-        allowBulkDelete: true,        
+        layout: {
+           layouts: $scope.model.config.layouts,
+           activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
+        },
+        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
+        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
+        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
+        allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
+        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete
     };
 
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function(e, i) {
-        
+
         if (e.isSystem) {
 
             //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
@@ -82,7 +168,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             if (e.alias != "contentTypeAlias") {
                 e.allowSorting = true;
             }
-            
+
             //localize the header
             var key = getLocalizedKey(e.alias);
             localizationService.localize(key).then(function (v) {
@@ -91,11 +177,21 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     });
 
+    $scope.selectLayout = function(selectedLayout) {
+        $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, selectedLayout, $scope.model.config.layouts);
+    };
+
     function showNotificationsAndReset(err, reload, successMsg) {
 
         //check if response is ysod
         if(err.status && err.status >= 500) {
-            dialogService.ysodDialog(err);
+
+            // Open ysod overlay
+            $scope.ysodOverlay = {
+                view : "ysod",
+                error : err,
+                show : true
+            };
         }
 
         $timeout(function() {
@@ -117,68 +213,54 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     }
 
-    $scope.isSortDirection = function (col, direction) {
-        return $scope.options.orderBy.toUpperCase() == col.toUpperCase() && $scope.options.orderDirection == direction;
-    }
-
-    $scope.next = function() {
-        if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
-            $scope.options.pageNumber++;
-            $scope.reloadView($scope.contentId);
-            //TODO: this would be nice but causes the whole view to reload
-            //$location.search("page", $scope.options.pageNumber);
-        }
+    $scope.next = function(pageNumber) {
+      $scope.options.pageNumber = pageNumber;
+      $scope.reloadView($scope.contentId);
     };
 
     $scope.goToPage = function(pageNumber) {
-        $scope.options.pageNumber = pageNumber + 1;
-        $scope.reloadView($scope.contentId);
-        //TODO: this would be nice but causes the whole view to reload
-        //$location.search("page", $scope.options.pageNumber);
+      $scope.options.pageNumber = pageNumber;
+      $scope.reloadView($scope.contentId);
     };
 
-    $scope.sort = function(field, allow) {
-        if (allow) {
-            $scope.options.orderBy = field;
-
-            if ($scope.options.orderDirection === "desc") {
-                $scope.options.orderDirection = "asc";
-            }
-            else {
-                $scope.options.orderDirection = "desc";
-            }
-
-            $scope.reloadView($scope.contentId);
-        }
+    $scope.prev = function(pageNumber) {
+      $scope.options.pageNumber = pageNumber;
+      $scope.reloadView($scope.contentId);
     };
 
-    $scope.prev = function() {
-        if ($scope.options.pageNumber > 1) {
-            $scope.options.pageNumber--;
-            $scope.reloadView($scope.contentId);
-            //TODO: this would be nice but causes the whole view to reload
-            //$location.search("page", $scope.options.pageNumber);
-        }
-    };
-    
 
     /*Loads the search results, based on parameters set in prev,next,sort and so on*/
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
     with simple values */
 
-    $scope.reloadView = function (id) {
+    $scope.reloadView = function(id) {
 
-        getListResultsCallback(id, $scope.options).then(function (data) {
+        $scope.viewLoaded = false;
+
+        listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
+
+        getListResultsCallback(id, $scope.options).then(function(data) {
 
             $scope.actionInProgress = false;
-
             $scope.listViewResultSet = data;
-
+            
             //update all values for display
             if ($scope.listViewResultSet.items) {
-                _.each($scope.listViewResultSet.items, function (e, index) {
+                _.each($scope.listViewResultSet.items, function(e, index) {
                     setPropertyValues(e);
                 });
+            }
+
+            if ($scope.entityType === 'media') {
+
+                mediaResource.getChildFolders($scope.contentId)
+                    .then(function(folders) {
+                        $scope.folders = folders;
+                        $scope.viewLoaded = true;
+                    });
+
+            } else {
+                $scope.viewLoaded = true;
             }
 
             //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
@@ -191,103 +273,51 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.reloadView(id);
             }
 
-            $scope.pagination = [];
-
-            //list 10 pages as per normal
-            if ($scope.listViewResultSet.totalPages <= 10) {
-                for (var i = 0; i < $scope.listViewResultSet.totalPages; i++) {
-                    $scope.pagination.push({
-                        val: (i + 1),
-                        isActive: $scope.options.pageNumber == (i + 1)
-                    });
-                }
-            }
-            else {
-                //if there is more than 10 pages, we need to do some fancy bits
-
-                //get the max index to start
-                var maxIndex = $scope.listViewResultSet.totalPages - 10;
-                //set the start, but it can't be below zero
-                var start = Math.max($scope.options.pageNumber - 5, 0);
-                //ensure that it's not too far either
-                start = Math.min(maxIndex, start);
-
-                for (var i = start; i < (10 + start) ; i++) {
-                    $scope.pagination.push({
-                        val: (i + 1),
-                        isActive: $scope.options.pageNumber == (i + 1)
-                    });
-                }
-
-                //now, if the start is greater than 0 then '1' will not be displayed, so do the elipses thing
-                if (start > 0) {
-                    $scope.pagination.unshift({ name: "First", val: 1, isActive: false }, {val: "...",isActive: false});
-                }
-
-                //same for the end
-                if (start < maxIndex) {
-                    $scope.pagination.push({ val: "...", isActive: false }, { name: "Last", val: $scope.listViewResultSet.totalPages, isActive: false });
-                }
-            }
-
         });
     };
 
-    $scope.$watch(function() {
-        return $scope.options.filter;
-    }, _.debounce(function(newVal, oldVal) {
+    var searchListView = _.debounce(function(){
         $scope.$apply(function() {
-            if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                $scope.options.pageNumber = 1;
-                $scope.actionInProgress = true;
-                $scope.reloadView($scope.contentId);
-            }
+            makeSearch();
         });
-    }, 1000));
+    }, 500);
 
-    $scope.filterResults = function (ev) {
+    $scope.forceSearch = function (ev) {
         //13: enter
-
         switch (ev.keyCode) {
             case 13:
-                $scope.options.pageNumber = 1;
-                $scope.actionInProgress = true;
-                $scope.reloadView($scope.contentId);
+                makeSearch();
                 break;
         }
     };
 
-    $scope.enterSearch = function ($event) {
-        $($event.target).next().focus();
+    $scope.enterSearch = function() {
+        $scope.viewLoaded = false;
+        searchListView();
     };
 
-    $scope.selectAll = function($event) {
-        var checkbox = $event.target;
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return;
+    function makeSearch() {
+        if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
+            $scope.options.pageNumber = 1;
+            //$scope.actionInProgress = true;
+            $scope.reloadView($scope.contentId);
         }
-        for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
-            var entity = $scope.listViewResultSet.items[i];
-            entity.selected = checkbox.checked;
-        }
-    };
-
-    $scope.isSelectedAll = function() {
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return false;
-        }
-        return _.every($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
-    };
+    }
 
     $scope.isAnythingSelected = function() {
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return false;
-        }
-        return _.some($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
+       if ($scope.selection.length === 0) {
+          return false;
+       } else {
+          return true;
+       }
+    };
+
+    $scope.selectedItemsCount = function() {
+      return $scope.selection.length;
+    };
+
+    $scope.clearSelection = function() {
+      listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
     };
 
     $scope.getIcon = function(entry) {
@@ -307,9 +337,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     }
 
     function applySelected(fn, getStatusMsg, getSuccessMsg, confirmMsg) {
-        var selected = _.filter($scope.listViewResultSet.items, function (item) {
-            return item.selected;
-        });
+        var selected = $scope.selection;
         if (selected.length === 0)
             return;
         if (confirmMsg && !confirm(confirmMsg))
@@ -324,29 +352,93 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             if (!(result.data && angular.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
         });
-    };
+    }
 
     $scope.delete = function () {
         applySelected(
-            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])) },
-            function (count, total) { return "Deleted " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Deleted " + total + " document" + (total > 1 ? "s" : "") },
+            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+            function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
             "Sure you want to delete?");
     };
 
     $scope.publish = function () {
         applySelected(
             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-            function (count, total) { return "Published " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Published " + total + " document" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Published " + total + " item" + (total > 1 ? "s" : ""); });
     };
 
     $scope.unpublish = function() {
         applySelected(
             function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
-            function (count, total) { return "Unpublished " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Unpublished " + total + " document" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : ""); });
     };
+
+    $scope.move = function() {
+      $scope.moveDialog = {};
+      $scope.moveDialog.title = "Move";
+      $scope.moveDialog.section = $scope.entityType;
+      $scope.moveDialog.currentNode = $scope.contentId;
+      $scope.moveDialog.view = "move";
+      $scope.moveDialog.show = true;
+
+      $scope.moveDialog.submit = function(model) {
+
+         if(model.target) {
+            performMove(model.target);
+         }
+
+         $scope.moveDialog.show = false;
+         $scope.moveDialog = null;
+      };
+
+      $scope.moveDialog.close = function(oldModel) {
+         $scope.moveDialog.show = false;
+         $scope.moveDialog = null;
+      };
+
+    };
+
+    function performMove(target) {
+
+      applySelected(
+          function(selected, index) {return contentResource.move({parentId: target.id, id: getIdCallback(selected[index])}); },
+          function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+          function(total) {return "Moved " + total + " item" + (total > 1 ? "s" : ""); });
+    }
+
+    $scope.copy = function() {
+      $scope.copyDialog = {};
+      $scope.copyDialog.title = "Copy";
+      $scope.copyDialog.section = $scope.entityType;
+      $scope.copyDialog.currentNode = $scope.contentId;
+      $scope.copyDialog.view = "copy";
+      $scope.copyDialog.show = true;
+
+      $scope.copyDialog.submit = function(model) {
+         if(model.target) {
+            performCopy(model.target, model.relateToOriginal);
+         }
+
+         $scope.copyDialog.show = false;
+         $scope.copyDialog = null;
+      };
+
+      $scope.copyDialog.close = function(oldModel) {
+         $scope.copyDialog.show = false;
+         $scope.copyDialog = null;
+      };
+
+    };
+
+    function performCopy(target, relateToOriginal) {
+      applySelected(
+          function(selected, index) {return contentResource.copy({parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal}); },
+          function(count, total) {return "Copied " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+          function(total) {return "Copied " + total + " item" + (total > 1 ? "s" : ""); });
+    }
 
     function getCustomPropertyValue(alias, properties) {
         var value = '';
@@ -365,7 +457,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
 
         return value;
-    };
+    }
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
@@ -377,9 +469,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             var alias = e.alias;
 
-            // First try to pull the value directly from the alias (e.g. updatedBy)        
+            // First try to pull the value directly from the alias (e.g. updatedBy)
             var value = result[alias];
-            
+
             // If this returns an object, look for the name property of that (e.g. owner.name)
             if (value === Object(value)) {
                 value = value['name'];
@@ -400,25 +492,38 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         });
 
 
-    };
+    }
 
     function isDate(val) {
         if (angular.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;
-    };
+    }
 
     function initView() {
-        if ($routeParams.id) {
-            $scope.listViewAllowedTypes = getContentTypesCallback($routeParams.id);
-
-            $scope.contentId = $routeParams.id;
-            $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
-
-            $scope.reloadView($scope.contentId);
+        //default to root id if the id is undefined
+        var id = $routeParams.id;
+        if(id === undefined){
+            id = -1;
         }
-    };
+
+        $scope.listViewAllowedTypes = getContentTypesCallback(id);
+
+        $scope.contentId = id;
+        $scope.isTrashed = id === "-20" || id === "-21";
+
+        $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
+        $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
+
+        $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
+            $scope.options.allowBulkUnpublish ||
+            $scope.options.allowBulkCopy ||
+            $scope.options.allowBulkMove ||
+            $scope.options.allowBulkDelete;
+
+        $scope.reloadView($scope.contentId);
+    }
 
     function getLocalizedKey(alias) {
 
@@ -444,6 +549,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 return "general_username";
         }
         return alias;
+    }
+
+    function getItemKey(itemId) {
+        for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+            var item = $scope.listViewResultSet.items[i];
+            if (item.id === itemId) {
+                return item.key;
+            }
+        }
     }
 
     //GO!

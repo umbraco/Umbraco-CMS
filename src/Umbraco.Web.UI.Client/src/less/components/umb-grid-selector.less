@@ -1,0 +1,74 @@
+.umb-grid-selector__items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.umb-grid-selector__item {
+  width: 125px;
+  height: 150px;
+  padding: 20px;
+  background: #f8f8f8;
+  border: 1px solid #CCCCCC;
+  text-align: center;
+  margin: 0 20px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s;
+  position: relative;
+}
+
+.umb-grid-selector__item.-default {
+  border-width: 2px;
+}
+
+.umb-grid-selector__item.-placeholder {
+  border: 1px dashed #d9d9d9;
+  background: none;
+  cursor: pointer;
+}
+
+.umb-grid-selector__item-content {
+  margin-top: 10px;
+}
+
+.umb-grid-selector__item-icon {
+  font-size: 50px;
+  color: #d9d9d9;
+  display: block;
+  line-height: 50px;
+  margin-bottom: 5px;
+}
+
+.umb-grid-selector__item-label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.umb-grid-selector__item-label.-blue {
+  color: @blue;
+}
+
+.umb-grid-selector__item-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
+.umb-grid-selector__item-default-label {
+  font-size: 10px;
+  color: @gray;
+  font-weight: bold;
+  position: relative;
+  top: -3px;
+}
+
+.umb-grid-selector__item-default-label.-blue {
+  color: @blue;
+}
+
+.umb-grid-selector__item-add {
+  color: @blue;
+}

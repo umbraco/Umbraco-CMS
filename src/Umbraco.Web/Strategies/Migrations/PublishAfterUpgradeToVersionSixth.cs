@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.UnitOfWork;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -19,6 +20,8 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
+            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+
             var target = new Version(6, 0, 0);
             if (e.ConfiguredVersion < target)
             {
@@ -69,7 +72,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     transaction.Complete();
                 }
             }
-        }      
-        
+        }
+
     }
 }
