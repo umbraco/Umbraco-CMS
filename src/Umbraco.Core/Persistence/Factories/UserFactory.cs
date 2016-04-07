@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Factories
                     LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue
                 };
 
-            foreach (var app in dto.User2AppDtos)
+            foreach (var app in dto.User2AppDtos.EmptyNull())
             {
                 user.AddAllowedSection(app.AppAlias);
             }

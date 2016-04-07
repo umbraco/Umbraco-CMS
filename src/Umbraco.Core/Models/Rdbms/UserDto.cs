@@ -76,6 +76,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime? LastLoginDate { get; set; }
         
         [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public List<User2AppDto> User2AppDtos { get; set; }
     }
 }

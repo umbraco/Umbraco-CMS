@@ -89,7 +89,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override UmbracoSql GetBaseQuery(bool isCount)
         {
-            return isCount ? Sql().SelectCount().From<UserDto>() : GetBaseQuery("*");
+            if (isCount)
+                return Sql().SelectCount().From<UserDto>();
+
+            return Sql()
+                .Select<UserDto>(r => r.Select<User2AppDto>("User2AppDtos"))
+                .From<UserDto>()
+                .LeftJoin<User2AppDto>()
+                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
         }
 
         private UmbracoSql GetBaseQuery(string columns)
