@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IUser>
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
                 return Sql().SelectCount().From<UserDto>();
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
         }
 
-        private UmbracoSql GetBaseQuery(string columns)
+        private Sql<SqlContext> GetBaseQuery(string columns)
         {
             return Sql()
                 .Select(columns)

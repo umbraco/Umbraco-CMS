@@ -81,9 +81,9 @@ namespace Umbraco.Core.Persistence.Migrations
             return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
         }
 
-        protected UmbracoSql Sql()
+        protected Sql<SqlContext> Sql()
         {
-            return new Sql().For(SqlSyntax, Context.Database);
+            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Context.Database));
         }
     }
 }

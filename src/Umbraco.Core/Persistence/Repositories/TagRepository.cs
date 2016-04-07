@@ -93,12 +93,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             return isCount ? Sql().SelectCount().From<TagDto>() : GetBaseQuery();
         }
 
-        private UmbracoSql GetBaseQuery()
+        private Sql<SqlContext> GetBaseQuery()
         {
             return Sql().SelectAll().From<TagDto>();
         }
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return ExecuteTagsQuery(sql);
         }
 
-        private UmbracoSql GetTagsQuerySelect(bool withGrouping = false)
+        private Sql<SqlContext> GetTagsQuerySelect(bool withGrouping = false)
         {
             var sql = Sql();
 
@@ -358,7 +358,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private UmbracoSql ApplyRelationshipJoinToTagsQuery(UmbracoSql sql)
+        private Sql<SqlContext> ApplyRelationshipJoinToTagsQuery(Sql<SqlContext> sql)
         {
             return sql
                 .From<TagDto>()
@@ -370,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId);
         }
 
-        private UmbracoSql ApplyGroupFilterToTagsQuery(UmbracoSql sql, string group)
+        private Sql<SqlContext> ApplyGroupFilterToTagsQuery(Sql<SqlContext> sql, string group)
         {
             if (group.IsNullOrWhiteSpace() == false)
             {
@@ -380,7 +380,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private UmbracoSql ApplyGroupByToTagsQuery(UmbracoSql sql)
+        private Sql<SqlContext> ApplyGroupByToTagsQuery(Sql<SqlContext> sql)
         {
             return sql.GroupBy("cmsTags.id", "cmsTags.tag", "cmsTags." + SqlSyntax.GetQuotedColumnName("group") + @"");
         }

@@ -287,7 +287,7 @@ namespace Umbraco.Tests.Services
             DatabaseContext.Database.BulkInsertRecords(SqlSyntax, nodes);
 
             //re-get the nodes with ids
-            var sql = new Sql().For(SqlSyntax, DatabaseContext.Database);
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
             sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
             nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
 

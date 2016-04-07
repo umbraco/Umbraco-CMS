@@ -100,7 +100,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.1.0-u001\lib\net45\NPoco.dll</HintPath>
+      <HintPath>..\packages\NPoco.3.1.0-u004\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

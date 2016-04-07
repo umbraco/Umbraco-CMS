@@ -93,7 +93,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.1.0-u001\lib\net45\NPoco.dll</HintPath>
+      <HintPath>..\packages\NPoco.3.1.0-u004\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
@@ -475,7 +475,6 @@
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\TupleExtensions.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
-    <Compile Include="Persistence\UmbracoSql.cs" />
     <Compile Include="Persistence\UmbracoSqlExtensions.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
@@ -977,7 +976,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsPropertyTypeGroupTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameCmsTabTable.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
-    <Compile Include="Persistence\NPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\BaseExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />

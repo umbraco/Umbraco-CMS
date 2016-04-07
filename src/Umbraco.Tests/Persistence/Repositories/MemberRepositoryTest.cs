@@ -374,11 +374,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private UmbracoSql GetBaseQuery(bool isCount)
+        private Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
             {
-                var sqlCount = new Sql().For(SqlSyntax, DatabaseContext.Database)
+                var sqlCount = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database))
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -389,7 +389,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 return sqlCount;
             }
 
-            var sql = new Sql().For(SqlSyntax, DatabaseContext.Database);
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -411,9 +411,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             return sql;
         }
 
-        private UmbracoSql GetSubquery()
+        private Sql<SqlContext> GetSubquery()
         {
-            var sql = new Sql().For(SqlSyntax, DatabaseContext.Database);
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

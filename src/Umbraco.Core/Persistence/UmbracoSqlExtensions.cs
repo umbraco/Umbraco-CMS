@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence
 
         #region Where
 
-        public static UmbracoSql Where<T>(this UmbracoSql sql, Expression<Func<T, bool>> predicate)
+        public static Sql<SqlContext> Where<T>(this Sql<SqlContext> sql, Expression<Func<T, bool>> predicate)
         {
             var expresionist = new PocoToSqlExpressionHelper<T>(sql.SqlContext);
             var whereExpression = expresionist.Visit(predicate);
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
-        public static UmbracoSql WhereIn<T>(this UmbracoSql sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
+        public static Sql<SqlContext> WhereIn<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
         {
             var expresionist = new PocoToSqlExpressionHelper<T>(sql.SqlContext);
             var fieldExpression = expresionist.Visit(fieldSelector);
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence
 
         #region From
 
-        public static UmbracoSql From<T>(this UmbracoSql sql)
+        public static Sql<SqlContext> From<T>(this Sql<SqlContext> sql)
         {
             var type = typeof (T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence
 
         #region OrderBy, GroupBy
 
-        public static UmbracoSql OrderBy<T>(this UmbracoSql sql, Expression<Func<T, object>> columnMember)
+        public static Sql<SqlContext> OrderBy<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
-        public static UmbracoSql OrderByDescending<T>(this UmbracoSql sql, Expression<Func<T, object>> columnMember)
+        public static Sql<SqlContext> OrderByDescending<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
@@ -83,13 +83,13 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
-        public static UmbracoSql OrderByDescending(this UmbracoSql sql, params object[] columns)
+        public static Sql<SqlContext> OrderByDescending(this Sql<SqlContext> sql, params object[] columns)
         {
             sql.Append("ORDER BY " + string.Join(", ", columns.Select(x => x + " DESC")));
             return sql;
         }
 
-        public static UmbracoSql GroupBy<T>(this UmbracoSql sql, Expression<Func<T, object>> columnMember)
+        public static Sql<SqlContext> GroupBy<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> columnMember)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence
 
         #region Joins
 
-        public static UmbracoSql.UmbracoSqlJoinClause InnerJoin<T>(this UmbracoSql sql)
+        public static Sql<SqlContext>.SqlJoinClause<SqlContext>  InnerJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence
             return sql.InnerJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql.UmbracoSqlJoinClause LeftJoin<T>(this UmbracoSql sql)
+        public static Sql<SqlContext>.SqlJoinClause<SqlContext> LeftJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Persistence
             return sql.LeftJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql.UmbracoSqlJoinClause LeftOuterJoin<T>(this UmbracoSql sql)
+        public static Sql<SqlContext>.SqlJoinClause<SqlContext> LeftOuterJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence
             return sql.LeftOuterJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql.UmbracoSqlJoinClause RightJoin<T>(this UmbracoSql sql)
+        public static Sql<SqlContext>.SqlJoinClause<SqlContext> RightJoin<T>(this Sql<SqlContext> sql)
         {
             var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence
             return sql.RightJoin(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
         }
 
-        public static UmbracoSql On<TLeft, TRight>(this UmbracoSql.UmbracoSqlJoinClause clause,
+        public static Sql<SqlContext> On<TLeft, TRight>(this Sql<SqlContext>.SqlJoinClause<SqlContext> clause,
             Expression<Func<TLeft, object>> leftMember, Expression<Func<TRight, object>> rightMember,
             params object[] args)
         {
@@ -162,19 +162,19 @@ namespace Umbraco.Core.Persistence
 
         #region Select
 
-        public static UmbracoSql SelectCount(this UmbracoSql sql)
+        public static Sql<SqlContext> SelectCount(this Sql<SqlContext> sql)
         {
             sql.Select("COUNT(*)");
             return sql;
         }
 
-        public static UmbracoSql SelectAll(this UmbracoSql sql)
+        public static Sql<SqlContext> SelectAll(this Sql<SqlContext> sql)
         {
             sql.Select("*");
             return sql;
         }
 
-        public static UmbracoSql Select<T>(this UmbracoSql sql, Func<RefSql, RefSql> refexpr = null)
+        public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, Func<RefSql, RefSql> refexpr = null)
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (T));
 
@@ -227,13 +227,13 @@ namespace Umbraco.Core.Persistence
 
         public class RefSql
         {
-            public RefSql(UmbracoSql sql, string prefix)
+            public RefSql(Sql<SqlContext> sql, string prefix)
             {
                 Sql = sql;
                 Prefix = prefix;
             }
 
-            public UmbracoSql Sql { get; }
+            public Sql<SqlContext> Sql { get; }
             public string Prefix { get; }
         }
 

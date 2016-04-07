@@ -84,7 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return BuildFromDtos(dtos);
         }
         
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
             {
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected UmbracoSql GetSubquery()
+        protected Sql<SqlContext> GetSubquery()
         {
             var sql = Sql()
                 .Select("DISTINCT(umbracoNode.id)")

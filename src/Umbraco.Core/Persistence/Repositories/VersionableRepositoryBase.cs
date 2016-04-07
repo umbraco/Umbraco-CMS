@@ -234,12 +234,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        private UmbracoSql PrepareSqlForPagedResults(UmbracoSql sql, UmbracoSql filterSql, string orderBy, Direction orderDirection)
+        private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
 
             // preserve original
-            var psql = new UmbracoSql(sql.SqlContext, sql.SQL, sql.Arguments);
+            var psql = new Sql<SqlContext>(sql.SqlContext, sql.SQL, sql.Arguments);
 
             // apply filter
             if (filterSql != null)
@@ -293,7 +293,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapper,
             string orderBy, Direction orderDirection,
-            UmbracoSql filterSql = null)
+            Sql<SqlContext> filterSql = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 

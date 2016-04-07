@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             var nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
 
-            var expected = new Sql().For(SqlContext);
+            var expected = Sql();
             expected.Select("*")
                 .From("[cmsDocumentType]")
                 .RightJoin("[cmsContentType]")
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"))
                 .Where("([cmsDocumentType].[IsDefault] = @0)", true);
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                 .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             var nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
 
-            var expected = new Sql().For(SqlContext);
+            var expected = Sql();
             expected.SelectAll()
                 .From("[cmsDocumentType]")
                 .RightJoin("[cmsContentType]")
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .Where("[cmsDocumentType].[IsDefault] = @0", true)
                 .Where("([umbracoNode].[id] = @0)", 1050);
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                 .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
@@ -89,13 +89,13 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_PerformQuery_Clause()
         {
-            var expected = new Sql().For(SqlContext);
+            var expected = Sql();
             expected.SelectAll()
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
                 .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                .From<PropertyTypeGroupDto>()
                .RightJoin<PropertyTypeDto>()
@@ -111,12 +111,12 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_AllowedContentTypeIds_Clause()
         {
-            var expected = new Sql().For(SqlContext);
+            var expected = Sql();
             expected.SelectAll()
                 .From("[cmsContentTypeAllowedContentType]")
                 .Where("([cmsContentTypeAllowedContentType].[Id] = @0)", 1050);
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                .From<ContentTypeAllowedContentTypeDto>()
                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == 1050);
@@ -135,14 +135,14 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_PropertyGroupCollection_Clause()
         {
-            var expected = new Sql().For(SqlContext);
+            var expected = Sql();
             expected.SelectAll()
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
                 .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]")
                 .Where("([cmsPropertyType].[contentTypeId] = @0)", 1050);
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                .From<PropertyTypeGroupDto>()
                .RightJoin<PropertyTypeDto>()

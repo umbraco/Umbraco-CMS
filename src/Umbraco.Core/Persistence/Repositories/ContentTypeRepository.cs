@@ -113,8 +113,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
         {
-            var sql = new Sql()
-                .For(SqlSyntax, Database)
+            var sql = Sql()
                 .Select("cmsContentType.alias")
                 .From<ContentTypeDto>()
                 .InnerJoin<NodeDto>()
@@ -128,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<string>(sql);
         }
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 
@@ -202,8 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // be done in the ContentTypeService by deleting all associated content first, but in some cases
             // like when we switch a document type, there is property data left over that is linked
             // to the previous document type. So we need to ensure it's removed.
-            var sql = new Sql()
-                .For(SqlSyntax, Database)
+            var sql = Sql()
                 .Select("DISTINCT cmsPropertyData.propertytypeid")
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()

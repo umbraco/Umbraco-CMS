@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<MigrationDto>(sql).Select(x => factory.BuildEntity(x));
         }
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 

@@ -23,6 +23,11 @@ namespace Umbraco.Tests.TestHelpers
 
         protected SqlContext SqlContext { get; private set; }
 
+        protected Sql<SqlContext> Sql()
+        {
+            return NPoco.Sql.BuilderFor(SqlContext);
+        }
+
         [SetUp]
         public virtual void Initialize()
         {

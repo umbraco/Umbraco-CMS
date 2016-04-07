@@ -131,7 +131,7 @@ namespace Umbraco.Core.Persistence
             base.OnExecutedCommand(cmd);
         }
 
-        public IEnumerable<TResult> FetchByGroups<TResult, TSource>(IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, UmbracoSql> sqlFactory)
+        public IEnumerable<TResult> FetchByGroups<TResult, TSource>(IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<SqlContext>> sqlFactory)
         {
             return source.SelectByGroups(x => Fetch<TResult>(sqlFactory(x)), groupSize);
         }

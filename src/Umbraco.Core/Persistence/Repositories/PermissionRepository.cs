@@ -80,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         whereBuilder.Append(")");
                     }
 
-                    var sql = new Sql().For(_sqlSyntax, _unitOfWork.Database)
+                    var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
                         .SelectAll()
                         .From<User2NodePermissionDto>()
                         .Where(whereBuilder.ToString());
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var sql = new Sql().For(_sqlSyntax, _unitOfWork.Database)
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
                 .SelectAll()
                 .From<User2NodePermissionDto>()
                 .Where<User2NodePermissionDto>(dto => dto.NodeId == entityId)

@@ -38,7 +38,7 @@ namespace Umbraco.Web.WebServices
         {
             var totalPublished = Services.ContentService.CountPublished();
             
-            var subQuery = new Sql().For(DatabaseContext.SqlSyntax, DatabaseContext.Database)
+            var subQuery = DatabaseContext.Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>()
                 .InnerJoin<DocumentDto>()
@@ -54,7 +54,7 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MediaService.Count();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql().For(DatabaseContext.SqlSyntax, DatabaseContext.Database)
+            var subQuery = DatabaseContext.Sql()
                 .SelectCount()
                 .From<ContentXmlDto>()
                 .InnerJoin<NodeDto>()
@@ -70,7 +70,7 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MemberService.Count();
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = new Sql().For(DatabaseContext.SqlSyntax, DatabaseContext.Database)
+            var subQuery = DatabaseContext.Sql()
                 .SelectCount()
                 .From<ContentXmlDto>()
                 .InnerJoin<NodeDto>()

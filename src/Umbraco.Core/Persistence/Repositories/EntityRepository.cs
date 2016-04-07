@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Query<IUmbracoEntity> Query => _queryFactory.Create<IUmbracoEntity>();
 
-        public UmbracoSql Sql() { return new Sql().For(_sqlSyntax, UnitOfWork.Database);}
+        public Sql<SqlContext> Sql() { return NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, UnitOfWork.Database));}
 
         public IUmbracoEntity GetByKey(Guid key)
         {
@@ -235,7 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Sql Statements
 
-        protected UmbracoSql GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
+        protected Sql<SqlContext> GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, key);
 
@@ -244,7 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        protected UmbracoSql GetFullSqlForEntityType(int id, bool isContent, bool isMedia, Guid objectTypeId)
+        protected Sql<SqlContext> GetFullSqlForEntityType(int id, bool isContent, bool isMedia, Guid objectTypeId)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, id);
 
@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        protected UmbracoSql GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectTypeId, Action<UmbracoSql> filter)
+        protected Sql<SqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectTypeId, Action<Sql<SqlContext>> filter)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, filter, objectTypeId);
 
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        private UmbracoSql GetFullSqlForMedia(UmbracoSql entitySql, Action<UmbracoSql> filter = null)
+        private Sql<SqlContext> GetFullSqlForMedia(Sql<SqlContext> entitySql, Action<Sql<SqlContext>> filter = null)
         {
             //this will add any dataNvarchar property to the output which can be added to the additional properties
 
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return wrappedSql;
         }
 
-        protected virtual UmbracoSql GetBase(bool isContent, bool isMedia, Action<UmbracoSql> customFilter)
+        protected virtual Sql<SqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<SqlContext>> customFilter)
         {
             var columns = new List<object>
                               {
@@ -353,14 +353,14 @@ namespace Umbraco.Core.Persistence.Repositories
             return entitySql;
         }
 
-        protected virtual UmbracoSql GetBaseWhere(Func<bool, bool, Action<UmbracoSql>, UmbracoSql> baseQuery, bool isContent, bool isMedia, Action<UmbracoSql> filter, Guid nodeObjectType)
+        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Action<Sql<SqlContext>> filter, Guid nodeObjectType)
         {
             var sql = baseQuery(isContent, isMedia, filter)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = nodeObjectType });
             return sql;
         }
 
-        protected virtual UmbracoSql GetBaseWhere(Func<bool, bool, Action<UmbracoSql>, UmbracoSql> baseQuery, bool isContent, bool isMedia, int id)
+        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @Id", new { Id = id })
@@ -368,7 +368,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual UmbracoSql GetBaseWhere(Func<bool, bool, Action<UmbracoSql>, UmbracoSql> baseQuery, bool isContent, bool isMedia, Guid key)
+        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key })
@@ -376,7 +376,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual UmbracoSql GetBaseWhere(Func<bool, bool, Action<UmbracoSql>, UmbracoSql> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
+        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual UmbracoSql GetBaseWhere(Func<bool, bool, Action<UmbracoSql>, UmbracoSql> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
+        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @UniqueID AND umbracoNode.nodeObjectType = @NodeObjectType",
@@ -392,7 +392,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual UmbracoSql GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
+        protected virtual Sql<SqlContext> GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
         {
             var columns = new List<object>
                               {

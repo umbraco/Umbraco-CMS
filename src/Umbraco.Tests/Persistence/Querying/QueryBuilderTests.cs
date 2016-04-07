@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_StartsWith_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll();
             sql.From("umbracoNode");
 
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ParentId_Query_For_IContent()
         {
             // Arrange
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll();
             sql.From("umbracoNode");
 
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Build_ContentTypeAlias_Query_For_IContentType()
         {
             // Arrange
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll();
             sql.From("umbracoNode");
 
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var id = 1046;
             var nodeObjectTypeId = new Guid(Constants.ObjectTypes.Document);
 
-            var sql = new Sql().For(SqlContext);
+            var sql = Sql();
             sql.SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>()

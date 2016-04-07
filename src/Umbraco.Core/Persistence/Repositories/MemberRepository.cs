@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IMembershipUser>
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 
@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return "umbracoNode.id = @Id";
         }
 
-        protected UmbracoSql GetNodeIdQueryWithPropertyData()
+        protected Sql<SqlContext> GetNodeIdQueryWithPropertyData()
         {
             return Sql()
                 .Select("DISTINCT(umbracoNode.id)")

@@ -61,12 +61,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             return isCount ? Sql().SelectCount().From<TaskDto>() : GetBaseQuery();
         }
 
-        private UmbracoSql GetBaseQuery()
+        private Sql<SqlContext> GetBaseQuery()
         {
             return Sql()
                 .Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        private UmbracoSql GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
+        private Sql<SqlContext> GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
             var sql = GetBaseQuery(false);
 

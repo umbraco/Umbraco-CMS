@@ -9,9 +9,9 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     internal class SqlTranslator<T>
     {
-        private readonly UmbracoSql _sql;
+        private readonly Sql<SqlContext> _sql;
 
-        public SqlTranslator(UmbracoSql sql, IQuery<T> query)
+        public SqlTranslator(Sql<SqlContext> sql, IQuery<T> query)
         {
             if (sql == null)
                 throw new Exception("Sql cannot be null");
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Querying
             }
         }
 
-        public UmbracoSql Translate()
+        public Sql<SqlContext> Translate()
         {
             return _sql;
         }

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         public void Can_Generate_Delete_SubQuery_Statement()
         {
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql().For(SqlContext)
+            var subQuery = Sql()
                             .Select("DISTINCT cmsContentXml.nodeId")
                             .From<ContentXmlDto>()
                             .InnerJoin<NodeDto>()

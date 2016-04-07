@@ -33,7 +33,7 @@ namespace Umbraco.Web.Strategies.Migrations
             var target = new Version(6, 0, 0);
             if (e.ConfiguredVersion < target)
             {
-                var sql = new Sql().For(_sqlSyntax, e.MigrationContext.Database)
+                var sql = Sql.BuilderFor(new SqlContext(_sqlSyntax, e.MigrationContext.Database))
                     .SelectAll()
                     .From<DocumentDto>()
                     .InnerJoin<ContentVersionDto>()

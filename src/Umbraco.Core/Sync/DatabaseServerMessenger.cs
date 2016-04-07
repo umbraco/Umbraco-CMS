@@ -245,7 +245,7 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
-            var sql = new Sql().For(_appContext.DatabaseContext.SqlSyntax, _appContext.DatabaseContext.Database).SelectAll()
+            var sql = _appContext.DatabaseContext.Sql().SelectAll()
                 .From<CacheInstructionDto>()
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id);
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Sync
         /// and it should instead cold-boot.</remarks>
         private void EnsureInstructions()
         {
-            var sql = new Sql().For(_appContext.DatabaseContext.SqlSyntax, _appContext.DatabaseContext.Database).SelectAll()
+            var sql = _appContext.DatabaseContext.Sql().SelectAll()
                 .From<CacheInstructionDto>()
                 .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
 

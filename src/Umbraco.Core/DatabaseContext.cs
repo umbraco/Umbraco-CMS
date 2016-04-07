@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
+using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -788,6 +789,11 @@ namespace Umbraco.Core
             }
 
             return true;
+        }
+
+        public Sql<SqlContext> Sql()
+        {
+            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Database));
         }
     }
 }

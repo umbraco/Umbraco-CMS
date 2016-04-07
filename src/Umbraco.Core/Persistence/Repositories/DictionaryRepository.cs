@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,DictionaryItem>
 
-        protected override UmbracoSql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
             if (isCount)
@@ -316,7 +316,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
-            protected override UmbracoSql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _dictionaryRepository.GetBaseQuery(isCount);
             }
@@ -374,7 +374,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
-            protected override UmbracoSql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _dictionaryRepository.GetBaseQuery(isCount);
             }

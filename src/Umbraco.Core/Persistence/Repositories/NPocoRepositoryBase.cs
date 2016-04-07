@@ -47,14 +47,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected UmbracoDatabase Database => UnitOfWork.Database;
 
-        protected UmbracoSql Sql()
+        protected Sql<SqlContext> Sql()
         {
-            return new Sql().For(SqlSyntax, Database);
+            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Database));
         }
 
         #region Abstract Methods
 
-        protected abstract UmbracoSql GetBaseQuery(bool isCount);
+        protected abstract Sql<SqlContext> GetBaseQuery(bool isCount);
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }
