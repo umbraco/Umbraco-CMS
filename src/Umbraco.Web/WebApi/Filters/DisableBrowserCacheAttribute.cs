@@ -16,7 +16,11 @@ namespace Umbraco.Web.WebApi.Filters
             base.OnActionExecuted(actionExecutedContext);
 
             // happens if exception
-            if (actionExecutedContext.Response == null) return;
+            if (actionExecutedContext == null || actionExecutedContext.Response == null ||
+                    actionExecutedContext.Response.Headers == null)
+            {
+                return;
+            }
 
             //NOTE: Until we upgraded to WebApi 2, this didn't work correctly and we had to revert to using
             // HttpContext.Current responses. I've changed this back to what it should be now since it works
