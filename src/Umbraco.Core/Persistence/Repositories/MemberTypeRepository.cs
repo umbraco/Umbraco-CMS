@@ -12,7 +12,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -41,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     expires: true));
             }
         }
-        
+
         protected override IMemberType PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all content types
@@ -61,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database
                 .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
-                .Transform(new PropertyTypePropertyGroupRelator().MapOneToManies)
+                .Transform(MapOneToManies)
                 .ToList();
 
             return BuildFromDtos(dtos);
@@ -78,12 +77,43 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database
                 .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
-                .Transform(new PropertyTypePropertyGroupRelator().MapOneToManies)
+                .Transform(MapOneToManies)
                 .ToList();
 
             return BuildFromDtos(dtos);
         }
-        
+
+        private IEnumerable<MemberTypeReadOnlyDto> MapOneToManies(IEnumerable<MemberTypeReadOnlyDto> dtos)
+        {
+            MemberTypeReadOnlyDto acc = null;
+            foreach (var dto in dtos)
+            {
+                if (acc == null)
+                {
+                    acc = dto;
+                }
+                else if (acc.UniqueId == dto.UniqueId)
+                {
+                    var prop = dto.PropertyTypes.SingleOrDefault();
+                    var group = dto.PropertyTypeGroups.SingleOrDefault();
+
+                    if (prop != null && prop.Id.HasValue && acc.PropertyTypes.Any(x => x.Id == prop.Id.Value) == false)
+                        acc.PropertyTypes.Add(prop);
+
+                    if (group != null && group.Id.HasValue && acc.PropertyTypeGroups.Any(x => x.Id == group.Id.Value) == false)
+                        acc.PropertyTypeGroups.Add(group);
+                }
+                else
+                {
+                    yield return acc;
+                    acc = dto;
+                }
+            }
+
+            if (acc != null)
+                yield return acc;
+        }
+
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
@@ -157,7 +187,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MemberType); }
         }
-        
+
         protected override void PersistNewItem(IMemberType entity)
         {
             ValidateAlias(entity);
@@ -228,7 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-        
+
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>
