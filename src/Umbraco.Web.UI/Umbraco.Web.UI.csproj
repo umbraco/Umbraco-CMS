@@ -2241,6 +2241,9 @@
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
+    <Content Include="Umbraco\ping.aspx">
+      <SubType>Form</SubType>
+    </Content>	
     <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />

@@ -173,19 +173,23 @@ namespace Umbraco.Web.Models.Mapping
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 },
-                new ContentPropertyDisplay
+                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                },
+                    //Not editible for people without publish permission (U4-287)
+                    View =  display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    //TODO: Fix up hard coded datepicker
+                } ,
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    //Not editible for people without publish permission (U4-287)
+                    View = display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay
                 {

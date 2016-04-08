@@ -328,6 +328,7 @@
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">Связать</key>
     <key alias="unLinkYour">Разорвать связь</key>
