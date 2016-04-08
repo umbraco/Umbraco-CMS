@@ -133,7 +133,6 @@
     <Compile Include="LocalStorage\MultiIndexLock.cs" />
     <Compile Include="LocalStorage\MultiIndexLockFactory.cs" />
     <Compile Include="LocalStorage\MultiIndexOutput.cs" />
-    <Compile Include="LoggingLevel.cs" />
     <Compile Include="StaticField.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

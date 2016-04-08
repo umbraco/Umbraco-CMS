@@ -125,22 +125,6 @@ namespace UmbracoExamine
                 DataService = new UmbracoDataService();
             }
 
-            DataService.LogService.LogLevel = LoggingLevel.Normal;
-
-            if (config["logLevel"] != null && !string.IsNullOrEmpty(config["logLevel"]))
-            {
-                try
-                {
-                    var logLevel = (LoggingLevel)Enum.Parse(typeof(LoggingLevel), config["logLevel"]);
-                    DataService.LogService.LogLevel = logLevel;
-                }
-                catch (ArgumentException)
-                {                    
-                    //FAILED
-                    DataService.LogService.LogLevel = LoggingLevel.Normal;
-                }
-            }
-
             DataService.LogService.ProviderName = name;
 
             EnableDefaultEventHandler = true; //set to true by default
