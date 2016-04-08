@@ -658,18 +658,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        protected override string GetEntityPropertyNameForOrderBy(string orderBy)
-        {
-            //Some custom ones
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "LOGINNAME":
-                    return "Username";
-            }
-
-            return base.GetEntityPropertyNameForOrderBy(orderBy);
-        }
-
         private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos)
         {
             var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();

@@ -27,6 +27,26 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    // this cannot be inside VersionableRepositoryBase because that class is static
+    internal static class VersionableRepositoryBaseAliasRegex
+    {
+        private readonly static Dictionary<Type, Regex> Regexes = new Dictionary<Type, Regex>();
+
+        public static Regex For(ISqlSyntaxProvider sqlSyntax)
+        {
+            var type = sqlSyntax.GetType();
+            Regex aliasRegex;
+            if (Regexes.TryGetValue(type, out aliasRegex))
+                return aliasRegex;
+
+            var col = Regex.Escape(sqlSyntax.GetQuotedColumnName("column")).Replace("column", @"\w+");
+            var fld = Regex.Escape(sqlSyntax.GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
+            aliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            Regexes[type] = aliasRegex;
+            return aliasRegex;
+        }
+    }
+
     internal abstract class VersionableRepositoryBase<TId, TEntity> : NPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
@@ -234,6 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+
         private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
@@ -250,45 +271,33 @@ namespace Umbraco.Core.Persistence.Repositories
             // apply sort
             if (string.IsNullOrEmpty(orderBy) == false)
             {
-                var orderByParams = new object[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                // get the database field eg "[table].[column]"
+                var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
+
+                // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
+                // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
+                // to be "NodeDto__Text" and NOT "umbracoNode.text".
+                // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
+                // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
+                // queries to begin with.
+                // thought about maintaining a map of columns-to-aliases in the sql context but that would
+                // be expensive and most of the time, useless. so instead we parse the SQL looking for the
+                // alias. somewhat expensive too but nothing's free.
+
+                var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+                var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value == dbfield);
+                if (match != null)
+                    dbfield = match.Groups[2].Value;
+
+                var orderByParams = new object[] { dbfield };
                 if (orderDirection == Direction.Ascending)
                     psql.OrderBy(orderByParams);
                 else
-
                     psql.OrderByDescending(orderByParams);
             }
 
             return psql;
         }
-
-        /*
-        private UmbracoSql GetFilteredSqlForPagedResults(UmbracoSql sql, Func<UmbracoSql> filterFactory = null)
-        {
-            if (filterFactory == null) return sql;
-
-            // preserve original
-            var filteredSql = new UmbracoSql(sql.SqlContext, sql.SQL, sql.Arguments);
-
-            // apply filter
-            var filterSql = filterFactory();
-            filteredSql.Append(filterSql);
-            return filteredSql;
-        }
-
-        private UmbracoSql GetSortedSqlForPagedResults(UmbracoSql sql, string orderBy, Direction orderDirection)
-        {
-            if (string.IsNullOrEmpty(orderBy)) return sql;
-
-            // preserve original
-            var sortedSql = new UmbracoSql(sql.SqlContext, sql.SQL, sql.Arguments);
-
-            // apply order by
-            var orderByParams = new object[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-            return orderDirection == Direction.Ascending
-                ? sortedSql.OrderBy(orderByParams)
-                : sortedSql.OrderByDescending(orderByParams);
-        }
-        */
 
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapper,
@@ -447,8 +456,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the database field names.
+            // translate the supplied "order by" field, which were originally defined for in-memory
+            // object sorting of ContentItemBasic instance, to the actual database field names.
+
             switch (orderBy.ToUpperInvariant())
             {
                 case "UPDATEDATE":
@@ -460,26 +470,6 @@ namespace Umbraco.Core.Persistence.Repositories
                     return SqlSyntax.GetQuotedTableName("umbracoNode") + "." + SqlSyntax.GetQuotedColumnName("nodeUser");
                 case "PATH":
                     return SqlSyntax.GetQuotedTableName("umbracoNode") + "." + SqlSyntax.GetQuotedColumnName("path");
-                default:
-                    //ensure invalid SQL cannot be submitted
-                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
-            }
-        }
-
-        protected virtual string GetEntityPropertyNameForOrderBy(string orderBy)
-        {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the IMedia property names.
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "OWNER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "CreatorId";
-                case "UPDATER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "WriterId";
-                case "VERSIONDATE":
-                    return "UpdateDate";
                 default:
                     //ensure invalid SQL cannot be submitted
                     return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");

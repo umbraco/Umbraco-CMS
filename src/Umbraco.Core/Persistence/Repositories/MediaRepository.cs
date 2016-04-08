@@ -495,7 +495,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var filterSql = filter.IsNullOrWhiteSpace()
                 ? null
-                : Sql().Append("AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
+                : Sql().Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos, orderBy, orderDirection,

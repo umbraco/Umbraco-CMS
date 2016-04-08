@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -539,6 +540,20 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreEqual(result.Count(), result2.Count());
             }
+        }
+
+        [Test]
+        public void RegexAliasTest()
+        {
+            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider());
+            Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
+            const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
+            var matches = regex.Matches(sql);
+            Assert.AreEqual(2, matches.Count);
+            Assert.AreEqual("[table].[column1]", matches[0].Groups[1].Value);
+            Assert.AreEqual("[alias1]", matches[0].Groups[2].Value);
+            Assert.AreEqual("[table].[column2]", matches[1].Groups[1].Value);
+            Assert.AreEqual("[alias2]", matches[1].Groups[2].Value);
         }
 
         [Test]
