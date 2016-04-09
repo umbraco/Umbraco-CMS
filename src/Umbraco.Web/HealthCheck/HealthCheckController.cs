@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -10,8 +11,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
     /// </summary>
-    [ValidateAngularAntiForgeryToken]
-    public class HealthCheckController : UmbracoAuthorizedApiController
+    public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly IHealthCheckResolver _healthCheckResolver;
 

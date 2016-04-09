@@ -11,6 +11,11 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// This moves the functionality from the XmlIntegrity check dashboard into a health check
     /// </summary>
+    [HealthCheck(
+        "D999EB2B-64C2-400F-B50C-334D41F8589A",
+        "XML Data Integrity", 
+        Description = "Checks the integrity of the XML data in Umbraco", 
+        Group = "DataIntegrity")]
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
         public XmlDataIntegrityHealthCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)

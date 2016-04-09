@@ -8,9 +8,9 @@ namespace Umbraco.Web.HealthCheck
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class HealthCheckAttribute : Attribute
     {        
-        public HealthCheckAttribute(Guid id, string name)
+        public HealthCheckAttribute(string id, string name)
         {
-            Id = id;
+            Id = new Guid(id);
             Name = name;
         }
 
