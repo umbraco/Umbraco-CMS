@@ -1,0 +1,9 @@
+<div id="umbracoHealthCheck" ng-controller="Umbraco.Dashboard.HealthCheckController">
+
+    <h3>Health Check</h3>
+
+	<span ng-repeat="check in checks">
+        <p><i class="icon icon-check"></i> {{check.message}}</p>
+    </span>
+
+</div>
