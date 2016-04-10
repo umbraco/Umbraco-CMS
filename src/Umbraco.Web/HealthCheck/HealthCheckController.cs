@@ -30,13 +30,25 @@ namespace Umbraco.Web.HealthCheck
         // * Execute action
         // * more?
 
-        public IEnumerable<HealthCheckStatus> GetAllHealthChecks()
-        {
-            //get the health check instances
-            var checks = _healthCheckResolver.HealthChecks;
-
-            //return their statuses
-            return checks.SelectMany(x => x.GetStatus());
+        /// <summary>
+        /// Gets a grouped list of health checks, but doesn't actively check the status of each health check.
+        /// </summary>
+        /// <returns>Returns a collection of anonymous objects representing each group.</returns>
+        public object GetAllHealthChecks() {
+            return (
+                from gr in _healthCheckResolver.HealthChecks.GroupBy(x => x.Group) 
+                select new {
+                    name = gr.Key,
+                    checks = (
+                        from check in gr
+                        select new {
+                            id = check.Id,
+                            name = check.Name,
+                            description = check.Description
+                        }
+                    )
+                }
+            );
         }
 
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)

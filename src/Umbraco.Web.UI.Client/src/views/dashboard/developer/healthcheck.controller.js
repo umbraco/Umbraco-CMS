@@ -1,8 +1,7 @@
 function healthCheckController($scope, healtCheckService) {
 	healtCheckService.getAllChecks().then(
 		function(response) {
-			var checks = response;
-			$scope.checks = checks;	
+			$scope.groups = response;	
 		}
 	);
 }
