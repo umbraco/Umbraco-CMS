@@ -51,6 +51,15 @@ namespace Umbraco.Web.HealthCheck
             );
         }
 
+        public object GetStatus(Guid id) {
+
+            HealthCheck check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == id);
+            if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
+
+            return check.GetStatus();
+
+        } 
+
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
             var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == action.HealthCheckId);
