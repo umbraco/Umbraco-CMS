@@ -32,10 +32,8 @@ namespace Umbraco.Core.Persistence
         //very important to have ThreadStatic:
         // see: http://issues.umbraco.org/issue/U4-2172
         [ThreadStatic]
-        private static volatile UmbracoDatabase _nonHttpInstance;
-
-		private static readonly object Locker = new object();
-
+        private static Lazy<UmbracoDatabase> _nonHttpInstance;
+        
 	    /// <summary>
 	    /// Constructor accepting custom connection string
 	    /// </summary>
@@ -88,6 +86,8 @@ namespace Umbraco.Core.Persistence
             _databaseFactory = DatabaseFactory.Config(x => x
                 .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                 .WithFluentConfig(config)); // with proper configuration
+
+            _nonHttpInstance = new Lazy<UmbracoDatabase>(() => (UmbracoDatabase)_databaseFactory.GetDatabase());
         }
 
 	    private UmbracoDatabase CreateDatabaseInstance()
@@ -102,16 +102,7 @@ namespace Umbraco.Core.Persistence
 			// no http context, create the singleton global object
 			if (HttpContext.Current == null)
 			{
-			    if (_nonHttpInstance != null) // double-check... bah.
-                    return _nonHttpInstance;
-
-                lock (Locker)
-                {
-                    if (_nonHttpInstance == null) // double-check... bah.
-                        _nonHttpInstance = (UmbracoDatabase) _databaseFactory.GetDatabase();
-                }
-
-			    return _nonHttpInstance;
+			    return _nonHttpInstance.Value;
 			}
 
 			// we have an http context, so only create one per request
@@ -122,9 +113,9 @@ namespace Umbraco.Core.Persistence
 
 		protected override void DisposeResources()
 		{
-			if (HttpContext.Current == null)
+			if (HttpContext.Current == null && _nonHttpInstance.IsValueCreated)
 			{
-                _nonHttpInstance.Dispose();
+                _nonHttpInstance.Value.Dispose();
 			}
 			else
 			{
