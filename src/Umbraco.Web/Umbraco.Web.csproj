@@ -1103,9 +1103,9 @@
     <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>    
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
