@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, $cookies, localizationService, userService, externalLoginInfo, $timeout, $location) {
+    function ($scope, $cookies, localizationService, userService, externalLoginInfo, $timeout, $location, authResource) {
 
         var setFieldFocus = function(form, field) {
             $timeout(function() {
@@ -8,6 +8,9 @@
         }
 
         function resetInputValidation() {
+            $scope.confirmPassword = "";
+            $scope.password = "";
+            $scope.login = "";
             if ($scope.loginForm) {
                 $scope.loginForm.username.$setValidity('auth', true);
                 $scope.loginForm.password.$setValidity('auth', true);
@@ -79,7 +82,7 @@
         var userId = $location.search().userId;
         var resetCode = $location.search().resetCode;
         if (userId && resetCode) {
-            userService.validatePasswordResetCode(userId, resetCode)
+            authResource.performValidatePasswordResetCode(userId, resetCode)
                 .then(function () {
                     $scope.showSetPassword();
                 }, function () {
@@ -139,8 +142,10 @@
                 return;
             }
 
-            userService.requestPasswordReset(email)
+            authResource.performRequestPasswordReset(email)
                 .then(function () {
+                    //remove the email entered
+                    $scope.email = "";
                     $scope.showEmailResetConfirmation = true;
                 }, function (reason) {
                     $scope.errorMsg = reason.errorMsg;
@@ -167,11 +172,17 @@
                 return;
             }
 
-            userService.setPassword(userId, password, confirmPassword, resetCode)
+            authResource.performSetPassword(userId, password, confirmPassword, resetCode)
                 .then(function () {
                     $scope.showSetPasswordConfirmation = true;
+                    $scope.resetComplete = true;
                 }, function (reason) {
-                    $scope.errorMsg = reason.errorMsg;
+                    if (reason.data && reason.data.Message) {
+                        $scope.errorMsg = reason.data.Message;
+                    }
+                    else {
+                        $scope.errorMsg = reason.errorMsg;
+                    }
                     $scope.setPasswordForm.password.$setValidity("auth", false);
                     $scope.setPasswordForm.confirmPassword.$setValidity("auth", false);
                 });

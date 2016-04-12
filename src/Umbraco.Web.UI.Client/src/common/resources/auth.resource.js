@@ -79,7 +79,10 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     errorMsg: 'Email address cannot be empty'
                 });
             }
-
+            
+            //TODO: This validation shouldn't really be done here, the validation on the login dialog
+            // is pretty hacky which is why this is here, ideally validation on the login dialog would
+            // be done properly.
             var emailRegex = /\S+@\S+\.\S+/;
             if (!emailRegex.test(email)) {
                 return angularHelper.rejectedPromise({
@@ -140,7 +143,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                             userId: userId,
                             resetCode: resetCode
                         }),
-                'Password reset code validation failed for userId + ' + userId + ', code' + resetCode);
+                'Password reset code validation failed for userId ' + userId + ', code' + resetCode);
         },
 
         /**
@@ -201,7 +204,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                             password: password,
                             resetCode: resetCode
                         }),
-                'Password reset code validation failed for userId + ' + userId);
+                'Password reset code validation failed for userId ' + userId);
         },
 
         unlinkLogin: function (loginProvider, providerKey) {

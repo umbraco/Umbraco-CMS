@@ -61,7 +61,7 @@
 
             <div ng-show="view == 'request-password-reset'">
                 <p>
-                    <localize key="login_forgottenPasswordInstruction">Please enter your email address. If your account is located an email will be sent to you containing a link from which you can reset your password.</localize>
+                    <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
                 </p>
 
                 <form method="POST" name="requestPasswordResetForm" ng-submit="requestPasswordResetSubmit(email)">
@@ -75,7 +75,7 @@
                     
                     <div class="control-group" ng-show="showEmailResetConfirmation">
                         <div class="text-info">
-                            <localize key="login_requestPasswordResetConfirmation">If your email address has been matched an email with password reset instructions has been sent.</localize>
+                            <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
                         </div>
                     </div>
 
@@ -88,34 +88,35 @@
             </div>
 
             <div ng-show="view == 'set-password'">
-                <p>
+                
+                <p ng-hide="resetComplete">
                     <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
                 </p>
 
                 <form method="POST" name="setPasswordForm" ng-submit="setPasswordSubmit(password, confirmPassword)">
 
-                    <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
-                        <input type="password" ng-model="password" name="password" class="input-xlarge" placeholder="@placeholders_password" />
+                    <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
+                        <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
                     </div>
 
-                    <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
+                    <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
                         <input type="password" ng-model="confirmPassword" name="confirmPassword" class="input-xlarge" localize="placeholder" placeholder="@placeholders_confirmPassword" />
                     </div>
                     
-                    <div class="control-group" ng-show="setPasswordForm.$invalid">
+                    <div ng-hide="resetComplete" class="control-group" ng-show="setPasswordForm.$invalid">
                         <div class="text-error">{{errorMsg}}</div>
                     </div>
 
-                    <p class="control-group" ng-show="showSetPasswordConfirmation">
+                    <div class="control-group" ng-show="showSetPasswordConfirmation">
                         <div class="text-info">
                             <localize key="login_setPasswordConfirmation">Your new password has been set and you may now use it to log in.</localize>
                         </div>                        
-                    </p>
+                    </div>
 
-                    <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
+                    <button ng-hide="resetComplete" type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
 
                     <div class="switch-view">
-                        <a href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
+                        <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                     </div>
                 </form>
             </div>
@@ -125,7 +126,7 @@
                     <localize key="login_resetCodeExpired">The link you have clicked on is invalid or has expired.</localize>
                 </div>
                 <div class="switch-view">
-                    <a href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
+                    <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                 </div>
             </div>
         </div>

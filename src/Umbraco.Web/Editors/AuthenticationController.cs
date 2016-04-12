@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
                     var callbackUrl = ConstuctCallbackUrl(http.Request.Url, identityUser.Id, code);
-                    var message = ConstructPasswordResetEmailMessage(user, callbackUrl);
+                    var message = Services.TextService.Localize("resetPasswordEmailCopyFormat", new[] {identityUser.UserName, callbackUrl});                        
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject"), 
                         message);
@@ -259,18 +259,7 @@ namespace Umbraco.Web.Editors
                 url.Host + (url.Port == 80 ? string.Empty : ":" + url.Port),
                 userId,
                 HttpUtility.UrlEncode(code));
-        }
-
-        private string ConstructPasswordResetEmailMessage(IUser user, string callbackUrl)
-        {
-            var emailCopy1 = Services.TextService.Localize("login/resetPasswordEmailCopyFormat1");
-            var emailCopy2 = Services.TextService.Localize("login/resetPasswordEmailCopyFormat2");
-            var message = string.Format("<p>" + emailCopy1 + "</p>\n\n" +
-                                        "<p>" + emailCopy2 + "</p>",
-                user.Username,
-                callbackUrl);
-            return message;
-        }
+        }      
 
         /// <summary>
         /// Processes a password reset request.  Looks for a match on the provided email address
@@ -307,7 +296,8 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            return Request.CreateValidationErrorResponse("Set password failed");
+            return Request.CreateValidationErrorResponse(
+                result.Errors.Any() ? result.Errors.First() : "Set password failed");
         }
 
         private HttpContextBase EnsureHttpContext()

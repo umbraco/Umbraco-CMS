@@ -211,39 +211,7 @@ angular.module('umbraco.services')
                         return result;
                     });
             },
-
-            /** Returns a promise, sends a request to the server to send a password reset email if the email is recognised  */
-            requestPasswordReset: function (email) {
-
-                return authResource.performRequestPasswordReset(email)
-                    .then(function (data) {
-                        // Note that we don't actually confirm if the email address was matched or not, to avoid
-                        // allowing an attacker to determine which email addresses are valid.
-                        var result = { success: true };
-                        return result;
-                    });
-            },
-
-            /** Returns a promise, sends a request to the server to validate a password reset code */
-            validatePasswordResetCode: function (userId, resetCode) {
-
-                return authResource.performValidatePasswordResetCode(userId, resetCode)
-                    .then(function (data) {
-                        var result = { success: data };
-                        return result;
-                    });
-            },
-
-            /** Returns a promise, sends a request to the server to validate a password reset code */
-            setPassword: function (userId, password, confirmPassword, resetCode) {
-
-                return authResource.performSetPassword(userId, password, confirmPassword, resetCode)
-                    .then(function (data) {
-                        var result = { success: data };
-                        return result;
-                    });
-            },
-
+          
             /** Logs the user out 
              */
             logout: function () {

@@ -664,12 +664,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
     <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
     <key alias="returnToLogin">Return to login form</key>
-    <key alias="setPasswordInstruction">Please provide a new password.</key>
-    <key alias="setPasswordConfirmation">Your new password has been set and you may now use it to log in.</key>
-    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired.</key>
+    <key alias="setPasswordInstruction">Please provide a new password</key>
+    <key alias="setPasswordConfirmation">Your new password has been set and you may now use it to log in</key>
+    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
-    <key alias="resetPasswordEmailCopyFormat1">Your username to login to the Umbraco back-office is: {0}</key>
-    <key alias="resetPasswordEmailCopyFormat2"><![CDATA[<Please reset your password by clicking <a href="{1}">here</a>. ]]></key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+    </key>    
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
