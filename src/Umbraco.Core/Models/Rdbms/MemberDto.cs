@@ -1,10 +1,11 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsMember")]
-    [PrimaryKey("nodeId", autoIncrement = false)]
+    [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class MemberDto
     {
@@ -30,6 +31,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Password { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public ContentVersionDto ContentVersionDto { get; set; }
     }
 }

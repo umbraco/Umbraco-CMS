@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -32,19 +33,19 @@ namespace Umbraco.Web.Strategies.Migrations
             var target = new Version(6, 0, 0);
             if (e.ConfiguredVersion < target)
             {
-                var sql = new Sql();
-                sql.Select("*")
-                    .From<DocumentDto>(_sqlSyntax)
-                    .InnerJoin<ContentVersionDto>(_sqlSyntax)
-                    .On<DocumentDto, ContentVersionDto>(_sqlSyntax, left => left.VersionId, right => right.VersionId)
-                    .InnerJoin<ContentDto>(_sqlSyntax)
-                    .On<ContentVersionDto, ContentDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<NodeDto>(_sqlSyntax)
-                    .On<ContentDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(_sqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
-                    .Where<NodeDto>(_sqlSyntax, x => x.Path.StartsWith("-1"));
+                var sql = Sql.BuilderFor(new SqlContext(_sqlSyntax, e.MigrationContext.Database))
+                    .SelectAll()
+                    .From<DocumentDto>()
+                    .InnerJoin<ContentVersionDto>()
+                    .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                    .InnerJoin<ContentDto>()
+                    .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<NodeDto>()
+                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<NodeDto>(x => x.Path.StartsWith("-1"));
 
-                var dtos = e.MigrationContext.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                var dtos = e.MigrationContext.Database.Fetch<DocumentDto>(sql);
                 var toUpdate = new List<DocumentDto>();
                 var versionGroup = dtos.GroupBy(x => x.NodeId);
                 foreach (var grp in versionGroup)

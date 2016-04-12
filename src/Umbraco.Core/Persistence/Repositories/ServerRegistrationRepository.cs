@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,7 +15,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
+    internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         private readonly ICacheProvider _staticCache;
 
@@ -59,11 +60,17 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method");
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ServerRegistrationDto>(SqlSyntax);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<ServerRegistrationDto>();
+
+            sql
+               .From<ServerRegistrationDto>();
+
             return sql;
         }
 

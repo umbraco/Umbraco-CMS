@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -66,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentTypeDto>(sql);
 
             return
                 //This returns a lookup from the GetAll cached looup
@@ -90,14 +91,21 @@ namespace Umbraco.Core.Persistence.Repositories
                 : Enumerable.Empty<IMediaType>();
         }       
         
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<ContentTypeDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<ContentTypeDto>(r =>
+                        r.Select<NodeDto>());
+
+            sql
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>( left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 

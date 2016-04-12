@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     //TODO: We need to get a readonly ISO code for the domain assigned
 
-    internal class DomainRepository : PetaPocoRepositoryBase<int, IDomain>, IDomainRepository
+    internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
         public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -57,19 +58,19 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method");
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)").From<DomainDto>(SqlSyntax);
+                sql.SelectCount().From<DomainDto>();
             }
             else
             {
                 sql.Select("umbracoDomains.*, umbracoLanguage.languageISOCode")
-                    .From<DomainDto>(SqlSyntax)
-                    .LeftJoin<LanguageDto>(SqlSyntax)
-                    .On<DomainDto, LanguageDto>(SqlSyntax, dto => dto.DefaultLanguage, dto => dto.Id);
+                    .From<DomainDto>()
+                    .LeftJoin<LanguageDto>()
+                    .On<DomainDto, LanguageDto>(dto => dto.DefaultLanguage, dto => dto.Id);
             }
             
             return sql;

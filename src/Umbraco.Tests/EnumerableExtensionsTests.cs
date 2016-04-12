@@ -156,6 +156,15 @@ namespace Umbraco.Tests
             CollectionAssert.AreEquivalent(integers, flattened);
         }
 
+        [Test]
+        public void InGroupsOf_CanRepeat()
+        {
+            var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+            var inGroupsOf = integers.InGroupsOf(2);
+            Assert.AreEqual(5, inGroupsOf.Count());
+            Assert.AreEqual(5, inGroupsOf.Count()); // again
+        }
+
         [TestCase]
         public void DistinctBy_ReturnsDistinctElements_AndResetsIteratorCorrectly()
         {

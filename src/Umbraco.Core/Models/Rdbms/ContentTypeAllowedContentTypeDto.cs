@@ -1,10 +1,11 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsContentTypeAllowedContentType")]
-    [PrimaryKey("Id", autoIncrement = false)]
+    [PrimaryKey("Id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentTypeAllowedContentTypeDto
     {
@@ -22,6 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int SortOrder { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne)]
         public ContentTypeDto ContentTypeDto { get; set; }
     }
 }

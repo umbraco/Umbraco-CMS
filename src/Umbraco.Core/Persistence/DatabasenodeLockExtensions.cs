@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence
         {
             if (database == null)
                 throw new ArgumentNullException("database");
-            if (database.CurrentTransactionIsolationLevel < IsolationLevel.RepeatableRead)
+            if (database.GetCurrentTransactionIsolationLevel() < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
         }
 

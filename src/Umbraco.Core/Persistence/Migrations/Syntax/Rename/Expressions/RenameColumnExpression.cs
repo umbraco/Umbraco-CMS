@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {

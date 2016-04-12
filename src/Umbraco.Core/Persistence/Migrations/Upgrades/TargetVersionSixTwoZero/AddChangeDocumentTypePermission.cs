@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 if (adminUserType.DefaultPermissions.Contains("7") == false)
                 {
                     adminUserType.DefaultPermissions = adminUserType.DefaultPermissions + "7";
-                    database.Save(adminUserType);
+                    database.Save<UserTypeDto>(adminUserType);
                 }
             }
 
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 if (adminUserType.DefaultPermissions.Contains("7"))
                 {
                     adminUserType.DefaultPermissions = adminUserType.DefaultPermissions.Replace("7", "");
-                    database.Save(adminUserType);
+                    database.Save<UserTypeDto>(adminUserType);
                 }
             }
 

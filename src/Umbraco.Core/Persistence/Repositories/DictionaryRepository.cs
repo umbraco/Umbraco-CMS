@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -10,7 +11,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DictionaryItem"/>
     /// </summary>
-    internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
+    internal class DictionaryRepository : NPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
         private readonly IMappingResolver _mappingResolver;
 
@@ -51,9 +51,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
-                .OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
+                .OrderBy<DictionaryDto>(x => x.UniqueId);
 
-            var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
+            var dto = Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .FirstOrDefault();
+
             if (dto == null)
                 return null;
             
@@ -74,8 +77,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("cmsDictionary.pk in (@ids)", new { ids = ids });
             }
 
-            return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
-                    .Select(dto => ConvertFromDto(dto));
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(dto => ConvertFromDto(dto));
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetByQuery(IQuery<IDictionaryItem> query)
@@ -83,30 +87,31 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
-            sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
             
-            return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(x => ConvertFromDto(x));
         }
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,DictionaryItem>
+        #region Overrides of NPocoRepositoryBase<int,DictionaryItem>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)")
-                    .From<DictionaryDto>(SqlSyntax);
+                sql.SelectCount()
+                    .From<DictionaryDto>();
             }
             else
             {
-                sql.Select("*")
-                   .From<DictionaryDto>(SqlSyntax)
-                   .LeftJoin<LanguageTextDto>(SqlSyntax)
-                   .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId);
+                sql.SelectAll()
+                   .From<DictionaryDto>()
+                   .LeftJoin<LanguageTextDto>()
+                   .On<DictionaryDto, LanguageTextDto>(left => left.UniqueId, right => right.UniqueId);
             }
             return sql;
         }
@@ -226,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var entity = factory.BuildEntity(dto);
 
             var list = new List<IDictionaryTranslation>();
-            foreach (var textDto in dto.LanguageTextDtos)
+            foreach (var textDto in dto.LanguageTextDtos.EmptyNull())
             {                
                 if (textDto.LanguageId <= 0)
                     continue;
@@ -273,15 +278,16 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select(@group =>
                     {
                         var sqlClause = GetBaseQuery(false)
-                            .Where<DictionaryDto>(SqlSyntax, x => x.Parent != null)
+                            .Where<DictionaryDto>(x => x.Parent != null)
                             .Where(string.Format("{0} IN (@parentIds)", SqlSyntax.GetQuotedColumnName("parent")), new { parentIds = @group });
 
                         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query);
                         var sql = translator.Translate();
-                        sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
+                        sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
-                        return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
-                            .Select(x => ConvertFromDto(x));
+                        return Database
+                            .FetchOneToMany<DictionaryDto>(x=> x.LanguageTextDtos, sql)
+                            .Select(ConvertFromDto);
                     });
             };
 
@@ -305,10 +311,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
-                return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
+                return Database
+                    .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _dictionaryRepository.GetBaseQuery(isCount);
             }
@@ -362,10 +369,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql)
             {
-                return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
+                return Database
+                    .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql);
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _dictionaryRepository.GetBaseQuery(isCount);
             }

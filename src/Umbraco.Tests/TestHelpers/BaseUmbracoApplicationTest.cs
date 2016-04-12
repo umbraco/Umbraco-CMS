@@ -193,9 +193,14 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual void SetupCacheHelper()
+        private void SetupCacheHelper()
         {
-            CacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            CacheHelper = CreateCacheHelper();
+        }
+
+        protected virtual CacheHelper CreateCacheHelper()
+        {
+            return CacheHelper.CreateDisabledCacheHelper();
         }
 
         /// <summary>
@@ -211,7 +216,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(
                     Container.GetInstance<RepositoryFactory>(), 
-                    new PetaPocoUnitOfWorkProvider(Logger), 
+                    new NPocoUnitOfWorkProvider(Logger), 
                     new FileUnitOfWorkProvider(),
                     new PublishingStrategy(evtMsgs, Logger), 
                     CacheHelper, 
@@ -241,7 +246,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("Umbraco.Core"),
                         Assembly.Load("umbraco"),
                         Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("businesslogic"),
                         Assembly.Load("cms"),
                         Assembly.Load("controls"),
                     }

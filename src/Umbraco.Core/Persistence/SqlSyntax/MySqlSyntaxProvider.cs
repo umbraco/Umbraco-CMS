@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -390,7 +391,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
 
         public override string EscapeString(string val)
         {
-            return PetaPocoExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
+            return NPocoDatabaseExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
         }
     }
 }

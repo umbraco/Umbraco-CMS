@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Private class to handle preview insert/update based on standard principles and units of work with transactions
     /// </summary>
-    internal class ContentPreviewRepository<TContent> : PetaPocoRepositoryBase<int, ContentPreviewEntity<TContent>> 
+    internal class ContentPreviewRepository<TContent> : NPocoRepositoryBase<int, ContentPreviewEntity<TContent>> 
         where TContent : IContentBase
     {
         public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotImplementedException();
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             throw new NotImplementedException();
         }

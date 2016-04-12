@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 

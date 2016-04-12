@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
     public class ConnectionRetryTest
     {
         [Test]
-        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_With_Invalid_User()
+        public void Cant_Connect_To_SqlDatabase_With_Invalid_User()
         {
             // Arrange
             const string providerName = "System.Data.SqlClient";
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         }
 
         [Test]
-        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_Because_Of_Network()
+        public void Cant_Connect_To_SqlDatabase_Because_Of_Network()
         {
             // Arrange
             const string providerName = "System.Data.SqlClient";

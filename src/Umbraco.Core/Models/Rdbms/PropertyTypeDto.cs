@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -52,6 +53,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Description { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
         public DataTypeDto DataTypeDto { get; set; }
 
         [Column("UniqueID")]

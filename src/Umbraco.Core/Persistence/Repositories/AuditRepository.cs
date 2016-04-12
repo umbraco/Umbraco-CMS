@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -11,7 +12,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class AuditRepository : PetaPocoRepositoryBase<int, AuditItem>, IAuditRepository
+    internal class AuditRepository : NPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
         public AuditRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -63,11 +64,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(x => new AuditItem(x.NodeId, x.Comment, Enum<AuditType>.Parse(x.Header), x.UserId)).ToArray();
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<LogDto>(SqlSyntax);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<LogDto>();
+
+            sql
+                .From<LogDto>();
+
             return sql;
         }
 

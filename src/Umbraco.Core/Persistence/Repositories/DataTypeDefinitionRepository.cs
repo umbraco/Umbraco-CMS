@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DataTypeDefinition"/>
     /// </summary>
-    internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
+    internal class DataTypeDefinitionRepository : NPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
@@ -56,10 +57,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
+            var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
             return dtos.Select(factory.BuildEntity).ToArray();
         }
 
@@ -71,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DataTypeDto>(sql);
 
             return dtos.Select(factory.BuildEntity).ToArray();
         }
@@ -111,16 +112,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,DataTypeDefinition>
+        #region Overrides of NPocoRepositoryBase<int,DataTypeDefinition>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DataTypeDto>(SqlSyntax)
-               .InnerJoin<NodeDto>(SqlSyntax)
-               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<DataTypeDto>(r =>
+                        r.Select<NodeDto>());
+
+            sql
+               .From<DataTypeDto>()
+               .InnerJoin<NodeDto>()
+               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -175,7 +182,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -275,8 +282,8 @@ AND umbracoNode.id <> @id",
 
         #endregion
 
-      
-        
+
+
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
             var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
@@ -387,10 +394,11 @@ AND umbracoNode.id <> @id",
             if (dataType.HasIdentity)
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
-                var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>(SqlSyntax)
-                                   .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
+                var sql = Sql()
+                    .SelectAll()
+                    .From<DataTypePreValueDto>()
+                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
+                    .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -477,12 +485,12 @@ AND umbracoNode.id <> @id",
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-         
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
@@ -520,7 +528,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Private class to handle pre-value crud based on standard principles and units of work with transactions
         /// </summary>
-        private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
+        private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
             public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
                 : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -543,7 +551,7 @@ AND umbracoNode.id <> @id",
                 throw new NotImplementedException();
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 throw new NotImplementedException();
             }
@@ -579,7 +587,7 @@ AND umbracoNode.id <> @id",
                 }
 
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
-                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -599,10 +607,10 @@ AND umbracoNode.id <> @id",
                 {
                     throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
                 }
-                
+
                 //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
                 // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
-                // there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // there is no need to check the uniqueness of this alias because the only way that this code executes is
                 // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
                 // must have unique aliases by definition, so there is no need for this additional check
 
@@ -617,7 +625,7 @@ AND umbracoNode.id <> @id",
                 Database.Update(dto);
             }
 
-            
+
         }
 
         internal static class PreValueConverter

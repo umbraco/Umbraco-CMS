@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -121,7 +122,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public virtual string EscapeString(string val)
         {
-            return PetaPocoExtensions.EscapeAtSymbols(val.Replace("'", "''"));
+            return NPocoDatabaseExtensions.EscapeAtSymbols(val.Replace("'", "''"));
         }
 
         public virtual string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType)

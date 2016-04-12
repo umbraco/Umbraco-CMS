@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -8,9 +9,9 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     internal class SqlTranslator<T>
     {
-        private readonly Sql _sql;
+        private readonly Sql<SqlContext> _sql;
 
-        public SqlTranslator(Sql sql, IQuery<T> query)
+        public SqlTranslator(Sql<SqlContext> sql, IQuery<T> query)
         {
             if (sql == null)
                 throw new Exception("Sql cannot be null");
@@ -22,7 +23,7 @@ namespace Umbraco.Core.Persistence.Querying
             }
         }
 
-        public Sql Translate()
+        public Sql<SqlContext> Translate()
         {
             return _sql;
         }

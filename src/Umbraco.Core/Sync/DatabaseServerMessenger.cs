@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -244,10 +245,10 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
-            var sql = new Sql().Select("*")
-                .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
-                .Where<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id > _lastId)
-                .OrderBy<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id);
+            var sql = _appContext.DatabaseContext.Sql().SelectAll()
+                .From<CacheInstructionDto>()
+                .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
+                .OrderBy<CacheInstructionDto>(dto => dto.Id);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
             if (dtos.Count <= 0) return;
@@ -348,9 +349,9 @@ namespace Umbraco.Core.Sync
         /// and it should instead cold-boot.</remarks>
         private void EnsureInstructions()
         {
-            var sql = new Sql().Select("*")
-                .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
-                .Where<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id == _lastId);
+            var sql = _appContext.DatabaseContext.Sql().SelectAll()
+                .From<CacheInstructionDto>()
+                .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
 

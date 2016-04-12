@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -28,12 +29,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 Constants.ObjectTypes.MemberTypeGuid,
             };
 
-            var sql = new Sql()
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Context.Database))
                 .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax)
-                .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                .WhereIn<NodeDto>(SqlSyntax, x => x.NodeObjectType, objectTypes);
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>()
+                .On<NodeDto, ContentTypeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
             var rows = Context.Database.Fetch<dynamic>(sql);
 

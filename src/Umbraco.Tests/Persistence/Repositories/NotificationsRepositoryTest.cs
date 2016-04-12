@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CreateNotification()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetUserNotifications()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetEntityNotifications()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
             
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_Entity()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_User()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork, SqlSyntax);
 

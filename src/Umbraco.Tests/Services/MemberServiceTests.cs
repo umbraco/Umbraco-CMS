@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
@@ -1017,12 +1018,12 @@ namespace Umbraco.Tests.Services
                 result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
             //now ensure the col is correct
-            var sql = new Sql().Select("cmsPropertyData.*")
-                .From<PropertyDataDto>(SqlSyntax)
-                .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
-                .Where<PropertyDataDto>(SqlSyntax, dto => dto.NodeId == member.Id)
-                .Where<PropertyTypeDto>(SqlSyntax, dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database)).Select("cmsPropertyData.*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
+                .Where<PropertyDataDto>(dto => dto.NodeId == member.Id)
+                .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
             
             var colResult = DatabaseContext.Database.Fetch<PropertyDataDto>(sql);
 
@@ -1056,7 +1057,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
 
             using (var uow = provider.GetUnitOfWork())
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute
 {

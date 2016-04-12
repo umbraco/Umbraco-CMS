@@ -1,10 +1,11 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoUser2NodeNotify")]
-    [PrimaryKey("userId", autoIncrement = false)]
+    [PrimaryKey("userId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class User2NodeNotifyDto
     {

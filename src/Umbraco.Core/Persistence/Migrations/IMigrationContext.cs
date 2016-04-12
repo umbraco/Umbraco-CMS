@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations

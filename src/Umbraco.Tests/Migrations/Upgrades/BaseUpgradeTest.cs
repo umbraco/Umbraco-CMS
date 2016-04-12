@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
@@ -58,7 +59,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             var logger = Mock.Of<ILogger>();
-            var sqlHelper = Mock.Of<ISqlSyntaxProvider>();
             var sql = GetSyntaxProvider();
 
             //Setup the MigrationRunner
@@ -83,11 +83,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 new UpdateCmsContentVersionTable(sql, logger),
                 new UpdateCmsPropertyTypeGroupTable(sql, logger));
 
-            bool upgraded = migrationRunner.Execute(db, provider, sqlHelper, true);
+            bool upgraded = migrationRunner.Execute(db, provider, sql, true);
 
             Assert.That(upgraded, Is.True);
 
-            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sqlHelper);
+            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sql);
 
             bool hasTabTable = schemaHelper.TableExist("cmsTab");
             bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");

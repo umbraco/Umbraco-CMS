@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using log4net;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -11,7 +12,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     expires: true));
             }
         }
-        
+
         protected override IMemberType PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all content types
@@ -56,11 +56,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
+            sql.OrderByDescending<NodeDto>(x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
+                .Transform(MapOneToManies)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
@@ -71,57 +72,89 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMemberType>(sqlSubquery, query);
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
+                .OrderBy<NodeDto>(x => x.SortOrder);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .Fetch<MemberTypeReadOnlyDto>(sql) // cannot use FetchOneToMany because we have 2 collections!
+                .Transform(MapOneToManies)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
-        
-        protected override Sql GetBaseQuery(bool isCount)
-        {
-            var sql = new Sql();
 
-            if (isCount)
+        private IEnumerable<MemberTypeReadOnlyDto> MapOneToManies(IEnumerable<MemberTypeReadOnlyDto> dtos)
+        {
+            MemberTypeReadOnlyDto acc = null;
+            foreach (var dto in dtos)
             {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
-                return sql;
+                if (acc == null)
+                {
+                    acc = dto;
+                }
+                else if (acc.UniqueId == dto.UniqueId)
+                {
+                    var prop = dto.PropertyTypes.SingleOrDefault();
+                    var group = dto.PropertyTypeGroups.SingleOrDefault();
+
+                    if (prop != null && prop.Id.HasValue && acc.PropertyTypes.Any(x => x.Id == prop.Id.Value) == false)
+                        acc.PropertyTypes.Add(prop);
+
+                    if (group != null && group.Id.HasValue && acc.PropertyTypeGroups.Any(x => x.Id == group.Id.Value) == false)
+                        acc.PropertyTypeGroups.Add(group);
+                }
+                else
+                {
+                    yield return acc;
+                    acc = dto;
+                }
             }
 
-            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
-                "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
-                "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
-                "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
-                "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
-                "cmsPropertyTypeGroup.text AS PropertyGroupName",
-                "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            if (acc != null)
+                yield return acc;
+        }
+
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        {
+            if (isCount)
+            {
+                return Sql()
+                    .SelectCount()
+                    .From<NodeDto>()
+                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            }
+
+            var sql = Sql()
+                .Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
+                    "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
+                    "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
+                    "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
+                    "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
+                    "cmsPropertyTypeGroup.text AS PropertyGroupName",
+                    "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
-        protected Sql GetSubquery()
+        protected Sql<SqlContext> GetSubquery()
         {
-            var sql = new Sql()
+            var sql = Sql()
                 .Select("DISTINCT(umbracoNode.id)")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, NodeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId)
-                .LeftJoin<MemberTypeDto>(SqlSyntax).On<MemberTypeDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyTypeGroupDto>(SqlSyntax).On<PropertyTypeGroupDto, NodeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
+                .LeftJoin<MemberTypeDto>().On<MemberTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyTypeGroupDto>().On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -154,13 +187,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MemberType); }
         }
-        
+
         protected override void PersistNewItem(IMemberType entity)
         {
             ValidateAlias(entity);
 
             ((MemberType)entity).AddingEntity();
-            
+
             //set a default icon if one is not specified
             if (entity.Icon.IsNullOrWhiteSpace())
             {
@@ -225,7 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-        
+
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>
@@ -311,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// If this is one of our internal properties - we will manually assign the data type since they must 
+        /// If this is one of our internal properties - we will manually assign the data type since they must
         /// always correspond to the correct db type no matter what the backing data type is assigned.
         /// </summary>
         /// <param name="propAlias"></param>
@@ -338,7 +371,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="propAlias"></param>
         /// <param name="propertyEditor"></param>

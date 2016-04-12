@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -16,7 +17,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <remarks>Exposes shared functionality</remarks>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
+    internal abstract class ContentTypeBaseRepository<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
@@ -92,24 +92,21 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
         {
-            var sqlClause = new Sql();
-            sqlClause.Select("*")
-               .From<PropertyTypeGroupDto>(SqlSyntax)
-               .RightJoin<PropertyTypeDto>(SqlSyntax)
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId);
+            var sqlClause = Sql()
+                .SelectAll()
+                .From<PropertyTypeGroupDto>()
+                .RightJoin<PropertyTypeDto>()
+                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
-
-            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeNodeId))
-            {
-                yield return dto.ContentTypeNodeId;
-            }
+            return Database
+                .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
+                .Select(x => x.ContentTypeNodeId).Distinct();
         }
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
@@ -145,7 +142,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -272,15 +269,15 @@ AND umbracoNode.id <> @id",
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
                 //Find Content based on the current ContentType
-                var sql = new Sql();
-                sql.Select("*")
-                   .From<ContentDto>(SqlSyntax)
-                   .InnerJoin<NodeDto>(SqlSyntax)
-                   .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                   .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
-                   .Where<ContentDto>(SqlSyntax, x => x.ContentTypeId == entity.Id);
+                var sql = Sql()
+                    .SelectAll()
+                    .From<ContentDto>()
+                    .InnerJoin<NodeDto>()
+                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
 
-                var contentDtos = Database.Fetch<ContentDto, NodeDto>(sql);
+                var contentDtos = Database.Fetch<ContentDto>(sql);
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
@@ -294,13 +291,13 @@ AND umbracoNode.id <> @id",
                         {
                             var nodeId = contentDto.NodeId;
                             var propertyTypeId = propertyType.Id;
-                            var propertySql = new Sql().Select("cmsPropertyData.id")
-                                                       .From<PropertyDataDto>(SqlSyntax)
-                                                       .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                                                       .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, 
-                                                           left => left.PropertyTypeId, right => right.Id)
-                                                       .Where<PropertyDataDto>(SqlSyntax, x => x.NodeId == nodeId)
-                                                       .Where<PropertyTypeDto>(SqlSyntax, x => x.Id == propertyTypeId);
+                            var propertySql = Sql()
+                                .Select("cmsPropertyData.id")
+                                .From<PropertyDataDto>()
+                                .InnerJoin<PropertyTypeDto>()
+                                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                                .Where<PropertyDataDto>(x => x.NodeId == nodeId)
+                                .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
 
                             //Finally delete the properties that match our criteria for removing a ContentType from the composition
                             Database.Delete<PropertyDataDto>(new Sql("WHERE id IN (" + propertySql.SQL + ")", propertySql.Arguments));
@@ -424,30 +421,32 @@ AND umbracoNode.id <> @id",
 
         protected IEnumerable<ContentTypeSort> GetAllowedContentTypeIds(int id)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<ContentTypeAllowedContentTypeDto>(SqlSyntax)
-               .LeftJoin<ContentTypeDto>(SqlSyntax)
-               .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(SqlSyntax, left => left.AllowedId, right => right.NodeId)
-               .Where<ContentTypeAllowedContentTypeDto>(SqlSyntax, x => x.Id == id);
+            var sql = Sql()
+                .SelectAll()
+                .From<ContentTypeAllowedContentTypeDto>()
+                .LeftJoin<ContentTypeDto>()
+                .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
+                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
-            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);
+            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql);
             return allowedContentTypeDtos.Select(x => new ContentTypeSort(new Lazy<int>(() => x.AllowedId), x.SortOrder, x.ContentTypeDto.Alias)).ToList();
         }
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id, DateTime createDate, DateTime updateDate)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<PropertyTypeGroupDto>(SqlSyntax)
-               .LeftJoin<PropertyTypeDto>(SqlSyntax)
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
-               .LeftJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeGroupDto>(SqlSyntax, x => x.ContentTypeNodeId == id)
-               .OrderBy<PropertyTypeGroupDto>(SqlSyntax, x => x.Id);
+            var sql = Sql()
+                .SelectAll()
+                .From<PropertyTypeGroupDto>()
+                .LeftJoin<PropertyTypeDto>()
+                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+                .LeftJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
+                .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
+
+            var dtos = Database
+                .Fetch<PropertyTypeGroupDto>(sql);
 
             var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
@@ -456,14 +455,14 @@ AND umbracoNode.id <> @id",
 
         protected PropertyTypeCollection GetPropertyTypeCollection(int id, DateTime createDate, DateTime updateDate)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<PropertyTypeDto>(SqlSyntax)
-               .InnerJoin<DataTypeDto>(SqlSyntax)
-               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(SqlSyntax, x => x.ContentTypeId == id);
+            var sql = Sql()
+                .SelectAll()
+                .From<PropertyTypeDto>()
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
 
-            var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
+            var dtos = Database.Fetch<PropertyTypeDto>(sql);
 
             //TODO Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();
@@ -531,11 +530,11 @@ AND umbracoNode.id <> @id",
             //we cannot try to assign a data type of it's empty
             if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
-                var sql = new Sql()
-                    .Select("*")
-                    .From<DataTypeDto>(SqlSyntax)
+                var sql = Sql()
+                    .SelectAll()
+                    .From<DataTypeDto>()
                     .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
-                    .OrderBy<DataTypeDto>(SqlSyntax, typeDto => typeDto.DataTypeId);
+                    .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
                 var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
                 //we cannot assign a data type if one was not found
                 if (datatype != null)
@@ -849,7 +848,7 @@ AND umbracoNode.id <> @id",
                 return mediaType;
             }
 
-            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,                
+            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, List<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
