@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using NPoco;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Column;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Constraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.DefaultConstraint;
@@ -11,65 +12,65 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
     public class DeleteBuilder : IDeleteBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseProviders[] _databaseProviders;
+        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public DeleteBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
+        public DeleteBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
         {
             _context = context;
-            _databaseProviders = databaseProviders;
+            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         public void Table(string tableName)
         {
-            var expression = new DeleteTableExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax) { TableName = tableName };
+            var expression = new DeleteTableExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
             _context.Expressions.Add(expression);
         }
 
         public IDeleteColumnFromTableSyntax Column(string columnName)
         {
-            var expression = new DeleteColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax) {ColumnNames = {columnName}};
+            var expression = new DeleteColumnExpression(_context, _supportedDatabaseTypes) {ColumnNames = {columnName}};
             _context.Expressions.Add(expression);
             return new DeleteColumnBuilder(expression);
         }
 
         public IDeleteForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = new DeleteForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax);
+            var expression = new DeleteForeignKeyExpression(_context, _supportedDatabaseTypes);
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyBuilder(expression);
         }
 
         public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = new DeleteForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax) {ForeignKey = {Name = foreignKeyName}};
+            var expression = new DeleteForeignKeyExpression(_context, _supportedDatabaseTypes) {ForeignKey = {Name = foreignKeyName}};
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyBuilder(expression);
         }
 
         public IDeleteDataSyntax FromTable(string tableName)
         {
-            var expression = new DeleteDataExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax) { TableName = tableName };
+            var expression = new DeleteDataExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
             _context.Expressions.Add(expression);
             return new DeleteDataBuilder(expression);
         }
 
         public IDeleteIndexForTableSyntax Index()
         {
-            var expression = new DeleteIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax);
+            var expression = new DeleteIndexExpression(_context, _supportedDatabaseTypes);
             _context.Expressions.Add(expression);
             return new DeleteIndexBuilder(expression);
         }
 
         public IDeleteIndexForTableSyntax Index(string indexName)
         {
-            var expression = new DeleteIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax) { Index = { Name = indexName } };
+            var expression = new DeleteIndexExpression(_context, _supportedDatabaseTypes) { Index = { Name = indexName } };
             _context.Expressions.Add(expression);
             return new DeleteIndexBuilder(expression);
         }
 
         public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
         {
-            var expression = new DeleteConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax, ConstraintType.PrimaryKey)
+            var expression = new DeleteConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
             {
                 Constraint = { ConstraintName = primaryKeyName }
             };
@@ -79,7 +80,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
 
         public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
         {
-            var expression = new DeleteConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax, ConstraintType.Unique)
+            var expression = new DeleteConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.Unique)
             {
                 Constraint = { ConstraintName = constraintName }
             };
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
 
         public IDeleteDefaultConstraintOnTableSyntax DefaultConstraint()
         {
-            var expression = new DeleteDefaultConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _context.SqlSyntax);
+            var expression = new DeleteDefaultConstraintExpression(_context, _supportedDatabaseTypes);
             _context.Expressions.Add(expression);
             return new DeleteDefaultConstraintBuilder(expression);
         }

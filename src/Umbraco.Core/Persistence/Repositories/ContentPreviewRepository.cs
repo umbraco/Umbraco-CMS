@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentPreviewRepository<TContent> : NPocoRepositoryBase<int, ContentPreviewEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Data.Common;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using SQLCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -20,13 +23,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test, NUnit.Framework.Ignore]
         public override void Can_Upgrade_From_470_To_600()
         {
-            var sqlSyntax = Mock.Of<ISqlSyntaxProvider>();
             var configuredVersion = new SemVersion(4, 11, 0);
             var targetVersion = new SemVersion(6, 0, 0);
-            var provider = GetDatabaseProvider();
             var db = GetConfiguredDatabase();
 
-            var fix = new PublishAfterUpgradeToVersionSixth(sqlSyntax);
+            var fix = new PublishAfterUpgradeToVersionSixth(db.SqlSyntax);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
@@ -34,11 +35,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
 
-            bool upgraded = migrationRunner.Execute(db, provider, sqlSyntax, true);
+            bool upgraded = migrationRunner.Execute(db /*, true*/);
 
             Assert.That(upgraded, Is.True);
 
-            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sqlSyntax);
+            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>());
 
             bool hasTabTable = schemaHelper.TableExist("cmsTab");
             bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
@@ -61,19 +62,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
-        public override ISqlSyntaxProvider GetSyntaxProvider()
-        {
-            return new SqlCeSyntaxProvider();
-        }
-
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
-        }
-
-        public override DatabaseProviders GetDatabaseProvider()
-        {
-            return DatabaseProviders.SqlServerCE;
+            var databaseType = DatabaseType.SQLCe;
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()

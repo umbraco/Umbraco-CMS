@@ -1,44 +1,52 @@
 ﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
     /// <summary>
-    /// Represents a Unit of Work Provider for creating a <see cref="NPocoUnitOfWork"/>.
+    /// Represents a <see cref="IDatabaseUnitOfWork"/> provider that creates <see cref="NPocoUnitOfWork"/> instances.
     /// </summary>
     public class NPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
         private readonly IDatabaseFactory _dbFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with an <see cref="IDatabaseFactory"/>.
+        /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a database factory.
         /// </summary>
-        /// <param name="dbFactory"></param>
+        /// <param name="dbFactory">A database factory implementation.</param>
         public NPocoUnitOfWorkProvider(IDatabaseFactory dbFactory)
         {
-            Mandate.ParameterNotNull(dbFactory, "dbFactory");
+            Mandate.ParameterNotNull(dbFactory, nameof(dbFactory));
             _dbFactory = dbFactory;
         }
 
-        // for unit tests only
-        // will re-create a new DefaultDatabaseFactory each time it is called
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a logger.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
+        /// <remarks>
+        /// <para>FOR UNIT TESTS ONLY</para>
+        /// <para>Creates a new <see cref="IDatabaseFactory"/> each time it is called, by initializing a new
+        /// <see cref="DefaultDatabaseFactory"/> with the default connection name, and default sql syntax providers.</para>
+        /// </remarks>
         internal NPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger))
+            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, SqlSyntaxProviders.GetDefaultProviders(logger), logger))
         { }
 
-        #region Implementation of IUnitOfWorkProvider
+        #region Implement IUnitOfWorkProvider
 
         /// <summary>
         /// Creates a unit of work around a database obtained from the database factory.
         /// </summary>
         /// <returns>A unit of work.</returns>
-        /// <remarks>The unit of work will execute on the current database returned by the database factory.</remarks>
+        /// <remarks>The unit of work will execute on the database returned by the database factory.</remarks>
         public IDatabaseUnitOfWork GetUnitOfWork()
         {
             // get a database from the factory - might be the "ambient" database eg
             // the one that's enlisted with the HttpContext - so it's not always a
             // "new" database.
-            var database = _dbFactory.CreateDatabase();
+            var database = _dbFactory.GetDatabase();
             return new NPocoUnitOfWork(database);
         }
 

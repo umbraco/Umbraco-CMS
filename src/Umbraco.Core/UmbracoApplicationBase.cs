@@ -36,8 +36,9 @@ namespace Umbraco.Core
         /// </summary>
         protected UmbracoApplicationBase()
         {
-            //create the container for the application, the boot managers are responsible for registrations
-            Container = new ServiceContainer();         
+            // create the container for the application, the boot managers are responsible for registrations
+            Container = new ServiceContainer();
+            Container.EnableAnnotatedConstructorInjection();
         }
 
         public event EventHandler ApplicationStarting;

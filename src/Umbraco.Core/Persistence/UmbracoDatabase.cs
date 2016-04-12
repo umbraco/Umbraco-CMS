@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -18,14 +16,15 @@ namespace Umbraco.Core.Persistence
     /// <para>Is used everywhere in place of the original NPoco Database object, and provides additional features
     /// such as profiling, retry policies, logging, etc.</para>
     /// <para>Is never created directly but obtained from the <see cref="DefaultDatabaseFactory"/>.</para>
+    /// <para>It implements IDisposeOnRequestEnd which means it will be disposed when the request ends, which
+    /// automatically closes the connection - as implemented by NPoco Database.Dispose().</para>
     /// </remarks>
-    public class UmbracoDatabase : Database, IDisposeOnRequestEnd
+    public class UmbracoDatabase : Database, IDisposeOnRequestEnd, IUmbracoDatabaseConfig
     {
         // Umbraco's default isolation level is RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
         private readonly ILogger _logger;
-        private readonly Guid _instanceId = Guid.NewGuid();
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private bool _enableCount;
@@ -33,10 +32,9 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Used for testing
         /// </summary>
-        internal Guid InstanceId
-        {
-            get { return _instanceId; }
-        }
+        internal Guid InstanceId { get; } = Guid.NewGuid();
+
+        public ISqlSyntaxProvider SqlSyntax { get; }
 
         /// <summary>
         /// Generally used for testing, will output all SQL statements executed to the logger
@@ -68,29 +66,28 @@ namespace Umbraco.Core.Persistence
         // used by DefaultDatabaseFactory
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
-        public UmbracoDatabase(string connectionString, string providerName, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
-            : base(connectionString, providerName, DefaultIsolationLevel)
+        public UmbracoDatabase(string connectionString,
+            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, DbProviderFactory provider,
+            ILogger logger,
+            RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+            : base(connectionString, databaseType, provider, DefaultIsolationLevel)
         {
+            SqlSyntax = sqlSyntax;
             _logger = logger;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
             EnableSqlTrace = false;
         }
 
-        // used by DefaultDatabaseFactory
-        // creates one instance per request
-        public UmbracoDatabase(string connectionStringName, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
-            : base(connectionStringName, DefaultIsolationLevel)
+        // fixme: that could be an extension method of IUmbracoDatabaseConfig
+        public Sql<SqlContext> Sql()
         {
-            _logger = logger;
-            _connectionRetryPolicy = connectionRetryPolicy;
-            _commandRetryPolicy = commandRetryPolicy;
-            EnableSqlTrace = false;
+            return NPoco.Sql.BuilderFor(new SqlContext(this));
         }
 
         protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
-            if (connection == null) throw new ArgumentNullException("connection");
+            if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             // wrap the connection with a profiling connection that tracks timings
             connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
@@ -129,11 +126,6 @@ namespace Umbraco.Core.Persistence
                 SqlCount++;
             }
             base.OnExecutedCommand(cmd);
-        }
-
-        public IEnumerable<TResult> FetchByGroups<TResult, TSource>(IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<SqlContext>> sqlFactory)
-        {
-            return source.SelectByGroups(x => Fetch<TResult>(sqlFactory(x)), groupSize);
         }
     }
 }

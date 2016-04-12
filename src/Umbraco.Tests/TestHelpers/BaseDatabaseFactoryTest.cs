@@ -87,15 +87,18 @@ namespace Umbraco.Tests.TestHelpers
 
         protected override void SetupApplicationContext()
         {
+            var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
+
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
+                sqlSyntaxProviders,
                 Logger);
 
             var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(dbFactory, Logger),
                 //assign the service context
                 new ServiceContext(
                         Container.GetInstance<RepositoryFactory>(),
@@ -118,7 +121,6 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                _appContext.DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
@@ -141,7 +143,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual string GetDbProviderName()
         {
-            return "System.Data.SqlServerCe.4.0";
+            return Constants.DbProviderNames.SqlCe;
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace Umbraco.Tests.TestHelpers
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
 
-                var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax);
+                var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger);
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(_appContext);
 
@@ -391,7 +393,7 @@ namespace Umbraco.Tests.TestHelpers
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-            
+
             return factory;
         }
 

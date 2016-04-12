@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
+    [SqlSyntaxProviderAttribute(Constants.DbProviderNames.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;

@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 repo.AddOrUpdate(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
                 unitOfWork.Commit();

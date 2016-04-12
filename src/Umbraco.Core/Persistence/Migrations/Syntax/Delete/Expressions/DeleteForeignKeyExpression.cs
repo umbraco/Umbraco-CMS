@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Logging;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
-
-
-        public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public DeleteForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {   
             ForeignKey = new ForeignKeyDefinition();
         }
@@ -26,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             if (ForeignKey.ForeignTable == null)
                 throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
 
-            if (CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (CurrentDatabaseType.IsMySql())
             {
                 //MySql naming "convention" for foreignkeys, which aren't explicitly named                
                 if (string.IsNullOrEmpty(ForeignKey.Name))

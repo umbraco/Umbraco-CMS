@@ -12,10 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
-        public UpdateToNewMemberPropertyAliases(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
+        public UpdateToNewMemberPropertyAliases(ILogger logger) 
+            : base(logger)
+        { }
 
         public override void Up()
         {

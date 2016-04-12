@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
 {
@@ -10,20 +9,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
     {
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
         
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public InsertDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public string SchemaName { get; set; }
         public string TableName { get; set; }
         public bool EnabledIdentityInsert { get; set; }
 
-        public List<InsertionDataDefinition> Rows
-        {
-            get { return _rows; }
-        }
-        
+        public List<InsertionDataDefinition> Rows => _rows;
+
         public override string ToString()
         {
             if (IsExpressionSupported() == false)
@@ -34,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
             {
                 sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} ON;", SqlSyntax.GetQuotedTableName(TableName)));
-                if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                if (CurrentDatabaseType.IsSqlServerOrCe())
                 {
                     sb.AppendLine("GO");
                 }
@@ -60,7 +55,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                                   cols, vals);
 
                     sb.AppendLine(string.Format("{0};", sql));
-                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                    if (CurrentDatabaseType.IsSqlServerOrCe())
                     {
                         sb.AppendLine("GO");
                     }
@@ -71,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
                 {
                     sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
-                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                    if (CurrentDatabaseType.IsSqlServerOrCe())
                     {
                         sb.AppendLine("GO");
                     }

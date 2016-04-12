@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             unitOfWork.Database.EnableSqlTrace = true;
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             unitOfWork.Database.EnableSqlTrace = true;
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {                
                 var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
             {
                 var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -273,10 +273,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, MappingResolver);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
 

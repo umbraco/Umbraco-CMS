@@ -1,5 +1,8 @@
-﻿using Moq;
+﻿using System.Data.Common;
+using Moq;
+using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -19,19 +22,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //TODO Remove created database here
         }
 
-        public override ISqlSyntaxProvider GetSyntaxProvider()
-        {
-            return new MySqlSyntaxProvider(Mock.Of<ILogger>());
-        }
-
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", "MySql.Data.MySqlClient", Mock.Of<ILogger>());
-        }
-
-        public override DatabaseProviders GetDatabaseProvider()
-        {
-            return DatabaseProviders.MySql;
+            var databaseType = DatabaseType.MySQL;
+            var sqlSyntax = new MySqlSyntaxProvider(Mock.Of<ILogger>());
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.MySql);
+            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()

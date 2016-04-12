@@ -15,9 +15,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingKeysAndIndexes : MigrationBase
     {
-        public AssignMissingKeysAndIndexes(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AssignMissingKeysAndIndexes(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()
@@ -39,8 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 Create.Index("IX_cmsContent").OnTable("cmsContent").OnColumn("nodeId").Ascending().WithOptions().Unique();
             }
 
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer
-                || Context.CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+            if (DatabaseType.IsSqlServerOrCe())
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 

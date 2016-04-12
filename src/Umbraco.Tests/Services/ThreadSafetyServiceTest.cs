@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -24,37 +26,40 @@ namespace Umbraco.Tests.Services
 	[TestFixture, RequiresSTA]
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
-		private PerThreadNPocoUnitOfWorkProvider _uowProvider;
-		private PerThreadDatabaseFactory _dbFactory;
+		private IDatabaseUnitOfWorkProvider _uowProvider;
+		private PerThreadSqlCeDatabaseFactory _dbFactory;
 
 		[SetUp]
 		public override void Initialize()
-		{            
+		{
 			base.Initialize();
-			
-			//we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
-			//a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
-			//threading environment, or a single apartment threading environment will not work for this test because 
-			//it is multi-threaded.
-			_dbFactory = new PerThreadDatabaseFactory(Logger);
-			//overwrite the local object
-            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
+
+		    var sqlSyntax = new SqlCeSyntaxProvider();
+
+            //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
+            //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
+            //threading environment, or a single apartment threading environment will not work for this test because
+            //it is multi-threaded.
+            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger);
+            _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory);
+
+            // overwrite the local object
+            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger);
 
             //disable cache
 		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
-			//here we are going to override the ServiceContext because normally with our test cases we use a 
+			//here we are going to override the ServiceContext because normally with our test cases we use a
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-            var repositoryFactory = new RepositoryFactory(SqlSyntax, Container);
-			_uowProvider = new PerThreadNPocoUnitOfWorkProvider(_dbFactory);
+            var repositoryFactory = new RepositoryFactory(Container);
 		    var evtMsgs = new TransientMessagesFactory();
 		    ApplicationContext.Services = new ServiceContext(
                 repositoryFactory,
-                _uowProvider, 
-                new FileUnitOfWorkProvider(), 
-                new PublishingStrategy(evtMsgs, Logger), 
-                cacheHelper, 
+                _uowProvider,
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(evtMsgs, Logger),
+                cacheHelper,
                 Logger,
                 evtMsgs,
                 Enumerable.Empty<IUrlSegmentProvider>());
@@ -75,9 +80,8 @@ namespace Umbraco.Tests.Services
 		{
 			_error = null;
 
-			//dispose!
+			// dispose!
 			_dbFactory.Dispose();
-			_uowProvider.Dispose();
 
 			base.TearDown();
 		}
@@ -94,9 +98,9 @@ namespace Umbraco.Tests.Services
 		{
 			//we will mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
 			var contentService = (ContentService)ServiceContext.ContentService;
-			
+
 			var threads = new List<Thread>();
-			
+
 			Debug.WriteLine("Starting test...");
 
 			for (var i = 0; i < MaxThreadCount; i++)
@@ -105,13 +109,13 @@ namespace Umbraco.Tests.Services
 					{
 						try
 						{
-							Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);							
-							
+							Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);
+
 							//create 2 content items
 
                             string name1 = "test" + Guid.NewGuid();
 							var content1 = contentService.CreateContent(name1, -1, "umbTextpage", 0);
-							
+
 							Debug.WriteLine("Saving content1 on thread: " + Thread.CurrentThread.ManagedThreadId);
 							contentService.Save(content1);
 
@@ -120,12 +124,12 @@ namespace Umbraco.Tests.Services
                             string name2 = "test" + Guid.NewGuid();
 							var content2 = contentService.CreateContent(name2, -1, "umbTextpage", 0);
 							Debug.WriteLine("Saving content2 on thread: " + Thread.CurrentThread.ManagedThreadId);
-							contentService.Save(content2);	
+							contentService.Save(content2);
 						}
 						catch(Exception e)
-						{														
+						{
 							_error = e;
-						}						
+						}
 					});
 				threads.Add(t);
 			}
@@ -149,7 +153,7 @@ namespace Umbraco.Tests.Services
 			{
 			    throw new Exception("Error!", _error);
 			}
-			
+
 		}
 
 		[Test]
@@ -213,69 +217,64 @@ namespace Umbraco.Tests.Services
 			}
 
 		}
-		
+
 		public void CreateTestData()
 		{
 			//Create and Save ContentType "umbTextpage" -> 1045
 			ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
 			contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-			ServiceContext.ContentTypeService.Save(contentType);			
+			ServiceContext.ContentTypeService.Save(contentType);
 		}
 
 		/// <summary>
-		/// Creates a Database object per thread, this mimics the web context which is per HttpContext and is required for the multi-threaded test
+		/// A special implementation of <see cref="IDatabaseFactory"/> that mimics the DefaultDatabaseFactory
+		/// (one db per HttpContext) by providing one db per thread, as required for multi-threaded
+		/// tests.
 		/// </summary>
-		internal class PerThreadDatabaseFactory : DisposableObject, IDatabaseFactory
+		internal class PerThreadSqlCeDatabaseFactory : DisposableObject, IDatabaseFactory
 		{
+            // the DefaultDatabaseFactory uses thread-static databases where there is no http context,
+            // so it would need to be disposed in each thread in order for each database to be disposed,
+            // instead we use this factory which also maintains one database per thread but can dispose
+            // them all in one call
+
 		    private readonly ILogger _logger;
 
-		    public PerThreadDatabaseFactory(ILogger logger)
+		    private readonly DbProviderFactory _dbProviderFactory =
+		        DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
+
+		    public bool Configured => true;
+            public bool CanConnect => true;
+
+            public void Configure(string connectionString, string providerName)
 		    {
-		        _logger = logger;
+		        throw new NotImplementedException();
 		    }
 
-		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>(); 
+		    public ISqlSyntaxProvider SqlSyntax { get; } = new SqlCeSyntaxProvider();
 
-			public UmbracoDatabase CreateDatabase()
+		    public DatabaseType DatabaseType => DatabaseType.SQLCe;
+
+            public PerThreadSqlCeDatabaseFactory(ILogger logger)
+		    {
+                _logger = logger;
+		    }
+
+		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>();
+
+			public UmbracoDatabase GetDatabase()
 			{
-				var db = _databases.GetOrAdd(
+                return _databases.GetOrAdd(
                     Thread.CurrentThread.ManagedThreadId,
-                    i => new UmbracoDatabase(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, _logger));
-				return db;
+                    i => new UmbracoDatabase(Core.Configuration.GlobalSettings.UmbracoConnectionName, SqlSyntax, DatabaseType, _dbProviderFactory, _logger));
 			}
 
 			protected override void DisposeResources()
 			{
-				//dispose the databases
-				_databases.ForEach(x => x.Value.Dispose());
+				// dispose the databases
+			    foreach (var database in _databases.Values) database.Dispose();
+			    _databases.Clear();
 			}
 		}
-
-		/// <summary>
-		/// Creates a UOW with a Database object per thread
-		/// </summary>
-		internal class PerThreadNPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
-		{
-			private readonly PerThreadDatabaseFactory _dbFactory;
-
-			public PerThreadNPocoUnitOfWorkProvider(PerThreadDatabaseFactory dbFactory)
-			{
-				_dbFactory = dbFactory;
-			}
-
-			public IDatabaseUnitOfWork GetUnitOfWork()
-			{
-				//Create or get a database instance for this thread.
-				var db = _dbFactory.CreateDatabase();
-				return new NPocoUnitOfWork(db);
-			}
-
-			protected override void DisposeResources()
-			{
-				//dispose the databases
-				_dbFactory.Dispose();
-			}
-		}
-
 	}
 }

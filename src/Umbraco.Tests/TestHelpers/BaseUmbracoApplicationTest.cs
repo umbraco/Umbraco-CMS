@@ -56,7 +56,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            Container = new ServiceContainer();
+            var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+            Container = container;
 
             TestHelper.InitializeContentDirectories();
 
@@ -211,8 +213,7 @@ namespace Umbraco.Tests.TestHelpers
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
-                    Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, SqlSyntaxProviders.GetDefaultProviders(Logger), Logger), Logger),
                 //assign the service context
                 new ServiceContext(
                     Container.GetInstance<RepositoryFactory>(), 

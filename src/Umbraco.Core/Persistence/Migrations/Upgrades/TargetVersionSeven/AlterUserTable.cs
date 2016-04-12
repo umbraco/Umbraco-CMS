@@ -8,9 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AlterUserTable : MigrationBase
     {
-        public AlterUserTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AlterUserTable(ILogger logger)
+            : base(logger)
+        { }
 
 
         public override void Up()

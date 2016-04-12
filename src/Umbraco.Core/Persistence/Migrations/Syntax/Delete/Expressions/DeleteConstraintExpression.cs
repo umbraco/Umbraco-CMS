@@ -1,23 +1,22 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {
-        
-        public DeleteConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ConstraintType type)
-            : base(sqlSyntax, current, databaseProviders)
+        public DeleteConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ConstraintType type)
+            : base(context, supportedDatabaseTypes)
         {
             Constraint = new ConstraintDefinition(type);
         }
 
-        public ConstraintDefinition Constraint { get; private set; }
+        public ConstraintDefinition Constraint { get; }
 
         public override string ToString()
         {
             // Test for MySQL primary key situation.
-            if (CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (CurrentDatabaseType.IsMySql())
             {
                 if (Constraint.IsPrimaryKeyConstraint)
                 {

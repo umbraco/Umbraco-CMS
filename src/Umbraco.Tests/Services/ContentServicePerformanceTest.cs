@@ -148,10 +148,10 @@ namespace Umbraco.Tests.Services
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
+            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
+            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
             {
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -179,10 +179,10 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
+            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
+            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
             {
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -209,10 +209,10 @@ namespace Umbraco.Tests.Services
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
+            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
+            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
             {
 
                 // Act
@@ -242,10 +242,10 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
+            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
+            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
             {
 
                 // Act

@@ -35,9 +35,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver);
-            var repository = new MediaRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+            var repository = new MediaRepository(unitOfWork, CacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
 

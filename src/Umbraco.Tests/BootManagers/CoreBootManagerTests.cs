@@ -68,8 +68,7 @@ namespace Umbraco.Tests.BootManagers
                 container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
                 container.Register<DatabaseContext>(factory => new DatabaseContext(
                     factory.GetInstance<IDatabaseFactory>(),
-                    factory.GetInstance<ILogger>(),
-                    factory.GetInstance<SqlSyntaxProviders>()), new PerContainerLifetime());
+                    factory.GetInstance<ILogger>()), new PerContainerLifetime());
             }
         }
         

@@ -8,10 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 15, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoLoginsTable : MigrationBase
     {
-        public RemoveUmbracoLoginsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public RemoveUmbracoLoginsTable(ILogger logger)
+            : base(logger)
+        { }
 
         public override void Up()
         {

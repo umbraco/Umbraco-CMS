@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class RemoveParentIdPropertyTypeGroupColumn : MigrationBase
     {
-        public RemoveParentIdPropertyTypeGroupColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public RemoveParentIdPropertyTypeGroupColumn(ILogger logger)
+            : base(logger)
         { }
 
         public override void Up()

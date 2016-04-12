@@ -11,9 +11,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AddChangeDocumentTypePermission : MigrationBase
     {
-        public AddChangeDocumentTypePermission(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AddChangeDocumentTypePermission(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()

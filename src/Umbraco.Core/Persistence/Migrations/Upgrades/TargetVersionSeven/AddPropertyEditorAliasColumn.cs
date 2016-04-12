@@ -9,9 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddPropertyEditorAliasColumn : MigrationBase
     {
-        public AddPropertyEditorAliasColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AddPropertyEditorAliasColumn(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()

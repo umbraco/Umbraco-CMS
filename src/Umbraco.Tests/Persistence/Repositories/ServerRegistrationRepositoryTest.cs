@@ -19,20 +19,20 @@ namespace Umbraco.Tests.Persistence.Repositories
     [TestFixture]
     public class ServerRegistrationRepositoryTest : BaseDatabaseFactoryTest
     {
-        private ICacheProvider _staticCache;
+        private CacheHelper _cacheHelper;
 
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
 
-            _staticCache = new StaticCacheProvider();
+            _cacheHelper = new CacheHelper();
             CreateTestData();
         }
 
         private ServerRegistrationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new ServerRegistrationRepository(unitOfWork, _staticCache, Logger, SqlSyntax, MappingResolver);
+            return new ServerRegistrationRepository(unitOfWork, _cacheHelper, Logger, MappingResolver);
         }
 
         [Test]

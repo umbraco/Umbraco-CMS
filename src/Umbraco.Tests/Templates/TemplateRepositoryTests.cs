@@ -2,14 +2,17 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -30,9 +33,13 @@ namespace Umbraco.Tests.Templates
         [SetUp]
         public void Setup()
         {
+            var uowMock = new Mock<IDatabaseUnitOfWork>();
+            var db = new UmbracoDatabase("cstr", new SqlCeSyntaxProvider(), DatabaseType.SQLCe, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe), Mock.Of<ILogger>());
+            uowMock.Setup(x => x.Database).Returns(db);
+
             var loggerMock = new Mock<ILogger>();
-            var sqlSyntaxMock = new Mock<ISqlSyntaxProvider>();
-            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, sqlSyntaxMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
+
+            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
 
         }
 

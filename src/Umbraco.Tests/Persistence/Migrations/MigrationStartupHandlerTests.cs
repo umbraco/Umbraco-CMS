@@ -67,13 +67,12 @@ namespace Umbraco.Tests.Persistence.Migrations
             var changed1 = new Args { CountExecuted = 0 };
             var testHandler1 = new TestMigrationHandler(changed1);
             testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            
-            var conn = new MockConnection();
-            var db = new Mock<Database>(conn);
+
+            var db = new UmbracoDatabase("cstr", new SqlCeSyntaxProvider(), DatabaseType.SQLCe, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe), Mock.Of<ILogger>());
 
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>() });
-            var result1 = runner1.Execute(db.Object, DatabaseProviders.SqlServerCE, new SqlCeSyntaxProvider(), (false));
+            var result1 = runner1.Execute(db /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);            
         }
 
@@ -87,18 +86,17 @@ namespace Umbraco.Tests.Persistence.Migrations
             var testHandler2 = new TestMigrationHandler("Test2", changed2);
             testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
 
-            var conn = new MockConnection();
-            var db = new Mock<Database>(conn);
+            var db = new UmbracoDatabase("cstr", new SqlCeSyntaxProvider(), DatabaseType.SQLCe, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe), Mock.Of<ILogger>());
 
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>()});
-            var result1 = runner1.Execute(db.Object, DatabaseProviders.SqlServerCE, new SqlCeSyntaxProvider(), false);
+            var result1 = runner1.Execute(db /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(0, changed2.CountExecuted);
 
             var runner2 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test2",
                 new IMigration[] { Mock.Of<IMigration>() });            
-            var result2 = runner2.Execute(db.Object, DatabaseProviders.SqlServerCE, new SqlCeSyntaxProvider(), false);
+            var result2 = runner2.Execute(db /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(1, changed2.CountExecuted);
         }

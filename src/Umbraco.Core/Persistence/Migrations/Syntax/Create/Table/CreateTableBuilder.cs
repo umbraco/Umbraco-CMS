@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
@@ -12,13 +13,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
                                                 ICreateTableColumnOptionForeignKeyCascadeSyntax
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseProviders[] _databaseProviders;
+        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public CreateTableBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, CreateTableExpression expression)
+        public CreateTableBuilder(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, CreateTableExpression expression)
             : base(expression)
         {
             _context = context;
-            _databaseProviders = databaseProviders;
+            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
@@ -93,9 +94,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
             // it.  For now, this is what I'm doing
-            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
+            if (Expression.CurrentDatabaseType.IsMySql() == false)
             {
-                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, ConstraintType.PrimaryKey)
+                var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
                 {
                     Constraint =
                 {
@@ -122,9 +123,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
             // it.  For now, this is what I'm doing
 
-            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
+            if (Expression.CurrentDatabaseType.IsMySql() == false)
             {
-                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, ConstraintType.PrimaryKey)
+                var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
                 {
                     Constraint =
                 {
@@ -160,7 +161,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
@@ -194,7 +195,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
@@ -231,7 +232,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         public ICreateTableColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,

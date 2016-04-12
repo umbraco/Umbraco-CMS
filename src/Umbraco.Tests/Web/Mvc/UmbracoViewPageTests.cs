@@ -428,7 +428,7 @@ namespace Umbraco.Tests.Web.Mvc
             var svcCtx = GetServiceContext();
 
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger),
                 svcCtx,
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };
