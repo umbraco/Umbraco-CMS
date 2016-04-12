@@ -10,7 +10,7 @@
                            ng-checked="isSelectedAll()">
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a class="umb-table-head__link sortable" href="#" ng-click="sort('Name', true)" prevent-default>
+                    <a class="umb-table-head__link sortable" href="#" ng-click="sort('Name', true, true)" prevent-default>
                         <localize key="general_name">Name</localize>
                         <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
                     </a>
