@@ -13,6 +13,13 @@ namespace Umbraco.Web.Mvc
         {
             base.OnActionExecuted(filterContext);
 
+            // could happens if exception (but afaik this wouldn't happen in MVC)
+            if (filterContext.HttpContext == null || filterContext.HttpContext.Response == null ||
+                    filterContext.HttpContext.Response.Cache == null)
+            {
+                return;
+            }
+
             filterContext.HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);            
             filterContext.HttpContext.Response.Cache.SetMaxAge(TimeSpan.Zero);            
             filterContext.HttpContext.Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);

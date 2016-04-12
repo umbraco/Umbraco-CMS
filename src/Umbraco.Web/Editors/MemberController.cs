@@ -103,7 +103,24 @@ namespace Umbraco.Web.Editors
             else
             {
                 int totalRecords;
-                var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+
+                MembershipUserCollection members;
+                if (filter.IsNullOrWhiteSpace())
+                {
+                    members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+                }
+                else
+                {
+                    //we need to search!
+
+                    //try by name first
+                    members = _provider.FindUsersByName(filter, (pageNumber - 1), pageSize, out totalRecords);
+                    if (totalRecords == 0)
+                    {
+                        //try by email then
+                        members = _provider.FindUsersByEmail(filter, (pageNumber - 1), pageSize, out totalRecords);
+                    }
+                }
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);
