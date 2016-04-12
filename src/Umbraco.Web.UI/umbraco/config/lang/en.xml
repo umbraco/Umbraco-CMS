@@ -663,8 +663,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
-    <key alias="forgottenPasswordInstruction">Please enter your email address. If your account is located an email will be sent to you containing a link from which you can reset your password.</key>
-    <key alias="requestPasswordResetConfirmation">If your email address has been matched an email with password reset instructions has been sent.</key>
+    <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
+    <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
     <key alias="returnToLogin">Return to login form</key>
     <key alias="setPasswordInstruction">Please provide a new password.</key>
     <key alias="setPasswordConfirmation">Your new password has been set and you may now use it to log in.</key>

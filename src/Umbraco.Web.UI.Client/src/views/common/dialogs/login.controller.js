@@ -7,28 +7,43 @@
             });
         }
 
+        function resetInputValidation() {
+            if ($scope.loginForm) {
+                $scope.loginForm.username.$setValidity('auth', true);
+                $scope.loginForm.password.$setValidity('auth', true);
+            }
+            if ($scope.requestPasswordResetForm) {
+                $scope.requestPasswordResetForm.email.$setValidity("auth", true);
+            }
+            if ($scope.setPasswordForm) {
+                $scope.setPasswordForm.password.$setValidity('auth', true);
+                $scope.setPasswordForm.confirmPassword.$setValidity('auth', true);
+            }
+        }
+
         $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
 
         $scope.showLogin = function () {
             $scope.errorMsg = "";
+            resetInputValidation();
             $scope.view = "login";
             setFieldFocus("loginForm", "username");
         }
 
         $scope.showRequestPasswordReset = function () {
             $scope.errorMsg = "";
+            resetInputValidation();
             $scope.view = "request-password-reset";
             $scope.showEmailResetConfirmation = false;
             setFieldFocus("requestPasswordResetForm", "email");
         }
 
         $scope.showSetPassword = function () {
+            $scope.errorMsg = "";
+            resetInputValidation();
             $scope.view = "set-password";
             setFieldFocus("setPasswordForm", "password");
         }
-
-
-
 
         var d = new Date();
         var konamiGreetings = new Array("Suze Sunday", "Malibu Monday", "Tequila Tuesday", "Whiskey Wednesday", "Negroni Day", "Fernet Friday", "Sancerre Saturday");
