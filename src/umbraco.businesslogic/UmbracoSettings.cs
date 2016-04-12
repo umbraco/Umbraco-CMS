@@ -103,6 +103,14 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Enable the UI and API to allow back-office users to reset their passwords? Default is true
+        /// </summary>
+        public static bool AllowPasswordReset
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset; }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the logs will be auto cleaned
         /// </summary>
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>

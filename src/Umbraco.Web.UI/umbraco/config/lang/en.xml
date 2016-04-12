@@ -290,6 +290,7 @@
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
+    <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="label">Label...</key>
@@ -297,6 +298,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
+    <key alias="email">Enter your email</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -660,6 +662,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">Forgotten password?</key>
+    <key alias="forgottenPasswordInstruction">Please enter your email address. If your account is located an email will be sent to you containing a link from which you can reset your password.</key>
+    <key alias="requestPasswordResetConfirmation">If your email address has been matched an email with password reset instructions has been sent.</key>
+    <key alias="returnToLogin">Return to login form</key>
+    <key alias="setPasswordInstruction">Please provide a new password.</key>
+    <key alias="setPasswordConfirmation">Your new password has been set and you may now use it to log in.</key>
+    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired.</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
+    <key alias="resetPasswordEmailCopyFormat1">Your username to login to the Umbraco back-office is: {0}</key>
+    <key alias="resetPasswordEmailCopyFormat2"><![CDATA[<Please reset your password by clicking <a href="{1}">here</a>. ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
