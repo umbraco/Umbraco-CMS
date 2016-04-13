@@ -42,7 +42,14 @@ namespace Umbraco.Core.Persistence
 
         // fixme - what needs to be private fields vs public properties?
         public bool Configured => _configured;
-        public ISqlSyntaxProvider SqlSyntax => _sqlSyntax;
+        public ISqlSyntaxProvider SqlSyntax
+        {
+            get
+            {
+                EnsureConfigured();
+                return _sqlSyntax;
+            }
+        }
 
         // very important to have ThreadStatic,
         // see: http://issues.umbraco.org/issue/U4-2172
@@ -166,6 +173,12 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public bool CanConnect => _configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
+        private void EnsureConfigured()
+        {
+            if (_configured == false)
+                throw new InvalidOperationException("Not configured.");
+        }
+
         // method used by NPoco's DatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
 	    {
@@ -177,9 +190,8 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <returns>The "ambient" database connection.</returns>
 		public UmbracoDatabase GetDatabase()
-		{
-            if (_configured == false)
-                throw new InvalidOperationException("Not configured.");
+        {
+            EnsureConfigured();
 
 			// no http context, create the thread-static singleton object
 			if (HttpContext.Current == null)

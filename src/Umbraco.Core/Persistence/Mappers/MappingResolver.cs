@@ -66,6 +66,7 @@ namespace Umbraco.Core.Persistence.Mappers
             return Attempt<BaseMapper>.Succeed(mapper);
         }
 
+        /*
         internal string GetMapping(Type type, string propertyName)
         {
             var mapper = ResolveMapperByType(type);
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
             return result;
         }
-
+        */
     }
 
 }

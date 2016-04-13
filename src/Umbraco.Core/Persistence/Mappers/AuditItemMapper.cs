@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -9,15 +8,8 @@ namespace Umbraco.Core.Persistence.Mappers
     public sealed class AuditItemMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-        
-        public AuditItemMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
         protected override void BuildMap()
         {
@@ -26,7 +18,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<AuditItem, LogDto>(src => src.AuditType, dto => dto.Header);
             CacheMap<AuditItem, LogDto>(src => src.UserId, dto => dto.UserId);
             CacheMap<AuditItem, LogDto>(src => src.CreateDate, dto => dto.Datestamp);
-        }
-        
+        }        
     }
 }

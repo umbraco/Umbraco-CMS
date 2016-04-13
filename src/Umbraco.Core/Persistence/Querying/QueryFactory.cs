@@ -5,8 +5,8 @@ namespace Umbraco.Core.Persistence.Querying
 {
     public class QueryFactory
     {
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
-        public IMappingResolver MappingResolver { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax { get; }
+        public IMappingResolver MappingResolver { get; }
 
         public QueryFactory(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
         {

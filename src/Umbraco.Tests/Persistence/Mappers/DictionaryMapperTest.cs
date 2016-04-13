@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryMapper(new SqlCeSyntaxProvider()).Map("Id");
+            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[pk]"));
@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryMapper(new SqlCeSyntaxProvider()).Map("Key");
+            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[id]"));
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryMapper(new SqlCeSyntaxProvider()).Map("ItemKey");
+            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "ItemKey");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[key]"));

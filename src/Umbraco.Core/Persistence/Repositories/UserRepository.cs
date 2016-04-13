@@ -344,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
             var mapper = QueryFactory.MappingResolver.ResolveMapperByType(typeof(IUser));
-            var mappedField = mapper.Map(expressionMember.Name);
+            var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
             if (mappedField.IsNullOrWhiteSpace())
             {
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
