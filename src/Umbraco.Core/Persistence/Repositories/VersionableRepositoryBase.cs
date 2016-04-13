@@ -274,7 +274,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
                 var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
                 var sortedString = string.Format(SqlSyntax.IsNull, "dataNvarchar", "''");
-                var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataInt");
+                var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
                 var orderBySql = string.Format(@"ORDER BY (
  	                SELECT CASE
