@@ -540,5 +540,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string IsNull { get { return "ISNULL({0},{1})"; } }
         public virtual string ConvertIntegerToOrderableString { get { return "RIGHT('00000000' + CAST({0} AS varchar(8)),8)"; } }
         public virtual string ConvertDateToOrderableString { get { return "CONVERT(varchar, {0}, 102)"; } }
+        public virtual string ConvertDecimalToOrderableString { get { return "RIGHT('0000000000000000000000000' + CAST({0} AS varchar(25)),25)"; } }
     }
 }

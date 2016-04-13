@@ -73,6 +73,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string IsNull { get; }
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
+        string ConvertDecimalToOrderableString { get; }
 
         IEnumerable<string> GetTablesInSchema(Database db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);

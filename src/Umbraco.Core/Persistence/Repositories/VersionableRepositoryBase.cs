@@ -274,12 +274,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
                 var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
                 var sortedString = string.Format(SqlSyntax.IsNull, "dataNvarchar", "''");
+                var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataInt");
 
                 var orderBySql = string.Format(@"ORDER BY (
  	                SELECT CASE
- 		                WHEN dataInt Is Not Null THEN {0}
- 		                WHEN dataDate Is Not Null THEN {1}
- 		                ELSE {2}
+ 		               WHEN dataInt Is Not Null THEN {0}
+                        WHEN dataDecimal Is Not Null THEN {1}
+                        WHEN dataDate Is Not Null THEN {2}
+                        ELSE {3}
  	                END 
  	                FROM cmsContent c
  	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
@@ -290,7 +292,7 @@ namespace Umbraco.Core.Persistence.Repositories
  	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
  		                AND cpd.versionId = cv.VersionId
  	                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
- 	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDate, sortedString);
+ 	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDecimal, sortedDate, sortedString);
 
                 sortedSql.Append(orderBySql, orderBy);
                 if (orderDirection == Direction.Descending)
