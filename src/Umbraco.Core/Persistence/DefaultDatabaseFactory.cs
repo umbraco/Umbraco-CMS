@@ -207,7 +207,7 @@ namespace Umbraco.Core.Persistence
 		    {
                 if (_nonHttpInstance.IsValueCreated)
                 {
-                    db = _nonHttpInstance;
+                    db = _nonHttpInstance.Value;
 	    	        _nonHttpInstance = null;
                 }
 		    }
