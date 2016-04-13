@@ -170,7 +170,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
          */
         performSetPassword: function (userId, password, confirmPassword, resetCode) {
 
-            if (!userId) {
+            if (userId === undefined || userId === null) {
                 return angularHelper.rejectedPromise({
                     errorMsg: 'User Id cannot be empty'
                 });

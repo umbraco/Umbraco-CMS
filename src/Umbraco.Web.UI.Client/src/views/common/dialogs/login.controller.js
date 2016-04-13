@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, $cookies, localizationService, userService, externalLoginInfo, $timeout, $location, authResource) {
+    function ($scope, $cookies, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource) {
 
         var setFieldFocus = function(form, field) {
             $timeout(function() {
@@ -63,6 +63,7 @@
         $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
+        $scope.resetPasswordCodeInfo = resetPasswordCodeInfo;
 
         $scope.activateKonamiMode = function () {
             if ($cookies.konamiLogin == "1") {
@@ -75,21 +76,6 @@
                     $scope.greeting = "Happy " + konamiGreetings[d.getDay()];
                 });
             }
-        }
-
-        // Set initial view - either set password if reset code provided in querystring
-        // otherwise login form
-        var userId = $location.search().userId;
-        var resetCode = $location.search().resetCode;
-        if (userId && resetCode) {
-            authResource.performValidatePasswordResetCode(userId, resetCode)
-                .then(function () {
-                    $scope.showSetPassword();
-                }, function () {
-                    $scope.view = "password-reset-code-expired";
-                });
-        } else {
-            $scope.showLogin();
         }
 
         $scope.loginSubmit = function (login, password) {
@@ -172,7 +158,7 @@
                 return;
             }
 
-            authResource.performSetPassword(userId, password, confirmPassword, resetCode)
+            authResource.performSetPassword($scope.resetPasswordCodeInfo.resetCodeModel.userId, password, confirmPassword, $scope.resetPasswordCodeInfo.resetCodeModel.resetCode)
                 .then(function () {
                     $scope.showSetPasswordConfirmation = true;
                     $scope.resetComplete = true;
@@ -197,6 +183,19 @@
                     $scope.setPasswordForm.confirmPassword.$setValidity('auth', true);
                 }
             });
+        }
+
+
+        //Now, show the correct panel:
+
+        if ($scope.resetPasswordCodeInfo.resetCodeModel) {
+            $scope.showSetPassword();
+        }
+        else if ($scope.resetPasswordCodeInfo.errors.length > 0) {
+            $scope.view = "password-reset-code-expired";
+        }
+        else {
+            $scope.showLogin();
         }
 
     });

@@ -3,6 +3,8 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
 {
+
+    [DataContract(Name = "requestPasswordReset", Namespace = "")]
     public class RequestPasswordResetModel
     {
         [Required]

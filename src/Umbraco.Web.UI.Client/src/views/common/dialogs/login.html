@@ -122,9 +122,10 @@
             </div>
 
             <div ng-show="view == 'password-reset-code-expired'">
-                <div class="text-error">
-                    <localize key="login_resetCodeExpired">The link you have clicked on is invalid or has expired.</localize>
+                <div class="text-error" ng-repeat="error in resetPasswordCodeInfo.errors">
+                    <span>{{error}}</span>
                 </div>
+                
                 <div class="switch-view">
                     <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                 </div>

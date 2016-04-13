@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Editors
         /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [System.Web.Http.HttpGet]
         public bool IsAuthenticated()
         {
             var attempt = UmbracoContext.Security.AuthorizeRequest();
@@ -231,9 +232,6 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
-
-            var http = EnsureHttpContext();
-
             var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);
             if (identityUser != null)
             {
@@ -241,7 +239,7 @@ namespace Umbraco.Web.Editors
                 if (user != null && user.IsLockedOut == false)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
-                    var callbackUrl = ConstuctCallbackUrl(http.Request.Url, identityUser.Id, code);
+                    var callbackUrl = ConstuctCallbackUrl(identityUser.Id, code);
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat", new[] {identityUser.UserName, callbackUrl});                        
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject"), 
@@ -252,37 +250,28 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        private static string ConstuctCallbackUrl(Uri url, int userId, string code)
+        private string ConstuctCallbackUrl(int userId, string code)
         {
-            return string.Format("{0}://{1}/umbraco/#/login?userId={2}&resetCode={3}",
-                url.Scheme,
-                url.Host + (url.Port == 80 ? string.Empty : ":" + url.Port),
-                userId,
-                HttpUtility.UrlEncode(code));
-        }      
+            //get an mvc helper to get the url
+            var http = EnsureHttpContext();
+            var urlHelper = new UrlHelper(http.Request.RequestContext);
 
-        /// <summary>
-        /// Processes a password reset request.  Looks for a match on the provided email address
-        /// and if found sends an email with a link to reset it
-        /// </summary>
-        /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
-        public async Task<HttpResponseMessage> PostValidatePasswordResetCode(ValidatePasswordResetCodeModel model)
-        {
-            var user = UserManager.FindById(model.UserId);
-            if (user != null)
-            {
-                var result = await UserManager.UserTokenProvider.ValidateAsync("ResetPassword", 
-                    model.ResetCode, UserManager, user);
-                if (result)
+            var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice", 
+                new
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
-            }
+                    area = GlobalSettings.UmbracoMvcArea,
+                    u = userId,
+                    r = code
+                });
 
-            return Request.CreateValidationErrorResponse("Password reset code not valid");
-        }
+            //TODO: Virtual path?
 
+            return string.Format("{0}://{1}{2}",
+                http.Request.Url.Scheme,
+                http.Request.Url.Host + (http.Request.Url.Port == 80 ? string.Empty : ":" + http.Request.Url.Port),
+                action);
+        }      
+     
         /// <summary>
         /// Processes a set password request.  Validates the request and sets a new password.
         /// </summary>
