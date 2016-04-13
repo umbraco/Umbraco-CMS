@@ -162,6 +162,10 @@
                 .then(function () {
                     $scope.showSetPasswordConfirmation = true;
                     $scope.resetComplete = true;
+
+                    //reset the values in the resetPasswordCodeInfo angular so if someone logs out the change password isn't shown again
+                    resetPasswordCodeInfo.resetCodeModel = null;
+
                 }, function (reason) {
                     if (reason.data && reason.data.Message) {
                         $scope.errorMsg = reason.data.Message;

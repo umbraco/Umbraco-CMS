@@ -14,6 +14,7 @@ using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -240,9 +241,16 @@ namespace Umbraco.Web.Editors
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
                     var callbackUrl = ConstuctCallbackUrl(identityUser.Id, code);
-                    var message = Services.TextService.Localize("resetPasswordEmailCopyFormat", new[] {identityUser.UserName, callbackUrl});                        
+
+                    var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
+                        //Ensure the culture of the found user is used for the email!
+                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService),
+                        new[] {identityUser.UserName, callbackUrl});
+
                     await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject"), 
+                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                            //Ensure the culture of the found user is used for the email!
+                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
                 }
             }
