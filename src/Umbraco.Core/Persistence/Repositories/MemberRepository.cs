@@ -278,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Ensure that strings don't contain characters that are invalid in XML
             entity.SanitizeEntityPropertiesForXmlStorage();
 
-            var dirtyEntity = (ICanBeDirty) entity;
+            var dirtyEntity = (ICanBeDirty)entity;
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (dirtyEntity.IsPropertyDirty("ParentId"))
@@ -456,7 +456,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -611,18 +611,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="query">
         /// The where clause, if this is null all records are queried
         /// </param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="orderDirection"></param>
-        /// <param name="filter"></param>
+        /// <param name="pageIndex">Index of the page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="totalRecords">The total records.</param>
+        /// <param name="orderBy">The order by column</param>
+        /// <param name="orderDirection">The order direction.</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search query</param>
         /// <returns></returns>
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using NPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
             var filterSql = filter.IsNullOrWhiteSpace()
                 ? null
@@ -630,7 +631,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         "OR (cmsMember.LoginName LIKE @0))", "%" + filter + "%");
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection,
+                MapQueryDtos, orderBy, orderDirection, TODO: Do we need a orderBySystemField here?,
                 filterSql);
         }
 
@@ -668,7 +669,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
                 // http://issues.umbraco.org/issue/U4-5503
-                .Select(x => new {dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId)})
+                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId) })
                 .Where(x => x.contentType != null)
                 .ToArray();
 

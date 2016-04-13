@@ -427,7 +427,25 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-           string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, string filter = "")
+        {
+            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page index (zero based)</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
@@ -435,8 +453,8 @@ namespace Umbraco.Core.Services
             {
                 var query = repository.Query;
                 query.Where(x => x.ParentId == id);
-                
-                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+
+                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return medias;
             }
@@ -477,6 +495,23 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
+            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+        {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
@@ -488,7 +523,7 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return contents;
             }
@@ -699,7 +734,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public void MoveToRecycleBin(IMedia media, int userId = 0)
         {
-            ((IMediaServiceOperations) this).MoveToRecycleBin(media, userId);
+            ((IMediaServiceOperations)this).MoveToRecycleBin(media, userId);
         }
 
         /// <summary>
@@ -716,7 +751,7 @@ namespace Umbraco.Core.Services
             //TODO: IT would be much nicer to mass delete all in one trans in the repo level!
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (Deleting.IsRaisedEventCancelled(                
+            if (Deleting.IsRaisedEventCancelled(
                 new DeleteEventArgs<IMedia>(media, evtMsgs), this))
             {
                 return OperationStatus.Cancelled(evtMsgs);
@@ -997,7 +1032,7 @@ namespace Umbraco.Core.Services
             ((IMediaServiceOperations)this).Delete(media, userId);
         }
 
-        
+
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
@@ -1053,7 +1088,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Delete, "Delete Media by version performed by user", userId, -1);
         }
-    
+
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
@@ -1062,7 +1097,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
         {
-            ((IMediaServiceOperations)this).Save (media, userId, raiseEvents);
+            ((IMediaServiceOperations)this).Save(media, userId, raiseEvents);
         }
 
         /// <summary>

@@ -323,7 +323,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  GetQuotedColumnName(foreignKey.ForeignColumns.First()),
                                  GetQuotedTableName(foreignKey.PrimaryTable),
                                  GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
-                                 FormatCascade("DELETE", foreignKey.OnDelete), 
+                                 FormatCascade("DELETE", foreignKey.OnDelete),
                                  FormatCascade("UPDATE", foreignKey.OnUpdate));
         }
 
@@ -332,7 +332,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var sb = new StringBuilder();
             foreach (var column in columns)
             {
-                sb.Append(Format(column) +",\n");
+                sb.Append(Format(column) + ",\n");
             }
             return sb.ToString().TrimEnd(",\n");
         }
@@ -432,11 +432,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return GetSpecialDbType(column.DbType);
             }
 
-            Type type = column.Type.HasValue 
+            Type type = column.Type.HasValue
                 ? DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key
                 : column.PropertyType;
 
-            if (type == typeof (string))
+            if (type == typeof(string))
             {
                 var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
                 return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
@@ -537,5 +537,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
         public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+
+        public virtual string IsNull { get { return "ISNULL({0},{1})"; } }
+        public virtual string ConvertIntegerToOrderableString { get { return "RIGHT('00000000' + CAST({0} AS varchar(8)),8)"; } }
+        public virtual string ConvertDateToOrderableString { get { return "CONVERT(varchar, {0}, 102)"; } }
+        public virtual string ConvertDecimalToOrderableString { get { return "RIGHT('0000000000000000000000000' + CAST({0} AS varchar(25)),25)"; } }
     }
 }
