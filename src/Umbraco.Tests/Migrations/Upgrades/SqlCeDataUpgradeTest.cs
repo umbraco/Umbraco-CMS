@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var targetVersion = new SemVersion(6, 0, 0);
             var db = GetConfiguredDatabase();
 
-            var fix = new PublishAfterUpgradeToVersionSixth(db.SqlSyntax);
+            var fix = new PublishAfterUpgradeToVersionSixth();
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(

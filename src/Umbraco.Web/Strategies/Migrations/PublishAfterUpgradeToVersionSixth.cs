@@ -19,13 +19,6 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </summary>
     public class PublishAfterUpgradeToVersionSixth : MigrationStartupHander
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-
-        public PublishAfterUpgradeToVersionSixth(ISqlSyntaxProvider sqlSyntax)
-        {
-            _sqlSyntax = sqlSyntax;
-        }
-
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;

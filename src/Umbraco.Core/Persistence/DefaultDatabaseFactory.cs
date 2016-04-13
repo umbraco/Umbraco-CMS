@@ -54,26 +54,26 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
+        /// <remarks>Used by LightInject.</remarks>
         public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-        {
-            if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger)
+        { }
 
-            _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
-            _logger = logger;
-        }
-
-        // fixme - used once by the other ctor, and 5 times in various tests
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with a connection string name and a logger.
         /// </summary>
         /// <param name="connectionStringName">The name of the connection string in web.config.</param>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
+        /// <remarks>Used by the other ctor and in tests.</remarks>
         public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-            : this(sqlSyntaxProviders, logger)
 		{
-	        Mandate.ParameterNotNullOrEmpty(connectionStringName, "connectionStringName");
+            if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
+
+            _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
+            _logger = logger;
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
@@ -82,7 +82,6 @@ namespace Umbraco.Core.Persistence
             Configure(settings.ConnectionString, settings.ProviderName);
         }
 
-        // fixme - used only once in tests
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with a connection string, a provider name and a logger.
         /// </summary>
@@ -90,9 +89,15 @@ namespace Umbraco.Core.Persistence
         /// <param name="providerName">The name of the database provider.</param>
 	    /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
+        /// <remarks>Used in tests.</remarks>
         public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-            : this(sqlSyntaxProviders, logger)
 		{
+            if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
+            _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
+            _logger = logger;
+
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
                 return; // not configured
 
