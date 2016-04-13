@@ -190,7 +190,7 @@ namespace Umbraco.Core.Services
                 var found = _supplementFileSources.Where(x =>
                 {
                     var fileName = Path.GetFileName(x.File.FullName);
-                    return fileName.InvariantStartsWith(culture.Name) && fileName.InvariantEndsWith(".xml");
+                    return fileName.InvariantStartsWith(culture.Name.Replace("-", "_")) && fileName.InvariantEndsWith(".xml");
                 });
                 
                 foreach (var supplementaryFile in found)
