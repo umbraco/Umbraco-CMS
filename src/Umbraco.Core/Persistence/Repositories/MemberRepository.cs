@@ -631,7 +631,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         "OR (cmsMember.LoginName LIKE @0))", "%" + filter + "%");
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection, TODO: Do we need a orderBySystemField here?,
+                MapQueryDtos, orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 

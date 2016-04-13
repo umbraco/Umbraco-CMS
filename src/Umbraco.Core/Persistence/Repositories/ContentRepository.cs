@@ -252,7 +252,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // want latest content items because a pulished content item might not actually be the latest.
                 // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
                 var descendants = GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out total,
-                    MapQueryDtos, "Path", Direction.Ascending, //TODO: Think this needs a true here);
+                    MapQueryDtos, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -789,7 +789,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos,
-                orderBy, orderDirection,
+                orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 

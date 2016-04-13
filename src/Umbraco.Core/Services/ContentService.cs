@@ -487,27 +487,6 @@ namespace Umbraco.Core.Services
             }
         }
 
-        [Obsolete("Use the overload with 'long' parameter types instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IContent> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
-            string orderBy, Direction orderDirection, string filter = "")
-        {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    repository.Query.Where(x => x.ParentId == id);
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
-        }
-
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
@@ -553,26 +532,6 @@ namespace Umbraco.Core.Services
                 }
                 var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
-                return contents;
-            }
-        }
-
-        [Obsolete("Use the overload with 'long' parameter types instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
-        {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    repository.Query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
                 return contents;
             }
         }

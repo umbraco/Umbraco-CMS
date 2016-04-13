@@ -499,7 +499,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : Sql().Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
 
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
-                MapQueryDtos, orderBy, orderDirection,
+                MapQueryDtos, orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 

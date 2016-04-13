@@ -255,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
 
-        private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection)
+        private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
 
@@ -271,29 +271,67 @@ namespace Umbraco.Core.Persistence.Repositories
             // apply sort
             if (string.IsNullOrEmpty(orderBy) == false)
             {
-                // get the database field eg "[table].[column]"
-                var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
+                if (orderBySystemField)
+                {
+                    // get the database field eg "[table].[column]"
+                    var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
 
-                // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
-                // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
-                // to be "NodeDto__Text" and NOT "umbracoNode.text".
-                // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
-                // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
-                // queries to begin with.
-                // thought about maintaining a map of columns-to-aliases in the sql context but that would
-                // be expensive and most of the time, useless. so instead we parse the SQL looking for the
-                // alias. somewhat expensive too but nothing's free.
+                    // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
+                    // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
+                    // to be "NodeDto__Text" and NOT "umbracoNode.text".
+                    // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
+                    // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
+                    // queries to begin with.
+                    // thought about maintaining a map of columns-to-aliases in the sql context but that would
+                    // be expensive and most of the time, useless. so instead we parse the SQL looking for the
+                    // alias. somewhat expensive too but nothing's free.
 
-                var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
-                var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value == dbfield);
-                if (match != null)
-                    dbfield = match.Groups[2].Value;
+                    var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+                    var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value == dbfield);
+                    if (match != null)
+                        dbfield = match.Groups[2].Value;
 
-                var orderByParams = new object[] { dbfield };
-                if (orderDirection == Direction.Ascending)
-                    psql.OrderBy(orderByParams);
+                    var orderByParams = new object[] {dbfield};
+                    if (orderDirection == Direction.Ascending)
+                        psql.OrderBy(orderByParams);
+                    else
+                        psql.OrderByDescending(orderByParams);
+                }
                 else
-                    psql.OrderByDescending(orderByParams);
+                {
+                    // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+                    // from most recent content version for the given order by field
+                    var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
+                    var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
+                    var sortedString = string.Format(SqlSyntax.IsNull, "dataNvarchar", "''");
+                    var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+
+                    var orderBySql = string.Format(@"ORDER BY (
+ 	                SELECT CASE
+ 		               WHEN dataInt Is Not Null THEN {0}
+                        WHEN dataDecimal Is Not Null THEN {1}
+                        WHEN dataDate Is Not Null THEN {2}
+                        ELSE {3}
+ 	                END 
+ 	                FROM cmsContent c
+ 	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
+ 		                SELECT Max(VersionDate)
+ 		                FROM cmsContentVersion
+ 		                WHERE ContentId = c.nodeId
+ 	                )
+ 	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
+ 		                AND cpd.versionId = cv.VersionId
+ 	                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
+ 	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDecimal, sortedDate, sortedString);
+
+                    throw new NotImplementedException("FIX ME!");
+
+                    //sortedSql.Append(orderBySql, orderBy);
+                    //if (orderDirection == Direction.Descending)
+                    //{
+                    //    sortedSql.Append(" DESC");
+                    //}
+                }
             }
 
             return psql;
@@ -301,7 +339,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapper,
-            string orderBy, Direction orderDirection,
+            string orderBy, Direction orderDirection, bool orderBySystemField,
             Sql<SqlContext> filterSql = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
@@ -313,7 +351,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlNodeIds = translator.Translate();
 
             // sort and filter
-            sqlNodeIds = PrepareSqlForPagedResults(sqlNodeIds, filterSql, orderBy, orderDirection);
+            sqlNodeIds = PrepareSqlForPagedResults(sqlNodeIds, filterSql, orderBy, orderDirection, orderBySystemField);
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIds);

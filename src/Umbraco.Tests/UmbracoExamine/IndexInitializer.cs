@@ -82,10 +82,6 @@ namespace Umbraco.Tests.UmbracoExamine
                         && x.GetPagedDescendants(
                         It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
                         ==
-                        allRecs
-                        && x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
-                        ==
                         allRecs);
                 
             }
