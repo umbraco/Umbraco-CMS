@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
@@ -81,9 +82,9 @@ namespace Umbraco.Tests.Services
 			_error = null;
 
 			// dispose!
-			_dbFactory.Dispose();
+            _dbFactory?.Dispose();
 
-			base.TearDown();
+            base.TearDown();
 		}
 
 		/// <summary>
@@ -264,9 +265,10 @@ namespace Umbraco.Tests.Services
 
 			public UmbracoDatabase GetDatabase()
 			{
+			    var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
                 return _databases.GetOrAdd(
                     Thread.CurrentThread.ManagedThreadId,
-                    i => new UmbracoDatabase(Core.Configuration.GlobalSettings.UmbracoConnectionName, SqlSyntax, DatabaseType, _dbProviderFactory, _logger));
+                    i => new UmbracoDatabase(settings.ConnectionString, SqlSyntax, DatabaseType, _dbProviderFactory, _logger));
 			}
 
 			protected override void DisposeResources()

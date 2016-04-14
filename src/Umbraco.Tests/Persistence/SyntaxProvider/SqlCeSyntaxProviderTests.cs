@@ -100,7 +100,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         {
             var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = new UmbracoDatabase("cstr", sqlSyntax, DatabaseType.SqlServer2005, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer), logger);
+            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);
             var createExpression = new CreateIndexExpression(context, new []{ DatabaseType.SqlServer2005 })
             {
@@ -116,7 +116,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         {
             var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = new UmbracoDatabase("cstr", sqlSyntax, DatabaseType.SqlServer2005, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer), logger);
+            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);
             var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
             {
@@ -132,7 +132,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         {
             var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = new UmbracoDatabase("cstr", sqlSyntax, DatabaseType.SqlServer2005, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer), logger);
+            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);
             var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
             {

@@ -17,29 +17,29 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Templates
 {
     [TestFixture]
     public class TemplateRepositoryTests
     {
-        private readonly Mock<IDatabaseUnitOfWork> _unitOfWorkMock = new Mock<IDatabaseUnitOfWork>();
         private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
-        private TemplateRepository _templateRepository;
         private readonly Mock<IFileSystem> _viewFileSystemMock = new Mock<IFileSystem>();
         private readonly Mock<IFileSystem> _masterpageFileSystemMock = new Mock<IFileSystem>();
         private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<Core.Configuration.UmbracoSettings.ITemplatesSection>();
+        private TemplateRepository _templateRepository;
 
         [SetUp]
         public void Setup()
         {
-            var uowMock = new Mock<IDatabaseUnitOfWork>();
-            var db = new UmbracoDatabase("cstr", new SqlCeSyntaxProvider(), DatabaseType.SQLCe, DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe), Mock.Of<ILogger>());
-            uowMock.Setup(x => x.Database).Returns(db);
+            var logger = Mock.Of<ILogger>();
 
-            var loggerMock = new Mock<ILogger>();
+            var unitOfWorkMock = new Mock<IDatabaseUnitOfWork>();
+            var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
+            unitOfWorkMock.Setup(x => x.Database).Returns(db);
 
-            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
+            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
 
         }
 

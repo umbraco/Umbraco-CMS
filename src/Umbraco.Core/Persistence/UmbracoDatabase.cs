@@ -79,6 +79,17 @@ namespace Umbraco.Core.Persistence
             EnableSqlTrace = false;
         }
 
+        // INTERNAL FOR UNIT TESTS
+        internal UmbracoDatabase(DbConnection connection,
+            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, DbProviderFactory provider,
+            ILogger logger)
+            : base(connection, databaseType, provider, DefaultIsolationLevel)
+        {
+            SqlSyntax = sqlSyntax;
+            _logger = logger;
+            EnableSqlTrace = false;
+        }
+
         // fixme: that could be an extension method of IUmbracoDatabaseConfig
         public Sql<SqlContext> Sql()
         {

@@ -33,28 +33,12 @@ namespace Umbraco.Tests.Persistence
             _logger = Mock.Of<ILogger>();
             var dbFactory = new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger);
             _dbContext = new DatabaseContext(dbFactory, _logger);
-
-			// unfortunately we have to set this up because the NPocoExtensions require singleton access
-            // fixme - there is no need for this!
-            /*
-			ApplicationContext.Current = new ApplicationContext(
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()))
-				{
-					DatabaseContext = _dbContext,
-					IsReady = true
-				};
-            */
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
 			_dbContext = null;
-            // fixme - no need
-            /*
-			ApplicationContext.Current = null;
-            */
 		}
 
         [Test]
@@ -95,7 +79,7 @@ namespace Umbraco.Tests.Persistence
             engine.CreateDatabase();
 
             // re-create the database factory and database context with proper connection string
-            var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, _sqlSyntaxProviders, _logger);
+            var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger);
             _dbContext = new DatabaseContext(dbFactory, _logger);
 
             // create application context

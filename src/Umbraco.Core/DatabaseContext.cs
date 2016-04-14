@@ -63,7 +63,7 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public virtual UmbracoDatabase Database => _factory.GetDatabase();
+        public UmbracoDatabase Database => _factory.GetDatabase();
 
         /// <summary>
         /// Gets a value indicating whether the database is configured, ie whether it exists
@@ -75,7 +75,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets a value indicating whether it is possible to connect to the database.
         /// </summary>
-        public virtual bool CanConnect
+        public bool CanConnect
         {
             get
             {

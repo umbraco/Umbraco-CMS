@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -31,8 +33,21 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <see cref="DefaultDatabaseFactory"/> with the default connection name, and default sql syntax providers.</para>
         /// </remarks>
         internal NPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, SqlSyntaxProviders.GetDefaultProviders(logger), logger))
+            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger))
         { }
+
+        // this should NOT be here, all tests should supply the appropriate providers,
+        // however the above ctor is used in hundreds of tests at the moment, so...
+        // will refactor later
+        private static IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger)
+        {
+            return new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(logger),
+                new SqlCeSyntaxProvider(),
+                new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null))
+            };
+        }
 
         #region Implement IUnitOfWorkProvider
 

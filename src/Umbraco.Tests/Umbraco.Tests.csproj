@@ -185,6 +185,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
+    <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
+    <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -436,7 +438,6 @@
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
-    <Compile Include="TestHelpers\MockHelper.cs" />
     <Compile Include="TestHelpers\RequiresAutoMapperMappingsAttribute.cs" />
     <Compile Include="TestHelpers\TestProfiler.cs" />
     <Compile Include="TreesAndSections\ResourceFiles.Designer.cs">

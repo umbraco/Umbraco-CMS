@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         public override void Up()
         {
             //NOTE Don't think we can remove this column yet as it seems to be used by some starterkits
-            IfDatabase(DatabaseType.SQLCe, DatabaseType.SqlServer2005)
+            IfDatabase(DatabaseType.SQLCe, DatabaseType.SqlServer2008)
                 .Delete.DefaultConstraint().OnTable("cmsContentType").OnColumn("masterContentType");
 
             Delete.Column("masterContentType").FromTable("cmsContentType");

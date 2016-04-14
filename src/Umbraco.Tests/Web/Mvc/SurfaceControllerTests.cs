@@ -73,9 +73,11 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Umbraco_Helper_Not_Null()
         {
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>()),
-                MockHelper.GetMockedServiceContext(),
+                new DatabaseContext(databaseFactory, Mock.Of<ILogger>()),
+                TestObjects.GetServiceContextMock(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 

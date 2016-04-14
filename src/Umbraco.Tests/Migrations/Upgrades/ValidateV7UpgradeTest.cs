@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroPropertyTable()
         {
-            var migration = new AddIndexToCmsMacroTable(true, _logger);
+            var migration = new AddIndexToCmsMacroPropertyTable(true, _logger);
             var migrationContext = new MigrationContext(_database, _logger);
             migration.GetUpExpressions(migrationContext);
 
