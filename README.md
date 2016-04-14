@@ -13,11 +13,11 @@ If you're interested in making changes to Belle make sure to read the [Belle Rea
 
 ## Umbraco - the simple, flexible and friendly ASP.NET CMS ##
 
-**More than 177,000 sites trust Umbraco** 
+**More than 350,000 sites trust Umbraco** 
 
 For the first time on the Microsoft platform, there is a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports ASP.NET MVC or Web Forms, including User and Custom Controls, out of the box. It's a developer's dream and your users will love it too. 
 
-Used by more than 177,000 active websites including [http://daviscup.com](http://daviscup.com), [http://heinz.com](http://heinz.com), [http://peugeot.com](http://peugeot.com), [http://www.hersheys.com/](http://www.hersheys.com/) and **The Official ASP.NET and IIS.NET website from Microsoft** ([http://asp.net](http://asp.net) / [http://iis.net](http://iis.net)), you can be sure that the technology is proven, stable and scales.  
+Used by more than 350,000 active websites including [http://daviscup.com](http://daviscup.com), [http://heinz.com](http://heinz.com), [http://peugeot.com](http://peugeot.com), [http://www.hersheys.com/](http://www.hersheys.com/) and **The Official ASP.NET and IIS.NET website from Microsoft** ([http://asp.net](http://asp.net) / [http://iis.net](http://iis.net)), you can be sure that the technology is proven, stable and scales.  
 
 To view more examples, please visit [http://umbraco.com/why-umbraco/#caseStudies](http://umbraco.com/why-umbraco/#caseStudies)
 

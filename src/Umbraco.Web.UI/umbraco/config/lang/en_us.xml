@@ -175,6 +175,7 @@
 	  <key alias="urls">Link to media</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
+    <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
   </area>
   <area alias="member">
@@ -271,7 +272,8 @@
 
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
-    <key alias="stracktrace">Stacktrace</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>

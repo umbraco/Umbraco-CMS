@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -23,6 +14,13 @@ namespace Umbraco.Web.WebApi.Filters
             //See: http://stackoverflow.com/questions/17755239/how-to-stop-chrome-from-caching-rest-response-from-webapi
 
             base.OnActionExecuted(actionExecutedContext);
+
+            // happens if exception
+            if (actionExecutedContext == null || actionExecutedContext.Response == null ||
+                    actionExecutedContext.Response.Headers == null)
+            {
+                return;
+            }
 
             //NOTE: Until we upgraded to WebApi 2, this didn't work correctly and we had to revert to using
             // HttpContext.Current responses. I've changed this back to what it should be now since it works
@@ -42,9 +40,6 @@ namespace Umbraco.Web.WebApi.Filters
                     //Mon, 01 Jan 1990 00:00:00 GMT
                     new DateTimeOffset(1990, 1, 1, 0, 0, 0, TimeSpan.Zero);
             }
-
-            
-            
         }
     }
 }
