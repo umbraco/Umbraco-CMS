@@ -162,6 +162,13 @@ namespace umbraco.presentation.developer.packages
 
                     /*Data types */
                     cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+
+                    // sort array by name
+                    Array.Sort(umbDataType, delegate(cms.businesslogic.datatype.DataTypeDefinition umbDataType1, cms.businesslogic.datatype.DataTypeDefinition umbDataType2)
+                    {
+                        return umbDataType1.Text.CompareTo(umbDataType2.Text);
+                    });
+
                     foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
                     {
 
