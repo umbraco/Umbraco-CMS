@@ -251,13 +251,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             string content;
 
-            if (template._useExistingContent)
+            var templateOnDisk = template as TemplateOnDisk;
+            if (templateOnDisk != null && templateOnDisk.IsOnDisk)
             {
-                content = _viewHelper.GetFileContents(template); // BUT the template does not exist yet?!
-                template._useExistingContent = false; // reset
+                // if "template on disk" load content from disk
+                content = _viewHelper.GetFileContents(template);
             }
             else
             {
+                // else, create or write template.Content to disk
                 if (DetermineTemplateRenderingEngine(template) == RenderingEngine.Mvc)
                 {
                     content = originalAlias == null
@@ -272,6 +274,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            // once content has been set, "template on disk" are not "on disk" anymore
             template.Content = content;
 
             if (dto.Design == content) return;
@@ -449,12 +452,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        public Stream GetFileStream(string filepath)
+        public Stream GetFileContent(string filepath)
         {
             return GetFileSystem(filepath).OpenFile(filepath);
         }
 
-        public void SetFile(string filepath, Stream content)
+        public void SetFileContent(string filepath, Stream content)
         {
             GetFileSystem(filepath).AddFile(filepath, content, true);
         }

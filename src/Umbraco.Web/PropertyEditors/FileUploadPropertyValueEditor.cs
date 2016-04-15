@@ -75,7 +75,7 @@ namespace Umbraco.Web.PropertyEditors
             if (clears)
             {
                 foreach (var pathToRemove in currentPaths)
-                    fs.DeleteFile(pathToRemove, true);
+                    ImageHelper.DeleteFile(fs, pathToRemove, true);
                 return string.Empty; // no more files
             }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove files that are not there anymore
             foreach (var pathToRemove in currentPaths.Except(newPaths))
-                fs.DeleteFile(pathToRemove, true);
+                ImageHelper.DeleteFile(fs, pathToRemove, true);
 
 
             return string.Join(",", newPaths.Select(x => fs.GetUrl(x)));

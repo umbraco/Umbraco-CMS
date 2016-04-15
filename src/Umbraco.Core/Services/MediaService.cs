@@ -1259,19 +1259,19 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Stream GetMediaFileStream(string filepath)
+        public Stream GetMediaFileContent(string filepath)
         {
             return MediaHelper.FileSystem.OpenFile(filepath);
         }
 
-        public void SetMediaFile(string filepath, Stream stream)
+        public void SetMediaFileContent(string filepath, Stream stream)
         {
             MediaHelper.FileSystem.AddFile(filepath, stream, true);
         }
 
         public void DeleteMediaFile(string filepath)
         {
-            MediaHelper.FileSystem.DeleteFile(filepath, true);
+            ImageHelper.DeleteFile(MediaHelper.FileSystem, filepath, true);
         }
 
         public void GenerateThumbnails(string filepath, PropertyType propertyType)

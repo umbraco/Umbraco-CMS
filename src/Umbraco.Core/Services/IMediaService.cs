@@ -377,14 +377,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         /// <returns>The content of the media.</returns>
-        Stream GetMediaFileStream(string filepath);
+        Stream GetMediaFileContent(string filepath);
 
         /// <summary>
         /// Sets the content of a media.
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         /// <param name="content">The content of the media.</param>
-        void SetMediaFile(string filepath, Stream content);
+        void SetMediaFileContent(string filepath, Stream content);
 
         /// <summary>
         /// Deletes a media file and all thumbnails.

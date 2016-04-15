@@ -558,19 +558,19 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Stream GetTemplateFileStream(string filepath)
+        public Stream GetTemplateFileContent(string filepath)
         {
-            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetFileStream(filepath);
+                return repository.GetFileContent(filepath);
             }
         }
 
-        public void SetTemplateFile(string filepath, Stream content)
+        public void SetTemplateFileContent(string filepath, Stream content)
         {
-            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
             {
-                repository.SetFile(filepath, content);
+                repository.SetFileContent(filepath, content);
             }
         }
 

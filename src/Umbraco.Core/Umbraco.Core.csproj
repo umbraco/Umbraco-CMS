@@ -403,6 +403,7 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployChecksumDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployDependencyDto.cs" />
+    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />

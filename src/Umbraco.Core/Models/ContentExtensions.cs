@@ -450,11 +450,11 @@ namespace Umbraco.Core.Models
         #region SetValue for setting file contents
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileBase object as the property value
+        /// Stores and sets an uploaded HttpPostedFileBase as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFileBase"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
             // ensure we get the filename without the path in IE in intranet mode 
@@ -478,37 +478,37 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFile object as the property value
+        /// Stores and sets an uploaded HttpPostedFile as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFile"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)new HttpPostedFileWrapper(value));
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) new HttpPostedFileWrapper(value));
         }
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileWrapper object as the property value
+        /// Stores and sets an uploaded HttpPostedFileWrapper as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFileWrapper"/>.</param>
         [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) value);
         }
 
         /// <summary>
-        /// Sets a content item property value with a file coming from a stream.
+        /// Stores and sets a file as a property value.
         /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="propertyTypeAlias">The property type alias.</param>
-        /// <param name="filename">Name of the file</param>
-        /// <param name="filestream">The stream containing the file data.</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <param name="filestream">A stream containing the file data.</param>
         /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
-        /// you need to store the file by yourself using <see cref="StoreFile"/> and then figure out
+        /// you need to store the file by yourself using Store and then figure out
         /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream)
         {
@@ -522,12 +522,28 @@ namespace Umbraco.Core.Models
             MediaHelper.SetUploadFile(content, propertyTypeAlias, filename, filestream);
         }
 
-        public static string StoreFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string oldpath)
+        /// <summary>
+        /// Stores a file.
+        /// </summary>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <param name="filestream">A stream containing the file data.</param>
+        /// <param name="filepath">The original file path, if any.</param>
+        /// <returns>The path to the file, relative to the media filesystem.</returns>
+        /// <remarks>
+        /// <para>Does NOT set the property value, so one should probably store the file and then do
+        /// something alike: property.Value = MediaHelper.FileSystem.GetUrl(filepath).</para>
+        /// <para>The original file path is used, in the old media file path scheme, to try and reuse
+        /// the "folder number" that was assigned to the previous file referenced by the property,
+        /// if any.</para>
+        /// </remarks>
+        public static string StoreFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
             var propertyType = content.GetContentType()
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
-            return MediaHelper.StoreFile(content, propertyType, filename, filestream, oldpath);
+            return MediaHelper.StoreFile(content, propertyType, filename, filestream, filepath);
         }
 
         #endregion

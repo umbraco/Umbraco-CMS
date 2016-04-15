@@ -22,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -579,7 +580,7 @@ WHERE EXISTS(
                     }
                     else
                     {
-                        fs.DeleteFile(file, true);
+                        ImageHelper.DeleteFile(fs, file, true);
                     }
                 }
                 catch (Exception e)

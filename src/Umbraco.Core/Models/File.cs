@@ -25,21 +25,6 @@ namespace Umbraco.Core.Models
         private string _content;
         internal Func<File, string> GetFileContent { get; set; }
 
-        // whether to use whatever already exists on filesystem
-        internal bool _useExistingContent;
-
-        /// <summary>
-        /// Indicates that the file should use whatever content already
-        /// exists on the filesystem which manages the file, bypassing content
-        /// management entirely.
-        /// </summary>
-        /// <remarks>Only for the next save. Is resetted when the file is saved.</remarks>
-        public void UseExistingContent()
-        {
-            _useExistingContent = true;
-            _content = null; // force content to be loaded
-        }
-
         protected File(string path, Func<File, string> getFileContent = null)
         {
             _path = SanitizePath(path);

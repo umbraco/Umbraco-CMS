@@ -91,6 +91,8 @@ namespace Umbraco.Core.Media
 
         #region Manage thumbnails
 
+        // note: this does not find 'custom' thumbnails?
+        // will find _thumb and _big-thumb but NOT _custom?
         public static IEnumerable<string> GetThumbnails(IFileSystem fs, string path)
         {
             var parentDirectory = Path.GetDirectoryName(path);

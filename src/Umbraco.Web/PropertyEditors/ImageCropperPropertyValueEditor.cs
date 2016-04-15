@@ -122,7 +122,7 @@ namespace Umbraco.Web.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    fs.DeleteFile(currentPath, true);
+                    ImageHelper.DeleteFile(fs, currentPath, true);
                     return null; // clear
                 }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                fs.DeleteFile(currentPath, true);
+                ImageHelper.DeleteFile(fs, currentPath, true);
 
             // update json and return
             if (editorJson == null) return null;

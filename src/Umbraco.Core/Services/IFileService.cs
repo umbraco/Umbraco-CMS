@@ -242,13 +242,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The content of the template.</returns>
-        Stream GetTemplateFileStream(string filepath);
+        Stream GetTemplateFileContent(string filepath);
 
         /// <summary>
         /// Sets the content of a template.
         /// </summary>
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <param name="content">The content of the template.</param>
-        void SetTemplateFile(string filepath, Stream content);
+        void SetTemplateFileContent(string filepath, Stream content);
     }
 }

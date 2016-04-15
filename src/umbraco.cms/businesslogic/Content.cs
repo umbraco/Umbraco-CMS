@@ -13,6 +13,7 @@ using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.cms.helpers;
 using umbraco.cms.businesslogic.datatype.controls;
+using Umbraco.Core.Media;
 using File = System.IO.File;
 using Property = umbraco.cms.businesslogic.property.Property;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -631,7 +632,7 @@ namespace umbraco.cms.businesslogic
                     }
                     else
                     {
-                        fs.DeleteFile(relativeFilePath, true);
+                        ImageHelper.DeleteFile(fs, relativeFilePath, true);
                     }
                 }
             }

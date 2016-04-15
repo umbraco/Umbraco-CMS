@@ -41,6 +41,7 @@ namespace Umbraco.Core.Media
         /// <param name="cuid">The unique identifier of the content/media owning the file.</param>
         /// <param name="puid">The unique identifier of the property type owning the file.</param>
         /// <returns>The filesystem-relative path to the media file.</returns>
+        /// <remarks>With the old media path scheme, this CREATES a new media path each time it is invoked.</remarks>
         public static string GetMediaPath(string filename, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
@@ -79,7 +80,7 @@ namespace Umbraco.Core.Media
         /// <param name="puid">The unique identifier of the property type owning the file.</param>
         /// <returns>The filesystem-relative path to the media file.</returns>
         /// <remarks>In the old, legacy, number-based scheme, we try to re-use the media folder
-        /// specified by <paramref name="prevpath"/>. Else, we create a new one.</remarks>
+        /// specified by <paramref name="prevpath"/>. Else, we CREATE a new one. Each time we are invoked.</remarks>
         public static string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
         {
             if (UseTheNewMediaPathScheme || string.IsNullOrWhiteSpace(prevpath))
@@ -112,14 +113,14 @@ namespace Umbraco.Core.Media
         /// Gets the next media folder in the original number-based scheme.
         /// </summary>
         /// <returns></returns>
+        /// <remarks>Should be private, is internal for legacy FileHandlerData which is obsolete.</remarks>
         internal static string GetNextFolder()
         {
             lock (FolderCounterLock)
             {
                 if (_folderCounterInitialized == false)
                 {
-                    // fixme - seed was not respected in MediaSubfolderCounter?
-                    _folderCounter = 1000; // seed
+                    _folderCounter = 1000; // seed - was not respected in MediaSubfolderCounter?
                     var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
                     var directories = fs.GetDirectories("");
                     foreach (var directory in directories)
@@ -163,7 +164,7 @@ namespace Umbraco.Core.Media
             // clear the old file, if any
             var fs = FileSystem;
             if (string.IsNullOrWhiteSpace(oldpath))
-                fs.DeleteFile(oldpath, true);
+                ImageHelper.DeleteFile(fs, oldpath, true);
 
             // get the filepath, store the data
             // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
@@ -178,7 +179,7 @@ namespace Umbraco.Core.Media
         /// <param name="filepath">The filesystem-relative path to the media file.</param>
         public static void DeleteFile(string filepath)
         {
-            FileSystem.DeleteFile(filepath, true);
+            ImageHelper.DeleteFile(FileSystem, filepath, true);
         }
 
         /// <summary>
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Media
             var filename = Path.GetFileName(sourcepath);
             var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             fs.CopyFile(sourcepath, filepath);
-            fs.CopyThumbnails(sourcepath, filepath);
+            ImageHelper.CopyThumbnails(fs, sourcepath, filepath);
             return filepath;
         }
 

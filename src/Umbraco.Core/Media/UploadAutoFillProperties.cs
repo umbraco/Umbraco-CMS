@@ -11,7 +11,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Media
 {
     /// <summary>
-    /// Provides extension methods to manage auto-fill properties for upload fields.
+    /// Provides methods to manage auto-fill properties for upload fields.
     /// </summary>
     internal static class UploadAutoFillProperties
     {
