@@ -39,8 +39,7 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (IsOnDisk) throw new InvalidOperationException("On-disk template do not have content until saved.");
-                return base.Content;
+                return IsOnDisk ? string.Empty : base.Content;
             }
             set
             {

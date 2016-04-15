@@ -418,6 +418,8 @@ namespace Umbraco.Core.Persistence.Repositories
             fsname = string.Concat(template.Alias, ".master");
             if (_masterpagesFileSystem.FileExists(fsname))
                 return GetFileContent(template, _masterpagesFileSystem, fsname, init);
+
+            template.VirtualPath = string.Empty; // file not found...
             return string.Empty;
         }
 
@@ -454,7 +456,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Stream GetFileContent(string filepath)
         {
-            return GetFileSystem(filepath).OpenFile(filepath);
+            var fs = GetFileSystem(filepath);
+            if (fs.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return GetFileSystem(filepath).OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
         }
 
         public void SetFileContent(string filepath, Stream content)

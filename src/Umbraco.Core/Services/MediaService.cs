@@ -1261,7 +1261,16 @@ namespace Umbraco.Core.Services
 
         public Stream GetMediaFileContent(string filepath)
         {
-            return MediaHelper.FileSystem.OpenFile(filepath);
+            if (MediaHelper.FileSystem.FileExists(filepath) == false)
+                return null;
+            try
+            {
+                return MediaHelper.FileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
         }
 
         public void SetMediaFileContent(string filepath, Stream stream)
