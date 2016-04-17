@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
+using System.Runtime.Serialization;
 using Umbraco.Web.Editors;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -30,13 +28,33 @@ namespace Umbraco.Web.HealthCheck
         // * Execute action
         // * more?
 
-        public IEnumerable<HealthCheckStatus> GetAllHealthChecks()
+        /// <summary>
+        /// Gets a grouped list of health checks, but doesn't actively check the status of each health check.
+        /// </summary>
+        /// <returns>Returns a collection of anonymous objects representing each group.</returns>
+        public object GetAllHealthChecks()
         {
-            //get the health check instances
-            var checks = _healthCheckResolver.HealthChecks;
+            var groups = _healthCheckResolver.HealthChecks.GroupBy(x => x.Group);
+            var healthCheckGroups = new List<HealthCheckGroup>();
+            foreach (var healthCheckGroup in groups)
+            {
+                var hcGroup = new HealthCheckGroup
+                {
+                    Name = healthCheckGroup.Key,
+                    Checks = healthCheckGroup.ToList()
+                };
+                healthCheckGroups.Add(hcGroup);
+            }
 
-            //return their statuses
-            return checks.SelectMany(x => x.GetStatus());
+            return healthCheckGroups;
+        }
+
+        public object GetStatus(Guid id)
+        {
+            var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == id);
+            if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
+
+            return check.GetStatus();
         }
 
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)

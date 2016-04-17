@@ -9,19 +9,28 @@
 angular.module("umbraco.services").factory("healtCheckService", function ($http, umbRequestHelper) {
     return {
         
-         /**
-          * @ngdoc function
-          * @name umbraco.services.healtCheckService#getAllChecks
-          * @methodOf umbraco.services.healtCheckService
-          * @function
-          *
-          * @description
-          * Called to execute all available health checks
-          */
-         getAllChecks: function() {
+        /**
+         * @ngdoc function
+         * @name umbraco.services.healtCheckService#getAllChecks
+         * @methodOf umbraco.services.healtCheckService
+         * @function
+         *
+         * @description
+         * Called to execute all available health checks
+         */
+        getAllChecks: function() {
             return umbRequestHelper.resourcePromise(
-               $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + "GetAllHealthChecks"),
-			   "Failed to retrieve health checks");
+                $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + "GetAllHealthChecks"),
+                "Failed to retrieve health checks"
+            );
+        },
+
+        getStatus: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'GetStatus?id=' + id),
+                'Failed to retrieve status for health check with ID ' + id
+            );
         }
+
 	};
 });

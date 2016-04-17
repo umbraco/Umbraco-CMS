@@ -1,0 +1,57 @@
+#umbracoHealthCheck {
+
+	.table {
+
+		> table {
+			width: 100%;
+			border: 1px solid #d9d9d9;
+
+			> thead {
+				font-size: 11px;
+				font-weight: 600;
+				text-transform: uppercase;
+				background-color: #f8f8f8;
+				th {
+					text-align: left;
+					border-bottom: 2px solid #dbdbdb;
+				}
+			}
+
+			> tbody {
+				td.page {
+					width: 100%;
+				}
+
+				td.nowrap {
+					white-space: nowrap;
+				}
+			}
+
+			> * > tr {
+				-moz-transition: opacity 0.5s;
+				-o-transition: opacity 0.5s;
+				-webkit-transition: opacity 0.5s;
+				transition: opacity 0.5s;
+
+				&.expanded > td {
+					border-bottom: 1px solid white;
+				}
+
+				> td, > th {
+					padding: 8px;
+					line-height: 20px;
+					text-align: left;
+					vertical-align: top;
+					border-top: 1px solid #dbdbdb;
+
+					&:last-child {
+						border-right: 1px solid #dbdbdb;
+					}
+				}
+			}
+
+		}
+
+	}
+
+}
