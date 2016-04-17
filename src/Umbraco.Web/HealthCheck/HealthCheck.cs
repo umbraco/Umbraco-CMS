@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core;
 
 namespace Umbraco.Web.HealthCheck
@@ -7,6 +8,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// The abstract health check class
     /// </summary>
+    [DataContract(Name = "healtCheck", Namespace = "")]
     public abstract class HealthCheck
     {
         protected HealthCheck(HealthCheckContext healthCheckContext)
@@ -24,10 +26,19 @@ namespace Umbraco.Web.HealthCheck
             Id = meta.Id;
         }
 
+        [IgnoreDataMember]
         public HealthCheckContext HealthCheckContext { get; private set; }
+
+        [DataMember(Name = "id")]
         public Guid Id { get; private set; }
+
+        [DataMember(Name = "name")]
         public string Name { get; private set; }
+
+        [DataMember(Name = "description")]
         public string Description { get; private set; }
+
+        [DataMember(Name = "group")]
         public string Group { get; private set; }
 
         /// <summary>

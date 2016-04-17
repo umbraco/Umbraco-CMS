@@ -322,6 +322,7 @@
     <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckContext.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
+    <Compile Include="HealthCheck\HealthCheckGroup.cs" />
     <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
