@@ -163,7 +163,7 @@ namespace Umbraco.Core.Media
 
             // clear the old file, if any
             var fs = FileSystem;
-            if (string.IsNullOrWhiteSpace(oldpath))
+            if (string.IsNullOrWhiteSpace(oldpath) == false)
                 ImageHelper.DeleteFile(fs, oldpath, true);
 
             // get the filepath, store the data
@@ -235,7 +235,7 @@ namespace Umbraco.Core.Media
             var oldpath = svalue == null ? null : FileSystem.GetRelativePath(svalue);
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.Value = FileSystem.GetUrl(filepath);
-            SetUploadFile(content, property, null, filepath, filestream);
+            SetUploadFile(content, property, FileSystem, filepath, filestream);
         }
 
         public static void SetUploadFile(IContentBase content, string propertyTypeAlias, string filepath)
