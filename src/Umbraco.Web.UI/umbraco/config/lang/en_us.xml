@@ -65,6 +65,7 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Clear selection</key>
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
@@ -483,8 +484,8 @@
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
     <key alias="current">current</key>
-    <key alias="move">Move</key>
     <key alias="embed">Embed</key>
+    <key alias="selected">selected</key>
   </area>
   <area alias="colors">
     <key alias="black">Black</key>
