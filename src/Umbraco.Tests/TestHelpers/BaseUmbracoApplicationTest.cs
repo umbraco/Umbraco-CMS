@@ -147,7 +147,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
-        protected void SetupApplicationContext()
+        protected virtual void SetupApplicationContext()
         {
             var applicationContext = CreateApplicationContext();
             ApplicationContext.Current = applicationContext;
