@@ -303,34 +303,37 @@ namespace Umbraco.Core.Persistence.Repositories
                     // from most recent content version for the given order by field
                     var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
                     var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
-                    var sortedString = string.Format(SqlSyntax.IsNull, "dataNvarchar", "''");
+                    var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar");
                     var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
-                    var orderBySql = string.Format(@"ORDER BY (
+                    var innerJoinTempTable = string.Format(@"INNER JOIN (
  	                SELECT CASE
- 		               WHEN dataInt Is Not Null THEN {0}
+ 		                WHEN dataInt Is Not Null THEN {0}
                         WHEN dataDecimal Is Not Null THEN {1}
                         WHEN dataDate Is Not Null THEN {2}
                         ELSE {3}
- 	                END 
- 	                FROM cmsContent c
- 	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
- 		                SELECT Max(VersionDate)
- 		                FROM cmsContentVersion
- 		                WHERE ContentId = c.nodeId
- 	                )
- 	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
- 		                AND cpd.versionId = cv.VersionId
- 	                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
- 	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDecimal, sortedDate, sortedString);
+ 	                END AS CustomPropVal,
+                    cd.nodeId AS CustomPropValContentId
+ 	                FROM cmsDocument cd
+                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
+                    INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
+			        WHERE cpt.Alias = @2 AND cd.newest = 1) AS CustomPropData
+                    ON CustomPropData.CustomPropValContentId = umbracoNode.id
+", sortedInt, sortedDecimal, sortedDate, sortedString);
 
-                    throw new NotImplementedException("FIX ME!");
+                    //insert this just above the LEFT OUTER JOIN
+                    var newSql = psql.SQL.Insert(psql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);                    
+                    var newArgs = psql.Arguments.ToList();
+                    newArgs.Add(orderBy);
 
-                    //sortedSql.Append(orderBySql, orderBy);
-                    //if (orderDirection == Direction.Descending)
-                    //{
-                    //    sortedSql.Append(" DESC");
-                    //}
+                    psql = new Sql<SqlContext>(psql.SqlContext, newSql, newArgs.ToArray());
+
+                    psql.OrderBy("CustomPropData.CustomPropVal");
+                    //psql.Append(innerJoinTempTable, orderBy);
+                    if (orderDirection == Direction.Descending)
+                    {
+                        psql.Append(" DESC");
+                    }
                 }
             }
 
