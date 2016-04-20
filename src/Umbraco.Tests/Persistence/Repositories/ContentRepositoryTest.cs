@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
@@ -544,6 +545,41 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_GetPagedResultsByQuery_Sorting_On_Custom_Property()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Name.Contains("Text"));
+                long totalRecords;
+                
+                try
+                {                    
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
+
+                    var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "title", Direction.Ascending, false);
+
+                    Assert.AreEqual(3, totalRecords);
+                    Assert.AreEqual(2, result.Count());
+
+                    result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
+                    
+                    Assert.AreEqual(1, result.Count());
+                }
+                finally
+                {                
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }                
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_ContentRepository()
         {
             // Arrange
@@ -555,12 +591,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
-                // Assert
-                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
-                Assert.That(result.Count(), Is.EqualTo(1));
-                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+                try
+                {
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
+                    var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
+
+                    // Assert
+                    Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                    Assert.That(result.Count(), Is.EqualTo(1));
+                    Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+                }
+                finally
+                {
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }
             }
         }
 

@@ -105,6 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
 
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",

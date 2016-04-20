@@ -360,10 +360,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
-        public override string IsNull { get { return "IFNULL({0},{1})"; } }
-        public override string ConvertIntegerToOrderableString { get { return "LPAD({0}, 8, '0')"; } }
+        public override string ConvertIntegerToOrderableString { get { return "LPAD(FORMAT({0}, 0), 8, '0')"; } }
         public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
-        public override string ConvertDecimalToOrderableString { get { return "LPAD({0}, 25, '0')"; } }
+        public override string ConvertDecimalToOrderableString { get { return "LPAD(FORMAT({0}, 9), 20, '0')"; } }
 
         public override bool? SupportsCaseInsensitiveQueries(Database db)
         {
