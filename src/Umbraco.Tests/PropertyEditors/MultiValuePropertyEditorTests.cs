@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -88,6 +99,22 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownPreValueEditor_Format_Data_For_Editor()
         {
+            // editor wants ApplicationContext.Current.Services.TextService
+            // (that should be fixed with proper injection)
+            var logger = Mock.Of<ILogger>();
+            var textService = new Mock<ILocalizedTextService>();
+            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
+            var appContext = new ApplicationContext(
+                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, new SqlSyntaxProviders(Enumerable.Empty<ISqlSyntaxProvider>())),
+                new ServiceContext(
+                    localizedTextService: textService.Object
+                ),
+                Mock.Of<CacheHelper>(),
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()))
+            {
+                IsReady = true
+            };
+            ApplicationContext.Current = appContext;
 
             var defaultVals = new Dictionary<string, object>();
             var persisted = new PreValueCollection(new Dictionary<string, PreValue>
