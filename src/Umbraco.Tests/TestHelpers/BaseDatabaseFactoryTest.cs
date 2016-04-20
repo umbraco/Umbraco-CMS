@@ -97,7 +97,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(
+                ServiceContextHelper.GetServiceContext(
                         Container.GetInstance<RepositoryFactory>(),
                         new NPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),

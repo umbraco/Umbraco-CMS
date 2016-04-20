@@ -181,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
+    <Compile Include="TestHelpers\ServiceContextHelper.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />

@@ -214,7 +214,7 @@ namespace Umbraco.Tests.TestHelpers
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
                     Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(
+                ServiceContextHelper.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(), 
                     new NPocoUnitOfWorkProvider(Logger), 
                     new FileUnitOfWorkProvider(),
