@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Migrations;
 
@@ -7,8 +8,10 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Base class that can be used to run code after the migration runner has executed
     /// </summary>
-    public abstract class MigrationStartupHander : ApplicationEventHandler
+    public abstract class MigrationStartupHandler : ApplicationEventHandler, IDisposable
     {
+        private bool _disposed;
+
         /// <summary>
         /// Ensure this is run when not configured
         /// </summary>
@@ -57,5 +60,23 @@ namespace Umbraco.Web.Strategies.Migrations
         /// Leaving empty will run for all migration products
         /// </remarks>
         public virtual string[] TargetProductNames { get { return new string[] {}; } }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~MigrationStartupHandler()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            _disposed = true;
+            Unsubscribe();
+        }
     }
 }

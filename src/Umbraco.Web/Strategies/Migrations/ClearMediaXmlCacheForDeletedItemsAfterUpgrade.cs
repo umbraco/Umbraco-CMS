@@ -16,7 +16,7 @@ namespace Umbraco.Web.Strategies.Migrations
     ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHander
+    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHandler
     {
         private readonly ISqlSyntaxProvider _sqlSyntax;
 

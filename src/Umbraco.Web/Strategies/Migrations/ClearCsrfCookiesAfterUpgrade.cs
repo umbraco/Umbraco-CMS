@@ -10,7 +10,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// After upgrade we clear out the csrf tokens
     /// </summary>
-    public class ClearCsrfCookiesAfterUpgrade : MigrationStartupHander
+    public class ClearCsrfCookiesAfterUpgrade : MigrationStartupHandler
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
