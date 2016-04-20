@@ -569,11 +569,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = repository.Query.Where(x => x.Name.Contains("Text"));
                 long totalRecords;
-
-                //var origRegex = NPoco.PagingHelper.rxOrderBy;
+                
                 try
                 {                    
-                    //NPoco.PagingHelper.rxOrderBy = new Regex("(?!.*(?:\\s+FROM[\\s\\(]+))ORDER\\s+BY\\s+([\\w\\.\\[\\]\\(\\) \"`,'@\\s\\+\\=]+)(?!.*\\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
                     DatabaseContext.Database.EnableSqlTrace = true;
                     DatabaseContext.Database.EnableSqlCount();
 
@@ -587,8 +585,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreEqual(1, result.Count());
                 }
                 finally
-                {
-                    //NPoco.PagingHelper.rxOrderBy = origRegex;
+                {                
                     DatabaseContext.Database.EnableSqlTrace = false;
                     DatabaseContext.Database.DisableSqlCount();
                 }                
