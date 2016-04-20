@@ -66,12 +66,16 @@
     font-weight: normal;
 }
 
-.login-overlay .alert.alert-error {
+.login-overlay .alert {
     display: inline-block;
     padding-right: 6px;
     padding-left: 6px;
     margin-top: 10px;
     text-align: center;
+}
+
+.login-overlay .switch-view {
+    margin-top: 10px;    
 }
 
 @media (max-width: 565px) {
@@ -108,3 +112,9 @@
     margin: auto;
     color: @grayLight;
 }
+
+.login-overlay .text-error, 
+.login-overlay .text-info 
+{
+    font-weight:bold;
+} 

@@ -449,13 +449,12 @@
 
         function setSorting(field, allow, options) {
             if (allow) {
-                options.orderBy = field;
-
-                if (options.orderDirection === "desc") {
-                    options.orderDirection = "asc";
-                } else {
+                if (options.orderBy === field && options.orderDirection === 'asc') {
                     options.orderDirection = "desc";
+                } else {
+                    options.orderDirection = "asc";
                 }
+                options.orderBy = field;
             }
         }
 
