@@ -113,6 +113,12 @@ namespace Umbraco.Tests.Persistence.Migrations
             private readonly string _prodName;
             private readonly Args _changed;
 
+            // need that one else it breaks IoC
+            public TestMigrationHandler()
+            {
+                _changed = new Args();
+            }
+
             public TestMigrationHandler(Args changed)
             {
                 _changed = changed;
