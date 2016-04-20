@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(28, foundTypes1.Count());
+            Assert.AreEqual(29, foundTypes1.Count()); // 29 classes in the solution implement BaseMapper
         }
 
         [Test]
@@ -277,14 +277,14 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Actions()
         {
             var actions = _manager.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(36, actions.Count()); // 36 classes in the solution implement IAction
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(39, trees.Count());
+            Assert.AreEqual(8, trees.Count()); // 8 classes in the solution implement BaseTree
         }
         
         [Test]
