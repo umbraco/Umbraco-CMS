@@ -497,6 +497,7 @@
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="Security\EmailService.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
@@ -1304,7 +1305,6 @@
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ShortStringHelperResolver.cs" />
     <Compile Include="Strings\IShortStringHelper.cs" />
-    <Compile Include="Strings\LegacyShortStringHelper.cs" />
     <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="Models\ApplicationTree.cs" />

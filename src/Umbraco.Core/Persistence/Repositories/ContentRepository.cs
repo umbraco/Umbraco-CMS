@@ -252,7 +252,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // want latest content items because a pulished content item might not actually be the latest.
                 // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
                 var descendants = GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out total,
-                    MapQueryDtos, "Path", Direction.Ascending);
+                    MapQueryDtos, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -777,10 +777,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
             var filterSql = Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter.IsNullOrWhiteSpace() == false)
@@ -788,7 +789,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos,
-                orderBy, orderDirection,
+                orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 

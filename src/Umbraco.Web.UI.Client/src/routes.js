@@ -93,10 +93,10 @@ app.config(function ($routeProvider) {
             //ensure auth is *not* required so it will redirect to /
             resolve: canRoute(false)
         })
-         .when('/logout', {
+        .when('/logout', {
              redirectTo: '/login/false',
-             resolve: doLogout()
-         })
+            resolve: doLogout()
+        })
         .when('/:section', {
             templateUrl: function (rp) {
                 if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")

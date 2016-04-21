@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
 using ClientDependency.Core;
+using Umbraco.Core.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownPropertyEditor(ILogger logger) : base(logger)
+        public DropDownPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
         {
         }
 

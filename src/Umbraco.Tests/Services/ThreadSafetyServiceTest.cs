@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Services
 			//we need a new Database object for each thread.
             var repositoryFactory = new RepositoryFactory(Container);
 		    var evtMsgs = new TransientMessagesFactory();
-		    ApplicationContext.Services = new ServiceContext(
+		    ApplicationContext.Services = ServiceContextHelper.GetServiceContext(
                 repositoryFactory,
                 _uowProvider,
                 new FileUnitOfWorkProvider(),

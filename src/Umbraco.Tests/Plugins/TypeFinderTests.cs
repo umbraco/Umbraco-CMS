@@ -19,6 +19,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
+using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 
@@ -73,17 +74,29 @@ namespace Umbraco.Tests.Plugins
             var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
-            Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(9, typesFound.Count());
-            Assert.AreEqual(9, originalTypesFound.Count());
+            foreach (var type in typesFound)
+                Console.WriteLine(type);
+            Console.WriteLine();
+            foreach (var type in originalTypesFound)
+                Console.WriteLine(type);
+
+            // 6 classes in _assemblies implement IApplicationEventHandler
+            Assert.AreEqual(6, typesFound.Count());
+
+            // however,
+            // Umbraco.Core.Profiling.WebProfiler is internal and is not returned by TypeFinderOriginal,
+            // that's a known issue of the legacy type finder, so we have to tweak the count here.
+            Assert.AreEqual(5, originalTypesFound.Count());
         }
 
         [Test]
         public void Find_Classes_With_Attribute()
         {
             var typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
-            //TODO: Fix this with the correct count
-            Assert.AreEqual(1, typesFound.Count());
+            Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
+
+            typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (UmbracoContext).Assembly });
+            Assert.AreEqual(23, typesFound.Count()); // 23 classes in Umbraco.Web are marked with [Tree]
         }
 
         [Ignore]

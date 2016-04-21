@@ -1,6 +1,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RadioButtonsPropertyEditor(ILogger logger) : base(logger)
+        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
         {
         }
     }

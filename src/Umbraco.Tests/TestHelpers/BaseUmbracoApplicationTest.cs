@@ -72,7 +72,7 @@ namespace Umbraco.Tests.TestHelpers
 
             SetupApplicationContext();
 
-            InitializeMappers();            
+            InitializeMappers();
 
             FreezeResolution();
 
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-            
+
             //reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
@@ -99,9 +99,10 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual void ConfigureContainer()
         {
+            // oh no! should not use a container in unit tests?
             var settings = SettingsForTests.GetDefault();
 
-            //register mappers            
+            //register mappers
             Container.RegisterFrom<CoreModelMappersCompositionRoot>();
             Container.RegisterFrom<WebModelMappersCompositionRoot>();
 
@@ -111,7 +112,7 @@ namespace Umbraco.Tests.TestHelpers
             //Default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
 
-            //register basic stuff that might need to be there for some container resolvers to work,  we can 
+            //register basic stuff that might need to be there for some container resolvers to work,  we can
             // add more to this in base classes in resolution freezing
             Container.RegisterSingleton<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
@@ -129,8 +130,12 @@ namespace Umbraco.Tests.TestHelpers
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
+
+            // need real file systems here as templates content is on-disk only
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
         }
 
         private static readonly object Locker = new object();
@@ -175,7 +180,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
+        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
         /// to be set to true if the  SetupPluginManager has been overridden.
         /// </summary>
@@ -209,20 +214,20 @@ namespace Umbraco.Tests.TestHelpers
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
         protected virtual void SetupApplicationContext()
-        {            
+        {
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger), Logger),
                 //assign the service context
-                new ServiceContext(
-                    Container.GetInstance<RepositoryFactory>(), 
-                    new NPocoUnitOfWorkProvider(Logger), 
+                ServiceContextHelper.GetServiceContext(
+                    Container.GetInstance<RepositoryFactory>(),
+                    new NPocoUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
-                    new PublishingStrategy(evtMsgs, Logger), 
-                    CacheHelper, 
-                    Logger, 
-                    evtMsgs, 
+                    new PublishingStrategy(evtMsgs, Logger),
+                    CacheHelper,
+                    Logger,
+                    evtMsgs,
                     Enumerable.Empty<IUrlSegmentProvider>()),
                 CacheHelper,
                 ProfilingLogger)
@@ -268,7 +273,7 @@ namespace Umbraco.Tests.TestHelpers
         protected ProfilingLogger ProfilingLogger { get; private set; }
         protected CacheHelper CacheHelper { get; private set; }
 
-        //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests 
+        //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests
         // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
         internal IServiceContainer Container { get; private set; }
 

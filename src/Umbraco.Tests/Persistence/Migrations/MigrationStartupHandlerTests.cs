@@ -75,10 +75,16 @@ namespace Umbraco.Tests.Persistence.Migrations
             public int CountExecuted { get; set; }
         }
 
-        public class TestMigrationHandler : MigrationStartupHander
+        public class TestMigrationHandler : MigrationStartupHandler
         {
             private readonly string _prodName;
             private readonly Args _changed;
+
+            // need that one else it breaks IoC
+            public TestMigrationHandler()
+            {
+                _changed = new Args();
+            }
 
             public TestMigrationHandler(Args changed)
             {

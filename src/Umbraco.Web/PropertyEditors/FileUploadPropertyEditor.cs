@@ -24,14 +24,17 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
+        private readonly ILocalizedTextService _textService;
 
-        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
+        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
             : base(logger)
         {
             if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
             if (contentSettings == null) throw new ArgumentNullException("contentSettings");
+            if (textService == null) throw new ArgumentNullException("textService");
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings;
+            _textService = textService;
             MemberService.Deleted += (sender, args) =>
                 args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
@@ -49,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new FileUploadPreValueEditor();
+            return new FileUploadPreValueEditor(_textService);
         }
 
         /// <summary>
@@ -172,8 +175,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class FileUploadPreValueEditor : ValueListPreValueEditor
         {
-            public FileUploadPreValueEditor()
-                : base()
+            public FileUploadPreValueEditor(ILocalizedTextService textService)
+                : base(textService)
             {
                 var field = Fields.First();
                 field.Description = "Enter a max width/height for each thumbnail";

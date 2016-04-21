@@ -44,16 +44,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets paged member results
         /// </summary>
-        /// <param name="query"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="orderDirection"></param>
-        /// <param name="filter"></param>
+        /// <param name="query">The query.</param>
+        /// <param name="pageIndex">Index of the page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="totalRecords">The total records.</param>
+        /// <param name="orderBy">The order by column</param>
+        /// <param name="orderDirection">The order direction.</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search query</param>
         /// <returns></returns>
         IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
 
         //IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
         //    Sql sql, int pageIndex, int pageSize, out int totalRecords,
