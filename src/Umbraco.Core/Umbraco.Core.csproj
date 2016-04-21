@@ -1300,7 +1300,6 @@
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ShortStringHelperResolver.cs" />
     <Compile Include="Strings\IShortStringHelper.cs" />
-    <Compile Include="Strings\LegacyShortStringHelper.cs" />
     <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="Models\ApplicationTree.cs" />

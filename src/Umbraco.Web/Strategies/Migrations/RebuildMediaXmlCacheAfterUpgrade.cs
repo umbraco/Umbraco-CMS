@@ -17,7 +17,7 @@ namespace Umbraco.Web.Strategies.Migrations
     ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class RebuildMediaXmlCacheAfterUpgrade : MigrationStartupHander
+    public class RebuildMediaXmlCacheAfterUpgrade : MigrationStartupHandler
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {

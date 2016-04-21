@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Services
             var repositoryFactory = new RepositoryFactory(SqlSyntax, Container);
 			_uowProvider = new PerThreadNPocoUnitOfWorkProvider(_dbFactory);
 		    var evtMsgs = new TransientMessagesFactory();
-		    ApplicationContext.Services = new ServiceContext(
+		    ApplicationContext.Services = ServiceContextHelper.GetServiceContext(
                 repositoryFactory,
                 _uowProvider, 
                 new FileUnitOfWorkProvider(), 

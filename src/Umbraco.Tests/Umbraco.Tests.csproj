@@ -181,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
+    <Compile Include="TestHelpers\ServiceContextHelper.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -349,9 +350,7 @@
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
     <Compile Include="Strings\ShortStringHelperResolverTest.cs" />
-    <Compile Include="Strings\LegacyShortStringHelperTests.cs" />
     <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
-    <Compile Include="Strings\LegacyStringExtensionsTests.cs" />
     <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />

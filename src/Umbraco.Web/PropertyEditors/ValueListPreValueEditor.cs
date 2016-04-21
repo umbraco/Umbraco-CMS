@@ -22,9 +22,11 @@ namespace Umbraco.Web.PropertyEditors
     /// </remarks>
     internal class ValueListPreValueEditor : PreValueEditor
     {
+        private readonly ILocalizedTextService _textService;
 
-        public ValueListPreValueEditor()
+        public ValueListPreValueEditor(ILocalizedTextService textService)
         {
+            _textService = textService;
             Fields.AddRange(CreatePreValueFields());
         }
 
@@ -46,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
                             //It's also important to note that by default the dropdown angular controller is expecting the 
                             // config options to come in with a property called 'items'
                             Key = "items",
-                            Name = ApplicationContext.Current.Services.TextService.Localize("editdatatype/addPrevalue"),
+                            Name = _textService.Localize("editdatatype/addPrevalue"), // todo: inject
                             View = "multivalues"
                         }                   
                 };

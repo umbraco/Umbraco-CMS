@@ -147,15 +147,20 @@ namespace Umbraco.Tests.Services.Importing
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("Templates").First();
             var packagingService = ServiceContext.PackagingService;
+            var init = ServiceContext.FileService.GetTemplates().Count();
 
             // Act
             var templates = packagingService.ImportTemplates(element);
             var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
+            var allTemplates = ServiceContext.FileService.GetTemplates();
 
             // Assert
             Assert.That(templates, Is.Not.Null);
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
+
+            Assert.AreEqual(init + numberOfTemplates, allTemplates.Count());
+            Assert.IsTrue(allTemplates.All(x => x.Content.Contains("UmbracoTemplatePage")));
         }
 
         [Test]
