@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 {
     /// <summary>
     /// This moves the functionality from the XmlIntegrity check dashboard into a health check

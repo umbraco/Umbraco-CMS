@@ -331,10 +331,10 @@
     <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
-    <Compile Include="HealthCheck\HttpsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
-    <Compile Include="HealthCheck\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
