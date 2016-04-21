@@ -17,6 +17,8 @@ namespace Umbraco.Tests.TestHelpers
 {
     class ServiceContextHelper
     {
+        //NOTE: Should be used sparingly for integration tests only - for unit tests you can just mock the services to be passed to the 
+        // ctor of the ServiceContext.
         public static ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,
