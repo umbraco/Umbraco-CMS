@@ -25,10 +25,17 @@ angular.module("umbraco.services").factory("healthCheckService", function ($http
             );
         },
 
-        getStatus: function(id) {
+        getStatus: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'GetStatus?id=' + id),
                 'Failed to retrieve status for health check with ID ' + id
+            );
+        },
+
+        executeAction: function (check, status, action) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'ExecuteAction?checkId=' + check.id + '&actionAlias=' + action.alias),
+                'Failed to execute action with alias ' + action.alias + ' for health check with ID ' + check.id
             );
         }
 

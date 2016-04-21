@@ -30,5 +30,18 @@ function healthCheckController($scope, $timeout, $q, healthCheckService) {
 
 	};
 
+	$scope.executeAction = function (check, statusIndex, status, actionIndex, action) {
+	    healthCheckService.executeAction(check, status, action).then(function (response) {
+	        check.status[statusIndex] = response;
+	    });
+    };
+
+    // Get a (grouped) list of all health checks
+	healthCheckService.getAllChecks().then(
+		function (response) {
+		    $scope.groups = response;
+		}
+	);
+
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.HealthCheckController", healthCheckController);

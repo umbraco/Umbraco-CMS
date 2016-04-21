@@ -20,7 +20,7 @@
                             <i class="icon icon-delete" ng-if="status.resultType == 2"></i>
                             {{status.message}}
                             <span ng-if="status.description" style="font-size: 11px;">{{status.description}}</span>
-                            <a href="#" prevent-default ng-repeat="action in status.actions" ng-click="executeAction(check, status, action);" style="color: #2E8AEA;" title="{{action.description}}">{{action.name ?? action.name}}</a>
+                            <a href="#" prevent-default ng-repeat="action in status.actions" ng-click="executeAction(check, $parent.$index, status, $index, action);" style="color: #2E8AEA;" title="{{action.description}}">{{action.name || action.name}}</a>
                         </div>
                     </div>
                     <umb-load-indicator ng-show="check.loading" />
