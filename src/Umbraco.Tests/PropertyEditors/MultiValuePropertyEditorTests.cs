@@ -105,7 +105,7 @@ namespace Umbraco.Tests.PropertyEditors
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, new SqlSyntaxProviders(Enumerable.Empty<ISqlSyntaxProvider>())),
+                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger),
                 new ServiceContext(
                     localizedTextService: textService.Object
                 ),
