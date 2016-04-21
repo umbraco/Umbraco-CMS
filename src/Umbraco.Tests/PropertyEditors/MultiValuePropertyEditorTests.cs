@@ -124,7 +124,7 @@ namespace Umbraco.Tests.PropertyEditors
                     {"item3", new PreValue(3, "Item 3")}
                 });
 
-            var editor = new ValueListPreValueEditor();
+            var editor = new ValueListPreValueEditor(Mock.Of<ILocalizedTextService>());
 
             var result = editor.ConvertDbToEditor(defaultVals, persisted);
 

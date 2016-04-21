@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Only_Tests_On_JArray()
         {
             var validator = new ColorListPreValueEditor.ColorListValidator();
-            var result = validator.Validate("hello", null, new ColorPickerPropertyEditor(Mock.Of<ILogger>()));
+            var result = validator.Validate("hello", null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
 
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Only_Tests_On_JArray_Of_Item_JObject()
         {
             var validator = new ColorListPreValueEditor.ColorListValidator();
-            var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>()));
+            var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
         
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.PropertyEditors
                                                 JObject.FromObject(new { value = "zxcvzxcvxzcv" }),
                                                 JObject.FromObject(new { value = "ABC" }),
                                                 JObject.FromObject(new { value = "1234567" })),
-                                            null, new ColorPickerPropertyEditor(Mock.Of<ILogger>()));
+                                            null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(2, result.Count());
         }
     }

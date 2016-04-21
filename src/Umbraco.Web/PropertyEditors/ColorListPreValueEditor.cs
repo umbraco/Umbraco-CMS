@@ -6,13 +6,14 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorListPreValueEditor : ValueListPreValueEditor
     {
       
-        public ColorListPreValueEditor()
+        public ColorListPreValueEditor(ILocalizedTextService textService) : base(textService)
         {
             var field = Fields.First();
 
