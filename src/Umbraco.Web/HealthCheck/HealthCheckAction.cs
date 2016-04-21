@@ -33,6 +33,18 @@ namespace Umbraco.Web.HealthCheck
         public string Alias { get; set; }
 
         /// <summary>
+        /// The name of the action - this is shown as the label of the button used for triggering the action.
+        /// </summary>
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The description of the action - this is shown as the tooltip of the button used for triggering the action.
+        /// </summary>
+        [DataMember(Name = "description")]
+        public string Description { get; set; }
+
+        /// <summary>
         /// The Id of the Health Check instance
         /// </summary>
         /// <remarks>
