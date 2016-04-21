@@ -6,13 +6,13 @@
  * @description
  * Used by the health check dashboard to get checks and send requests to fix checks.
  */
-angular.module("umbraco.services").factory("healtCheckService", function ($http, umbRequestHelper) {
+angular.module("umbraco.services").factory("healthCheckService", function ($http, umbRequestHelper) {
     return {
         
         /**
          * @ngdoc function
-         * @name umbraco.services.healtCheckService#getAllChecks
-         * @methodOf umbraco.services.healtCheckService
+         * @name umbraco.services.healthCheckService#getAllChecks
+         * @methodOf umbraco.services.healthCheckService
          * @function
          *
          * @description

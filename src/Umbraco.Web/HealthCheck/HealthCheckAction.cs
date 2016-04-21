@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.HealthCheck
 {
-    [DataContract(Name = "healtCheckAction", Namespace = "")]
+    [DataContract(Name = "healthCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
 
@@ -50,7 +50,7 @@ namespace Umbraco.Web.HealthCheck
         /// <remarks>
         /// This is used to find the Health Check instance to execute this action
         /// </remarks>
-        [DataMember(Name = "healtCheckId")]
+        [DataMember(Name = "healthCheckId")]
         public Guid HealthCheckId { get; set; }
 
         /// <summary>
