@@ -14,7 +14,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     [HealthCheck(
         "D999EB2B-64C2-400F-B50C-334D41F8589A",
         "XML Data Integrity", 
-        Description = "Checks the integrity of the XML data in Umbraco", 
+        Description = "Checks the integrity of the XML data in Umbraco.", 
         Group = "DataIntegrity")]
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {

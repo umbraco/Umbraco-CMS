@@ -12,7 +12,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
         "HTTPS Configuration",
-        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct",
+        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.",
         Group = "Security")]
     public class HttpsCheck : HealthCheck
     {
