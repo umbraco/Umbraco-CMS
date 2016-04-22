@@ -56,7 +56,9 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseContext.Database, Logger);
+            var database = TestObjects.GetUmbracoSqlServerDatabase(Mock.Of<ILogger>());
+
+            var context = new MigrationContext(database, Logger);
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;

@@ -16,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.PropertyEditors
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger),
+                new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger),
                 new ServiceContext(
                     localizedTextService: textService.Object
                 ),
