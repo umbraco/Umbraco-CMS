@@ -220,7 +220,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger), Logger),
                 //assign the service context
-                ServiceContextHelper.GetServiceContext(
+                TestObjects.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(),
                     new NPocoUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
