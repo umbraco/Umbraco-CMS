@@ -57,8 +57,10 @@ namespace Umbraco.Web
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
+
+        //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
         //NOTE: see the Initialize method for what this is used for
-        private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>();
+        //private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>();
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : base(umbracoApplication)
@@ -84,12 +86,13 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Initialize()
         {
-            //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
-             // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
-             // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
-             // boot process has completed. It's a hack but it works.
-            ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
+            //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
+            ////This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
+            // // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
+            // // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
+            // // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
+            // // boot process has completed. It's a hack but it works.
+            //ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
 
             base.Initialize();
 
@@ -170,17 +173,18 @@ namespace Umbraco.Web
 
             base.Complete(afterComplete);
 
-            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
-            // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
-            // initialize during startup, in which case we want it to rebuild the indexes itself.
-            ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
-            if (IndexesToRebuild.Any())
-            {
-                foreach (var indexer in IndexesToRebuild)
-                {
-                    indexer.RebuildIndex();
-                }
-            }
+            //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
+            ////Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
+            //// (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
+            //// initialize during startup, in which case we want it to rebuild the indexes itself.
+            //ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
+            //if (IndexesToRebuild.Any())
+            //{
+            //    foreach (var indexer in IndexesToRebuild)
+            //    {
+            //        indexer.RebuildIndex();
+            //    }
+            //}
 
             //Now ensure webapi is initialized after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
@@ -423,10 +427,11 @@ namespace Umbraco.Web
                 // method directly and they will be in charge of this check if they need it
                 Action rebuildIndexes = () =>
                 {
-                    //If the developer has explicitly opted out of rebuilding indexes on startup then we
-                    // should adhere to that and not do it, this means that if they are load balancing things will be
-                    // out of sync if they are auto-scaling but there's not much we can do about that.
-                    if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
+                    //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
+                    ////If the developer has explicitly opted out of rebuilding indexes on startup then we
+                    //// should adhere to that and not do it, this means that if they are load balancing things will be
+                    //// out of sync if they are auto-scaling but there's not much we can do about that.
+                    //if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
 
                     foreach (var indexer in GetIndexesForColdBoot())
                     {
@@ -570,10 +575,11 @@ namespace Umbraco.Web
             // all indexes
             IEnumerable<BaseIndexProvider> indexes = ExamineManager.Instance.IndexProviderCollection;
 
-            // except those that are already flagged
-            // and are processed in Complete()
-            if (IndexesToRebuild.Any())
-                indexes = indexes.Except(IndexesToRebuild);
+            //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
+            //// except those that are already flagged
+            //// and are processed in Complete()
+            //if (IndexesToRebuild.Any())
+            //    indexes = indexes.Except(IndexesToRebuild);
 
             // return
             foreach (var index in indexes)
@@ -581,13 +587,14 @@ namespace Umbraco.Web
         }
 
 
-        private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
-        {
-            //store the indexer that needs rebuilding because it's empty for when the boot process
-            // is complete and cancel this current event so the rebuild process doesn't start right now.
-            args.Cancel = true;
-            IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
-        }
+        //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
+        //private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
+        //{
+        //    //store the indexer that needs rebuilding because it's empty for when the boot process
+        //    // is complete and cancel this current event so the rebuild process doesn't start right now.
+        //    args.Cancel = true;
+        //    IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
+        //}
     }
 }
 

@@ -43,30 +43,26 @@ namespace UmbracoExamine
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
-        /// <param name="indexerData"></param>
+        /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="memberService"></param>
-        /// <param name="dataService"></param>
         /// <param name="contentService"></param>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
         /// <param name="userService"></param>
         /// <param name="urlSegmentProviders"></param>
         /// <param name="analyzer"></param>
-        /// <param name="async"></param>
         public UmbracoMemberIndexer(
-            IIndexCriteria indexerData,
+            IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             IMemberService memberService,
-            IDataService dataService,
             IContentService contentService,
             IMediaService mediaService,
             IDataTypeService dataTypeService,
             IUserService userService,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            Analyzer analyzer,
-            bool async) :
-            base(indexerData, luceneDirectory, dataService, contentService, mediaService, dataTypeService, userService, urlSegmentProviders, analyzer, async)
+            Analyzer analyzer) :
+            base(fieldDefinitions, luceneDirectory, analyzer, contentService, mediaService, dataTypeService, userService, urlSegmentProviders)
         {
             if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
@@ -79,6 +75,8 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
+            //TODO: This is only required for config based index delcaration - We need to change this!
+
             var indexerData = base.GetIndexerData(indexSet);
 
             if (CanInitialize())

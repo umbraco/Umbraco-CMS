@@ -44,15 +44,11 @@ namespace Umbraco.Tests.PublishedContent
         public override void Initialize()
         {
             base.Initialize();
-            UmbracoExamineSearcher.DisableInitializationCheck = true;
-            BaseUmbracoIndexer.DisableInitializationCheck = true;            
         }
 
         public override void TearDown()
         {
             base.TearDown();
-            UmbracoExamineSearcher.DisableInitializationCheck = null;
-            BaseUmbracoIndexer.DisableInitializationCheck = null;
         }
 
         /// <summary>

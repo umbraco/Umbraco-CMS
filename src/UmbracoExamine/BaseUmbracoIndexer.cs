@@ -95,11 +95,22 @@ namespace UmbracoExamine
         /// </summary>
         public bool SupportUnpublishedContent { get; protected set; }
 
-        //TODO: Probably get rid of this right ?
+        
         /// <summary>
         /// The data service used for retreiving and submitting data to the cms
         /// </summary>
-        public IDataService DataService { get; protected internal set; }
+        public IDataService DataService
+        {
+            //TODO: Get rid of this
+            get
+            {
+                throw new NotSupportedException("FIX THIS - remove DataService");
+            }
+            protected internal set
+            {
+             throw new NotSupportedException("FIX THIS - remove DataService");   
+            }
+        }
 
         /// <summary>
         /// the supported indexable types
