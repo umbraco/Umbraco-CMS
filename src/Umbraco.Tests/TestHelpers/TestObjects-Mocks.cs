@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Data.Common;
 using Moq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
@@ -24,6 +25,11 @@ namespace Umbraco.Tests.TestHelpers
             var databaseFactoryMock = new Mock<IDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
+
+            // can get a database - but don't try to use it!
+            if (configured && canConnect)
+                databaseFactoryMock.Setup(x => x.GetDatabase()).Returns(TestObjects.GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
+
             return databaseFactoryMock.Object;
         }
 

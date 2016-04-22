@@ -45,9 +45,6 @@ namespace Umbraco.Core
 
             _factory = factory;
             _logger = logger;
-
-            if (_factory.Configured == false)
-                GiveLegacyAChance();
         }
 
         /// <summary>
@@ -95,7 +92,12 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+            ConfigureEmbeddedDatabaseConnection(_factory, _logger);
+        }
+
+        private static void ConfigureEmbeddedDatabaseConnection(IDatabaseFactory factory, ILogger logger)
+        {
+            SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
 
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
@@ -107,7 +109,7 @@ namespace Umbraco.Core
                 engine.CreateDatabase();
             }
 
-            _factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+            factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
         }
 
         /// <summary>
@@ -122,7 +124,7 @@ namespace Umbraco.Core
                 ? Constants.DbProviderNames.MySql
                 : Constants.DbProviderNames.SqlServer;
 
-            SaveConnectionString(connectionString, providerName);
+            SaveConnectionString(connectionString, providerName, _logger);
             _factory.Configure(connectionString, providerName);
         }
 
@@ -139,7 +141,7 @@ namespace Umbraco.Core
             string providerName;
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
 
-            SaveConnectionString(connectionString, providerName);
+            SaveConnectionString(connectionString, providerName, _logger);
             _factory.Configure(connectionString, providerName);
         }
 
@@ -177,7 +179,7 @@ namespace Umbraco.Core
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
+            SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _logger);
             _factory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 
@@ -252,7 +254,8 @@ namespace Umbraco.Core
         /// <remarks>Saves the ConnectionString in the very nasty 'medium trust'-supportive way.</remarks>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The provider name.</param>
-        private void SaveConnectionString(string connectionString, string providerName)
+        /// <param name="logger">A logger.</param>
+        private static void SaveConnectionString(string connectionString, string providerName, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionString));
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(providerName));
@@ -282,14 +285,14 @@ namespace Umbraco.Core
             }
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            _logger.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
+            logger.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
         }
 
         #endregion
 
         #region Utils
 
-        internal void GiveLegacyAChance()
+        internal static void GiveLegacyAChance(IDatabaseFactory factory, ILogger logger)
         {
             // look for the legacy appSettings key
             var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
@@ -299,13 +302,13 @@ namespace Umbraco.Core
             if (test.Contains("sqlce4umbraco"))
             {
                 // sql ce
-                ConfigureEmbeddedDatabaseConnection();
+                ConfigureEmbeddedDatabaseConnection(factory, logger);
             }
             else if (test.Contains("tcp:"))
             {
                 // sql azure
-                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer);
-                _factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
+                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer, logger);
+                factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
             }
             else if (test.Contains("datalayer=mysql"))
             {
@@ -317,14 +320,14 @@ namespace Umbraco.Core
                 foreach (var variable in legacyConnString.Split(';').Where(x => x.ToLowerInvariant().StartsWith("datalayer") == false))
                     connectionStringWithoutDatalayer = $"{connectionStringWithoutDatalayer}{variable};";
 
-                SaveConnectionString(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql);
-                _factory.Configure(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql);
+                SaveConnectionString(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql, logger);
+                factory.Configure(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql);
             }
             else
             {
                 // sql server
-                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer);
-                _factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
+                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer, logger);
+                factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
             }
 
             // remove the legacy connection string, so we don't end up in a loop if something goes wrong

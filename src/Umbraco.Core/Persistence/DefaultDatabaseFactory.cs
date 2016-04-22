@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence
         // see: http://issues.umbraco.org/issue/U4-2172
         [ThreadStatic]
         private static Lazy<UmbracoDatabase> _nonHttpInstance;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with the default connection, and a logger.
         /// </summary>
@@ -64,7 +64,10 @@ namespace Umbraco.Core.Persistence
         /// <remarks>Used by LightInject.</remarks>
         public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
             : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger)
-        { }
+        {
+            if (Configured == false)
+                DatabaseContext.GiveLegacyAChance(this, logger);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with a connection string name and a logger.

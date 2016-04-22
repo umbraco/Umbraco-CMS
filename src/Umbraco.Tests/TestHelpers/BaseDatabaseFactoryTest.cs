@@ -115,7 +115,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var evtMsgs = new TransientMessagesFactory();
             var databaseContext = new DatabaseContext(databaseFactory, Logger);
-            var serviceContext = ServiceContextHelper.GetServiceContext(
+            var serviceContext = TestObjects.GetServiceContext(
                 Container.GetInstance<RepositoryFactory>(),
                 new NPocoUnitOfWorkProvider(databaseFactory),
                 new FileUnitOfWorkProvider(),
@@ -125,15 +125,14 @@ namespace Umbraco.Tests.TestHelpers
                 evtMsgs,
                 Enumerable.Empty<IUrlSegmentProvider>());
 
-            //var appContextMock = new Mock<ApplicationContext>(databaseContext, serviceContext, CacheHelper, ProfilingLogger);
-            //// if the test does not require an actual database, or runs with an empty database, the application
-            //// context will not be able to check the migration status in the database, so we have to force it
-            //// to think it is configured.
-            //if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture // no db at all
-            //    || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest) // empty db
-            //    appContextMock.Setup(x => x.IsConfigured).Returns(true);
-            //_appContext = appContextMock.Object;
-            _appContext = new ApplicationContext(databaseContext, serviceContext, CacheHelper, ProfilingLogger);
+            // if the test does not require an actual database, or runs with an empty database, the application
+            // context will not be able to check the migration status in the database, so we have to force it
+            // to think it is configured.
+            var appContextMock = new Mock<ApplicationContext>(databaseContext, serviceContext, CacheHelper, ProfilingLogger);
+            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture // no db at all
+                || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest) // empty db
+                appContextMock.Setup(x => x.IsConfigured).Returns(true);
+            _appContext = appContextMock.Object;
 
             // initialize the database if required
             // note: must do after creating the application context as
@@ -143,10 +142,6 @@ namespace Umbraco.Tests.TestHelpers
                 // TODO make it faster
                 InitializeDatabase(_appContext);
             }
-
-            // ensure the application context understand we are configured now
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-            _appContext.ResetConfigured();
 
             // application is ready
             _appContext.IsReady = true;
