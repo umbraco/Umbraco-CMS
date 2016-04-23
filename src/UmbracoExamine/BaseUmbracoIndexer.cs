@@ -8,13 +8,16 @@ using Examine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Umbraco.Core;
-using UmbracoExamine.DataServices;
 using Examine;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
+using Examine.LuceneEngine;
 using Examine.LuceneEngine.Faceting;
 using Examine.LuceneEngine.Indexing;
+using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Umbraco.Core.Logging;
 using UmbracoExamine.LocalStorage;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -27,6 +30,19 @@ namespace UmbracoExamine
     /// </summary>
     public abstract class BaseUmbracoIndexer : LuceneIndexer
     {
+        /// <summary>
+        /// Used to store the path of a content object
+        /// </summary>
+        public const string IndexPathFieldName = "__Path";
+
+        public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
+        public const string IconFieldName = "__Icon";
+
+        /// <summary>
+        /// The prefix added to a field when it is duplicated in order to store the original raw value.
+        /// </summary>
+        public const string RawFieldPrefix = "__Raw_";
+
         #region Constructors
 
         /// <summary>
@@ -35,40 +51,57 @@ namespace UmbracoExamine
         protected BaseUmbracoIndexer()
             : base()
         {
+            ProfilingLogger = ApplicationContext.Current.ProfilingLogger;
         }
 
-        protected BaseUmbracoIndexer(IEnumerable<FieldDefinition> fieldDefinitions, Directory luceneDirectory, Analyzer defaultAnalyzer, FacetConfiguration facetConfiguration = null, IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
-            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, facetConfiguration, indexValueTypes)
+        protected BaseUmbracoIndexer(
+            IEnumerable<FieldDefinition> fieldDefinitions, 
+            Directory luceneDirectory, 
+            Analyzer defaultAnalyzer, 
+            ProfilingLogger profilingLogger, 
+            IValueSetValidator validator = null,
+            FacetConfiguration facetConfiguration = null, IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, facetConfiguration, indexValueTypes)
         {
+            if (profilingLogger == null) throw new ArgumentNullException("profilingLogger");
+            ProfilingLogger = profilingLogger;
         }
-
-  //      /// <summary>
-  //      /// Constructor to allow for creating an indexer at runtime
-  //      /// </summary>
-  //      /// <param name="indexerData"></param>
-  //      /// <param name="indexPath"></param>
-  //      /// <param name="dataService"></param>
-  //      /// <param name="analyzer"></param>
-  //      [Obsolete("Do not use the ctor using IIndexCriteria, it is obsolete")]
-  //      protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-  //          : base(indexerData, indexPath, analyzer, async)
-  //      {
-  //          DataService = dataService;
-  //      }
-
-  //      [Obsolete("Do not use the ctor using IIndexCriteria, it is obsolete")]
-		//protected BaseUmbracoIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
-		//	: base(indexerData, luceneDirectory, analyzer, async)
-		//{
-		//	DataService = dataService;
-		//}
 
         #endregion
         
         private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
-        private BaseLuceneSearcher _internalTempStorageSearcher = null;
+
+        /// <summary>
+        /// A type that defines the type of index for each Umbraco field (non user defined fields)
+        /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
+        /// for retreival after searching.
+        /// </summary>
+        internal static readonly List<StaticField> IndexFieldPolicies
+            = new List<StaticField>
+            {
+                new StaticField("id", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("key", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
+                new StaticField( "writerID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "creatorID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "nodeType", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "template", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "sortOrder", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
+                new StaticField( "createDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
+                new StaticField( "updateDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
+                new StaticField( "nodeName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField( "urlName", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "writerName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField( "creatorName", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField( "nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
+            };
 
         #region Properties
+
+        protected ProfilingLogger ProfilingLogger { get; private set; }
 
         public bool UseTempStorage
         {
@@ -88,30 +121,7 @@ namespace UmbracoExamine
         /// If true, the IndexingActionHandler will be run to keep the default index up to date.
         /// </summary>
         public bool EnableDefaultEventHandler { get; protected set; }
-
-        /// <summary>
-        /// Determines if the manager will call the indexing methods when content is saved or deleted as
-        /// opposed to cache being updated.
-        /// </summary>
-        public bool SupportUnpublishedContent { get; protected set; }
-
         
-        /// <summary>
-        /// The data service used for retreiving and submitting data to the cms
-        /// </summary>
-        public IDataService DataService
-        {
-            //TODO: Get rid of this
-            get
-            {
-                throw new NotSupportedException("FIX THIS - remove DataService");
-            }
-            protected internal set
-            {
-             throw new NotSupportedException("FIX THIS - remove DataService");   
-            }
-        }
-
         /// <summary>
         /// the supported indexable types
         /// </summary>
@@ -128,47 +138,15 @@ namespace UmbracoExamine
         /// <param name="name"></param>
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
-        {
-
-            if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
-            {
-                //this should be a fully qualified type
-                var serviceType = Type.GetType(config["dataService"]);
-                DataService = (IDataService)Activator.CreateInstance(serviceType);
-            }
-            else if (DataService == null)
-            {
-                //By default, we will be using the UmbracoDataService
-                //generally this would only need to be set differently for unit testing
-                DataService = new UmbracoDataService();
-            }
-
-            DataService.LogService.LogLevel = LoggingLevel.Normal;
-
-            if (config["logLevel"] != null && !string.IsNullOrEmpty(config["logLevel"]))
-            {
-                try
-                {
-                    var logLevel = (LoggingLevel)Enum.Parse(typeof(LoggingLevel), config["logLevel"]);
-                    DataService.LogService.LogLevel = logLevel;
-                }
-                catch (ArgumentException)
-                {                    
-                    //FAILED
-                    DataService.LogService.LogLevel = LoggingLevel.Normal;
-                }
-            }
-
-            DataService.LogService.ProviderName = name;
-
+        {                        
             EnableDefaultEventHandler = true; //set to true by default
             bool enabled;
             if (bool.TryParse(config["enableDefaultEventHandler"], out enabled))
             {
                 EnableDefaultEventHandler = enabled;
-            }         
+            }
 
-            DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));               
+            ProfilingLogger.Logger.Debug(GetType(), "{0} indexer initializing", () => name); 
 
             base.Initialize(name, config);
 
@@ -231,6 +209,7 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
+                ProfilingLogger.Logger.Debug(GetType(), "Rebuilding index");
                 base.RebuildIndex();
             }
         }
@@ -255,6 +234,17 @@ namespace UmbracoExamine
             {
                 if (!SupportedTypes.Contains(type))
                     return;
+
+                if (node.Attribute("id") != null)
+                {
+                    ProfilingLogger.Logger.Debug(GetType(), "ReIndexNode {0} with type {1}", () => node.Attribute("id"), () => type);
+                    base.ReIndexNode(node, type);
+                }
+                else
+                {
+                    ProfilingLogger.Logger.Error(GetType(), "ReIndexNode cannot proceed, the format of the XElement is invalid",
+                        new XmlException("XElement is invalid, the xml has not id attribute"));
+                }
 
                 base.ReIndexNode(node, type);
             }
@@ -319,131 +309,236 @@ namespace UmbracoExamine
             }
         }
         
+        ///// <summary>
+        ///// Builds an xpath statement to query against Umbraco data for the index type specified, then
+        ///// initiates the re-indexing of the data matched.
+        ///// </summary>
+        ///// <param name="type"></param>
+        //protected override void PerformIndexAll(string type)
+        //{
+        //    //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
+        //    // and we query directly against the umbraco service layer.
+
+        //    if (SupportedTypes.Contains(type) == false)
+        //        return;
+
+        //    var xPath = "//*[(number(@id) > 0 and (@isDoc or @nodeTypeAlias)){0}]"; //we'll add more filters to this below if needed
+
+        //    var sb = new StringBuilder();
+
+        //    //create the xpath statement to match node type aliases if specified
+        //    if (IndexerData.IncludeNodeTypes.Any())
+        //    {
+        //        sb.Append("(");
+        //        foreach (var field in IndexerData.IncludeNodeTypes)
+        //        {
+        //            //this can be used across both schemas
+        //            const string nodeTypeAlias = "(@nodeTypeAlias='{0}' or (count(@nodeTypeAlias)=0 and name()='{0}'))";
+
+        //            sb.Append(string.Format(nodeTypeAlias, field));
+        //            sb.Append(" or ");
+        //        }
+        //        sb.Remove(sb.Length - 4, 4); //remove last " or "
+        //        sb.Append(")");
+        //    }
+
+        //    //create the xpath statement to match all children of the current node.
+        //    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+        //    {
+        //        if (sb.Length > 0)
+        //            sb.Append(" and ");
+        //        sb.Append("(");
+        //        sb.Append("contains(@path, '," + IndexerData.ParentNodeId.Value + ",')"); //if the path contains comma - id - comma then the nodes must be a child
+        //        sb.Append(")");
+        //    }
+
+        //    //create the full xpath statement to match the appropriate nodes. If there is a filter
+        //    //then apply it, otherwise just select all nodes.
+        //    var filter = sb.ToString();
+        //    xPath = string.Format(xPath, filter.Length > 0 ? " and " + filter : "");
+
+        //    //raise the event and set the xpath statement to the value returned
+        //    var args = new IndexingNodesEventArgs(IndexerData, xPath, type);
+        //    OnNodesIndexing(args);
+        //    if (args.Cancel)
+        //    {
+        //        return;
+        //    }
+
+        //    xPath = args.XPath;
+
+        //    ProfilingLogger.Logger.Debug(GetType(), "({0}) PerformIndexAll with XPATH: {1}", () => Name, () => xPath);
+            
+        //    AddNodesToIndex(xPath, type);
+        //}
+
+        #endregion
+
+        protected override void OnIndexingError(IndexingErrorEventArgs e)
+        {
+            ProfilingLogger.Logger.Error(GetType(), e.Message, e.Exception);
+
+            base.OnIndexingError(e);
+        }
+
         /// <summary>
-        /// Builds an xpath statement to query against Umbraco data for the index type specified, then
-        /// initiates the re-indexing of the data matched.
+        /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
+        /// <param name="docArgs"></param>
+
+        protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
+        {
+            var d = docArgs.Document;
+            foreach (var f in docArgs.Fields.Where(x => x.Key.StartsWith(RawFieldPrefix)))
+            {
+                d.Add(new Field(
+                    f.Key,
+                    f.Value,
+                    Field.Store.YES,
+                    Field.Index.NO, //don't index this field, we never want to search by it 
+                    Field.TermVector.NO));
+            }
+
+            base.OnDocumentWriting(docArgs);
+        }
+
+        protected override void OnNodeIndexed(IndexedNodeEventArgs e)
+        {
+            ProfilingLogger.Logger.Debug(GetType(), "Index created for node {0}", () => e.NodeId);
+            base.OnNodeIndexed(e);
+        }
+
+        protected override void OnIndexDeleted(DeleteIndexEventArgs e)
+        {
+            ProfilingLogger.Logger.Debug(GetType(), "Index deleted for term: {0} with value {1}", () => e.DeletedTerm.Key, () => e.DeletedTerm.Value);
+            base.OnIndexDeleted(e);
+        }
+
+        protected override void OnIndexOptimizing(EventArgs e)
+        {
+            ProfilingLogger.Logger.Debug(GetType(), "Index is being optimized");
+            base.OnIndexOptimizing(e);
+        }
+
+        /// <summary>
+        /// Overridden for logging.
+        /// </summary>
+        /// <param name="values"></param>
+        protected override void AddDocument(ValueSet values)
+        {
+            ProfilingLogger.Logger.Debug(GetType(), "AddDocument {0} with type {1}", () => values.Id, () => values.ItemType);
+            base.AddDocument(values);
+        }
+
+        /// <summary>
+        /// Overridden for logging.
+        /// </summary>
+        /// <param name="node"></param>
         /// <param name="type"></param>
-        protected override void PerformIndexAll(string type)
+        protected override void AddSingleNodeToIndex(XElement node, string type)
         {
-            //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
-            // and we query directly against the umbraco service layer.
-
-            if (!SupportedTypes.Contains(type))
-                return;
-
-            var xPath = "//*[(number(@id) > 0 and (@isDoc or @nodeTypeAlias)){0}]"; //we'll add more filters to this below if needed
-
-            var sb = new StringBuilder();
-
-            //create the xpath statement to match node type aliases if specified
-            if (IndexerData.IncludeNodeTypes.Any())
-            {
-                sb.Append("(");
-                foreach (var field in IndexerData.IncludeNodeTypes)
-                {
-                    //this can be used across both schemas
-                    const string nodeTypeAlias = "(@nodeTypeAlias='{0}' or (count(@nodeTypeAlias)=0 and name()='{0}'))";
-
-                    sb.Append(string.Format(nodeTypeAlias, field));
-                    sb.Append(" or ");
-                }
-                sb.Remove(sb.Length - 4, 4); //remove last " or "
-                sb.Append(")");
-            }
-
-            //create the xpath statement to match all children of the current node.
-            if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
-            {
-                if (sb.Length > 0)
-                    sb.Append(" and ");
-                sb.Append("(");
-                sb.Append("contains(@path, '," + IndexerData.ParentNodeId.Value + ",')"); //if the path contains comma - id - comma then the nodes must be a child
-                sb.Append(")");
-            }
-
-            //create the full xpath statement to match the appropriate nodes. If there is a filter
-            //then apply it, otherwise just select all nodes.
-            var filter = sb.ToString();
-            xPath = string.Format(xPath, filter.Length > 0 ? " and " + filter : "");
-
-            //raise the event and set the xpath statement to the value returned
-            var args = new IndexingNodesEventArgs(IndexerData, xPath, type);
-            OnNodesIndexing(args);
-            if (args.Cancel)
-            {
-                return;
-            }
-
-            xPath = args.XPath;
-
-            DataService.LogService.AddVerboseLog(-1, string.Format("({0}) PerformIndexAll with XPATH: {1}", this.Name, xPath));
-
-            AddNodesToIndex(xPath, type);
+            ProfilingLogger.Logger.Debug(GetType(), "AddSingleNodeToIndex {0} with type {1}", () => (int)node.Attribute("id"), () => type);
+            base.AddSingleNodeToIndex(node, type);
         }
 
         /// <summary>
-        /// Returns an XDocument for the entire tree stored for the IndexType specified.
+        /// Override this method to strip all html from all user fields before raising the event, then after the event 
+        /// ensure our special Path field is added to the collection
         /// </summary>
-        /// <param name="xPath">The xpath to the node.</param>
-        /// <param name="type">The type of data to request from the data service.</param>
-        /// <returns>Either the Content or Media xml. If the type is not of those specified null is returned</returns>
-        protected virtual XDocument GetXDocument(string xPath, string type)
-        {
-            //TODO: We need to get rid of this! it will now only ever be called for published content - but we're keeping the other
-            // logic here for backwards compatibility in case inheritors are calling this for some reason.
+        /// <param name="e"></param>
 
-            if (type == IndexTypes.Content)
-            {
-                if (this.SupportUnpublishedContent)
-                {
-                    return DataService.ContentService.GetLatestContentByXPath(xPath);
-                }
-                else
-                {
-                    return DataService.ContentService.GetPublishedContentByXPath(xPath);
-                }
-            }
-            else if (type == IndexTypes.Media)
-            {
-                return DataService.MediaService.GetLatestMediaByXpath(xPath);
-            }
-            return null;
-        }
-        #endregion
-
-        #region Private
-        /// <summary>
-        /// Adds all nodes with the given xPath root.
-        /// </summary>
-        /// <param name="xPath">The x path.</param>
-        /// <param name="type">The type.</param>
-        private void AddNodesToIndex(string xPath, string type)
+        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
-            // Get all the nodes of nodeTypeAlias == nodeTypeAlias
-            XDocument xDoc = GetXDocument(xPath, type);
-            if (xDoc != null)
+
+            //strip html of all users fields if we detect it has HTML in it. 
+            //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
+            //the value of the field 'as-is'.
+            // Get all user data that we want to index and store into a dictionary 
+            foreach (var field in IndexerData.UserFields)
             {
-                var rootNode = xDoc.Root;
-                if (rootNode != null)
+                if (e.Fields.ContainsKey(field.Name))
                 {
-                    //the result will either be a single doc with an id as the root, or it will
-                    // be multiple docs with a <nodes> wrapper, we need to check for this
-                    if (rootNode.HasAttributes)
+                    //check if the field value has html
+                    if (XmlHelper.CouldItBeXml(e.Fields[field.Name]))
                     {
-                        AddNodesToIndex(new[] {rootNode}, type);
-                    }
-                    else
-                    {
-                        AddNodesToIndex(rootNode.Elements(), type);
+                        //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
+                        e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
+                        //now replace the original value with the stripped html
+                        //TODO: This should be done with an analzer?!
+                        e.Fields[field.Name] = e.Fields[field.Name].StripHtml();
                     }
                 }
             }
 
+            base.OnGatheringNodeData(e);
+
+            //ensure the special path and node type alias fields is added to the dictionary to be saved to file
+            var path = e.Node.Attribute("path").Value;
+            if (!e.Fields.ContainsKey(IndexPathFieldName))
+                e.Fields.Add(IndexPathFieldName, path);
+
+            //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
+            var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
+            if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
+                e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
+
+            //add icon 
+            var icon = (string)e.Node.Attribute("icon");
+            if (!e.Fields.ContainsKey(IconFieldName))
+                e.Fields.Add(IconFieldName, icon);  
+            
         }
 
-        
+        /// <summary>
+        /// Called when a duplicate field is detected in the dictionary that is getting indexed.
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <param name="indexSetName"></param>
+        /// <param name="fieldName"></param>
+        protected override void OnDuplicateFieldWarning(int nodeId, string indexSetName, string fieldName)
+        {
+            base.OnDuplicateFieldWarning(nodeId, indexSetName, fieldName);
 
-        #endregion
+            ProfilingLogger.Logger.Debug(
+                GetType(),
+                "Field \"{0}\" is listed multiple times in the index set \"{1}\". Please ensure all names are unique. Node id {2}",
+                () => fieldName, () => indexSetName, () => nodeId);
+        }
+
+        /// <summary>
+        /// Overridden to add the path property to the special fields to index
+        /// </summary>
+        /// <param name="allValuesForIndexing"></param>
+        /// <returns></returns>
+        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
+        {
+            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
+
+            //adds the special path property to the index
+            fields.Add(IndexPathFieldName, allValuesForIndexing[IndexPathFieldName]);
+
+            //adds the special node type alias property to the index
+            fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
+
+            //icon
+            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            {
+                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+            }
+
+            return fields;
+
+        }
+
+        /// <summary>
+        /// return the index policy for the field name passed in, if not found, return normal
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        protected override FieldIndexTypes GetPolicy(string fieldName)
+        {
+            var def = IndexFieldPolicies.Where(x => x.Name == fieldName).ToArray();
+            return (def.Any() == false ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
+        }
     }
 }

@@ -6,14 +6,13 @@ using System.Xml.XPath;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using UmbracoExamine;
-using UmbracoExamine.DataServices;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
     /// <summary>
 	/// A mock data service used to return content from the XML data file created with CWS
 	/// </summary>
-	public class TestContentService : IContentService
+	public class TestContentService
 	{
 		public const int ProtectedNode = 1142;
 

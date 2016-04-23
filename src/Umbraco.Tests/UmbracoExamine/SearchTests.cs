@@ -24,11 +24,13 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var luceneDir = new RAMDirectory())
             //using (var luceneDir = new SimpleFSDirectory(newIndexFolder))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir, null,
-                    new TestDataService()
-                        {
-                            ContentService = new TestContentService(TestFiles.umbraco_sort)
-                        });
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, null
+                    //new TestDataService()
+                    //    {
+                    //        ContentService = new TestContentService(TestFiles.umbraco_sort)
+                    //    });
+                    );
+
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
 

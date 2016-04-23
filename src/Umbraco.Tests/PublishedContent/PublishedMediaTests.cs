@@ -1,31 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Examine;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using UmbracoExamine;
-using UmbracoExamine.DataServices;
-using umbraco.BusinessLogic;
 using System.Linq;
 using LightInject;
 using Umbraco.Core.Logging;
@@ -118,7 +104,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
@@ -147,7 +133,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
@@ -187,7 +173,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
@@ -209,7 +195,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
@@ -231,7 +217,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
@@ -253,7 +239,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
@@ -272,7 +258,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir);
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);

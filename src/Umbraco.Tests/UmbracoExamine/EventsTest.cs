@@ -41,7 +41,6 @@ namespace Umbraco.Tests.UmbracoExamine
 		}
 
 		private readonly TestContentService _contentService = new TestContentService();
-		private static UmbracoExamineSearcher _searcher;
 		private static UmbracoContentIndexer _indexer;
 		private Lucene.Net.Store.Directory _luceneDir;
 
@@ -49,9 +48,8 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
             base.TestSetup();
 			_luceneDir = new RAMDirectory();
-			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
+			_indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, _luceneDir);
 			_indexer.RebuildIndex();
-			_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
 		}
 
 		public override void TestTearDown()

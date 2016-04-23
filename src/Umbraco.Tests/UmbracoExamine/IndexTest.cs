@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
 
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             using (var searcher = indexer.GetSearcher().GetSearcher())
             {
                 var protectedQuery = new BooleanQuery();
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             {
                 var searcher = indexer.GetSearcher();
 
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Move_Media_To_Non_Indexable_ParentID()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             {
                 var searcher = indexer.GetSearcher();
 
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Reindex_Content()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             {
                 var searcher = indexer.GetSearcher();
 
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             {
                 var searcher = indexer.GetSearcher();
 
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		#region Private methods and properties
 
-	    private readonly TestMediaService _mediaService = new TestMediaService();
+	    private readonly ExamineDemoDataMediaService _mediaService = new ExamineDemoDataMediaService();
 
 		//private static UmbracoExamineSearcher _searcher;
 		//private static UmbracoContentIndexer _indexer;

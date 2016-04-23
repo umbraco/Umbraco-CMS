@@ -11,7 +11,6 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Examine.Providers;
 using Umbraco.Core.Macros;
-using UmbracoExamine.DataServices;
 
 namespace UmbracoExamine
 {

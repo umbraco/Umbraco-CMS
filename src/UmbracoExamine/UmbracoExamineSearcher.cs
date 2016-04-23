@@ -11,7 +11,6 @@ using Examine.SearchCriteria;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Umbraco.Core;
-using UmbracoExamine.Config;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;

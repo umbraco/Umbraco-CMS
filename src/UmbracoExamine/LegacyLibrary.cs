@@ -4,11 +4,11 @@ using System.Xml.XPath;
 
 namespace UmbracoExamine
 {
-	/// <summary>
-	/// This is only used for backward compatibility to get access to the umbraco.library object but this needs to be done
-	/// via reflection because of the circular reference we have between Umbraco.Web and UmbracoExamine. 
-	/// </summary>
-	internal static class LegacyLibrary
+    /// <summary>
+    /// This is only used for backward compatibility to get access to the umbraco.library object but this needs to be done
+    /// via reflection because of the circular reference we have between Umbraco.Web and UmbracoExamine. 
+    /// </summary>
+    internal static class LegacyLibrary
 	{
 		private static volatile Type _libraryType;
 		private static readonly object Locker = new object();

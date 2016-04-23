@@ -7,14 +7,13 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
-using UmbracoExamine.Config;
-using UmbracoExamine.DataServices;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;
@@ -27,19 +26,15 @@ namespace Umbraco.Tests.UmbracoExamine
 	internal static class IndexInitializer
 	{
 		public static UmbracoContentIndexer GetUmbracoIndexer(
+            ProfilingLogger profilingLogger,
             Directory luceneDir, 
             Analyzer analyzer = null,
-            IDataService dataService = null,
             IContentService contentService = null,
             IMediaService mediaService = null,
             IDataTypeService dataTypeService = null,
             IMemberService memberService = null,
             IUserService userService = null)
-		{
-            if (dataService == null)
-            {
-                dataService = new TestDataService();
-            }
+		{            
 		    if (contentService == null)
 		    {
                 contentService = Mock.Of<IContentService>();
@@ -52,7 +47,9 @@ namespace Umbraco.Tests.UmbracoExamine
             {
                 long totalRecs;
 
-                var allRecs = dataService.MediaService.GetLatestMediaByXpath("//node")
+                var demoData = new ExamineDemoDataMediaService();
+
+                var allRecs = demoData.GetLatestMediaByXpath("//node")
                     .Root
                     .Elements()
                     .Select(x => Mock.Of<IMedia>(
@@ -82,12 +79,7 @@ namespace Umbraco.Tests.UmbracoExamine
             if (dataTypeService == null)
             {
                 dataTypeService = Mock.Of<IDataTypeService>();
-            }
-         
-            if (memberService == null)
-            {
-                memberService = Mock.Of<IMemberService>();
-            }
+            }        
 
             if (analyzer == null)
             {
@@ -110,6 +102,8 @@ namespace Umbraco.Tests.UmbracoExamine
 
 			//i.IndexSecondsInterval = 1;
 
+            var options = new UmbracoContentIndexerOptions(false, false);
+
 		    var i = new UmbracoContentIndexer(
 		        new[]
 		        {
@@ -117,11 +111,14 @@ namespace Umbraco.Tests.UmbracoExamine
 		        },
 		        luceneDir,
                 analyzer,
+                profilingLogger,
                 contentService,
                 mediaService,
                 dataTypeService,
                 userService,
-                new[] { new DefaultUrlSegmentProvider() });
+                new[] { new DefaultUrlSegmentProvider() },
+                new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
+                options);
 
 			i.IndexingError += IndexingError;
 
@@ -150,7 +147,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		internal static void IndexingError(object sender, IndexingErrorEventArgs e)
 		{
-			throw new ApplicationException(e.Message, e.InnerException);
+			throw new ApplicationException(e.Message, e.Exception);
 		}
 
 

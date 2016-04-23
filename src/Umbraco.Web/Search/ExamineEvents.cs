@@ -389,7 +389,7 @@ namespace Umbraco.Web.Search
 
             ExamineManager.Instance.ReIndexNode(
                 xml, IndexTypes.Media,
-                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
 
                     //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
                     // then only index this for indexers supporting unpublished media
@@ -415,7 +415,7 @@ namespace Umbraco.Web.Search
                     //if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                     // otherwise if keepIfUnpublished == false then remove from all indexes
                 
-                    .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
+                    .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
 	                .Where(x => x.EnableDefaultEventHandler));
 	    }
 
@@ -434,7 +434,7 @@ namespace Umbraco.Web.Search
 
 	        ExamineManager.Instance.ReIndexNode(
                 xml, IndexTypes.Content,
-	            ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+	            ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
                     
 	                //Index this item for all indexers if the content is published, otherwise if the item is not published
 	                // then only index this for indexers supporting unpublished content

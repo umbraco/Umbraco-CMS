@@ -8,12 +8,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using UmbracoExamine.Config;
 using System.Collections.Generic;
 using Examine;
 using System.IO;
-using UmbracoExamine.DataServices;
+using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -24,9 +24,8 @@ namespace UmbracoExamine
     /// <summary>
     /// Custom indexer for members
     /// </summary>
-    public class UmbracoMemberIndexer : UmbracoContentIndexer
+    public class UmbracoMemberIndexer : BaseUmbracoIndexer
     {
-
         private readonly IMemberService _memberService;
         private readonly IDataTypeService _dataTypeService;
 
@@ -45,27 +44,25 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
-        /// <param name="memberService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="userService"></param>
-        /// <param name="urlSegmentProviders"></param>
+        /// <param name="profilingLogger"></param>
+        /// <param name="validator"></param>
+        /// <param name="memberService"></param>        
         /// <param name="analyzer"></param>
+        /// <param name="dataTypeService"></param>
         public UmbracoMemberIndexer(
             IEnumerable<FieldDefinition> fieldDefinitions,
-            Directory luceneDirectory,
+            Directory luceneDirectory,                      
+            Analyzer analyzer,
+            ProfilingLogger profilingLogger,
+            IValueSetValidator validator,
             IMemberService memberService,
-            IContentService contentService,
-            IMediaService mediaService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            Analyzer analyzer) :
-            base(fieldDefinitions, luceneDirectory, analyzer, contentService, mediaService, dataTypeService, userService, urlSegmentProviders)
-        {
+            IDataTypeService dataTypeService) :
+            base(fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
+        {            
             if (memberService == null) throw new ArgumentNullException("memberService");
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _memberService = memberService;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -168,12 +165,7 @@ namespace UmbracoExamine
             var serializer = new EntityXmlSerializer();
             return members.Select(member => serializer.Serialize(_dataTypeService, member));
         }
-
-        protected override XDocument GetXDocument(string xPath, string type)
-        {
-            throw new NotSupportedException();
-        }
-
+        
         protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
         {
             var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
