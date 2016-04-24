@@ -7,6 +7,7 @@ using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Examine.Session;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
@@ -115,6 +116,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();
 
@@ -130,6 +132,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //ensure it's indexed
                 indexer.ReIndexNode(node, IndexTypes.Media);
+
+                session.WaitForChanges();
+
+                //now ensure it's deleted
+                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
+                Assert.AreEqual(1, results.Count());
 
                 //change the parent node id to be the one it used to exist under
                 var existingCriteria = indexer.IndexerData;
@@ -148,8 +156,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
                     null);
 
+                session.WaitForChanges();
+
                 //now ensure it's deleted
-                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
+                results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(0, results.Count());
             }
 		}

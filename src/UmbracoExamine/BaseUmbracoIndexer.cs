@@ -34,16 +34,12 @@ namespace UmbracoExamine
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = "__Path";
-
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
         public const string IconFieldName = "__Icon";
-
         /// <summary>
         /// The prefix added to a field when it is duplicated in order to store the original raw value.
         /// </summary>
         public const string RawFieldPrefix = "__Raw_";
-
-        #region Constructors
 
         /// <summary>
         /// Default constructor
@@ -52,6 +48,7 @@ namespace UmbracoExamine
             : base()
         {
             ProfilingLogger = ApplicationContext.Current.ProfilingLogger;
+            _configBased = true;
         }
 
         protected BaseUmbracoIndexer(
@@ -67,8 +64,7 @@ namespace UmbracoExamine
             ProfilingLogger = profilingLogger;
         }
 
-        #endregion
-        
+        private bool _configBased = false;
         private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
 
         /// <summary>
@@ -98,9 +94,7 @@ namespace UmbracoExamine
                 new StaticField( "nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
             };
-
-        #region Properties
-
+        
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
         public bool UseTempStorage
@@ -125,9 +119,7 @@ namespace UmbracoExamine
         /// <summary>
         /// the supported indexable types
         /// </summary>
-        protected abstract IEnumerable<string> SupportedTypes { get; }
-
-        #endregion
+        protected abstract IEnumerable<string> SupportedTypes { get; }        
 
         #region Initialize
 
@@ -270,14 +262,21 @@ namespace UmbracoExamine
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// This only affects indexers that are config file based, if an index was created via code then 
+        /// this has no affect, it is assumed the index would not be created if it could not be initialized.
+        /// </remarks>
         protected bool CanInitialize()
         {
-            //We need to check if we actually can initialize, if not then don't continue
-            if (ApplicationContext.Current == null
-                || !ApplicationContext.Current.IsConfigured
-                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            if (_configBased)
             {
-                return false;
+                //We need to check if we actually can initialize, if not then don't continue
+                if (ApplicationContext.Current == null
+                    || ApplicationContext.Current.IsConfigured == false
+                    || ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured == false)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -441,15 +440,34 @@ namespace UmbracoExamine
             base.AddSingleNodeToIndex(node, type);
         }
 
+        protected override void OnTransformingIndexValues(TransformingIndexDataEventArgs e)
+        {
+            base.OnTransformingIndexValues(e);
+
+            if (e.OriginalValues.ContainsKey("path"))
+            {
+                e.IndexItem.ValueSet.Values[IndexPathFieldName] = new List<object> { e.OriginalValues["path"].First() };
+            }           
+
+            ////adds the special node type alias property to the index
+            //fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
+
+            ////icon
+            //if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            //{
+            //    fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);
+            //}
+
+            //return fields;
+        }
+
         /// <summary>
         /// Override this method to strip all html from all user fields before raising the event, then after the event 
         /// ensure our special Path field is added to the collection
         /// </summary>
         /// <param name="e"></param>
-
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
-
             //strip html of all users fields if we detect it has HTML in it. 
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
@@ -503,31 +521,6 @@ namespace UmbracoExamine
                 GetType(),
                 "Field \"{0}\" is listed multiple times in the index set \"{1}\". Please ensure all names are unique. Node id {2}",
                 () => fieldName, () => indexSetName, () => nodeId);
-        }
-
-        /// <summary>
-        /// Overridden to add the path property to the special fields to index
-        /// </summary>
-        /// <param name="allValuesForIndexing"></param>
-        /// <returns></returns>
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special path property to the index
-            fields.Add(IndexPathFieldName, allValuesForIndexing[IndexPathFieldName]);
-
-            //adds the special node type alias property to the index
-            fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
-
-            //icon
-            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
-            {
-                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
-            }
-
-            return fields;
-
         }
 
         /// <summary>

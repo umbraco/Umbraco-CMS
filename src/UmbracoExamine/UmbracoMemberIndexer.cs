@@ -165,16 +165,13 @@ namespace UmbracoExamine
             var serializer = new EntityXmlSerializer();
             return members.Select(member => serializer.Serialize(_dataTypeService, member));
         }
-        
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
+
+        protected override void OnTransformingIndexValues(TransformingIndexDataEventArgs e)
         {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
+            base.OnTransformingIndexValues(e);
 
             //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
-
-            return fields;
-
+            //fields.Add("__key", allValuesForIndexing["__key"]);
         }
 
         /// <summary>

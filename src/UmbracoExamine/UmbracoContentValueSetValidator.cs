@@ -21,7 +21,10 @@ namespace UmbracoExamine
 
         public bool Validate(ValueSet valueSet)
         {
-            var path = valueSet.Values[BaseUmbracoIndexer.IndexPathFieldName];
+            //must have a 'path'
+            if (valueSet.Values.ContainsKey("path") == false) return false;
+
+            var path = valueSet.Values["path"];
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
             if (_options.SupportUnpublishedContent == false
