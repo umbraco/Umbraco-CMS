@@ -125,7 +125,7 @@
     <key alias="visit">방문</key>
     <key alias="welcome">환영합니다</key>
   </area>
-  <area alias="notifications">
+  <area alias="prompt">
     <key alias="stay">Stay</key>
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>

@@ -166,7 +166,7 @@
     <key alias="visit">访问</key>
     <key alias="welcome">欢迎</key>
   </area>
-  <area alias="notifications">
+  <area alias="prompt">
     <key alias="stay">Stay</key>
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>

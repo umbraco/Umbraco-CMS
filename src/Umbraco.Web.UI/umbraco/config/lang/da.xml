@@ -187,7 +187,7 @@
     <key alias="visit">Besøg</key>
     <key alias="welcome">Velkommen</key>
   </area>
-  <area alias="notifications">
+  <area alias="prompt">
     <key alias="stay">Bliv</key>
     <key alias="discardChanges">Kassér ændringer</key>
     <key alias="unsavedChanges">Du har ikke-gemte ændringer</key>
