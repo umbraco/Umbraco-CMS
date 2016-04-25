@@ -192,7 +192,8 @@ namespace Umbraco.Web.WebServices
                     new
                     {
                         path = syncPath,
-                        contents = t.Design
+                        contents = t.Design,
+                        alias = t.Alias // might have been updated!
                     });
             }
             catch (Exception ex)
