@@ -212,15 +212,22 @@ Use this directive to construct a header inside the main editor window.
                 scope.dialogModel = {
                     view: "iconpicker",
                     show: true,
-                    submit: function(model) {
-                        if (model.color) {
-                            scope.icon = model.icon + " " + model.color;
-                        } else {
-                            scope.icon = model.icon;
-                        }
+                    submit: function (model) {
 
-                        // set form to dirty
-                        ctrl.$setDirty();
+                        /* ensure an icon is selected, because on focus on close button
+                           or an element in background no icon is submitted. So don't clear/update existing icon/preview.
+                        */
+                        if (model.icon) {
+
+                            if (model.color) {
+                                scope.icon = model.icon + " " + model.color;
+                            } else {
+                                scope.icon = model.icon;
+                            }
+
+                            // set form to dirty
+                            ctrl.$setDirty();
+                        }
 
                         scope.dialogModel.show = false;
                         scope.dialogModel = null;
