@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
 
     /// <summary>
-	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
+	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when
 	/// used dynamically.
 	/// </summary>
     // because that version of RTE converter parses {locallink} and executes macros, when going from
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 	        UmbracoContext.Current.InPreviewMode = preview;
 
             var sb = new StringBuilder();
-            
+
             try
 	        {
 	            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 	        finally
 	        {
                 // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;	            
+                UmbracoContext.Current.InPreviewMode = inPreviewMode;
 	        }
 
             return sb.ToString();
@@ -109,12 +109,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     if (modified)
                     {
-                        return doc.DocumentNode.OuterHtml;
+                        return new HtmlString(doc.DocumentNode.OuterHtml);
                     }
                 }
             }
 
-            return sourceString;
+            return new HtmlString(sourceString ?? string.Empty);
         }
     }
 }
