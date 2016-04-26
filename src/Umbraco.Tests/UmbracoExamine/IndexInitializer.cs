@@ -33,7 +33,8 @@ namespace Umbraco.Tests.UmbracoExamine
             IMediaService mediaService = null,
             IDataTypeService dataTypeService = null,
             IMemberService memberService = null,
-            IUserService userService = null)
+            IUserService userService = null,
+            UmbracoContentIndexerOptions options = null)
 		{            
 		    if (contentService == null)
 		    {
@@ -102,7 +103,10 @@ namespace Umbraco.Tests.UmbracoExamine
 
 			//i.IndexSecondsInterval = 1;
 
-            var options = new UmbracoContentIndexerOptions(false, false);
+		    if (options == null)
+		    {
+                options = new UmbracoContentIndexerOptions(false, false, null);
+            }
 
 		    var i = new UmbracoContentIndexer(
 		        new[]

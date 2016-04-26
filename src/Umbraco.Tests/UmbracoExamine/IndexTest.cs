@@ -52,7 +52,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
                         Occur.MUST));
 
-                var collector = TopScoreDocCollector.Create(int.MaxValue, true);
+                var collector = TopScoreDocCollector.Create(100, true);
                 
                 searcher.Search(protectedQuery, collector);
 
@@ -115,10 +115,12 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Move_Media_To_Non_Indexable_ParentID()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                //make parent id 2222
+                options: new UmbracoContentIndexerOptions(false, false, 2222)))           
+            using (var session = new ThreadScopedIndexSession(indexer1.SearcherContext))
             {
-                var searcher = indexer.GetSearcher();
+                var searcher = indexer1.GetSearcher();
 
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -131,30 +133,20 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
                 //ensure it's indexed
-                indexer.ReIndexNode(node, IndexTypes.Media);
+                indexer1.ReIndexNode(node, IndexTypes.Media);
 
                 session.WaitForChanges();
-
-                //now ensure it's deleted
+                
+                //it will exist because it exists under 2222
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(1, results.Count());
-
-                //change the parent node id to be the one it used to exist under
-                var existingCriteria = indexer.IndexerData;
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    2222);
 
                 //now mimic moving the node underneath 1116 instead of 2222
                 node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
                 node.SetAttributeValue("parentID", "1116");
 
                 //now reindex the node, this should first delete it and then NOT add it because of the parent id constraint
-                indexer.ReIndexNode(node, IndexTypes.Media);
-
-                //RESET the parent id
-                existingCriteria = ((IndexCriteria)indexer.IndexerData);
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    null);
+                indexer1.ReIndexNode(node, IndexTypes.Media);
 
                 session.WaitForChanges();
 
@@ -188,7 +180,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 writer.Commit();
                 
                 //make sure the content is gone. This is done with lucene APIs, not examine!
-                var collector = TopScoreDocCollector.Create(int.MaxValue, true);
+                var collector = TopScoreDocCollector.Create(100, true);
                 var query = new TermQuery(contentTerm);
                 s = (IndexSearcher)searcher.GetSearcher(); //make sure the searcher is up do date.
                 s.Search(query, collector);
@@ -197,7 +189,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 //call our indexing methods
                 indexer.IndexAll(IndexTypes.Content);
 
-                collector = TopScoreDocCollector.Create(int.MaxValue, true);
+                collector = TopScoreDocCollector.Create(100, true);
                 s = searcher.GetSearcher(); //make sure the searcher is up do date.
                 s.Search(query, collector);
                 //var ids = new List<string>();
