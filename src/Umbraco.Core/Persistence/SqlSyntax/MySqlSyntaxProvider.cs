@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public MySqlSyntaxProvider(ILogger logger)
         {
             _logger = logger;
-            
+
             AutoIncrementDefinition = "AUTO_INCREMENT";
             IntColumnDefinition = "int(11)";
             BoolColumnDefinition = "tinyint(1)";
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             TimeColumnDefinition = "time";
             DecimalColumnDefinition = "decimal(38,6)";
             GuidColumnDefinition = "char(36)";
-            
+
             DefaultValueFormat = "DEFAULT {0}";
 
             InitColumnTypeMap();
@@ -326,13 +326,13 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             {
                 case SystemMethods.NewGuid:
                     return null; // NOT SUPPORTED!
-                    //return "NEWID()";                
+                                 //return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
-                //case SystemMethods.NewSequentialId:
-                //    return "NEWSEQUENTIALID()";
-                //case SystemMethods.CurrentUTCDateTime:
-                //    return "GETUTCDATE()";
+                    //case SystemMethods.NewSequentialId:
+                    //    return "NEWSEQUENTIALID()";
+                    //case SystemMethods.CurrentUTCDateTime:
+                    //    return "GETUTCDATE()";
             }
 
             return null;
@@ -360,6 +360,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
+        public override string ConvertIntegerToOrderableString { get { return "LPAD(FORMAT({0}, 0), 8, '0')"; } }
+        public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
+        public override string ConvertDecimalToOrderableString { get { return "LPAD(FORMAT({0}, 9), 20, '0')"; } }
 
         public override bool? SupportsCaseInsensitiveQueries(Database db)
         {

@@ -28,6 +28,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [ConfigurationProperty("allowPasswordReset")]
+        internal InnerTextConfigurationElement<bool> AllowPasswordReset
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["allowPasswordReset"],
+                    //set the default
+                    true);
+            }
+        }
+
         [ConfigurationProperty("authCookieName")]
         internal InnerTextConfigurationElement<string> AuthCookieName
         {
@@ -60,6 +72,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool ISecuritySection.HideDisabledUsersInBackoffice
         {
             get { return HideDisabledUsersInBackoffice; }
+        }
+
+        bool ISecuritySection.AllowPasswordReset
+        {
+            get { return AllowPasswordReset; }
         }
 
         string ISecuritySection.AuthCookieName

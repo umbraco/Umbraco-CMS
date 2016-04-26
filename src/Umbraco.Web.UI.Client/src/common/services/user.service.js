@@ -211,7 +211,7 @@ angular.module('umbraco.services')
                         return result;
                     });
             },
-
+          
             /** Logs the user out 
              */
             logout: function () {
