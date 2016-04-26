@@ -811,14 +811,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
-    <key alias="includeUnpublished">Include unpublished child pages</key>
+    <key alias="includeUnpublished">Include unpublished subpages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
     <key alias="nodePublishAll">%0% and subpages have been published</key>
     <key alias="publishAll">Publish %0% and all its subpages</key>
-    <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
-      You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
+    <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
+      You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
       ]]></key>
   </area>
   <area alias="colorpicker">
