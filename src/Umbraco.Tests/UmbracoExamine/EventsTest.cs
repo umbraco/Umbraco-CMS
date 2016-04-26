@@ -40,7 +40,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		}
 
-		private readonly TestContentService _contentService = new TestContentService();
+		private readonly ExamineDemoDataContentService _contentService = new ExamineDemoDataContentService();
 		private static UmbracoContentIndexer _indexer;
 		private Lucene.Net.Store.Directory _luceneDir;
 

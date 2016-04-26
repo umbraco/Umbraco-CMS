@@ -38,7 +38,37 @@ namespace Umbraco.Tests.UmbracoExamine
 		{            
 		    if (contentService == null)
 		    {
-                contentService = Mock.Of<IContentService>();
+                long totalRecs;
+
+                var demoData = new ExamineDemoDataContentService();
+
+                var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
+                    .Root
+                    .Elements()
+                    .Select(x => Mock.Of<IContent>(
+                        m =>
+                            m.Id == (int)x.Attribute("id") &&
+                            m.ParentId == (int)x.Attribute("parentID") &&
+                            m.Level == (int)x.Attribute("level") &&
+                            m.CreatorId == 0 &&
+                            m.SortOrder == (int)x.Attribute("sortOrder") &&
+                            m.CreateDate == (DateTime)x.Attribute("createDate") &&
+                            m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
+                            m.Name == (string)x.Attribute("nodeName") &&
+                            m.Path == (string)x.Attribute("path") &&
+                            m.Properties == new PropertyCollection() &&
+                            m.ContentType == Mock.Of<IContentType>(mt =>
+                                mt.Icon == "test" &&
+                                mt.Alias == x.Name.LocalName &&
+                                mt.Id == (int)x.Attribute("nodeType"))))
+                    .ToArray();
+
+
+                contentService = Mock.Of<IContentService>(
+                    x => x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        ==
+                        allRecs);                
 		    }
 		    if (userService == null)
 		    {

@@ -29,18 +29,43 @@ namespace Umbraco.Tests.UmbracoExamine
     public class IndexTest : ExamineBaseTest
 	{
 
-		///// <summary>
-		/// <summary>
-		/// Check that the node signalled as protected in the content service is not present in the index.
-		/// </summary>
-		[Test]
+	    [Test]
+	    public void Rebuild_Index()
+	    {
+
+	        using (var luceneDir = new RAMDirectory())
+	        using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+	        using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+	        {
+	            var searcher = indexer.GetSearcher();
+
+                //create the whole thing
+                indexer.RebuildIndex();
+	            session.WaitForChanges();
+                
+	            var result = searcher.Find(searcher.CreateCriteria().All().Compile());
+
+                Assert.AreEqual(29, result.TotalItemCount);
+            }
+	    }
+
+	    ///// <summary>
+        /// <summary>
+        /// Check that the node signalled as protected in the content service is not present in the index.
+        /// </summary>
+        [Test]
 		public void Index_Protected_Content_Not_Indexed()
 		{
 
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             using (var searcher = indexer.GetSearcher().GetSearcher())
             {
+                //create the whole thing
+                indexer.RebuildIndex();
+                session.WaitForChanges();
+
                 var protectedQuery = new BooleanQuery();
                 protectedQuery.Add(
                     new BooleanClause(
@@ -49,11 +74,11 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
+                        new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
                         Occur.MUST));
 
                 var collector = TopScoreDocCollector.Create(100, true);
-                
+
                 searcher.Search(protectedQuery, collector);
 
                 Assert.AreEqual(0, collector.TotalHits, "Protected node should not be indexed");
@@ -65,21 +90,12 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                //make parent id 1116
+                options: new UmbracoContentIndexerOptions(false, false, 1116)))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();
-
-                //change parent id to 1116
-                var existingCriteria = indexer.IndexerData;
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    1116);
-
-                //rebuild so it excludes children unless they are under 1116
-                indexer.RebuildIndex();
-
-                //ensure that node 2112 doesn't exist
-                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(0, results.Count());
 
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -91,6 +107,15 @@ namespace Umbraco.Tests.UmbracoExamine
                 var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
+                //ensure it's indexed
+                indexer.ReIndexNode(node, IndexTypes.Media);
+
+                session.WaitForChanges();
+
+                //it will not exist because it exists under 2222
+                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
+                Assert.AreEqual(0, results.Count());
+
                 //now mimic moving 2112 to 1116
                 //node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
                 node.SetAttributeValue("path", "-1,1116,2112");
@@ -99,14 +124,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 //now reindex the node, this should first delete it and then WILL add it because of the parent id constraint
                 indexer.ReIndexNode(node, IndexTypes.Media);
 
-                //RESET the parent id
-                existingCriteria = ((IndexCriteria)indexer.IndexerData);
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    null);
+                session.WaitForChanges();
 
-                //now ensure it's deleted
-                var newResults = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(1, newResults.Count());
+                //now ensure it exists
+                results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
+                Assert.AreEqual(1, results.Count());
             }
 
 		}
@@ -166,42 +188,40 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();
 
-
-                var s = searcher.GetSearcher();
-
-                //first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
+                //create the whole thing
+                indexer.RebuildIndex();
+                session.WaitForChanges();
                 
-                var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
-                var writer = indexer.GetIndexWriter();
-                writer.DeleteDocuments(contentTerm);
-                writer.Commit();
-                
-                //make sure the content is gone. This is done with lucene APIs, not examine!
-                var collector = TopScoreDocCollector.Create(100, true);
-                var query = new TermQuery(contentTerm);
-                s = (IndexSearcher)searcher.GetSearcher(); //make sure the searcher is up do date.
-                s.Search(query, collector);
-                Assert.AreEqual(0, collector.TotalHits);
+                var result = searcher.Find(searcher.CreateCriteria().Field(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content).Compile());
+                Assert.AreEqual(21, result.TotalItemCount);
+
+                //delete all content
+                foreach (var r in result)
+                {
+                    indexer.DeleteFromIndex(r.LongId);
+                }
+                session.WaitForChanges();
+
+                //ensure it's all gone
+                result = searcher.Find(searcher.CreateCriteria().Field(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content).Compile());
+                Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
                 indexer.IndexAll(IndexTypes.Content);
 
-                collector = TopScoreDocCollector.Create(100, true);
-                s = searcher.GetSearcher(); //make sure the searcher is up do date.
-                s.Search(query, collector);
-                //var ids = new List<string>();
-                //for (var i = 0; i < collector.Count;i++)
-                //{
-                //    ids.Add(s.Doc(collector.GetDocId(i)).GetValues("__NodeId")[0]);
-                //}
-                Assert.AreEqual(20, collector.TotalHits);
+                session.WaitForChanges();
+
+                result = searcher.Find(searcher.CreateCriteria().Field(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content).Compile());
+                Assert.AreEqual(21, result.TotalItemCount);
+
             }
 
-		    
-		}
+
+        }
 
 		/// <summary>
 		/// This will delete an item from the index and ensure that all children of the node are deleted too!
@@ -211,13 +231,20 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();
+
+                //create the whole thing
+                indexer.RebuildIndex();
+                session.WaitForChanges();
 
                 //now delete a node that has children
 
                 indexer.DeleteFromIndex(1140.ToString());
                 //this node had children: 1141 & 1142, let's ensure they are also removed
+
+                session.WaitForChanges();
 
                 var results = searcher.Search(searcher.CreateSearchCriteria().Id(1141).Compile());
                 Assert.AreEqual(0, results.Count());

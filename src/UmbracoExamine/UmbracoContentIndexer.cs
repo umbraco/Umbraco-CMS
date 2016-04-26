@@ -76,6 +76,11 @@ namespace UmbracoExamine
 
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
+            ParentId = options.ParentId;
+            //backward compat hack:
+            IndexerData = new IndexCriteria(Enumerable.Empty<IIndexField>(), Enumerable.Empty<IIndexField>(), Enumerable.Empty<string>(), Enumerable.Empty<string>(), 
+                //hack to set the parent Id for backwards compat, when using this ctor the IndexerData will (should) always be null
+                options.ParentId);
 
             ContentService = contentService;
             MediaService = mediaService;
@@ -151,6 +156,11 @@ namespace UmbracoExamine
         /// </summary>
         public bool SupportUnpublishedContent { get; protected set; }
 
+        /// <summary>
+        /// If set this will filter the content items allowed to be indexed
+        /// </summary>
+        public int? ParentId { get; protected set; }
+
         protected override IEnumerable<string> SupportedTypes
         {
             get
@@ -176,29 +186,28 @@ namespace UmbracoExamine
         /// <param name="nodeId">ID of the node to delete</param>
         public override void DeleteFromIndex(string nodeId)
         {
-            throw new NotImplementedException("Fix DeleteFromIndex!");
+            //find all descendants based on path
+            var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
+            var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
+            var searcher = GetSearcher();
+            var c = searcher.CreateSearchCriteria();
+            var filtered = c.RawQuery(rawQuery);
+            var results = searcher.Search(filtered);
 
-            ////find all descendants based on path
-            //var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
-            //var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
-            //var c = InternalSearcher.CreateSearchCriteria();
-            //var filtered = c.RawQuery(rawQuery);
-            //var results = InternalSearcher.Search(filtered);
+            ProfilingLogger.Logger.Debug(GetType(), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.TotalItemCount));
 
-            //DataService.LogService.AddVerboseLog(int.Parse(nodeId), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.Count()));
+            //need to create a delete queue item for each one found
+            foreach (var r in results)
+            {
+                EnqueueIndexOperation(new IndexOperation()
+                {
+                    Operation = IndexOperationType.Delete,
+                    Item = new IndexItem(null, "", r.Id.ToString())
+                });
+                //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
+            }
 
-            ////need to create a delete queue item for each one found
-            //foreach (var r in results)
-            //{
-            //    EnqueueIndexOperation(new IndexOperation()
-            //        {
-            //            Operation = IndexOperationType.Delete,
-            //            Item = new IndexItem(null, "", r.Id.ToString())
-            //        });
-            //    //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
-            //}
-
-            //base.DeleteFromIndex(nodeId);
+            base.DeleteFromIndex(nodeId);
         }
         #endregion
 
@@ -213,47 +222,40 @@ namespace UmbracoExamine
             switch (type)
             {
                 case IndexTypes.Content:
-                    if (this.SupportUnpublishedContent == false)
+
+                    var contentParentId = -1;
+                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
                     {
-                        //TODO: Need to deal with Published Content here
-
-                        throw new NotImplementedException("NEED TO FIX PUBLISHED CONTENT INDEXING");
-
-                        //use the base implementation which will use the published XML cache to perform the lookups
-                        //base.PerformIndexAll(type);
+                        contentParentId = IndexerData.ParentNodeId.Value;
                     }
-                    else
+                    IContent[] content;
+
+                    do
                     {
-                        var contentParentId = -1;
-                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                        long total;
+
+                        var descendants = SupportUnpublishedContent == false 
+                            ? ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, filter: "published") 
+                            : ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+
+                        //if specific types are declared we need to post filter them
+                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                        if (IndexerData.IncludeNodeTypes.Any())
                         {
-                            contentParentId = IndexerData.ParentNodeId.Value;
+                            content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
-                        IContent[] content;
-
-                        do
+                        else
                         {
-                            long total;
-                            var descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                            content = descendants.ToArray();
+                        }
 
-                            //if specific types are declared we need to post filter them
-                            //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                            if (IndexerData.IncludeNodeTypes.Any())
-                            {
-                                content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
-                            }
-                            else
-                            {
-                                content = descendants.ToArray();
-                            }
-
-                            AddNodesToIndex(GetSerializedContent(content), type);
-                            pageIndex++;
+                        AddNodesToIndex(GetSerializedContent(content), type);
+                        pageIndex++;
 
 
-                        } while (content.Length == pageSize);
+                    } while (content.Length == pageSize);
 
-                    }
+                    
                     break;
                 case IndexTypes.Media:
 

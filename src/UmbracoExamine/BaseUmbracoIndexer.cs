@@ -52,10 +52,10 @@ namespace UmbracoExamine
         }
 
         protected BaseUmbracoIndexer(
-            IEnumerable<FieldDefinition> fieldDefinitions, 
-            Directory luceneDirectory, 
-            Analyzer defaultAnalyzer, 
-            ProfilingLogger profilingLogger, 
+            IEnumerable<FieldDefinition> fieldDefinitions,
+            Directory luceneDirectory,
+            Analyzer defaultAnalyzer,
+            ProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
             FacetConfiguration facetConfiguration = null, IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, facetConfiguration, indexValueTypes)
@@ -96,6 +96,23 @@ namespace UmbracoExamine
             };
         
         protected ProfilingLogger ProfilingLogger { get; private set; }
+
+        /// <summary>
+        /// Overridden to ensure that 
+        /// </summary>
+        /// <param name="originalDefinitions"></param>
+        /// <returns></returns>
+        protected override IEnumerable<FieldDefinition> InitializeFieldDefinitions(IEnumerable<FieldDefinition> originalDefinitions)
+        {
+            var fd = base.InitializeFieldDefinitions(originalDefinitions).ToList();
+            fd.AddRange(new[]
+            {
+                new FieldDefinition(IndexPathFieldName, FieldDefinitionTypes.Raw),
+                new FieldDefinition(NodeTypeAliasFieldName, FieldDefinitionTypes.Raw),
+                new FieldDefinition(IconFieldName, FieldDefinitionTypes.Raw)
+            });
+            return fd;
+        }
 
         public bool UseTempStorage
         {
