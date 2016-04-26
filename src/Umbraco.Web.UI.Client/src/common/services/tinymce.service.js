@@ -98,7 +98,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         currentTarget = {
                             altText: img.attr("alt"),
                             url: img.attr("src"),
-                            id: img.attr("rel")
+                            id: img.attr("id")
                         };
                     }
 
@@ -118,15 +118,14 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                var data = {
                    alt: img.altText || "",
                    src: (img.url) ? img.url : "nothing.jpg",
-                   rel: img.id,
+                   id: img.id,
                    'data-id': img.id,
-                   id: '__mcenew'
                };
 
                editor.insertContent(editor.dom.createHTML('img', data));
 
                $timeout(function () {
-                   var imgElm = editor.dom.get('__mcenew');
+                   imgElm = editor.dom.get(img.id)
                    var size = editor.dom.getSize(imgElm);
 
                    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
