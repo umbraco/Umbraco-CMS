@@ -158,15 +158,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 			return i;
 		}
-        public static UmbracoExamineSearcher GetUmbracoSearcher(Directory luceneDir, Analyzer analyzer = null)
-		{
-            if (analyzer == null)
-            {
-                analyzer = new StandardAnalyzer(Version.LUCENE_29);
-            }
-            return new UmbracoExamineSearcher(luceneDir, analyzer);
-		}
-		
+        
 		public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
 		{
 			return new LuceneSearcher(luceneDir, new StandardAnalyzer(Version.LUCENE_29));

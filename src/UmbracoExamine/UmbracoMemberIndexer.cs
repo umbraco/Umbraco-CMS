@@ -70,6 +70,7 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="indexSet"></param>
         /// <returns></returns>
+        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
             //TODO: This is only required for config based index delcaration - We need to change this!

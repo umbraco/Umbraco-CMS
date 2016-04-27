@@ -255,36 +255,7 @@ namespace Umbraco.Tests.UmbracoExamine
             }
         }
 
-		#region Private methods and properties
+        private readonly ExamineDemoDataMediaService _mediaService = new ExamineDemoDataMediaService();
 
-	    private readonly ExamineDemoDataMediaService _mediaService = new ExamineDemoDataMediaService();
-
-		//private static UmbracoExamineSearcher _searcher;
-		//private static UmbracoContentIndexer _indexer;
-
-		#endregion
-
-		#region Initialize and Cleanup
-
-		//private Lucene.Net.Store.Directory _luceneDir;
-
-		public override void TestTearDown()
-		{
-            base.TestTearDown();
-			//_luceneDir.Dispose();            
-		}
-
-		public override void TestSetup()
-		{
-            base.TestSetup();
-			//_luceneDir = new RAMDirectory();
-
-   //         _indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
-			//_indexer.RebuildIndex();
-			//_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
-		}
-
-
-		#endregion
-	}
+    }
 }

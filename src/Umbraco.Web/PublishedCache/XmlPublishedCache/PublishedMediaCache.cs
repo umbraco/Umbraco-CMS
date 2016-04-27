@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
+using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
 using Lucene.Net.Documents;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="applicationContext"></param>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
-        internal PublishedMediaCache(ApplicationContext applicationContext, BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
+        internal PublishedMediaCache(ApplicationContext applicationContext, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider)
 	    {
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 	        if (searchProvider == null) throw new ArgumentNullException("searchProvider");
@@ -62,7 +63,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    }
 
         private readonly ApplicationContext _applicationContext;
-	    private readonly BaseSearchProvider _searchProvider;
+	    private readonly ILuceneSearcher _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
         public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
@@ -146,7 +147,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return null;
 	    }
 
-	    private BaseSearchProvider GetSearchProviderSafe()
+	    private ILuceneSearcher GetSearchProviderSafe()
 		{
 			if (_searchProvider != null)
 				return _searchProvider;
@@ -157,7 +158,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			    try
 			    {
 			        //by default use the InternalSearcher
-			        return eMgr.SearchProviderCollection["InternalSearcher"];
+			        return eMgr.GetSearcher("InternalSearcher");
 			    }
 			    catch (FileNotFoundException)
 			    {

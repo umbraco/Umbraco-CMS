@@ -72,6 +72,7 @@ namespace UmbracoExamine
         /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
         /// for retreival after searching.
         /// </summary>
+        [Obsolete("IndexFieldPolicies is not really used apart for some legacy reasons - use FieldDefinition's instead")]
         internal static readonly List<StaticField> IndexFieldPolicies
             = new List<StaticField>
             {
@@ -107,6 +108,22 @@ namespace UmbracoExamine
             var fd = base.InitializeFieldDefinitions(originalDefinitions).ToList();
             fd.AddRange(new[]
             {
+                new FieldDefinition("parentID", FieldDefinitionTypes.Integer),
+                new FieldDefinition("level", FieldDefinitionTypes.Integer),
+                new FieldDefinition("writerID", FieldDefinitionTypes.Integer),
+                new FieldDefinition("creatorID", FieldDefinitionTypes.Integer),
+                new FieldDefinition("sortOrder", FieldDefinitionTypes.Integer),
+
+                new FieldDefinition("createDate", FieldDefinitionTypes.DateTime),
+                new FieldDefinition("updateDate", FieldDefinitionTypes.DateTime),
+
+                new FieldDefinition("key", FieldDefinitionTypes.Raw),
+                new FieldDefinition("version", FieldDefinitionTypes.Raw),
+                new FieldDefinition("nodeType", FieldDefinitionTypes.Raw),
+                new FieldDefinition("template", FieldDefinitionTypes.Raw),
+                new FieldDefinition("urlName", FieldDefinitionTypes.Raw),
+                new FieldDefinition("path", FieldDefinitionTypes.Raw),
+
                 new FieldDefinition(IndexPathFieldName, FieldDefinitionTypes.Raw),
                 new FieldDefinition(NodeTypeAliasFieldName, FieldDefinitionTypes.Raw),
                 new FieldDefinition(IconFieldName, FieldDefinitionTypes.Raw)
@@ -509,31 +526,5 @@ namespace UmbracoExamine
             
         }
 
-        /// <summary>
-        /// Called when a duplicate field is detected in the dictionary that is getting indexed.
-        /// </summary>
-        /// <param name="nodeId"></param>
-        /// <param name="indexSetName"></param>
-        /// <param name="fieldName"></param>
-        protected override void OnDuplicateFieldWarning(int nodeId, string indexSetName, string fieldName)
-        {
-            base.OnDuplicateFieldWarning(nodeId, indexSetName, fieldName);
-
-            ProfilingLogger.Logger.Debug(
-                GetType(),
-                "Field \"{0}\" is listed multiple times in the index set \"{1}\". Please ensure all names are unique. Node id {2}",
-                () => fieldName, () => indexSetName, () => nodeId);
-        }
-
-        /// <summary>
-        /// return the index policy for the field name passed in, if not found, return normal
-        /// </summary>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        protected override FieldIndexTypes GetPolicy(string fieldName)
-        {
-            var def = IndexFieldPolicies.Where(x => x.Name == fieldName).ToArray();
-            return (def.Any() == false ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
-        }
     }
 }

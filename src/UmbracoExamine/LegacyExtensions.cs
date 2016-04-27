@@ -30,7 +30,7 @@ namespace UmbracoExamine
                 lock (Locker)
                 {
                     //we need to add all system fields to the collection if it is empty (this is the default if none are specified)
-                    var sysFields = UmbracoContentIndexer.IndexFieldPolicies.Select(x => x.Name);
+                    var sysFields = BaseUmbracoIndexer.IndexFieldPolicies.Select(x => x.Name);
                     foreach (var s in sysFields)
                     {
                         set.IndexAttributeFields.Add(new IndexField() { Name = s });
