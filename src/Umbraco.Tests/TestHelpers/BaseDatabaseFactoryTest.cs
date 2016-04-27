@@ -103,7 +103,7 @@ namespace Umbraco.Tests.TestHelpers
             // ensure the configuration matches the current version for tests
             SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 
-            // create the database factory -  if the test does not require an actual database,
+            // create the database factory - if the test does not require an actual database,
             // use a mock factory; otherwise use a real factory.
             var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
                 ? TestObjects.GetIDatabaseFactoryMock()
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
                 {
-                    RemoveDatabaseFile(ex =>
+                    RemoveDatabaseFile(null, ex =>
                     {
                         //if this doesn't work we have to make sure everything is reset! otherwise
                         // well run into issues because we've already set some things up
@@ -273,14 +273,14 @@ namespace Umbraco.Tests.TestHelpers
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
-
-                var schemaHelper = new DatabaseSchemaHelper(appContext.DatabaseContext.Database, Logger);
+                var database = appContext.DatabaseContext.Database;
+                var schemaHelper = new DatabaseSchemaHelper(database, Logger);
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(appContext);
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the
                 // damn db for each test
-                CloseDbConnections();
+                CloseDbConnections(database);
 
                 _dbBytes = File.ReadAllBytes(_dbPath);
             }
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            RemoveDatabaseFile();
+            RemoveDatabaseFile(ApplicationContext.Current?.DatabaseContext.Database);
         }
 
         [TearDown]
@@ -301,7 +301,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
                 {
-                    RemoveDatabaseFile();
+                    RemoveDatabaseFile(ApplicationContext.Current?.DatabaseContext.Database);
                 }
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
@@ -311,12 +311,11 @@ namespace Umbraco.Tests.TestHelpers
             base.TearDown();
         }
 
-        private void CloseDbConnections()
+        private void CloseDbConnections(UmbracoDatabase database)
         {
             //Ensure that any database connections from a previous test is disposed.
             //This is really just double safety as its also done in the TearDown.
-            if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
-                DatabaseContext.Database.Dispose();
+            database?.Dispose();
             SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
@@ -348,9 +347,9 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        private void RemoveDatabaseFile(Action<Exception> onFail = null)
+        private void RemoveDatabaseFile(UmbracoDatabase database, Action<Exception> onFail = null)
         {
-            CloseDbConnections();
+            CloseDbConnections(database);
             string path = TestHelper.CurrentAssemblyDirectory;
             try
             {
