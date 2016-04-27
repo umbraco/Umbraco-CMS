@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Routing
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             base.FreezeResolution();
         }

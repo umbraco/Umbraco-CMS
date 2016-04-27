@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -19,6 +20,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             var sqlSyntax = new SqlCeSyntaxProvider();
             var migration = new AddIndexToCmsMacroTable(true, sqlSyntax, Mock.Of<ILogger>());
+            // fixme Database vs UmbracoDatabase
             var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(),
                 sqlSyntax);
             migration.GetUpExpressions(migrationContext);
@@ -35,6 +37,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             var sqlSyntax = new SqlCeSyntaxProvider();
             var migration = new AddIndexToCmsMacroPropertyTable(true, sqlSyntax, Mock.Of<ILogger>());
+            // fixme Database vs UmbracoDatabase
             var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(), sqlSyntax);
             migration.GetUpExpressions(migrationContext);
 

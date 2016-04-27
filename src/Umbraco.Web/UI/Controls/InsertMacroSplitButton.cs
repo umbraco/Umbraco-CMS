@@ -71,7 +71,8 @@ namespace Umbraco.Web.UI.Controls
 			var divMacroItemContainer = new TagBuilder("div");
 			divMacroItemContainer.Attributes.Add("style", "width: 285px;display:none;");
 			divMacroItemContainer.Attributes.Add("class", "sbMenu");
-			var macros = ApplicationContext.DatabaseContext.Database.Fetch<MacroDto>("select id, macroAlias, macroName from cmsMacro order by macroName");
+
+		    var macros = Services.MacroService.GetAll().OrderBy(x => x.Name);
 			foreach (var macro in macros)
 			{
 				var divMacro = new TagBuilder("div");

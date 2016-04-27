@@ -18,5 +18,15 @@ namespace Umbraco.Web.PropertyEditors
         public RelatedLinksPropertyEditor(ILogger logger) : base(logger)
         {
         }
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new RelatedLinksPreValueEditor();
+        }
+
+        internal class RelatedLinksPreValueEditor : PreValueEditor
+        {
+            [PreValueField("max", "Maximum number of links", "number", Description = "Enter the maximum amount of links to be added, enter 0 for unlimited")]
+            public int Maximum { get; set; }
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
@@ -22,6 +24,43 @@ namespace Umbraco.Tests.Persistence.Migrations
     [TestFixture]
     public class MigrationStartupHandlerTests
     {
+        // NPoco wants a DbConnection and NOT an IDbConnection
+        // and DbConnection is hard to mock...
+        private class MockConnection : DbConnection
+        {
+            protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
+            {
+                return Mock.Of<DbTransaction>(); // enough here
+            }
+
+            public override void Close()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void ChangeDatabase(string databaseName)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Open()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override string ConnectionString { get; set; }
+
+            protected override DbCommand CreateDbCommand()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override string Database { get; }
+            public override string DataSource { get; }
+            public override string ServerVersion { get; }
+            public override ConnectionState State => ConnectionState.Open; // else NPoco reopens
+        }
+
         [Test]
         public void Executes_For_Any_Product_Name_When_Not_Specified()
         {
@@ -29,9 +68,8 @@ namespace Umbraco.Tests.Persistence.Migrations
             var testHandler1 = new TestMigrationHandler(changed1);
             testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             
-            var conn = new Mock<IDbConnection>();
-            conn.Setup(x => x.BeginTransaction(It.IsAny<IsolationLevel>())).Returns(Mock.Of<IDbTransaction>());
-            var db = new Mock<Database>(conn.Object);
+            var conn = new MockConnection();
+            var db = new Mock<Database>(conn);
 
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>() });
@@ -49,9 +87,8 @@ namespace Umbraco.Tests.Persistence.Migrations
             var testHandler2 = new TestMigrationHandler("Test2", changed2);
             testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
 
-            var conn = new Mock<IDbConnection>();
-            conn.Setup(x => x.BeginTransaction(It.IsAny<IsolationLevel>())).Returns(Mock.Of<IDbTransaction>());
-            var db = new Mock<Database>(conn.Object);
+            var conn = new MockConnection();
+            var db = new Mock<Database>(conn);
 
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), Mock.Of<ILogger>(), new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>()});
@@ -71,10 +108,16 @@ namespace Umbraco.Tests.Persistence.Migrations
             public int CountExecuted { get; set; }
         }
 
-        public class TestMigrationHandler : MigrationStartupHander
+        public class TestMigrationHandler : MigrationStartupHandler
         {
             private readonly string _prodName;
             private readonly Args _changed;
+
+            // need that one else it breaks IoC
+            public TestMigrationHandler()
+            {
+                _changed = new Args();
+            }
 
             public TestMigrationHandler(Args changed)
             {

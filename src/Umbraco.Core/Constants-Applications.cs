@@ -106,13 +106,26 @@
             public const string Xslt = "xslt";
 
             public const string Languages = "languages";
+            
+            public const string Macros = "macros";
 
             /// <summary>
             /// alias for the user types tree.
             /// </summary>
             public const string UserTypes = "userTypes";
 
-            //TODO: Fill in the rest!
+            /// <summary>
+            /// alias for the users tree.
+            /// </summary>
+            public const string Users = "users";
+
+            public const string Scripts = "scripts";
+
+            public const string PartialViews = "partialViews";
+
+            public const string PartialViewMacros = "partialViewMacros";
+
+            //TODO: Fill in the rest! 
         }
 	}
 

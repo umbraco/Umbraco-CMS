@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -8,13 +9,12 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class PublicAccessRepository : PetaPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
+    internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -59,19 +59,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(factory.BuildEntity);
         }
 
-       protected override Sql GetBaseQuery(bool isCount)
+       protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<AccessDto>(SqlSyntax)
-                .LeftJoin<AccessRuleDto>(SqlSyntax)
-                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
-                
-            return sql;
+            return Sql()
+                .SelectAll()
+                .From<AccessDto>()
+                .LeftJoin<AccessRuleDto>()
+                .On<AccessDto, AccessRuleDto>(left => left.Id, right => right.AccessId);
         }
 
         protected override string GetBaseWhereClause()
@@ -164,6 +162,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity.Key;
         }
 
-    
+
     }
 }

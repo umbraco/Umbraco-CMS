@@ -10,6 +10,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
+    // fixme.npoco - are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
+
     internal abstract class BaseExpressionHelper<T> : BaseExpressionHelper
     {
         protected BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
@@ -151,13 +153,13 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 // deal with (x != true|false) - most common
                 var constRight = b.Right as ConstantExpression;
-                if (constRight != null && constRight.Type == typeof(bool))
+                if (constRight != null && constRight.Type == typeof (bool))
                     return ((bool) constRight.Value) ? VisitNot(b.Left) : VisitNotNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false != x) - why not
                 var constLeft = b.Left as ConstantExpression;
-                if (constLeft != null && constLeft.Type == typeof(bool))
+                if (constLeft != null && constLeft.Type == typeof (bool))
                     return ((bool) constLeft.Value) ? VisitNot(b.Right) : VisitNotNot(b.Right);
                 left = Visit(b.Left);
             }
@@ -578,11 +580,11 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// Logic that is shared with the expression helpers
     /// </summary>
-    internal class BaseExpressionHelper
+    internal abstract class BaseExpressionHelper
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
-        public BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
+        protected BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
         {
             SqlSyntax = sqlSyntax;
         }

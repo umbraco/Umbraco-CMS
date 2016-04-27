@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
@@ -21,12 +22,12 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[umbracoNode]").On("[cmsDataType].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"));
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<DataTypeDto>(SqlSyntax)
-               .InnerJoin<NodeDto>(SqlSyntax)
-               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+            sql.SelectAll()
+               .From<DataTypeDto>()
+               .InnerJoin<NodeDto>()
+               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

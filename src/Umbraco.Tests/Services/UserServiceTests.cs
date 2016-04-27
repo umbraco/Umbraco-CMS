@@ -4,12 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Tests.Services
@@ -397,9 +394,10 @@ namespace Umbraco.Tests.Services
 
             var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
 
-            var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
+            var result1 = ServiceContext.UserService.GetUserById(user1.Id);
             //expect 2 sections by default
-            Assert.AreEqual(2, result1.AllowedSections.Count());
+            // 3: see commit eb59d33
+            Assert.AreEqual(3, result1.AllowedSections.Count());
 
             //adds some allowed sections
             user1.AddAllowedSection("test1");
@@ -408,9 +406,9 @@ namespace Umbraco.Tests.Services
             user1.AddAllowedSection("test4");
             ServiceContext.UserService.Save(user1);
 
-            result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
-            //expect 6 sections including the two default sections
-            Assert.AreEqual(6, result1.AllowedSections.Count());
+            result1 = ServiceContext.UserService.GetUserById(user1.Id);
+            //expect 7 sections including the two default sections
+            Assert.AreEqual(7, result1.AllowedSections.Count());
 
             //simulate clearing the sections
             foreach (var s in user1.AllowedSections)
@@ -424,7 +422,7 @@ namespace Umbraco.Tests.Services
 
             //assert
             //re-get
-            result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
+            result1 = ServiceContext.UserService.GetUserById(user1.Id);
             Assert.AreEqual(2, result1.AllowedSections.Count());
         }
 
@@ -547,7 +545,7 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
-            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(3)); // 3: see commit eb59d33
         }
     }
 }

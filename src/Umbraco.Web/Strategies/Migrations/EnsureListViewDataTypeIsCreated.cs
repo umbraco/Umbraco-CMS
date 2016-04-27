@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -16,7 +17,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Creates the built in list view data types
     /// </summary>
-    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHander
+    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHandler
     {
         private readonly ISqlSyntaxProvider _sqlSyntax;
 

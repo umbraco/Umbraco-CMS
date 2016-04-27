@@ -40,6 +40,7 @@
     <header>Xslt</header>
     <usercontrol>/create/xslt.ascx</usercontrol>
     <tasks>
+      <create assembly="umbraco" type="XsltTasks" />
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
@@ -72,6 +73,14 @@
       <create assembly="umbraco" type="StylesheetTasks" />
     </tasks>
   </nodeType>
+  <nodeType alias="stylesheetsFolder">
+    <header>Stylesheet</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="StylesheetTasks" />
+      <delete assembly="umbraco" type="StylesheetTasks" />
+    </tasks>
+  </nodeType>
   <nodeType alias="initxslt">
     <header>XSLT file</header>
     <usercontrol>/create/xslt.ascx</usercontrol>
@@ -101,14 +110,7 @@
       <delete assembly="umbraco" type="stylesheetPropertyTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initdictionary">
-    <header>Dictionary editor egenskab</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="dictionaryTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="DictionaryItem">
+  <nodeType alias="dictionary">
     <header>Dictionary editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
@@ -229,12 +231,26 @@
       <delete assembly="umbraco" type="PartialViewTasks" />
     </tasks>
   </nodeType>
+  <nodeType alias="initpartialViews">
+    <header>Macro</header>
+    <usercontrol>/Create/PartialView.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PartialViewTasks" />
+    </tasks>
+  </nodeType>
   <nodeType alias="partialViewMacros">
     <header>Macro</header>
     <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="PartialViewMacroTasks" />
       <delete assembly="umbraco" type="PartialViewMacroTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="initpartialViewMacros">
+    <header>Macro</header>
+    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PartialViewMacroTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="partialViewsFolder">

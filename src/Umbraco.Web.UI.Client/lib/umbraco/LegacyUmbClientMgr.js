@@ -106,6 +106,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             treeService.clearCache();
                         });
                     },
+                    childNodeCreated: function() {
+                        //no-op, just needs to be here for legacy reasons
+                    },
                     reloadActionNode: function () {
                         angularHelper.safeApply($rootScope, function() {
                             var currentMenuNode = appState.getMenuState("currentNode");
@@ -187,20 +190,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var actions = {
                     openDashboard : function(section){
                         navService.changeSection(section);
-                    },
-                    actionDisable: function () {
-                        localizationService.localize("defaultdialogs_confirmdisable").then(function (txtConfirmDisable) {
-                            var currentMenuNode = UmbClientMgr.mainTree().getActionNode();
-                            if (currentMenuNode) {
-                                if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
-                                    angularHelper.safeApply($rootScope, function () {
-                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
-                                            UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
-                                        });
-                                    });
-                                }
-                            }
-                        });
                     }
                 };
 

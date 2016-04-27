@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -208,7 +209,6 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-
         
     }
 }

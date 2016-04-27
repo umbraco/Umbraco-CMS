@@ -92,6 +92,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.1.0-u005\lib\net45\NPoco.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -333,6 +337,7 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="DependencyInjection\LightInjectExtensions.cs" />
+    <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
     <Compile Include="Logging\LoggingEventHelper.cs" />
@@ -368,6 +373,9 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
@@ -445,7 +453,6 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
-    <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
@@ -465,6 +472,9 @@
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\TupleExtensions.cs" />
+    <Compile Include="Persistence\SqlContext.cs" />
+    <Compile Include="Persistence\UmbracoSqlExtensions.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
@@ -480,6 +490,7 @@
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="Security\EmailService.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
@@ -755,7 +766,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveCmsMacroPropertyTypeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterUserTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
-    <Compile Include="Persistence\Relators\MacroPropertyRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITagRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
@@ -766,7 +776,7 @@
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
     <Compile Include="Persistence\Mappers\MemberMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
+    <Compile Include="Persistence\Mappers\PocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
@@ -964,19 +974,13 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentVersionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsPropertyTypeGroupTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameCmsTabTable.cs" />
-    <Compile Include="Persistence\PetaPocoCommandExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoConnectionExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
+    <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
     <Compile Include="Persistence\Querying\BaseExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
     <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
-    <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
-    <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
-    <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
@@ -997,7 +1001,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
-    <Compile Include="Persistence\Relators\GroupPropertyTypeRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryVersionable.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
@@ -1012,7 +1015,7 @@
     <Compile Include="Persistence\Repositories\MemberRepository.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\PermissionRepository.cs" />
-    <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
+    <Compile Include="Persistence\Repositories\NPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RecycleBinRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
@@ -1045,8 +1048,8 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\NPocoUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\NPocoUnitOfWorkProvider.cs" />
     <Compile Include="Profiling\IProfiler.cs" />
     <Compile Include="Profiling\LogProfiler.cs" />
     <Compile Include="Profiling\ProfilerExtensions.cs" />
@@ -1150,7 +1153,6 @@
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
-    <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />
@@ -1298,7 +1300,6 @@
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ShortStringHelperResolver.cs" />
     <Compile Include="Strings\IShortStringHelper.cs" />
-    <Compile Include="Strings\LegacyShortStringHelper.cs" />
     <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="Models\ApplicationTree.cs" />

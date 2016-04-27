@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Xml.Linq;
+using NPoco;
+using StackExchange.Profiling.Helpers.Dapper;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
@@ -63,10 +65,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
-                .Where<DocumentDto>(SqlSyntax, x => x.Newest)
-                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+                .Where<DocumentDto>(x => x.Newest)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -85,9 +87,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //we only want the newest ones with this method
-            sql.Where<DocumentDto>(SqlSyntax, x => x.Newest);
+            sql.Where<DocumentDto>(x => x.Newest);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -95,18 +97,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(SqlSyntax, x => x.Newest)
-                                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
-                                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                                .Where<DocumentDto>(x => x.Newest)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sql);
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
         }
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<IContent>
+        #region Overrides of NPocoRepositoryBase<IContent>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
                 SqlSyntax.GetQuotedTableName("cmsDocument"),
@@ -114,23 +116,32 @@ namespace Umbraco.Core.Persistence.Repositories
                 SqlSyntax.GetQuotedColumnName("nodeId"),
                 SqlSyntax.GetQuotedColumnName("published"));
 
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<DocumentDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax)
-                .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+            var sql = Sql();
 
-                // cannot do this because PetaPoco does not know how to alias the table
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<DocumentDto>(r =>
+                        r.Select<ContentVersionDto>(rr =>
+                            rr.Select<ContentDto>(rrr =>
+                                rrr.Select<NodeDto>()))
+                         .Select<DocumentPublishedReadOnlyDto>(tableAlias: "cmsDocument2"));
+
+            sql
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+
+                // cannot do this because NPoco does not know how to alias the table
                 //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
                 //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
                 // so have to rely on writing our own SQL
                 .Append(sqlx/*, new { @published = true }*/)
 
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -180,11 +191,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
                 if (contentTypeIds == null)
                 {
-                    var subQuery = new Sql()
+                    var subQuery = Sql()
                             .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>(SqlSyntax)
-                            .InnerJoin<DocumentDto>(SqlSyntax)
-                            .On<ContentXmlDto, DocumentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                            .From<ContentXmlDto>()
+                            .InnerJoin<DocumentDto>()
+                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
@@ -194,13 +205,13 @@ namespace Umbraco.Core.Persistence.Repositories
                     foreach (var id in contentTypeIds)
                     {
                         var id1 = id;
-                        var subQuery = new Sql()
+                        var subQuery = Sql()
                             .Select("cmsDocument.nodeId")
-                            .From<DocumentDto>(SqlSyntax)
-                            .InnerJoin<ContentDto>(SqlSyntax)
-                            .On<DocumentDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .Where<DocumentDto>(SqlSyntax, dto => dto.Published)
-                            .Where<ContentDto>(SqlSyntax, dto => dto.ContentTypeId == id1);
+                            .From<DocumentDto>()
+                            .InnerJoin<ContentDto>()
+                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<DocumentDto>(dto => dto.Published)
+                            .Where<ContentDto>( dto => dto.ContentTypeId == id1);
 
                         var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
@@ -228,7 +239,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        private void RebuildXmlStructuresProcessQuery(Func<IContent, XElement> serializer, IQuery<IContent> query, Transaction tr, int pageSize)
+        private void RebuildXmlStructuresProcessQuery(Func<IContent, XElement> serializer, IQuery<IContent> query, ITransaction tr, int pageSize)
         {
             var pageIndex = 0;
             var total = long.MinValue;
@@ -240,10 +251,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 // because that method is used to query 'latest' content items where in this case we don't necessarily
                 // want latest content items because a pulished content item might not actually be the latest.
                 // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
-                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
-                    new Tuple<string, string>("cmsDocument", "nodeId"),
-                    ProcessQuery, "Path", Direction.Ascending);
-                
+                var descendants = GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out total,
+                    MapQueryDtos, "Path", Direction.Ascending, true);
+
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
@@ -261,9 +271,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -275,13 +285,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override void DeleteVersion(Guid versionId)
         {
-            var sql = new Sql()
-                .Select("*")
-                .From<DocumentDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
-                .Where<ContentVersionDto>(SqlSyntax, x => x.VersionId == versionId)
-                .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
+            var sql = Sql()
+                .SelectAll()
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId)
+                .Where<DocumentDto>(x => x.Newest != true);
+            var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
 
             if (dto == null) return;
 
@@ -295,14 +305,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override void DeleteVersions(int id, DateTime versionDate)
         {
-            var sql = new Sql()
-                .Select("*")
-                .From<DocumentDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
-                .Where<ContentVersionDto>(SqlSyntax, x => x.NodeId == id)
-                .Where<ContentVersionDto>(SqlSyntax, x => x.VersionDate < versionDate)
-                .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var list = Database.Fetch<DocumentDto, ContentVersionDto>(sql);
+            var sql = Sql()
+                .SelectAll()
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.NodeId == id)
+                .Where<ContentVersionDto>(x => x.VersionDate < versionDate)
+                .Where<DocumentDto>(x => x.Newest != true);
+            var list = Database.Fetch<DocumentDto>(sql);
             if (list.Any() == false) return;
 
             using (var transaction = Database.GetTransaction())
@@ -330,14 +340,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(IContent entity)
         {
-            //We need to clear out all access rules but we need to do this in a manual way since 
+            //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
-            var subQuery = new Sql()
+            var subQuery = Sql()
                 .Select("umbracoAccessRule.accessId")
-                .From<AccessRuleDto>(SqlSyntax)
-                .InnerJoin<AccessDto>(SqlSyntax)
-                .On<AccessRuleDto, AccessDto>(SqlSyntax, left => left.AccessId, right => right.Id)
-                .Where<AccessDto>(SqlSyntax, dto => dto.NodeId == entity.Id);
+                .From<AccessRuleDto>()
+                .InnerJoin<AccessDto>()
+                .On<AccessRuleDto, AccessDto>(left => left.AccessId, right => right.Id)
+                .Where<AccessDto>(dto => dto.NodeId == entity.Id);
             Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
 
             //now let the normal delete clauses take care of everything else
@@ -377,7 +387,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -390,7 +400,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = level;
 
             //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161     
+            // http://issues.umbraco.org/issue/U4-2161
             var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
@@ -661,12 +671,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(SqlSyntax, x => x.Published)
-                                .OrderBy<NodeDto>(SqlSyntax, x => x.Level)
-                                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                                .Where<DocumentDto>(x => x.Published)
+                                .OrderBy<NodeDto>(x => x.Level)
+                                .OrderBy<NodeDto>(x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
+            var dtos = Database.Fetch<DocumentDto>(sql);
 
             foreach (var dto in dtos)
             {
@@ -689,8 +699,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int CountPublished()
         {
-            var sql = GetBaseQuery(true).Where<NodeDto>(SqlSyntax, x => x.Trashed == false)
-                .Where<DocumentDto>(SqlSyntax, x => x.Published == true);
+            var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+                .Where<DocumentDto>(x => x.Published == true);
             return Database.ExecuteScalar<int>(sql);
         }
 
@@ -716,7 +726,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>        
+        /// <param name="userIds"></param>
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
@@ -767,31 +777,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
-
-            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
-            // what we always require for a paged result, so we'll ensure it's included in the filter
-
-            var args = new List<object>();
-            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
-
+            var filterSql = Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter.IsNullOrWhiteSpace() == false)
-            {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
-            }
+                filterSql.Append("AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
 
-            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
-
-            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
-                filterCallback);
-
+            return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
+                MapQueryDtos,
+                orderBy, orderDirection, orderBySystemField,
+                filterSql);
         }
 
         /// <summary>
@@ -801,7 +800,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public XElement GetContentXml(int contentId)
         {
-            var sql = new Sql().Select("*").From<ContentXmlDto>(SqlSyntax).Where<ContentXmlDto>(SqlSyntax, d => d.NodeId == contentId);
+            var sql = Sql().SelectAll().From<ContentXmlDto>().Where<ContentXmlDto>(d => d.NodeId == contentId);
             var dto = Database.SingleOrDefault<ContentXmlDto>(sql);
             if (dto == null) return null;
             return XElement.Parse(dto.Xml);
@@ -815,8 +814,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public XElement GetContentPreviewXml(int contentId, Guid version)
         {
-            var sql = new Sql().Select("*").From<PreviewXmlDto>(SqlSyntax)
-                .Where<PreviewXmlDto>(SqlSyntax, d => d.NodeId == contentId && d.VersionId == version);
+            var sql = Sql().SelectAll().From<PreviewXmlDto>()
+                .Where<PreviewXmlDto>(d => d.NodeId == contentId && d.VersionId == version);
             var dto = Database.SingleOrDefault<PreviewXmlDto>(sql);
             if (dto == null) return null;
             return XElement.Parse(dto.Xml);
@@ -848,11 +847,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IContent> ProcessQuery(Sql sql)
+        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos)
         {
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
-
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();
 
@@ -884,7 +880,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(docDefs.ToArray());
 
             return dtosWithContentTypes.Select(d => CreateContentFromDto(
                 d.dto,
@@ -950,7 +946,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new[] { docDef });
 
             content.Properties = properties[dto.NodeId];
 
@@ -965,10 +961,10 @@ namespace Umbraco.Core.Persistence.Repositories
             if (EnsureUniqueNaming == false)
                 return nodeName;
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;

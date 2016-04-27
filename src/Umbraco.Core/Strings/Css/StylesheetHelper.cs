@@ -39,7 +39,7 @@ namespace Umbraco.Core.Strings.Css
         public static string ReplaceRule(string input, string oldRuleName, StylesheetRule rule)
         {
             var contents = input;
-            var ruleRegex = new Regex(string.Format(RuleRegexFormat, oldRuleName), RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var ruleRegex = new Regex(string.Format(RuleRegexFormat, oldRuleName.EscapeRegexSpecialCharacters()), RegexOptions.IgnoreCase | RegexOptions.Singleline);
             contents = ruleRegex.Replace(contents, rule != null ? rule.ToString() : "");
             return contents;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
@@ -78,6 +79,11 @@ namespace Umbraco.Core.Persistence.Migrations
         public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
         {
             return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
+        }
+
+        protected Sql<SqlContext> Sql()
+        {
+            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Context.Database));
         }
     }
 }

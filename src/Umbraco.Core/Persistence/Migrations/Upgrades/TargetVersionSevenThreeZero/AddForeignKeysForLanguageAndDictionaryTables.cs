@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                         .WithColumn("languageISOCode").AsString(10).Nullable()
                         .WithColumn("languageCultureName").AsString(50).Nullable();
                 
-                    var currentData = this.Context.Database.Fetch<LanguageDto>(new Sql().Select("*").From<LanguageDto>(SqlSyntax));
+                    var currentData = Context.Database.Fetch<LanguageDto>(Sql().SelectAll().From<LanguageDto>());
                     foreach (var languageDto in currentData)
                     {
                         Insert.IntoTable("umbracoLanguage_TEMP")

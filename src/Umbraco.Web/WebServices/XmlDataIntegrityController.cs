@@ -1,5 +1,6 @@
 using System;
 using System.Web.Http;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -37,13 +38,13 @@ namespace Umbraco.Web.WebServices
         {
             var totalPublished = Services.ContentService.CountPublished();
             
-            var subQuery = new Sql()
+            var subQuery = DatabaseContext.Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
-                .InnerJoin<DocumentDto>(DatabaseContext.SqlSyntax)
-                .On<DocumentDto, ContentXmlDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId);
+                .From<ContentXmlDto>()
+                .InnerJoin<DocumentDto>()
+                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
 
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
+            var totalXml = DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
 
             return totalXml == totalPublished;
         }
@@ -53,13 +54,13 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MediaService.Count();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
-                .InnerJoin<NodeDto>(DatabaseContext.SqlSyntax)
-                .On<ContentXmlDto, NodeDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(DatabaseContext.SqlSyntax, dto => dto.NodeObjectType == mediaObjectType);
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
+            var subQuery = DatabaseContext.Sql()
+                .SelectCount()
+                .From<ContentXmlDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+            var totalXml = DatabaseContext.Database.ExecuteScalar<int>(subQuery);
 
             return totalXml == total;
         }
@@ -69,13 +70,13 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MemberService.Count();
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = new Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>(DatabaseContext.SqlSyntax)
-                .InnerJoin<NodeDto>(DatabaseContext.SqlSyntax)
-                .On<ContentXmlDto, NodeDto>(DatabaseContext.SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(DatabaseContext.SqlSyntax, dto => dto.NodeObjectType == memberObjectType);
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
+            var subQuery = DatabaseContext.Sql()
+                .SelectCount()
+                .From<ContentXmlDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+            var totalXml = DatabaseContext.Database.ExecuteScalar<int>(subQuery);
 
             return totalXml == total;
         }

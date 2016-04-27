@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -46,14 +47,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Rebuild_All_Xml_Structures()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType1 = CreateTestMemberType();
-                
+
                 for (var i = 0; i < 100; i++)
                 {
                     var member = MockedMember.CreateSimpleMember(memberType1, "blah" + i, "blah" + i + "@example.com", "blah", "blah" + i);
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Rebuild_All_Xml_Structures_For_Content_Type()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Members_By_Ids()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberRepository_Can_Get_All_Members()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -204,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Persist_Member()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -215,19 +216,19 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.HasIdentity, Is.True);      
+                Assert.That(sut.HasIdentity, Is.True);
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
-                Assert.That(sut.Username, Is.EqualTo("hefty"));      
+                Assert.That(sut.Username, Is.EqualTo("hefty"));
             }
         }
 
         [Test]
         public void New_Member_Has_Built_In_Properties_By_Default()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -261,7 +262,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Does_Not_Replace_Password_When_Null()
         {
             IMember sut;
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -290,7 +291,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
         {
             IMember sut;
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -327,9 +328,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var translator = new SqlTranslator<IMember>(sqlSubquery, query);
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
-                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                .OrderBy<NodeDto>(x => x.SortOrder);
 
             Console.WriteLine(sql.SQL);
             Assert.That(sql.SQL, Is.Not.Empty);
@@ -337,7 +338,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -347,7 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
                     memberTypeRepository.AddOrUpdate(memberType);
-                    unitOfWork.Commit();    
+                    unitOfWork.Commit();
                 }
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
@@ -360,7 +361,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMemberType CreateTestMemberType(string alias = null)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -373,22 +374,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private Sql GetBaseQuery(bool isCount)
+        private Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
             {
-                var sqlCount = new Sql()
-                    .Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                var sqlCount = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database))
+                    .SelectCount()
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
                 return sqlCount;
             }
 
-            var sql = new Sql();
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -397,33 +398,33 @@ namespace Umbraco.Tests.Persistence.Repositories
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
                 "cmsPropertyType.dataTypeId", "cmsDataType.propertyEditorAlias", "cmsDataType.dbType")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, ContentDto>(SqlSyntax, left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
-        private Sql GetSubquery()
+        private Sql<SqlContext> GetSubquery()
         {
-            var sql = new Sql();
+            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
             sql.Select("umbracoNode.id")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, ContentDto>(SqlSyntax, left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

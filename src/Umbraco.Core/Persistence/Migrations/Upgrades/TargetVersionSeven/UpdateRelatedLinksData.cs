@@ -9,6 +9,7 @@ using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -33,8 +34,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
             if (database != null)
             {
-                var dtSql = new Sql().Select("nodeId").From<DataTypeDto>(SqlSyntax)
-                    .Where<DataTypeDto>(SqlSyntax, dto => dto.PropertyEditorAlias == Constants.PropertyEditors.RelatedLinksAlias);
+                var dtSql = Sql().Select("nodeId").From<DataTypeDto>()
+                    .Where<DataTypeDto>(dto => dto.PropertyEditorAlias == Constants.PropertyEditors.RelatedLinksAlias);
                 var dataTypeIds = database.Fetch<int>(dtSql);
 
                 if (!dataTypeIds.Any()) return string.Empty;

@@ -26,7 +26,8 @@ namespace Umbraco.Core.Configuration
     /// <summary>
     /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
     /// </summary>
-    internal class GlobalSettings
+    [Obsolete("TODO: Need to move this configuration class into the proper configuration accesors for v8!")]
+    public class GlobalSettings
     {
 
         #region Private static fields

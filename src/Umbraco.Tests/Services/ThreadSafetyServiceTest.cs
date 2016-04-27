@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Services
 	[TestFixture, RequiresSTA]
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
-		private PerThreadPetaPocoUnitOfWorkProvider _uowProvider;
+		private PerThreadNPocoUnitOfWorkProvider _uowProvider;
 		private PerThreadDatabaseFactory _dbFactory;
 
 		[SetUp]
@@ -47,9 +47,9 @@ namespace Umbraco.Tests.Services
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
             var repositoryFactory = new RepositoryFactory(SqlSyntax, Container);
-			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
+			_uowProvider = new PerThreadNPocoUnitOfWorkProvider(_dbFactory);
 		    var evtMsgs = new TransientMessagesFactory();
-		    ApplicationContext.Services = new ServiceContext(
+		    ApplicationContext.Services = ServiceContextHelper.GetServiceContext(
                 repositoryFactory,
                 _uowProvider, 
                 new FileUnitOfWorkProvider(), 
@@ -254,11 +254,11 @@ namespace Umbraco.Tests.Services
 		/// <summary>
 		/// Creates a UOW with a Database object per thread
 		/// </summary>
-		internal class PerThreadPetaPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
+		internal class PerThreadNPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
 		{
 			private readonly PerThreadDatabaseFactory _dbFactory;
 
-			public PerThreadPetaPocoUnitOfWorkProvider(PerThreadDatabaseFactory dbFactory)
+			public PerThreadNPocoUnitOfWorkProvider(PerThreadDatabaseFactory dbFactory)
 			{
 				_dbFactory = dbFactory;
 			}
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Services
 			{
 				//Create or get a database instance for this thread.
 				var db = _dbFactory.CreateDatabase();
-				return new PetaPocoUnitOfWork(db);
+				return new NPocoUnitOfWork(db);
 			}
 
 			protected override void DisposeResources()

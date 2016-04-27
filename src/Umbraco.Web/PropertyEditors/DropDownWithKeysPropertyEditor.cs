@@ -1,6 +1,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -15,11 +16,14 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropdownlistPublishingKeysAlias, "Dropdown list, publishing keys", "dropdown", ValueType = "INT", Group = "lists", Icon = "icon-indent")]
     public class DropDownWithKeysPropertyEditor : PropertyEditor
     {
+        private readonly ILocalizedTextService _textService;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownWithKeysPropertyEditor(ILogger logger) : base(logger)
+        public DropDownWithKeysPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger)
         {
+            _textService = textService;
         }
 
         /// <summary>
@@ -28,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new ValueListPreValueEditor();
+            return new ValueListPreValueEditor(_textService);
         }
     }
 }

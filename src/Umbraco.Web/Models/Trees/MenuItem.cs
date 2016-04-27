@@ -191,7 +191,25 @@ namespace Umbraco.Web.Models.Trees
                            view => LaunchDialogView(
                                view,
                                ApplicationContext.Current.Services.TextService.Localize("defaultdialogs/confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
-        } 
+        }
+
+        internal void ConvertLegacyFileSystemMenuItem(string path, string nodeType, string currentSection)
+        {
+            //First try to get a URL/title from the legacy action,
+            // if that doesn't work, try to get the legacy confirm view
+
+            //in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
+            Attempt
+                .Try(LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
+                                                                            path,
+                                                                            nodeType,
+                                                                            path, currentSection),
+                     action => LaunchDialogUrl(action.Url, action.DialogTitle))
+                .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection),
+                           view => LaunchDialogView(
+                               view,
+                               ApplicationContext.Current.Services.TextService.Localize("defaultdialogs/confirmdelete") + " '" + path + "' ?"));
+        }
         #endregion
 
     }

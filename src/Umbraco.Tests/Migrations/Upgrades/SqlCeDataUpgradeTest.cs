@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public override DatabaseProviders GetDatabaseProvider()
@@ -79,6 +79,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public override string GetDatabaseSpecificSqlScript()
         {
             return SqlScripts.SqlResources.SqlCe_SchemaAndData_4110;
-        } 
+        }
     }
 }

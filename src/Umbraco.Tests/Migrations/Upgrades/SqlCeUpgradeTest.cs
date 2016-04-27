@@ -17,13 +17,13 @@ namespace Umbraco.Tests.Migrations.Upgrades
     {
         public override void DatabaseSpecificSetUp()
         {
-            string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
+            string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
 
             if (!File.Exists(filePath))
             {
                 try
                 {
-                    //Delete database file before continueing                    
+                    //Delete database file before continueing
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             {
                 TestHelper.ClearDatabase();
             }
-            
+
         }
 
         public override void DatabaseSpecificTearDown()
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public override DatabaseProviders GetDatabaseProvider()

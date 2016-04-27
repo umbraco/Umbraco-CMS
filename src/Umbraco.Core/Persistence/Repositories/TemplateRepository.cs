@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the Template Repository
     /// </summary>
-    internal class TemplateRepository : PetaPocoRepositoryBase<int, ITemplate>, ITemplateRepository
+    internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
         private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
@@ -75,14 +76,14 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+            var dtos = Database.Fetch<TemplateDto>(sql);
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
             var childIds = (ids.Any()
                 ? GetAxisDefinitions(dtos.ToArray())
@@ -92,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     ParentId = x.NodeDto.ParentId,
                     Name = x.Alias
                 })).ToArray();
-            
+
             return dtos.Select(d => MapFromDto(d, childIds));
         }
 
@@ -102,11 +103,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<ITemplate>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+            var dtos = Database.Fetch<TemplateDto>(sql);
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
             var childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
 
@@ -115,16 +116,23 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,ITemplate>
+        #region Overrides of NPocoRepositoryBase<int,ITemplate>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<TemplateDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TemplateDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<TemplateDto>(r =>
+                        r.Select<NodeDto>());
+
+            sql
+                .From<TemplateDto>()
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
@@ -166,7 +174,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
             nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             var parent = Get(template.MasterTemplateId.Value);
@@ -325,23 +333,23 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var masterpageName = string.Concat(entity.Alias, ".master");
                 _masterpagesFileSystem.DeleteFile(masterpageName);
-            }         
+            }
         }
 
         #endregion
 
         private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
         {
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIdsSql = new Sql()
+            var childIdsSql = Sql()
                 .Select("nodeId,alias,parentID")
-                .From<TemplateDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TemplateDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .From<TemplateDto>()
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
                 //lookup axis's
                 .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
-                    new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});            
+                    new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
             var childIds = Database.Fetch<dynamic>(childIdsSql)
                 .Select(x => new UmbracoEntity
@@ -571,7 +579,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         [Obsolete("Use GetDescendants instead")]
         public TemplateNode GetTemplateNode(string alias)
-        {            
+        {
             //first get all template objects
             var allTemplates = base.GetAll().ToArray();
 
@@ -580,7 +588,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return null;
             }
-            
+
             var top = selfTemplate;
             while (top.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
             {
@@ -631,16 +639,16 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
-        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
         /// rendering engine to use.
-        /// </summary> 
+        /// </summary>
         /// <returns></returns>
         /// <remarks>
         /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
-        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
-        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page.
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
@@ -748,7 +756,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="template"></param>
         private void EnsureValidAlias(ITemplate template)
         {
-            //ensure unique alias 
+            //ensure unique alias
             template.Alias = template.Alias.ToCleanString(CleanStringType.UnderscoreAlias);
 
             if (template.Alias.Length > 100)
@@ -762,7 +770,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(SqlSyntax, x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

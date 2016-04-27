@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
         public IMacro BuildEntity(MacroDto dto)
         {
             var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
-            foreach (var p in dto.MacroPropertyDtos)
+            foreach (var p in dto.MacroPropertyDtos.EmptyNull())
             {
                 model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
             }

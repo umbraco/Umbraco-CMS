@@ -23,16 +23,20 @@ namespace Umbraco.Core.DependencyInjection
         {
             container.RegisterSingleton<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
             container.RegisterSingleton<DatabaseContext>(factory => GetDbContext(factory));
+
             container.RegisterSingleton<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()));
+            container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
+
             container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
-            container.RegisterSingleton<IDatabaseUnitOfWorkProvider>(factory => new PetaPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()));
+            container.RegisterSingleton<IDatabaseUnitOfWorkProvider>(factory => new NPocoUnitOfWorkProvider(factory.GetInstance<IDatabaseFactory>()));
+
             container.RegisterSingleton<IMappingResolver>(factory => new MappingResolver(
                 factory.GetInstance<IServiceContainer>(),
                 factory.GetInstance<ILogger>(),
                 () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()));
             container.Register<RepositoryFactory>();
-            container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
             container.RegisterSingleton<CacheHelper>(factory => CacheHelper.CreateDisabledCacheHelper(), "DisabledCache");
+
             container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Scripts), "ScriptFileSystem");
             container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"), "PartialViewFileSystem");
             container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"), "PartialViewMacroFileSystem");

@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,11 +17,14 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
     public class DropDownMultipleWithKeysPropertyEditor : DropDownPropertyEditor
     {
+        private readonly ILocalizedTextService _textService;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownMultipleWithKeysPropertyEditor(ILogger logger) : base(logger)
+        public DropDownMultipleWithKeysPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
         {
+            _textService = textService;
         }
 
         protected override PropertyValueEditor CreateValueEditor()
@@ -30,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new DropDownMultiplePreValueEditor();
+            return new DropDownMultiplePreValueEditor(_textService);
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         internal class DropDownMultiplePreValueEditor : ValueListPreValueEditor
         {
-            public DropDownMultiplePreValueEditor()
+            public DropDownMultiplePreValueEditor(ILocalizedTextService textService) : base(textService)
             {
                 //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
                 Fields.Add(new PreValueField

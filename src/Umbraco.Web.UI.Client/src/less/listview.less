@@ -243,7 +243,8 @@
   background-color: @grayLighter
 }
 
-.table-striped tbody i:hover {
+/* don't hide all icons, e.g. for a sortable handle */
+.umb-listview .table-striped tbody i:not(.handle):hover {
   display: none !important
 }
 

@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownMultiplePropertyEditor(ILogger logger) : base(logger)
+        public DropDownMultiplePropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
         {
         }
 

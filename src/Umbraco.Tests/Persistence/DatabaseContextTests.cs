@@ -27,14 +27,14 @@ namespace Umbraco.Tests.Persistence
                 new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
                 Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
 
-			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
+			//unfortunately we have to set this up because the NPocoExtensions require singleton access
 			ApplicationContext.Current = new ApplicationContext(
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()))
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true
-				};			
+				};
 		}
 
 		[TearDown]
@@ -78,10 +78,10 @@ namespace Umbraco.Tests.Persistence
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
-            //by default the conn string is: Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;
+            //by default the conn string is: Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;
             //we'll just replace the sdf file with our custom one:
             //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoPetaPocoTests", "DatabaseContextTests"));
+            var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoNPocoTests", "DatabaseContextTests"));
             engine.CreateDatabase();
 
             var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Persistence
 
             var appCtx = new ApplicationContext(
                 new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
-                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
+                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 

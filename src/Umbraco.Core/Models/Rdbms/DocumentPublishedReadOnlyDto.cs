@@ -1,10 +1,11 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsDocument")]
-    [PrimaryKey("versionId", autoIncrement = false)]
+    [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentPublishedReadOnlyDto
     {

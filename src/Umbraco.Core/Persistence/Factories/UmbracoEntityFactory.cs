@@ -93,18 +93,15 @@ namespace Umbraco.Core.Persistence.Factories
             entity.IsDraft = dto.NewestVersion != default(Guid) && (dto.PublishedVersion == default(Guid) || dto.PublishedVersion != dto.NewestVersion);
             entity.HasPendingChanges = (dto.PublishedVersion != default(Guid) && dto.NewestVersion != default(Guid)) && dto.PublishedVersion != dto.NewestVersion;
 
-            if (dto.UmbracoPropertyDtos != null)
+            foreach (var propertyDto in dto.UmbracoPropertyDtos.EmptyNull())
             {
-                foreach (var propertyDto in dto.UmbracoPropertyDtos)
+                entity.AdditionalData[propertyDto.PropertyAlias] = new UmbracoEntity.EntityProperty
                 {
-                    entity.AdditionalData[propertyDto.PropertyAlias] = new UmbracoEntity.EntityProperty
-                    {
-                        PropertyEditorAlias = propertyDto.PropertyEditorAlias,
-                        Value = propertyDto.NTextValue.IsNullOrWhiteSpace()
-                            ? propertyDto.NVarcharValue
-                            : propertyDto.NTextValue.ConvertToJsonIfPossible()
-                    };
-                }
+                    PropertyEditorAlias = propertyDto.PropertyEditorAlias,
+                    Value = propertyDto.NTextValue.IsNullOrWhiteSpace()
+                        ? propertyDto.NVarcharValue
+                        : propertyDto.NTextValue.ConvertToJsonIfPossible()
+                };
             }
 
             return entity;

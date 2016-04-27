@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,7 +14,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MigrationEntryRepository : PetaPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
+    internal class MigrationEntryRepository : NPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
         public MigrationEntryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -63,11 +64,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<MigrationDto>(sql).Select(x => factory.BuildEntity(x));
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<MigrationDto>(SqlSyntax);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<MigrationDto>();
+
+            sql
+                .From<MigrationDto>();
+
             return sql;
         }
 
@@ -119,9 +126,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var versionString = version.ToString();
 
-            var sql = new Sql().Select("*")
-                .From<MigrationDto>(SqlSyntax)
-                .Where<MigrationDto>(SqlSyntax, x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
+            var sql = Sql().SelectAll()
+                .From<MigrationDto>()
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
 
             var result = Database.FirstOrDefault<MigrationDto>(sql);
 

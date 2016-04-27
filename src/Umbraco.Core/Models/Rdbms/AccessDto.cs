@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.AccessControl;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -9,7 +10,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoAccess")]
-    [PrimaryKey("id", autoIncrement = false)]
+    [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class AccessDto
     {
@@ -39,6 +40,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime UpdateDate { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "AccessId")]
         public List<AccessRuleDto> Rules { get; set; }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsPreviewXml")]
-    [PrimaryKey("nodeId", autoIncrement = false)]
+    [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class PreviewXmlDto
     {

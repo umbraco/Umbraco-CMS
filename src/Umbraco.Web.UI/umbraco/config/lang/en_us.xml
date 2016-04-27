@@ -175,6 +175,7 @@
 	  <key alias="urls">Link to media</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
+    <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
   </area>
   <area alias="member">
@@ -271,7 +272,8 @@
 
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
-    <key alias="stracktrace">Stacktrace</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>
@@ -289,6 +291,7 @@
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
+    <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="label">Label...</key>
@@ -296,6 +299,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
+    <key alias="email">Enter your email</key>
   </area>
 
   <area alias="editcontenttype">
@@ -656,6 +660,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">Forgotten password?</key>
+    <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
+    <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+    <key alias="returnToLogin">Return to login form</key>
+    <key alias="setPasswordInstruction">Please provide a new password</key>
+    <key alias="setPasswordConfirmation">Your Password has been updated</key>
+    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+    </key>    
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -1193,6 +1208,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="xslt">XSLT Files</key>
     <key alias="analytics">Analytics</key>
     <key alias="userTypes">User Types</key>
+    <key alias="users">Users</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
