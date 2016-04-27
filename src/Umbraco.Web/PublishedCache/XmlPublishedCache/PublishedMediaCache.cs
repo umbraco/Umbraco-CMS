@@ -628,15 +628,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			{
 				if (LoadedFromExamine)
 				{
-					try
-					{
-						//we might need to parse the date time using Lucene converters
-						return DateTools.StringToDate(val);
-					}
-					catch (FormatException)
-					{
-						//swallow exception, its not formatted correctly so revert to just trying to parse
-					}
+                    //we need to parse the date time using Lucene converters
+				    var ticks = long.Parse(val);
+                    return new DateTime(ticks);
 				}
 
 				return DateTime.Parse(val);

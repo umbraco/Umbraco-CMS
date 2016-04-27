@@ -36,6 +36,7 @@ namespace UmbracoExamine
         public const string IndexPathFieldName = "__Path";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
         public const string IconFieldName = "__Icon";
+        public const string PublishedFieldName = "__Published";
         /// <summary>
         /// The prefix added to a field when it is duplicated in order to store the original raw value.
         /// </summary>
@@ -254,11 +255,20 @@ namespace UmbracoExamine
             }
         }
 
+        public override void IndexItems(IEnumerable<ValueSet> nodes)
+        {
+            if (CanInitialize())
+            {
+                base.IndexItems(nodes);
+            }
+        }
+
+        [Obsolete("Use ValueSets with IndexItems instead")]
         public override void ReIndexNode(XElement node, string type)
         {
             if (CanInitialize())
             {
-                if (!SupportedTypes.Contains(type))
+                if (SupportedTypes.Contains(type) == false)
                     return;
 
                 if (node.Attribute("id") != null)
@@ -271,8 +281,6 @@ namespace UmbracoExamine
                     ProfilingLogger.Logger.Error(GetType(), "ReIndexNode cannot proceed, the format of the XElement is invalid",
                         new XmlException("XElement is invalid, the xml has not id attribute"));
                 }
-
-                base.ReIndexNode(node, type);
             }
         }
 

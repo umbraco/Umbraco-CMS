@@ -14,7 +14,7 @@ namespace UmbracoExamine
     {
         private readonly UmbracoContentIndexerOptions _options;
         private readonly IPublicAccessService _publicAccessService;
-
+        private const string PathKey = "path";
         public UmbracoContentValueSetValidator(UmbracoContentIndexerOptions options, IPublicAccessService publicAccessService)
         {
             _options = options;
@@ -23,27 +23,46 @@ namespace UmbracoExamine
 
         public bool Validate(ValueSet valueSet)
         {
+            //check for published content
+            if (valueSet.IndexCategory == IndexTypes.Content
+                && valueSet.Values.ContainsKey(BaseUmbracoIndexer.PublishedFieldName))
+            {
+                var published = valueSet.Values[BaseUmbracoIndexer.PublishedFieldName] != null && valueSet.Values[BaseUmbracoIndexer.PublishedFieldName][0].Equals(1);
+                //we don't support unpublished and the item is not published return false
+                if (_options.SupportUnpublishedContent == false && published == false)
+                {
+                    return false;
+                }
+            }
+
             //must have a 'path'
-            if (valueSet.Values.ContainsKey("path") == false) return false;
+            if (valueSet.Values.ContainsKey(PathKey) == false) return false;
+            var path = valueSet.Values[PathKey] == null ? string.Empty : valueSet.Values[PathKey][0].ToString();
 
-            var path = valueSet.Values["path"] == null ? string.Empty : valueSet.Values["path"][0].ToString();
-
-            
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
-            if (_options.SupportUnpublishedContent == false
-                && (_options.SupportProtectedContent == false
-                    && path != null
-                    && _publicAccessService.IsProtected(path)))
+            if (valueSet.IndexCategory == IndexTypes.Content
+                && _options.SupportUnpublishedContent == false 
+                && _options.SupportProtectedContent == false 
+                && _publicAccessService.IsProtected(path))
             {
                 return false;
             }
 
-            //check if this document is a descendent of the parent
+            //check if this document is a descendent of the parent  
             if (_options.ParentId.HasValue && _options.ParentId.Value > 0)
             {
                 if (path.IsNullOrWhiteSpace()) return false;
                 if (path.Contains(string.Concat(",", _options.ParentId.Value, ",")) == false)
+                    return false;
+            }
+
+            //check for recycle bin
+            if (_options.SupportUnpublishedContent == false)
+            {
+                if (path.IsNullOrWhiteSpace()) return false;
+                var recycleBinId = valueSet.IndexCategory == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
+                if (path.Contains(string.Concat(",", recycleBinId, ",")))
                     return false;
             }
 

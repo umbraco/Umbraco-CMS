@@ -17,6 +17,7 @@ using Examine.Session;
 using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Strings;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -104,7 +105,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Ensure_Children_Sorted_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -136,7 +137,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Do_Not_Find_In_Recycle_Bin()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -159,6 +160,7 @@ namespace Umbraco.Tests.PublishedContent
 					<data alias='umbracoExtension'>jpg</data>
 				</node>");
                 indexer.ReIndexNode(newXml, "media");
+                session.WaitForChanges();
 
                 //ensure it still exists in the index (raw examine search)
                 var criteria = searcher.CreateSearchCriteria();
@@ -179,7 +181,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Children_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -204,7 +206,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Descendants_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -229,7 +231,7 @@ namespace Umbraco.Tests.PublishedContent
         public void DescendantsOrSelf_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -254,7 +256,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Ancestors_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();
@@ -276,7 +278,7 @@ namespace Umbraco.Tests.PublishedContent
         public void AncestorsOrSelf_With_Examine()
         {
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 indexer.RebuildIndex();

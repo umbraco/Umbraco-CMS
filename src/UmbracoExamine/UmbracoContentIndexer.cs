@@ -327,6 +327,7 @@ namespace UmbracoExamine
 
                 //add a custom 'icon' attribute
                 xml.Add(new XAttribute("icon", c.ContentType.Icon));
+                xml.Add(new XAttribute(PublishedFieldName, c.Published ? 1 : 0));
 
                 yield return xml;
             }
