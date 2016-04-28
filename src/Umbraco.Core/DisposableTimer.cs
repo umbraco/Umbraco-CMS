@@ -18,6 +18,7 @@ namespace Umbraco.Core
 	    private readonly IProfiler _profiler;
 	    private readonly Type _loggerType;
 	    private readonly string _endMessage;
+	    private readonly int _minimumMsThreshold = 0;
 	    private readonly IDisposable _profilerStep;
 	    private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 		private readonly Action<long> _callback;
@@ -27,7 +28,28 @@ namespace Umbraco.Core
 	        Debug, Info
 	    }
 
-        internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType, string startMessage, string endMessage)
+	    internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType, string startMessage, string endMessage, int minimumMsThreshold)
+	    {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (loggerType == null) throw new ArgumentNullException("loggerType");
+
+            _logger = logger;
+            _logType = logType;
+            _profiler = profiler;
+            _loggerType = loggerType;
+            _endMessage = endMessage;
+	        _minimumMsThreshold = minimumMsThreshold;
+
+            //NOTE: We aren't logging the start message with this ctor, this is output to the profiler but not the log,
+            // we just want the log to contain the result  if it's more than the minimum ms threshold
+
+	        if (profiler != null)
+            {
+                _profilerStep = profiler.Step(loggerType, startMessage);
+            }
+        }
+
+	    internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType, string startMessage, string endMessage)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (loggerType == null) throw new ArgumentNullException("loggerType");
@@ -147,6 +169,7 @@ namespace Umbraco.Core
         #endregion
 
         #region DebugDuration
+
         /// <summary>
         /// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
         /// </summary>
@@ -217,6 +240,8 @@ namespace Umbraco.Core
 		/// </summary>
 		protected override void DisposeResources()
 		{
+            Stopwatch.Stop();
+
             if (_profiler != null)
             {
                 _profiler.DisposeIfDisposable();
@@ -227,7 +252,7 @@ namespace Umbraco.Core
                 _profilerStep.Dispose();
             }
 
-		    if (_logType.HasValue && _endMessage.IsNullOrWhiteSpace() == false && _loggerType != null && _logger != null)
+		    if (Stopwatch.ElapsedMilliseconds >= _minimumMsThreshold && _logType.HasValue && _endMessage.IsNullOrWhiteSpace() == false && _loggerType != null && _logger != null)
 		    {
                 switch (_logType)
                 {

@@ -37,6 +37,8 @@ namespace UmbracoExamine.LocalStorage
 
         public LocalTempStorageIndexer()
         {
+            throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
+
             IndexDeletionPolicy policy = new KeepOnlyLastCommitDeletionPolicy();
             Snapshotter = new SnapshotDeletionPolicy(policy);
         }
@@ -67,8 +69,6 @@ namespace UmbracoExamine.LocalStorage
             var tempPath = localStorageDir.GetLocalStorageDirectory(config, configuredPath);
             if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorageDir.GetType() + " specified");
             TempPath = tempPath.FullName;
-
-            throw new NotSupportedException("Fix the local storage stuff!");
 
             switch (localStorageType)
             {
@@ -128,13 +128,13 @@ namespace UmbracoExamine.LocalStorage
                     }
 
                     break;
-                //case LocalStorageType.LocalOnly:
-                //    if (Directory.Exists(TempPath) == false)
-                //    {
-                //        Directory.CreateDirectory(TempPath);
-                //    }
-                //    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(TempPath));
-                //    break;
+                case LocalStorageType.LocalOnly:
+                    if (Directory.Exists(TempPath) == false)
+                    {
+                        Directory.CreateDirectory(TempPath);
+                    }
+                    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(TempPath));
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("localStorageType");
             }

@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
@@ -144,6 +145,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 contentService,
                 mediaService,
                 userService,
+                new SqlCeSyntaxProvider(), 
                 new[] { new DefaultUrlSegmentProvider() },
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
                 options);

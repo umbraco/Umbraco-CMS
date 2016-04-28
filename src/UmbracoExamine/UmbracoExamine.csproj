@@ -83,7 +83,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Examine, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.2.0.0-beta023\lib\net45\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.2.0.0-beta024\lib\net45\Examine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
@@ -167,6 +167,7 @@
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LocalStorage\AzureLocalStorageDirectory.cs" />
     <Compile Include="LocalStorage\CodeGenLocalStorageDirectory.cs" />
+    <Compile Include="LocalStorage\DirectoryTracker.cs" />
     <Compile Include="LocalStorage\ILocalStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalStorageType.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectory.cs" />

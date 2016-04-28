@@ -66,7 +66,7 @@ namespace UmbracoExamine
         }
 
         private readonly bool _configBased = false;
-        private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
+        private LocalTempStorageIndexer _localTempStorageIndexer;
 
         /// <summary>
         /// A type that defines the type of index for each Umbraco field (non user defined fields)
@@ -135,7 +135,7 @@ namespace UmbracoExamine
 
         public bool UseTempStorage
         {
-            get { return _localTempStorageIndexer.LuceneDirectory != null; }
+            get { return _localTempStorageIndexer != null && _localTempStorageIndexer.LuceneDirectory != null; }
         }
 
         public string TempStorageLocation
@@ -182,6 +182,10 @@ namespace UmbracoExamine
 
             if (config["useTempStorage"] != null)
             {
+                throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
+
+                _localTempStorageIndexer = new LocalTempStorageIndexer();
+
                 var fsDir = base.GetLuceneDirectory() as FSDirectory;
                 if (fsDir != null)
                 {

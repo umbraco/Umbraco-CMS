@@ -97,6 +97,8 @@ namespace UmbracoExamine
 
             if (config != null && config["useTempStorage"] != null)
             {
+                throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
+
                 //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
                 // for websites that are running from a remove file server and file IO latency becomes an issue
                 var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
@@ -144,7 +146,7 @@ namespace UmbracoExamine
                                 }
                                 return base.GetLuceneDirectory();
                             case LocalStorageType.LocalOnly:
-                                return new SimpleFSDirectory(new DirectoryInfo(localTempPath));
+                                return DirectoryTracker.Current.GetDirectory(new DirectoryInfo(localTempPath));
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
