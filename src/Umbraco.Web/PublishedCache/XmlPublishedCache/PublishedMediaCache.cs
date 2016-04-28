@@ -249,53 +249,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
 		{
-			//NOTE: Some fields will not be included if the config section for the internal index has been
-            //mucked around with. It should index everything and so the index definition should simply be:
-            // <IndexSet SetName="InternalIndexSet" IndexPath="~/App_Data/TEMP/ExamineIndexes/Internal/" />
-
-
 			var values = new Dictionary<string, string>(searchResult.Fields);
-			//we need to ensure some fields exist, because of the above issue
-			if (!new []{"template", "templateId"}.Any(values.ContainsKey))
-				values.Add("template", 0.ToString());
-			if (!new[] { "sortOrder" }.Any(values.ContainsKey))
-				values.Add("sortOrder", 0.ToString());
-			if (!new[] { "urlName" }.Any(values.ContainsKey))
-				values.Add("urlName", "");
-			if (!new[] { "nodeType" }.Any(values.ContainsKey))
-				values.Add("nodeType", 0.ToString());
-			if (!new[] { "creatorName" }.Any(values.ContainsKey))
-				values.Add("creatorName", "");
-			if (!new[] { "writerID" }.Any(values.ContainsKey))
-				values.Add("writerID", 0.ToString());
-			if (!new[] { "creatorID" }.Any(values.ContainsKey))
-				values.Add("creatorID", 0.ToString());
-			if (!new[] { "createDate" }.Any(values.ContainsKey))
-				values.Add("createDate", default(DateTime).ToString("yyyy-MM-dd HH:mm:ss"));
-			if (!new[] { "level" }.Any(values.ContainsKey))
-			{
-				values.Add("level", values["__Path"].Split(',').Length.ToString());
-			}
-
-            // because, migration
-            if (values.ContainsKey("key") == false)
-                values["key"] = Guid.Empty.ToString();
-
-		    return new CacheValues
+            
+			return new CacheValues
 		    {
 		        Values = values,
                 FromExamine = true
 		    };
-
-            //var content = new DictionaryPublishedContent(values,
-            //                                      d => d.ParentId != -1 //parent should be null if -1
-            //                                               ? GetUmbracoMedia(d.ParentId)
-            //                                               : null,
-            //                                      //callback to return the children of the current node
-            //                                      d => GetChildrenMedia(d.Id),
-            //                                      GetProperty,
-            //                                      true);
-            //return content.CreateModel();
 		}
 
 		internal CacheValues ConvertFromXPathNavigator(XPathNavigator xpath, bool forceNav = false)
