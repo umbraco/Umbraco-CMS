@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Net;
 using System.Web;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     /// <summary>
     /// Checks Umbraco backoffice users against the HaveIBeenPwned database to check if they've been breached
@@ -12,7 +12,7 @@ namespace Umbraco.Web.HealthCheck
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
         "HTTPS Configuration",
-        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct",
+        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.",
         Group = "Security")]
     public class HttpsCheck : HealthCheck
     {

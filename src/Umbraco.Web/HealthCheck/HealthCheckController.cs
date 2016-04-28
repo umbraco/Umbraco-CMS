@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Web.Http;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.HealthCheck
@@ -57,12 +58,27 @@ namespace Umbraco.Web.HealthCheck
             return check.GetStatus();
         }
 
-        public HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
+        public HealthCheckStatus ExecuteAction(HealthCheckAction action) {
             var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == action.HealthCheckId);
             if (check == null) throw new InvalidOperationException("No health check found with id " + action.HealthCheckId);
 
             return check.ExecuteAction(action);
         }
+
+        [HttpGet]
+        public HealthCheckStatus ExecuteAction(string checkId, string actionAlias) {
+
+            // Attempt to find the health check
+            HealthCheck check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id.ToString() == checkId);
+            if (check == null) throw new InvalidOperationException("No health check found with id " + checkId);
+
+            // TODO: Totally not sure about this
+            HealthCheckAction action = new HealthCheckAction(actionAlias, Guid.Empty);
+
+            return check.ExecuteAction(action);
+        
+        }
+    
     }
+
 }

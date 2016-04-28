@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.HealthCheck
 {
-    [DataContract(Name = "healtCheckAction", Namespace = "")]
+    [DataContract(Name = "healthCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
 
@@ -33,12 +33,24 @@ namespace Umbraco.Web.HealthCheck
         public string Alias { get; set; }
 
         /// <summary>
+        /// The name of the action - this is shown as the label of the button used for triggering the action.
+        /// </summary>
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The description of the action - this is shown as the tooltip of the button used for triggering the action.
+        /// </summary>
+        [DataMember(Name = "description")]
+        public string Description { get; set; }
+
+        /// <summary>
         /// The Id of the Health Check instance
         /// </summary>
         /// <remarks>
         /// This is used to find the Health Check instance to execute this action
         /// </remarks>
-        [DataMember(Name = "healtCheckId")]
+        [DataMember(Name = "healthCheckId")]
         public Guid HealthCheckId { get; set; }
 
         /// <summary>

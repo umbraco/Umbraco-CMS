@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -8,11 +9,15 @@ namespace Umbraco.Web.HealthCheck
     /// The status returned for a health check when it performs it check
     /// TODO: This model will be used in the WebApi result so needs attributes for JSON usage
     /// </summary>
-    [DataContract(Name = "healtCheckStatus", Namespace = "")]
-    public class HealthCheckStatus
-    {
-        public HealthCheckStatus(string message)
-        {
+    [DataContract(Name = "healthCheckStatus", Namespace = "")]
+    public class HealthCheckStatus {
+        
+        public HealthCheckStatus() {
+            Message = String.Empty;
+            Actions = Enumerable.Empty<HealthCheckAction>();
+        }
+        
+        public HealthCheckStatus(string message) {
             Message = message;
             Actions = Enumerable.Empty<HealthCheckAction>();
         }
@@ -21,7 +26,7 @@ namespace Umbraco.Web.HealthCheck
         /// The status message
         /// </summary>
         [DataMember(Name = "message")]
-        public string Message { get; private set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// The status description if one is necessary

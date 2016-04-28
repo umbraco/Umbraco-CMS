@@ -318,6 +318,11 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="HealthCheck\Checks\Config\CompilationDebugCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\CustomErrorsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ValueComparisonType.cs" />
     <Compile Include="HealthCheck\HealthCheckAction.cs" />
     <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckContext.cs" />
@@ -326,10 +331,10 @@
     <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
-    <Compile Include="HealthCheck\HttpsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
-    <Compile Include="HealthCheck\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />

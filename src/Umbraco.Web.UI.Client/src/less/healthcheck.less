@@ -1,57 +1,61 @@
 #umbracoHealthCheck {
 
-	.table {
+    padding-bottom: 20px;
 
-		> table {
-			width: 100%;
-			border: 1px solid #d9d9d9;
+    .healthCheck {
+        border: 1px solid @grayLight;
+    }
 
-			> thead {
-				font-size: 11px;
-				font-weight: 600;
-				text-transform: uppercase;
-				background-color: #f8f8f8;
-				th {
-					text-align: left;
-					border-bottom: 2px solid #dbdbdb;
-				}
-			}
+    .healthCheck  + .healthCheck {
+        border-top: 0;
+    }
+    
+    .healthCheckHeader {
+        border-bottom: 1px solid @grayLight;
+        padding: 8px;
+        line-height: 20px;
+        vertical-align: top;
+        background-color: @grayLighter;
+    }
+    
+    .healthCheckContent {
+        position: relative;
+        padding: 10px;
+    }
+    
+    .healthCheckStatusList {
+        margin-top: 10px;
+        &.loading {
+            opacity: 0.5;
+        }
+    }
+        
+    .healthCheckGroup .healthCheckGroupName {
+        margin: 0 0 20px 0;
+        font-size: 26px;
+        line-height: 40px;
+        font-weight: normal;
+    }
+    
+    .healthCheckGroup + .healthCheckGroup .healthCheckGroupName {
+        margin: 20px 0 20px 0;
+    }
+    
+    .healthCheckStatus {
+        position: relative;
+        padding-left: 20px;
+        border-top: 1px solid @grayLight;
+        margin-top: 5px;
+        padding-top: 5px;
+        .icon {
+            position: absolute;
+            top: 6px;
+            left: 0;
+        }
+    }
 
-			> tbody {
-				td.page {
-					width: 100%;
-				}
-
-				td.nowrap {
-					white-space: nowrap;
-				}
-			}
-
-			> * > tr {
-				-moz-transition: opacity 0.5s;
-				-o-transition: opacity 0.5s;
-				-webkit-transition: opacity 0.5s;
-				transition: opacity 0.5s;
-
-				&.expanded > td {
-					border-bottom: 1px solid white;
-				}
-
-				> td, > th {
-					padding: 8px;
-					line-height: 20px;
-					text-align: left;
-					vertical-align: top;
-					border-top: 1px solid #dbdbdb;
-
-					&:last-child {
-						border-right: 1px solid #dbdbdb;
-					}
-				}
-			}
-
-		}
-
-	}
+    .healthCheckStatusSuccess .icon { color: @green; }
+    .healthCheckStatusWarning .icon { color: @orange; }
+    .healthCheckStatusError .icon { color: @red; }
 
 }

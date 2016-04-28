@@ -8,7 +8,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// The abstract health check class
     /// </summary>
-    [DataContract(Name = "healtCheck", Namespace = "")]
+    [DataContract(Name = "healthCheck", Namespace = "")]
     public abstract class HealthCheck
     {
         protected HealthCheck(HealthCheckContext healthCheckContext)

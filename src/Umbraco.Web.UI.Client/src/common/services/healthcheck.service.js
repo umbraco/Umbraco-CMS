@@ -6,13 +6,13 @@
  * @description
  * Used by the health check dashboard to get checks and send requests to fix checks.
  */
-angular.module("umbraco.services").factory("healtCheckService", function ($http, umbRequestHelper) {
+angular.module("umbraco.services").factory("healthCheckService", function ($http, umbRequestHelper) {
     return {
         
         /**
          * @ngdoc function
-         * @name umbraco.services.healtCheckService#getAllChecks
-         * @methodOf umbraco.services.healtCheckService
+         * @name umbraco.services.healthCheckService#getAllChecks
+         * @methodOf umbraco.services.healthCheckService
          * @function
          *
          * @description
@@ -25,10 +25,17 @@ angular.module("umbraco.services").factory("healtCheckService", function ($http,
             );
         },
 
-        getStatus: function(id) {
+        getStatus: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'GetStatus?id=' + id),
                 'Failed to retrieve status for health check with ID ' + id
+            );
+        },
+
+        executeAction: function (check, status, action) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'ExecuteAction?checkId=' + check.id + '&actionAlias=' + action.alias),
+                'Failed to execute action with alias ' + action.alias + ' for health check with ID ' + check.id
             );
         }
 
