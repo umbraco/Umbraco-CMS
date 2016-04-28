@@ -34,7 +34,7 @@ namespace Umbraco.Tests.UmbracoExamine
 	    {
 
 	        using (var luceneDir = new RAMDirectory())
-	        using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+	        using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
 	        using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
 	        {
 	            var searcher = indexer.GetSearcher();
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Reindex_Content()
 		{
             using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
                 var searcher = indexer.GetSearcher();

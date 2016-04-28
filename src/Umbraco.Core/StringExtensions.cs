@@ -631,6 +631,11 @@ namespace Umbraco.Core
             return str.ToString(CultureInfo.InvariantCulture);
         }
 
+        public static string ToInvariantString(this long str)
+        {
+            return str.ToString(CultureInfo.InvariantCulture);
+        }
+
         /// <summary>
         /// Compares 2 strings with invariant culture and case ignored
         /// </summary>

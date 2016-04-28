@@ -31,7 +31,6 @@ namespace Umbraco.Tests.UmbracoExamine
             Analyzer analyzer = null,
             IContentService contentService = null,
             IMediaService mediaService = null,
-            IDataTypeService dataTypeService = null,
             IMemberService memberService = null,
             IUserService userService = null,
             UmbracoContentIndexerOptions options = null)
@@ -107,11 +106,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         ==
                         allRecs);
             }
-            if (dataTypeService == null)
-            {
-                dataTypeService = Mock.Of<IDataTypeService>();
-            }        
-
+            
             if (analyzer == null)
             {
                 analyzer = new StandardAnalyzer(Version.LUCENE_30);
@@ -148,7 +143,6 @@ namespace Umbraco.Tests.UmbracoExamine
                 profilingLogger,
                 contentService,
                 mediaService,
-                dataTypeService,
                 userService,
                 new[] { new DefaultUrlSegmentProvider() },
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),

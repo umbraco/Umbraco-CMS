@@ -41,6 +41,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.Name == (string)x.Attribute("nodeName") &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
+                        m.Published == true && 
                         m.ContentType == Mock.Of<IContentType>(mt =>
                             mt.Icon == "test" &&
                             mt.Alias == x.Name.LocalName &&

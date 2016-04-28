@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using Examine.LuceneEngine.Config;
@@ -33,8 +34,7 @@ namespace UmbracoExamine
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
-        public const string IndexPathFieldName = "__Path";
-        public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
+        public const string IndexPathFieldName = "__Path";        
         public const string IconFieldName = "__Icon";
         public const string PublishedFieldName = "__Published";
         /// <summary>
@@ -65,7 +65,7 @@ namespace UmbracoExamine
             ProfilingLogger = profilingLogger;
         }
 
-        private bool _configBased = false;
+        private readonly bool _configBased = false;
         private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace UmbracoExamine
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
         /// <summary>
-        /// Overridden to ensure that 
+        /// Overridden to ensure that the umbraco system field definitions are in place
         /// </summary>
         /// <param name="originalDefinitions"></param>
         /// <returns></returns>
@@ -114,6 +114,7 @@ namespace UmbracoExamine
                 new FieldDefinition("writerID", FieldDefinitionTypes.Integer),
                 new FieldDefinition("creatorID", FieldDefinitionTypes.Integer),
                 new FieldDefinition("sortOrder", FieldDefinitionTypes.Integer),
+                new FieldDefinition("template", FieldDefinitionTypes.Integer),
 
                 new FieldDefinition("createDate", FieldDefinitionTypes.DateTime),
                 new FieldDefinition("updateDate", FieldDefinitionTypes.DateTime),
@@ -146,9 +147,8 @@ namespace UmbracoExamine
             }
         }
 
-        /// <summary>
-        /// If true, the IndexingActionHandler will be run to keep the default index up to date.
-        /// </summary>
+        [Obsolete("This should not be used, it is used by the configuration based indexes but instead to disable Examine event handlers use the ExamineEvents class instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool EnableDefaultEventHandler { get; protected set; }
         
         /// <summary>
@@ -164,6 +164,9 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
+        /// <remarks>
+        /// This is ONLY used for configuration based indexes
+        /// </remarks> 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {                        
             EnableDefaultEventHandler = true; //set to true by default
@@ -201,7 +204,7 @@ namespace UmbracoExamine
         #endregion
       
         
-        public override Lucene.Net.Store.Directory GetLuceneDirectory()
+        public override Directory GetLuceneDirectory()
         {
             //if temp local storage is configured use that, otherwise return the default
             if (UseTempStorage)
@@ -212,19 +215,6 @@ namespace UmbracoExamine
             return base.GetLuceneDirectory();
 
         }        
-
-        ///// <summary>
-        ///// Override to check if we can actually initialize.
-        ///// </summary>
-        ///// <returns></returns>
-        ///// <remarks>
-        ///// This check is required since the base examine lib will try to check this method on app startup. If the app
-        ///// is not ready then we need to deal with it otherwise the base class will throw exceptions since we've bypassed initialization.
-        ///// </remarks>
-        //public override bool IndexExists()
-        //{
-        //    return base.IndexExists();
-        //}
 
         /// <summary>
         /// override to check if we can actually initialize. 
@@ -254,11 +244,11 @@ namespace UmbracoExamine
                 base.IndexAll(type);
             }
         }
-
+       
         public override void IndexItems(IEnumerable<ValueSet> nodes)
         {
             if (CanInitialize())
-            {
+            {               
                 base.IndexItems(nodes);
             }
         }
@@ -298,8 +288,6 @@ namespace UmbracoExamine
             }            
         }
 
-        #region Protected
-
         /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
@@ -334,104 +322,57 @@ namespace UmbracoExamine
                 IndexAll(t);
             }
         }
-        
-        ///// <summary>
-        ///// Builds an xpath statement to query against Umbraco data for the index type specified, then
-        ///// initiates the re-indexing of the data matched.
-        ///// </summary>
-        ///// <param name="type"></param>
-        //protected override void PerformIndexAll(string type)
-        //{
-        //    //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
-        //    // and we query directly against the umbraco service layer.
-
-        //    if (SupportedTypes.Contains(type) == false)
-        //        return;
-
-        //    var xPath = "//*[(number(@id) > 0 and (@isDoc or @nodeTypeAlias)){0}]"; //we'll add more filters to this below if needed
-
-        //    var sb = new StringBuilder();
-
-        //    //create the xpath statement to match node type aliases if specified
-        //    if (IndexerData.IncludeNodeTypes.Any())
-        //    {
-        //        sb.Append("(");
-        //        foreach (var field in IndexerData.IncludeNodeTypes)
-        //        {
-        //            //this can be used across both schemas
-        //            const string nodeTypeAlias = "(@nodeTypeAlias='{0}' or (count(@nodeTypeAlias)=0 and name()='{0}'))";
-
-        //            sb.Append(string.Format(nodeTypeAlias, field));
-        //            sb.Append(" or ");
-        //        }
-        //        sb.Remove(sb.Length - 4, 4); //remove last " or "
-        //        sb.Append(")");
-        //    }
-
-        //    //create the xpath statement to match all children of the current node.
-        //    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
-        //    {
-        //        if (sb.Length > 0)
-        //            sb.Append(" and ");
-        //        sb.Append("(");
-        //        sb.Append("contains(@path, '," + IndexerData.ParentNodeId.Value + ",')"); //if the path contains comma - id - comma then the nodes must be a child
-        //        sb.Append(")");
-        //    }
-
-        //    //create the full xpath statement to match the appropriate nodes. If there is a filter
-        //    //then apply it, otherwise just select all nodes.
-        //    var filter = sb.ToString();
-        //    xPath = string.Format(xPath, filter.Length > 0 ? " and " + filter : "");
-
-        //    //raise the event and set the xpath statement to the value returned
-        //    var args = new IndexingNodesEventArgs(IndexerData, xPath, type);
-        //    OnNodesIndexing(args);
-        //    if (args.Cancel)
-        //    {
-        //        return;
-        //    }
-
-        //    xPath = args.XPath;
-
-        //    ProfilingLogger.Logger.Debug(GetType(), "({0}) PerformIndexAll with XPATH: {1}", () => Name, () => xPath);
-            
-        //    AddNodesToIndex(xPath, type);
-        //}
-
-        #endregion
-
+      
+        /// <summary>
+        /// overridden for logging
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnIndexingError(IndexingErrorEventArgs e)
         {
             ProfilingLogger.Logger.Error(GetType(), e.Message, e.Exception);
-
             base.OnIndexingError(e);
+        }
+
+        /// <summary>
+        /// Override for logging
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnIgnoringIndexItem(IndexItemEventArgs e)
+        {
+            ProfilingLogger.Logger.Debug(GetType(), "OnIgnoringIndexItem {0} with type {1}", () => e.IndexItem.ValueSet.Id, () => e.IndexItem.ValueSet.IndexCategory);
+            base.OnIgnoringIndexItem(e);
         }
 
         /// <summary>
         /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
         /// <param name="docArgs"></param>
-
         protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
         {
             var d = docArgs.Document;
-            foreach (var f in docArgs.Fields.Where(x => x.Key.StartsWith(RawFieldPrefix)))
+
+            foreach (var f in docArgs.Values.Values.Where(x => x.Key.StartsWith(RawFieldPrefix)))
             {
-                d.Add(new Field(
-                    f.Key,
-                    f.Value,
-                    Field.Store.YES,
-                    Field.Index.NO, //don't index this field, we never want to search by it 
-                    Field.TermVector.NO));
+                if (f.Value.Count > 0)
+                {
+                    d.Add(new Field(
+                        f.Key,
+                        f.Value[0].ToString(),
+                        Field.Store.YES,
+                        Field.Index.NO, //don't index this field, we never want to search by it 
+                        Field.TermVector.NO));
+                }
             }
+
+            ProfilingLogger.Logger.Debug(GetType(), "OnDocumentWriting {0} with type {1}", () => docArgs.Values.Id, () => docArgs.Values.ItemType);
 
             base.OnDocumentWriting(docArgs);
         }
 
-        protected override void OnNodeIndexed(IndexedNodeEventArgs e)
+        protected override void OnItemIndexed(IndexItemEventArgs e)
         {
-            ProfilingLogger.Logger.Debug(GetType(), "Index created for node {0}", () => e.NodeId);
-            base.OnNodeIndexed(e);
+            ProfilingLogger.Logger.Debug(GetType(), "Index created for node {0}", () => e.IndexItem.Id);
+            base.OnItemIndexed(e);
         }
 
         protected override void OnIndexDeleted(DeleteIndexEventArgs e)
@@ -440,6 +381,7 @@ namespace UmbracoExamine
             base.OnIndexDeleted(e);
         }
 
+        [Obsolete("This is no longer used, index optimization is no longer managed with the LuceneIndexer")]
         protected override void OnIndexOptimizing(EventArgs e)
         {
             ProfilingLogger.Logger.Debug(GetType(), "Index is being optimized");
@@ -456,81 +398,43 @@ namespace UmbracoExamine
             base.AddDocument(values);
         }
 
-        /// <summary>
-        /// Overridden for logging.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="type"></param>
-        protected override void AddSingleNodeToIndex(XElement node, string type)
-        {
-            ProfilingLogger.Logger.Debug(GetType(), "AddSingleNodeToIndex {0} with type {1}", () => (int)node.Attribute("id"), () => type);
-            base.AddSingleNodeToIndex(node, type);
-        }
-
         protected override void OnTransformingIndexValues(TransformingIndexDataEventArgs e)
         {
             base.OnTransformingIndexValues(e);
 
-            if (e.OriginalValues.ContainsKey("path"))
+            //ensure special __Path field
+            if (e.OriginalValues.ContainsKey("path") && e.IndexItem.ValueSet.Values.ContainsKey(IndexPathFieldName) == false)
             {
                 e.IndexItem.ValueSet.Values[IndexPathFieldName] = new List<object> { e.OriginalValues["path"].First() };
-            }           
-
-            ////adds the special node type alias property to the index
-            //fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
-
-            ////icon
-            //if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
-            //{
-            //    fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);
-            //}
-
-            //return fields;
-        }
-
-        /// <summary>
-        /// Override this method to strip all html from all user fields before raising the event, then after the event 
-        /// ensure our special Path field is added to the collection
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
-        {
+            }
+            
             //strip html of all users fields if we detect it has HTML in it. 
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
-            // Get all user data that we want to index and store into a dictionary 
-            foreach (var field in IndexerData.UserFields)
+            foreach (var originalValue in e.OriginalValues)
             {
-                if (e.Fields.ContainsKey(field.Name))
+                if (originalValue.Value.Any())
                 {
-                    //check if the field value has html
-                    if (XmlHelper.CouldItBeXml(e.Fields[field.Name]))
+                    var str = originalValue.Value.First() as string;
+                    if (str != null)
                     {
-                        //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
-                        e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
-                        //now replace the original value with the stripped html
-                        //TODO: This should be done with an analzer?!
-                        e.Fields[field.Name] = e.Fields[field.Name].StripHtml();
+                        if (XmlHelper.CouldItBeXml(str))
+                        {
+                            //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
+                            e.IndexItem.ValueSet.Values[string.Concat(RawFieldPrefix, originalValue.Key)] = new List<object> { str };
+                            //now replace the original value with the stripped html
+                            //TODO: This should be done with an analzer?!
+                            e.IndexItem.ValueSet.Values[originalValue.Key] = new List<object> { str.StripHtml() };
+                        }
                     }
-                }
+                }                
             }
 
-            base.OnGatheringNodeData(e);
-
-            //ensure the special path and node type alias fields is added to the dictionary to be saved to file
-            var path = e.Node.Attribute("path").Value;
-            if (!e.Fields.ContainsKey(IndexPathFieldName))
-                e.Fields.Add(IndexPathFieldName, path);
-
-            //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
-            var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
-            if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
-                e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
-
-            //add icon 
-            var icon = (string)e.Node.Attribute("icon");
-            if (!e.Fields.ContainsKey(IconFieldName))
-                e.Fields.Add(IconFieldName, icon);  
+            //icon
+            if (e.OriginalValues.ContainsKey("icon") && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
+            {
+                e.IndexItem.ValueSet.Values[IconFieldName] = new List<object> { e.OriginalValues["icon"] };
+            }
             
         }
 

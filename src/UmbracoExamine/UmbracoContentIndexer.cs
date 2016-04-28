@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -31,9 +32,9 @@ namespace UmbracoExamine
     {
         protected IContentService ContentService { get; private set; }
         protected IMediaService MediaService { get; private set; }
-        protected IDataTypeService DataTypeService { get; private set; }
         protected IUserService UserService { get; private set; }
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders; 
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private int? _parentId;
 
         #region Constructors
 
@@ -45,7 +46,6 @@ namespace UmbracoExamine
         {
             ContentService = ApplicationContext.Current.Services.ContentService;
             MediaService = ApplicationContext.Current.Services.MediaService;
-            DataTypeService = ApplicationContext.Current.Services.DataTypeService;
             UserService = ApplicationContext.Current.Services.UserService;
             _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
         }
@@ -57,7 +57,6 @@ namespace UmbracoExamine
             ProfilingLogger profilingLogger,
             IContentService contentService, 
             IMediaService mediaService, 
-            IDataTypeService dataTypeService,             
             IUserService userService, 
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
             IValueSetValidator validator,
@@ -68,7 +67,6 @@ namespace UmbracoExamine
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (mediaService == null) throw new ArgumentNullException("mediaService");
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             if (validator == null) throw new ArgumentNullException("validator");
@@ -84,7 +82,6 @@ namespace UmbracoExamine
 
             ContentService = contentService;
             MediaService = mediaService;
-            DataTypeService = dataTypeService;
             UserService = userService;
             _urlSegmentProviders = urlSegmentProviders;
         }
@@ -132,12 +129,7 @@ namespace UmbracoExamine
             else
                 SupportProtectedContent = false;
 
-
             base.Initialize(name, config);
-
-            
-
-            
         }
 
         #endregion
@@ -159,13 +151,21 @@ namespace UmbracoExamine
         /// <summary>
         /// If set this will filter the content items allowed to be indexed
         /// </summary>
-        public int? ParentId { get; protected set; }
+        public int? ParentId
+        {
+            get
+            {
+                //fallback to the legacy data
+                return _parentId ?? (IndexerData == null ? (int?)null : IndexerData.ParentNodeId);
+            }
+            protected set { _parentId = value; }
+        }
 
         protected override IEnumerable<string> SupportedTypes
         {
             get
             {
-                return new string[] { IndexTypes.Content, IndexTypes.Media };
+                return new[] { IndexTypes.Content, IndexTypes.Media };
             }
         }
 
@@ -190,21 +190,20 @@ namespace UmbracoExamine
             var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
             var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
             var searcher = GetSearcher();
-            var c = searcher.CreateSearchCriteria();
+            var c = searcher.CreateCriteria();
             var filtered = c.RawQuery(rawQuery);
-            var results = searcher.Search(filtered);
+            var results = searcher.Find(filtered);
 
             ProfilingLogger.Logger.Debug(GetType(), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.TotalItemCount));
 
             //need to create a delete queue item for each one found
             foreach (var r in results)
             {
-                EnqueueIndexOperation(new IndexOperation()
+                ProcessIndexOperation(new IndexOperation()
                 {
                     Operation = IndexOperationType.Delete,
-                    Item = new IndexItem(null, "", r.Id.ToString())
+                    Item = new IndexItem(new ValueSet(r.LongId, string.Empty))
                 });
-                //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
             }
 
             base.DeleteFromIndex(nodeId);
@@ -224,9 +223,9 @@ namespace UmbracoExamine
                 case IndexTypes.Content:
 
                     var contentParentId = -1;
-                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                    if (ParentId.HasValue && ParentId.Value > 0)
                     {
-                        contentParentId = IndexerData.ParentNodeId.Value;
+                        contentParentId = ParentId.Value;
                     }
                     IContent[] content;
 
@@ -240,7 +239,7 @@ namespace UmbracoExamine
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData.IncludeNodeTypes.Any())
+                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
                         {
                             content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
@@ -249,7 +248,8 @@ namespace UmbracoExamine
                             content = descendants.ToArray();
                         }
 
-                        AddNodesToIndex(GetSerializedContent(content), type);
+                        IndexItems(GetValueSets(content));
+
                         pageIndex++;
 
 
@@ -260,9 +260,9 @@ namespace UmbracoExamine
                 case IndexTypes.Media:
 
                     var mediaParentId = -1;
-                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                    if (ParentId.HasValue && ParentId.Value > 0)
                     {
-                        mediaParentId = IndexerData.ParentNodeId.Value;
+                        mediaParentId = ParentId.Value;
                     }
                     IMedia[] media;
                     
@@ -273,7 +273,7 @@ namespace UmbracoExamine
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData.IncludeNodeTypes.Any())
+                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
                         {
                             media = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
@@ -281,8 +281,9 @@ namespace UmbracoExamine
                         {
                             media = descendants.ToArray();
                         }
+
+                        IndexItems(GetValueSets(media));
                         
-                        AddNodesToIndex(GetSerializedMedia(media), type);
                         pageIndex++;
                     } while (media.Length == pageSize);
 
@@ -290,61 +291,77 @@ namespace UmbracoExamine
             }
         }
 
-        private IEnumerable<XElement> GetSerializedMedia(IEnumerable<IMedia> media)
+        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IContent> content)
         {
-            var serializer = new EntityXmlSerializer();
-            foreach (var m in media)
-            {
-                var xml = serializer.Serialize(
-                    MediaService,
-                    DataTypeService,
-                    UserService,
-                    _urlSegmentProviders,
-                    m);
-
-                //add a custom 'icon' attribute
-                if (m.ContentType.Icon.IsNullOrWhiteSpace() == false)
-                {
-                    xml.Add(new XAttribute("icon", m.ContentType.Icon));    
-                }
-                
-
-                yield return xml;
-            }
-        }
-
-        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content)
-        {
-            var serializer = new EntityXmlSerializer();
             foreach (var c in content)
             {
-                var xml = serializer.Serialize(
-                    ContentService,
-                    DataTypeService,
-                    UserService,
-                    _urlSegmentProviders,
-                    c);
+                var urlValue = c.GetUrlSegment(_urlSegmentProviders);
+                var values = new Dictionary<string, object[]>
+                {
+                    {"icon", new object[] {c.ContentType.Icon}},
+                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},
+                    {"id", new object[] {c.Id}},
+                    {"key", new object[] {c.Key}},
+                    {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
+                    {"level", new object[] {c.Level}},
+                    {"creatorID", new object[] {c.CreatorId}},
+                    {"sortOrder", new object[] {c.SortOrder}},
+                    {"createDate", new object[] {c.CreateDate}},
+                    {"updateDate", new object[] {c.UpdateDate}},
+                    {"nodeName", new object[] {c.Name}},
+                    {"urlName", new object[] {urlValue}},
+                    {"path", new object[] {c.Path}},
+                    {"nodeType", new object[] {c.ContentType.Id}},
+                    {"creatorName", new object[] {c.GetCreatorProfile(UserService).Name}},
+                    {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},        
+                    {"writerID", new object[] {c.WriterId}},
+                    {"version", new object[] {c.Version}},
+                    {"template", new object[] {c.Template == null ? 0 : c.Template.Id}}
+                };
 
-                //add a custom 'icon' attribute
-                xml.Add(new XAttribute("icon", c.ContentType.Icon));
-                xml.Add(new XAttribute(PublishedFieldName, c.Published ? 1 : 0));
+                foreach (var property in c.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                {
+                    values.Add(property.Alias, new[] {property.Value});
+                }
 
-                yield return xml;
+                var vs = new ValueSet(c.Id, IndexTypes.Content, c.ContentType.Alias, values);
+
+                yield return vs;
             }
         }
 
-
-        /// <summary>
-        /// Used to refresh the current IndexerData from the data in the DataService. This can be used
-        /// if there are more properties added/removed from the database
-        /// </summary>
-        public void RefreshIndexerDataFromDataService()
+        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IMedia> media)
         {
-            //TODO: This would be much better done if the IndexerData property had read/write locks applied
-            // to it! Unless we update the base class there's really no way to prevent the IndexerData from being
-            // changed during an operation that is reading from it.
-            var newIndexerData = GetIndexerData(IndexSets.Instance.Sets[IndexSetName]);
-            IndexerData = newIndexerData;
+            foreach (var m in media)
+            {
+                var urlValue = m.GetUrlSegment(_urlSegmentProviders);
+                var values = new Dictionary<string, object[]>
+                {
+                    {"icon", new object[] {m.ContentType.Icon}},
+                    {"id", new object[] {m.Id}},
+                    {"key", new object[] {m.Key}},
+                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
+                    {"level", new object[] {m.Level}},
+                    {"creatorID", new object[] {m.CreatorId}},
+                    {"sortOrder", new object[] {m.SortOrder}},
+                    {"createDate", new object[] {m.CreateDate}},
+                    {"updateDate", new object[] {m.UpdateDate}},
+                    {"nodeName", new object[] {m.Name}},
+                    {"urlName", new object[] {urlValue}},
+                    {"path", new object[] {m.Path}},
+                    {"nodeType", new object[] {m.ContentType.Id}},
+                    {"creatorName", new object[] {m.GetCreatorProfile(UserService).Name}}
+                };
+
+                foreach (var property in m.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                {
+                    values.Add(property.Alias, new[] { property.Value });
+                }
+
+                var vs = new ValueSet(m.Id, IndexTypes.Media, m.ContentType.Alias, values);
+
+                yield return vs;
+            }
         }
 
         /// <summary>
@@ -355,6 +372,7 @@ namespace UmbracoExamine
         /// <remarks>
         /// If we cannot initialize we will pass back empty indexer data since we cannot read from the database
         /// </remarks>
+        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
             if (CanInitialize())
@@ -364,11 +382,7 @@ namespace UmbracoExamine
                 // the DI ctor is not used.
                 return indexSet.ToIndexCriteria(ApplicationContext.Current.Services.ContentTypeService);
             }
-            else
-            {
-                return base.GetIndexerData(indexSet);
-            }
-
+            return base.GetIndexerData(indexSet);
         }
 
         #endregion

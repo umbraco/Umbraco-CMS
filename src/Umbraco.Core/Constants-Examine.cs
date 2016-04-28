@@ -11,14 +11,14 @@ namespace Umbraco.Core
         public static class Examine
         {
             /// <summary>
-            /// The alias of the internal member searcher
+            /// The alias of the internal member indexer
             /// </summary>
-            public const string InternalMemberSearcher = "InternalMemberSearcher";
+            public const string InternalMemberIndexer = "InternalMemberIndexer";
 
             /// <summary>
-            /// The alias of the internal content searcher
+            /// The alias of the internal content indexer
             /// </summary>
-            public const string InternalSearcher = "InternalSearcher";
+            public const string InternalIndexer = "InternalIndexer";
         }
     }
 }
