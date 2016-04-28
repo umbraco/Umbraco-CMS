@@ -298,17 +298,14 @@ namespace UmbracoExamine
         /// </remarks>
         protected bool CanInitialize()
         {
-            if (_configBased)
+            //We need to check if we actually can initialize, if not then don't continue
+            if (_configBased
+                && (ApplicationContext.Current == null
+                || ApplicationContext.Current.IsConfigured == false
+                || ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured == false))
             {
-                //We need to check if we actually can initialize, if not then don't continue
-                if (ApplicationContext.Current == null
-                    || ApplicationContext.Current.IsConfigured == false
-                    || ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured == false)
-                {
-                    return false;
-                }
+                return false;
             }
-
             return true;
         }
         
