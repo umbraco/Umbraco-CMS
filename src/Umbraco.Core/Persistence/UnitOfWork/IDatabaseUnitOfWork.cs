@@ -8,5 +8,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	public interface IDatabaseUnitOfWork : IUnitOfWork, IDisposable
 	{
 		UmbracoDatabase Database { get; }
-	}
+
+	    void ReadLockNodes(params int[] lockIds);
+	    void WriteLockNodes(params int[] lockIds);
+    }
 }

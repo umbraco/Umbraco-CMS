@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -63,9 +64,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 //validate the parent
                 if (parentId.HasValue && parentId.Value != Guid.Empty)
                 {
@@ -110,8 +111,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(int id)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var item = repository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
@@ -126,8 +128,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="DictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(Guid id)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var item = repository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
@@ -142,8 +145,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemByKey(string key)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var item = repository.Get(key);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
@@ -158,8 +162,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
@@ -175,8 +180,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var items = repository.GetDictionaryItemDescendants(parentId).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);
@@ -190,8 +196,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = repository.QueryFactory.Create<IDictionaryItem>().Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
@@ -207,8 +214,9 @@ namespace Umbraco.Core.Services
         /// <returns>True if a <see cref="IDictionaryItem"/> exists, otherwise false</returns>
         public bool DictionaryItemExists(string key)
         {
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 return repository.Get(key) != null;
             }
         }
@@ -223,9 +231,9 @@ namespace Umbraco.Core.Services
             if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 repository.AddOrUpdate(dictionaryItem);
                 uow.Commit();
                 //ensure the lazy Language callback is assigned
@@ -248,9 +256,9 @@ namespace Umbraco.Core.Services
             if (DeletingDictionaryItem.IsRaisedEventCancelled(new DeleteEventArgs<IDictionaryItem>(dictionaryItem), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateDictionaryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 //NOTE: The recursive delete is done in the repository
                 repository.Delete(dictionaryItem);
                 uow.Commit();
@@ -268,8 +276,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageById(int id)
         {
-            using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 return repository.Get(id);
             }
         }
@@ -281,8 +290,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByCultureCode(string cultureName)
         {
-            using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 return repository.GetByCultureName(cultureName);
             }
         }
@@ -294,8 +304,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByIsoCode(string isoCode)
         {
-            using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 return repository.GetByIsoCode(isoCode);
             }
         }
@@ -306,8 +317,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ILanguage"/> objects</returns>
         public IEnumerable<ILanguage> GetAllLanguages()
         {
-            using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 var languages = repository.GetAll();
                 return languages;
             }
@@ -323,9 +335,9 @@ namespace Umbraco.Core.Services
             if (SavingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateLanguageRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 repository.AddOrUpdate(language);
                 uow.Commit();
             }
@@ -345,9 +357,9 @@ namespace Umbraco.Core.Services
             if (DeletingLanguage.IsRaisedEventCancelled(new DeleteEventArgs<ILanguage>(language), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateLanguageRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ILanguageRepository>();
                 //NOTE: There isn't any constraints in the db, so possible references aren't deleted
                 repository.Delete(language);
                 uow.Commit();
@@ -360,10 +372,10 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var auditRepo = RepositoryFactory.CreateAuditRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                var repo = uow.CreateRepository<IAuditRepository>();
+                repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
                 uow.Commit();
             }
         }

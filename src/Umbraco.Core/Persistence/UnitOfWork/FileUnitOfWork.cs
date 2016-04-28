@@ -1,72 +1,82 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Transactions;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
     /// <summary>
     /// Represents the Unit of Work implementation for working with files
     /// </summary>
-    internal class FileUnitOfWork : IUnitOfWork
+    internal class FileUnitOfWork : DisposableObject, IUnitOfWork
     {
-        private Guid _key;
         private readonly Queue<Operation> _operations = new Queue<Operation>();
-
-        public FileUnitOfWork()
-        {
-            _key = Guid.NewGuid();
-        }
-
-        #region Implementation of IUnitOfWork
+        private readonly RepositoryFactory _factory;
 
         /// <summary>
-        /// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />
+        /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a a repository factory.
         /// </summary>
-        /// <param name="entity">The <see cref="IEntity" /></param>
-        /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
+        /// <param name="factory">A repository factory.</param>
+        /// <remarks>This should be used by the FileUnitOfWorkProvider exclusively.</remarks>
+        public FileUnitOfWork(RepositoryFactory factory)
+        {
+            _factory = factory;
+        }
+
+        /// <summary>
+        /// Creates a repository.
+        /// </summary>
+        /// <typeparam name="TRepository">The type of the repository.</typeparam>
+        /// <param name="name">The optional name of the repository.</param>
+        /// <returns>The created repository for the unit of work.</returns>
+	    public TRepository CreateRepository<TRepository>(string name = null)
+            where TRepository : IRepository
+        {
+            return _factory.CreateRepository<TRepository>(this, name);
+        }
+
+        /// <summary>
+        /// Registers an <see cref="IEntity" /> instance to be added through this <see cref="IUnitOfWork" />.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="repository">The repository participating in the transaction.</param>
         public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Enqueue(
-                new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = TransactionType.Insert
-                });
+            _operations.Enqueue(new Operation
+            {
+                Entity = entity,
+                Repository = repository,
+                Type = TransactionType.Insert
+            });
         }
 
         /// <summary>
-        /// Registers an <see cref="IEntity" /> instance to be changed through this <see cref="UnitOfWork" />
+        /// Registers an <see cref="IEntity" /> instance to be changed through this <see cref="IUnitOfWork" />.
         /// </summary>
-        /// <param name="entity">The <see cref="IEntity" /></param>
-        /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
+        /// <param name="entity">The entity.</param>
+        /// <param name="repository">The repository participating in the transaction.</param>
         public void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Enqueue(
-                new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = TransactionType.Update
-                });
+            _operations.Enqueue(new Operation
+            {
+                Entity = entity,
+                Repository = repository,
+                Type = TransactionType.Update
+            });
         }
 
         /// <summary>
-        /// Registers an <see cref="IEntity" /> instance to be removed through this <see cref="UnitOfWork" />
+        /// Registers an <see cref="IEntity" /> instance to be removed through this <see cref="IUnitOfWork" />.
         /// </summary>
-        /// <param name="entity">The <see cref="IEntity" /></param>
-        /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
+        /// <param name="entity">The entity.</param>
+        /// <param name="repository">The repository participating in the transaction.</param>
         public void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Enqueue(
-                new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = TransactionType.Delete
-                });
+            _operations.Enqueue(new Operation
+            {
+                Entity = entity,
+                Repository = repository,
+                Type = TransactionType.Delete
+            });
         }
 
         public void Commit()
@@ -98,19 +108,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 }
             }
 
-            // Clear everything
+            // clear everything
+            // fixme - why? everything should have been dequeued?
             _operations.Clear();
-            _key = Guid.NewGuid();
         }
 
-        public object Key
+        protected override void DisposeResources()
         {
-            get { return _key; }
+            _operations.Clear();
         }
-
-        #endregion
-
-        #region Operation
 
         /// <summary>
         /// Provides a snapshot of an entity and the repository reference it belongs to.
@@ -135,8 +141,5 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             /// <value>The type of operation.</value>
             public TransactionType Type { get; set; }
         }
-
-        #endregion
-
     }
 }

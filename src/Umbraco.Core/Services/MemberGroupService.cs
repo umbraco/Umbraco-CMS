@@ -39,24 +39,27 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.GetAll();
             }
         }
 
         public IMemberGroup GetById(int id)
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.Get(id);
             }
         }
 
         public IMemberGroup GetByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.GetByName(name);
             }
         }
@@ -71,9 +74,9 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.AddOrUpdate(memberGroup);
                 uow.Commit();
             }
@@ -87,9 +90,9 @@ namespace Umbraco.Core.Services
             if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.Delete(memberGroup);
                 uow.Commit();
             }

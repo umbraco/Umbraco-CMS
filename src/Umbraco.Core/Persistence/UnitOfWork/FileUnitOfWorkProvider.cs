@@ -5,13 +5,30 @@
     /// </summary>
     public class FileUnitOfWorkProvider : IUnitOfWorkProvider
     {
-        #region Implementation of IUnitOfWorkProvider
+        private readonly RepositoryFactory _repositoryFactory;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileUnitOfWorkProvider"/> class with a repository factory.
+        /// </summary>
+        /// <param name="repositoryFactory">A repository factory.</param>
+        public FileUnitOfWorkProvider(RepositoryFactory repositoryFactory)
+        {
+            Mandate.ParameterNotNull(repositoryFactory, nameof(repositoryFactory));
+            _repositoryFactory = repositoryFactory;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileUnitOfWorkProvider"/> class.
+        /// </summary>
+        /// <remarks>FOR UNIT TESTS ONLY</remarks>
+        internal FileUnitOfWorkProvider()
+        {
+            // careful, _repositoryFactory remains null!
+        }
 
         public IUnitOfWork GetUnitOfWork()
         {
-            return new FileUnitOfWork();
+            return new FileUnitOfWork(_repositoryFactory);
         }
-
-        #endregion
     }
 }

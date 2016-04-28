@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -24,8 +25,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
                 return repo.GetAll();
             }
         }
@@ -68,8 +70,10 @@ namespace Umbraco.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
+
                 //This will retrieve from cache!                 
                 var entries = repo.GetAll().ToArray();
 
@@ -115,9 +119,10 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
+
                 var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
@@ -161,9 +166,10 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
+
                 var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return Attempt<OperationStatus>.Fail();
 
@@ -203,9 +209,9 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.AddOrUpdate(entry);
                 uow.Commit();
             }
@@ -228,9 +234,9 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.Delete(entry);
                 uow.Commit();
             }

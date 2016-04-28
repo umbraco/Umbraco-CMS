@@ -50,8 +50,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), UowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
                 return repository.GetAll(names);
             }
         }
@@ -63,8 +64,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Stylesheet"/> object</returns>
         public Stylesheet GetStylesheetByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), UowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
                 return repository.Get(name);
             }
         }
@@ -79,9 +81,9 @@ namespace Umbraco.Core.Services
             if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this))
                 return;
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
                 repository.AddOrUpdate(stylesheet);
                 uow.Commit();
 
@@ -98,9 +100,9 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteStylesheet(string path, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
                 var stylesheet = repository.Get(path);
                 if (stylesheet == null) return;
 
@@ -123,10 +125,9 @@ namespace Umbraco.Core.Services
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
-
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateStylesheetRepository(uow, UowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IStylesheetRepository>();
                 return repository.ValidateStylesheet(stylesheet);
             }
         }
@@ -140,8 +141,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 return repository.GetAll(names);
             }
         }
@@ -153,8 +155,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateScriptRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 return repository.Get(name);
             }
         }
@@ -169,9 +172,9 @@ namespace Umbraco.Core.Services
             if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this))
                 return;
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 repository.AddOrUpdate(script);
                 uow.Commit();
 
@@ -188,9 +191,9 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteScript(string path, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 var script = repository.Get(path);
                 if (script == null) return;
 
@@ -213,18 +216,18 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateScript(Script script)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 return repository.ValidateScript(script);
             }
         }
 
         public void CreateScriptFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 ((ScriptRepository)repository).AddFolder(folderPath);
                 uow.Commit();
             }
@@ -232,9 +235,9 @@ namespace Umbraco.Core.Services
 
         public void DeleteScriptFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateScriptRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IScriptRepository>();
                 ((ScriptRepository)repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
@@ -280,9 +283,9 @@ namespace Umbraco.Core.Services
                 return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 repository.AddOrUpdate(template);
                 uow.Commit();
 
@@ -314,8 +317,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetAll(aliases).OrderBy(x => x.Name);
             }
         }
@@ -326,8 +330,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
             }
         }
@@ -339,8 +344,9 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         public ITemplate GetTemplate(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.Get(alias);
             }
         }
@@ -352,8 +358,9 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.Get(id);
             }
         }
@@ -365,8 +372,9 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(Guid id)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 var query = repository.Query.Where(x => x.Key == id);
                 return repository.GetByQuery(query).SingleOrDefault();
             }
@@ -374,8 +382,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<ITemplate> GetTemplateDescendants(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetDescendants(alias);
             }
         }
@@ -387,8 +396,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetDescendants(masterTemplateId);
             }
         }
@@ -400,8 +410,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetChildren(alias);
             }
         }
@@ -413,8 +424,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetChildren(masterTemplateId);
             }
         }
@@ -428,8 +440,9 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode GetTemplateNode(string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.GetTemplateNode(alias);
             }
         }
@@ -444,8 +457,9 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
         {
-            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.FindTemplateInTree(anyNode, alias);
             }
         }
@@ -460,9 +474,9 @@ namespace Umbraco.Core.Services
             if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 repository.AddOrUpdate(template);
                 uow.Commit();
 
@@ -482,9 +496,9 @@ namespace Umbraco.Core.Services
             if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(templates), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 foreach (var template in templates)
                 {
                     repository.AddOrUpdate(template);
@@ -512,9 +526,9 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.DetermineTemplateRenderingEngine(template);
             }
         }
@@ -526,9 +540,9 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteTemplate(string alias, int userId = 0)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 var template = repository.Get(alias);
                 if (template == null) return;
 
@@ -551,9 +565,9 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateTemplate(ITemplate template)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateTemplateRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<ITemplateRepository>();
                 return repository.ValidateTemplate(template);
             }
         }
@@ -580,36 +594,39 @@ namespace Umbraco.Core.Services
 
         public void DeletePartialViewFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
-                ((PartialViewRepository)repository).DeleteFolder(folderPath);
+                var repository = uow.CreateRepository<IPartialViewRepository>();
+
+                ((PartialViewRepository) repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
         }
 
         public void DeletePartialViewMacroFolder(string folderPath)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
-                ((PartialViewMacroRepository)repository).DeleteFolder(folderPath);
+                var repository = uow.CreateRepository<IPartialViewMacroRepository>();
+                ((PartialViewMacroRepository) repository).DeleteFolder(folderPath);
                 uow.Commit();
             }
         }
 
         public IPartialView GetPartialView(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IPartialViewRepository>();
                 return repository.Get(path);
             }
         }
 
         public IPartialView GetPartialViewMacro(string path)
         {
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IPartialViewMacroRepository>();
                 return repository.Get(path);
             }
         }
@@ -744,18 +761,18 @@ namespace Umbraco.Core.Services
 
         public bool ValidatePartialView(PartialView partialView)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IPartialViewRepository>();
                 return repository.ValidatePartialView(partialView);
             }
         }
 
         public bool ValidatePartialViewMacro(PartialView partialView)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreateRepository<IPartialViewMacroRepository>();
                 return repository.ValidatePartialView(partialView);
             }
         }
@@ -784,9 +801,9 @@ namespace Umbraco.Core.Services
             switch (partialViewType)
             {
                 case PartialViewType.PartialView:
-                    return RepositoryFactory.CreatePartialViewRepository(uow);
+                    return uow.CreateRepository<IPartialViewRepository>();
                 case PartialViewType.PartialViewMacro:
-                    return RepositoryFactory.CreatePartialViewMacroRepository(uow);
+                    return uow.CreateRepository<IPartialViewMacroRepository>();
             }
             throw new ArgumentOutOfRangeException("partialViewType");
         }
@@ -795,10 +812,10 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var auditRepo = RepositoryFactory.CreateAuditRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                var repo = uow.CreateRepository<IAuditRepository>();
+                repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
                 uow.Commit();
             }
         }

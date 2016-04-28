@@ -115,9 +115,10 @@ namespace Umbraco.Tests.TestHelpers
 
             var evtMsgs = new TransientMessagesFactory();
             var databaseContext = new DatabaseContext(databaseFactory, Logger);
+            var repositoryFactory = Container.GetInstance<RepositoryFactory>();
             var serviceContext = TestObjects.GetServiceContext(
-                Container.GetInstance<RepositoryFactory>(),
-                new NPocoUnitOfWorkProvider(databaseFactory),
+                repositoryFactory,
+                new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
                 new FileUnitOfWorkProvider(),
                 new PublishingStrategy(evtMsgs, Logger),
                 CacheHelper,

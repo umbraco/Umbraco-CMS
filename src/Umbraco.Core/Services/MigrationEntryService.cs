@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -35,9 +36,9 @@ namespace Umbraco.Core.Services
                 Version = version
             };
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateMigrationEntryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IMigrationEntryRepository>();
                 repo.AddOrUpdate(entry);
                 uow.Commit();
             }
@@ -53,9 +54,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IMigrationEntry FindEntry(string migrationName, SemVersion version)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateMigrationEntryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IMigrationEntryRepository>();
                 return repo.FindEntry(migrationName, version);
             }
         }
@@ -67,9 +68,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IMigrationEntry> GetAll(string migrationName)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateMigrationEntryRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<IMigrationEntryRepository>();
                 var query = repo.Query
                     .Where(x => x.MigrationName.ToUpper() == migrationName.ToUpper());
                 return repo.GetByQuery(query);

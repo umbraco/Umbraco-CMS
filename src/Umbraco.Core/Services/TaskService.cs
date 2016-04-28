@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -19,25 +20,27 @@ namespace Umbraco.Core.Services
 
         public TaskType GetTaskTypeByAlias(string taskTypeAlias)
         {
-            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskTypeRepository>();
                 return repo.GetByQuery(repo.Query.Where(type => type.Alias == taskTypeAlias)).FirstOrDefault();
             }
         }
 
         public TaskType GetTaskTypeById(int id)
         {
-            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskTypeRepository>();
                 return repo.Get(id);
             }
         }
 
         public void Save(TaskType taskType)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateTaskTypeRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskTypeRepository>();
                 repo.AddOrUpdate(taskType);
                 uow.Commit();
             }
@@ -45,9 +48,9 @@ namespace Umbraco.Core.Services
 
         public void Delete(TaskType taskTypeEntity)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateTaskTypeRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskTypeRepository>();
                 repo.Delete(taskTypeEntity);
                 uow.Commit();
             }
@@ -55,8 +58,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TaskType> GetAllTaskTypes()
         {
-            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskTypeRepository>();
                 return repo.GetAll();
             }
         }
@@ -64,8 +68,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
-            using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskRepository>();
                 return repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
             }
         }
@@ -76,9 +81,9 @@ namespace Umbraco.Core.Services
         /// <param name="task"></param>
         public void Save(Task task)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateTaskRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskRepository>();
                 repo.AddOrUpdate(task);
                 uow.Commit();
             }
@@ -86,9 +91,9 @@ namespace Umbraco.Core.Services
 
         public void Delete(Task task)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateTaskRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskRepository>();
                 repo.Delete(task);
                 uow.Commit();
             }
@@ -96,8 +101,9 @@ namespace Umbraco.Core.Services
 
         public Task GetTaskById(int id)
         {
-            using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = uow.CreateRepository<ITaskRepository>();
                 return repo.Get(id);
             }
         }

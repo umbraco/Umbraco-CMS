@@ -1,44 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using LightInject;
 using NPoco;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
 	/// <summary>
-	/// Represents the Unit of Work implementation for NPoco
+	/// Represents the Unit of Work implementation for NPoco.
 	/// </summary>
 	internal class NPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
 	{
-
-		/// <summary>
-		/// Used for testing
-		/// </summary>
-		internal Guid InstanceId { get; private set; }
-
-		private Guid _key;
         private readonly Queue<Operation> _operations = new Queue<Operation>();
+        private readonly RepositoryFactory _factory;
+        private ITransaction _transaction;
 
-		/// <summary>
-		/// Creates a new unit of work instance
-		/// </summary>
-		/// <param name="database"></param>
-		/// <remarks>
-		/// This should normally not be used directly and should be created with the UnitOfWorkProvider
-		/// </remarks>
-		internal NPocoUnitOfWork(UmbracoDatabase database)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a database and a repository factory.
+        /// </summary>
+        /// <param name="database">A database.</param>
+        /// <param name="factory">A repository factory.</param>
+        /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
+        internal NPocoUnitOfWork(UmbracoDatabase database, RepositoryFactory factory)
 		{
 			Database = database;
-			_key = Guid.NewGuid();
-			InstanceId = Guid.NewGuid();
+            _factory = factory;
 		}
 
-		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />
-		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
-		public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
+        /// <summary>
+        /// Gets the unit of work underlying database.
+        /// </summary>
+        public UmbracoDatabase Database { get; }
+
+        /// <summary>
+        /// Creates a repository.
+        /// </summary>
+        /// <typeparam name="TRepository">The type of the repository.</typeparam>
+        /// <param name="name">The optional name of the repository.</param>
+        /// <returns>The created repository for the unit of work.</returns>
+	    public TRepository CreateRepository<TRepository>(string name = null)
+	        where TRepository : IRepository
+        {
+            return _factory.CreateRepository<TRepository>(this, name);
+        }
+
+        /// <summary>
+        /// Registers an <see cref="IEntity" /> instance to be added through this <see cref="IUnitOfWork" />.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="repository">The repository participating in the transaction.</param>
+        public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
 		{
             _operations.Enqueue(new Operation
             {
@@ -49,39 +62,48 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		}
 
 		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be changed through this <see cref="UnitOfWork" />
+		/// Registers an <see cref="IEntity" /> instance to be changed through this <see cref="IUnitOfWork" />.
 		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
+		/// <param name="entity">The entity.</param>
+		/// <param name="repository">The repository participating in the transaction.</param>
 		public void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository)
 		{
-		    _operations.Enqueue(
-		        new Operation
-		        {
-		            Entity = entity,
-		            Repository = repository,
-		            Type = TransactionType.Update
-		        });
+		    _operations.Enqueue(new Operation
+		    {
+		        Entity = entity,
+		        Repository = repository,
+		        Type = TransactionType.Update
+		    });
 		}
 
 		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be removed through this <see cref="UnitOfWork" />
+		/// Registers an <see cref="IEntity" /> instance to be removed through this <see cref="IUnitOfWork" />.
 		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
+		/// <param name="entity">The entity.</param>
+		/// <param name="repository">The repository participating in the transaction.</param>
 		public void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository)
 		{
-		    _operations.Enqueue(
-		        new Operation
-		        {
-		            Entity = entity,
-		            Repository = repository,
-		            Type = TransactionType.Delete
-		        });
+		    _operations.Enqueue(new Operation
+		    {
+		        Entity = entity,
+		        Repository = repository,
+		        Type = TransactionType.Delete
+		    });
 		}
 
+        /// <summary>
+        ///  Ensures that we have a transaction.
+        /// </summary>
+        /// <remarks>Isolation level is determined by the database, see UmbracoDatabase.DefaultIsolationLevel. Should be
+        /// at least IsolationLevel.RepeatablRead else the node locks will not work correctly.</remarks>
+        public void EnsureTransaction()
+	    {
+	        if (_transaction == null)
+	            _transaction = Database.GetTransaction();
+	    }
+
 		/// <summary>
-		/// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
+		/// Commits all batched changes.
 		/// </summary>
 		/// <remarks>
 		/// Unlike a typical unit of work, this UOW will let you commit more than once since a new transaction is creaed per
@@ -93,15 +115,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		}
 
         /// <summary>
-        /// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
+        /// Commits all batched changes.
         /// </summary>
-        /// <param name="transactionCompleting">
-        /// Allows you to set a callback which is executed before the transaction is committed, allow you to add additional SQL
-        /// operations to the overall commit process after the queue has been processed.
-        /// </param>
-        internal void Commit(Action<UmbracoDatabase> transactionCompleting)
+        /// <param name="completing">A callback which is executed after the operations have been processed and
+        /// before the transaction is completed.</param>
+        internal void Commit(Action<UmbracoDatabase> completing)
         {
-            using (var transaction = Database.GetTransaction())
+            EnsureTransaction();
+
+            try
             {
                 while (_operations.Count > 0)
                 {
@@ -120,33 +142,55 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                     }
                 }
 
-                //Execute the callback if there is one
-                if (transactionCompleting != null)
-                {
-                    transactionCompleting(Database);    
-                }
-
-                transaction.Complete();
+                // execute the callback if there is one
+                completing?.Invoke(Database);
+                _transaction.Complete();
+            }
+            finally
+            {
+                _transaction.Dispose(); // will rollback if not completed
+                _transaction = null;
             }
 
-            // Clear everything
+            // clear everything
+            // in case the Dequeue loop was aborted
+            // fixme - but the, exception and this is never reached?
             _operations.Clear();
-            _key = Guid.NewGuid();
         }
 
-		public object Key
-		{
-			get { return _key; }
-		}
+        protected override void DisposeResources()
+        {
+            _operations.Clear();
 
-		public UmbracoDatabase Database { get; private set; }
+            if (_transaction == null) return;
+            _transaction.Dispose();
+            _transaction = null;
+        }
 
-		#region Operation
+	    public void ReadLockNodes(params int[] lockIds)
+	    {
+	        EnsureTransaction();
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            foreach (var lockId in lockIds)
+                Database.ExecuteScalar<int>("SELECT sortOrder FROM umbracoNode WHERE id=@id",
+                    new { @id = lockId });
+        }
 
-		/// <summary>
-		/// Provides a snapshot of an entity and the repository reference it belongs to.
-		/// </summary>
-		private sealed class Operation
+        public void WriteLockNodes(params int[] lockIds)
+	    {
+            EnsureTransaction();
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            foreach (var lockId in lockIds)
+                Database.Execute("UPDATE umbracoNode SET sortOrder = (CASE WHEN (sortOrder=1) THEN -1 ELSE 1 END) WHERE id=@id",
+                    new { @id = lockId });
+        }
+
+        /// <summary>
+        /// Provides a snapshot of an entity and the repository reference it belongs to.
+        /// </summary>
+        private sealed class Operation
 		{
 			/// <summary>
 			/// Gets or sets the entity.
@@ -165,19 +209,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			/// </summary>
 			/// <value>The type of operation.</value>
 			public TransactionType Type { get; set; }
-		}
-
-		#endregion
-
-		/// <summary>
-		/// Ensures disposable objects are disposed
-		/// </summary>		
-		/// <remarks>
-		/// Ensures that the Transaction instance is disposed of
-		/// </remarks>
-		protected override void DisposeResources()
-		{
-			_operations.Clear();
 		}
 	}
 }

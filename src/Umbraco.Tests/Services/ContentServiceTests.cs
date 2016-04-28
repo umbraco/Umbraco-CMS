@@ -1334,7 +1334,8 @@ namespace Umbraco.Tests.Services
         public void Can_Save_Lazy_Content()
         {
             var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger);
-            var provider = new NPocoUnitOfWorkProvider(databaseFactory);
+            var repositoryFactory = MockRepositoryFactory();
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
@@ -1616,6 +1617,31 @@ namespace Umbraco.Tests.Services
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
             var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
+        }
+
+        private RepositoryFactory MockRepositoryFactory()
+        {
+            RepositoryFactory factory = null;
+            var mock = new Mock<RepositoryFactory>(Container);
+
+            mock
+                .Setup(x => x.CreateRepository<ITemplateRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<ITagRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new TagRepository(uow, DisabledCache, Logger, MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<IContentTypeRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<IContentRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), MappingResolver));
+
+            return factory = mock.Object;
         }
     }
 }

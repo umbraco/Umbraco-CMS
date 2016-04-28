@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public class NotificationsRepository : INotificationsRepository
+    public class NotificationsRepository : DisposableObject, INotificationsRepository
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
 
@@ -95,5 +95,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.Insert(dto);
             return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
         }
+
+        protected override void DisposeResources()
+        { }
     }
 }
