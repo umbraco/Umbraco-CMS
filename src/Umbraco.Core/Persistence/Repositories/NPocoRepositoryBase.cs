@@ -19,37 +19,52 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-        public ISqlSyntaxProvider SqlSyntax { get; }
-
         /// <summary>
-        /// Returns the Query factory
+        /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/>.
         /// </summary>
-        public override QueryFactory QueryFactory { get; }
-
-        /// <summary>
-        /// Used to create a new query instance
-        /// </summary>
-        /// <returns></returns>
-        public override Query<TEntity> Query => QueryFactory.Create<TEntity>();
-
-        protected NPocoRepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        /// <param name="work">A database unit of work.</param>
+        /// <param name="cache">A cache helper.</param>
+        /// <param name="logger">A logger.</param>
+        /// <param name="mappingResolver">A mapping resolver.</param>
+        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
             : base(work, cache, logger)
         {
-            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
-            SqlSyntax = sqlSyntax;
             QueryFactory = new QueryFactory(SqlSyntax, mappingResolver);
         }
 
         /// <summary>
-		/// Returns the database Unit of Work added to the repository
+		/// Gets the repository's unit of work.
 		/// </summary>
 		protected internal new IDatabaseUnitOfWork UnitOfWork => (IDatabaseUnitOfWork) base.UnitOfWork;
 
+        /// <summary>
+        /// Gets the repository's database.
+        /// </summary>
         protected UmbracoDatabase Database => UnitOfWork.Database;
 
+        /// <summary>
+        /// Gets the repository's database sql syntax.
+        /// </summary>
+        public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
+
+        /// <summary>
+        /// Gets the repository's query factory.
+        /// </summary>
+        public override QueryFactory QueryFactory { get; }
+
+        /// <summary>
+        /// Creates a new query.
+        /// </summary>
+        /// <returns>A new query.</returns>
+        public override Query<TEntity> Query => QueryFactory.Create<TEntity>();
+
+        /// <summary>
+        /// Creates a new Sql statement.
+        /// </summary>
+        /// <returns>A new Sql statement.</returns>
         protected Sql<SqlContext> Sql()
         {
-            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Database));
+            return Database.Sql();
         }
 
         #region Abstract Methods

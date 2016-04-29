@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Data.Common;
+using System.Linq;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -13,16 +15,25 @@ namespace Umbraco.Tests.Migrations.Upgrades
     [TestFixture]
     public class ValidateV7UpgradeTest
     {
-       
+        private ILogger _logger;
+        private ISqlSyntaxProvider _sqlSyntax;
+        private UmbracoDatabase _database;
+
+        [SetUp]
+        public void Setup()
+        {
+            _logger = Mock.Of<ILogger>();
+            _sqlSyntax = new SqlCeSyntaxProvider();
+
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
+            _database = new UmbracoDatabase("cstr", _sqlSyntax, DatabaseType.SQLCe, dbProviderFactory, _logger);
+        }
 
         [Test]
         public void Validate_AddIndexToCmsMacroTable()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
-            var migration = new AddIndexToCmsMacroTable(true, sqlSyntax, Mock.Of<ILogger>());
-            // fixme Database vs UmbracoDatabase
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(),
-                sqlSyntax);
+            var migration = new AddIndexToCmsMacroTable(true, _logger);
+            var migrationContext = new MigrationContext(_database, _logger);
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);
@@ -35,10 +46,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroPropertyTable()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
-            var migration = new AddIndexToCmsMacroPropertyTable(true, sqlSyntax, Mock.Of<ILogger>());
-            // fixme Database vs UmbracoDatabase
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(), sqlSyntax);
+            var migration = new AddIndexToCmsMacroPropertyTable(true, _logger);
+            var migrationContext = new MigrationContext(_database, _logger);
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);

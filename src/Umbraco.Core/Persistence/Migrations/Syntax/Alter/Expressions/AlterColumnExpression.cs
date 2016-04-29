@@ -1,16 +1,15 @@
-﻿using System;
+﻿using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterColumnExpression : MigrationExpressionBase
     {
 
-        public AlterColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public AlterColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {
-            Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
+            Column = new ColumnDefinition { ModificationType = ModificationType.Alter };
         }
 
 

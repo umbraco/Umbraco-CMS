@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentXmlRepository<TContent> : NPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 

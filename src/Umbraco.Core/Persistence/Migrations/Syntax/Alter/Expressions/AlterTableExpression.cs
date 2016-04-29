@@ -1,21 +1,20 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterTableExpression : MigrationExpressionBase
     {
-
-        public AlterTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public AlterTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public virtual string SchemaName { get; set; }
+
         public virtual string TableName { get; set; }
 
         public override string ToString()
         {
-            return string.Format("ALTER TABLE {0}", TableName);
+            return $"ALTER TABLE {TableName}";
         }
     }
 }

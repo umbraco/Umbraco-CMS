@@ -21,18 +21,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </remarks>
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly QueryFactory _queryFactory;
 
-        public EntityRepository(IDatabaseUnitOfWork work, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        public EntityRepository(IDatabaseUnitOfWork work, IMappingResolver mappingResolver)
         {
             UnitOfWork = work;
-            _sqlSyntax = sqlSyntax;
-            _queryFactory = new QueryFactory(_sqlSyntax, mappingResolver);
+            _queryFactory = new QueryFactory(work.Database.SqlSyntax, mappingResolver);
         }
 
         /// <summary>
-        /// Returns the Unit of Work added to the repository
+        /// Gets the repository's unit of work.
         /// </summary>
         protected internal IDatabaseUnitOfWork UnitOfWork { get; }
 
@@ -45,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Query<IUmbracoEntity> Query => _queryFactory.Create<IUmbracoEntity>();
 
-        public Sql<SqlContext> Sql() { return NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, UnitOfWork.Database));}
+        public Sql<SqlContext> Sql() { return UnitOfWork.Database.Sql();}
 
         public IUmbracoEntity GetByKey(Guid key)
         {

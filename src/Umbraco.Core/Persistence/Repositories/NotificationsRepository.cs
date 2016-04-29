@@ -14,17 +14,15 @@ namespace Umbraco.Core.Persistence.Repositories
     public class NotificationsRepository : INotificationsRepository
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
-        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        public NotificationsRepository(IDatabaseUnitOfWork unitOfWork, ISqlSyntaxProvider sqlSyntax)
+        public NotificationsRepository(IDatabaseUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _sqlSyntax = sqlSyntax;
         }
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
+            var sql = _unitOfWork.Database.Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -51,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
+            var sql = _unitOfWork.Database.Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -82,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
+            var sql = _unitOfWork.Database.Sql()
                 .Select("DISTINCT nodeObjectType")
                 .From<NodeDto>()
                 .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);

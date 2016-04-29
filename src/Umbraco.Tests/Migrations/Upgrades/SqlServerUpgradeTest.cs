@@ -1,4 +1,7 @@
-﻿using Moq;
+﻿using System;
+using System.Data.Common;
+using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -17,19 +20,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
         }
 
-        public override ISqlSyntaxProvider GetSyntaxProvider()
-        {
-            return new SqlServerSyntaxProvider();
-        }
-
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", "System.Data.SqlClient", Mock.Of<ILogger>());
-        }
-
-        public override DatabaseProviders GetDatabaseProvider()
-        {
-            return DatabaseProviders.SqlServer;
+            var databaseType = DatabaseType.SqlServer2008;
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
+            var dbProviderFactory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()

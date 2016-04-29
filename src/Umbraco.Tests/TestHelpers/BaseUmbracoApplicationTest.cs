@@ -56,7 +56,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            Container = new ServiceContainer();
+            var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+            Container = container;
 
             TestHelper.InitializeContentDirectories();
 
@@ -216,10 +218,12 @@ namespace Umbraco.Tests.TestHelpers
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
-                    Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(new DefaultDatabaseFactory(
+                    Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                    TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
+                    Logger, new TestScopeContextFactory()), Logger),
                 //assign the service context
-                ServiceContextHelper.GetServiceContext(
+                TestObjects.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(),
                     new NPocoUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
@@ -266,15 +270,9 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
         }
 
-        protected ApplicationContext ApplicationContext
-        {
-            get { return ApplicationContext.Current; }
-        }
+        protected ApplicationContext ApplicationContext => ApplicationContext.Current;
 
-        protected ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
+        protected ILogger Logger => ProfilingLogger.Logger;
         protected ProfilingLogger ProfilingLogger { get; private set; }
         protected CacheHelper CacheHelper { get; private set; }
 
@@ -282,9 +280,6 @@ namespace Umbraco.Tests.TestHelpers
         // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
         internal IServiceContainer Container { get; private set; }
 
-        protected virtual ISqlSyntaxProvider SqlSyntax
-        {
-            get { return new SqlCeSyntaxProvider(); }
-        }
+        protected virtual ISqlSyntaxProvider SqlSyntax => new SqlCeSyntaxProvider();
     }
 }

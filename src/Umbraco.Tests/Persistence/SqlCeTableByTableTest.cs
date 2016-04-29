@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence
         
         protected DatabaseSchemaHelper DatabaseSchemaHelper
         {
-            get { return _schemaHelper ?? (_schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax)); }
+            get { return _schemaHelper ?? (_schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger)); }
         }
 
         [SetUp]

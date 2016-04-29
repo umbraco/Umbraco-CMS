@@ -1,14 +1,12 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
     {        
-        public RenameColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public RenameColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
@@ -17,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 
         public override string Process(Database database)
         {
-            if (CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (CurrentDatabaseType.IsMySql())
             {
                 string columnDefinitionSql = string.Format(@"
 SELECT CONCAT(

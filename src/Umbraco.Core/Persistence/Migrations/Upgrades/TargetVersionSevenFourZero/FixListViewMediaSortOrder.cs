@@ -10,8 +10,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class FixListViewMediaSortOrder : MigrationBase
     {
-        public FixListViewMediaSortOrder(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public FixListViewMediaSortOrder(ILogger logger)
+            : base(logger)
         {
         }
 

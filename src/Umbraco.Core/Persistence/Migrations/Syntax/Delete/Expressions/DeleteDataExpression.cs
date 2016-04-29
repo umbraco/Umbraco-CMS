@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
@@ -9,19 +9,15 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     {
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
         
-        public DeleteDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public DeleteDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
         public virtual bool IsAllRows { get; set; }
 
-        public List<DeletionDataDefinition> Rows
-        {
-            get { return _rows; }
-        }
+        public List<DeletionDataDefinition> Rows => _rows;
 
         public override string ToString()
         {

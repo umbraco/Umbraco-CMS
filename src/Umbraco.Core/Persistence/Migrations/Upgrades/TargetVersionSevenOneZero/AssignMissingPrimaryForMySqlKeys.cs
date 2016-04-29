@@ -14,14 +14,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
     [Migration("7.0.0", "7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AssignMissingPrimaryForMySqlKeys(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()
         {
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 

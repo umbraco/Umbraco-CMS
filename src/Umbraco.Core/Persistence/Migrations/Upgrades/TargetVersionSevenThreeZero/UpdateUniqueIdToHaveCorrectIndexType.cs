@@ -11,10 +11,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
-        public UpdateUniqueIdToHaveCorrectIndexType(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public UpdateUniqueIdToHaveCorrectIndexType(ILogger logger)
+            : base(logger)
+        { }
 
 
         public override void Up()

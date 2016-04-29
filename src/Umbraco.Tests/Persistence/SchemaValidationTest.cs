@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence
         {
             // Arrange
             var db = DatabaseContext.Database;
-            var schema = new DatabaseSchemaCreation(db, Logger, new SqlCeSyntaxProvider());
+            var schema = new DatabaseSchemaCreation(db, Logger);
 
             // Act
             var result = schema.ValidateSchema();

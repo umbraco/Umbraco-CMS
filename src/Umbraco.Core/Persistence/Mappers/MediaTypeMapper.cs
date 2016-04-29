@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -15,41 +14,28 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-
-        #region Overrides of BaseMapper
-
-        public MediaTypeMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
         protected override void BuildMap()
         {
-            if (PropertyInfoCache.IsEmpty)
-            {
-                CacheMap<MediaType, NodeDto>(src => src.Id, dto => dto.NodeId);
-                CacheMap<MediaType, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-                CacheMap<MediaType, NodeDto>(src => src.Level, dto => dto.Level);
-                CacheMap<MediaType, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-                CacheMap<MediaType, NodeDto>(src => src.Path, dto => dto.Path);
-                CacheMap<MediaType, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-                CacheMap<MediaType, NodeDto>(src => src.Name, dto => dto.Text);
-                CacheMap<MediaType, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-                CacheMap<MediaType, NodeDto>(src => src.Key, dto => dto.UniqueId);
-                CacheMap<MediaType, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-                CacheMap<MediaType, ContentTypeDto>(src => src.Alias, dto => dto.Alias);
-                CacheMap<MediaType, ContentTypeDto>(src => src.AllowedAsRoot, dto => dto.AllowAtRoot);
-                CacheMap<MediaType, ContentTypeDto>(src => src.Description, dto => dto.Description);
-                CacheMap<MediaType, ContentTypeDto>(src => src.Icon, dto => dto.Icon);
-                CacheMap<MediaType, ContentTypeDto>(src => src.IsContainer, dto => dto.IsContainer);
-                CacheMap<MediaType, ContentTypeDto>(src => src.Thumbnail, dto => dto.Thumbnail);
-            }
-        }
+            if (PropertyInfoCache.IsEmpty == false) return;
 
-        #endregion 
+            CacheMap<MediaType, NodeDto>(src => src.Id, dto => dto.NodeId);
+            CacheMap<MediaType, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
+            CacheMap<MediaType, NodeDto>(src => src.Level, dto => dto.Level);
+            CacheMap<MediaType, NodeDto>(src => src.ParentId, dto => dto.ParentId);
+            CacheMap<MediaType, NodeDto>(src => src.Path, dto => dto.Path);
+            CacheMap<MediaType, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
+            CacheMap<MediaType, NodeDto>(src => src.Name, dto => dto.Text);
+            CacheMap<MediaType, NodeDto>(src => src.Trashed, dto => dto.Trashed);
+            CacheMap<MediaType, NodeDto>(src => src.Key, dto => dto.UniqueId);
+            CacheMap<MediaType, NodeDto>(src => src.CreatorId, dto => dto.UserId);
+            CacheMap<MediaType, ContentTypeDto>(src => src.Alias, dto => dto.Alias);
+            CacheMap<MediaType, ContentTypeDto>(src => src.AllowedAsRoot, dto => dto.AllowAtRoot);
+            CacheMap<MediaType, ContentTypeDto>(src => src.Description, dto => dto.Description);
+            CacheMap<MediaType, ContentTypeDto>(src => src.Icon, dto => dto.Icon);
+            CacheMap<MediaType, ContentTypeDto>(src => src.IsContainer, dto => dto.IsContainer);
+            CacheMap<MediaType, ContentTypeDto>(src => src.Thumbnail, dto => dto.Thumbnail);
+        }
     }
 }

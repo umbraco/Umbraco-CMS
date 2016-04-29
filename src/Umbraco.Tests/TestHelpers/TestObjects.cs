@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
+using Moq;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
@@ -15,10 +19,71 @@ using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    class ServiceContextHelper
+    /// <summary>
+    /// Provides objects for tests.
+    /// </summary>
+    static partial class TestObjects
     {
-        //NOTE: Should be used sparingly for integration tests only - for unit tests you can just mock the services to be passed to the 
-        // ctor of the ServiceContext.
+        /// <summary>
+        /// Gets the default ISqlSyntaxProvider objects.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
+        /// <param name="lazyFactory">A (lazy) database factory.</param>
+        /// <returns>The default ISqlSyntaxProvider objects.</returns>
+        public static IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IDatabaseFactory> lazyFactory = null)
+        {
+            return new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(logger),
+                new SqlCeSyntaxProvider(),
+                new SqlServerSyntaxProvider(lazyFactory ?? new Lazy<IDatabaseFactory>(() => null))
+            };
+        }
+
+        /// <summary>
+        /// Gets an UmbracoDatabase.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
+        /// <returns>An UmbracoDatabase.</returns>
+        /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
+        /// that can begin a transaction.</remarks>
+        public static UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
+        {
+            var syntax = new SqlCeSyntaxProvider();
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
+            var connection = TestObjects.GetDbConnection();
+            return new UmbracoDatabase(connection, syntax, DatabaseType.SQLCe, dbProviderFactory, logger);
+        }
+
+        /// <summary>
+        /// Gets an UmbracoDatabase.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
+        /// <returns>An UmbracoDatabase.</returns>
+        /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
+        /// that can begin a transaction.</remarks>
+        public static UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
+        {
+            var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
+            var connection = TestObjects.GetDbConnection();
+            return new UmbracoDatabase(connection, syntax, DatabaseType.SqlServer2008, dbProviderFactory, logger);
+        }
+
+        /// <summary>
+        /// Gets a ServiceContext.
+        /// </summary>
+        /// <param name="repositoryFactory">A repository factory.</param>
+        /// <param name="dbUnitOfWorkProvider">A database unit of work provider.</param>
+        /// <param name="fileUnitOfWorkProvider">A file unit of work provider.</param>
+        /// <param name="publishingStrategy">A publishing strategy.</param>
+        /// <param name="cache">A cache.</param>
+        /// <param name="logger">A logger.</param>
+        /// <param name="eventMessagesFactory">An event messages factory.</param>
+        /// <param name="urlSegmentProviders">Some url segment providers.</param>
+        /// <returns>A ServiceContext.</returns>
+        /// <remarks>Should be used sparingly for integration tests only - for unit tests
+        /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
         public static ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,

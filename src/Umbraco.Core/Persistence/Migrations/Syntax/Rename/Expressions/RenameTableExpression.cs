@@ -1,13 +1,12 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameTableExpression : MigrationExpressionBase
     {
-        public RenameTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public RenameTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public virtual string SchemaName { get; set; }
         public virtual string OldName { get; set; }

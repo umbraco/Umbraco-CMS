@@ -35,16 +35,16 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, contentSection, mappingResolver)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, contentSection, mappingResolver)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>

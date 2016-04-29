@@ -29,15 +29,15 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
         private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache, ISqlSyntaxProvider sqlSyntax)
+        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache)
         {
             _unitOfWork = unitOfWork;
             //Make this repository use an isolated cache
             _runtimeCache = cache.IsolatedRuntimeCache.GetOrCreateCache<EntityPermission>();
-            _sqlSyntax = sqlSyntax;
         }
+
+        private ISqlSyntaxProvider SqlSyntax => _unitOfWork.Database.SqlSyntax;
 
         /// <summary>
         /// Returns permissions for a given user for any number of nodes
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var whereBuilder = new StringBuilder();
             
                     //where userId = @userId AND
-                    whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("userId"));
+                    whereBuilder.Append(SqlSyntax.GetQuotedColumnName("userId"));
                     whereBuilder.Append("=");
                     whereBuilder.Append(userId);
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         for (var index = 0; index < entityIds.Length; index++)
                         {
                             var entityId = entityIds[index];
-                            whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("nodeId"));
+                            whereBuilder.Append(SqlSyntax.GetQuotedColumnName("nodeId"));
                             whereBuilder.Append("=");
                             whereBuilder.Append(entityId);
                             if (index < entityIds.Length - 1)
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         whereBuilder.Append(")");
                     }
 
-                    var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
+                    var sql = _unitOfWork.Database.Sql()
                         .SelectAll()
                         .From<User2NodePermissionDto>()
                         .Where(whereBuilder.ToString());
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(_sqlSyntax, _unitOfWork.Database))
+            var sql = _unitOfWork.Database.Sql()
                 .SelectAll()
                 .From<User2NodePermissionDto>()
                 .Where<User2NodePermissionDto>(dto => dto.NodeId == entityId)
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, toInsert, trans);
+                _unitOfWork.Database.BulkInsertRecords(SqlSyntax, toInsert, trans);
 
                 trans.Complete();
 
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = userId
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions, trans);
 
                 trans.Complete();
 
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = id
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions, trans);
 
                 trans.Complete();
 
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = p.UserId
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions, trans);
 
                 trans.Complete();
 

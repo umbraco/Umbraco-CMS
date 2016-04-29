@@ -48,8 +48,12 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="LightInject, Version=4.0.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LightInject.4.0.8\lib\net46\LightInject.dll</HintPath>
+    <Reference Include="LightInject, Version=4.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.4.0.9\lib\net46\LightInject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject.Annotation, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.Annotation.1.0.0.4\lib\net45\LightInject.Annotation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -417,12 +421,20 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
+    <Compile Include="CallContextScope.cs" />
+    <Compile Include="Persistence\Constants-DbProviderNames.cs" />
+    <Compile Include="DefaultScopeContextFactory.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="HttpContextScope.cs" />
+    <Compile Include="IScopeContext.cs" />
+    <Compile Include="IScopeContextFactory.cs" />
+    <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
+    <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
     <Compile Include="Persistence\Querying\QueryFactory.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -518,7 +530,7 @@
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\TupleExtensions.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
-    <Compile Include="Persistence\UmbracoSqlExtensions.cs" />
+    <Compile Include="Persistence\NPocoSqlExtensions.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
@@ -845,7 +857,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-    <Compile Include="Persistence\DatabaseProviders.cs" />
     <Compile Include="Persistence\DefaultDatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
@@ -1082,7 +1093,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviders.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />

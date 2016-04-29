@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -17,37 +14,25 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        #region Overrides of BaseMapper
-
-        public MediaMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
         protected override void BuildMap()
         {
-            if (PropertyInfoCache.IsEmpty)
-            {
-                CacheMap<Models.Media, NodeDto>(src => src.Id, dto => dto.NodeId);
-                CacheMap<Models.Media, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-                CacheMap<Models.Media, NodeDto>(src => src.Level, dto => dto.Level);
-                CacheMap<Models.Media, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-                CacheMap<Models.Media, NodeDto>(src => src.Path, dto => dto.Path);
-                CacheMap<Models.Media, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-                CacheMap<Models.Media, NodeDto>(src => src.Name, dto => dto.Text);
-                CacheMap<Models.Media, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-                CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
-                CacheMap<Models.Media, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-                CacheMap<Models.Media, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
-                CacheMap<Models.Media, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
-                CacheMap<Models.Media, ContentVersionDto>(src => src.Version, dto => dto.VersionId);
-            }
-        }
+            if (PropertyInfoCache.IsEmpty == false) return;
 
-        #endregion
+            CacheMap<Models.Media, NodeDto>(src => src.Id, dto => dto.NodeId);
+            CacheMap<Models.Media, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
+            CacheMap<Models.Media, NodeDto>(src => src.Level, dto => dto.Level);
+            CacheMap<Models.Media, NodeDto>(src => src.ParentId, dto => dto.ParentId);
+            CacheMap<Models.Media, NodeDto>(src => src.Path, dto => dto.Path);
+            CacheMap<Models.Media, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
+            CacheMap<Models.Media, NodeDto>(src => src.Name, dto => dto.Text);
+            CacheMap<Models.Media, NodeDto>(src => src.Trashed, dto => dto.Trashed);
+            CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
+            CacheMap<Models.Media, NodeDto>(src => src.CreatorId, dto => dto.UserId);
+            CacheMap<Models.Media, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
+            CacheMap<Models.Media, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
+            CacheMap<Models.Media, ContentVersionDto>(src => src.Version, dto => dto.VersionId);
+        }
     }
 }

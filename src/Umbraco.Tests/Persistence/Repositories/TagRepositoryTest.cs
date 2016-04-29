@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private TagRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
             return tagRepository;
         }
 
@@ -1034,18 +1034,18 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
+            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
-            var repository = new MediaRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+            var repository = new MediaRepository(unitOfWork, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
     }

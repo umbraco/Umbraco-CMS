@@ -373,7 +373,7 @@ namespace Umbraco.Tests.Web.Mvc
 
         ServiceContext GetServiceContext()
         {
-            return MockHelper.GetMockedServiceContext();
+            return TestObjects.GetServiceContextMock();
         }
 
         ViewContext GetViewContext()
@@ -427,8 +427,10 @@ namespace Umbraco.Tests.Web.Mvc
             // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
             var svcCtx = GetServiceContext();
 
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(databaseFactory, logger),
                 svcCtx,
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };

@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence
 {
-    public static class UmbracoSqlExtensions
+    public static class NPocoSqlExtensions
     {
         // note: here we take benefit from the fact that NPoco methods that return a Sql, such as
         // when doing "sql = sql.Where(...)" actually append to, and return, the original Sql, not

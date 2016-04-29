@@ -22,6 +22,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Setup()
         {
             var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
 
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new TestServerRegistrar());

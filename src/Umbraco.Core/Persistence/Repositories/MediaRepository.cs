@@ -35,15 +35,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, contentSection, mappingResolver)
+        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, contentSection, mappingResolver)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 

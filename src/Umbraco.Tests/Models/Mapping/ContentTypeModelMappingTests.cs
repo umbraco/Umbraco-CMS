@@ -43,9 +43,11 @@ namespace Umbraco.Tests.Models.Mapping
             var nullCacheHelper = CacheHelper.CreateDisabledCacheHelper();
             var logger = Mock.Of<ILogger>();
 
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+
             //Create an app context using mocks
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(databaseFactory, logger),
                 
                 //Create service context using mocks
                 new ServiceContext(

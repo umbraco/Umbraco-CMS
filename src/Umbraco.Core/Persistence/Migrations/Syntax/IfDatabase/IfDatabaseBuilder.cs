@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Migrations.Syntax.Create;
+﻿using NPoco;
+using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 using Umbraco.Core.Persistence.Migrations.Syntax.Rename;
@@ -10,39 +11,22 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase
     public class IfDatabaseBuilder : IIfDatabaseBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-        private readonly DatabaseProviders[] _databaseProviders;
+        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public IfDatabaseBuilder(IMigrationContext context, ISqlSyntaxProvider sqlSyntax, params DatabaseProviders[] databaseProviders)
+        public IfDatabaseBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
         {
             _context = context;
-            _sqlSyntax = sqlSyntax;
-            _databaseProviders = databaseProviders;
+            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public ICreateBuilder Create
-        {
-            get { return new CreateBuilder(_context, _databaseProviders); }
-        }
+        public ICreateBuilder Create => new CreateBuilder(_context, _supportedDatabaseTypes);
 
-        public IExecuteBuilder Execute
-        {
-            get { return new ExecuteBuilder(_context, _sqlSyntax, _databaseProviders); }
-        }
+        public IExecuteBuilder Execute => new ExecuteBuilder(_context, _supportedDatabaseTypes);
 
-        public IDeleteBuilder Delete
-        {
-            get { return new DeleteBuilder(_context, _databaseProviders); }
-        }
+        public IDeleteBuilder Delete => new DeleteBuilder(_context, _supportedDatabaseTypes);
 
-        public IRenameBuilder Rename
-        {
-            get { return new RenameBuilder(_context, _sqlSyntax, _databaseProviders); }
-        }
+        public IRenameBuilder Rename => new RenameBuilder(_context, _supportedDatabaseTypes);
 
-        public IUpdateBuilder Update
-        {
-            get { return new UpdateBuilder(_context, _sqlSyntax, _databaseProviders); }
-        }
+        public IUpdateBuilder Update => new UpdateBuilder(_context, _supportedDatabaseTypes);
     }
 }

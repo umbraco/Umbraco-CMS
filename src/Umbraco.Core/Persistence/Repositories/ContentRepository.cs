@@ -41,8 +41,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
 
-        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cacheHelper, logger, syntaxProvider, contentSection, mappingResolver)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cacheHelper, logger, contentSection, mappingResolver)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
             if (templateRepository == null) throw new ArgumentNullException("templateRepository");
@@ -51,8 +51,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, syntaxProvider, mappingResolver);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, syntaxProvider, mappingResolver);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
 
             EnsureUniqueNaming = true;
         }
@@ -401,7 +401,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
@@ -706,7 +706,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             repo.ReplaceEntityPermissions(permissionSet);
         }
 
@@ -729,13 +729,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userIds"></param>
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             return repo.GetPermissionsForEntity(entityId);
         }
 

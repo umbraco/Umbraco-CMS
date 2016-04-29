@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
     public interface IMigrationContext
     {
+        UmbracoDatabase Database { get; }
+
         ICollection<IMigrationExpression> Expressions { get; set; }
-        DatabaseProviders CurrentDatabaseProvider { get; }
-        Database Database { get; }
-        ISqlSyntaxProvider SqlSyntax { get; }
     }
 }

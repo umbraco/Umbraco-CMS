@@ -15,12 +15,14 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationBase : IMigration
     {
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax => Context.Database.SqlSyntax;
+
+        public DatabaseType DatabaseType => Context.Database.DatabaseType;
+
         public ILogger Logger { get; private set; }
 
-        protected MigrationBase(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        protected MigrationBase(ILogger logger)
         {
-            SqlSyntax = sqlSyntax;
             Logger = logger;
         }
 
@@ -41,49 +43,28 @@ namespace Umbraco.Core.Persistence.Migrations
             Down();
         }
 
-        public IAlterSyntaxBuilder Alter
-        {
-            get { return new AlterSyntaxBuilder(Context, SqlSyntax); }
-        }
+        public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(Context);
 
-        public ICreateBuilder Create
-        {
-            get { return new CreateBuilder(Context); }
-        }
+        public ICreateBuilder Create => new CreateBuilder(Context);
 
-        public IDeleteBuilder Delete
-        {
-            get { return new DeleteBuilder(Context); }
-        }
+        public IDeleteBuilder Delete => new DeleteBuilder(Context);
 
-        public IExecuteBuilder Execute
-        {
-            get { return new ExecuteBuilder(Context, SqlSyntax); }
-        }
+        public IExecuteBuilder Execute => new ExecuteBuilder(Context);
 
-        public IInsertBuilder Insert
-        {
-            get { return new InsertBuilder(Context, SqlSyntax); }
-        }
+        public IInsertBuilder Insert => new InsertBuilder(Context);
 
-        public IRenameBuilder Rename
-        {
-            get { return new RenameBuilder(Context, SqlSyntax); }
-        }
+        public IRenameBuilder Rename => new RenameBuilder(Context);
 
-        public IUpdateBuilder Update
-        {
-            get { return new UpdateBuilder(Context, SqlSyntax); }
-        }
+        public IUpdateBuilder Update => new UpdateBuilder(Context);
 
-        public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
+        public IIfDatabaseBuilder IfDatabase(params DatabaseType[] supportedDatabaseTypes)
         {
-            return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
+            return new IfDatabaseBuilder(Context, supportedDatabaseTypes);
         }
 
         protected Sql<SqlContext> Sql()
         {
-            return NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Context.Database));
+            return Context.Database.Sql();
         }
     }
 }

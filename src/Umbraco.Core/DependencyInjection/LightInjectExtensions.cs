@@ -7,27 +7,27 @@ namespace Umbraco.Core.DependencyInjection
     internal static class LightInjectExtensions
     {
         /// <summary>
-        /// Extension method to register a singleton (syntax sugar)
+        /// Registers the TService with the factory that describes the dependencies of the service, as a singleton.
         /// </summary>
         public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory, string serviceName)
         {
-            container.Register<TService>(factory, serviceName, new PerContainerLifetime());
+            container.Register(factory, serviceName, new PerContainerLifetime());
         }
 
         /// <summary>
-        /// Extension method to register a singleton (syntax sugar)
+        /// Registers the TService with the TImplementation as a singleton.
         /// </summary>
-        /// <typeparam name="TContract"></typeparam>
+        /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="container"></param>
-        public static void RegisterSingleton<TContract, TImplementation>(this IServiceRegistry container) 
-            where TImplementation : TContract
+        public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container) 
+            where TImplementation : TService
         {
-            container.Register<TContract, TImplementation>(new PerContainerLifetime());
+            container.Register<TService, TImplementation>(new PerContainerLifetime());
         }
 
         /// <summary>
-        /// Extension method to register a singleton (syntax sugar)
+        /// Registers a concrete type as a singleton service.
         /// </summary>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="container"></param>
@@ -37,14 +37,14 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
-        /// Extension method to register a singleton (syntax sugar)
+        /// Registers the TService with the factory that describes the dependencies of the service, as a singleton.
         /// </summary>
-        /// <typeparam name="TImplementation"></typeparam>
+        /// <typeparam name="TService"></typeparam>
         /// <param name="container"></param>
         /// <param name="factory"></param>
-        public static void RegisterSingleton<TImplementation>(this IServiceRegistry container, Func<IServiceFactory, TImplementation> factory)
+        public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory)
         {
-            container.Register<TImplementation>(factory);
+            container.Register(factory, new PerContainerLifetime());
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Umbraco.Core.DependencyInjection
         public static void RegisterCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
             where TLifetime : ILifetime
         {
-            var i = 0;
+            //var i = 0;
             foreach (var type in implementationTypes)
             {
                 //This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
@@ -83,7 +83,7 @@ namespace Umbraco.Core.DependencyInjection
         /// <param name="implementationTypes"></param>
         public static void RegisterCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
         {
-            var i = 0;
+            //var i = 0;
             foreach (var type in implementationTypes)
             {
                 //This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
@@ -121,7 +121,6 @@ namespace Umbraco.Core.DependencyInjection
                     Register(svc);
                 }
             }
-        }
-        
+        }        
     }
 }

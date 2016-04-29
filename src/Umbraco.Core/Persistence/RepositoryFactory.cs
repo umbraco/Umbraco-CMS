@@ -1,30 +1,25 @@
-using Umbraco.Core.Configuration;
 using System;
-using Umbraco.Core.Cache;
 using LightInject;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence
 {
     /// <summary>
-    /// Used to instantiate each repository type
+    /// Instanciates repositories.
     /// </summary>
-    public class RepositoryFactory 
+    public class RepositoryFactory
     {
         private readonly IServiceContainer _container;
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
-        
-        public RepositoryFactory(ISqlSyntaxProvider sqlSyntax, IServiceContainer container)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RepositoryFactory"/> class with a container.
+        /// </summary>
+        /// <param name="container">A container.</param>
+        public RepositoryFactory(IServiceContainer container)
         {
+            if (container == null) throw new ArgumentNullException(nameof(container));
             _container = container;
-            SqlSyntax = sqlSyntax;
         }
 
         public virtual INotificationsRepository CreateNotificationsRepository(IDatabaseUnitOfWork uow)

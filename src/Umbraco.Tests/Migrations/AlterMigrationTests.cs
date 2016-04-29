@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data.Common;
 using System.Linq;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -14,15 +16,26 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class AlterMigrationTests
     {
+        private ILogger _logger;
+        private ISqlSyntaxProvider _sqlSyntax;
+        private UmbracoDatabase _database;
+
+        [SetUp]
+        public void Setup()
+        {
+            _logger = Mock.Of<ILogger>();
+            _sqlSyntax = new SqlCeSyntaxProvider();
+
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
+            _database = new UmbracoDatabase("cstr", _sqlSyntax, DatabaseType.SqlServer2008, dbProviderFactory, _logger);
+        }
 
         [Test]
         public void Drop_Foreign_Key()
         {
             // Arrange
-            var sqlSyntax = new SqlCeSyntaxProvider();
-            // fixme Database vs UmbracoDatabase
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(), sqlSyntax);
-            var stub = new DropForeignKeyMigrationStub(sqlSyntax, Mock.Of<ILogger>());
+            var context = new MigrationContext(_database, _logger);
+            var stub = new DropForeignKeyMigrationStub(_logger);
 
             // Act
             stub.GetUpExpressions(context);
@@ -38,9 +51,8 @@ namespace Umbraco.Tests.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var sqlSyntax = new SqlCeSyntaxProvider();
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>(), sqlSyntax);
-            var stub = new AlterUserTableMigrationStub(sqlSyntax, Mock.Of<ILogger>());
+            var context = new MigrationContext(_database, _logger);
+            var stub = new AlterUserTableMigrationStub(_logger);
 
             // Act
             stub.GetUpExpressions(context);

@@ -19,10 +19,10 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ICacheProvider _staticCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver)
         {
-            _staticCache = staticCache;
+            _staticCache = cacheHelper.StaticCache;
         }
 
         protected override int PerformCount(IQuery<IServerRegistration> query)
