@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);            
+            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);            
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = userType.Id;
 
-                using (var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
+                using (var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver))
                 {
                     repository2.Delete(userType);
                     unitOfWork.Commit();

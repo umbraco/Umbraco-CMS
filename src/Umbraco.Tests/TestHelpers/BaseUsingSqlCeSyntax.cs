@@ -34,7 +34,8 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var container = new ServiceContainer();
-            container.RegisterSingleton<ISqlSyntaxProvider>(factory => sqlSyntax);
+            container.EnableAnnotatedConstructorInjection();
+
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 

@@ -18,9 +18,7 @@ namespace Umbraco.Core.Persistence.Mappers
         /// <param name="assignedMapperTypes"></param>
         public MappingResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
             : base(container, logger, assignedMapperTypes)
-        {
-
-        }
+        { }
 
         /// <summary>
         /// Caches the type -> mapper so that we don't have to type check each time we want one or lookup the attribute
@@ -68,6 +66,7 @@ namespace Umbraco.Core.Persistence.Mappers
             return Attempt<BaseMapper>.Succeed(mapper);
         }
 
+        /*
         internal string GetMapping(Type type, string propertyName)
         {
             var mapper = ResolveMapperByType(type);
@@ -77,7 +76,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
             return result;
         }
-
+        */
     }
 
 }

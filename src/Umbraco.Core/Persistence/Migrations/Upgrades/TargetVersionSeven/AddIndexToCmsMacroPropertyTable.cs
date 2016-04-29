@@ -15,15 +15,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToCmsMacroPropertyTable(bool skipIndexCheck, ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        internal AddIndexToCmsMacroPropertyTable(bool skipIndexCheck, ILogger logger)
+            : base(logger)
         {
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AddIndexToCmsMacroPropertyTable(ILogger logger) 
+            : base(logger)
+        { }
 
         public override void Up()
         {

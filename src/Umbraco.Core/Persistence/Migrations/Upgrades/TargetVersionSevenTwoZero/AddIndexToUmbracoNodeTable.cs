@@ -11,14 +11,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger, bool skipIndexCheck) : base(sqlSyntax, logger)
+        internal AddIndexToUmbracoNodeTable(ILogger logger, bool skipIndexCheck) 
+            : base(logger)
         {
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AddIndexToUmbracoNodeTable(ILogger logger) 
+            : base(logger)
+        { }
 
         public override void Up()
         {

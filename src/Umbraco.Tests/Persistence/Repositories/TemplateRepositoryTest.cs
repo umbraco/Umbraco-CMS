@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
         {
-            return new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, _masterPageFileSystem, _viewsFileSystem,
+            return new TemplateRepository(unitOfWork, DisabledCache, Logger, _masterPageFileSystem, _viewsFileSystem,
                 templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc), MappingResolver);
         }
 
@@ -403,9 +403,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var templateRepository = CreateRepository(unitOfWork))
             {
-                var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
-                var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, templateRepository, MappingResolver);
-                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+                var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+                var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
+                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
 
                 using (contentRepo)
                 {

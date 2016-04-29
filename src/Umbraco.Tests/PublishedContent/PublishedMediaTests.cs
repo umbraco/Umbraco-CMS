@@ -61,6 +61,8 @@ namespace Umbraco.Tests.PublishedContent
         protected override void FreezeResolution()
         {
             var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+
             UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
 
             base.FreezeResolution();

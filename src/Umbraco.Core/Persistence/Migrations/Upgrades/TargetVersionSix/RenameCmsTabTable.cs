@@ -7,9 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RenameCmsTabTable : MigrationBase
     {
-        public RenameCmsTabTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public RenameCmsTabTable(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()

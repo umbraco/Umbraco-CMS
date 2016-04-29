@@ -19,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserTypeRepository : NPocoRepositoryBase<int, IUserType>, IUserTypeRepository
     {
-        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 

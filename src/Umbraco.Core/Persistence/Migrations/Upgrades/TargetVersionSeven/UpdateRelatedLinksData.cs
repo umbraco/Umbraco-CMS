@@ -20,9 +20,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class UpdateRelatedLinksData : MigrationBase
     {
-        public UpdateRelatedLinksData(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public UpdateRelatedLinksData(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()

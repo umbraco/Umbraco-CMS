@@ -1,14 +1,12 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
 {
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {
-
-        public ExecuteSqlStatementExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public ExecuteSqlStatementExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public virtual string SqlStatement { get; set; }
 

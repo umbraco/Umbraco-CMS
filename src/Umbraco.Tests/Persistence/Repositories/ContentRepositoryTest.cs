@@ -50,10 +50,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, MappingResolver);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
 
@@ -546,7 +546,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void RegexAliasTest()
         {
-            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider());
+            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)));
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             var matches = regex.Matches(sql);

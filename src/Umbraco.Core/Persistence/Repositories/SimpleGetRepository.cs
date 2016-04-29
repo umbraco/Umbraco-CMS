@@ -19,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TDto: class
     {
 
-        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 

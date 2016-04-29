@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class AddUmbracoDeployTables : MigrationBase
     {
-        public AddUmbracoDeployTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddUmbracoDeployTables(ILogger logger)
+            : base(logger)
         { }
 
         public override void Up()

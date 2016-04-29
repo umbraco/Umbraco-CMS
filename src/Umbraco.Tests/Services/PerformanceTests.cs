@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
 
         protected override string GetDbProviderName()
         {
-            return "System.Data.SqlClient";
+            return Constants.DbProviderNames.SqlServer;
         }
 
 
@@ -287,7 +287,7 @@ namespace Umbraco.Tests.Services
             DatabaseContext.Database.BulkInsertRecords(SqlSyntax, nodes);
 
             //re-get the nodes with ids
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, DatabaseContext.Database));
+            var sql = DatabaseContext.Database.Sql();
             sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
             nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
 

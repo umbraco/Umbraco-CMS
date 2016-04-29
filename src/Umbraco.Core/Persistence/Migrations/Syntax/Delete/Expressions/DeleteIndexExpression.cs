@@ -1,24 +1,23 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteIndexExpression : MigrationExpressionBase
     {
-
-        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {
             Index = new IndexDefinition();
         }
 
-        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, IndexDefinition index) 
-            : base(sqlSyntax, current, databaseProviders)
+        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index) 
+            : base(context, supportedDatabaseTypes)
         {
             Index = index;
         }
 
-        public IndexDefinition Index { get; private set; }
+        public IndexDefinition Index { get; }
 
         public override string ToString()
         {

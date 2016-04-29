@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
 
@@ -11,41 +6,34 @@ namespace Umbraco.Web.Install
 {
     internal class DatabaseHelper
     {
-        internal bool CheckConnection(DatabaseModel database, ApplicationContext applicationContext)
+        internal bool CheckConnection(DatabaseContext context, DatabaseModel model)
         {
-            string connectionString;
-            DatabaseProviders provider;
-            var dbContext = applicationContext.DatabaseContext;
-
-            if (database.ConnectionString.IsNullOrWhiteSpace() == false)
-            {
-                connectionString = database.ConnectionString;
-                provider = DbConnectionExtensions.DetectProviderFromConnectionString(connectionString);
-            }
-            else if (database.DatabaseType == DatabaseType.SqlCe)
-            {
-                //we do not test this connection
+            // we do not test SqlCE connection
+            if (model.DatabaseType == DatabaseType.SqlCe)
                 return true;
-                //connectionString = dbContext.GetEmbeddedDatabaseConnectionString();
-            }
-            else if (database.IntegratedAuth)
+
+            string providerName;
+            string connectionString;
+
+            if (string.IsNullOrWhiteSpace(model.ConnectionString) == false)
             {
-                connectionString = dbContext.GetIntegratedSecurityDatabaseConnectionString(
-                    database.Server, database.DatabaseName);
-                provider = DatabaseProviders.SqlServer;;
+                providerName = DbConnectionExtensions.DetectProviderNameFromConnectionString(model.ConnectionString);
+                connectionString = model.ConnectionString;
+            }
+            else if (model.IntegratedAuth)
+            {
+                // has to be Sql Server
+                providerName = Constants.DbProviderNames.SqlServer;
+                connectionString = context.GetIntegratedSecurityDatabaseConnectionString(model.Server, model.DatabaseName);
             }
             else
             {
-                string providerName;
-                connectionString = dbContext.GetDatabaseConnectionString(
-                    database.Server, database.DatabaseName, database.Login, database.Password,
-                    database.DatabaseType.ToString(),
-                    out providerName);
-
-                provider = database.DatabaseType == DatabaseType.MySql ? DatabaseProviders.MySql : DatabaseProviders.SqlServer;
+                connectionString = context.GetDatabaseConnectionString(
+                    model.Server, model.DatabaseName, model.Login, model.Password,
+                    model.DatabaseType.ToString(), out providerName);
             }
 
-            return DbConnectionExtensions.IsConnectionAvailable(connectionString, provider);
+            return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
         }
     }
 }

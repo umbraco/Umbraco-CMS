@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class EnsureContentTypeUniqueIdsAreConsistent : MigrationBase
     {
-        public EnsureContentTypeUniqueIdsAreConsistent(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public EnsureContentTypeUniqueIdsAreConsistent(ILogger logger)
+            : base(logger)
         { }
         
         public override void Up()
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 Constants.ObjectTypes.MemberTypeGuid,
             };
 
-            var sql = NPoco.Sql.BuilderFor(new SqlContext(SqlSyntax, Context.Database))
+            var sql = Context.Database.Sql()
                 .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
                 .From<NodeDto>()
                 .InnerJoin<ContentTypeDto>()

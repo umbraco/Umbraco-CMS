@@ -1,20 +1,19 @@
-﻿using System;
+﻿using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateIndexExpression : MigrationExpressionBase
     {
 
-        public CreateIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, IndexDefinition index)
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index)
+            : base(context, supportedDatabaseTypes)
         {
             Index = index;
         }
 
-        public CreateIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {
             Index = new IndexDefinition();
         }

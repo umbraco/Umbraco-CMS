@@ -10,8 +10,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 17, GlobalSettings.UmbracoMigrationName)]
     public class AddServerRegistrationColumnsAndLock : MigrationBase
     {
-        public AddServerRegistrationColumnsAndLock(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddServerRegistrationColumnsAndLock(ILogger logger)
+            : base(logger)
         { }
 
         public override void Up()

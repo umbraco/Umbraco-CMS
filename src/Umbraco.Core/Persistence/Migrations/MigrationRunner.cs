@@ -53,11 +53,9 @@ namespace Umbraco.Core.Persistence.Migrations
         /// Executes the migrations against the database.
         /// </summary>
         /// <param name="database">The NPoco Database, which the migrations will be run against</param>
-        /// <param name="databaseProvider"></param>
-        /// <param name="sqlSyntaxProvider"></param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, ISqlSyntaxProvider sqlSyntaxProvider, bool isUpgrade = true)
+        public virtual bool Execute(UmbracoDatabase database, bool isUpgrade = true)
         {
             _logger.Info<MigrationRunner>("Initializing database migrations");
 
@@ -76,7 +74,7 @@ namespace Umbraco.Core.Persistence.Migrations
             }
 
             //Loop through migrations to generate sql
-            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, sqlSyntaxProvider, isUpgrade);
+            var migrationContext = InitializeMigrations(migrations, database, isUpgrade);
 
             try
             {
@@ -87,7 +85,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 //if this fails then the transaction will be rolled back, BUT if we are using MySql this is not the case,
                 //since it does not support schema changes in a transaction, see: http://dev.mysql.com/doc/refman/5.0/en/implicit-commit.html
                 //so in that case we have to downgrade
-                if (databaseProvider == DatabaseProviders.MySql)
+                if (database.DatabaseType is NPoco.DatabaseTypes.MySqlDatabaseType)
                 {
                     throw new DataLossException(
                             "An error occurred running a schema migration but the changes could not be rolled back. Error: " + ex.Message + ". In some cases, it may be required that the database be restored to it's original state before running this upgrade process again.",
@@ -166,13 +164,11 @@ namespace Umbraco.Core.Persistence.Migrations
 
         internal MigrationContext InitializeMigrations(
             List<IMigration> migrations,
-            Database database,
-            DatabaseProviders databaseProvider,
-            ISqlSyntaxProvider sqlSyntax,
+            UmbracoDatabase database,
             bool isUpgrade = true)
         {
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider, database, _logger, sqlSyntax);
+            var context = new MigrationContext(database, _logger);
 
             foreach (var migration in migrations)
             {

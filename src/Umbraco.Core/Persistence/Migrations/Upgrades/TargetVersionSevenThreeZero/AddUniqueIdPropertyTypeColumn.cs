@@ -9,8 +9,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 13, GlobalSettings.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeColumn : MigrationBase
     {
-        public AddUniqueIdPropertyTypeColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddUniqueIdPropertyTypeColumn(ILogger logger)
+            : base(logger)
         { }
 
         public override void Up()

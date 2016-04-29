@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentMapper(new SqlCeSyntaxProvider()).Map("Id");
+            string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Id");
 
 
             // Assert
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentMapper(new SqlCeSyntaxProvider()).Map("Trashed");
+            string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Trashed");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[trashed]"));
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentMapper(new SqlCeSyntaxProvider()).Map("Published");
+            string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Published");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDocument].[published]"));
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentMapper(new SqlCeSyntaxProvider()).Map("Version");
+            string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Version");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionId]"));

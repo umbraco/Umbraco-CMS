@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
                             return uow.Database.ExecuteScalar<int?>(
-                                 NPoco.Sql.BuilderFor(new SqlContext(RepositoryFactory.SqlSyntax, uow.Database))
+                                 uow.Database.Sql()
                                     .Select("id")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.UniqueId == key));
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                             return uow.Database.ExecuteScalar<Guid?>(
-                                 NPoco.Sql.BuilderFor(new SqlContext(RepositoryFactory.SqlSyntax, uow.Database))
+                                 uow.Database.Sql()
                                     .Select("uniqueID")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.NodeId == id));
@@ -495,7 +495,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = NPoco.Sql.BuilderFor(new SqlContext(RepositoryFactory.SqlSyntax, uow.Database))
+                var sql = uow.Database.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeId == id);
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = NPoco.Sql.BuilderFor(new SqlContext(RepositoryFactory.SqlSyntax, uow.Database))
+                var sql = uow.Database.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.UniqueId == key);

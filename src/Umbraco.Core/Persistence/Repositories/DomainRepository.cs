@@ -20,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {           
         }
 

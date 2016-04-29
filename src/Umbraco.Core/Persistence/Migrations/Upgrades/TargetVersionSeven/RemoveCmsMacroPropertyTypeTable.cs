@@ -8,9 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class RemoveCmsMacroPropertyTypeTable : MigrationBase
     {
-        public RemoveCmsMacroPropertyTypeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public RemoveCmsMacroPropertyTypeTable(ILogger logger) 
+            : base(logger)
+        { }
 
 
         public override void Up()

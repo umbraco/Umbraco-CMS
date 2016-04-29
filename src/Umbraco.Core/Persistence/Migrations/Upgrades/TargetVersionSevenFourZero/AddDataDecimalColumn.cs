@@ -8,10 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AddDataDecimalColumn : MigrationBase
     {
-        public AddDataDecimalColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public AddDataDecimalColumn(ILogger logger)
+            : base(logger)
+        { }
 
         public override void Up()
         {

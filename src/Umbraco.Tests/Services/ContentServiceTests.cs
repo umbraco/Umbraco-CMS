@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -1332,7 +1333,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger);
+            var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger);
             var provider = new NPocoUnitOfWorkProvider(databaseFactory);
             var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
@@ -1610,10 +1611,10 @@ namespace Umbraco.Tests.Services
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
+            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
     }

@@ -26,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
             _templateRepository = templateRepository;
         }

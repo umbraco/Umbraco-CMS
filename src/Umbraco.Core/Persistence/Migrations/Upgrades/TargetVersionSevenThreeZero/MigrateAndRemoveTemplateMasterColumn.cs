@@ -16,10 +16,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
 
-        public MigrateAndRemoveTemplateMasterColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public MigrateAndRemoveTemplateMasterColumn(ILogger logger)
+            : base(logger)
+        { }
 
         public override void Up()
         {
@@ -99,7 +98,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             
 
             //now remove the master column and key
-            if (this.Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 //Because MySQL doesn't name keys with what you want, we need to query for the one that is associated
                 // this is required for this specific case because there are 2 foreign keys on the cmsTemplate table

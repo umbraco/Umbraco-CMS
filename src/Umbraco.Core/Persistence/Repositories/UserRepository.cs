@@ -26,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository, IMappingResolver mappingResolver)
-            : base(work, cacheHelper, logger, sqlSyntax, mappingResolver)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMappingResolver mappingResolver)
+            : base(work, cacheHelper, logger, mappingResolver)
         {
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
             var mapper = QueryFactory.MappingResolver.ResolveMapperByType(typeof(IUser));
-            var mappedField = mapper.Map(expressionMember.Name);
+            var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
             if (mappedField.IsNullOrWhiteSpace())
             {
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
@@ -377,7 +377,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
@@ -389,7 +389,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             repo.ReplaceUserPermissions(userId, permissions, entityIds);
         }
 
@@ -401,7 +401,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void AssignUserPermission(int userId, char permission, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             repo.AssignUserPermission(userId, permission, entityIds);
         }
 

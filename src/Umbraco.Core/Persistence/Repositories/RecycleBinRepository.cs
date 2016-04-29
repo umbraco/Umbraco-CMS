@@ -1,17 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using NPoco;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -19,8 +12,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, contentSection, mappingResolver)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, contentSection, mappingResolver)
         {
         }
 

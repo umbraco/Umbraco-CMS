@@ -30,22 +30,18 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 throw new InstallException("The database failed to install. ERROR: " + result.Message);
             }
-            
+
             if (result.RequiresUpgrade == false)
             {
                 HandleConnectionStrings();
                 return null;
             }
-            else
-            {
-                //upgrade is required so set the flag for the next step
 
-                return new InstallSetupResult(new Dictionary<string, object>
-                {
-                    {"upgrade", true}
-                });
-            }
-            
+            //upgrade is required so set the flag for the next step
+            return new InstallSetupResult(new Dictionary<string, object>
+            {
+                {"upgrade", true}
+            });
         }
 
         internal static void HandleConnectionStrings()

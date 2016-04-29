@@ -9,10 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddRelationTypeForDocumentOnDelete : MigrationBase
     {
-        public AddRelationTypeForDocumentOnDelete(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public AddRelationTypeForDocumentOnDelete(ILogger logger)
+            : base(logger)
+        { }
 
         public override void Up()
         {

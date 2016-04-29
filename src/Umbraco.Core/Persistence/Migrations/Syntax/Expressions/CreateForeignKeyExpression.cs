@@ -1,18 +1,18 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateForeignKeyExpression : MigrationExpressionBase
     {
-        public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ForeignKeyDefinition fkDef)
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ForeignKeyDefinition fkDef)
+            : base(context, supportedDatabaseTypes)
         {
             ForeignKey = fkDef;
         }
 
-        public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {
             ForeignKey = new ForeignKeyDefinition();
         }

@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this Database db, T poco)
+        internal static RecordPersistenceType InsertOrUpdate<T>(this IDatabase db, T poco)
             where T : class
         {
             return db.InsertOrUpdate(poco, null, null);
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this Database db,
+        internal static RecordPersistenceType InsertOrUpdate<T>(this IDatabase db,
             T poco,
             string updateCommand,
             object updateArgs)
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence
 
         // fixme - NPoco has BulkInsert now?
 
-        public static void BulkInsertRecords<T>(this Database db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
+        public static void BulkInsertRecords<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="collection"></param>
         /// <param name="tr"></param>
         /// <param name="commitTrans"></param>
-        public static void BulkInsertRecords<T>(this Database db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection, ITransaction tr, bool commitTrans = false)
+        public static void BulkInsertRecords<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection, ITransaction tr, bool commitTrans = false)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Persistence
             {
                 //if it is sql ce or it is a sql server version less than 2008, we need to do individual inserts.
                 var sqlServerSyntax = sqlSyntax as SqlServerSyntaxProvider;
-                if ((sqlServerSyntax != null && (int)sqlServerSyntax.VersionName.Value < (int)SqlServerVersionName.V2008)
+                if ((sqlServerSyntax != null && (int) sqlServerSyntax.ServerVersion.ProductVersionName < (int) SqlServerSyntaxProvider.VersionName.V2008)
                     || sqlSyntax is SqlCeSyntaxProvider)
                 {
                     //SqlCe doesn't support bulk insert statements!
@@ -247,7 +247,7 @@ namespace Umbraco.Core.Persistence
         /// that is max. I've reduced it to 2000 anyways.
         /// </remarks>
         internal static IDbCommand[] GenerateBulkInsertCommand<T>(
-            this Database db,
+            this IDatabase db,
             IEnumerable<T> collection,
             DbConnection connection,
             out string[] sql)
@@ -320,7 +320,7 @@ namespace Umbraco.Core.Persistence
             return commands.ToArray();
         }
 
-        public static void TruncateTable(this Database db, ISqlSyntaxProvider sqlSyntax, string tableName)
+        public static void TruncateTable(this IDatabase db, ISqlSyntaxProvider sqlSyntax, string tableName)
         {
             var sql = new Sql(string.Format(
                 sqlSyntax.TruncateTable,
@@ -328,10 +328,16 @@ namespace Umbraco.Core.Persistence
             db.Execute(sql);
         }
 
-        public static IsolationLevel GetCurrentTransactionIsolationLevel(this Database database)
+        public static IsolationLevel GetCurrentTransactionIsolationLevel(this IDatabase database)
         {
             var transaction = database.Transaction;
             return transaction == null ? IsolationLevel.Unspecified : transaction.IsolationLevel;
         }
+
+        public static IEnumerable<TResult> FetchByGroups<TResult, TSource>(this IDatabase db, IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<SqlContext>> sqlFactory)
+        {
+            return source.SelectByGroups(x => db.Fetch<TResult>(sqlFactory(x)), groupSize);
+        }
+
     }
 }

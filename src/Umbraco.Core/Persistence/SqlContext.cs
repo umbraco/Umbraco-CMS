@@ -17,12 +17,10 @@ namespace Umbraco.Core.Persistence
             DatabaseType = databaseType;
         }
 
-        public SqlContext(ISqlSyntaxProvider sqlSyntax, IDatabaseConfig database)
+        public SqlContext(IUmbracoDatabaseConfig database)
         {
-            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
             if (database == null) throw new ArgumentNullException(nameof(database));
-
-            SqlSyntax = sqlSyntax;
+            SqlSyntax = database.SqlSyntax;
             PocoDataFactory = database.PocoDataFactory;
             DatabaseType = database.DatabaseType;
         }

@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
     [Migration("7.3.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class EnsureMigrationsTableIdentityIsCorrect : MigrationBase
     {
-        public EnsureMigrationsTableIdentityIsCorrect(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public EnsureMigrationsTableIdentityIsCorrect(ILogger logger) 
+            : base(logger)
+        { }
 
         public override void Up()
         {

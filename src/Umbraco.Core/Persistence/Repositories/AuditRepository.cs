@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using NPoco;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -14,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class AuditRepository : NPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
-        public AuditRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public AuditRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 

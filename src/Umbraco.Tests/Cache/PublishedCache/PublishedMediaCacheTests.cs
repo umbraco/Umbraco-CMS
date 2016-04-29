@@ -28,6 +28,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
         protected override void FreezeResolution()
         {
             var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+
             UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();

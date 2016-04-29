@@ -1,13 +1,12 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using NPoco;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateColumnExpression : MigrationExpressionBase
     {
-
-        public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
+            : base(context, supportedDatabaseTypes)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
