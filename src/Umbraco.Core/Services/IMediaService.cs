@@ -142,10 +142,11 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
+        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs);
         
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -171,10 +172,11 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
+        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs);
 
         /// <summary>
         /// Gets descendants of a <see cref="IMedia"/> object by its Id

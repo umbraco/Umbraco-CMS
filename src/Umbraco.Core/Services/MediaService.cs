@@ -409,7 +409,15 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+            string f = filter;
+            object[] fa = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                //add the default text filter
+                f = $"umbracoNode.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
+                fa = new object[] { $"%{filter}%" };
+            }
+            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, f, fa);
         }
 
         /// <summary>
@@ -422,10 +430,11 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
+        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
@@ -453,7 +462,15 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+            string f = filter;
+            object[] fa = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                //add the default text filter
+                f = $"umbracoNode.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
+                fa = new object[] { $"%{filter}%" };
+            }
+            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, f, fa);
         }
 
         /// <summary>
@@ -466,9 +483,10 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
+        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");

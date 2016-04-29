@@ -390,9 +390,10 @@ namespace Umbraco.Web.Editors
             sb.Append(type);
 
             
-            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString()).MaxCount(200);
+            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString())
+                //limit results to 200 to avoid huge over processing (CPU)
+                .MaxCount(200);
             
-            //limit results to 200 to avoid huge over processing (CPU)
             var result = internalSearcher.Find(raw);
 
             switch (entityType)

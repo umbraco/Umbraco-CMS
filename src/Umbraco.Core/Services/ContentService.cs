@@ -506,7 +506,7 @@ namespace Umbraco.Core.Services
             if (filter.IsNullOrWhiteSpace() == false)
             {
                 //add the default text filter
-                f = $"cmsDocument.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")}=@0";
+                f = $"cmsDocument.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
                 fa = new object[] { $"%{filter}%" };
             }
             return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, f, fa);
@@ -564,7 +564,7 @@ namespace Umbraco.Core.Services
             if (filter.IsNullOrWhiteSpace() == false)
             {
                 //add the default text filter
-                f = $"cmsDocument.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")}=@0";
+                f = $"cmsDocument.{RepositoryFactory.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
                 fa = new object[] { $"%{filter}%" };
             }
             return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, f, fa);

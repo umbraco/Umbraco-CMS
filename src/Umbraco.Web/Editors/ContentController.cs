@@ -195,7 +195,7 @@ namespace Umbraco.Web.Editors
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
                     //add the default text filter
-                    f = $"cmsDocument.{DatabaseContext.SqlSyntax.GetQuotedColumnName("text")}=@0";
+                    f = $"cmsDocument.{DatabaseContext.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
                     fa = new object[] { $"%{filter}%" };
                 }
 

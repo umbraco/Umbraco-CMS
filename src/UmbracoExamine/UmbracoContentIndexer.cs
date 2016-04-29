@@ -168,13 +168,7 @@ namespace UmbracoExamine
             protected set { _parentId = value; }
         }
 
-        protected override IEnumerable<string> SupportedTypes
-        {
-            get
-            {
-                return new[] { IndexTypes.Content, IndexTypes.Media };
-            }
-        }
+        protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Content, IndexTypes.Media};
 
         #endregion
 
@@ -194,14 +188,14 @@ namespace UmbracoExamine
         public override void DeleteFromIndex(string nodeId)
         {
             //find all descendants based on path
-            var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
-            var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
+            var descendantPath = $@"\-1\,*{nodeId}\,*";
+            var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
             var searcher = GetSearcher();
             var c = searcher.CreateCriteria();
             var filtered = c.RawQuery(rawQuery);
             var results = searcher.Find(filtered);
 
-            ProfilingLogger.Logger.Debug(GetType(), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.TotalItemCount));
+            ProfilingLogger.Logger.Debug(GetType(), $"DeleteFromIndex with query: {rawQuery} (found {results.TotalItemCount} results)");
 
             //need to create a delete queue item for each one found
             foreach (var r in results)

@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs);
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = null, object[] filterArgs = null);
 
         /// <summary>
         /// Returns the persisted content's preview XML structure

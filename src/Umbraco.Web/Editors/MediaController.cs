@@ -186,9 +186,21 @@ namespace Umbraco.Web.Editors
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
+                string f = filter;
+                object[] fa = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    //add the default text filter
+                    f = $"umbracoNode.{DatabaseContext.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
+                    fa = new object[] { $"%{filter}%" };
+                }
+
                 children = Services.MediaService
-                 .GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren
-                 , orderBy, orderDirection, orderBySystemField, filter).ToArray();
+                    .GetPagedChildren(
+                        id, (pageNumber - 1), pageSize,
+                        out totalChildren,
+                        orderBy, orderDirection, orderBySystemField,
+                        f, fa).ToArray();
             }
             else
             {

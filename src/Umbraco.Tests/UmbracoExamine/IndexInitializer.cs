@@ -68,8 +68,15 @@ namespace Umbraco.Tests.UmbracoExamine
                     x => x.GetPagedDescendants(
                         It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
                         ==
-                        allRecs);                
-		    }
+                        allRecs
+                        
+                        &&
+
+                        x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<object[]>())
+                        ==
+                        allRecs); 
+            }
 		    if (userService == null)
 		    {
 		        userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == (object)0 && p.Name == "admin"));
@@ -104,6 +111,13 @@ namespace Umbraco.Tests.UmbracoExamine
                 mediaService = Mock.Of<IMediaService>(
                     x => x.GetPagedDescendants(
                         It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>()) 
+                        ==
+                        allRecs
+
+                        &&
+
+                        x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<object[]>())
                         ==
                         allRecs);
             }

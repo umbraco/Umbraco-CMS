@@ -424,7 +424,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, "File");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true,
+                    $"umbracoNode.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0",
+                    new object[] { "%File%" });
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -445,7 +447,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, "Test");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true,
+                    $"umbracoNode.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0",
+                    new object[] { "%Test%" });
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));

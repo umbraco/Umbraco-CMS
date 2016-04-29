@@ -699,7 +699,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, "Page 2");
+                
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, 
+                    $"cmsDocument.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0",
+                    new object[] { "%Page 2%" });
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -720,7 +723,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, "Page");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true,
+                    $"cmsDocument.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0",
+                    new object[] { "%Page%" });
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));
