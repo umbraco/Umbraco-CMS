@@ -1336,7 +1336,6 @@ namespace Umbraco.Tests.Services
             var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger);
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
-            var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1344,9 +1343,11 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentTypeRepository contentTypeRepository;
+                var repository = CreateRepository(unitOfWork, out contentTypeRepository);
+
                 foreach (var content in list)
                 {
                     repository.AddOrUpdate(content.Value);

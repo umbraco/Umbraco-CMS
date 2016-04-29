@@ -16,10 +16,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -44,9 +45,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var created = DateTime.Now;
                 repo.AddOrUpdate(new Task(new TaskType("asdfasdf"))
                 {
@@ -76,9 +78,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var task = new Task(new TaskType("asdfasdf"))
                 {
                     AssigneeUserId = 0,
@@ -112,9 +115,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var task = new Task(new TaskType("asdfasdf"))
                 {
                     AssigneeUserId = 0,
@@ -140,9 +144,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 20);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var found = repo.GetAll().ToArray();
                 Assert.AreEqual(20, found.Count());
             }
@@ -155,9 +160,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(true, 5);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var found = repo.GetTasks(includeClosed: true).ToArray();
                 Assert.AreEqual(15, found.Count());
             }
@@ -170,9 +176,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 5, -21);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var found = repo.GetTasks(itemId:-20).ToArray();
                 Assert.AreEqual(10, found.Count());
             }
@@ -185,9 +192,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(true, 5);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var found = repo.GetTasks(includeClosed: false);
                 Assert.AreEqual(10, found.Count());
             }
@@ -196,9 +204,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 for (int i = 0; i < count; i++)
                 {
                     repo.AddOrUpdate(new Task(new TaskType("asdfasdf"))

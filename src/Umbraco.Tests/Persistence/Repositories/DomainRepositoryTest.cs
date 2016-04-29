@@ -31,14 +31,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private int CreateTestData(string isoName, out ContentType ct)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = new Language(isoName);
                 langRepo.AddOrUpdate(lang);
 
@@ -54,18 +54,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_And_Get_By_Id()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -89,18 +89,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_And_Get_By_Id_Empty_lang()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var content = contentRepo.Get(contentId);
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id };
@@ -122,18 +122,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cant_Create_Duplicate_Domain_Name()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -145,28 +145,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(domain2);
 
                 Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
-
-
             }
-
-
         }
 
         [Test]
         public void Can_Delete()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -183,25 +179,23 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.IsNull(domain);                
             }
-
-
         }
 
         [Test]
         public void Can_Update()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId1 = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var content1 = contentRepo.Get(contentId1);
 
                 //more test data
@@ -234,26 +228,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(lang2.Id, domain.LanguageId);
                 Assert.AreEqual(lang2.IsoCode, domain.LanguageIsoCode);
             }
-
-
         }
 
 
         [Test]
         public void Exists()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -273,18 +265,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_By_Name()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -304,18 +296,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -335,18 +327,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All_Ids()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -368,18 +360,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All_Without_Wildcards()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
@@ -403,18 +395,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All_For_Content()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var contentItems = new List<IContent>();
 
                 var lang = langRepo.GetByIsoCode("en-AU");
@@ -454,18 +446,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All_For_Content_Without_Wildcards()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            ContentRepository contentRepo;
-            LanguageRepository langRepo;
-            ContentTypeRepository contentTypeRepo;
-
-            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            var provider = new NPocoUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentRepository contentRepo;
+                LanguageRepository langRepo;
+                ContentTypeRepository contentTypeRepo;
+
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+
                 var contentItems = new List<IContent>();
 
                 var lang = langRepo.GetByIsoCode("en-AU");
@@ -496,9 +488,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var all2 = repo.GetAssignedDomains(contentItems[1].Id, false);
                 Assert.AreEqual(0, all2.Count());
-
             }
         }
-
     }
 }

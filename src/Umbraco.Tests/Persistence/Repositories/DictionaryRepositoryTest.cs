@@ -37,10 +37,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -70,10 +69,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -103,10 +101,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -137,10 +134,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");                
 
                 repository.AddOrUpdate(dictionaryItem);
@@ -164,9 +160,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dictionaryItem = repository.Get(1);
@@ -185,9 +181,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dictionaryItems = repository.GetAll(1, 2);
@@ -205,9 +201,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey == "Article");
@@ -225,9 +221,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey.StartsWith("Read"));
@@ -243,10 +239,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
 
                 var language = languageRepository.Get(1);
 
@@ -274,9 +270,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var item = repository.Get(1);
@@ -329,9 +325,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var item = repository.Get(1);
@@ -350,9 +346,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(1);

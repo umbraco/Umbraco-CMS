@@ -38,10 +38,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            unitOfWork.Database.EnableSqlTrace = true;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                unitOfWork.Database.EnableSqlTrace = true;
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var language = repository.Get(1);
 
@@ -57,9 +58,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
                 {
@@ -83,9 +85,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
                 {
@@ -110,9 +113,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var language = repository.Get(0);
 
@@ -126,9 +130,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languages = repository.GetAll();
@@ -146,9 +150,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         { 
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languages = repository.GetAll(1, 2);
@@ -166,9 +170,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<ILanguage>(SqlSyntax, MappingResolver).Where(x => x.IsoCode == "da-DK");
@@ -186,9 +190,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<ILanguage>(SqlSyntax, MappingResolver).Where(x => x.IsoCode.StartsWith("D"));
@@ -204,9 +208,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
@@ -224,9 +228,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var language = repository.Get(5);
@@ -250,9 +254,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var language = repository.Get(3);
@@ -271,9 +275,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(3);

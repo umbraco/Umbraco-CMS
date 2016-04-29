@@ -682,9 +682,9 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreatePartialViewRepository(partialViewType);
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
 
@@ -708,9 +708,9 @@ namespace Umbraco.Core.Services
 
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = 0)
         {
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
-            {
+            using (var uow = _fileUowProvider.GetUnitOfWork())
+            { 
+                var repository = uow.CreatePartialViewRepository(partialViewType);
                 var partialView = repository.Get(path);
                 if (partialView == null)
                     return true;
@@ -745,9 +745,9 @@ namespace Umbraco.Core.Services
             if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<IPartialView>(partialView), this))
                 return Attempt<IPartialView>.Fail();
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = GetPartialViewRepository(partialViewType, uow))
+            using (var uow = _fileUowProvider.GetUnitOfWork())
             {
+                var repository = uow.CreatePartialViewRepository(partialViewType);
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
             }
@@ -794,18 +794,6 @@ namespace Umbraco.Core.Services
             return System.IO.File.Exists(snippetPath)
                 ? Attempt<string>.Succeed(snippetPath)
                 : Attempt<string>.Fail();
-        }
-
-        private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType, IUnitOfWork uow)
-        {
-            switch (partialViewType)
-            {
-                case PartialViewType.PartialView:
-                    return uow.CreateRepository<IPartialViewRepository>();
-                case PartialViewType.PartialViewMacro:
-                    return uow.CreateRepository<IPartialViewMacroRepository>();
-            }
-            throw new ArgumentOutOfRangeException("partialViewType");
         }
 
         #endregion

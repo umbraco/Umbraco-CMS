@@ -48,11 +48,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -65,9 +63,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -88,9 +87,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
+
                 // Act
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
@@ -114,9 +114,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
+
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
@@ -143,9 +144,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
@@ -163,9 +165,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -189,9 +192,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
@@ -217,9 +221,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -246,9 +251,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -281,9 +287,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -311,9 +318,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var template = new Template("test", "test")
                 {
@@ -332,8 +340,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
             }
-
-
         }
 
         [Test]
@@ -341,9 +347,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var template = new Template("test", "test")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
@@ -361,8 +368,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNull(repository.Get("test"));
                 Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.False);
             }
-
-
         }
 
         [Test]
@@ -370,9 +375,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
@@ -390,8 +396,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNull(repository.Get("test"));
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
-
-
         }
 
         [Test]
@@ -399,44 +403,40 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var templateRepository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var templateRepository = CreateRepository(unitOfWork);
+
                 var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
                 var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
                 var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
 
-                using (contentRepo)
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
+                var textpage = MockedContent.CreateSimpleContent(contentType);
+                contentTypeRepository.AddOrUpdate(contentType);
+                contentRepo.AddOrUpdate(textpage);
+                unitOfWork.Commit();
+
+
+                var template = new Template("test", "test")
                 {
-                    var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                    var textpage = MockedContent.CreateSimpleContent(contentType);
-                    contentTypeRepository.AddOrUpdate(contentType);
-                    contentRepo.AddOrUpdate(textpage);
-                    unitOfWork.Commit();
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                templateRepository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
+                textpage.Template = template;
+                contentRepo.AddOrUpdate(textpage);
+                unitOfWork.Commit();
 
-                    var template = new Template("test", "test")
-                    {
-                        Content = @"<%@ Master Language=""C#"" %>"
-                    };
-                    templateRepository.AddOrUpdate(template);
-                    unitOfWork.Commit();
+                // Act
+                var templates = templateRepository.Get("test");
+                templateRepository.Delete(templates);
+                unitOfWork.Commit();
 
-                    textpage.Template = template;
-                    contentRepo.AddOrUpdate(textpage);
-                    unitOfWork.Commit();
-
-                    // Act
-                    var templates = templateRepository.Get("test");
-                    templateRepository.Delete(templates);
-                    unitOfWork.Commit();
-
-                    // Assert
-                    Assert.IsNull(templateRepository.Get("test"));
-                }
+                // Assert
+                Assert.IsNull(templateRepository.Get("test"));
             }
-
         }
 
         [Test]
@@ -444,9 +444,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var parent = new Template("parent", "parent")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
@@ -476,8 +477,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.IsNull(repository.Get("test"));
             }
-
-
         }
 
         [Test]
@@ -485,9 +484,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 CreateHierarchy(repository, unitOfWork);
 
                 // Act
@@ -511,9 +511,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
@@ -538,9 +539,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
@@ -553,7 +555,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(2, childrenById.DistinctBy(x => x.Id).Count());
                 Assert.AreEqual(2, childrenByAlias.Count());
                 Assert.AreEqual(2, childrenByAlias.DistinctBy(x => x.Id).Count());
-
             }
         }
 
@@ -562,9 +563,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
@@ -574,7 +576,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.AreEqual(1, children.Count());
                 Assert.AreEqual(1, children.DistinctBy(x => x.Id).Count());
-
             }
         }
 
@@ -583,9 +584,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
@@ -607,9 +609,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var parent = new Template("parent", "parent");
                 var child1 = new Template("child1", "child1");
                 var toddler1 = new Template("toddler1", "toddler1");
@@ -662,8 +665,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id), baby1.Path);
                 Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id), baby2.Path);
             }
-
-
         }
 
         [Test]
@@ -671,9 +672,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var parent = new Template("parent", "parent");
                 var child1 = new Template("child1", "child1");
                 var child2 = new Template("child2", "child2");
@@ -703,7 +705,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //Assert
                 Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler2.Id), toddler2.Path);
-
             }
         }
 

@@ -45,10 +45,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 var mediaType = mediaTypeRepository.Get(1032);
 
@@ -73,10 +73,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures_For_Content_Type()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 var imageMediaType = mediaTypeRepository.Get(1032);
                 var fileMediaType = mediaTypeRepository.Get(1033);
@@ -114,10 +114,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 var mediaType = mediaTypeRepository.Get(1032);
                 var image = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -138,10 +138,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 var mediaType = mediaTypeRepository.Get(1032);
                 var file = MockedMedia.CreateMediaFile(mediaType, -1);
@@ -169,10 +169,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 var mediaType = mediaTypeRepository.Get(1032);
                 var file = MockedMedia.CreateMediaFile(mediaType, -1);
@@ -200,10 +200,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var media = repository.Get(NodeDto.NodeIdSeed + 1);
@@ -219,10 +219,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
@@ -243,10 +243,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var media = repository.Get(NodeDto.NodeIdSeed + 2);
@@ -267,10 +267,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var media = repository.Get(NodeDto.NodeIdSeed + 1);
@@ -294,10 +294,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
@@ -312,10 +313,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -333,10 +335,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -354,10 +357,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -375,10 +379,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -396,10 +401,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -417,10 +423,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -438,10 +445,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
+
                 // Act
                 var query = new Query<IMedia>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 long totalRecords;
@@ -459,10 +467,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var medias = repository.GetAll(NodeDto.NodeIdSeed + 1, NodeDto.NodeIdSeed + 2);
@@ -479,10 +487,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var medias = repository.GetAll();
@@ -499,10 +507,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 var exists = repository.Exists(NodeDto.NodeIdSeed + 1);
@@ -521,10 +529,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MediaTypeRepository mediaTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MediaTypeRepository mediaTypeRepository;
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
                 int level = 2;

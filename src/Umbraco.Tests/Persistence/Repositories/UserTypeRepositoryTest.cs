@@ -40,9 +40,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 var userType = MockedUserType.CreateUserType();
 
@@ -60,9 +60,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 var userType1 = MockedUserType.CreateUserType("1");
                 var userType2 = MockedUserType.CreateUserType("2");
@@ -84,9 +84,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
                 unitOfWork.Commit();
@@ -105,9 +106,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
                 unitOfWork.Commit();
@@ -132,9 +134,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 var userType = MockedUserType.CreateUserType();
 
@@ -143,17 +145,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = userType.Id;
 
-                using (var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver))
-                {
-                    repository2.Delete(userType);
-                    unitOfWork.Commit();
+                var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+                repository2.Delete(userType);
+                unitOfWork.Commit();
 
-                    var resolved = repository2.Get(id);
+                var resolved = repository2.Get(id);
 
-                    // Assert
-                    Assert.That(resolved, Is.Null);    
-                }
-                
+                // Assert
+                Assert.That(resolved, Is.Null);    
             }
         }
 
@@ -162,9 +161,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
                 unitOfWork.Commit();
@@ -187,9 +187,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
@@ -206,9 +207,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
@@ -226,9 +228,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
@@ -246,9 +249,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
@@ -264,9 +268,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act

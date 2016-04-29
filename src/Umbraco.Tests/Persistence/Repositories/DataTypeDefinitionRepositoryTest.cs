@@ -16,6 +16,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -82,10 +83,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Move()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
                 var container1 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Commit();
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 containerRepository.AddOrUpdate(container2);
                 unitOfWork.Commit();
 
-                var dataType = (IDataTypeDefinition) new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType = (IDataTypeDefinition)new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt1"
                 };
@@ -129,17 +130,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
                 Assert.That(container.Id, Is.GreaterThan(0));
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
@@ -149,22 +147,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
             }
@@ -174,10 +167,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container_Containing_Data_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
@@ -194,23 +187,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container_Containing_Data_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            IDataTypeDefinition dataType;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
 
-                dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                IDataTypeDefinition dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataType);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
@@ -228,22 +216,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            int id;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
+                var repository = CreateRepository(unitOfWork);
+                IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
 
                 repository.AddOrUpdate(dataTypeDefinition);
 
                 unitOfWork.Commit();
-                id = dataTypeDefinition.Id;
+                var id = dataTypeDefinition.Id;
                 Assert.That(id, Is.GreaterThan(0));
-            }
-            using (var repository = CreateRepository(unitOfWork))
-            {
+
                 // Act
-                var dataTypeDefinition = repository.Get(id);
+                dataTypeDefinition = repository.Get(id);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);
@@ -257,9 +242,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var dataTypeDefinition = repository.Get(-42);
 
@@ -268,7 +253,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
                 Assert.That(dataTypeDefinition.Name, Is.EqualTo("Dropdown"));
             }
-
         }
 
         [Test]
@@ -276,9 +260,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dataTypeDefinitions = repository.GetAll();
@@ -296,9 +280,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dataTypeDefinitions = repository.GetAll(-40, -41, -42);
@@ -316,9 +300,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDataTypeDefinition>(SqlSyntax, MappingResolver).Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
@@ -336,9 +320,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDataTypeDefinition>(SqlSyntax, MappingResolver).Where(x => x.Name.StartsWith("D"));
@@ -354,16 +338,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
@@ -381,23 +364,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.blah")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.blah")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
 
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-            definition.PropertyEditorAlias = "Test.TestEditor"; //change
+                definition.PropertyEditorAlias = "Test.TestEditor"; //change
                 repository.AddOrUpdate(definition);
                 unitOfWork.Commit();
 
@@ -406,7 +388,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-            Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
+                Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
             }
         }
 
@@ -415,16 +397,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
@@ -447,9 +428,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(1034); //Content picker
@@ -465,22 +446,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Pre_Value_Collection()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            int dtid;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
-                dtid = dataTypeDefinition.Id;
-            }
+                var dtid = dataTypeDefinition.Id;
 
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
-            using (var repository = CreateRepository(unitOfWork))
-            {
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtid);
                 Assert.AreEqual(2, collection.PreValuesAsArray.Count());
             }
@@ -490,22 +466,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Pre_Value_As_String()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            int dtid;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
-                dtid = dataTypeDefinition.Id;
-            }
+                var dtid = dataTypeDefinition.Id;
 
-            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                var id = unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
-            using (var repository = CreateRepository(unitOfWork))
-            {
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);
             }
@@ -515,22 +486,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Pre_Value_Collection_With_Cache()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             DataTypeDefinition dtd;
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                    dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Commit();
-            }
 
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
-            //this will cache the result
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
-            {
+                //this will cache the result
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
             }
 
@@ -549,22 +516,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Pre_Value_As_String_With_Cache()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
             DataTypeDefinition dtd;
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            object id;
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Commit();
-            }
 
-            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                id = unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
-            //this will cache the result
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
-            {
+                //this will cache the result
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
             }
 
@@ -578,8 +542,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual(1, cached.Count());
             Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
 
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);

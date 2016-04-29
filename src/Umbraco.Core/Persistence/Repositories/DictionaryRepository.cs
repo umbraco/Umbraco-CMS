@@ -246,18 +246,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, _mappingResolver))
-            {
-                return uniqueIdRepo.Get(uniqueId);
-            }
+            // fixme - this is ugly
+            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, _mappingResolver);
+            return uniqueIdRepo.Get(uniqueId);
         }
 
         public IDictionaryItem Get(string key)
         {
-            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, _mappingResolver))
-            {
-                return keyRepo.Get(key);
-            }
+            // fixme - this is ugly
+            var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, _mappingResolver);
+            return keyRepo.Get(key);
         }
         
         private IEnumerable<IDictionaryItem> GetRootDictionaryItems()

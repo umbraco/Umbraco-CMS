@@ -40,11 +40,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
                 repository.AddOrUpdate(server);
 
@@ -58,11 +57,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
                 repository.AddOrUpdate(server);
@@ -76,11 +74,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Assert
                 Assert.That(repository, Is.Not.Null);
             }
@@ -91,9 +88,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var server = repository.Get(1);
 
@@ -111,9 +109,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var servers = repository.GetAll();
 
@@ -130,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //{
         //    // Arrange
         //    var provider = new NPocoUnitOfWorkProvider(Logger);
-        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var unitOfWork = provider.GetUnitOfWork())
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
         //        // Act
@@ -147,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //{
         //    // Arrange
         //    var provider = new NPocoUnitOfWorkProvider(Logger);
-        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var unitOfWork = provider.GetUnitOfWork())
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
         //        // Act
@@ -164,9 +163,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
                 repository.AddOrUpdate(server);
@@ -183,9 +183,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var server = repository.Get(2);
                 server.ServerAddress = "https://umbraco.com";
@@ -208,9 +209,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var server = repository.Get(3);
                 Assert.IsNotNull(server);
@@ -229,9 +231,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var exists = repository.Exists(3);
                 var doesntExist = repository.Exists(10);
@@ -252,8 +255,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = CreateRepository(unitOfWork))
             {
+                var repository = CreateRepository(unitOfWork);
+
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
                 repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));

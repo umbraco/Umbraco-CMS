@@ -382,6 +382,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
+    <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />

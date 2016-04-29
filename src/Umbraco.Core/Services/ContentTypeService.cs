@@ -162,7 +162,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var repo = GetContainerRepository(uow, containerObjectType);
+                var repo = uow.CreateContainerRepository(containerObjectType);
                 repo.AddOrUpdate(container);
                 uow.Commit();
             }
@@ -172,15 +172,6 @@ namespace Umbraco.Core.Services
             //TODO: Audit trail ?
 
             return OperationStatus.Success(evtMsgs);
-        }
-
-        private IEntityContainerRepository GetContainerRepository(IDatabaseUnitOfWork uow, Guid containerObjectType)
-        {
-            if (containerObjectType == Constants.ObjectTypes.DocumentTypeContainerGuid)
-                return uow.CreateRepository<IDocumentTypeContainerRepository>();
-            if (containerObjectType == Constants.ObjectTypes.MediaTypeContainerGuid)
-                return uow.CreateRepository<IMediaTypeContainerRepository>();
-            throw new ArgumentException("Object type is not supported.", nameof(containerObjectType));
         }
 
         public EntityContainer GetContentTypeContainer(int containerId)
@@ -197,7 +188,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var repo = GetContainerRepository(uow, containerObjectType);
+                var repo = uow.CreateContainerRepository(containerObjectType);
                 var container = repo.Get(containerId);
                 return container;
             }
@@ -274,7 +265,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var repo = GetContainerRepository(uow, containerObjectType);
+                var repo = uow.CreateContainerRepository(containerObjectType);
                 var container = ((EntityContainerRepository)repo).Get(containerId);
                 return container;
             }

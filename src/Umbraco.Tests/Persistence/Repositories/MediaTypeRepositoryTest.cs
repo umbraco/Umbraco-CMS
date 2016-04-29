@@ -41,10 +41,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Move()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
+
                 var container1 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Commit();
@@ -87,17 +88,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
                 Assert.That(container.Id, Is.GreaterThan(0));
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
@@ -107,23 +106,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
                 Assert.That(container.Id, Is.GreaterThan(0));
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
             }
@@ -133,10 +128,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
+
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
@@ -154,24 +150,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            IMediaType contentType;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
+
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
 
-                contentType = MockedContentTypes.CreateVideoMediaType();
+                IMediaType contentType = MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container.Id;
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
@@ -190,9 +182,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var contentType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(contentType);
@@ -213,9 +206,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var videoMediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(videoMediaType);
                 unitOfWork.Commit();
@@ -250,9 +244,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
@@ -275,9 +269,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var mediaType = repository.Get(1033); //File
@@ -294,9 +288,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var mediaType = repository.Get(1033); //File
 
                 // Act
@@ -314,9 +309,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var mediaTypes = repository.GetAll();
                 int count =
@@ -335,9 +331,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
 
                 // Act
@@ -360,9 +357,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(1032); //Image
@@ -377,9 +374,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
@@ -404,9 +402,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
@@ -425,9 +424,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var contentType = repository.Get(1033); //File

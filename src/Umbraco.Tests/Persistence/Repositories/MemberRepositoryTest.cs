@@ -48,11 +48,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var memberType1 = CreateTestMemberType();
 
                 for (var i = 0; i < 100; i++)
@@ -76,11 +77,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures_For_Content_Type()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
 
                 var memberType1 = CreateTestMemberType("mt1");
                 var memberType2 = CreateTestMemberType("mt2");
@@ -119,11 +120,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Get_Member_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var member = CreateTestMember();
 
                 member = repository.Get(member.Id);
@@ -137,11 +139,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Members_By_Ids()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var type = CreateTestMemberType();
                 var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
                 var m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
@@ -159,11 +162,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Get_All_Members()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var type = CreateTestMemberType();
                 for (var i = 0; i < 5; i++)
                 {
@@ -184,11 +188,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var key = Guid.NewGuid();
                 var member = CreateTestMember(key: key);
 
@@ -206,11 +211,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Persist_Member()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var member = CreateTestMember();
 
                 var sut = repository.Get(member.Id);
@@ -229,11 +235,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void New_Member_Has_Built_In_Properties_By_Default()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
@@ -263,11 +270,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             IMember sut;
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
@@ -292,11 +300,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             IMember sut;
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
@@ -339,11 +348,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 if (memberType == null)
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
@@ -362,11 +372,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IMemberType CreateTestMemberType(string alias = null)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                MemberTypeRepository memberTypeRepository;
+                MemberGroupRepository memberGroupRepository;
+                var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType(alias);
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();

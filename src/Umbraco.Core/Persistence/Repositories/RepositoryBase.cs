@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -12,50 +10,38 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RepositoryBase : DisposableObject
+    internal abstract class RepositoryBase
     {
-        private readonly IUnitOfWork _work;
-        private readonly CacheHelper _cache;
-
         protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
         {
-            if (work == null) throw new ArgumentNullException("work");
-            if (cache == null) throw new ArgumentNullException("cache");
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (work == null) throw new ArgumentNullException(nameof(work));
+            if (cache == null) throw new ArgumentNullException(nameof(cache));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             Logger = logger;
-            _work = work;
-            _cache = cache;
+            UnitOfWork = work;
+            RepositoryCache = cache;
         }
 
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-        protected internal IUnitOfWork UnitOfWork
-        {
-            get { return _work; }
-        }
+        protected internal IUnitOfWork UnitOfWork { get; }
 
-        protected CacheHelper RepositoryCache
-        {
-            get { return _cache; }
-        }
+        protected CacheHelper RepositoryCache { get; }
 
         /// <summary>
         /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
         /// </summary>
-        protected virtual IRuntimeCacheProvider RuntimeCache
-        {
-            get { return _cache.RuntimeCache; }
-        }
+        protected virtual IRuntimeCacheProvider RuntimeCache => RepositoryCache.RuntimeCache;
 
         public static string GetCacheIdKey<T>(object id)
         {
-            return string.Format("{0}{1}", GetCacheTypeKey<T>(), id);
+            return $"{GetCacheTypeKey<T>()}{id}";
         }
 
         public static string GetCacheTypeKey<T>()
         {
-            return string.Format("uRepo_{0}_", typeof(T).Name);
+            return $"uRepo_{typeof (T).Name}_";
         }
 
         protected ILogger Logger { get; private set; }
@@ -93,10 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// The runtime cache used for this repo by default is the isolated cache for this type
         /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
-        {
-            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
-        }
+        protected override IRuntimeCacheProvider RuntimeCache => RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
 
         private IRepositoryCachePolicyFactory<TEntity, TId> _cachePolicyFactory;
         /// <summary>
@@ -143,10 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            if (UnitOfWork != null)
-            {
-                UnitOfWork.RegisterRemoved(entity, this);
-            }
+            UnitOfWork?.RegisterRemoved(entity, this);
         }
 
         protected abstract TEntity PerformGet(TId id);
@@ -274,17 +254,5 @@ namespace Umbraco.Core.Persistence.Repositories
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
-
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            UnitOfWork.DisposeIfDisposable();
-        }
     }
 }

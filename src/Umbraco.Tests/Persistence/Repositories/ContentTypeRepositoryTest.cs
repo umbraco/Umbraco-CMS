@@ -76,10 +76,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var repository = CreateRepository(unitOfWork);
                 var templates = new[]
                 {
                     new Template("test1", "test1"),
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 var contentType = MockedContentTypes.CreateSimpleContentType();
-                contentType.AllowedTemplates = new[] {templates[0], templates[1]};
+                contentType.AllowedTemplates = new[] { templates[0], templates[1] };
                 contentType.SetDefaultTemplate(templates[0]);
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
@@ -111,10 +111,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Move()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                var repository = CreateRepository(unitOfWork);
                 var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Commit();
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 containerRepository.AddOrUpdate(container2);
                 unitOfWork.Commit();
 
-                var contentType = (IContentType) MockedContentTypes.CreateBasicContentType("asdfasdf");
+                var contentType = (IContentType)MockedContentTypes.CreateBasicContentType("asdfasdf");
                 contentType.ParentId = container2.Id;
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
@@ -157,17 +157,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
                 Assert.That(container.Id, Is.GreaterThan(0));
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
@@ -177,22 +174,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
             }
@@ -202,10 +194,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
+                var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
@@ -223,24 +215,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            IMediaType contentType;
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid))
-            using (var repository = CreateMediaTypeRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
+                var repository = CreateMediaTypeRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
 
-                contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                IMediaType contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid))
-            using (var repository = CreateMediaTypeRepository(unitOfWork))
-            {
+
                 // Act
                 containerRepository.Delete(container);
                 unitOfWork.Commit();
@@ -259,9 +246,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
                 repository.AddOrUpdate(contentType);
@@ -290,9 +277,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
 
@@ -339,14 +326,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 contentType.Thumbnail = "Doc2.png";
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+                contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
                 {
                     Name = "Subtitle",
                     Description = "Optional Subtitle",
@@ -415,9 +402,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
@@ -478,9 +465,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = MockedContentTypes.CreateSimpleContentType();
                 repository.AddOrUpdate(contentType);
@@ -502,9 +489,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var ctMain = MockedContentTypes.CreateSimpleContentType();
                 var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
                 var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
@@ -532,9 +519,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
                 var child1 = MockedContentTypes.CreateSimpleContentType("aabc", "aabc", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child1);
@@ -561,9 +548,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
@@ -579,9 +566,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
                 var childContentType = MockedContentTypes.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true);
                 repository.AddOrUpdate(childContentType);
@@ -601,9 +588,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var result = repository.Get(Guid.NewGuid());
 
@@ -617,9 +604,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var contentTypes = repository.GetAll();
@@ -639,9 +626,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
 
                 // Act
@@ -662,9 +649,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(NodeDto.NodeIdSeed);
@@ -679,9 +666,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act
@@ -703,9 +690,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed);
@@ -721,9 +708,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
@@ -739,9 +726,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act
@@ -773,9 +760,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
                 var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
@@ -807,10 +794,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository repository;
-            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository(unitOfWork, out repository);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
@@ -834,10 +821,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository repository;
-            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository(unitOfWork, out repository);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
@@ -862,10 +849,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository repository;
-            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository(unitOfWork, out repository);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
@@ -892,16 +879,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void
-            Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType
-            ()
+        public void Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType()
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository repository;
-            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            using (var unitOfWork = provider.GetUnitOfWork())
             {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository(unitOfWork, out repository);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
