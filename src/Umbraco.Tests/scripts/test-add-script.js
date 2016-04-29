@@ -1,0 +1,1 @@
+/// <reference name="MicrosoftAjax.js"/>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
 using System.Linq;
-using System.Web;
+using System.Threading;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Configuration;
@@ -26,11 +26,12 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
     {
+        private readonly IScopeContextFactory _scopeContextFactory;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
-	    private readonly ILogger _logger;
-        private bool _configured;
+        private readonly ILogger _logger;
 
-	    private DatabaseFactory _databaseFactory;
+        private const string HttpItemKey = "Umbraco.Core.Persistence.DefaultDatabaseFactory";
+        private DatabaseFactory _databaseFactory;
         private IPocoDataFactory _pocoDataFactory;
         private string _connectionString;
         private string _providerName;
@@ -39,9 +40,9 @@ namespace Umbraco.Core.Persistence
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        // fixme - what needs to be private fields vs public properties?
-        public bool Configured => _configured;
+        public bool Configured { get; private set; }
         public ISqlSyntaxProvider SqlSyntax
         {
             get
@@ -51,20 +52,16 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        // very important to have ThreadStatic,
-        // see: http://issues.umbraco.org/issue/U4-2172
-        [ThreadStatic]
-        private static Lazy<UmbracoDatabase> _nonHttpInstance;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with the default connection, and a logger.
         /// </summary>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="scopeContextFactory"></param>
         /// <remarks>Used by LightInject.</remarks>
-        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger)
-        {
+        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextFactory scopeContextFactory)
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, scopeContextFactory)
+        {            
             if (Configured == false)
                 DatabaseContext.GiveLegacyAChance(this, logger);
         }
@@ -75,15 +72,20 @@ namespace Umbraco.Core.Persistence
         /// <param name="connectionStringName">The name of the connection string in web.config.</param>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
+        /// <param name="scopeContextFactory"></param>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-		{
+        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextFactory scopeContextFactory)
+        {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (scopeContextFactory == null) throw new ArgumentNullException(nameof(scopeContextFactory));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
 
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
+            _scopeContextFactory = scopeContextFactory;
+
+            _logger.Debug<DefaultDatabaseFactory>("Created!");
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
@@ -97,61 +99,73 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="providerName">The name of the database provider.</param>
-	    /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
+        /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="scopeContextFactory"></param>
         /// <remarks>Used in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger)
-		{
+        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextFactory scopeContextFactory)
+        {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (scopeContextFactory == null) throw new ArgumentNullException(nameof(scopeContextFactory));
 
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
+            _scopeContextFactory = scopeContextFactory;
+
+            _logger.Debug<DefaultDatabaseFactory>("Created!");
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
                 return; // not configured
 
             Configure(connectionString, providerName);
-		}
+        }
 
         public void Configure(string connectionString, string providerName)
         {
-            if (_configured) throw new InvalidOperationException("Already configured.");
+            using (new WriteLock(_lock))
+            {
+                _logger.Debug<DefaultDatabaseFactory>("Configuring!");
 
-            Mandate.ParameterNotNullOrEmpty(connectionString, nameof(connectionString));
-            Mandate.ParameterNotNullOrEmpty(providerName, nameof(providerName));
+                if (Configured) throw new InvalidOperationException("Already configured.");
 
-            _connectionString = connectionString;
-            _providerName = providerName;
+                Mandate.ParameterNotNullOrEmpty(connectionString, nameof(connectionString));
+                Mandate.ParameterNotNullOrEmpty(providerName, nameof(providerName));
 
-            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
-            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
+                _connectionString = connectionString;
+                _providerName = providerName;
 
-            _dbProviderFactory = DbProviderFactories.GetFactory(_providerName);
-            if (_dbProviderFactory == null)
-                throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
-            _databaseType = DatabaseType.Resolve(_dbProviderFactory.GetType().Name, _providerName);
-            if (_databaseType == null)
-                throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
+                _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
+                _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
 
-            _sqlSyntax = GetSqlSyntaxProvider(_providerName);
-            if (_sqlSyntax == null)
-                throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
+                _dbProviderFactory = DbProviderFactories.GetFactory(_providerName);
+                if (_dbProviderFactory == null)
+                    throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
+                _databaseType = DatabaseType.Resolve(_dbProviderFactory.GetType().Name, _providerName);
+                if (_databaseType == null)
+                    throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
 
-            // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
-            // so that everything NPoco is properly cached for the lifetime of the application
-            var mappers = new MapperCollection { new PocoMapper() };
-            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
-            _pocoDataFactory = factory;
-            var config = new FluentConfig(xmappers => factory);
+                _sqlSyntax = GetSqlSyntaxProvider(_providerName);
+                if (_sqlSyntax == null)
+                    throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
 
-            // create the database factory
-            _databaseFactory = DatabaseFactory.Config(x => x
-                .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                .WithFluentConfig(config)); // with proper configuration
+                // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
+                // so that everything NPoco is properly cached for the lifetime of the application
+                var mappers = new MapperCollection { new PocoMapper() };
+                var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+                _pocoDataFactory = factory;
+                var config = new FluentConfig(xmappers => factory);
 
-            _nonHttpInstance = new Lazy<UmbracoDatabase>(() => (UmbracoDatabase) _databaseFactory.GetDatabase());
-            _configured = true;
+                // create the database factory
+                _databaseFactory = DatabaseFactory.Config(x => x
+                    .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
+                    .WithFluentConfig(config)); // with proper configuration
+
+                if (_databaseFactory == null) throw new NullReferenceException("The call to DatabaseFactory.Config yielded a null DatabaseFactory instance");
+                
+                _logger.Debug<DefaultDatabaseFactory>("Created _nonHttpInstance");
+                Configured = true;
+            }
         }
 
         // gets the sql syntax provider that corresponds, from attribute
@@ -174,19 +188,22 @@ namespace Umbraco.Core.Persistence
         /// Gets a value indicating whether it is possible to connect to the database.
         /// </summary>
         /// <returns></returns>
-        public bool CanConnect => _configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
+        public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
         private void EnsureConfigured()
         {
-            if (_configured == false)
-                throw new InvalidOperationException("Not configured.");
+            using (new ReadLock(_lock))
+            {
+                if (Configured == false)
+                    throw new InvalidOperationException("Not configured.");
+            }
         }
 
         // method used by NPoco's DatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
-	    {
-	        return new UmbracoDatabase(_connectionString, _sqlSyntax, _databaseType, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
-	    }
+        {
+            return new UmbracoDatabase(_connectionString, _sqlSyntax, _databaseType, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
+        }
 
         /// <summary>
         /// Gets (creates or retrieves) the "ambient" database connection.
@@ -196,43 +213,29 @@ namespace Umbraco.Core.Persistence
         {
             EnsureConfigured();
 
-			// no http context, create the thread-static singleton object
-			if (HttpContext.Current == null)
-			{
-			    return _nonHttpInstance.Value;
-			}
+            var scope = _scopeContextFactory.GetContext();            
 
-			// we have an http context, so only create one per request
-		    var db = HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] as UmbracoDatabase;
-		    if (db == null) HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] = db = (UmbracoDatabase) _databaseFactory.GetDatabase();
-		    return db;
-		}
-
-		protected override void DisposeResources()
-		{
+            // check if it's in scope
+            var db = scope.GetData(HttpItemKey) as UmbracoDatabase;
+            if (db != null) return db;
+            db = (UmbracoDatabase) _databaseFactory.GetDatabase();
+            scope.SetData(HttpItemKey, db);
+            return db;
+        }
+        
+        protected override void DisposeResources()
+        {
             // this is weird, because _nonHttpInstance is thread-static, so we would need
             // to dispose the factory in each thread where a database has been used - else
             // it only disposes the current thread's database instance.
             //
             // besides, we don't really want to dispose the factory, which is a singleton...
-
-		    UmbracoDatabase db = null;
-
-			if (HttpContext.Current == null)
-		    {
-                if (_nonHttpInstance.IsValueCreated)
-                {
-                    db = _nonHttpInstance.Value;
-	    	        _nonHttpInstance = null;
-                }
-		    }
-		    else
-		    {
-		        db = HttpContext.Current.Items[typeof(DefaultDatabaseFactory)] as UmbracoDatabase;
-		        HttpContext.Current.Items[typeof (DefaultDatabaseFactory)] = null;
-		    }
-
-		    db?.Dispose();
-		}
-	}
+            
+            var scope = _scopeContextFactory.GetContext();
+            var db = scope.GetData(HttpItemKey) as UmbracoDatabase;
+            scope.ClearData(HttpItemKey);            
+            db?.Dispose();
+            Configured = false;
+        }
+    }
 }

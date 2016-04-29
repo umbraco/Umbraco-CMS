@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <see cref="DefaultDatabaseFactory"/> with the default connection name, and default sql syntax providers.</para>
         /// </remarks>
         internal NPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger))
+            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextFactory()))
         { }
 
         // this should NOT be here, all tests should supply the appropriate providers,
