@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Web.Http;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.HealthCheck
@@ -57,6 +58,7 @@ namespace Umbraco.Web.HealthCheck
             return check.GetStatus();
         }
 
+        [HttpPost]
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
             var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == action.HealthCheckId);

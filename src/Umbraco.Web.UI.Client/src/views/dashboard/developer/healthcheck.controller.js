@@ -1,9 +1,9 @@
-function healthCheckController($scope, healtCheckService) {
+function healthCheckController($scope, healthCheckService) {
 	
 	$scope.groups = [];
 	
 	// Get a (grouped) list of all health checks
-	healtCheckService.getAllChecks().then(
+	healthCheckService.getAllChecks().then(
 		function(response) {
 			$scope.groups = response;	
 		}
@@ -13,10 +13,24 @@ function healthCheckController($scope, healtCheckService) {
 	$scope.getStatus = function(check) {
 		check.loading = true;
 		check.status = null;
-		healtCheckService.getStatus(check.id).then(function(response) {
+		healthCheckService.getStatus(check.id).then(function(response) {
 			check.loading = false;
 			check.status = response;
 		});
+	};
+
+	$scope.executeAction = function(check, status, action) {
+		healthCheckService.executeAction(action).then(function (response) {
+		});
+	};
+
+	$scope.checkAllInGroup = function(checks) {
+	    angular.forEach(checks, function(check) {
+	        healthCheckService.getStatus(check.id).then(function(response) {
+	            check.loading = false;
+	            check.status = response;
+	        });
+	    });
 	};
 
 }

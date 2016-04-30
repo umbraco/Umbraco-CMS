@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Net;
 using System.Web;
+using System.Web.Configuration;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -12,7 +13,7 @@ namespace Umbraco.Web.HealthCheck
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
         "HTTPS Configuration",
-        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct",
+        Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.",
         Group = "Security")]
     public class HttpsCheck : HealthCheck
     {
@@ -45,6 +46,8 @@ namespace Umbraco.Web.HealthCheck
                     return CheckHttpsConfigurationSetting();
                 case "checkIfCurrentSchemeIsHttps":
                     return CheckIfCurrentSchemeIsHttps();
+                case "fixHttpsSetting":
+                    return FixHttpsSetting();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -55,7 +58,7 @@ namespace Umbraco.Web.HealthCheck
             var message = string.Empty;
             var success = false;
             var url = HttpContext.Current.Request.Url;
-            
+
             // Attempt to access the site over HTTPS to see if it HTTPS is supported 
             // and a valid certificate has been configured
             using (var webClient = new WebClient())
@@ -97,9 +100,9 @@ namespace Umbraco.Web.HealthCheck
         {
             var uri = HttpContext.Current.Request.Url;
             var success = uri.Scheme == "https";
-            
+
             var actions = new List<HealthCheckAction>();
-            
+
             return
                 new HealthCheckStatus(string.Format("You are currently {0} viewing the site using the HTTPS scheme.", success ? string.Empty : "not"))
                 {
@@ -116,6 +119,8 @@ namespace Umbraco.Web.HealthCheck
                 bool.TryParse(httpsAppSetting, out httpsSettingEnabled);
 
             var actions = new List<HealthCheckAction>();
+            if (httpsSettingEnabled == false)
+                actions.Add(new HealthCheckAction("fixHttpsSetting", Id) { Name = "Enable HTTPS", Description = "Sets umbracoSSL setting to true in the appSettings of the web.config file." });
 
             return
                 new HealthCheckStatus(
@@ -126,6 +131,22 @@ namespace Umbraco.Web.HealthCheck
                     ResultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error,
                     Actions = actions
                 };
+        }
+
+        private HealthCheckStatus FixHttpsSetting()
+        {
+            var httpsAppSetting = ConfigurationManager.AppSettings["umbracoUseSSL"];
+            var webConfig = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+
+            if (httpsAppSetting != null)
+                webConfig.AppSettings.Settings.Remove("umbracoUseSSL");
+            webConfig.AppSettings.Settings.Add("umbracoUseSSL", "true");
+            webConfig.Save(ConfigurationSaveMode.Minimal);
+
+            return new HealthCheckStatus("The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.")
+            {
+                ResultType = StatusResultType.Success
+            };
         }
     }
 }

@@ -47,5 +47,23 @@ namespace Umbraco.Web.HealthCheck
         /// </summary>
         [DataMember(Name = "actionParameters")]
         public Dictionary<string, object> ActionParameters { get; set; }
+
+
+        /// <summary>
+        /// The name of the action - this is used to name the fix button
+        /// </summary>
+        [DataMember(Name = "name")]
+        private string _name = "Rectify";
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        /// <summary>
+        /// The description of the action - this is used to give a description before executing the action
+        /// </summary>
+        [DataMember(Name = "description")]
+        public string Description { get; set; }
     }
 }

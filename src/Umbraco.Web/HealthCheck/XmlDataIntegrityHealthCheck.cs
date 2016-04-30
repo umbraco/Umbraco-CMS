@@ -73,14 +73,15 @@ namespace Umbraco.Web.HealthCheck
                 .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
             var totalXml = _database.ExecuteScalar<int>(subQuery);
+            
+            var actions = new List<HealthCheckAction>();
+            if(totalXml != total)
+                actions.Add(new HealthCheckAction("checkMembersXmlTable", Id));
 
             return new HealthCheckStatus(string.Format("Total XML: {0}, Total: {1}", totalXml, total))
             {
                 ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
-                Actions = new[]
-                {
-                    new HealthCheckAction("checkMembersXmlTable", Id)
-                }
+                Actions = actions
             };
         }
 
@@ -95,14 +96,15 @@ namespace Umbraco.Web.HealthCheck
                 .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
             var totalXml = _database.ExecuteScalar<int>(subQuery);
+            
+            var actions = new List<HealthCheckAction>();
+            if (totalXml != total)
+                actions.Add(new HealthCheckAction("checkMediaXmlTable", Id));
 
             return new HealthCheckStatus(string.Format("Total XML: {0}, Total: {1}", totalXml, total))
             {
                 ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
-                Actions = new[]
-                {
-                    new HealthCheckAction("checkMediaXmlTable", Id)
-                }
+                Actions = actions
             };
         }
 
@@ -116,13 +118,14 @@ namespace Umbraco.Web.HealthCheck
                 .On<DocumentDto, ContentXmlDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId);
             var totalXml = _database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
 
+            var actions = new List<HealthCheckAction>();
+            if (totalXml != total)
+                actions.Add(new HealthCheckAction("checkContentXmlTable", Id));
+
             return new HealthCheckStatus(string.Format("Total XML: {0}, Total Published: {1}", totalXml, total))
             {
                 ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
-                Actions = new[]
-                {
-                    new HealthCheckAction("checkContentXmlTable", Id)
-                }
+                Actions = actions
             };
         }
     }
