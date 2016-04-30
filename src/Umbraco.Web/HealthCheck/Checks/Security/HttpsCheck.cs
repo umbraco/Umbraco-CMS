@@ -5,7 +5,7 @@ using System.Net;
 using System.Web;
 using System.Web.Configuration;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     /// <summary>
     /// Checks Umbraco backoffice users against the HaveIBeenPwned database to check if they've been breached
