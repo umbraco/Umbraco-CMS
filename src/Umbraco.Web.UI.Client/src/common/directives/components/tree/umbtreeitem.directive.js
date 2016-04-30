@@ -34,7 +34,7 @@ angular.module("umbraco.directives")
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
-        template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(node, $event)">' +
+        template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
@@ -72,14 +72,13 @@ angular.module("umbraco.directives")
                     //set the padding
                     .css("padding-left", (node.level * 20) + "px");
 
-                //remove first 'ins' if there is no children
-                //show/hide last 'ins' depending on children
+                //toggle visibility of last 'ins' depending on children
+                //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
                 if (!node.hasChildren) {
-                    element.find("ins:first").remove();
-                    element.find("ins").last().hide();
+                    element.find("ins").last().css("visibility", "hidden");
                 }
                 else {
-                    element.find("ins").last().show();
+                    element.find("ins").last().css("visibility", "visible");
                 }
 
                 var icon = element.find("i:first");

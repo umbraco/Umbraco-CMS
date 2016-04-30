@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IMediaRepository : IRepositoryVersionable<int, IMedia>, IRecycleBinRepository<IMedia>, IDeleteMediaFilesRepository
     {
-        
+
         /// <summary>
         /// Used to add/update published xml for the media item
         /// </summary>
@@ -33,9 +33,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
     }
 }

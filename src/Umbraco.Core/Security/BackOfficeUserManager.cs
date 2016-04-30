@@ -118,6 +118,8 @@ namespace Umbraco.Core.Security
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
 
+            manager.EmailService = new EmailService();
+
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
@@ -132,7 +134,6 @@ namespace Umbraco.Core.Security
             //    BodyFormat = "Your security code is: {0}"
             //});
 
-            //manager.EmailService = new EmailService();
             //manager.SmsService = new SmsService();            
         }
 

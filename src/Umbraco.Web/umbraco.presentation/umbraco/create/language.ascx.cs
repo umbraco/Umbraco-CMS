@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.create.controls
                 Cultures.SelectedValue);
 
             BasePage.Current.ClientTools
-                .ChildNodeCreated()
+                .ReloadActionNode(false, true)
                 .CloseModalWindow();
         }
 

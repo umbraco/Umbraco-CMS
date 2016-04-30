@@ -25,6 +25,8 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    using SqlSyntax;
+
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
@@ -61,11 +63,11 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void DeleteVersion(Guid versionId)
         {
             var dto = Database.FirstOrDefault<ContentVersionDto>("WHERE versionId = @VersionId", new { VersionId = versionId });
-            if(dto == null) return;
+            if (dto == null) return;
 
             //Ensure that the lastest version is not deleted
             var latestVersionDto = Database.FirstOrDefault<ContentVersionDto>("WHERE ContentId = @Id ORDER BY VersionDate DESC", new { Id = dto.NodeId });
-            if(latestVersionDto.VersionId == dto.VersionId)
+            if (latestVersionDto.VersionId == dto.VersionId)
                 return;
 
             using (var transaction = Database.GetTransaction())
@@ -83,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list =
                 Database.Fetch<ContentVersionDto>(
                     "WHERE versionId <> @VersionId AND (ContentId = @Id AND VersionDate < @VersionDate)",
-                    new {VersionId = latestVersionDto.VersionId, Id = id, VersionDate = versionDate});
+                    new { VersionId = latestVersionDto.VersionId, Id = id, VersionDate = versionDate });
             if (list.Any() == false) return;
 
             using (var transaction = Database.GetTransaction())
@@ -244,25 +246,68 @@ namespace Umbraco.Core.Persistence.Repositories
             return filteredSql;
         }
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField)
         {
+
             //copy to var so that the original isn't changed
             var sortedSql = new Sql(sql.SQL, sql.Arguments);
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
+
+            if (orderBySystemField)
             {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                if (orderDirection == Direction.Ascending)
+                // Apply order according to parameters
+                if (string.IsNullOrEmpty(orderBy) == false)
                 {
-                    sortedSql.OrderBy(orderByParams);
+                    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                    if (orderDirection == Direction.Ascending)
+                    {
+                        sortedSql.OrderBy(orderByParams);
+                    }
+                    else
+                    {
+                        sortedSql.OrderByDescending(orderByParams);
+                    }
                 }
-                else
-                {
-                    sortedSql.OrderByDescending(orderByParams);
-                }
-                return sortedSql;
             }
+            else
+            {
+                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+                // from most recent content version for the given order by field
+                var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
+                var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
+                var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar");
+                var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+
+                var innerJoinTempTable = string.Format(@"INNER JOIN (
+                 	                SELECT CASE
+                 		                WHEN dataInt Is Not Null THEN {0}
+                                        WHEN dataDecimal Is Not Null THEN {1}
+                                        WHEN dataDate Is Not Null THEN {2}
+                                        ELSE {3}
+                 	                END AS CustomPropVal,
+                                    cd.nodeId AS CustomPropValContentId
+                 	                FROM cmsDocument cd
+                                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
+                                    INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
+                			        WHERE cpt.Alias = @{4} AND cd.newest = 1) AS CustomPropData
+                                    ON CustomPropData.CustomPropValContentId = umbracoNode.id
+                ", sortedInt, sortedDecimal, sortedDate, sortedString, sortedSql.Arguments.Length);
+
+                //insert this just above the LEFT OUTER JOIN
+                var newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);
+                var newArgs = sortedSql.Arguments.ToList();
+                newArgs.Add(orderBy);
+
+                sortedSql = new Sql(newSql, newArgs.ToArray());
+
+                sortedSql.OrderBy("CustomPropData.CustomPropVal");
+                if (orderDirection == Direction.Descending)
+                {
+                    sortedSql.Append(" DESC");
+                }                
+            }
+
             return sortedSql;
+            
         }
 
         /// <summary>
@@ -279,13 +324,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="processQuery">A callback to process the query result</param>
         /// <param name="orderBy">The order by column</param>
         /// <param name="orderDirection">The order direction.</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
-            string orderBy, 
+            string orderBy,
             Direction orderDirection,
+            bool orderBySystemField,
             Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
         {
@@ -297,18 +344,18 @@ namespace Umbraco.Core.Persistence.Repositories
             if (query == null) query = new Query<TEntity>();
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
-            
+
             // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
             // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
             // So we'll modify the SQL.
             var sqlNodeIds = new Sql(
-                sqlQuery.SQL.Replace("SELECT *", string.Format("SELECT {0}.{1}",nodeIdSelect.Item1, nodeIdSelect.Item2)), 
+                sqlQuery.SQL.Replace("SELECT *", string.Format("SELECT {0}.{1}", nodeIdSelect.Item1, nodeIdSelect.Item2)),
                 sqlQuery.Arguments);
-            
+
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
-                orderDirection, orderBy);
+                orderDirection, orderBy, orderBySystemField);
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -324,7 +371,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
-                
+
                 //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId                
                 sqlStringPage = sqlStringPage
                     .Replace("SELECT *",
@@ -333,7 +380,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         "SELECT " + nodeIdSelect.Item2);
 
                 //We need to make this an inner join on the paged query
-                var splitQuery = sqlQuery.SQL.Split(new[] {"WHERE "}, StringSplitOptions.None);
+                var splitQuery = sqlQuery.SQL.Split(new[] { "WHERE " }, StringSplitOptions.None);
                 var withInnerJoinSql = new Sql(splitQuery[0])
                     .Append("INNER JOIN (")
                     //join the paged query with the paged query arguments
@@ -345,23 +392,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
-                    GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),                     
-                    orderDirection, orderBy);
-                
-                var content = processQuery(fullQuery)
-                    .Cast<TContentBase>()
-                    .AsQueryable();
-
-                // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-                if (orderDirection == Direction.Ascending)
-                {
-                    result = content.OrderBy(orderByProperty);
-                }
-                else
-                {
-                    result = content.OrderByDescending(orderByProperty);
-                }
+                    GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),
+                    orderDirection, orderBy, orderBySystemField);
+                return processQuery(fullQuery);
             }
             else
             {
@@ -394,9 +427,9 @@ INNER JOIN
 	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
 LEFT OUTER JOIN cmsDataTypePreValues
-ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments); 
+ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments);
 
-            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql); 
+            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql);
 
             //This is a lazy access call to get all prevalue data for the data types that make up all of these properties which we use
             // below if any property requires tag support
@@ -414,7 +447,7 @@ WHERE EXISTS(
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 
-                return Database.Fetch<DataTypePreValueDto>(preValsSql); 
+                return Database.Fetch<DataTypePreValueDto>(preValsSql);
             });
 
             var result = new Dictionary<int, PropertyCollection>();
@@ -432,8 +465,8 @@ WHERE EXISTS(
                     var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
                     var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();                    
-                    
+                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();
+
                     var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
 
                     foreach (var property in newProperties)
@@ -481,7 +514,7 @@ WHERE EXISTS(
                         Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
                     }
                     result[def.Id] = new PropertyCollection(properties);
-                }                
+                }
             }
 
             return result;
@@ -521,6 +554,9 @@ WHERE EXISTS(
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
+                // Members only
+                case "USERNAME":
+                    return "cmsMember.LoginName";
                 default:
                     //ensure invalid SQL cannot be submitted
                     return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
