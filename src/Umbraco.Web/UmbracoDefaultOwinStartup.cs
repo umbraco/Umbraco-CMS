@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -59,12 +60,24 @@ namespace Umbraco.Web
             app
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize);
+                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize)
+                .FinalizeMiddlewareConfiguration();
         }
+
+        /// <summary>
+        /// Raised when the middelware has been configured
+        /// </summary>
+        public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;
 
         protected virtual ApplicationContext ApplicationContext
         {
             get { return ApplicationContext.Current; }
+        }
+
+        internal static void OnMiddlewareConfigured(OwinMiddlewareConfiguredEventArgs args)
+        {
+            var handler = MiddlewareConfigured;
+            if (handler != null) handler(null, args);
         }
     }
 }

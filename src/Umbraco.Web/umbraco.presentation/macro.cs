@@ -1589,7 +1589,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.DebugDuration<macro>(string.Format("{0}", message)))
                 {
                 }
             }
