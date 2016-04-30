@@ -19,9 +19,12 @@ function healthCheckController($scope, healthCheckService) {
 		});
 	};
 
-	$scope.executeAction = function(check, status, action) {
-		healthCheckService.executeAction(action).then(function (response) {
-		});
+	$scope.executeAction = function (check, status, action) {
+	    check.status = null;
+	    check.rectify = "Loading result of '" + action.name + "'...";
+	    healthCheckService.executeAction(action).then(function (response) {
+	        check.rectify = response.message;
+	    });
 	};
 
 	$scope.checkAllInGroup = function(checks) {

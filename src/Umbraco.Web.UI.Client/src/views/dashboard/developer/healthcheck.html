@@ -20,7 +20,7 @@
                         </div>
 
                         <span ng-if="check.loading">Loading status...</span>
-
+                        
                         <div ng-if="check.status">
                             <div ng-repeat="status in check.status" class="check-status">
                                 <i class="icon icon-check color-green" ng-if="status.resultType == 0"></i>
@@ -34,6 +34,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <span ng-bind="check.rectify"></span>
                     </td>
                 </tr>
                 </tbody>
