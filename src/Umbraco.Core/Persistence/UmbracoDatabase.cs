@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 
@@ -128,15 +129,25 @@ namespace Umbraco.Core.Persistence
             // if no timeout is specified, and the connection has a longer timeout, use it
             if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
+
+            if (EnableSqlTrace)
+            {
+                var sb = new StringBuilder();
+                sb.Append(cmd.CommandText);
+                foreach (DbParameter p in cmd.Parameters)
+                {
+                    sb.Append(" - ");
+                    sb.Append(p.Value);
+                }
+                
+                _logger.Debug<UmbracoDatabase>(sb.ToString());
+            }
+
             base.OnExecutingCommand(cmd);
         }
 
         public override void OnExecutedCommand(IDbCommand cmd)
         {
-            if (EnableSqlTrace)
-            {
-                _logger.Debug<UmbracoDatabase>(cmd.CommandText);
-            }
             if (_enableCount)
             {
                 SqlCount++;

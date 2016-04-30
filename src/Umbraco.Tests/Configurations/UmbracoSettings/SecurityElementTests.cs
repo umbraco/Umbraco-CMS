@@ -11,16 +11,25 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Security.KeepUserLoggedIn == true);
         }
+
         [Test]
         public void HideDisabledUsersInBackoffice()
         {
             Assert.IsTrue(SettingsSection.Security.HideDisabledUsersInBackoffice == false);
         }
+
+        [Test]
+        public void AllowPasswordReset()
+        {
+            Assert.IsTrue(SettingsSection.Security.AllowPasswordReset == true);
+        }
+
         [Test]
         public void AuthCookieDomain()
         {
             Assert.IsTrue(SettingsSection.Security.AuthCookieDomain == null);
         }
+
         [Test]
         public void AuthCookieName()
         {
