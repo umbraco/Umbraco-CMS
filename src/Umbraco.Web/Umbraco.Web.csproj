@@ -318,6 +318,7 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="HealthCheck\CustomErrorsModeHealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckAction.cs" />
     <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckContext.cs" />
