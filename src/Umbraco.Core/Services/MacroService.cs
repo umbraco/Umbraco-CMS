@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 var q = repository.Query.Where(macro => macro.Alias == alias);
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 return repository.GetAll(ids);
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Services
 
         public IMacro GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 return repository.Get(id);
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
 			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this))
 				return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.Delete(macro);
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
 	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
 				return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.AddOrUpdate(macro);
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));

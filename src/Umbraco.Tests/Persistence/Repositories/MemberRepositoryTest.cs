@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Rebuild_All_Xml_Structures_For_Content_Type()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Get_Member_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Members_By_Ids()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Get_All_Members()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Persist_Member()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void New_Member_Has_Built_In_Properties_By_Default()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             IMember sut;
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             IMember sut;
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -348,7 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;
@@ -372,7 +372,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IMemberType CreateTestMemberType(string alias = null)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
                 MemberGroupRepository memberGroupRepository;

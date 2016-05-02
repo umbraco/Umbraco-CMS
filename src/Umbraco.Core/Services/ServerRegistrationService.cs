@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 repo.WriteLockServers();
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Services
 
             // because the repository caches "all" and has queries disabled...
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 repo.WriteLockServers();
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 repo.WriteLockServers();
@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
             // this raises a good number of questions, including whether caching anything in
             // repositories works at all in a LB environment - TODO: figure it out
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {                
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 repo.ReadLockServers();

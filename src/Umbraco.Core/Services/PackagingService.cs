@@ -782,7 +782,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = repository.Query.Where(x => x.Alias == contentTypeAlias);

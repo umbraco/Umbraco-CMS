@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Move()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
 
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
 
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Container_Containing_Media_Types()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -288,7 +288,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -357,7 +357,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -374,7 +374,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -402,7 +402,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 

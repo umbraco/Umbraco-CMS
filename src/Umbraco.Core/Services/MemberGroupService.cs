@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.GetAll();
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.Get(id);
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 return repository.GetByName(name);
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.AddOrUpdate(memberGroup);
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Services
             if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
                 return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.Delete(memberGroup);

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberType> GetAll(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberTypeRepository>();
                 return repository.GetAll(ids);
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberTypeRepository>();
                 return repository.Get(id);
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberTypeRepository>();
                 return repository.Get(key);
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMemberType"/></returns>
         public IMemberType Get(string alias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberTypeRepository>();
                 return repository.Get(alias);
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMemberTypeRepository>();
                     memberType.CreatorId = userId;
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMemberTypeRepository>();
                     foreach (var memberType in asArray)
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services
             {
                 _memberService.DeleteMembersOfType(memberType.Id);
 
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMemberTypeRepository>();
                     repository.Delete(memberType);
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services
                     _memberService.DeleteMembersOfType(contentType.Id);
                 }
 
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMemberTypeRepository>();
                     foreach (var memberType in asArray)

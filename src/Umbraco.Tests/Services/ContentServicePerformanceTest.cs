@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);

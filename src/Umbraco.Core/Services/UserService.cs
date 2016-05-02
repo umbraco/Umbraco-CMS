@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
         /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
 
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
         /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 return repository.Exists(username);
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
             //TODO: PUT lock here!!
 
             User user;
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var loginExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = username }) != 0;
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var user = repository.Get((int)id);
@@ -206,7 +206,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByEmail(string email)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var query = repository.Query.Where(x => x.Email.Equals(email));
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByUsername(string username)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var query = repository.Query.Where(x => x.Username.Equals(username));
@@ -294,7 +294,7 @@ namespace Umbraco.Core.Services
                 if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
                     return;
 
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IUserRepository>();
                     repository.Delete(user);
@@ -319,7 +319,7 @@ namespace Umbraco.Core.Services
                     return;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 repository.AddOrUpdate(entity);
@@ -355,7 +355,7 @@ namespace Umbraco.Core.Services
                     return;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 foreach (var member in entities)
@@ -381,7 +381,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var query = repository.Query;
@@ -422,7 +422,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var query = repository.Query;
@@ -464,7 +464,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="System.int"/> with number of Users for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 IQuery<IUser> query;
@@ -508,7 +508,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IUser> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
@@ -548,7 +548,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetUserById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 return repository.Get(id);
@@ -564,7 +564,7 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 repository.ReplaceUserPermissions(userId, permissions, entityIds);
@@ -579,7 +579,7 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         public void AssignUserPermission(int userId, char permission, params int[] entityIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 repository.AssignUserPermission(userId, permission, entityIds);
@@ -593,7 +593,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUserType"/></returns>
         public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 return repository.GetAll(ids);
@@ -607,7 +607,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeByAlias(string alias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Alias == alias);
@@ -623,7 +623,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 return repository.Get(id);                
@@ -637,7 +637,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 var query = repository.QueryFactory.Create<IUserType>().Where(x => x.Name == name);
@@ -660,7 +660,7 @@ namespace Umbraco.Core.Services
                     return;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 repository.AddOrUpdate(userType);
@@ -680,7 +680,7 @@ namespace Umbraco.Core.Services
             if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
                 return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 repository.Delete(userType);
@@ -697,7 +697,7 @@ namespace Umbraco.Core.Services
         /// <param name="sectionAlias">Alias of the section to remove</param>
         public void DeleteSectionFromAllUsers(string sectionAlias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var assignedUsers = repository.GetUsersAssignedToSection(sectionAlias);
@@ -719,7 +719,7 @@ namespace Umbraco.Core.Services
         /// <param name="userIds">Specifiying nothing will add the section to all user</param>
         public void AddSectionToAllUsers(string sectionAlias, params int[] userIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 IEnumerable<IUser> users;
@@ -750,7 +750,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);

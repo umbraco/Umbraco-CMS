@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string domainName)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
                 return repo.Exists(domainName);
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
                 repository.Delete(domain);
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
                 return repository.GetByName(name);
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
                 return repo.Get(id);
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
                 return repo.GetAll(includeWildcards);
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
                 return repo.GetAssignedDomains(contentId, includeWildcards);
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
                 repository.AddOrUpdate(domainEntity);

@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 20);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(true, 5);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 5, -21);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(true, 5);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 

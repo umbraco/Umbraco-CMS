@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
                 return media;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 media.CreatorId = userId;
@@ -210,7 +210,7 @@ namespace Umbraco.Core.Services
                 return media;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 media.CreatorId = userId;
@@ -238,7 +238,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.Get(id);
@@ -247,7 +247,7 @@ namespace Umbraco.Core.Services
 
         public int Count(string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.Count(contentTypeAlias);
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Services
 
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.CountChildren(parentId, contentTypeAlias);
@@ -265,7 +265,7 @@ namespace Umbraco.Core.Services
 
         public int CountDescendants(int parentId, string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.CountDescendants(parentId, contentTypeAlias);
@@ -281,7 +281,7 @@ namespace Umbraco.Core.Services
         {
             if (ids.Any() == false) return Enumerable.Empty<IMedia>();
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.GetAll(ids.ToArray());
@@ -295,7 +295,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.Key == key);
@@ -311,7 +311,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetByLevel(int level)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.Level == level && !x.Path.StartsWith("-21"));
@@ -328,7 +328,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMedia"/> item</returns>
         public IMedia GetByVersion(Guid versionId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.GetByVersion(versionId);
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetVersions(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var versions = repository.GetAllVersions(id);
@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services
             if (ids.Any() == false)
                 return new List<IMedia>();
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 return repository.GetAll(ids);
@@ -386,7 +386,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetChildren(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id);
@@ -430,7 +430,7 @@ namespace Umbraco.Core.Services
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query;
@@ -474,7 +474,7 @@ namespace Umbraco.Core.Services
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
 
@@ -512,7 +512,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetDescendants(IMedia media)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var pathMatch = media.Path + ",";
@@ -554,7 +554,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaOfMediaType(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.ContentTypeId == id);
@@ -570,7 +570,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetRootMedia()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.ParentId == -1);
@@ -586,7 +586,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaInRecycleBin()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.Path.Contains("-21"));
@@ -603,7 +603,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetMediaByPath(string mediaPath)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IMediaRepository>();
                 return repo.GetMediaByPath(mediaPath);
@@ -617,7 +617,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if the media has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id);
@@ -727,7 +727,7 @@ namespace Umbraco.Core.Services
                 Delete(child, userId);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.Delete(media);
@@ -766,7 +766,7 @@ namespace Umbraco.Core.Services
 
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 media.CreatorId = userId;
@@ -809,7 +809,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 foreach (var media in asArray)
@@ -847,7 +847,7 @@ namespace Umbraco.Core.Services
                 bool success;
                 var nodeObjectType = new Guid(Constants.ObjectTypes.Media);
 
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMediaRepository>();
                     //Create a dictionary of ids -> dictionary of property aliases + values
@@ -884,7 +884,7 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IMediaRepository>();
                     //NOTE What about media that has the contenttype as part of its composition?
@@ -945,7 +945,7 @@ namespace Umbraco.Core.Services
             //Find Descendants, which will be moved to the recycle bin along with the parent/grandparent.
             var descendants = GetDescendants(media).OrderBy(x => x.Level).ToList();
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 //TODO: This should be part of the repo!
@@ -1006,7 +1006,7 @@ namespace Umbraco.Core.Services
             if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
                 return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.DeleteVersions(id, versionDate);
@@ -1036,7 +1036,7 @@ namespace Umbraco.Core.Services
                 DeleteVersions(id, content.UpdateDate, userId);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.DeleteVersion(versionId);
@@ -1087,7 +1087,7 @@ namespace Umbraco.Core.Services
                     return false;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 int i = 0;
@@ -1133,7 +1133,7 @@ namespace Umbraco.Core.Services
         /// </param>
         public void RebuildXmlStructures(params int[] contentTypeIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.RebuildXmlStructures(
@@ -1190,7 +1190,7 @@ namespace Umbraco.Core.Services
         {
             Mandate.ParameterNotNullOrEmpty(mediaTypeAlias, "mediaTypeAlias");
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMediaTypeRepository>();
                 var query = repository.QueryFactory.Create<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
@@ -1212,7 +1212,7 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));

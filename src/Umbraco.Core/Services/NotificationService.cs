@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 return repository.GetUserNotifications(user);
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 return repository.GetEntityNotifications(entity);
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IEntity entity)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 repository.DeleteNotifications(entity);
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Services
         /// <param name="user"></param>
         public void DeleteNotifications(IUser user)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 repository.DeleteNotifications(user);
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IUser user, IEntity entity)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 repository.DeleteNotifications(user, entity);
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 return repository.SetNotifications(user, entity, actions);
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
                 return repository.CreateNotification(user, entity, action);

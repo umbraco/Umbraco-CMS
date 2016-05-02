@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 unitOfWork.Database.EnableSqlTrace = true;
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 unitOfWork.Database.EnableSqlTrace = true;
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -245,7 +245,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = CreateTestData(3).ToArray();
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
 
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IEnumerable<IContent> CreateTestData(int count)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository ctRepo;
                 var repo = CreateRepository(unitOfWork, out ctRepo);

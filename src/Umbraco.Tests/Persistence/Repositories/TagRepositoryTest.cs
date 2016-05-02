@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
 
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Append_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -173,7 +173,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Replace_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Merge_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Clear_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -294,7 +294,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Remove_Specific_Tags_From_Property()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -339,7 +339,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Content_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -384,7 +384,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Content_By_Key()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -430,7 +430,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -466,7 +466,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All_With_Ids()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -507,7 +507,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Content_For_Group()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -552,7 +552,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Property_By_Id()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -598,7 +598,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Property_By_Key()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -643,7 +643,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Property_For_Group()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -689,7 +689,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Entity_Type()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
@@ -748,7 +748,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
@@ -802,7 +802,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cascade_Deletes_Tag_Relations()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
@@ -841,7 +841,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
@@ -926,7 +926,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Tagged_Entities_For_Tag()
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;

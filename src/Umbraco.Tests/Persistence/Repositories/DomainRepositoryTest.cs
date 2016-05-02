@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private int CreateTestData(string isoName, out ContentType ct)
         {
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId1 = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;
@@ -450,7 +450,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentId = CreateTestData("en-AU", out ct);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
                 LanguageRepository langRepo;

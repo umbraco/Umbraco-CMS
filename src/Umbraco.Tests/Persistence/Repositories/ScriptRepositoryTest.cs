@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
 
             // Act
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             // Act
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             // Act
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             // Act
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             // Act
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             // Act
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             var script = new Script("test-move-script.js") { Content = content };
@@ -226,7 +226,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // unless noted otherwise, no changes / 7.2.8
 
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
             var script = new Script("test-path-1.js") { Content = "// script" };

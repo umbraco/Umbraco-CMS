@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
                 return repo.GetAll();
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.AddOrUpdate(entry);
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.Delete(entry);

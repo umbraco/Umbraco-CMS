@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         /// <returns>A unit of work.</returns>
         /// <remarks>The unit of work will execute on the database returned by the database factory.</remarks>
-        public IDatabaseUnitOfWork GetUnitOfWork()
+        public IDatabaseUnitOfWork CreateUnitOfWork()
         {
             // get a database from the factory - might be the "ambient" database eg
             // the one that's enlisted with the HttpContext - so it's not always a

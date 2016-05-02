@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
 
             // Act
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
 
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -125,7 +125,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
 
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -145,7 +145,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -166,7 +166,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -185,7 +185,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -208,7 +208,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -231,7 +231,7 @@ p{font-size:2em;}"));
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
@@ -248,7 +248,7 @@ p{font-size:2em;}"));
             // unless noted otherwise, no changes / 7.2.8
 
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };

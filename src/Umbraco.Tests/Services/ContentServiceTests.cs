@@ -747,7 +747,7 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
+            var uow = provider.CreateUnitOfWork();
             Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
 
             // Act
@@ -758,7 +758,7 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.GetUnitOfWork();
+            uow = provider.CreateUnitOfWork();
             Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
         }
 
@@ -809,7 +809,7 @@ namespace Umbraco.Tests.Services
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");    
             }
@@ -824,7 +824,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(published);
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));    
             }
@@ -844,7 +844,7 @@ namespace Umbraco.Tests.Services
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");
             }
@@ -856,7 +856,7 @@ namespace Umbraco.Tests.Services
             contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
 
             // Assert            
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
             }
@@ -1343,7 +1343,7 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            using (var unitOfWork = provider.GetUnitOfWork())
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
@@ -1454,14 +1454,14 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
 
             contentService.Publish(content);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
@@ -1478,7 +1478,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new{nodeId = content.Id, versionId = content.Version}) != null);
             }

@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 try
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(int containerId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(Guid containerId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = ((EntityContainerRepository)repo).Get(containerId);
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 return ((EntityContainerRepository)repo).Get(name, level);
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 return repo.GetAll(containerIds);
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Services
                 return OperationStatus.Cancelled(evtMsgs);
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 repo.AddOrUpdate(container);
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionByName(string name)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 return repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 return repository.Get(id);
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = repository.Query.Where(x => x.Key == id);
@@ -235,7 +235,7 @@ namespace Umbraco.Core.Services
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = repository.Query.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
         public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 return repository.GetAll(ids);
@@ -265,7 +265,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var collection = repository.GetPreValuesCollectionByDataTypeId(id);
@@ -284,7 +284,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 return repository.GetPreValuesCollectionByDataTypeId(id);
@@ -298,7 +298,7 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 return repository.GetPreValueAsString(id);
@@ -319,7 +319,7 @@ namespace Umbraco.Core.Services
             }
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var containerRepository = uow.CreateRepository<IDataTypeContainerRepository>();
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
@@ -361,7 +361,7 @@ namespace Umbraco.Core.Services
 
             dataTypeDefinition.CreatorId = userId;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 repository.AddOrUpdate(dataTypeDefinition);
@@ -396,7 +396,7 @@ namespace Umbraco.Core.Services
                     return;
             }
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 foreach (var dataTypeDefinition in dataTypeDefinitions)
@@ -423,7 +423,7 @@ namespace Umbraco.Core.Services
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 using (var transaction = uow.Database.GetTransaction())
                 {
@@ -480,7 +480,7 @@ namespace Umbraco.Core.Services
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 repository.AddOrUpdatePreValues(dataTypeDefinition, values);
@@ -501,7 +501,7 @@ namespace Umbraco.Core.Services
 
             dataTypeDefinition.CreatorId = userId;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 repository.AddOrUpdate(dataTypeDefinition); // definition
@@ -528,7 +528,7 @@ namespace Umbraco.Core.Services
 	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
 				return;
 
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 repository.Delete(dataTypeDefinition);
@@ -542,7 +542,7 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));

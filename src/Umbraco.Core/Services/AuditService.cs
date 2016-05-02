@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, comment, type, userId));
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<AuditItem> GetLogs(int objectId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = repo.GetByQuery(repo.Query.Where(x => x.Id == objectId));
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<AuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<AuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
 
         public void CleanLogs(int maximumAgeOfLogsInMinutes)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.CleanLogs(maximumAgeOfLogsInMinutes);

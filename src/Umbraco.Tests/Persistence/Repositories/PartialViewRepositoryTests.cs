@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // unless noted otherwise, no changes / 7.2.8
 
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new PartialViewRepository(unitOfWork, _fileSystem);
 
             var partialView = new PartialView("test-path-1.cshtml") { Content = "// partialView" };

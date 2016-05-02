@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> GetAll(int userId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 return repo.GetByQuery(repo.Query.Where(x => x.UserId == userId));
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 return repo.GetByQuery(repo.Query
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
         /// <param name="logins"></param>
         public void SaveUserLogins(int userId, IEnumerable<UserLoginInfo> logins)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.SaveUserLogins(userId, logins);
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteUserLogins(int userId)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.DeleteUserLogins(userId);

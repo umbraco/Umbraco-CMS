@@ -26,7 +26,7 @@
             // careful, _repositoryFactory remains null!
         }
 
-        public IUnitOfWork GetUnitOfWork()
+        public IUnitOfWork CreateUnitOfWork()
         {
             return new FileUnitOfWork(_repositoryFactory);
         }
