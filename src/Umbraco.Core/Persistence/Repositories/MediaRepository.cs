@@ -490,17 +490,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter"></param>
-        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = null, object[] filterArgs = null)
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null)
         {
             Sql<SqlContext> filterSql = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            if (filter != null)
             {
-                filterSql = Sql().Append($"AND ({filter})", filterArgs);
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql = Sql().Append($"AND ({filterClaus.Item1})", filterClaus.Item2);
+                }
             }
-            
+
             return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos, orderBy, orderDirection, orderBySystemField,
                 filterSql);

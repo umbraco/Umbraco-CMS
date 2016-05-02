@@ -86,12 +86,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Used to create a new query instance
         /// </summary>
         /// <returns></returns>
-        public abstract Query<TEntity> Query { get; }
+        public abstract IQuery<TEntity> Query { get; }
 
         /// <summary>
         /// Returns a query factory instance
         /// </summary>
-        public abstract QueryFactory QueryFactory { get; }
+        public abstract IQueryFactory QueryFactory { get; }
 
         protected virtual TId GetEntityId(TEntity entity)
         {

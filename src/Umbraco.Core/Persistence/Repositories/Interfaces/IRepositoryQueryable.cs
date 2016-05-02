@@ -16,12 +16,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Returns a query instance
         /// </summary>
-        Query<TEntity> Query { get; }
+        IQuery<TEntity> Query { get; }
 
         /// <summary>
         /// Returns a query factory instance
         /// </summary>
-        QueryFactory QueryFactory { get; }
+        IQueryFactory QueryFactory { get; }
 
         /// <summary>
         /// Gets all entities of the specified type and query

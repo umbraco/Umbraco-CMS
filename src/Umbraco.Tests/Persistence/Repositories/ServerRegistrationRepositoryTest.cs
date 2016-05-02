@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Add_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Update_To_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_GetByQuery_On_Repository()
         //{
         //    // Arrange
-        //    var provider = new NPocoUnitOfWorkProvider(Logger);
+        //    var provider = CreateUowProvider();
         //    var unitOfWork = provider.GetUnitOfWork();
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_Count_On_Repository()
         //{
         //    // Arrange
-        //    var provider = new NPocoUnitOfWorkProvider(Logger);
+        //    var provider = CreateUowProvider();
         //    var unitOfWork = provider.GetUnitOfWork();
         //    using (var repository = CreateRepository(unitOfWork))
         //    {
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_Repository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.GetUnitOfWork())
             using (var repository = CreateRepository(unitOfWork))
             {

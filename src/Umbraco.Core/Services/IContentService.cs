@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
@@ -241,10 +242,9 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
-        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs);
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
         
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -274,7 +274,7 @@ namespace Umbraco.Core.Services
         /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, object[] filterArgs);
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
 
         /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id

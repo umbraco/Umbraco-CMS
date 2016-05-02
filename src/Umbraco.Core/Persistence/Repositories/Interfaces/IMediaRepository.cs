@@ -36,9 +36,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter"></param>
-        /// <param name="filterArgs"></param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = null, object[] filterArgs = null);
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null);
     }
 }

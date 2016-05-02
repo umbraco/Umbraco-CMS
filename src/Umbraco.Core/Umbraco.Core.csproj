@@ -435,6 +435,7 @@
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
+    <Compile Include="Persistence\Querying\IQueryFactory.cs" />
     <Compile Include="Persistence\Querying\QueryFactory.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />

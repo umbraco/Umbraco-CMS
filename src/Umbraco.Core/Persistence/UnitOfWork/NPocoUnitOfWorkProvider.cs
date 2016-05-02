@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
@@ -27,13 +28,14 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a logger.
         /// </summary>
         /// <param name="logger">A logger.</param>
+        /// <param name="mappingResolver"></param>
         /// <remarks>
         /// <para>FOR UNIT TESTS ONLY</para>
         /// <para>Creates a new <see cref="IDatabaseFactory"/> each time it is called, by initializing a new
         /// <see cref="DefaultDatabaseFactory"/> with the default connection name, and default sql syntax providers.</para>
         /// </remarks>
-        internal NPocoUnitOfWorkProvider(ILogger logger)
-            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextFactory()))
+        internal NPocoUnitOfWorkProvider(ILogger logger, IMappingResolver mappingResolver)
+            : this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextFactory(), mappingResolver))
         { }
 
         // this should NOT be here, all tests should supply the appropriate providers,

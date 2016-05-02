@@ -12,6 +12,7 @@ using Examine.Session;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 .ToArray();
             var contentService = Mock.Of<IContentService>(
                 x => x.GetPagedDescendants(
-                    It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<object[]>())
+                    It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
                     ==
                     allRecs);
 

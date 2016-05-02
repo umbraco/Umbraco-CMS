@@ -30,6 +30,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
@@ -190,21 +191,20 @@ namespace Umbraco.Web.Editors
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                string f = filter;
-                object[] fa = null;
+                IQuery<IContent> queryFilter = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    //add the default text filter
-                    f = $"cmsDocument.{DatabaseContext.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
-                    fa = new object[] { $"%{filter}%" };
+                    //add the default text filter                    
+                    queryFilter = DatabaseContext.QueryFactory.Create<IContent>()
+                        .Where(x => x.Name.Contains(filter));
                 }
-
+                
                 children = Services.ContentService
                     .GetPagedChildren(
                         id, (pageNumber - 1), pageSize, 
                         out totalChildren, 
-                        orderBy, orderDirection, orderBySystemField, 
-                        f, fa).ToArray();
+                        orderBy, orderDirection, orderBySystemField,
+                        queryFilter).ToArray();
             }
             else
             {

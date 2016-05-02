@@ -50,13 +50,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets the repository's query factory.
         /// </summary>
-        public override QueryFactory QueryFactory { get; }
+        public override IQueryFactory QueryFactory { get; }
 
         /// <summary>
         /// Creates a new query.
         /// </summary>
         /// <returns>A new query.</returns>
-        public override Query<TEntity> Query => QueryFactory.Create<TEntity>();
+        public override IQuery<TEntity> Query => QueryFactory.Create<TEntity>();
 
         /// <summary>
         /// Creates a new Sql statement.

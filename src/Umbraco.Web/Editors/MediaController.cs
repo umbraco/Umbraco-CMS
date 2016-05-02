@@ -33,6 +33,7 @@ using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.UI;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
@@ -186,13 +187,12 @@ namespace Umbraco.Web.Editors
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                string f = filter;
-                object[] fa = null;
+                IQuery<IMedia> queryFilter = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    //add the default text filter
-                    f = $"umbracoNode.{DatabaseContext.SqlSyntax.GetQuotedColumnName("text")} LIKE @0";
-                    fa = new object[] { $"%{filter}%" };
+                    //add the default text filter                    
+                    queryFilter = DatabaseContext.QueryFactory.Create<IMedia>()
+                        .Where(x => x.Name.Contains(filter));
                 }
 
                 children = Services.MediaService
@@ -200,7 +200,7 @@ namespace Umbraco.Web.Editors
                         id, (pageNumber - 1), pageSize,
                         out totalChildren,
                         orderBy, orderDirection, orderBySystemField,
-                        f, fa).ToArray();
+                        queryFilter).ToArray();
             }
             else
             {

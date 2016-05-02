@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -19,7 +20,7 @@ namespace Umbraco.Core.Persistence
         bool Configured { get; }
 
         bool CanConnect { get; }
-
-        ISqlSyntaxProvider SqlSyntax { get; }
+        
+        IQueryFactory QueryFactory { get; }
 	}
 }

@@ -20,6 +20,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Store;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
@@ -35,8 +36,8 @@ namespace UmbracoExamine
         protected IContentService ContentService { get; private set; }
         protected IMediaService MediaService { get; private set; }
         protected IUserService UserService { get; private set; }
-        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly IQueryFactory _queryFactory;
         private int? _parentId;
 
         #region Constructors
@@ -51,7 +52,7 @@ namespace UmbracoExamine
             MediaService = ApplicationContext.Current.Services.MediaService;
             UserService = ApplicationContext.Current.Services.UserService;
             _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
-            _sqlSyntax = ApplicationContext.Current.DatabaseContext.SqlSyntax;
+            _queryFactory = ApplicationContext.Current.DatabaseContext.QueryFactory;
         }
 
         public UmbracoContentIndexer(
@@ -62,10 +63,10 @@ namespace UmbracoExamine
             IContentService contentService, 
             IMediaService mediaService, 
             IUserService userService, 
-            ISqlSyntaxProvider sqlSyntax,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
+            IQueryFactory queryFactory,
             FacetConfiguration facetConfiguration = null, 
             IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null) 
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
@@ -73,10 +74,10 @@ namespace UmbracoExamine
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (mediaService == null) throw new ArgumentNullException("mediaService");
             if (userService == null) throw new ArgumentNullException("userService");
-            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             if (validator == null) throw new ArgumentNullException("validator");
             if (options == null) throw new ArgumentNullException("options");
+            if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
 
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
@@ -89,8 +90,8 @@ namespace UmbracoExamine
             ContentService = contentService;
             MediaService = mediaService;
             UserService = userService;
-            _sqlSyntax = sqlSyntax;
             _urlSegmentProviders = urlSegmentProviders;
+            _queryFactory = queryFactory;
         }
     
 
@@ -242,9 +243,9 @@ namespace UmbracoExamine
                         else
                         {
                             //add the published filter
-                            var f = $"cmsDocument.{_sqlSyntax.GetQuotedColumnName("published")}=@0";
-                            var fa = new object[] { 1 };
-                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, f, fa);
+                            var qry = _queryFactory.Create<IContent>().Where(x => x.Published == true);
+
+                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, qry);
                         }
 
                         //if specific types are declared we need to post filter them

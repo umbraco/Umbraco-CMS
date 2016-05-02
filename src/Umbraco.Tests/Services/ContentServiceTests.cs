@@ -746,7 +746,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
             bool published = contentService.Publish(content, 0);
 
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             var uow = provider.GetUnitOfWork();
             Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
 
@@ -808,7 +808,7 @@ namespace Umbraco.Tests.Services
             }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var uow = provider.GetUnitOfWork())
             {
                 uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");    
@@ -842,7 +842,7 @@ namespace Umbraco.Tests.Services
             }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants())).ToList();
             //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             
             using (var uow = provider.GetUnitOfWork())
             {
@@ -1337,7 +1337,8 @@ namespace Umbraco.Tests.Services
                 Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
                 Logger, 
-                new TestScopeContextFactory());
+                new TestScopeContextFactory(), 
+                MappingResolver);
             var provider = new NPocoUnitOfWorkProvider(databaseFactory);
             var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
@@ -1454,7 +1455,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
 
             using (var uow = provider.GetUnitOfWork())
             {
@@ -1478,7 +1479,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             
             using (var uow = provider.GetUnitOfWork())
             {

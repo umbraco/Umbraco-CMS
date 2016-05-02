@@ -11,6 +11,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -73,7 +75,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         &&
 
                         x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<object[]>())
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
                         ==
                         allRecs); 
             }
@@ -117,7 +119,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         &&
 
                         x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<object[]>())
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IMedia>>())
                         ==
                         allRecs);
             }
@@ -159,10 +161,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 contentService,
                 mediaService,
                 userService,
-                new SqlCeSyntaxProvider(), 
                 new[] { new DefaultUrlSegmentProvider() },
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-                options);
+                options,
+                Mock.Of<IQueryFactory>());
 
 			i.IndexingError += IndexingError;
 
