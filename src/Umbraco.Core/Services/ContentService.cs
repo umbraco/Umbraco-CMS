@@ -41,14 +41,13 @@ namespace Umbraco.Core.Services
 
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
-            RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IPublishingStrategy publishingStrategy,
             IDataTypeService dataTypeService,
             IUserService userService,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");

@@ -19,8 +19,8 @@ namespace Umbraco.Core.Services
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         
-        public MemberTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MemberTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
+            : base(provider, logger, eventMessagesFactory)
         {
             if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;

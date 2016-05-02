@@ -38,8 +38,8 @@ namespace Umbraco.Core.Services
         private readonly IUserService _userService;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
 
-        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MediaService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            : base(provider, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");

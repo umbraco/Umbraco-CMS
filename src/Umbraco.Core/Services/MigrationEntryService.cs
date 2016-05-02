@@ -17,8 +17,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public sealed class MigrationEntryService : RepositoryService, IMigrationEntryService
     {
-        public MigrationEntryService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MigrationEntryService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
         }
 

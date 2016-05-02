@@ -33,8 +33,8 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService, IMediaService mediaService)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService, IMediaService mediaService)
+            : base(provider, logger, eventMessagesFactory)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (mediaService == null) throw new ArgumentNullException("mediaService");

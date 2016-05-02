@@ -22,10 +22,10 @@ namespace Umbraco.Core.Services
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
         
 
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public EntityService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
             IContentTypeService contentTypeService1 = contentTypeService;

@@ -11,8 +11,8 @@ namespace Umbraco.Core.Services
 {
     public class ExternalLoginService : RepositoryService, IExternalLoginService
     {
-        public ExternalLoginService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public ExternalLoginService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         { }
 
         /// <summary>

@@ -16,8 +16,8 @@ namespace Umbraco.Core.Services
     {
         private readonly IEntityService _entityService;
         
-        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService)
-            : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
+        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService)
+            : base(uowProvider, logger, eventMessagesFactory)
         {
             if (entityService == null) throw new ArgumentNullException("entityService");
             _entityService = entityService;

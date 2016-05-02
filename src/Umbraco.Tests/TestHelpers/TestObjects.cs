@@ -104,12 +104,12 @@ namespace Umbraco.Tests.TestHelpers
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
-            var migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var externalLoginService = new Lazy<IExternalLoginService>(() => new ExternalLoginService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var taskService = new Lazy<ITaskService>(() => new TaskService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var domainService = new Lazy<IDomainService>(() => new DomainService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory, logger, eventMessagesFactory));
+            var migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, logger, eventMessagesFactory));
+            var externalLoginService = new Lazy<IExternalLoginService>(() => new ExternalLoginService(provider, logger, eventMessagesFactory));
+            var publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, logger, eventMessagesFactory));
+            var taskService = new Lazy<ITaskService>(() => new TaskService(provider, logger, eventMessagesFactory));
+            var domainService = new Lazy<IDomainService>(() => new DomainService(provider, logger, eventMessagesFactory));
+            var auditService = new Lazy<IAuditService>(() => new AuditService(provider, logger, eventMessagesFactory));
 
             var localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
@@ -143,30 +143,30 @@ namespace Umbraco.Tests.TestHelpers
                     }),
                     logger));
 
-            var userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, publishingStrategy, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
+            var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
+            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, publishingStrategy, dataTypeService.Value, userService.Value, urlSegmentProviders));
             var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, repositoryFactory, logger));
-            var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger, eventMessagesFactory));
-            var memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, memberGroupService.Value, dataTypeService.Value));
-            var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
-            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory, logger, eventMessagesFactory, contentService.Value, mediaService.Value));
-            var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory, logger, eventMessagesFactory));
-            var localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger, eventMessagesFactory));
+            var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
+            var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
+            var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, dataTypeService.Value));
+            var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value, mediaService.Value));
+            var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, logger, eventMessagesFactory));
+            var localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, logger, eventMessagesFactory));
 
-            var memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory, logger, eventMessagesFactory, memberService.Value));
+            var memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
             var entityService = new Lazy<IEntityService>(() => new EntityService(
-                    provider, repositoryFactory, logger, eventMessagesFactory,
+                    provider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
-            var macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory, logger, eventMessagesFactory));
+            var macroService = new Lazy<IMacroService>(() => new MacroService(provider, logger, eventMessagesFactory));
             var packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, repositoryFactory, provider, urlSegmentProviders));
-            var relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, logger, eventMessagesFactory, entityService.Value));
+            var relationService = new Lazy<IRelationService>(() => new RelationService(provider, logger, eventMessagesFactory, entityService.Value));
             var treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(logger, cache));
-            var tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory, logger, eventMessagesFactory));
+            var tagService = new Lazy<ITagService>(() => new TagService(provider, logger, eventMessagesFactory));
             var sectionService = new Lazy<ISectionService>(() => new SectionService(userService.Value, treeService.Value, provider, cache));
 
             return new ServiceContext(

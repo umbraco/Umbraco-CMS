@@ -26,11 +26,10 @@ namespace Umbraco.Core.Services
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
         /// <param name="uowProvider">A UnitOfWork provider.</param>
-        /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
+        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(uowProvider, logger, eventMessagesFactory)
         { }
 
         /// <summary>

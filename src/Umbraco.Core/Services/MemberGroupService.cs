@@ -14,8 +14,8 @@ namespace Umbraco.Core.Services
     public class MemberGroupService : RepositoryService, IMemberGroupService
     {
 
-        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
             //Proxy events!
             MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;

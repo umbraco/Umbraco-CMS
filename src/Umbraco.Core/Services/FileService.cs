@@ -33,10 +33,9 @@ namespace Umbraco.Core.Services
         public FileService(
             IUnitOfWorkProvider fileProvider,
             IDatabaseUnitOfWorkProvider dataProvider,
-            RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
-            : base(dataProvider, repositoryFactory, logger, eventMessagesFactory)
+            : base(dataProvider, logger, eventMessagesFactory)
         {
             _fileUowProvider = fileProvider;
         }
