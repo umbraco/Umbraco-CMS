@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -400,6 +401,12 @@ namespace Umbraco.Core.Models
                 //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);
                 //Check if dataType is null (meaning that the ControlId is valid) ?
                 //Possibly cast to BaseDataType and get the DbType from there (which might not be possible because it lives in umbraco.cms.businesslogic.datatype) ?
+
+                //for wrapped editors that use JSON, convert JArrays and JObjects to strings for this check
+                if (type == typeof(JArray) || type == typeof(JObject))
+                {
+                    type = typeof(string);
+                }
 
                 //Simple validation using the DatabaseType from the DataTypeDefinition and Type of the passed in value
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
