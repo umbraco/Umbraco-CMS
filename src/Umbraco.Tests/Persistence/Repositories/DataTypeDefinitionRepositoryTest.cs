@@ -89,18 +89,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var container1 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dataType = (IDataTypeDefinition)new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt1"
                 };
                 repository.AddOrUpdate(dataType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //create a
                 var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
@@ -108,10 +108,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Name = "dt2"
                 };
                 repository.AddOrUpdate(dataType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.Move(dataType, container1).ToArray();
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(2, result.Count());
 
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 var found = containerRepository.Get(container.Id);
@@ -152,11 +152,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -173,11 +173,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dataTypeDefinition = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
             }
@@ -193,15 +193,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 IDataTypeDefinition dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(dataTypeDefinition);
 
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var id = dataTypeDefinition.Id;
                 Assert.That(id, Is.GreaterThan(0));
 
@@ -350,7 +350,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var exists = repository.Exists(dataTypeDefinition.Id);
 
                 // Assert
@@ -374,14 +374,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CreatorId = 0
                 };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
                 definition.PropertyEditorAlias = "Test.TestEditor"; //change
                 repository.AddOrUpdate(definition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
 
@@ -409,11 +409,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var existsBefore = repository.Exists(dataTypeDefinition.Id);
 
                 repository.Delete(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var existsAfter = repository.Exists(dataTypeDefinition.Id);
 
@@ -451,7 +451,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var dtid = dataTypeDefinition.Id;
 
                 unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
@@ -471,7 +471,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var dtid = dataTypeDefinition.Id;
 
                 var id = unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
@@ -492,7 +492,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                     dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
                 unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
@@ -523,7 +523,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 id = unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
                 unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });

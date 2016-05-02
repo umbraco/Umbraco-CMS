@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Returns all logins matching the login info - generally there should only be one but in some cases 
+        /// Returns all logins matching the login info - generally there should only be one but in some cases
         /// there might be more than one depending on if an adminstrator has been editing/removing members
         /// </summary>
         /// <param name="login"></param>
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.SaveUserLogins(userId, logins);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.DeleteUserLogins(userId);
-                uow.Commit();
+                uow.Complete();
             }
         }
     }

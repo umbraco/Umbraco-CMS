@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
                     }
 
                     repo.AddOrUpdate(container);
-                    uow.Commit();
+                    uow.Complete();
 
                     SavedContentTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
                     //TODO: Audit trail ?
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Services
                     }
 
                     repo.AddOrUpdate(container);
-                    uow.Commit();
+                    uow.Complete();
 
                     SavedMediaTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
                     //TODO: Audit trail ?
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateContainerRepository(containerObjectType);
                 repo.AddOrUpdate(container);
-                uow.Commit();
+                uow.Complete();
             }
 
             savedEvent.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Services
                 }
 
                 repo.Delete(container);
-                uow.Commit();
+                uow.Complete();
 
                 DeletedContentTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
 
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Services
                 }
 
                 repo.Delete(container);
-                uow.Commit();
+                uow.Complete();
 
                 DeletedMediaTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
 
@@ -744,7 +744,7 @@ namespace Umbraco.Core.Services
                     contentType.CreatorId = userId;
                     repository.AddOrUpdate(contentType);
 
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 UpdateContentXmlStructure(contentType);
@@ -782,7 +782,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //save it all in one go
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
@@ -817,7 +817,7 @@ namespace Umbraco.Core.Services
                 {
                     var repository = uow.CreateRepository<IContentTypeRepository>();
                     repository.Delete(contentType);
-                    uow.Commit();
+                    uow.Complete();
 
                     DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentType, false), this);
                 }
@@ -856,7 +856,7 @@ namespace Umbraco.Core.Services
                         repository.Delete(contentType);
                     }
 
-                    uow.Commit();
+                    uow.Complete();
 
                     DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(asArray, false), this);
                 }
@@ -1038,7 +1038,7 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(
                         new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
-                uow.Commit();
+                uow.Complete();
             }
 
             MovedMediaType.RaiseEvent(new MoveEventArgs<IMediaType>(false, evtMsgs, moveInfo.ToArray()), this);
@@ -1082,7 +1082,7 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(
                         new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
-                uow.Commit();
+                uow.Complete();
             }
 
             MovedContentType.RaiseEvent(new MoveEventArgs<IContentType>(false, evtMsgs, moveInfo.ToArray()), this);
@@ -1128,7 +1128,7 @@ namespace Umbraco.Core.Services
                 {
                     return Attempt.Fail(new OperationStatus<IMediaType, MoveOperationStatusType>(null, ex.Operation, evtMsgs));
                 }
-                uow.Commit();
+                uow.Complete();
             }
 
             return Attempt.Succeed(new OperationStatus<IMediaType, MoveOperationStatusType>(copy, MoveOperationStatusType.Success, evtMsgs));
@@ -1171,7 +1171,7 @@ namespace Umbraco.Core.Services
                 {
                     return Attempt.Fail(new OperationStatus<IContentType, MoveOperationStatusType>(null, ex.Operation, evtMsgs));
                 }
-                uow.Commit();
+                uow.Complete();
             }
 
             return Attempt.Succeed(new OperationStatus<IContentType, MoveOperationStatusType>(copy, MoveOperationStatusType.Success, evtMsgs));
@@ -1195,7 +1195,7 @@ namespace Umbraco.Core.Services
                     ValidateLocked(mediaType); // throws if invalid
                     mediaType.CreatorId = userId;
                     repository.AddOrUpdate(mediaType);
-                    uow.Commit();
+                    uow.Complete();
 
                 }
 
@@ -1235,7 +1235,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //save it all in one go
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
@@ -1264,7 +1264,7 @@ namespace Umbraco.Core.Services
                     var repository = uow.CreateRepository<IMediaTypeRepository>();
 
                     repository.Delete(mediaType);
-                    uow.Commit();
+                    uow.Complete();
 
                     DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaType, false), this);
                 }
@@ -1299,7 +1299,7 @@ namespace Umbraco.Core.Services
                     {
                         repository.Delete(mediaType);
                     }
-                    uow.Commit();
+                    uow.Complete();
 
                     DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(asArray, false), this);
                 }
@@ -1361,7 +1361,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 

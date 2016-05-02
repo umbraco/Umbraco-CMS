@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(tag);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(tag.HasIdentity, Is.True);
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(tag);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var tag2 = new Tag()
                     {
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         Text = "Test2"
                     };
                 repository.AddOrUpdate(tag2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(tag.HasIdentity, Is.True);
@@ -110,10 +110,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -141,10 +141,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -181,10 +181,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -224,10 +224,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -265,10 +265,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -302,10 +302,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -347,12 +347,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -392,12 +392,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -438,12 +438,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -474,12 +474,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 var tags = new[]
@@ -515,12 +515,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -560,10 +560,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -606,10 +606,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -651,10 +651,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -699,16 +699,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.AddOrUpdate(media1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -758,16 +758,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.AddOrUpdate(media1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -810,10 +810,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -829,7 +829,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 contentRepository.Delete(content1);
 
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(0, DatabaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
@@ -851,22 +851,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.AddOrUpdate(media1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(
@@ -936,22 +936,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.AddOrUpdate(media1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
                 repository.AssignTagsToProperty(

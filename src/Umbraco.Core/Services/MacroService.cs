@@ -120,12 +120,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.Delete(macro);
-				uow.Commit();
-
-				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+				uow.Complete();
 			}
 
-			Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
+            Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+            Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
         }
 
         /// <summary>
@@ -142,12 +141,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.AddOrUpdate(macro);
-		        uow.Commit();
-
-		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+		        uow.Complete();
 	        }
 
-	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
+            Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+            Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }
 
         ///// <summary>
@@ -175,7 +173,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 

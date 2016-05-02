@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             //Assert
             Assert.That(_fileSystem.FileExists("test-add.css"), Is.True);
@@ -75,12 +75,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             var stylesheetUpdate = repository.Get("test-update.css");
             stylesheetUpdate.Content = "body { color:#000; }";
             repository.AddOrUpdate(stylesheetUpdate);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             var stylesheetUpdated = repository.Get("test-update.css");
 
@@ -102,12 +102,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             //re-get
             stylesheet = repository.Get(stylesheet.Name);
@@ -132,7 +132,7 @@ p{font-size:2em;}"));
             // Act
             var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
@@ -152,10 +152,10 @@ p{font-size:2em;}"));
             // Act
             var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             repository.Delete(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             //Assert
             Assert.That(_fileSystem.FileExists("test-delete.css"), Is.False);
@@ -191,7 +191,7 @@ p{font-size:2em;}"));
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Act
             var stylesheets = repository.GetAll();
@@ -214,7 +214,7 @@ p{font-size:2em;}"));
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Act
             var stylesheets = repository.GetAll("styles-v2.css", "styles.css");
@@ -253,14 +253,14 @@ p{font-size:2em;}"));
 
             var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.css"));
             Assert.AreEqual("test-path-1.css", stylesheet.Path);
             Assert.AreEqual("/css/test-path-1.css", stylesheet.VirtualPath);
 
             stylesheet = new Stylesheet("path-2/test-path-2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
             Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
             Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
@@ -272,7 +272,7 @@ p{font-size:2em;}"));
 
             stylesheet = new Stylesheet("path-2\\test-path-3.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.css"));
             Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
             Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);

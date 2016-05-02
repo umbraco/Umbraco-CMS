@@ -119,11 +119,12 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
+            PublicAccessEntry entry;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
-                var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
 
@@ -149,12 +150,12 @@ namespace Umbraco.Core.Services
 
                 repo.AddOrUpdate(entry);
 
-                uow.Commit();
-
-                Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-                return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                    new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+                uow.Complete();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
+            return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
+                new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
         }
 
         /// <summary>
@@ -166,11 +167,12 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
+            PublicAccessEntry entry;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
-                var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return Attempt<OperationStatus>.Fail();
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
@@ -178,21 +180,15 @@ namespace Umbraco.Core.Services
 
                 entry.RemoveRule(existingRule);
 
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
-                {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
                     return OperationStatus.Cancelled(evtMsgs);
-                }
 
                 repo.AddOrUpdate(entry);
-
-                uow.Commit();
-
-                Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-                return OperationStatus.Success(evtMsgs);
+                uow.Complete();
             }
 
+            Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
@@ -213,7 +209,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.AddOrUpdate(entry);
-                uow.Commit();
+                uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
@@ -238,7 +234,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
                 repo.Delete(entry);
-                uow.Commit();
+                uow.Complete();
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);

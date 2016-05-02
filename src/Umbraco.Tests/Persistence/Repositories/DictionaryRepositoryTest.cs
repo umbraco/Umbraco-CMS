@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get("Testing1235");
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Key);
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");                
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(read);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(read.Id);
 
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 item.Translations = translations;
 
                 repository.AddOrUpdate(item);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dictionaryItem = repository.Get(1);
 
@@ -310,7 +310,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             item.Translations = translations;
 
             repository.AddOrUpdate(item);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             var dictionaryItem = (DictionaryItem)repository.Get(1);
             
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var item = repository.Get(1);
                 repository.Delete(item);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(1);
 

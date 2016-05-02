@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
                 repository.AddOrUpdate(server);
 
-                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+                Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
 
         }
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
                 repository.AddOrUpdate(server);
-                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+                Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
 
         }
@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
                 repository.AddOrUpdate(server);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(server.HasIdentity, Is.True);
@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 server.IsActive = true;
 
                 repository.AddOrUpdate(server);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var serverUpdated = repository.Get(2);
 
@@ -217,7 +217,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var server = repository.Get(3);
                 Assert.IsNotNull(server);
                 repository.Delete(server);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
                 repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
-                unitOfWork.Commit();
+                unitOfWork.Flush();
             }
 
         }

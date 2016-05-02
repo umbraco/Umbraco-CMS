@@ -31,14 +31,14 @@ namespace Umbraco.Core.Services
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(
-            IUnitOfWorkProvider fileProvider, 
-            IDatabaseUnitOfWorkProvider dataProvider, 
+            IUnitOfWorkProvider fileProvider,
+            IDatabaseUnitOfWorkProvider dataProvider,
             RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
             : base(dataProvider, repositoryFactory, logger, eventMessagesFactory)
         {
-            _fileUowProvider = fileProvider;         
+            _fileUowProvider = fileProvider;
         }
 
 
@@ -85,12 +85,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IStylesheetRepository>();
                 repository.AddOrUpdate(stylesheet);
-                uow.Commit();
-
-                SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
+            SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
+            Audit(AuditType.Save, "Save Stylesheet performed by user", userId, -1);
         }
 
         /// <summary>
@@ -100,22 +99,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteStylesheet(string path, int userId = 0)
         {
+            Stylesheet stylesheet;
             using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IStylesheetRepository>();
-                var stylesheet = repository.Get(path);
+                stylesheet = repository.Get(path);
                 if (stylesheet == null) return;
 
                 if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this))
                     return;
 
                 repository.Delete(stylesheet);
-                uow.Commit();
-
-                DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
+                uow.Complete();
             }
+
+            DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
+            Audit(AuditType.Delete, "Delete Stylesheet performed by user", userId, -1);
         }
 
         /// <summary>
@@ -176,11 +175,10 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
                 repository.AddOrUpdate(script);
-                uow.Commit();
-
-                SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
+                uow.Complete();
             }
 
+            SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
             Audit(AuditType.Save, string.Format("Save Script performed by user"), userId, -1);
         }
 
@@ -191,22 +189,23 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteScript(string path, int userId = 0)
         {
+            Script script;
+
             using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
-                var script = repository.Get(path);
+                script = repository.Get(path);
                 if (script == null) return;
 
                 if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this))
-                    return; ;
+                    return;
 
                 repository.Delete(script);
-                uow.Commit();
-
-                DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
+                uow.Complete();
             }
+
+            DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
+            Audit(AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -228,8 +227,8 @@ namespace Umbraco.Core.Services
             using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
-                ((ScriptRepository)repository).AddFolder(folderPath);
-                uow.Commit();
+                ((ScriptRepository) repository).AddFolder(folderPath);
+                uow.Complete();
             }
         }
 
@@ -238,8 +237,8 @@ namespace Umbraco.Core.Services
             using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
-                ((ScriptRepository)repository).DeleteFolder(folderPath);
-                uow.Commit();
+                ((ScriptRepository) repository).DeleteFolder(folderPath);
+                uow.Complete();
             }
         }
 
@@ -287,12 +286,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITemplateRepository>();
                 repository.AddOrUpdate(template);
-                uow.Commit();
-
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false, evtMsgs), this);
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, template.Id);
+            SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false, evtMsgs), this);
+            Audit(AuditType.Save, "Save Template performed by user", userId, template.Id);
 
             return Attempt.Succeed(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.Success, evtMsgs));
         }
@@ -478,12 +476,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITemplateRepository>();
                 repository.AddOrUpdate(template);
-                uow.Commit();
-
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, template.Id);
+            SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
+            Audit(AuditType.Save, "Save Template performed by user", userId, template.Id);
         }
 
         /// <summary>
@@ -500,28 +497,25 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITemplateRepository>();
                 foreach (var template in templates)
-                {
                     repository.AddOrUpdate(template);
-                }
-                uow.Commit();
-
-                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, -1);
+            SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+            Audit(AuditType.Save, "Save Template performed by user", userId, -1);
         }
 
         /// <summary>
-        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
-        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
         /// rendering engine to use.
-        /// </summary> 
+        /// </summary>
         /// <returns></returns>
         /// <remarks>
         /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
-        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
-        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page.
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
@@ -540,22 +534,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteTemplate(string alias, int userId = 0)
         {
+            ITemplate template;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITemplateRepository>();
-                var template = repository.Get(alias);
+                template = repository.Get(alias);
                 if (template == null) return;
 
                 if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this))
                     return;
 
                 repository.Delete(template);
-                uow.Commit();
-
-                DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
+                uow.Complete();
             }
+
+            DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
+            Audit(AuditType.Delete, "Delete Template performed by user", userId, template.Id);
         }
 
         /// <summary>
@@ -590,16 +584,15 @@ namespace Umbraco.Core.Services
                 .ToArray();
 
             return empty.Union(files.Except(empty));
-        } 
+        }
 
         public void DeletePartialViewFolder(string folderPath)
         {
             using (var uow = _fileUowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IPartialViewRepository>();
-
                 ((PartialViewRepository) repository).DeleteFolder(folderPath);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -609,7 +602,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IPartialViewMacroRepository>();
                 ((PartialViewMacroRepository) repository).DeleteFolder(folderPath);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -674,9 +667,9 @@ namespace Umbraco.Core.Services
 
                     //strip the @inherits if it's there
                     snippetContent = StripPartialViewHeader(snippetContent);
-                    
+
                     var content = string.Format("{0}{1}{2}",
-                        partialViewHeader, 
+                        partialViewHeader,
                         Environment.NewLine, snippetContent);
                     partialView.Content = content;
                 }
@@ -686,13 +679,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreatePartialViewRepository(partialViewType);
                 repository.AddOrUpdate(partialView);
-                uow.Commit();
-
-                CreatedPartialView.RaiseEvent(new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1), this);
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
-
+            CreatedPartialView.RaiseEvent(new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1), this);
+            Audit(AuditType.Save, $"Save {partialViewType} performed by user", userId, -1);
             return Attempt<IPartialView>.Succeed(partialView);
         }
 
@@ -708,10 +699,11 @@ namespace Umbraco.Core.Services
 
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = 0)
         {
+            IPartialView partialView;
             using (var uow = _fileUowProvider.GetUnitOfWork())
-            { 
+            {
                 var repository = uow.CreatePartialViewRepository(partialViewType);
-                var partialView = repository.Get(path);
+                partialView = repository.Get(path);
                 if (partialView == null)
                     return true;
 
@@ -719,15 +711,12 @@ namespace Umbraco.Core.Services
                     return false;
 
                 repository.Delete(partialView);
-                uow.Commit();
-
-                DeletedPartialView.RaiseEvent(new DeleteEventArgs<IPartialView>(partialView, false), this);
-
-                Audit(AuditType.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
+                uow.Complete();
             }
 
+            DeletedPartialView.RaiseEvent(new DeleteEventArgs<IPartialView>(partialView, false), this);
+            Audit(AuditType.Delete, $"Delete {partialViewType} performed by user", userId, -1);
             return true;
-
         }
 
         public Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0)
@@ -749,13 +738,11 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreatePartialViewRepository(partialViewType);
                 repository.AddOrUpdate(partialView);
-                uow.Commit();
+                uow.Complete();
             }
 
-            Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
-
+            Audit(AuditType.Save, $"Save {partialViewType} performed by user", userId, -1);
             SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
-
             return Attempt.Succeed(partialView);
         }
 
@@ -804,7 +791,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -813,7 +800,7 @@ namespace Umbraco.Core.Services
         #region Event Handlers
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
 
         /// <summary>
@@ -823,7 +810,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
 
         /// <summary>
@@ -833,7 +820,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Delete
-        /// </summary>        
+        /// </summary>
         public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
 
         /// <summary>
@@ -880,7 +867,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IFileService, SaveEventArgs<IPartialView>> SavedPartialView;
-        
+
         /// <summary>
         /// Occurs before Create
         /// </summary>

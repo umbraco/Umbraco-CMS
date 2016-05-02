@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentTypeRepo.AddOrUpdate(ct);
                 var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 contentRepo.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 return content.Id;
             }
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 domain = repo.Get(domain.Id);
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id };
                 repo.AddOrUpdate(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 domain = repo.Get(domain.Id);
@@ -139,12 +139,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain2);
 
-                Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
+                Assert.Throws<DuplicateNameException>(unitOfWork.Flush);
             }
         }
 
@@ -168,10 +168,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 repo.Delete(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 domain = repo.Get(domain.Id);
@@ -204,12 +204,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 langRepo.AddOrUpdate(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 contentRepo.AddOrUpdate(content2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content1.Id, LanguageId = lang1.Id };
                 repo.AddOrUpdate(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 domain = repo.Get(domain.Id);
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 domain.RootContentId = content2.Id;
                 domain.LanguageId = lang2.Id;
                 repo.AddOrUpdate(domain);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 domain = repo.Get(domain.Id);
@@ -253,7 +253,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var found = repo.Exists("test1.com");
@@ -284,7 +284,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var found = repo.GetByName("test1.com");
@@ -315,7 +315,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var all = repo.GetAll();
@@ -347,7 +347,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                     ids.Add(domain.Id);
                 }
 
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var all = repo.GetAll(false);
@@ -417,7 +417,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
                     contentRepo.AddOrUpdate(c);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                     contentItems.Add(c);
                 }
                 
@@ -429,7 +429,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var all1 = repo.GetAssignedDomains(contentItems[0].Id, true);
@@ -468,7 +468,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
                     contentRepo.AddOrUpdate(c);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                     contentItems.Add(c);
                 }
 
@@ -480,7 +480,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var all1 = repo.GetAssignedDomains(contentItems[0].Id, false);

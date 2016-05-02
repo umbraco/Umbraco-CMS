@@ -130,6 +130,7 @@ namespace Umbraco.Core.Services
 
             //TODO: PUT lock here!!
 
+            User user;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = uow.CreateRepository<IUserRepository>();
@@ -137,7 +138,7 @@ namespace Umbraco.Core.Services
                 if (loginExists)
                     throw new ArgumentException("Login already exists");
 
-                var user = new User(userType)
+                user = new User(userType)
                 {
                     DefaultToLiveEditing = false,
                     Email = email,
@@ -159,12 +160,11 @@ namespace Umbraco.Core.Services
                     return user;
 
                 repository.AddOrUpdate(user);
-                uow.Commit();
-
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
-
-                return user;
+                uow.Complete();
             }
+
+            SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+            return user;
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace Umbraco.Core.Services
                 {
                     var repository = uow.CreateRepository<IUserRepository>();
                     repository.Delete(user);
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(user, false), this);
@@ -325,7 +325,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(entity);
                 try
                 {
-                    uow.Commit();
+                    uow.Complete();
                 }
                 catch (DbException ex)
                 {
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(member);
                 }
                 //commit the whole lot in one go
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
@@ -664,7 +664,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 repository.AddOrUpdate(userType);
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
@@ -684,7 +684,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IUserTypeRepository>();
                 repository.Delete(userType);
-                uow.Commit();
+                uow.Complete();
             }
 
             DeletedUserType.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
@@ -707,7 +707,7 @@ namespace Umbraco.Core.Services
                     user.RemoveAllowedSection(sectionAlias);
                     repository.AddOrUpdate(user);
                 }
-                uow.Commit();
+                uow.Complete();
             }
         }
         
@@ -737,7 +737,7 @@ namespace Umbraco.Core.Services
                     user.AddAllowedSection(sectionAlias);
                     repository.AddOrUpdate(user);
                 }
-                uow.Commit();
+                uow.Complete();
             }
         }    
 

@@ -90,7 +90,7 @@ namespace Umbraco.Core.Services
                     memberType.CreatorId = userId;
                     repository.AddOrUpdate(memberType);
 
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 UpdateContentXmlStructure(memberType);
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //save it all in one go
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
                 {
                     var repository = uow.CreateRepository<IMemberTypeRepository>();
                     repository.Delete(memberType);
-                    uow.Commit();
+                    uow.Complete();
 
                     Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(memberType, false), this);
                 }
@@ -167,10 +167,10 @@ namespace Umbraco.Core.Services
                         repository.Delete(memberType);
                     }
 
-                    uow.Commit();
+                    uow.Complete();
+                }
 
-                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
-                }                
+                Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
             }
         }
 

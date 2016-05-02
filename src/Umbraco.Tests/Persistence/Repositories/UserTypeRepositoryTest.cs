@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(userType.HasIdentity, Is.True);
@@ -69,9 +69,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(userType1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 repository.AddOrUpdate(userType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(userType1.HasIdentity, Is.True);
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get(userType.Id);
@@ -112,14 +112,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get(userType.Id);
                 resolved.Name = "New Name";
                 resolved.Permissions = new[]{"Z", "Y", "X"};
                 repository.AddOrUpdate(resolved);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var updatedItem = repository.Get(userType.Id);
 
                 // Assert
@@ -142,12 +142,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var id = userType.Id;
 
                 var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
                 repository2.Delete(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var resolved = repository2.Get(id);
 
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get(userType.Id);
@@ -291,7 +291,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(userType1);
             repository.AddOrUpdate(userType2);
             repository.AddOrUpdate(userType3);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             return new IUserType[] {userType1, userType2, userType3};
         }
     }

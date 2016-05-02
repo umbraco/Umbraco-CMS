@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relationType = repositoryType.Get(1);
                 var relation = new Relation(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3, relationType);
                 repository.AddOrUpdate(relation);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(relation, Is.Not.Null);
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relation = repository.Get(1);
                 relation.Comment = "This relation has been updated";
                 repository.AddOrUpdate(relation);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var relationUpdated = repository.Get(1);
 
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relation = repository.Get(2);
                 repository.Delete(relation);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(2);
 
@@ -271,7 +271,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 relationTypeRepository.AddOrUpdate(relateContent);
                 relationTypeRepository.AddOrUpdate(relateContentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };
                 relationRepository.AddOrUpdate(relation);
                 relationRepository.AddOrUpdate(relation2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
             }
         }
     }

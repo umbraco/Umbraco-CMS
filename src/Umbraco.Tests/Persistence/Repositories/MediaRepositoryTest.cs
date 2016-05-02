@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var image = MockedMedia.CreateMediaImage(mediaType, -1);
                     repository.AddOrUpdate(image);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml                 
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
                     repository.AddOrUpdate(folder);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml                 
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 mediaTypeRepository.AddOrUpdate(mediaType);
                 repository.AddOrUpdate(image);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(mediaType.HasIdentity, Is.True);
@@ -148,11 +148,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(file);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var image = MockedMedia.CreateMediaImage(mediaType, -1);
                 repository.AddOrUpdate(image);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(file.HasIdentity, Is.True);
@@ -179,11 +179,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(file);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var image = MockedMedia.CreateMediaImage(mediaType, -1);
                 repository.AddOrUpdate(image);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(file.HasIdentity, Is.True);
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Name = "Test File Updated";
                 repository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var media = repository.Get(NodeDto.NodeIdSeed + 2);
                 repository.Delete(media);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var deleted = repository.Get(NodeDto.NodeIdSeed + 2);
                 var exists = repository.Exists(NodeDto.NodeIdSeed + 2);

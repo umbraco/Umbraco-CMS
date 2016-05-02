@@ -48,16 +48,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var container1 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var contentType = (IMediaType)MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container2.Id;
                 repository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //create a 
                 var contentType2 = (IMediaType)new MediaType(contentType, "hello")
@@ -66,10 +66,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
                 contentType.ParentId = contentType.Id;
                 repository.AddOrUpdate(contentType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.Move(contentType, container1).ToArray();
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(2, result.Length);
 
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 var found = containerRepository.Get(container.Id);
@@ -112,12 +112,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -135,12 +135,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var contentType = MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container.Id;
                 repository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(container.Id, contentType.ParentId);
             }
@@ -157,16 +157,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 IMediaType contentType = MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container.Id;
                 repository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var contentType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var videoMediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(videoMediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var mediaType = repository.Get(NodeDto.NodeIdSeed);
@@ -227,7 +227,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         DataTypeDefinitionId = -88
                     });
                 repository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dirty = ((MediaType) mediaType).IsDirty();
 
@@ -251,11 +251,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var contentType2 = repository.Get(mediaType.Id);
                 repository.Delete(contentType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(mediaType.Id);
 
@@ -380,13 +380,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var mediaTypeV2 = repository.Get(NodeDto.NodeIdSeed);
                 mediaTypeV2.PropertyGroups["Media"].PropertyTypes.Remove("title");
                 repository.AddOrUpdate(mediaTypeV2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var mediaTypeV3 = repository.Get(NodeDto.NodeIdSeed);
 
@@ -408,7 +408,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.AddOrUpdate(mediaType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed);

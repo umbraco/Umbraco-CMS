@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.AddOrUpdate(memberGroup);
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.Delete(memberGroup);
-                uow.Commit();
+                uow.Complete();
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<IMemberGroup>(memberGroup, false), this);

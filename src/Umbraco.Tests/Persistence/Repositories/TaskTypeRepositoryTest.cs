@@ -32,12 +32,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     OwnerUserId = 0
                 };
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var alltasktypes = taskTypeRepo.GetAll();
 
                 taskTypeRepo.Delete(taskType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetAll().Count());
                 Assert.AreEqual(0, repo.GetAll().Count());

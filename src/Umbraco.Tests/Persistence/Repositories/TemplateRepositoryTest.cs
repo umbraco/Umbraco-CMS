@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -121,13 +121,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
                 repository.AddOrUpdate(template2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -199,13 +199,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
                 repository.AddOrUpdate(template2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
@@ -231,14 +231,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var template2 = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.AreEqual("test1", template2.Alias);
@@ -261,18 +261,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var template2 = new Template("test1", "test1")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 template.Alias = "test1";
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.AreEqual("test11", template.Alias);
@@ -297,11 +297,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 template.Content = @"<%@ Master Language=""VB"" %>";
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var updated = repository.Get("test");
 
@@ -328,11 +328,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 template.Content += "<html></html>";
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var updated = repository.Get("test");
 
@@ -356,13 +356,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var templates = repository.Get("test");
                 Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);
                 repository.Delete(templates);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
@@ -384,13 +384,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var templates = repository.Get("test");
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 repository.Delete(templates);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var textpage = MockedContent.CreateSimpleContent(contentType);
                 contentTypeRepository.AddOrUpdate(contentType);
                 contentRepo.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
 
                 var template = new Template("test", "test")
@@ -423,16 +423,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
                 templateRepository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 textpage.Template = template;
                 contentRepo.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var templates = templateRepository.Get("test");
                 templateRepository.Delete(templates);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.IsNull(templateRepository.Get("test"));
@@ -467,12 +467,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(parent);
                 repository.AddOrUpdate(child);
                 repository.AddOrUpdate(baby);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var templates = repository.Get("parent");
                 repository.Delete(templates);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
@@ -651,7 +651,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(toddler4);
                 repository.AddOrUpdate(baby1);
                 repository.AddOrUpdate(baby2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.AreEqual(string.Format("-1,{0}", parent.Id), parent.Path);
@@ -696,12 +696,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(child2);
                 repository.AddOrUpdate(toddler1);
                 repository.AddOrUpdate(toddler2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Act
                 toddler2.SetMasterTemplate(child2);
                 repository.AddOrUpdate(toddler2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //Assert
                 Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler2.Id), toddler2.Path);
@@ -814,7 +814,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(toddler4);
             repository.AddOrUpdate(baby1);
             repository.AddOrUpdate(baby2);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};
         }

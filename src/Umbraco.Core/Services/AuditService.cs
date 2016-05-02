@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, comment, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 

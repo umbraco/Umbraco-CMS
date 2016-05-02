@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var member = MockedMember.CreateSimpleMember(memberType1, "blah" + i, "blah" + i + "@example.com", "blah", "blah" + i);
                     repository.AddOrUpdate(member);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var member = MockedMember.CreateSimpleMember(memberType3, "b3lah" + i, "b3lah" + i + "@example.com", "b3lah", "b3lah" + i);
                     repository.AddOrUpdate(member);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -243,11 +243,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var sut = repository.Get(member.Id);
 
@@ -278,17 +278,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 sut = repository.Get(member.Id);
                 //when the password is null it will not overwrite what is already there.
                 sut.RawPasswordValue = null;
                 repository.AddOrUpdate(sut);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 sut = repository.Get(member.Id);
 
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
@@ -308,17 +308,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 sut = repository.Get(member.Id);
                 sut.Username = "This is new";
                 sut.Email = "thisisnew@hello.com";
                 repository.AddOrUpdate(sut);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 sut = repository.Get(member.Id);
 
                 Assert.That(sut.Email, Is.EqualTo("thisisnew@hello.com"));
@@ -358,12 +358,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
                     memberTypeRepository.AddOrUpdate(memberType);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
                 repository.AddOrUpdate(member);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 return member;
             }
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType(alias);
                 memberTypeRepository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 return memberType;
             }
         }

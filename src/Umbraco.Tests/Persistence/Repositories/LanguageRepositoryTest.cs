@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CultureName = au.DisplayName
                 };
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 language = repository.GetByIsoCode(au.Name);
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CultureName = au.DisplayName
                 };
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 language = repository.GetByCultureName(au.DisplayName);
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
                 repository.AddOrUpdate(languageBR);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 language.CultureName = "pt-BR";
 
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var languageUpdated = repository.Get(5);
 
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var language = repository.Get(3);
                 repository.Delete(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 

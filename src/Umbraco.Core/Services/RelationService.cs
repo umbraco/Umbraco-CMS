@@ -403,7 +403,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
                 repository.AddOrUpdate(relation);
-                uow.Commit();
+                uow.Complete();
             }
 
             SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
@@ -431,7 +431,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
                 repository.AddOrUpdate(relation);
-                uow.Commit();
+                uow.Complete();
             }
 
             SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
@@ -555,7 +555,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
                 repository.AddOrUpdate(relation);
-                uow.Commit();
+                uow.Complete();
             }
 
             SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
@@ -574,7 +574,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
                 repository.AddOrUpdate(relationType);
-                uow.Commit();
+                uow.Complete();
             }
 
             SavedRelationType.RaiseEvent(new SaveEventArgs<IRelationType>(relationType, false), this);
@@ -593,7 +593,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
                 repository.Delete(relation);
-                uow.Commit();
+                uow.Complete();
             }
 
             DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
@@ -612,7 +612,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
                 repository.Delete(relationType);
-                uow.Commit();
+                uow.Complete();
             }
 
             DeletedRelationType.RaiseEvent(new DeleteEventArgs<IRelationType>(relationType, false), this);
@@ -632,10 +632,9 @@ namespace Umbraco.Core.Services
                 relations.AddRange(repository.GetByQuery(query).ToList());
 
                 foreach (var relation in relations)
-                {
                     repository.Delete(relation);
-                }
-                uow.Commit();
+
+                uow.Complete();
             }
 
             DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);

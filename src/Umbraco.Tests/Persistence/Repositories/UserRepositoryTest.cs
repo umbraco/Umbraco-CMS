@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
@@ -76,9 +76,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 repository.AddOrUpdate(use2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(user1.HasIdentity, Is.True);
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get((int)user.Id);
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = (User)repository.Get((int)user.Id);
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.RemoveAllowedSection("content");
 
                 repository.AddOrUpdate(resolved);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var updatedItem = (User)repository.Get((int)user.Id);
 
                 // Assert
@@ -174,14 +174,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var id = user.Id;
 
                 var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
                 var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver);
 
                 repository2.Delete(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var resolved = repository2.Get((int) id);
 
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var updatedItem = repository.Get((int) user.Id);
@@ -373,7 +373,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(users[0]);
                 repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.GetAll((int) users[0].Id, (int) users[1].Id).ToArray();
@@ -411,7 +411,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(users[0]);
                 repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.GetAll((int) users[0].Id, (int) users[1].Id, (int) users[2].Id).ToArray();
@@ -447,7 +447,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 users[0].AddAllowedSection("settings");
 
                 repository.AddOrUpdate(users[0]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.Get((int) users[0].Id);
@@ -474,7 +474,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(user1);
                 repository.AddOrUpdate(user2);
                 repository.AddOrUpdate(user3);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
 
@@ -501,7 +501,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
                 repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.AreEqual(3, user1.DefaultPermissions.Count());
@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(user1);
             repository.AddOrUpdate(user2);
             repository.AddOrUpdate(user3);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             return new IUser[] { user1, user2, user3 };
         }
 
@@ -549,7 +549,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 return userType;
             }
         }

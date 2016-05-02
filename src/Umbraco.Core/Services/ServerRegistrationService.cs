@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
                     server.IsMaster = true;
 
                 repo.AddOrUpdate(server);
-                uow.Commit(); // triggers a cache reload
+                uow.Flush(); // triggers a cache reload
                 // fixme - this will release the log since we commited the uow?!
                 repo.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
                         ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
                         : ServerRole.Single;
 
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Services
                 server.IsActive = server.IsMaster = false;
                 repo.AddOrUpdate(server); // will trigger a cache reload
 
-                uow.Commit();
+                uow.Complete();
             }
         }
 

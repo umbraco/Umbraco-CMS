@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
                 return repo.Exists(domainName);
-            } 
+            }
         }
 
         public Attempt<OperationStatus> Delete(IDomain domain)
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
                 repository.Delete(domain);
-                uow.Commit();               
+                uow.Complete();
             }
 
             var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
                 repository.AddOrUpdate(domainEntity);
-                uow.Commit();
+                uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this);
@@ -109,14 +109,14 @@ namespace Umbraco.Core.Services
         #region Event Handlers
         /// <summary>
         /// Occurs before Delete
-        /// </summary>		
+        /// </summary>
         public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleted;
-      
+
         /// <summary>
         /// Occurs before Save
         /// </summary>
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saved;
 
-      
+
         #endregion
     }
 }

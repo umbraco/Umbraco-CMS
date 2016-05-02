@@ -886,7 +886,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
@@ -967,7 +967,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMemberRepository>();
                 repository.Delete(member);
-                uow.Commit();
+                uow.Complete();
 
                 var args = new DeleteEventArgs<IMember>(member, false);
                 Deleted.RaiseEvent(args, this);
@@ -1004,7 +1004,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
@@ -1043,7 +1043,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //commit the whole lot in one go
-                    uow.Commit();
+                    uow.Complete();
                 }
 
                 if (raiseEvents)
@@ -1228,7 +1228,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 

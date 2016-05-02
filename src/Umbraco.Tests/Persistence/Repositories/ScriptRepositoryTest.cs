@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var script = new Script("test-add-script.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             //Assert
             Assert.That(_fileSystem.FileExists("test-add-script.js"), Is.True);
@@ -72,11 +72,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             script.Content = "/// <reference name=\"MicrosoftAjax-Updated.js\"/>";
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             var scriptUpdated = repository.Get("test-updated-script.js");
 
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var script = repository.Get("test-script.js");
             repository.Delete(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Assert
 
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(script2);
             var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script3);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Act
             var scripts = repository.GetAll();
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(script2);
             var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script3);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Act
             var scripts = repository.GetAll("test-script1.js", "test-script2.js");
@@ -200,13 +200,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var script = new Script("test-move-script.js") { Content = content };
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             // Act
             script = repository.Get("test-move-script.js");
             script.Path = "moved/test-move-script.js";
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
 
             var existsOld = repository.Exists("test-move-script.js");
             var existsNew = repository.Exists("moved/test-move-script.js");
@@ -231,14 +231,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var script = new Script("test-path-1.js") { Content = "// script" };
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
             Assert.AreEqual("test-path-1.js", script.Path);
             Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
 
             script = new Script("path-2/test-path-2.js") { Content = "// script" };
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
             Assert.AreEqual("path-2\\test-path-2.js", script.Path); // fixed in 7.3 - 7.2.8 does not update the path
             Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             script = new Script("path-2\\test-path-3.js") { Content = "// script" };
             repository.AddOrUpdate(script);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
             Assert.AreEqual("path-2\\test-path-3.js", script.Path);
             Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);

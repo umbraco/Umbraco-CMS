@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //now create some versions of this content - this shouldn't affect the xml structures saved
                 for (int i = 0; i < allCreated.Count; i++)
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     allCreated[i].ChangePublishedState(PublishedState.Saved);
                     repository.AddOrUpdate(allCreated[i]);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -107,6 +107,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.RebuildXmlStructures(media => new XElement("test"), 10);
 
                 Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                unitOfWork.Complete();
             }
         }
 
@@ -137,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //now create some versions of this content - this shouldn't affect the xml structures saved
                 for (int i = 0; i < allCreated.Count; i++)
@@ -145,7 +147,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     allCreated[i].Name = "blah" + i;
                     repository.AddOrUpdate(allCreated[i]);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -154,6 +156,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.RebuildXmlStructures(media => new XElement("test"), 10);
 
                 Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                unitOfWork.Complete();
             }
         }
 
@@ -202,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //now create some versions of this content - this shouldn't affect the xml structures saved
                 for (int i = 0; i < allCreated.Count; i++)
@@ -210,7 +214,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     allCreated[i].Name = "blah" + i;
                     repository.AddOrUpdate(allCreated[i]);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
@@ -219,6 +223,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] { contentType1.Id, contentType2.Id });
 
                 Assert.AreEqual(60, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                unitOfWork.Complete();
             }
         }
 
@@ -239,20 +245,21 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var parentPage = MockedContent.CreateSimpleContent(contentType);
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(parentPage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 repository.AssignEntityPermission(parentPage, 'A', new int[] { 0 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var permissions = repository.GetPermissionsForEntity(childPage.Id);
                 Assert.AreEqual(1, permissions.Count());
                 Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
-            }
 
+                unitOfWork.Complete();
+            }
         }
 
         [Test]
@@ -270,7 +277,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -292,7 +299,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var template = new Template("hello", "hello");
                 templateRepository.AddOrUpdate(template);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 contentType.AllowedTemplates = Enumerable.Empty<ITemplate>(); // because CreateSimple... assigns one
@@ -303,11 +310,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(textpage.Template, Is.Not.Null);
                 Assert.That(textpage.Template, Is.EqualTo(contentType.DefaultTemplate));
+
+                unitOfWork.Complete();
             }
         }
 
@@ -323,7 +332,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
                 var anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
@@ -332,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(textpage);
                 repository.AddOrUpdate(anotherTextpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -343,6 +352,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var content2 = repository.Get(anotherTextpage.Id);
                 Assert.That(content2.Name, Is.EqualTo(anotherTextpage.Name));
+
+                unitOfWork.Complete();
             }
         }
 
@@ -361,11 +372,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
                 repository.AddOrUpdate(subpage);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -408,7 +419,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Name = "About 2";
                 repository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
                 // Assert
@@ -431,7 +442,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Template = null;
                 repository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
                 // Assert
@@ -456,11 +467,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var id = content.Id;
 
                 repository.Delete(content);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var content1 = repository.Get(id);
 
@@ -528,13 +539,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                     content.ChangePublishedState(PublishedState.Saved);
                     repository.AddOrUpdate(content);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 foreach (var content in result)
                 {
                     content.ChangePublishedState(PublishedState.Published);
                     repository.AddOrUpdate(content);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
 

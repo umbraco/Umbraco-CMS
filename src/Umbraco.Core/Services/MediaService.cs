@@ -166,14 +166,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
-
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
-
-            Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
+            Audit(AuditType.New, $"Media '{name}' was created with Id {media.Id}", media.CreatorId, media.Id);
 
             return media;
         }
@@ -224,15 +222,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
-
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
-
-            Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
-
+            Audit(AuditType.New, $"Media '{name}' was created with Id {media.Id}", media.CreatorId, media.Id);
             return media;
         }
 
@@ -736,7 +731,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.Delete(media);
-                uow.Commit();
+                uow.Complete();
 
                 var args = new DeleteEventArgs<IMedia>(media, false, evtMsgs);
                 Deleted.RaiseEvent(args, this);
@@ -783,12 +778,11 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false, evtMsgs), this);
-
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
 
             return OperationStatus.Success(evtMsgs);
@@ -831,12 +825,11 @@ namespace Umbraco.Core.Services
                 }
 
                 //commit the whole lot in one go
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false, evtMsgs), this);
-
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
 
             return OperationStatus.Success(evtMsgs);
@@ -975,12 +968,11 @@ namespace Umbraco.Core.Services
                     moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             Trashed.RaiseEvent(
                 new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), this);
-
             Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 
             return OperationStatus.Success(evtMsgs);
@@ -1018,11 +1010,10 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.DeleteVersions(id, versionDate);
-                uow.Commit();
+                uow.Complete();
             }
 
             DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
-
             Audit(AuditType.Delete, "Delete Media by version date performed by user", userId, -1);
         }
 
@@ -1049,11 +1040,10 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
                 repository.DeleteVersion(versionId);
-                uow.Commit();
+                uow.Complete();
             }
 
             DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
-
             Audit(AuditType.Delete, "Delete Media by version performed by user", userId, -1);
         }
 
@@ -1124,12 +1114,11 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
-
             Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);
 
             return true;
@@ -1227,7 +1216,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                uow.Complete();
             }
         }
 

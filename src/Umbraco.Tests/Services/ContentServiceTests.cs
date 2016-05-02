@@ -1351,7 +1351,7 @@ namespace Umbraco.Tests.Services
                 foreach (var content in list)
                 {
                     repository.AddOrUpdate(content.Value);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 Assert.That(c.Value.HasIdentity, Is.True);

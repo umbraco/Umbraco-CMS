@@ -39,10 +39,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 repo.Delete(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 entry = repo.Get(entry.Key);
                 Assert.IsNull(entry);
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = repo.GetAll().ToArray();
 
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = repo.GetAll().ToArray();
 
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 entry = repo.Get(entry.Key);
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 entry.Rules.First().RuleType = "asdf";
                 repo.AddOrUpdate(entry);
 
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 entry = repo.Get(entry.Key);
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 entry = repo.Get(entry.Key);
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 });
                 repo.AddOrUpdate(entry2);
                 
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = repo.GetAll().ToArray();
                 Assert.AreEqual(2, found.Count());
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 });
                 repo.AddOrUpdate(entry2);
 
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = repo.GetAll(entry1.Key).ToArray();
                 Assert.AreEqual(1, found.Count());
@@ -296,7 +296,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var ct = MockedContentTypes.CreateBasicContentType("testing");
                 ctRepo.AddOrUpdate(ct);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var result = new List<IContent>();
                 for (int i = 0; i < count; i++)
                 {
@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     repo.AddOrUpdate(c);
                     result.Add(c);
                 }
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 return result;
             }

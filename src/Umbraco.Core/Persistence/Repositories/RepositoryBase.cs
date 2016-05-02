@@ -112,11 +112,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (entity.HasIdentity == false)
             {
-                UnitOfWork.RegisterAdded(entity, this);
+                UnitOfWork.RegisterCreated(entity, this);
             }
             else
             {
-                UnitOfWork.RegisterChanged(entity, this);
+                UnitOfWork.RegisterUpdated(entity, this);
             }
         }
 
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            UnitOfWork?.RegisterRemoved(entity, this);
+            UnitOfWork?.RegisterDeleted(entity, this);
         }
 
         protected abstract TEntity PerformGet(TId id);

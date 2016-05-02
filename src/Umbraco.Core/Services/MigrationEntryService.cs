@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IMigrationEntryRepository>();
                 repo.AddOrUpdate(entry);
-                uow.Commit();
+                uow.Complete();
             }
 
             return entry;

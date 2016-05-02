@@ -31,10 +31,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                     OwnerUserId = 0
                 };
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 repo.Delete(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 task = repo.Get(task.Id);
                 Assert.IsNull(task);
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     EntityId = -1,
                     OwnerUserId = 0
                 });
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = repo.GetAll().ToArray();
 
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 task = repo.Get(task.Id);
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 task.Closed = true;
 
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 task = repo.Get(task.Id);
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 task = repo.Get(task.Id);
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         EntityId = entityId,
                         OwnerUserId = 0
                     });
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
                 
             }

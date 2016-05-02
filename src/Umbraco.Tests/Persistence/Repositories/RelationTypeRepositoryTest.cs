@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                                             "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
 
                 repository.AddOrUpdate(relateMemberToContent);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(relateMemberToContent.HasIdentity, Is.True);
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 relationType.Alias = relationType.Alias + "Updated";
                 relationType.Name = relationType.Name + " Updated";
                 repository.AddOrUpdate(relationType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var relationTypeUpdated = repository.Get(3);
 
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relationType = repository.Get(3);
                 repository.Delete(relationType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(relateContent);//Id 2
                 repository.AddOrUpdate(relateContentType);//Id 3
-                unitOfWork.Commit();
+                unitOfWork.Flush();
             }
         }
     }

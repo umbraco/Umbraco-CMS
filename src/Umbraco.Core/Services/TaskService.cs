@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
                 repo.AddOrUpdate(taskType);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
                 repo.Delete(taskTypeEntity);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<ITaskRepository>();
                 repo.AddOrUpdate(task);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<ITaskRepository>();
                 repo.Delete(task);
-                uow.Commit();
+                uow.Complete();
             }
         }
 
