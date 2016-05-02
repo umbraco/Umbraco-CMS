@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Config;
@@ -156,15 +157,20 @@ namespace Umbraco.Tests.UmbracoExamine
 		            new FieldDefinition("", FieldDefinitionTypes.FullText)
 		        },
 		        luceneDir,
-                analyzer,
-                profilingLogger,
-                contentService,
-                mediaService,
-                userService,
-                new[] { new DefaultUrlSegmentProvider() },
-                new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-                options,
-                Mock.Of<IQueryFactory>());
+		        analyzer,
+		        profilingLogger,
+		        contentService,
+		        mediaService,
+		        userService,
+		        new[] {new DefaultUrlSegmentProvider()},
+		        new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
+		        options,
+                //TODO: This should be rewritten without the Mock fluent syntax so it can be read better, 
+                // but I'll do that some other time, for this now just mocks the GetWhereClauses to return the 
+                // correct clauses that are expected
+		        Mock.Of<IQueryFactory>(
+		            factory => factory.Create<IContent>() == Mock.Of<IQuery<IContent>>(
+		                query => query.GetWhereClauses() == new List<Tuple<string, object[]>> {new Tuple<string, object[]>("cmsDocument.published", new object[] {1})})));
 
 			i.IndexingError += IndexingError;
 
