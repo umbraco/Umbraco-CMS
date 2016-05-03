@@ -210,6 +210,9 @@ namespace Umbraco.Core
             var childNodesAndOrder = parentNode.SelectNodes(childNodesXPath).Cast<XmlNode>()
                 .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
 
+            // only one node = node is in the right place already, obviously
+            if (childNodesAndOrder.Length == 1) return false;
+
             // find the first node with a sortOrder > node.sortOrder
             var i = 0;
             while (i < childNodesAndOrder.Length && childNodesAndOrder[i].Item2 <= nodeSortOrder)
@@ -220,17 +223,18 @@ namespace Umbraco.Core
             {
                 // and node is just before, we're done already
                 // else we need to move it right before the node that was found
-                if (i > 0 && childNodesAndOrder[i - 1].Item1 != node)
+                if (i == 0 || childNodesAndOrder[i - 1].Item1 != node)
                 {
                     parentNode.InsertBefore(node, childNodesAndOrder[i].Item1);
                     return true;
                 }
             }
-            else
+            else // i == childNodesAndOrder.Length && childNodesAndOrder.Length > 1
             {
                 // and node is the last one, we're done already
                 // else we need to append it as the last one
-                if (i > 0 && childNodesAndOrder[i - 1].Item1 != node)
+                // (and i > 1, see above)
+                if (childNodesAndOrder[i - 1].Item1 != node)
                 {
                     parentNode.AppendChild(node);
                     return true;
