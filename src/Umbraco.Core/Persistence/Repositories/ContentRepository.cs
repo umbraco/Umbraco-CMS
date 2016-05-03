@@ -375,10 +375,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
             //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
             var level = parent.Level + 1;
             var maxSortOrder = Database.ExecuteScalar<int>(
-                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentId = @ParentId AND nodeObjectType = @NodeObjectType",
                 new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
             var sortOrder = maxSortOrder + 1;
 
@@ -506,7 +506,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
                 var maxSortOrder =

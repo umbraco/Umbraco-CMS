@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -36,42 +35,41 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, EntityContainer container)
+        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
             var parentId = Constants.System.Root;
             if (container != null)
             {
-                // Check on paths
-                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
-                {
+                // check path
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", moving.Id), StringComparison.Ordinal) > -1)
                     throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
-                }
+
                 parentId = container.Id;
             }
 
-            //used to track all the moved entities to be given to the event
+            // track moved entities
             var moveInfo = new List<MoveEventInfo<TEntity>>
             {
-                new MoveEventInfo<TEntity>(toMove, toMove.Path, parentId)
+                new MoveEventInfo<TEntity>(moving, moving.Path, parentId)
             };
 
 
             // get the level delta (old pos to new pos)
             var levelDelta = container == null
-                ? 1 - toMove.Level
-                : container.Level + 1 - toMove.Level;
+                ? 1 - moving.Level
+                : container.Level + 1 - moving.Level;
 
             // move to parent (or -1), update path, save
-            toMove.ParentId = parentId;
-            var toMovePath = toMove.Path + ","; // save before changing
-            toMove.Path = (container == null ? Constants.System.Root.ToString() : container.Path) + "," + toMove.Id;
-            toMove.Level = container == null ? 1 : container.Level + 1;
-            AddOrUpdate(toMove);
+            moving.ParentId = parentId;
+            var movingPath = moving.Path + ","; // save before changing
+            moving.Path = (container == null ? Constants.System.Root.ToString() : container.Path) + "," + moving.Id;
+            moving.Level = container == null ? 1 : container.Level + 1;
+            AddOrUpdate(moving);
 
             //update all descendants, update in order of level
-            var descendants = GetByQuery(Query.Where(type => type.Path.StartsWith(toMovePath)));
+            var descendants = GetByQuery(Query.Where(type => type.Path.StartsWith(movingPath)));
             var paths = new Dictionary<int, string>();
-            paths[toMove.Id] = toMove.Path;
+            paths[moving.Id] = moving.Path;
 
             foreach (var descendant in descendants.OrderBy(x => x.Level))
             {
@@ -92,6 +90,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
         {
+            // used by DataTypeDefinitionRepository to remove properties
+            // from content types if they have a deleted data type - see
+            // notes in DataTypeDefinitionRepository.Delete as it's a bit
+            // weird
+
             var sqlClause = Sql()
                 .SelectAll()
                 .From<PropertyTypeGroupDto>()
@@ -243,8 +246,11 @@ AND umbracoNode.nodeObjectType = @objectType
 AND umbracoNode.id <> @id",
                 new { id = dto.NodeId, alias = dto.Alias, objectType = NodeObjectTypeId });
             if (exists > 0)
+            {
                 throw new DuplicateNameException("An item with the alias " + dto.Alias + " already exists");
+            }
 
+            // repository should be write-locked when doing this, so we are safe from race-conds
             // handle (update) the node
             var nodeDto = dto.NodeDto;
             Database.Update(nodeDto);
@@ -548,6 +554,21 @@ AND umbracoNode.id <> @id",
             }
         }
 
+        public IEnumerable<TEntity> GetTypesDirectlyComposedOf(int id)
+        {
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .InnerJoin<ContentType2ContentTypeDto>()
+                .On<NodeDto, ContentType2ContentTypeDto>(left => left.NodeId, right => right.ChildId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<ContentType2ContentTypeDto>(x => x.ParentId == id);
+            var dtos = Database.Fetch<NodeDto>(sql);
+            return dtos.Any()
+                ? GetAll(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
+                : Enumerable.Empty<TEntity>();
+        }
+
         internal static class ContentTypeQueryMapper
         {
 
@@ -649,7 +670,7 @@ AND umbracoNode.id <> @id",
                         var allParentContentTypes = contentTypes.Where(x => allParentIdsAsArray.Contains(x.Id)).ToArray();
 
                         foreach (var contentType in contentTypes)
-                        {                            
+                        {
                             var entityId = contentType.Id;
 
                             var parentContentTypes = allParentContentTypes.Where(x =>
@@ -714,10 +735,10 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, List<int>> parentMediaTypeIds)
             {
                 Mandate.ParameterNotNull(db, "db");
-                
+
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
-                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
+                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
@@ -741,7 +762,7 @@ AND umbracoNode.id <> @id",
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
-                
+
                 var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
 
                 if (result.Any() == false)
@@ -853,11 +874,11 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
                 Mandate.ParameterNotNull(db, "db");
-                
+
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
-                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
+                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
@@ -890,7 +911,7 @@ AND umbracoNode.id <> @id",
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
-                
+
                 var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
 
                 if (result.Any() == false)
@@ -911,7 +932,7 @@ AND umbracoNode.id <> @id",
                 {
                     var ct = queue.Dequeue();
 
-                    //check for default templates                    
+                    //check for default templates
                     bool? isDefaultTemplate = Convert.ToBoolean(ct.dtIsDefault);
                     int? templateId = ct.dtTemplateId;
                     if (currDefaultTemplate == -1 && isDefaultTemplate.HasValue && isDefaultTemplate.Value && templateId.HasValue)
@@ -1225,6 +1246,28 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             string test;
             while (aliases.Contains(test = alias + i)) i++;
             return test;
+        }
+
+        protected override IEnumerable<string> GetDeleteClauses()
+        {
+            // in theory, services should have ensured that content items of the given content type
+            // have been deleted and therefore cmsPropertyData has been cleared, so cmsPropertyData
+            // is included here just to be 100% sure since it has a FK on cmsPropertyType.
+
+            var list = new List<string>
+            {
+                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
+                "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",
+                "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id",
+                "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id",
+                "DELETE FROM cmsPropertyData WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @Id)",
+                "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
+                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
+            };
+            return list;
         }
     }
 }
