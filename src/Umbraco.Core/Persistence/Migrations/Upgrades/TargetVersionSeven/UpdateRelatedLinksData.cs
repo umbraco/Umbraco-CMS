@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     var prop = x.Element(propertyType.Alias);
                     if (prop != null)
                     {
-                        prop.ReplaceAll(new XCData(data.Text));
+                        prop.ReplaceAll(new XCData(data.dataNtext));
                         database.Update(xmlItem);
                     }
                 }
