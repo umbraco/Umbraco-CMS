@@ -34,6 +34,8 @@ using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrad
 
 namespace Umbraco.Core
 {
+    using Umbraco.Core.PropertyEditors.ValueCorrectors;
+
     /// <summary>
     /// A bootstrapper for the Umbraco application which initializes all objects for the Core of the application 
     /// </summary>
@@ -511,6 +513,13 @@ namespace Umbraco.Core
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 PluginManager.ResolveTypes<IPropertyValueConverter>());
+
+            // resolve the database property value corrections
+            if (LegacyDbPropertyValueCorrectionResolver.HasCurrent == false)
+            {
+                LegacyDbPropertyValueCorrectionResolver.Current =
+                    new LegacyDbPropertyValueCorrectionResolver(PluginManager.ResolveTypesWithAttribute<DbPropertyValueCorrectionBase, DbPropertyValueCorrectionAttribute>());
+            }
 
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
