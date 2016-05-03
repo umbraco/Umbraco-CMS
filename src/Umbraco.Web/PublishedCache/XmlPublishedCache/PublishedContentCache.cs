@@ -89,6 +89,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // else actually determine the route
             route = DetermineRouteById(umbracoContext, preview, contentId);
 
+            // node not found
+            if (route == null)
+                return null;
+
             // find the content back, detect routes collisions: we should find ourselves back,
             // else it means that another content with "higher priority" is sharing the same route.
             // perf impact:
@@ -109,7 +113,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // cache if we have a route and not previewing and it's not a colliding route
             // (the result of DetermineRouteById is always the deepest route)
-            if (route != null && preview == false && loopId == contentId)
+            if (/*route != null &&*/ preview == false && loopId == contentId)
                 _routesCache.Store(contentId, route);
 
             // return route if no collision, else report collision
