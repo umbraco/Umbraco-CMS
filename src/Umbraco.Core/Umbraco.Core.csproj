@@ -377,10 +377,15 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
+    <Compile Include="CallContextScope.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
+    <Compile Include="DefaultScopeContextFactory.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="HttpContextScope.cs" />
+    <Compile Include="IScopeContext.cs" />
+    <Compile Include="IScopeContextFactory.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />

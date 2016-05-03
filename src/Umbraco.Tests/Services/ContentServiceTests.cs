@@ -1333,7 +1333,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var databaseFactory = new DefaultDatabaseFactory(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger);
+            var databaseFactory = new DefaultDatabaseFactory(
+                Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
+                Logger,
+                new TestScopeContextFactory());
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");

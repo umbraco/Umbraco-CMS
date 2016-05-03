@@ -219,7 +219,10 @@ namespace Umbraco.Tests.TestHelpers
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, TestObjects.GetDefaultSqlSyntaxProviders(Logger), Logger), Logger),
+                new DatabaseContext(new DefaultDatabaseFactory(
+                    Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                    TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
+                    Logger, new TestScopeContextFactory()), Logger),
                 //assign the service context
                 TestObjects.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(),
