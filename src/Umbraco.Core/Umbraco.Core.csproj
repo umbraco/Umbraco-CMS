@@ -143,7 +143,6 @@
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ActivatorServiceProvider.cs" />
-    <Compile Include="AmbientContext.cs" />
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
