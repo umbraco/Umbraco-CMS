@@ -143,6 +143,7 @@
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ActivatorServiceProvider.cs" />
+    <Compile Include="AmbientContext.cs" />
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
@@ -290,6 +291,7 @@
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="DefaultScopeContextAdapter.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
     <Compile Include="DependencyInjection\CoreModelMappersCompositionRoot.cs" />
@@ -341,6 +343,7 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="DependencyInjection\LightInjectExtensions.cs" />
+    <Compile Include="IScopeContextAdapter.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
@@ -377,15 +380,10 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
-    <Compile Include="CallContextScope.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
-    <Compile Include="DefaultScopeContextFactory.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="HttpContextScope.cs" />
-    <Compile Include="IScopeContext.cs" />
-    <Compile Include="IScopeContextFactory.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
