@@ -9,7 +9,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// </summary>
     internal class NPocoUnitOfWork : UnitOfWorkBase, IDatabaseUnitOfWork
     {
-        private readonly RepositoryFactory _factory;
         private ITransaction _transaction;
 
         /// <summary>
@@ -19,9 +18,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="factory">A repository factory.</param>
         /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
         internal NPocoUnitOfWork(UmbracoDatabase database, RepositoryFactory factory)
+            : base(factory)
         {
             Database = database;
-            _factory = factory;
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <returns>The created repository for the unit of work.</returns>
         public override TRepository CreateRepository<TRepository>(string name = null)
         {
-            return _factory.CreateRepository<TRepository>(this, name);
+            return Factory.CreateRepository<TRepository>(this, name);
         }
 
         /// <summary>

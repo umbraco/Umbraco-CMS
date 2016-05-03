@@ -9,8 +9,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 
-        // fixme eventually kill this
-        public virtual T CreateRepository<T>(string name = null) where T:IRepository {  throw new NotImplementedException(); }
+        protected UnitOfWorkBase(RepositoryFactory factory)
+        {
+            Factory = factory;
+        }
+
+        protected RepositoryFactory Factory { get; }
+
+        public abstract TRepository CreateRepository<TRepository>(string name = null)
+            where TRepository : IRepository;
 
         /// <summary>
         /// Registers an entity to be added as part of this unit of work.

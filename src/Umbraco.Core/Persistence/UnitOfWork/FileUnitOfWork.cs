@@ -8,17 +8,14 @@
     /// mechanism.</remarks>
     internal class FileUnitOfWork : UnitOfWorkBase
     {
-        private readonly RepositoryFactory _factory;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a a repository factory.
         /// </summary>
         /// <param name="factory">A repository factory.</param>
         /// <remarks>This should be used by the FileUnitOfWorkProvider exclusively.</remarks>
         public FileUnitOfWork(RepositoryFactory factory)
-        {
-            _factory = factory;
-        }
+            : base(factory)
+        { }
 
         /// <summary>
         /// Creates a repository.
@@ -28,7 +25,7 @@
         /// <returns>The created repository for the unit of work.</returns>
 	    public override TRepository CreateRepository<TRepository>(string name = null)
         {
-            return _factory.CreateRepository<TRepository>(this, name);
+            return Factory.CreateRepository<TRepository>(this, name);
         }
     }
 }

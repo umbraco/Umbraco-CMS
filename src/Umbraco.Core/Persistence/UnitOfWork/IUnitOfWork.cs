@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <summary>
         /// Begins the unit of work.
         /// </summary>
-        /// <remarks>When a unit of work begins, a local transaction scope is created at database level. 
+        /// <remarks>When a unit of work begins, a local transaction scope is created at database level.
         /// This is useful eg when reading entities before creating, updating or deleting, and the read
         /// needs to be part of the transaction. Flushing or completing the unit of work automatically
         /// begins the transaction (so no need to call Begin if not necessary).</remarks>
@@ -58,8 +58,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// before it is disposed, all queued operations are cleared and the scope is rolled back (and also
         /// higher level transactions if any).
         /// Whether this actually commits or rolls back the transaction depends on whether the transaction scope
-        /// is part of a higher level transactions. The  database transaction is committed or rolled back only 
+        /// is part of a higher level transactions. The  database transaction is committed or rolled back only
         /// when the upper level scope is disposed.
+        /// If any operation is added to the unit of work after it has been completed, then its completion
+        /// status is resetted. So in a way it could be possible to always complete and never flush, but flush
+        /// is preferred when appropriate to indicate that you understand what you are doing.
         /// </remarks>
         void Complete();
 
