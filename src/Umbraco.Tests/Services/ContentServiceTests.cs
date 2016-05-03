@@ -1337,7 +1337,7 @@ namespace Umbraco.Tests.Services
                 Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
                 Logger,
-                new TestScopeContextFactory());
+                new TestScopeContextAdapter());
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");

@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </remarks>
         internal NPocoUnitOfWorkProvider(ILogger logger)
         {
-            _databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextFactory());
+            _databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextAdapter());
             // careful, _repositoryFactory remains null!
         }
 

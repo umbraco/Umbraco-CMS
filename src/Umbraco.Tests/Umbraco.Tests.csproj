@@ -187,8 +187,7 @@
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="TestHelpers\TestScopeContext.cs" />
-    <Compile Include="TestHelpers\TestScopeContextFactory.cs" />
+    <Compile Include="TestHelpers\TestScopeContextAdapter.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
