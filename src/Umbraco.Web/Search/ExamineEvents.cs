@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
+using Examine.Session;
 using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -33,6 +34,10 @@ namespace Umbraco.Web.Search
 		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{            
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
+
+            //TODO: For now we'll make this true, it means that indexes will be near real time
+            // we'll see about what implications this may have - should be great in most scenarios
+		    DefaultExamineSession.RequireImmediateConsistency = true;
 
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
