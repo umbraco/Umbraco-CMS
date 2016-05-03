@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(0, found.First().OwnerUserId);
                 Assert.AreEqual(true, found.First().HasIdentity);
                 Assert.AreEqual(true, found.First().TaskType.HasIdentity);
-            }            
+            }
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(task);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 task.Comment = "blah";
@@ -103,12 +103,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(task);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 Assert.AreEqual(true, task.Closed);
                 Assert.AreEqual("blah", task.Comment);
-            }            
+            }
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(task);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 Assert.IsNotNull(task);
@@ -218,9 +218,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                         EntityId = entityId,
                         OwnerUserId = 0
                     });
-                    unitOfWork.Flush();
                 }
-                
+
+                unitOfWork.Complete();
             }
         }
     }

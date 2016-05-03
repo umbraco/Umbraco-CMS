@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(entry);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 entry = repo.Get(entry.Key);
 
                 entry.Rules.First().RuleValue = "blah";
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 entry = repo.Get(entry.Key);
 
                 Assert.AreEqual("blah", entry.Rules.First().RuleValue);
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repo.AddOrUpdate(entry);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 entry = repo.Get(entry.Key);
 
                 Assert.IsNotNull(entry);
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     },
                 });
                 repo.AddOrUpdate(entry2);
-                
+
                 unitOfWork.Flush();
 
                 var found = repo.GetAll().ToArray();
@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     repo.AddOrUpdate(c);
                     result.Add(c);
                 }
-                unitOfWork.Flush();
+                unitOfWork.Complete();
 
                 return result;
             }

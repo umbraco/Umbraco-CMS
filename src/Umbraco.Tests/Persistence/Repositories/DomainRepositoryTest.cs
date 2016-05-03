@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentTypeRepo.AddOrUpdate(ct);
                 var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 contentRepo.AddOrUpdate(content);
-                unitOfWork.Flush();
+                unitOfWork.Complete();
                 return content.Id;
             }
         }
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 domain = repo.Get(domain.Id);
 
 
-                Assert.IsNull(domain);                
+                Assert.IsNull(domain);
             }
         }
 
@@ -411,7 +411,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var lang = langRepo.GetByIsoCode("en-AU");
                 contentItems.Add(contentRepo.Get(contentId));
-                
+
                 //more test data (3 content items total)
                 for (int i = 0; i < 2; i++)
                 {
@@ -420,7 +420,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     unitOfWork.Flush();
                     contentItems.Add(c);
                 }
-                
+
                 for (int i = 0; i < 10; i++)
                 {
                     var domain = (IDomain)new UmbracoDomain((i % 2 == 0) ? "test " + i + ".com" : ("*" + i))
@@ -434,7 +434,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var all1 = repo.GetAssignedDomains(contentItems[0].Id, true);
                 Assert.AreEqual(5, all1.Count());
-                
+
                 var all2 = repo.GetAssignedDomains(contentItems[1].Id, true);
                 Assert.AreEqual(5, all2.Count());
 

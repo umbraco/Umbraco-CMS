@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
                 repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
-                unitOfWork.Flush();
+                unitOfWork.Complete();
             }
 
         }

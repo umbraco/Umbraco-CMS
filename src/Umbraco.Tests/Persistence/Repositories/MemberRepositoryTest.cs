@@ -363,7 +363,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
                 repository.AddOrUpdate(member);
-                unitOfWork.Flush();
+                unitOfWork.Complete();
 
                 return member;
             }
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType(alias);
                 memberTypeRepository.AddOrUpdate(memberType);
-                unitOfWork.Flush();
+                unitOfWork.Complete();
                 return memberType;
             }
         }

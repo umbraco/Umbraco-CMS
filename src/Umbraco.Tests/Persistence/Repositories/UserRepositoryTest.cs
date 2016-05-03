@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(user1);
             repository.AddOrUpdate(user2);
             repository.AddOrUpdate(user3);
-            unitOfWork.Flush();
+            unitOfWork.Complete();
             return new IUser[] { user1, user2, user3 };
         }
 
@@ -549,7 +549,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Flush();
+                unitOfWork.Complete();
                 return userType;
             }
         }

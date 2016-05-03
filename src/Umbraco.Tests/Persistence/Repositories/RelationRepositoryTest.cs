@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };
                 relationRepository.AddOrUpdate(relation);
                 relationRepository.AddOrUpdate(relation2);
-                unitOfWork.Flush();
+                unitOfWork.Complete();
             }
         }
     }

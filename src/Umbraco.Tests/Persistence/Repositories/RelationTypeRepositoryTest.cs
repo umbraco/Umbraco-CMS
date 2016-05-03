@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(relateContent);//Id 2
                 repository.AddOrUpdate(relateContentType);//Id 3
-                unitOfWork.Flush();
+                unitOfWork.Complete();
             }
         }
     }
