@@ -421,16 +421,5 @@ namespace Umbraco.Core.Persistence.Repositories
                     return userFactory.BuildEntity(dto);
                 });
         }
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            _userTypeRepository.Dispose();
-        }
     }
 }

@@ -18,6 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         private readonly ICacheProvider _staticCache;
+        private readonly int[] _lockIds = { Constants.System.ServersLock };
 
         public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMappingResolver mappingResolver)
             : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver)
@@ -145,6 +146,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update<ServerRegistrationDto>("SET isActive=0, isMaster=0 WHERE lastNotifiedDate < @timeoutDate", new { /*timeoutDate =*/ timeoutDate });
             ReloadCache();
+        }
+
+        public void ReadLockServers()
+        {
+            UnitOfWork.ReadLockNodes(_lockIds);
+        }
+
+        public void WriteLockServers()
+        {
+            UnitOfWork.WriteLockNodes(_lockIds);
         }
     }
 }

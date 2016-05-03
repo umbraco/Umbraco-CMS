@@ -10,9 +10,9 @@ namespace Umbraco.Core.Persistence.Repositories
 	/// Currently this interface is empty but it is useful for flagging a repository without having generic parameters, it also might
 	/// come in handy if we need to add anything to the base/non-generic repository interface.
 	/// </remarks>
-	public interface IRepository : IDisposable
+	public interface IRepository
 	{
-		
+
 	}
 
     public interface IReadRepository<in TId, out TEntity> : IRepository

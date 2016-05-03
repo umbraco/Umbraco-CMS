@@ -42,7 +42,8 @@ namespace Umbraco.Tests.Services
             //threading environment, or a single apartment threading environment will not work for this test because
             //it is multi-threaded.
             _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger);
-            _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory);
+            var repositoryFactory = new RepositoryFactory(Container);
+            _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
 
             // overwrite the local object
             ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger);
@@ -53,7 +54,6 @@ namespace Umbraco.Tests.Services
 			//here we are going to override the ServiceContext because normally with our test cases we use a
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-            var repositoryFactory = new RepositoryFactory(Container);
 		    var evtMsgs = new TransientMessagesFactory();
 		    ApplicationContext.Services = TestObjects.GetServiceContext(
                 repositoryFactory,

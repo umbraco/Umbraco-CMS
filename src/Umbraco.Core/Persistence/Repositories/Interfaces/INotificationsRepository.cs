@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface INotificationsRepository
+    public interface INotificationsRepository : IRepository
     {
         Notification CreateNotification(IUser user, IEntity entity, string action);
         int DeleteNotifications(IUser user);

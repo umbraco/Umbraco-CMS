@@ -1,4 +1,3 @@
-using System;
 using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -36,11 +35,8 @@ namespace Umbraco.Core.DependencyInjection
             container.RegisterSingleton<DatabaseContext>();
 
             // register IUnitOfWork providers
-            // using a factory for NPocoUnitOfWorkProvider because it has another ctor accepting
-            // one single parameter - we should get rid of it but it is used hundreds of times in
-            // unit tests and I am lazy
             container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
-            container.RegisterSingleton<IDatabaseUnitOfWorkProvider>(factory => new NPocoUnitOfWorkProvider(factory.GetInstance<IDatabaseFactory>()));
+            container.RegisterSingleton<IDatabaseUnitOfWorkProvider, NPocoUnitOfWorkProvider>();
 
             // register mapping resover
             // using a factory because... no time to clean it up at the moment
@@ -65,10 +61,14 @@ namespace Umbraco.Core.DependencyInjection
             // the disabled one is used by those repositories that have an annotated ctor parameter
             container.RegisterSingleton(factory => CacheHelper.CreateDisabledCacheHelper(), DisabledCache);
 
-            // register IDatabaseUnitOfWork
-            // resolve ctor dependency from GetInstance() runtimeArguments if possible
-            container.RegisterConstructorDependency((factory, info, runtimeArguments) =>
-                runtimeArguments.Length > 0 ? runtimeArguments[0] as IDatabaseUnitOfWork : null);
+            // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is 
+            // the container, 'info' describes the ctor argument, and 'args' contains the args that
+            // were passed to GetInstance() - use first arg if it is the right type,
+            //
+            // for IDatabaseUnitOfWork
+            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IDatabaseUnitOfWork : null);
+            // for IUnitOfWork
+            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IUnitOfWork : null);
 
             // register repositories
             // repos depend on various things, and a IDatabaseUnitOfWork (registered above)
@@ -95,7 +95,6 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<IMemberGroupRepository, MemberGroupRepository>();
             container.Register<IEntityRepository, EntityRepository>();
             container.Register<IDomainRepository, DomainRepository>();
-            container.Register<EntityContainerRepository, EntityContainerRepository>();
             container.Register<ITaskRepository, TaskRepository>();
             container.Register<ITaskTypeRepository,TaskTypeRepository>();
             container.Register<IAuditRepository, AuditRepository>();
@@ -103,12 +102,15 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<IRelationTypeRepository, RelationTypeRepository>();
             container.Register<IMigrationEntryRepository, MigrationEntryRepository>();
             container.Register<IServerRegistrationRepository, ServerRegistrationRepository>();
+            container.Register<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
+            container.Register<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
+            container.Register<IDataTypeContainerRepository, DataTypeContainerRepository>();
 
             // repositories that depend on a filesystem
             // these have an annotated ctor parameter to pick the right file system
             container.Register<IScriptRepository, ScriptRepository>();
-            container.Register<IPartialViewRepository, PartialViewRepository>("PartialViewRepository");
-            container.Register<IPartialViewRepository, PartialViewMacroRepository>("PartialViewMacroRepository");
+            container.Register<IPartialViewRepository, PartialViewRepository>();
+            container.Register<IPartialViewMacroRepository, PartialViewMacroRepository>();
             container.Register<IStylesheetRepository, StylesheetRepository>();
         }
     }

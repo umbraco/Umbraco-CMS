@@ -747,7 +747,7 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
+            var uow = provider.CreateUnitOfWork();
             Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
 
             // Act
@@ -758,7 +758,7 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.GetUnitOfWork();
+            uow = provider.CreateUnitOfWork();
             Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
         }
 
@@ -809,7 +809,7 @@ namespace Umbraco.Tests.Services
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");    
             }
@@ -824,7 +824,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(published);
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));    
             }
@@ -844,7 +844,7 @@ namespace Umbraco.Tests.Services
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");
             }
@@ -856,7 +856,7 @@ namespace Umbraco.Tests.Services
             contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
 
             // Assert            
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
             }
@@ -1334,12 +1334,12 @@ namespace Umbraco.Tests.Services
         public void Can_Save_Lazy_Content()
         {
             var databaseFactory = new DefaultDatabaseFactory(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
-                Logger, 
+                Logger,
                 new TestScopeContextFactory());
-            var provider = new NPocoUnitOfWorkProvider(databaseFactory);
-            var unitOfWork = provider.GetUnitOfWork();
+            var repositoryFactory = MockRepositoryFactory();
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1347,13 +1347,15 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                ContentTypeRepository contentTypeRepository;
+                var repository = CreateRepository(unitOfWork, out contentTypeRepository);
+
                 foreach (var content in list)
                 {
                     repository.AddOrUpdate(content.Value);
-                    unitOfWork.Commit();
+                    unitOfWork.Flush();
                 }
 
                 Assert.That(c.Value.HasIdentity, Is.True);
@@ -1456,14 +1458,14 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
 
             contentService.Publish(content);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
@@ -1480,7 +1482,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
             
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new{nodeId = content.Id, versionId = content.Version}) != null);
             }
@@ -1620,6 +1622,31 @@ namespace Umbraco.Tests.Services
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
             var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
+        }
+
+        private RepositoryFactory MockRepositoryFactory()
+        {
+            RepositoryFactory factory = null;
+            var mock = new Mock<RepositoryFactory>(Container);
+
+            mock
+                .Setup(x => x.CreateRepository<ITemplateRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<ITagRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new TagRepository(uow, DisabledCache, Logger, MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<IContentTypeRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), MappingResolver));
+            mock
+                .Setup(x => x.CreateRepository<IContentRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
+                .Returns((IDatabaseUnitOfWork uow, string name) =>
+                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), MappingResolver));
+
+            return factory = mock.Object;
         }
     }
 }

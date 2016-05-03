@@ -31,6 +31,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Web.DependencyInjection;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
@@ -125,7 +126,6 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
 
             //replace some stuff
-            Container.Register<ISqlSyntaxProvider>(factory => SqlSyntax);
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");

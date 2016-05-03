@@ -11,6 +11,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -21,10 +22,10 @@ namespace Umbraco.Core.Services
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
         
 
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public EntityService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
             IContentTypeService contentTypeService1 = contentTypeService;
@@ -73,7 +74,7 @@ namespace Umbraco.Core.Services
         {
             var result = _runtimeCache.GetCacheItem<int?>(CacheKeys.IdToKeyCacheKey + key, () =>
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     switch (umbracoObjectType)
                     {
@@ -116,7 +117,7 @@ namespace Umbraco.Core.Services
         {
             var result = _runtimeCache.GetCacheItem<Guid?>(CacheKeys.KeyToIdCacheKey + id, () =>
             {
-                using (var uow = UowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     switch (umbracoObjectType)
                     {
@@ -152,8 +153,9 @@ namespace Umbraco.Core.Services
         {
             if (loadBaseType)
             {
-                using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    var repository = uow.CreateRepository<IEntityRepository>();
                     return repository.GetByKey(key);
                 }
             }
@@ -182,8 +184,9 @@ namespace Umbraco.Core.Services
         {
             if (loadBaseType)
             {
-                using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    var repository = uow.CreateRepository<IEntityRepository>();
                     return repository.Get(id);
                 }
             }
@@ -201,8 +204,9 @@ namespace Umbraco.Core.Services
             if (loadBaseType)
             {
                 var objectTypeId = umbracoObjectType.GetGuid();
-                using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    var repository = uow.CreateRepository<IEntityRepository>();
                     return repository.GetByKey(key, objectTypeId);
                 }
             }
@@ -232,8 +236,9 @@ namespace Umbraco.Core.Services
             if (loadBaseType)
             {
                 var objectTypeId = umbracoObjectType.GetGuid();
-                using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    var repository = uow.CreateRepository<IEntityRepository>();
                     return repository.Get(id, objectTypeId);
                 }
             }
@@ -264,8 +269,9 @@ namespace Umbraco.Core.Services
         {
             if (loadBaseType)
             {
-                using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+                using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    var repository = uow.CreateRepository<IEntityRepository>();
                     return repository.Get(id);
                 }
             }
@@ -288,8 +294,9 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public virtual IUmbracoEntity GetParent(int id)
         {
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
                 if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
                     return null;
@@ -306,8 +313,9 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public virtual IUmbracoEntity GetParent(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
                 if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
                     return null;
@@ -324,8 +332,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetChildren(int parentId)
         {
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query);
 
@@ -342,8 +351,9 @@ namespace Umbraco.Core.Services
         public virtual IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType)
         {
             var objectTypeId = umbracoObjectType.GetGuid();
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query, objectTypeId).ToList(); // run within using!
 
@@ -358,8 +368,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetDescendents(int id)
         {
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
                 var pathMatch = entity.Path + ",";
                 var query = repository.Query.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
@@ -378,8 +389,9 @@ namespace Umbraco.Core.Services
         public virtual IEnumerable<IUmbracoEntity> GetDescendents(int id, UmbracoObjectTypes umbracoObjectType)
         {
             var objectTypeId = umbracoObjectType.GetGuid();
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
                 var query = repository.Query.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
                 var entities = repository.GetByQuery(query, objectTypeId);
@@ -396,8 +408,9 @@ namespace Umbraco.Core.Services
         public virtual IEnumerable<IUmbracoEntity> GetRootEntities(UmbracoObjectTypes umbracoObjectType)
         {
             var objectTypeId = umbracoObjectType.GetGuid();
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == -1);
                 var entities = repository.GetByQuery(query, objectTypeId);
 
@@ -440,8 +453,9 @@ namespace Umbraco.Core.Services
             });
 
             var objectTypeId = umbracoObjectType.GetGuid();
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 return repository.GetAll(objectTypeId, ids);
             }
         }
@@ -457,8 +471,9 @@ namespace Umbraco.Core.Services
             });
 
             var objectTypeId = umbracoObjectType.GetGuid();
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 return repository.GetAll(objectTypeId, keys);
             }
         }
@@ -480,8 +495,9 @@ namespace Umbraco.Core.Services
                     ("The passed in type is not supported");
             });
 
-            using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IEntityRepository>();
                 return repository.GetAll(objectTypeId, ids);
             }
         }
@@ -493,7 +509,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="UmbracoObjectTypes"/></returns>
         public virtual UmbracoObjectTypes GetObjectType(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var sql = uow.Database.Sql()
                     .Select("nodeObjectType")
@@ -512,7 +528,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="UmbracoObjectTypes"/></returns>
         public virtual UmbracoObjectTypes GetObjectType(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var sql = uow.Database.Sql()
                     .Select("nodeObjectType")

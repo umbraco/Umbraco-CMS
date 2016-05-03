@@ -146,13 +146,13 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
+
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
                 var contents = repository.GetAll();
@@ -178,12 +178,13 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
+
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
                 var contents = repository.GetAll();
@@ -207,13 +208,12 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
 
                 // Act
                 var contents = repository.GetAll();
@@ -241,12 +241,12 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(pages, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver))
-            using (var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver))
-            using (var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver))
-            using (var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+                var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository, MappingResolver);
+                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
 
                 // Act
                 var contents = repository.GetAll();

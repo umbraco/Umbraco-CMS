@@ -1059,7 +1059,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
+            using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
             }
