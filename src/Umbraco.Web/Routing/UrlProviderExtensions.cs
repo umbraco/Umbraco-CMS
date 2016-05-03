@@ -66,6 +66,7 @@ namespace Umbraco.Web.Routing
                         l.Add(o.Name);
                         o = o.Parent;
                     }
+                    l.Reverse();
                     s = "/" + string.Join("/", l) + " (id=" + id + ")";
 
                 }
