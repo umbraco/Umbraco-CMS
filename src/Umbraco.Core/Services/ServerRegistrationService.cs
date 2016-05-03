@@ -67,7 +67,6 @@ namespace Umbraco.Core.Services
 
                 repo.AddOrUpdate(server);
                 uow.Flush(); // triggers a cache reload
-                // fixme - this will release the log since we commited the uow?!
                 repo.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
@@ -139,8 +138,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IServerRegistration> GetActiveServers()
         {
-            // fixme - oops?!
-            // fixme - do we want to ensure that the repository does NOT cache?
+            // fixme - this needs to be refactored entirely now that we have repeatable read everywhere
 
             //return _lrepo.WithReadLocked(xr =>
             //{
@@ -166,7 +164,7 @@ namespace Umbraco.Core.Services
             // repositories works at all in a LB environment - TODO: figure it out
 
             using (var uow = UowProvider.CreateUnitOfWork())
-            {                
+            {
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 repo.ReadLockServers();
 

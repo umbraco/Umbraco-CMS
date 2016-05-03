@@ -126,7 +126,6 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
 
             //replace some stuff
-            Container.Register<ISqlSyntaxProvider>(factory => SqlSyntax); // fixme kill?
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");

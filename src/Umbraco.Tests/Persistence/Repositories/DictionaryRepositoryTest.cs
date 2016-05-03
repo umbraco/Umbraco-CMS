@@ -297,27 +297,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.CreateUnitOfWork();
-            var repository = CreateRepository(unitOfWork);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork);
 
-            var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
-            ServiceContext.LocalizationService.Save(languageNo);
+                var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+                ServiceContext.LocalizationService.Save(languageNo);
 
-            // Act
-            var item = repository.Get(1);
-            var translations = item.Translations.ToList();
-            translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
-            item.Translations = translations;
+                // Act
+                var item = repository.Get(1);
+                var translations = item.Translations.ToList();
+                translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
+                item.Translations = translations;
 
-            repository.AddOrUpdate(item);
-            unitOfWork.Flush();
+                repository.AddOrUpdate(item);
+                unitOfWork.Flush();
 
-            var dictionaryItem = (DictionaryItem)repository.Get(1);
-            
-            // Assert
-            Assert.That(dictionaryItem, Is.Not.Null);
-            Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+                var dictionaryItem = (DictionaryItem) repository.Get(1);
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
+                Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+            }
         }
 
         [Test]
