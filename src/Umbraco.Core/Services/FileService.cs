@@ -254,7 +254,7 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationStatus<ITemplate, OperationStatusType>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0)
+        public Attempt<OperationStatus<OperationStatusType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0)
         {
             var template = new Template(contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -278,7 +278,7 @@ namespace Umbraco.Core.Services
                   new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData),
                   this))
             {
-                return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                return OperationStatus.Attempt.Fail<OperationStatusType, ITemplate>(OperationStatusType.FailedCancelledByEvent, evtMsgs, template);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -291,7 +291,7 @@ namespace Umbraco.Core.Services
             SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false, evtMsgs), this);
             Audit(AuditType.Save, "Save Template performed by user", userId, template.Id);
 
-            return Attempt.Succeed(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.Success, evtMsgs));
+            return OperationStatus.Attempt.Succeed<OperationStatusType, ITemplate>(OperationStatusType.Success, evtMsgs, template);
         }
 
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)

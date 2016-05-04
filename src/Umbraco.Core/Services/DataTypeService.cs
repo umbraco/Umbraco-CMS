@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
 
         #region Containers
 
-        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
                         this))
                     {
-                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                        return OperationStatus.Attempt.Cancel(evtMsgs, container);
                     }
 
                     repo.AddOrUpdate(container);
@@ -57,11 +57,11 @@ namespace Umbraco.Core.Services
                     SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
                     //TODO: Audit trail ?
 
-                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                    return OperationStatus.Attempt.Succeed(evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
-                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                    return OperationStatus.Attempt.Fail<EntityContainer>(evtMsgs, ex);
                 }
             }
         }
@@ -126,20 +126,20 @@ namespace Umbraco.Core.Services
             if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
             {
                 var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataTypeGuid + " container.");
-                return OperationStatus.Exception(evtMsgs, ex);
+                return OperationStatus.Attempt.Fail(evtMsgs, ex);
             }
 
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
             {
                 var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return OperationStatus.Exception(evtMsgs, ex);
+                return OperationStatus.Attempt.Fail(evtMsgs, ex);
             }
 
             if (SavingContainer.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
                         this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
 
             //TODO: Audit trail ?
 
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
-                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+                if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
 
                 if (DeletingContainer.IsRaisedEventCancelled(
                         new DeleteEventArgs<EntityContainer>(container, evtMsgs),
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
 
                 DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
 
-                return OperationStatus.Success(evtMsgs);
+                return OperationStatus.Attempt.Succeed(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
@@ -313,9 +313,7 @@ namespace Umbraco.Core.Services
                   new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
                   this))
             {
-                return Attempt.Fail(
-                    new OperationStatus<MoveOperationStatusType>(
-                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+                return OperationStatus.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
             }
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
@@ -337,16 +335,14 @@ namespace Umbraco.Core.Services
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return Attempt.Fail(
-                        new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                    return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs);
                 }
                 uow.Complete();
             }
 
             Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this);
 
-            return Attempt.Succeed(
-                new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+            return OperationStatus.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
         /// <summary>

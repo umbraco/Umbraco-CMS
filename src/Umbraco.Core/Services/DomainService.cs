@@ -34,7 +34,7 @@ namespace Umbraco.Core.Services
                    new DeleteEventArgs<IDomain>(domain, evtMsgs),
                    this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Services
 
             var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
             Deleted.RaiseEvent(args, this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         public IDomain GetByName(string name)
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IDomain>(domainEntity, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         #region Event Handlers

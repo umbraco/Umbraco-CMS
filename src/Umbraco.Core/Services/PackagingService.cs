@@ -480,7 +480,7 @@ namespace Umbraco.Core.Services
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }
-                        var rootFolderId = tryCreateFolder.Result.Entity.Id;
+                        var rootFolderId = tryCreateFolder.Result.Value.Id;
                         current = _contentTypeService.GetContentTypeContainer(rootFolderId);
                     }
 
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Services
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result.Entity.Id);
+            return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result.Value.Id);
         }
 
         private IContentType CreateContentTypeFromXml(XElement documentType)
@@ -953,7 +953,7 @@ namespace Umbraco.Core.Services
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }                        
-                        current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
+                        current = _dataTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
                     }
 
                     importedFolders.Add(name, current.Id);
@@ -986,7 +986,7 @@ namespace Umbraco.Core.Services
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
+            return _dataTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
         }
 
         private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)

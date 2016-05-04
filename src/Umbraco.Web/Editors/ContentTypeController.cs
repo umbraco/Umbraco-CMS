@@ -199,7 +199,7 @@ namespace Umbraco.Web.Editors
                                     () => ctSave.Alias,
                                     () => tryCreateTemplate.Result.StatusType);
                             }
-                            template = tryCreateTemplate.Result.Entity;
+                            template = tryCreateTemplate.Result.Value;
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back

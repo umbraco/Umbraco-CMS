@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
         protected HttpResponseMessage PerformCopy<TContentType>(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<TContentType, MoveOperationStatusType>>> doCopy)
+            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType, TContentType>>> doCopy)
             where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
@@ -327,7 +327,7 @@ namespace Umbraco.Web.Editors
             var result = doCopy(toMove, move.ParentId);
             if (result.Success)
             {
-                var copy = result.Result.Entity;
+                var copy = result.Result.Value;
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 response.Content = new StringContent(copy.Path, Encoding.UTF8, "application/json");
                 return response;

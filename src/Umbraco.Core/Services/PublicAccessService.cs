@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationStatus<OperationStatusType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
@@ -126,7 +126,11 @@ namespace Umbraco.Core.Services
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
+                    // fixme - that one is weird - returning a failed attempt without an operation status?
+                    // there should be an OperationStatusType.FailedNoTarget
+                    // so, now returning a failed attempt with an operation status and a null exception
+                    //return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
+                    return OperationStatus.Attempt.Fail<PublicAccessEntry>(evtMsgs, null);
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -136,16 +140,14 @@ namespace Umbraco.Core.Services
                 else
                 {
                     //If they are both the same already then there's nothing to update, exit
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+                    return OperationStatus.Attempt.Succeed(evtMsgs, entry);
                 }
 
                 if (Saving.IsRaisedEventCancelled(
                     new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
                 {
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail(
-                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    return OperationStatus.Attempt.Cancel(evtMsgs, entry);
                 }
 
                 repo.AddOrUpdate(entry);
@@ -154,8 +156,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+            return OperationStatus.Attempt.Succeed(evtMsgs, entry);
         }
 
         /// <summary>
@@ -181,14 +182,14 @@ namespace Umbraco.Core.Services
                 entry.RemoveRule(existingRule);
 
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
-                    return OperationStatus.Cancelled(evtMsgs);
+                    return OperationStatus.Attempt.Cancel(evtMsgs);
 
                 repo.AddOrUpdate(entry);
                 uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -213,7 +214,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -227,7 +228,7 @@ namespace Umbraco.Core.Services
                     new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -238,7 +239,7 @@ namespace Umbraco.Core.Services
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>

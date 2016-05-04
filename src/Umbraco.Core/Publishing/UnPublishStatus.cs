@@ -5,26 +5,32 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Publishing
 {
     /// <summary>
-    /// The result of unpublishing a content item
+    /// Represents the result of unpublishing a content item.
     /// </summary>
-    public class UnPublishStatus : OperationStatus<IContent, UnPublishedStatusType>
+    public class UnPublishStatus : OperationStatus<UnPublishedStatusType, IContent>
     {
-        public UnPublishStatus(IContent content, UnPublishedStatusType statusType, EventMessages eventMessages)
-            : base(content, statusType, eventMessages)
-        {
-        }
+        /// <summary>
+        /// Creates a new instance of the <see cref="UnPublishStatus"/> class with a status type, event messages, and a content item.
+        /// </summary>
+        /// <param name="statusType">The status of the operation.</param>
+        /// <param name="eventMessages">Event messages produced by the operation.</param>
+        /// <param name="content">The content item.</param>
+        public UnPublishStatus(UnPublishedStatusType statusType, EventMessages eventMessages, IContent content)
+            : base(statusType, eventMessages, content)
+        { }
 
         /// <summary>
-        /// Creates a successful unpublish status
+        /// Creates a new successful instance of the <see cref="UnPublishStatus"/> class with a event messages, and a content item.
         /// </summary>
+        /// <param name="eventMessages">Event messages produced by the operation.</param>
+        /// <param name="content">The content item.</param>
         public UnPublishStatus(IContent content, EventMessages eventMessages)
-            : this(content, UnPublishedStatusType.Success, eventMessages)
-        {
-        }
+            : base(UnPublishedStatusType.Success, eventMessages, content)
+        { }
 
-        public IContent ContentItem
-        {
-            get { return Entity; }
-        }        
+        /// <summary>
+        /// Gets the content item.
+        /// </summary>
+        public IContent ContentItem => Value;
     }
 }
