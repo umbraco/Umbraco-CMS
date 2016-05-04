@@ -35,7 +35,7 @@ DEL /F /Q webpihash.txt
 ECHO Making sure Git is in the path so that the build can succeed
 CALL InstallGit.cmd
 ECHO Performing MSBuild and producing Umbraco binaries zip files
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
+"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
 
 ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
