@@ -683,7 +683,7 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
 xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
