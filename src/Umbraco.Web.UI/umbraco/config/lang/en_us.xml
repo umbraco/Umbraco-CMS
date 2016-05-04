@@ -148,6 +148,7 @@
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -676,7 +677,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
-    </key>    
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
