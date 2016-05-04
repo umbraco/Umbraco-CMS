@@ -21,6 +21,7 @@
     "net461": { }
   },
   "runtimes": {
-    "win": { }
+    "win": { },
+    "win-anycpu": { }
   }
 }
