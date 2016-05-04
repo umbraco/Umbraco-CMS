@@ -288,7 +288,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes =
-                ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
+                ApplicationContext.Services.ContentTypeService.GetAll()
                     .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name })
                     .OrderBy(x => x.Name).ToList();
             contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = "Everything" });

@@ -1269,5 +1269,15 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             };
             return list;
         }
+
+        public void ReadLockTypes()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteLockTypes()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

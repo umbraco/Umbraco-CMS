@@ -14,8 +14,8 @@ namespace Umbraco.Core.Models
         public static IEnumerable<IContentTypeBase> Descendants(this IContentTypeBase contentType)
         {
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var descendants = contentTypeService.GetContentTypeChildren(contentType.Id)
-                                                .SelectRecursive(type => contentTypeService.GetContentTypeChildren(type.Id));
+            var descendants = contentTypeService.GetChildren(contentType.Id)
+                                                .SelectRecursive(type => contentTypeService.GetChildren(type.Id));
             return descendants;
         }
 

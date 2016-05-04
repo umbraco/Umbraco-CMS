@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Services
         {
             var mediaService = ServiceContext.MediaService;
             var mediaType = MockedContentTypes.CreateVideoMediaType();
-            ServiceContext.ContentTypeService.Save(mediaType);
+            ServiceContext.MediaTypeService.Save(mediaType);
             var media = mediaService.CreateMedia("Test", -1, "video");
 
             mediaService.Save(media);
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Services
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
         {
             //Create and Save folder-Media -> 1050
-            var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
             ServiceContext.MediaService.Save(folder);
             
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MediaService.Save(folder2);
             
             //Create and Save image-Media  -> 1052
-            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
             var image = (Media)MockedMedia.CreateMediaImage(imageMediaType, 1050);
             ServiceContext.MediaService.Save(image);
             

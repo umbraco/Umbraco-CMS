@@ -66,7 +66,7 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static new MediaType GetByAlias(string Alias)
         {
-            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Alias);
+            var mediaType = ApplicationContext.Current.Services.MediaTypeService.Get(Alias);
             return new MediaType(mediaType);
         }
 
@@ -85,7 +85,7 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static IEnumerable<MediaType> GetAllAsList()
         {
-            var mediaTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllMediaTypes();
+            var mediaTypes = ApplicationContext.Current.Services.MediaTypeService.GetAll();
             return mediaTypes.OrderBy(x => x.Name).Select(x => new MediaType(x));
         }
 
@@ -98,7 +98,7 @@ namespace umbraco.cms.businesslogic.media
         internal static MediaType MakeNew(IUser u, string text, int parentId)
         {
             var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
-            ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
+            ApplicationContext.Current.Services.MediaTypeService.Save(mediaType, u.Id);
             var mt = new MediaType(mediaType.Id);
 
 
@@ -114,7 +114,7 @@ namespace umbraco.cms.businesslogic.media
         {
             var current = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity as UmbracoBackOfficeIdentity : null;
             var userId = current == null ? Attempt<int>.Fail() : current.Id.TryConvertTo<int>();
-            ApplicationContext.Current.Services.ContentTypeService.Save(MediaTypeItem, userId.Success ? userId.Result : 0);
+            ApplicationContext.Current.Services.MediaTypeService.Save(MediaTypeItem, userId.Success ? userId.Result : 0);
 
             base.Save();
 
@@ -132,7 +132,7 @@ namespace umbraco.cms.businesslogic.media
                 throw new ArgumentException("Can't delete a Media Type used as a Master Content Type. Please remove all references first!");
             }
 
-            ApplicationContext.Current.Services.ContentTypeService.Delete(MediaTypeItem);
+            ApplicationContext.Current.Services.MediaTypeService.Delete(MediaTypeItem);
 
             
         }
@@ -142,7 +142,7 @@ namespace umbraco.cms.businesslogic.media
 
         protected override void setupNode()
         {
-            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
+            var mediaType = ApplicationContext.Current.Services.MediaTypeService.Get(Id);
             // If it's null, it's probably a folder
             if (mediaType != null)
                 SetupNode(mediaType);

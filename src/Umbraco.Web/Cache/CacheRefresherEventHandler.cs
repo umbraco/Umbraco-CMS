@@ -67,10 +67,10 @@ namespace Umbraco.Web.Cache
 
             //Bind to content type events
 
-            ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
-            ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
-            ContentTypeService.DeletedContentType += ContentTypeServiceDeletedContentType;
-            ContentTypeService.DeletedMediaType += ContentTypeServiceDeletedMediaType;
+            ContentTypeService.Saved += ContentTypeServiceSavedContentType;
+            MediaTypeService.Saved += ContentTypeServiceSavedMediaType;
+            ContentTypeService.Deleted += ContentTypeServiceDeletedContentType;
+            MediaTypeService.Deleted += ContentTypeServiceDeletedMediaType;
             MemberTypeService.Saved += MemberTypeServiceSaved;
             MemberTypeService.Deleted += MemberTypeServiceDeleted;
 
@@ -439,7 +439,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, DeleteEventArgs<IMediaType> e)
+        static void ContentTypeServiceDeletedMediaType(IMediaTypeService sender, DeleteEventArgs<IMediaType> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveMediaTypeCache(x));
         }
@@ -469,7 +469,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, SaveEventArgs<IMediaType> e)
+        static void ContentTypeServiceSavedMediaType(IMediaTypeService sender, SaveEventArgs<IMediaType> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMediaTypeCache(x));
         }

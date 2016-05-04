@@ -300,7 +300,7 @@ namespace Umbraco.Web.Cache
             ClearContentTypeCache(
                 ids.Select(
                     x =>
-                    ApplicationContext.Current.Services.ContentTypeService.GetContentType(x) as IContentTypeBase)
+                    ApplicationContext.Current.Services.ContentTypeService.Get(x) as IContentTypeBase)
                    .WhereNotNull()
                    .Select(x => FromContentType(x, isDeleted))
                    .ToArray());

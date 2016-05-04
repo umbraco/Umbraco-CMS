@@ -566,8 +566,8 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.PropertyType:
 
                     //get all document types, then combine all property types into one list
-                    var propertyTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
-                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                    var propertyTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
@@ -577,8 +577,8 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.PropertyGroup:
 
                     //get all document types, then combine all property types into one list
-                    var propertyGroups = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
-                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                    var propertyGroups = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);

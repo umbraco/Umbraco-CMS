@@ -553,17 +553,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void CreateTestData()
         {
             //Create and Save folder-Media -> (NodeDto.NodeIdSeed)
-            var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
             ServiceContext.MediaService.Save(folder, 0);
 
             //Create and Save image-Media -> (NodeDto.NodeIdSeed + 1)
-            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
             var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
             ServiceContext.MediaService.Save(image, 0);
 
             //Create and Save file-Media -> (NodeDto.NodeIdSeed + 2)
-            var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
+            var fileMediaType = ServiceContext.MediaTypeService.Get(1033);
             var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
             ServiceContext.MediaService.Save(file, 0);
         }

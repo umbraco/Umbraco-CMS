@@ -99,9 +99,9 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                var ct = Services.ContentTypeService.GetContentType(int.Parse(id));
+                var ct = Services.ContentTypeService.Get(int.Parse(id));
                 IContentType parent = null;
-                parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
+                parent = ct == null ? null : Services.ContentTypeService.Get(ct.ParentId);
 
                 if (enableInheritedDocumentTypes)
                 {

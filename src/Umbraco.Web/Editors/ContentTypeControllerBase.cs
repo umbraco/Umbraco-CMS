@@ -27,7 +27,8 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
-    public abstract class ContentTypeControllerBase : UmbracoAuthorizedJsonController
+    public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
+        where TContentType : class, IContentTypeComposition
     {
         private ICultureDictionary _cultureDictionary;
 
@@ -79,19 +80,19 @@ namespace Umbraco.Web.Editors
                 case UmbracoObjectTypes.DocumentType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        source = Services.ContentTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MediaType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        source = Services.MediaTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.MediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MemberType:
@@ -148,12 +149,11 @@ namespace Umbraco.Web.Editors
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+        protected TContentType PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
             Action<TContentTypeSave> beforeCreateNew = null)
-            where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
@@ -312,11 +312,10 @@ namespace Umbraco.Web.Editors
         /// <param name="getContentType"></param>
         /// <param name="doCopy"></param>
         /// <returns></returns>
-        protected HttpResponseMessage PerformCopy<TContentType>(
+        protected HttpResponseMessage PerformCopy(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
             Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType, TContentType>>> doCopy)
-            where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
             if (toMove == null)
@@ -356,12 +355,16 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, IContentTypeComposition composition)
+        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType composition)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
-            var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
+            // fixme was defined on content type service:
+            //Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
+
+            var service = ApplicationContext.Services.GetContentTypeService<TContentType>();
+            var validateAttempt = service.ValidateComposition(composition);
             if (validateAttempt == false)
             {
                 //if it's not successful then we need to return some model state for the property aliases that

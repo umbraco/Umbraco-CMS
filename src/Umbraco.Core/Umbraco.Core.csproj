@@ -473,7 +473,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IContentTypeCompositionRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IContentTypeRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMigrationEntryRepository.cs" />
@@ -510,6 +510,7 @@
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
+    <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
@@ -526,14 +527,17 @@
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\ExternalLoginService.cs" />
     <Compile Include="Services\IAuditService.cs" />
+    <Compile Include="Services\IContentTypeServiceBase.cs" />
     <Compile Include="Services\IDomainService.cs" />
     <Compile Include="Services\IExternalLoginService.cs" />
+    <Compile Include="Services\IMediaTypeService.cs" />
     <Compile Include="Services\IMigrationEntryService.cs" />
     <Compile Include="Services\IPublicAccessService.cs" />
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\LocalizedTextServiceSupplementaryFileSource.cs" />
     <Compile Include="Models\MediaExtensions.cs" />
+    <Compile Include="Services\MediaTypeService.cs" />
     <Compile Include="Services\MigrationEntryService.cs" />
     <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\PublicAccessService.cs" />

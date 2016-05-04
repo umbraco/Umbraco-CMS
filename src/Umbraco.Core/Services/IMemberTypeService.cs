@@ -4,7 +4,10 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    public interface IMemberTypeService : IService
+    /// <summary>
+    /// Manages <see cref="IMemberType"/> objects.
+    /// </summary>
+    public interface IMemberTypeService : IContentTypeServiceBase<IMemberType>
     { 
         /// <summary>
         /// Gets a list of all available <see cref="IContentType"/> objects

@@ -642,5 +642,26 @@ namespace Umbraco.Core.Models
 
             return clone;
         }
+
+        public IContentType DeepCloneWithResetIdentities(string alias)
+        {
+            var clone = (ContentType)DeepClone();
+            clone.Alias = alias;
+            clone.Key = Guid.Empty;
+            foreach (var propertyGroup in clone.PropertyGroups)
+            {
+                propertyGroup.ResetIdentity();
+                propertyGroup.ResetDirtyProperties(false);
+            }
+            foreach (var propertyType in clone.PropertyTypes)
+            {
+                propertyType.ResetIdentity();
+                propertyType.ResetDirtyProperties(false);
+            }
+
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
     }
 }

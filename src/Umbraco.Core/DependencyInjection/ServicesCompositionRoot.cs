@@ -23,29 +23,30 @@ namespace Umbraco.Core.DependencyInjection
 
             //These will be replaced by the web boot manager when running in a web context
             container.Register<IEventMessagesFactory, TransientMessagesFactory>();
-            
+
             //the context
             container.RegisterSingleton<ServiceContext>();
-            
+
             //now the services...
             container.RegisterSingleton<IMigrationEntryService, MigrationEntryService>();
             container.RegisterSingleton<IPublicAccessService, PublicAccessService>();
             container.RegisterSingleton<ITaskService, TaskService>();
             container.RegisterSingleton<IDomainService, DomainService>();
-            container.RegisterSingleton<IAuditService, AuditService>();            
+            container.RegisterSingleton<IAuditService, AuditService>();
             container.RegisterSingleton<ITagService, TagService>();
             container.RegisterSingleton<IContentService, ContentService>();
             container.RegisterSingleton<IUserService, UserService>();
             container.RegisterSingleton<IMemberService, MemberService>();
             container.RegisterSingleton<IMediaService, MediaService>();
             container.RegisterSingleton<IContentTypeService, ContentTypeService>();
+            container.RegisterSingleton<IMediaTypeService, MediaTypeService>();
             container.RegisterSingleton<IDataTypeService, DataTypeService>();
             container.RegisterSingleton<IFileService, FileService>();
             container.RegisterSingleton<ILocalizationService, LocalizationService>();
             container.RegisterSingleton<IPackagingService, PackagingService>();
             container.RegisterSingleton<IServerRegistrationService, ServerRegistrationService>();
             container.RegisterSingleton<IEntityService, EntityService>();
-            container.RegisterSingleton<IRelationService, RelationService>();            
+            container.RegisterSingleton<IRelationService, RelationService>();
             container.RegisterSingleton<IMacroService, MacroService>();
             container.RegisterSingleton<IMemberTypeService, MemberTypeService>();
             container.RegisterSingleton<IMemberGroupService, MemberGroupService>();
@@ -83,7 +84,7 @@ namespace Umbraco.Core.DependencyInjection
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetInstance<ILogger>()));
 
-            //TODO: These are replaced in the web project - we need to declare them so that 
+            //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
             container.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
             container.RegisterSingleton<ISectionService, EmptySectionService>();

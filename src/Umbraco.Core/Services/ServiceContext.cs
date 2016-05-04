@@ -19,6 +19,7 @@ namespace Umbraco.Core.Services
         private readonly Lazy<IMemberService> _memberService;
         private readonly Lazy<IMediaService> _mediaService;
         private readonly Lazy<IContentTypeService> _contentTypeService;
+        private readonly Lazy<IMediaTypeService> _mediaTypeService;
         private readonly Lazy<IDataTypeService> _dataTypeService;
         private readonly Lazy<IFileService> _fileService;
         private readonly Lazy<ILocalizationService> _localizationService;
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Services
         /// Initializes a new instance of the <see cref="ServiceContext"/> class with lazy services.
         /// </summary>
         /// <remarks>Used by IoC. Note that LightInject will favor lazy args when picking a constructor.</remarks>
-        public ServiceContext(Lazy<IMigrationEntryService> migrationEntryService, Lazy<IPublicAccessService> publicAccessService, Lazy<ITaskService> taskService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService)
+        public ServiceContext(Lazy<IMigrationEntryService> migrationEntryService, Lazy<IPublicAccessService> publicAccessService, Lazy<ITaskService> taskService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IMediaTypeService> mediaTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService)
         {
             _migrationEntryService = migrationEntryService;
             _publicAccessService = publicAccessService;
@@ -52,6 +53,7 @@ namespace Umbraco.Core.Services
             _memberService = memberService;
             _mediaService = mediaService;
             _contentTypeService = contentTypeService;
+            _mediaTypeService = mediaTypeService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
             _localizationService = localizationService;
@@ -76,6 +78,7 @@ namespace Umbraco.Core.Services
             IContentService contentService = null,
             IMediaService mediaService = null,
             IContentTypeService contentTypeService = null,
+            IMediaTypeService mediaTypeService = null,
             IDataTypeService dataTypeService = null,
             IFileService fileService = null,
             ILocalizationService localizationService = null,
@@ -109,6 +112,7 @@ namespace Umbraco.Core.Services
             if (contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
             if (mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
             if (contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            if (mediaTypeService != null) _mediaTypeService = new Lazy<IMediaTypeService>(() => mediaTypeService);
             if (dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
             if (fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
             if (localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
@@ -197,6 +201,11 @@ namespace Umbraco.Core.Services
         /// Gets the <see cref="IContentTypeService"/>
         /// </summary>
         public IContentTypeService ContentTypeService => _contentTypeService.Value;
+
+        /// <summary>
+        /// Gets the <see cref="IMediaTypeService"/>
+        /// </summary>
+        public IMediaTypeService MediaTypeService => _mediaTypeService.Value;
 
         /// <summary>
         /// Gets the <see cref="IDataTypeService"/>

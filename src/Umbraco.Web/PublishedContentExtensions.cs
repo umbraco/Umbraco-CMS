@@ -634,10 +634,10 @@ namespace Umbraco.Web
 		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
 		{
 			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
-			var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
+			var type = contentTypeService.Get(content.DocumentTypeAlias);
 			while (type != null && type.ParentId > 0)
 			{
-				type = contentTypeService.GetContentType(type.ParentId);
+				type = contentTypeService.Get(type.ParentId);
 				if (type.Alias.InvariantEquals(docTypeAlias))
 					return true;
 			}

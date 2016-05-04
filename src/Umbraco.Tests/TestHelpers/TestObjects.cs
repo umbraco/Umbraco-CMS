@@ -151,14 +151,15 @@ namespace Umbraco.Tests.TestHelpers
             var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
             var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, dataTypeService.Value));
             var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
-            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value, mediaService.Value));
+            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
+            var mediaTypeService = new Lazy<IMediaTypeService>(() => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
             var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, logger, eventMessagesFactory));
             var localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, logger, eventMessagesFactory));
 
             var memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
             var entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, logger, eventMessagesFactory,
-                    contentService.Value, contentTypeService.Value, mediaService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
+                    contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
@@ -182,6 +183,7 @@ namespace Umbraco.Tests.TestHelpers
                 memberService,
                 mediaService,
                 contentTypeService,
+                mediaTypeService,
                 dataTypeService,
                 fileService,
                 localizationService,

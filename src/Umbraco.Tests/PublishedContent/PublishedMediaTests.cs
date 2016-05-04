@@ -99,7 +99,7 @@ namespace Umbraco.Tests.PublishedContent
                         Name = "Rich Text",
                         DataTypeDefinitionId = -87 //tiny mce
                     });
-            ServiceContext.ContentTypeService.Save(mType);
+            ServiceContext.MediaTypeService.Save(mType);
             var media = MockedMedia.CreateMediaImage(mType, -1);
             media.Properties["content"].Value = "<div>This is some content</div>";
             ServiceContext.MediaService.Save(media);
