@@ -134,3 +134,4 @@ src/.vs/
 src/Umbraco.Web.UI/umbraco/js/install.loader.js
 src/Umbraco.Web.UI/js/*
 src/Umbraco.Tests/media
+src/*/project.lock.json
