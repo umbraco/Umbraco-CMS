@@ -852,6 +852,13 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="settingDialogDetails">Die Einstellungen werden nur gespeichert, wenn die angegebene JSON-Konfiguration gültig ist.</key>
     <key alias="allowAllEditors">Alle Elemente erlauben</key>
     <key alias="allowAllRowConfigurations">Alle Zeilenlayouts erlauben</key>
+
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternatives Feld</key>

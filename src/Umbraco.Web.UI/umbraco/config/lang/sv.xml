@@ -768,6 +768,13 @@
     <key alias="settingDialogDetails">Inställningarna kommer bara att sparas om det inmatade json-konfigurationen är giltig</key>
     <key alias="allowAllEditors">Tillåt alla editors</key>
     <key alias="allowAllRowConfigurations">Tillåt alla rad- konfigurationer</key>
+
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt fält</key>

@@ -855,6 +855,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
+
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
 </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternatief veld</key>

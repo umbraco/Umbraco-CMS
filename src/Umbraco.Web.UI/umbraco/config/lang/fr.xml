@@ -882,6 +882,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 
     <key alias="allowAllEditors">Autoriser tous les éditeurs</key>
     <key alias="allowAllRowConfigurations">Autoriser toutes les configurations de lignes</key>
+
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Champ alternatif</key>

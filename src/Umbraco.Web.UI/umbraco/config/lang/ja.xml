@@ -1014,6 +1014,13 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="chooseExtra">追加を選択</key>
     <key alias="chooseDefault">デフォルトの選択</key>
     <key alias="areAdded">追加されました</key>
+      
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
   </area>
 
   <area alias="contentTypeEditor">
