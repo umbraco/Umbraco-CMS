@@ -27,11 +27,11 @@
                                 <i class="icon icon-alert color-yellow" ng-if="status.resultType == 1"></i>
                                 <i class="icon icon-delete color-red" ng-if="status.resultType == 2"></i>
                                 <i class="icon icon-info" ng-if="status.resultType == 3"></i>
-                                {{status.message}}
-                                <span ng-if="status.description">{{status.description}}</span>
+                                <span ng-bind-html="status.message"></span><br/>
+                                <span ng-if="status.description" ng-bind-html="status.description"></span>
                                 <div ng-repeat="action in status.actions">
                                     <button type="button" class="btn" ng-click="executeAction(check, status, action);">{{action.name}}</button><br/>
-                                    <p>{{action.description}}</p>
+                                    <p ng-bind-html="action.description"></p>
                                 </div>
                             </div>
                         </div>
