@@ -8,6 +8,8 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    using Umbraco.Core.PropertyEditors.ValueCorrectors;
+
     [PropertyValueType(typeof(IEnumerable<string>))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
@@ -19,6 +21,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
+            // TODO this would be better put in the base class, but the method is a virtual method.
+            source = LegacyDbPropertyValueCorrectionResolver.Current.CorrectedValue(propertyType.PropertyEditorAlias, source);
+
             // data is (both in database and xml):
             // <keyFeatureList>
             //    <values>

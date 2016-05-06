@@ -2,6 +2,8 @@
 
 namespace Umbraco.Core.PropertyEditors
 {
+    using Umbraco.Core.PropertyEditors.ValueCorrectors;
+
     /// <summary>
     /// Provides a default overridable implementation for <see cref="IPropertyValueConverter"/> that does nothing.
     /// </summary>

@@ -480,6 +480,11 @@
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueCorrectors\DbPropertyValueCorrectionAttribute.cs" />
+    <Compile Include="PropertyEditors\ValueCorrectors\ILegacyDbPropertyValueCorrection.cs" />
+    <Compile Include="PropertyEditors\ValueCorrectors\LegacyDbPropertyValueCorrectionResolver.cs" />
+    <Compile Include="PropertyEditors\ValueCorrectors\DbPropertyValueCorrectionBase.cs" />
+    <Compile Include="PropertyEditors\ValueCorrectors\RepeatableTextstringDbValueCorrection .cs" />
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
