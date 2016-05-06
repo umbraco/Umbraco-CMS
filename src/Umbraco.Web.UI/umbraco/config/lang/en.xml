@@ -147,6 +147,7 @@
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -196,6 +197,12 @@
     <key alias="restart">Restart</key>
     <key alias="visit">Visit</key>
     <key alias="welcome">Welcome</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Name</key>

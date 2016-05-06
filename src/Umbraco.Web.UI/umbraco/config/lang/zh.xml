@@ -166,6 +166,12 @@
     <key alias="visit">访问</key>
     <key alias="welcome">欢迎</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">锚点名称</key>
     <key alias="assignDomain">管理主机名</key>
