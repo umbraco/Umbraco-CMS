@@ -201,6 +201,10 @@ namespace Umbraco.Core.Services
                 return Core.Attempt.Fail(new OperationStatus<TStatusType, TValue>(statusType, eventMessages, value), exception);
             }
 
+            public static Attempt<OperationStatus<OperationStatusType, TValue>> Cannot<TValue>(EventMessages eventMessages)
+            {
+                return Core.Attempt.Fail(new OperationStatus<OperationStatusType, TValue>(OperationStatusType.FailedCannot, eventMessages));
+            }
         }
     }
 }

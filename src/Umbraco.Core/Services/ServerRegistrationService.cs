@@ -42,8 +42,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                repo.WriteLockServers();
 
                 ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
 
@@ -103,8 +103,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                repo.WriteLockServers();
 
                 ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
 
@@ -125,8 +125,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                repo.WriteLockServers();
 
                 repo.DeactiveStaleServers(staleTimeout);
             }
@@ -165,8 +165,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.ReadLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                repo.ReadLockServers();
 
                 return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
             }

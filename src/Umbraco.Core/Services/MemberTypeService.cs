@@ -19,6 +19,10 @@ namespace Umbraco.Core.Services
             _memberService = memberService;
         }
 
+        // beware! order is important to avoid deadlocks
+        protected override int[] ReadLockIds { get; } = { Constants.System.MemberTypesLock };
+        protected override int[] WriteLockIds { get; } = { Constants.System.MemberTreeLock, Constants.System.MemberTypesLock };
+
         // don't remove, will need it later
         private IMemberService MemberService => _memberService;
         //// handle circular dependencies

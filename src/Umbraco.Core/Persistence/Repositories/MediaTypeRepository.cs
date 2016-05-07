@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMediaType"/>
     /// </summary>
-    internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
+    internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
         public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
             : base(work, cache, logger, mappingResolver)

@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         protected ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
-        
+
         /// <summary>
         /// This is called after an content type is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
                 //      - a content type changes it's alias OR
                 //      - if a content type has it's property removed OR
                 //      - if a content type has a property whose alias has changed
-                //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+                //here we need to check if the alias of the content type changed or if one of the properties was removed.
                 var dirty = contentType as IRememberBeingDirty;
                 if (dirty == null) continue;
 
@@ -52,18 +52,18 @@ namespace Umbraco.Core.Services
                     && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") || hasAnyPropertiesChangedAlias))
                 {
                     //If the alias was changed then we only need to update the xml structures for content of the current content type.
-                    //If a property was deleted or a property alias was changed then we need to update the xml structures for any 
+                    //If a property was deleted or a property alias was changed then we need to update the xml structures for any
                     // content of the current content type and any of the content type's child content types.
                     if (dirty.WasPropertyDirty("Alias")
                         && dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") == false && hasAnyPropertiesChangedAlias == false)
                     {
-                        //if only the alias changed then only update the current content type                        
+                        //if only the alias changed then only update the current content type
                         toUpdate.Add(contentType);
                     }
                     else
                     {
                         //if a property was deleted or alias changed, then update all content of the current content type
-                        // and all of it's desscendant doc types.     
+                        // and all of it's desscendant doc types.
                         toUpdate.AddRange(contentType.DescendantsAndSelf());
                     }
                 }
@@ -176,6 +176,14 @@ namespace Umbraco.Core.Services
         {
             DeletedContainer.RaiseEvent(args, _this);
         }
+
+        // for later usage
+        //public static event TypedEventHandler<TService, Change.EventArgs> TxRefreshed;
+
+        //protected void OnTxRefreshed(Change.EventArgs args)
+        //{
+        //    TxRefreshed.RaiseEvent(args, this);
+        //}
     }
 
     internal abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
@@ -187,19 +195,19 @@ namespace Umbraco.Core.Services
             : base(provider, logger, eventMessagesFactory)
         { }
 
+        protected abstract int[] WriteLockIds { get; }
+        protected abstract int[] ReadLockIds { get; }
+
         #region Validation
 
         public Attempt<string[]> ValidateComposition(TItem compo)
         {
-            // locking the content types but it really does not matter
-            // because it locks ALL content types incl. medias & members &...
-
             try
             {
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repo = uow.CreateRepository<TRepository>();
-                    repo.ReadLockTypes();
+                    uow.ReadLock(ReadLockIds);
                     ValidateLocked(repo, compo);
                     uow.Complete();
                 }
@@ -272,7 +280,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 return repo.Get(id);
             }
         }
@@ -282,7 +290,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 return repo.Get(alias);
             }
         }
@@ -292,7 +300,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 return repo.Get(id);
             }
         }
@@ -302,7 +310,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 return repo.GetAll(ids);
             }
         }
@@ -312,7 +320,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 // IReadRepository<Guid, TEntity> is explicitely implemented, need to cast the repo
                 return ((IReadRepository<Guid, TItem>) repo).GetAll(ids);
             }
@@ -323,7 +331,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 var query = repo.Query.Where(x => x.ParentId == id);
                 var contentTypes = repo.GetByQuery(query);
                 return contentTypes;
@@ -335,7 +343,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return Enumerable.Empty<TItem>();
                 var query = repo.Query.Where(x => x.ParentId == found.Id);
@@ -349,7 +357,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 var query = repo.Query.Where(x => x.ParentId == id);
                 var count = repo.Count(query);
                 return count > 0;
@@ -361,7 +369,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return false;
                 var query = repo.Query.Where(x => x.ParentId == found.Id);
@@ -375,7 +383,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
 
                 var descendants = new List<TItem>();
                 if (andSelf) descendants.Add(repo.Get(id));
@@ -404,7 +412,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
 
                 // hash set handles duplicates
                 var composed = new HashSet<TItem>(new DelegateEqualityComparer<TItem>(
@@ -435,7 +443,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.ReadLockTypes();
+                uow.ReadLock(ReadLockIds);
                 return repo.Count(repo.Query);
             }
         }
@@ -452,7 +460,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds);
 
                 // validate the DAG transform, within the lock
                 ValidateLocked(repo, item); // throws if invalid
@@ -466,7 +474,9 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            UpdateContentXmlStructure(item); // fixme - should happen within lock!
+            // todo: should use TxRefreshed event within the transaction instead, see CC branch
+            UpdateContentXmlStructure(item);
+
             OnSaved(new SaveEventArgs<TItem>(item, false));
             Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
         }
@@ -481,7 +491,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds);
 
                 // all-or-nothing, validate them all first
                 foreach (var contentType in itemsA)
@@ -498,7 +508,9 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            UpdateContentXmlStructure(itemsA.Cast<IContentTypeBase>().ToArray()); // fixme - should happen within lock!
+            // todo: should use TxRefreshed event within the transaction instead, see CC branch
+            UpdateContentXmlStructure(itemsA.Cast<IContentTypeBase>().ToArray());
+
             OnSaved(new SaveEventArgs<TItem>(itemsA, false));
             Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
         }
@@ -515,7 +527,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
                 var descendantsAndSelf = item.DescendantsAndSelf()
@@ -552,7 +564,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
                 var allDescendantsAndSelf = itemsA.SelectMany(xx => xx.DescendantsAndSelf())
@@ -647,7 +659,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds);
 
                 var containerRepository = uow.CreateContainerRepository(ContainerObjectType);
                 try
@@ -704,18 +716,17 @@ namespace Umbraco.Core.Services
             var moveInfo = new List<MoveEventInfo<TItem>>();
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var repo = uow.CreateRepository<TRepository>();
-                repo.WriteLockTypes();
+                uow.WriteLock(WriteLockIds); // also for containers
 
-                var containerRepository = uow.CreateRepository<IDocumentTypeContainerRepository>();
-                // fixme lock?
+                var repo = uow.CreateRepository<TRepository>();
+                var containerRepo = uow.CreateRepository<IDocumentTypeContainerRepository>();
 
                 try
                 {
                     EntityContainer container = null;
                     if (containerId > 0)
                     {
-                        container = containerRepository.Get(containerId);
+                        container = containerRepo.Get(containerId);
                         if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                     }
@@ -746,8 +757,9 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(WriteLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 try
                 {
                     var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid)
@@ -797,8 +809,9 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(WriteLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(containerObjectType);
-                // fixme - what shall we lock?
                 repo.AddOrUpdate(container);
                 uow.Complete();
             }
@@ -814,8 +827,9 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.ReadLock(ReadLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 var container = repo.Get(containerId);
                 return container;
             }
@@ -825,8 +839,9 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.ReadLock(ReadLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 var container = ((EntityContainerRepository) repo).Get(containerId);
                 return container;
             }
@@ -836,8 +851,9 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.ReadLock(ReadLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 return repo.GetAll(containerIds);
             }
         }
@@ -860,19 +876,22 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.ReadLock(ReadLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 return ((EntityContainerRepository) repo).Get(name, level);
             }
         }
 
+        // fixme - what happens if deleting a non-empty container?
         public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.WriteLock(WriteLockIds); // also for containers
+
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                // fixme - what shall we lock?
                 var container = repo.Get(containerId);
                 if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
 
@@ -908,7 +927,7 @@ namespace Umbraco.Core.Services
         #region Xml - Should Move!
 
         protected abstract void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes);
-       
+
         #endregion
     }
 }

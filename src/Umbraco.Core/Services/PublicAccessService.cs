@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -126,11 +123,7 @@ namespace Umbraco.Core.Services
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    // fixme - that one is weird - returning a failed attempt without an operation status?
-                    // there should be an OperationStatusType.FailedNoTarget
-                    // so, now returning a failed attempt with an operation status and a null exception
-                    //return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
-                    return OperationStatus.Attempt.Fail<PublicAccessEntry>(evtMsgs, null);
+                    return OperationStatus.Attempt.Cannot<PublicAccessEntry>(evtMsgs);
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)

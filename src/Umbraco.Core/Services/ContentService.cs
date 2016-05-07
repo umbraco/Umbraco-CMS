@@ -2001,7 +2001,7 @@ namespace Umbraco.Core.Services
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
                 //if it is not successful, then check if the props are valid
-                if ((int)publishStatus.StatusType < 10)
+                if (publishStatus.StatusType.IsSuccess())
                 {
                     //Content contains invalid property values and can therefore not be published - fire event?
                     publishStatus.StatusType = CheckAndLogIsValid(content);

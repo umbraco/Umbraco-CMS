@@ -9,8 +9,6 @@ namespace Umbraco.Core.Persistence.Repositories
         where TItem : IContentTypeComposition
     {
         TItem Get(string alias);
-        void ReadLockTypes();
-        void WriteLockTypes();
         IEnumerable<MoveEventInfo<TItem>> Move(TItem moving, EntityContainer container);
         IEnumerable<TItem> GetTypesDirectlyComposedOf(int id);
 

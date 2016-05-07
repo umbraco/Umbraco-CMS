@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	{
 		UmbracoDatabase Database { get; }
 
-	    void ReadLockNodes(params int[] lockIds);
-	    void WriteLockNodes(params int[] lockIds);
+	    void ReadLock(params int[] lockIds);
+	    void WriteLock(params int[] lockIds);
     }
 }

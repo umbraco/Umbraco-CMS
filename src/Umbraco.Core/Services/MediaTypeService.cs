@@ -19,6 +19,10 @@ namespace Umbraco.Core.Services
             _mediaService = mediaService;
         }
 
+        // beware! order is important to avoid deadlocks
+        protected override int[] ReadLockIds { get; } = { Constants.System.MediaTypesLock };
+        protected override int[] WriteLockIds { get; } = { Constants.System.MediaTreeLock, Constants.System.MediaTypesLock };
+
         // don't remove, will need it later
         private IMediaService MediaService => _mediaService;
         //// handle circular dependencies
