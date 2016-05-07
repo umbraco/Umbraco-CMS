@@ -340,6 +340,7 @@
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
+    <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />

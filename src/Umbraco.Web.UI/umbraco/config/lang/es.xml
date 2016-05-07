@@ -850,6 +850,7 @@
     <key alias="stylesheets">Hojas de estilo</key>
     <key alias="templates">Plantillas</key>
     <key alias="xslt">Archivos XSLT</key>
+    <key alias="userPermissions">Permisos de Usuarios</key>
     <key alias="userTypes">Tipos de Usuarios</key>
     <key alias="users">Usuarios</key>
   </area>

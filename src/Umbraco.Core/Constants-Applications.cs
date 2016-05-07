@@ -115,6 +115,11 @@
             public const string UserTypes = "userTypes";
 
             /// <summary>
+            /// alias for the user permissions tree.
+            /// </summary>
+            public const string UserPermissions = "userPermissions";
+
+            /// <summary>
             /// alias for the users tree.
             /// </summary>
             public const string Users = "users";

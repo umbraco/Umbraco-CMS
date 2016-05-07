@@ -951,6 +951,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Sjablonen</key>
     <key alias="xslt">XSLT Bestanden</key>
+    <key alias="userPermissions">Gebruikersrechten</key>
     <key alias="userTypes">Gebruiker Types</key>
     <key alias="users">Gebruikers</key>
   </area>

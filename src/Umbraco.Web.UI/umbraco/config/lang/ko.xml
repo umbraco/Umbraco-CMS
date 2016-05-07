@@ -846,6 +846,7 @@
     <key alias="stylesheets">스타일시트</key>
     <key alias="templates">템플릿</key>
     <key alias="xslt">XSLT 파일</key>
+    <key alias="userPermissions">사용자권한</key>
     <key alias="userTypes">사용자 유형</key>
     <key alias="users">사용자</key>
   </area>
