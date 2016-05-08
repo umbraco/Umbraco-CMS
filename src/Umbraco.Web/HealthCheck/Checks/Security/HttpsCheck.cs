@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Net;
 using System.Web;
-using System.Web.Configuration;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
 {
@@ -113,10 +112,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
-            var httpsSettingEnabled = false;
-            var httpsAppSetting = ConfigurationManager.AppSettings["umbracoUseSSL"];
-            if (httpsAppSetting != null)
-                bool.TryParse(httpsAppSetting, out httpsSettingEnabled);
+            var httpsSettingEnabled = Core.Configuration.GlobalSettings.UseSSL;
 
             var actions = new List<HealthCheckAction>();
             if (httpsSettingEnabled == false)
@@ -125,8 +121,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             return
                 new HealthCheckStatus(
                     string.Format(
-                        "The appSetting 'umbracoUseSSL' is set to '{1}' in your web.config file, your cookies are {0} marked as secure.",
-                        httpsSettingEnabled ? string.Empty : "not", httpsAppSetting))
+                        "The appSetting 'umbracoUseSSL' is set to '{0}' in your web.config file, your cookies are {1} marked as secure.",
+                        httpsSettingEnabled, httpsSettingEnabled ? string.Empty : "not"))
                 {
                     ResultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error,
                     Actions = actions
@@ -135,18 +131,25 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var httpsAppSetting = ConfigurationManager.AppSettings["umbracoUseSSL"];
-            var webConfig = WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+            var configFile = HttpContext.Current.Server.MapPath("~/Web.config");
+            const string xPath = "/configuration/appSettings/add[@key='umbracoUseSSL']/@value";
+            var configurationService = new ConfigurationService(configFile, xPath);
+            var updateConfigFile = configurationService.UpdateConfigFile("true");
 
-            if (httpsAppSetting != null)
-                webConfig.AppSettings.Settings.Remove("umbracoUseSSL");
-            webConfig.AppSettings.Settings.Add("umbracoUseSSL", "true");
-            webConfig.Save(ConfigurationSaveMode.Minimal);
-
-            return new HealthCheckStatus("The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.")
+            if (updateConfigFile.Success)
             {
-                ResultType = StatusResultType.Success
-            };
+                return
+                    new HealthCheckStatus("The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.")
+                    {
+                        ResultType = StatusResultType.Success
+                    };
+            }
+
+            return
+                new HealthCheckStatus(string.Format("Could not update the 'umbracoUseSSL' setting in your web.config file. Error: {0}", updateConfigFile.Result))
+                {
+                    ResultType = StatusResultType.Error
+                };
         }
     }
 }

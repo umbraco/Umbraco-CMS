@@ -320,6 +320,8 @@
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ConfigurationServiceResult.cs" />
     <Compile Include="HealthCheck\Checks\Config\MacroErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\TrySkipIisCustomErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\CustomErrorsCheck.cs" />

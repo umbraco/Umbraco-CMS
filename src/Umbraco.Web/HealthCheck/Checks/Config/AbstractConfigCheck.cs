@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Xml;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
     public abstract class AbstractConfigCheck : HealthCheck
     {
+        private readonly ConfigurationService _configurationService;
+
         /// <summary>
         /// Gets the config file path.
         /// </summary>
@@ -34,7 +35,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
 
-        protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext) { }
+        protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath);
+        }
 
         /// <summary>
         /// Gets the name of the file.
@@ -91,30 +95,26 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load(AbsoluteFilePath);
-
-            var xmlNode = xmlDocument.SelectSingleNode(XPath);
-            if (xmlNode == null)
+            var configValue = _configurationService.GetConfigurationValue();
+            if (configValue.Success == false)
             {
-                var message = string.Format("Unable to find node <strong>{1}</strong> in config file <strong>{0}</strong>", FileName, XPath);
+                var message = configValue.Result;
                 return new[] { new HealthCheckStatus(message) { ResultType = StatusResultType.Error } };
             }
 
-            var currentValue = xmlNode.Value ?? xmlNode.InnerText;
-            CurrentValue = currentValue;
+            CurrentValue = configValue.Result;
 
-            var valueFound = Values.Any(value => string.Equals(currentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
+            var valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
             if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound)
             {
-                var message = string.Format(CheckSuccessMessage, FileName, XPath, Values, currentValue);
+                var message = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
                 return new[] { new HealthCheckStatus(message) { ResultType = StatusResultType.Success } };
             }
 
             // Declare the action for rectifying the config value
             var rectifyAction = new HealthCheckAction("rectify", Id) { Name = "Rectify" };
 
-            var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, currentValue);
+            var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);
             return new[]
             {
                 new HealthCheckStatus(resultMessage)
@@ -134,23 +134,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             if (ValueComparisonType == ValueComparisonType.ShouldNotEqual)
                 throw new InvalidOperationException("Cannot rectify a check with a value comparison type of ShouldNotEqual.");
 
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load(AbsoluteFilePath);
-
-            var node = xmlDocument.SelectSingleNode(XPath);
-            if (node == null)
+            var recommendedValue = Values.First(v => v.IsRecommended).Value;
+            var updateConfigFile = _configurationService.UpdateConfigFile(recommendedValue);
+            
+            if (updateConfigFile.Success == false)
             {
-                var message = string.Format("Unable to find node <strong>{1}</strong> in config file <strong>{0}</strong>", FileName, XPath);
+                var message = updateConfigFile.Result;
                 return new HealthCheckStatus(message) { ResultType = StatusResultType.Error };
             }
-
-            var newValue = Values.First(v => v.IsRecommended).Value;
-            if (node.NodeType == XmlNodeType.Element)
-                node.InnerText = newValue;
-            else
-                node.Value = newValue;
-
-            xmlDocument.Save(AbsoluteFilePath);
 
             var resultMessage = string.Format(RectifySuccessMessage, FileName, XPath, Values);
             return new HealthCheckStatus(resultMessage) { ResultType = StatusResultType.Success };
