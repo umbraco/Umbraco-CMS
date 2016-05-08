@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Web;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -8,7 +8,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        public CompilationDebugCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext) { }
+        private readonly ILocalizedTextService _textService;
+
+        public CompilationDebugCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
         public override string FilePath
         {
@@ -38,20 +43,17 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         
         public override string CheckSuccessMessage
         {
-            get { return "Debug compilation mode is disabled."; }
+            get { return _textService.Localize("healthcheck/compilationDebugCheckSuccessMessage"); }
         }
 
         public override string CheckErrorMessage
         {
-            get
-            {
-                return "Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.";
-            }
+            get { return _textService.Localize("healthcheck/compilationDebugCheckErrorMessage"); }
         }
 
         public override string RectifySuccessMessage
         {
-            get { return "Debug compilation mode successfully disabled."; }
+            get { return _textService.Localize("healthcheck/compilationDebugCheckRectifySuccessMessage"); }
         }
     }
 }

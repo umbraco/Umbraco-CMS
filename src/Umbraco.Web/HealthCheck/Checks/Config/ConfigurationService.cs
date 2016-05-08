@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -11,6 +12,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private readonly string _configFilePath;
         private readonly string _xPath;
+        private readonly ILocalizedTextService _textService;
 
         /// <param name="configFilePath">The absolute file location of the configuration file</param>
         /// <param name="xPath">The XPath to select the value</param>
@@ -19,6 +21,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             _configFilePath = configFilePath;
             _xPath = xPath;
+            _textService = UmbracoContext.Current.Application.Services.TextService;
         }
 
         /// <summary>
@@ -32,7 +35,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = string.Format("File does not exist: {0}", _configFilePath)
+                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
                     };
 
                 var xmlDocument = new XmlDocument();
@@ -43,7 +46,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = string.Format("Unable to find <strong>{0}</strong> in config file <strong>{1}</strong>", _xPath, _configFilePath)
+                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
                     };
 
                 return new ConfigurationServiceResult
@@ -58,7 +61,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = string.Format("Error trying to get configuration value, check log for full error: {0}", exception.Message)
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
                 };
             }
         }
@@ -76,7 +79,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = string.Format("File does not exist: {0}", _configFilePath)
+                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
                     };
 
                 var xmlDocument = new XmlDocument { PreserveWhitespace = true };
@@ -87,7 +90,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = string.Format("Unable to find <strong>{0}</strong> in config file <strong>{1}</strong>", _xPath, _configFilePath)
+                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
                     };
 
                 if (node.NodeType == XmlNodeType.Element)
@@ -104,7 +107,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = string.Format("Error trying to update configuration, check log for full error: {0}", exception.Message)
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
                 };
             }
         }

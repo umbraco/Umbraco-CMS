@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck
 {
     [DataContract(Name = "healtCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
-
         /// <summary>
         /// Empty ctor used for serialization
         /// </summary>
-        public HealthCheckAction()
-        {
-        }
+        public HealthCheckAction() { }
 
         /// <summary>
         /// Default ctor
@@ -53,7 +51,7 @@ namespace Umbraco.Web.HealthCheck
         /// The name of the action - this is used to name the fix button
         /// </summary>
         [DataMember(Name = "name")]
-        private string _name = "Rectify";
+        private string _name = UmbracoContext.Current.Application.Services.TextService.Localize("healthcheck/rectifyButton");
         public string Name
         {
             get { return _name; }

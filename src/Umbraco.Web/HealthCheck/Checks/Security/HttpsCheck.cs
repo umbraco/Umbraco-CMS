@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web;
+using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
@@ -16,8 +17,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         Group = "Security")]
     public class HttpsCheck : HealthCheck
     {
+        private readonly ILocalizedTextService _textService;
+
         public HttpsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
         }
 
         /// <summary>
@@ -75,12 +79,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                     if (exception != null)
                     {
                         message = exception.Status == WebExceptionStatus.TrustFailure
-                            ? string.Format("Certificate validation error: '{0}'", exception.Message)
-                            : string.Format("Error pinging the URL {0} - '{1}'", address, exception.Message);
+                            ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
+                            : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
                     }
                     else
                     {
-                        message = string.Format("Error pinging the URL {0} - '{1}'", address, ex.Message);
+                        message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
                     }
                 }
             }
@@ -103,7 +107,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var actions = new List<HealthCheckAction>();
 
             return
-                new HealthCheckStatus(string.Format("You are currently {0} viewing the site using the HTTPS scheme.", success ? string.Empty : "not"))
+                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
                 {
                     ResultType = success ? StatusResultType.Success : StatusResultType.Error,
                     Actions = actions
@@ -116,13 +120,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
             if (httpsSettingEnabled == false)
-                actions.Add(new HealthCheckAction("fixHttpsSetting", Id) { Name = "Enable HTTPS", Description = "Sets umbracoSSL setting to true in the appSettings of the web.config file." });
+                actions.Add(new HealthCheckAction("fixHttpsSetting", Id) {
+                    Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
+                    Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
+                });
 
             return
-                new HealthCheckStatus(
-                    string.Format(
-                        "The appSetting 'umbracoUseSSL' is set to '{0}' in your web.config file, your cookies are {1} marked as secure.",
-                        httpsSettingEnabled, httpsSettingEnabled ? string.Empty : "not"))
+                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckConfigurationCheckResult", new [] {
+                        httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" }))
                 {
                     ResultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error,
                     Actions = actions
@@ -139,14 +144,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             if (updateConfigFile.Success)
             {
                 return
-                    new HealthCheckStatus("The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.")
+                    new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
                     {
                         ResultType = StatusResultType.Success
                     };
             }
 
             return
-                new HealthCheckStatus(string.Format("Could not update the 'umbracoUseSSL' setting in your web.config file. Error: {0}", updateConfigFile.Result))
+                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsError", new [] { updateConfigFile.Result }))
                 {
                     ResultType = StatusResultType.Error
                 };

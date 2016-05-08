@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
+        private readonly ILocalizedTextService _textService;
 
         /// <summary>
         /// Gets the config file path.
@@ -37,6 +39,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
             _configurationService = new ConfigurationService(AbsoluteFilePath, XPath);
         }
 
@@ -61,7 +64,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// </summary>
         public virtual string CheckSuccessMessage
         {
-            get { return "Node <strong>{1}</strong> passed check successfully."; }
+            get
+            {
+                return _textService.Localize("healthcheck/checkSuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath  });
+            }
         }
 
         /// <summary>
@@ -72,8 +79,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return ValueComparisonType == ValueComparisonType.ShouldEqual
-                    ? "Expected value <strong>{2}</strong> for the node <strong>{1}</strong> in config <strong>{0}</strong>, but found <strong>{3}</strong>"
-                    : "Found unexpected value <strong>{2}</strong> for the node <strong>{1}</strong> in config <strong>{0}</strong>";
+                    ? _textService.Localize("healthcheck/checkErrorMessageDifferentExpectedValue",
+                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath })
+                    : _textService.Localize("healthcheck/checkErrorMessageUnexpectedValue",
+                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
             }
         }
 
@@ -82,7 +91,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// </summary>
         public virtual string RectifySuccessMessage
         {
-            get { return "Node <strong>{1}</strong> rectified successfully."; }
+            get
+            {
+                return _textService.Localize("healthcheck/rectifySuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
+            }
         }
 
         /// <summary>
@@ -112,7 +125,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
 
             // Declare the action for rectifying the config value
-            var rectifyAction = new HealthCheckAction("rectify", Id) { Name = "Rectify" };
+            var rectifyAction = new HealthCheckAction("rectify", Id) { Name = _textService.Localize("healthcheck/rectifyButton") };
 
             var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);
             return new[]
@@ -132,11 +145,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         public virtual HealthCheckStatus Rectify()
         {
             if (ValueComparisonType == ValueComparisonType.ShouldNotEqual)
-                throw new InvalidOperationException("Cannot rectify a check with a value comparison type of ShouldNotEqual.");
+                throw new InvalidOperationException(_textService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
 
             var recommendedValue = Values.First(v => v.IsRecommended).Value;
             var updateConfigFile = _configurationService.UpdateConfigFile(recommendedValue);
-            
+
             if (updateConfigFile.Success == false)
             {
                 var message = updateConfigFile.Result;

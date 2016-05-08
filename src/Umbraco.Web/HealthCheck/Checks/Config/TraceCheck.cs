@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -7,7 +8,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class TraceCheck : AbstractConfigCheck
     {
-        public TraceCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext) { }
+        private readonly ILocalizedTextService _textService;
+
+        public TraceCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
         public override string FilePath
         {
@@ -37,17 +43,17 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override string CheckSuccessMessage
         {
-            get { return "Trace mode is disabled."; }
+            get { return _textService.Localize("healthcheck/traceModeCheckSuccessMessage"); }
         }
 
         public override string CheckErrorMessage
         {
-            get { return "Trace mode is currently enabled. It is recommended to disable this setting before go live."; }
+            get { return _textService.Localize("healthcheck/traceModeCheckErrorMessage"); }
         }
 
         public override string RectifySuccessMessage
         {
-            get { return "Trace mode successfully disabled."; }
+            get { return _textService.Localize("healthcheck/traceModeCheckRectifySuccessMessage"); }
         }
     }
 }

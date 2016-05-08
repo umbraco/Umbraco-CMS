@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Configuration;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -9,7 +10,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractConfigCheck
     {
-        public CustomErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext) { }
+        private readonly ILocalizedTextService _textService;
+
+        public CustomErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
         public override string FilePath
         {
@@ -40,15 +46,19 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override string CheckSuccessMessage
         {
-            get { return string.Format("Custom errors are set to '{0}'.", CurrentValue); }
+            get
+            {
+                return _textService.Localize("healthcheck/customErrorsCheckSuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
+            }
         }
 
         public override string CheckErrorMessage
         {
             get
             {
-                var recommendedValue = Values.First(x => x.IsRecommended).Value;
-                return string.Format("Custom errors are currently set to '{0}'. It is recommended to set this to '{1}' before go live.", CurrentValue, recommendedValue);
+                return _textService.Localize("healthcheck/customErrorsCheckErrorMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
@@ -56,8 +66,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                var recommendedValue = Values.First(x => x.IsRecommended).Value;
-                return string.Format("Custom errors successfully set to '{0}'.", recommendedValue);
+                return _textService.Localize("healthcheck/customErrorsCheckRectifySuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
     }

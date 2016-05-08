@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -8,7 +9,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Configuration")]
     public class MacroErrorsCheck : AbstractConfigCheck
     {
-        public MacroErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext) { }
+        private readonly ILocalizedTextService _textService;
+
+        public MacroErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
         public override string FilePath
         {
@@ -46,18 +52,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return values;
             }
         }
-
+        
         public override string CheckSuccessMessage
         {
-            get { return string.Format("MacroErrors are set to '{0}'.", CurrentValue); }
+            get
+            {
+                return _textService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
+            }
         }
 
         public override string CheckErrorMessage
         {
             get
             {
-                var rectifiedValue = Values.First(x => x.IsRecommended).Value;
-                return string.Format("MacroErrors are set to '{0}' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '{1}'", CurrentValue, rectifiedValue);
+                return _textService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
@@ -65,8 +75,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                var rectifiedValue = Values.First(x => x.IsRecommended).Value;
-                return string.Format("MacroErrors are now set to '{0}'", rectifiedValue);
+                return _textService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
     }
