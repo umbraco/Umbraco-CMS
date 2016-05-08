@@ -34,8 +34,5 @@ namespace UmbracoExamine.DataServices
 			LogHelper.Debug<UmbracoLogService>("{0}, Provider={1}, NodeId={2}", () => msg, () => ProviderName, () => nodeId);
         }
 
-		[Obsolete("This value is no longer used since we support the log levels that are available with LogHelper")]
-        public LoggingLevel LogLevel { get; set; }
-
     }
 }
