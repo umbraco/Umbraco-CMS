@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public PropertyValueEditor()
         {
-            ValueType = "string";
+            ValueType = PropertyEditorValueTypes.StringType;
             //set a default for validators
             Validators = new List<IPropertyValidator>();
         }
@@ -238,7 +238,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
             //if it's json but it's empty json, then return null
-            if (ValueType.InvariantEquals("JSON") && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
+            if (ValueType.InvariantEquals(PropertyEditorValueTypes.JsonType) && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
             {
                 return null;
             }
