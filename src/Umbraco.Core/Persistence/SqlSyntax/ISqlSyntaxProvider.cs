@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetWildcardPlaceholder();
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
+        string GetConcat(params string[] args);
 
         [Obsolete("Use the overload with the parameter index instead")]
         string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);

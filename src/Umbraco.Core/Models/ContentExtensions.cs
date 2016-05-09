@@ -107,10 +107,10 @@ namespace Umbraco.Core.Models
         /// * The language is changed
         /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
         /// </remarks>
-        internal static bool ShouldCreateNewVersion(this IContent entity)
+        internal static bool RequiresNewVersion(this IContent entity)
         {
             var publishedState = ((Content)entity).PublishedState;
-            return ShouldCreateNewVersion(entity, publishedState);
+            return RequiresNewVersion(entity, publishedState);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Models
         /// * The language is changed
         /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
         /// </remarks>
-        internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
+        internal static bool RequiresNewVersion(this IContent entity, PublishedState publishedState)
         {
             //check if the published state has changed or the language
             var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
@@ -178,10 +178,10 @@ namespace Umbraco.Core.Models
         /// * If a new version is being created and the entity is published
         /// * If the published state has changed and the entity is published OR the entity has been un-published.
         /// </remarks>
-        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity)
+        internal static bool RequiresClearPublishedFlag(this IContent entity)
         {
             var publishedState = ((Content)entity).PublishedState;
-            return entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, entity.ShouldCreateNewVersion(publishedState));
+            return entity.RequiresClearPublishedFlag(publishedState, entity.RequiresNewVersion(publishedState));
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Models
         /// * If a new version is being created and the entity is published
         /// * If the published state has changed and the entity is published OR the entity has been un-published.
         /// </remarks>
-        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity, PublishedState publishedState, bool isCreatingNewVersion)
+        internal static bool RequiresClearPublishedFlag(this IContent entity, PublishedState publishedState, bool isCreatingNewVersion)
         {
             if (isCreatingNewVersion && entity.Published)
             {

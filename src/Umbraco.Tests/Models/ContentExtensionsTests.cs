@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
             
             content.ChangePublishedState(PublishedState.Published);
-            Assert.IsTrue(content.ShouldCreateNewVersion());
+            Assert.IsTrue(content.RequiresNewVersion());
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Models
             content.Properties.First().Value = "hello world";
 
             content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsTrue(content.ShouldCreateNewVersion());
+            Assert.IsTrue(content.RequiresNewVersion());
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.Language = "en-AU";
-            Assert.IsTrue(content.ShouldCreateNewVersion(PublishedState.Unpublished));
+            Assert.IsTrue(content.RequiresNewVersion(PublishedState.Unpublished));
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.Properties.First().Value = "hello world";
-            Assert.IsTrue(content.ShouldCreateNewVersion(PublishedState.Published));
+            Assert.IsTrue(content.RequiresNewVersion(PublishedState.Published));
         }
         
         [Test]
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Models
 
             content.ResetDirtyProperties(false);
 
-            Assert.IsFalse(content.ShouldCreateNewVersion(PublishedState.Unpublished));
+            Assert.IsFalse(content.RequiresNewVersion(PublishedState.Unpublished));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.Properties.First().Value = "hello world";
-            Assert.IsFalse(content.ShouldCreateNewVersion(PublishedState.Unpublished));
+            Assert.IsFalse(content.RequiresNewVersion(PublishedState.Unpublished));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.ChangePublishedState(PublishedState.Published);
-            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
+            Assert.IsTrue(content.RequiresClearPublishedFlag());
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
+            Assert.IsFalse(content.RequiresClearPublishedFlag());
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.ChangePublishedState(PublishedState.Unpublished);
-            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
+            Assert.IsTrue(content.RequiresClearPublishedFlag());
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
 
             content.ChangePublishedState(PublishedState.Unpublished);
-            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
+            Assert.IsFalse(content.RequiresClearPublishedFlag());
         }
 
 

@@ -64,7 +64,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }   
         }
 
-        
+        public override string GetConcat(params string[] args)
+        {
+            return "(" + string.Join("+", args) + ")";
+        }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {

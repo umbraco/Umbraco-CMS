@@ -1959,7 +1959,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 // is published is not newest, reset the published flag on published version
                 if (published.Version != content.Version)
-                    repository.ClearPublished(published);
+                    repository.ClearPublishedFlag(published);
                 repository.DeleteContentXml(content);
                 uow.Complete();
             }
