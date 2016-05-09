@@ -8,7 +8,7 @@ using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 using File = System.IO.File;
 

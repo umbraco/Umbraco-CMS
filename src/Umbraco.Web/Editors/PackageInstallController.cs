@@ -14,7 +14,6 @@ using Umbraco.Core.Auditing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager.repositories;
 using Umbraco.Core.IO;
-using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
