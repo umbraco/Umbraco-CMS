@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 

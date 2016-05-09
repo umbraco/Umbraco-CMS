@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;

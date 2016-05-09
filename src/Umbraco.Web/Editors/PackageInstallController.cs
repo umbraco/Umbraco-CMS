@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Core.Auditing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager.repositories;
 using Umbraco.Core.IO;
