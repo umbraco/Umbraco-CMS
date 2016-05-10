@@ -419,6 +419,12 @@ namespace Umbraco.Core
             /// Alias for the email address property editor
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
+
+            /// <summary>
+            /// Pre-value name used to indicate a field that can be used to override the database field to which data for the associated
+            /// property is saved
+            /// </summary>
+            public const string DataValueTypePreValueKey = "umbracoDataValueType";
         }
 	}
 }

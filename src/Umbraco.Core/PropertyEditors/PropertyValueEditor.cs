@@ -130,20 +130,20 @@ namespace Umbraco.Core.PropertyEditors
         {
             switch (ValueType.ToUpper(CultureInfo.InvariantCulture))
             {
-                case "INT":
-                case "INTEGER":
+                case PropertyEditorValueTypes.IntegerType:
+                case PropertyEditorValueTypes.IntegerTypeAlternative:
                     return DataTypeDatabaseType.Integer;
-                case "DECIMAL":
+                case PropertyEditorValueTypes.DecimalType:
                     return DataTypeDatabaseType.Decimal;
-                case "STRING":
+                case PropertyEditorValueTypes.StringType:
                     return DataTypeDatabaseType.Nvarchar;
-                case "TEXT":
-                case "JSON":
-                case "XML":
+                case PropertyEditorValueTypes.TextType:
+                case PropertyEditorValueTypes.JsonType:
+                case PropertyEditorValueTypes.XmlType:
                     return DataTypeDatabaseType.Ntext;
-                case "DATETIME":
-                case "DATE":
-                case "TIME":
+                case PropertyEditorValueTypes.DateTimeType:
+                case PropertyEditorValueTypes.DateType:
+                case PropertyEditorValueTypes.TimeType:
                     return DataTypeDatabaseType.Date;
                 default:
                     throw new FormatException("The ValueType does not match a known value type");

@@ -504,6 +504,8 @@ namespace Umbraco.Core.Services
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
                 return;
 
+            OverrideDatabaseTypeIfProvidedInPreValues(dataTypeDefinition, values);
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
@@ -523,6 +525,36 @@ namespace Umbraco.Core.Services
             Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
+        /// <summary>
+        /// If the database data field is provided in the pre-values update the data type definition to that instead of the
+        /// default for the property editor 
+        /// </summary>
+        /// <param name="dataTypeDefinition"></param>
+        /// <param name="values"></param>
+        private static void OverrideDatabaseTypeIfProvidedInPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values)
+        {
+            if (values != null && values.ContainsKey(Constants.PropertyEditors.DataValueTypePreValueKey))
+            {
+                switch (values[Constants.PropertyEditors.DataValueTypePreValueKey].Value)
+                {
+                    case PropertyEditorValueTypes.StringType:
+                        dataTypeDefinition.DatabaseType = DataTypeDatabaseType.Nvarchar;
+                        break;
+                    case PropertyEditorValueTypes.IntegerType:
+                        dataTypeDefinition.DatabaseType = DataTypeDatabaseType.Integer;
+                        break;
+                    case PropertyEditorValueTypes.DecimalType:
+                        dataTypeDefinition.DatabaseType = DataTypeDatabaseType.Decimal;
+                        break;
+                    case PropertyEditorValueTypes.DateTimeType:
+                        dataTypeDefinition.DatabaseType = DataTypeDatabaseType.Date;
+                        break;
+                    case PropertyEditorValueTypes.TextType:
+                        dataTypeDefinition.DatabaseType = DataTypeDatabaseType.Ntext;
+                        break;
+                }
+            }
+        }
 
         /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>

@@ -41,7 +41,6 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class LabelPreValueEditor : PreValueEditor
         {
-            private const string ValueTypeKey = "valueType";
             private const string LegacyPropertyEditorValuesKey = "values";
 
             public LabelPreValueEditor()
@@ -56,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
                 ValueType = PropertyEditorValueTypes.StringType;
             }
 
-            [PreValueField(ValueTypeKey, "Value type", "valuetype")]
+            [PreValueField(Constants.PropertyEditors.DataValueTypePreValueKey, "Value type", "valuetype")]
             public string ValueType { get; set; }
 
             /// <summary>
@@ -72,19 +71,19 @@ namespace Umbraco.Web.PropertyEditors
 
                 // Check for a saved value type.  If not found set to default string type.
                 var valueType = PropertyEditorValueTypes.StringType;
-                if (existing.ContainsKey(ValueTypeKey))
+                if (existing.ContainsKey(Constants.PropertyEditors.DataValueTypePreValueKey))
                 {
-                    valueType = (string)existing[ValueTypeKey];
+                    valueType = (string)existing[Constants.PropertyEditors.DataValueTypePreValueKey];
                 }
 
                 // Convert any other values from a legacy property editor to a list, easier to enumerate on the editor.
                 // Make sure to exclude values defined on the label property editor itself.
                 var asList = existing
                     .Select(e => new KeyValuePair<string, object>(e.Key, e.Value))
-                    .Where(e => e.Key != ValueTypeKey)
+                    .Where(e => e.Key != Constants.PropertyEditors.DataValueTypePreValueKey)
                     .ToList();
 
-                var result = new Dictionary<string, object> { { ValueTypeKey, valueType } };
+                var result = new Dictionary<string, object> { { Constants.PropertyEditors.DataValueTypePreValueKey, valueType } };
                 if (asList.Any())
                 {
                     result.Add("values", asList);
