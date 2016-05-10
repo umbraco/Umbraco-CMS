@@ -119,6 +119,15 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Sets the ParentId from the lazy integer id
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        internal void SetLazyParentId(Lazy<int> id)
+        {
+            _parentId = id;
+        }
+
+        /// <summary>
         /// Gets or sets the name of the entity
         /// </summary>
         [DataMember]

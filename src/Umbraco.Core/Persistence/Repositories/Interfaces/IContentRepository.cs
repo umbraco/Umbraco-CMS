@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IDeleteMediaFilesRepository
+    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>
     {
         /// <summary>
         /// Get the count of published items
@@ -18,6 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
         /// </remarks>
         int CountPublished(string contentTypeAlias = null);
+
+        bool IsPathPublished(IContent content);
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions

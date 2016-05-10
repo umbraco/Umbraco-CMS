@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     //IMPORTANT testing note here: We need to changed the published state here so that
                     // it doesn't automatically think this is simply publishing again - this forces the latest
                     // version to be Saved and not published
-                    allCreated[i].ChangePublishedState(PublishedState.Saved);
+                    allCreated[i].ChangePublishedState(PublishedState.Saving);
                     repository.AddOrUpdate(allCreated[i]);
                 }
                 unitOfWork.Flush();
@@ -536,13 +536,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.GetAll().ToArray();
                 foreach (var content in result)
                 {
-                    content.ChangePublishedState(PublishedState.Saved);
+                    content.ChangePublishedState(PublishedState.Saving);
                     repository.AddOrUpdate(content);
                 }
                 unitOfWork.Flush();
                 foreach (var content in result)
                 {
-                    content.ChangePublishedState(PublishedState.Published);
+                    content.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(content);
                 }
                 unitOfWork.Flush();

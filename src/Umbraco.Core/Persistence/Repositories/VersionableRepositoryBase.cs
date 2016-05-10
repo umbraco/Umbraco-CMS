@@ -315,14 +315,14 @@ namespace Umbraco.Core.Persistence.Repositories
  	                END AS CustomPropVal,
                     cd.nodeId AS CustomPropValContentId
  	                FROM cmsDocument cd
-                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
+                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
 			        WHERE cpt.Alias = @2 AND cd.newest = 1) AS CustomPropData
                     ON CustomPropData.CustomPropValContentId = umbracoNode.id
 ", sortedInt, sortedDecimal, sortedDate, sortedString);
 
                     //insert this just above the LEFT OUTER JOIN
-                    var newSql = psql.SQL.Insert(psql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);                    
+                    var newSql = psql.SQL.Insert(psql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);
                     var newArgs = psql.Arguments.ToList();
                     newArgs.Add(orderBy);
 
@@ -522,7 +522,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public virtual bool DeleteMediaFiles(IEnumerable<string> files)
+        public virtual bool DeleteMediaFiles(IEnumerable<string> files) // fixme kill eventually
         {
             //ensure duplicates are removed
             files = files.Distinct();
