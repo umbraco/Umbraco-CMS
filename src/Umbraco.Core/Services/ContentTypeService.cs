@@ -64,7 +64,9 @@ namespace Umbraco.Core.Services
                 // that one is special because it works accross content, media and member types
                 uow.ReadLock(Constants.System.ContentTypesLock, Constants.System.MediaTypesLock, Constants.System.MemberTypesLock);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
-                return repo.GetAllPropertyTypeAliases();
+                var aliases = repo.GetAllPropertyTypeAliases();
+                uow.Complete();
+                return aliases;
             }
         }
 
@@ -81,7 +83,9 @@ namespace Umbraco.Core.Services
                 // that one is special because it works accross content, media and member types
                 uow.ReadLock(Constants.System.ContentTypesLock, Constants.System.MediaTypesLock, Constants.System.MemberTypesLock);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
-                return repo.GetAllContentTypeAliases(guids);
+                var aliases = repo.GetAllContentTypeAliases(guids);
+                uow.Complete();
+                return aliases;
             }
         }
 

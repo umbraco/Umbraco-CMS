@@ -791,14 +791,15 @@ namespace Umbraco.Core.Services
                 if (types.Any() == false)
                     throw new Exception(
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-                                      contentTypeAlias));
+                                      contentTypeAlias)); // causes rollback
 
                 var contentType = types.FirstOrDefault();
 
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-                                                      contentTypeAlias));
+                                                      contentTypeAlias)); // causes rollback
 
+                uow.Complete();
                 return contentType;
             }
         }

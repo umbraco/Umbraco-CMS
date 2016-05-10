@@ -76,7 +76,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.CountPublished();
+                var count = repo.CountPublished();
+                uow.Complete();
+                return count;
             }
         }
 
@@ -86,7 +88,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.Count(contentTypeAlias);
+                var count = repo.Count(contentTypeAlias);
+                uow.Complete();
+                return count;
             }
         }
 
@@ -96,7 +100,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.CountChildren(parentId, contentTypeAlias);
+                var count = repo.CountChildren(parentId, contentTypeAlias);
+                uow.Complete();
+                return count;
             }
         }
 
@@ -106,7 +112,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.CountDescendants(parentId, contentTypeAlias);
+                var count = repo.CountDescendants(parentId, contentTypeAlias);
+                uow.Complete();
+                return count;
             }
         }
 
@@ -126,6 +134,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.ReplaceContentPermissions(permissionSet);
+                uow.Complete();
             }
         }
 
@@ -142,6 +151,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.AssignEntityPermission(entity, permission, userIds);
+                uow.Complete();
             }
         }
 
@@ -156,7 +166,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.GetPermissionsForEntity(content.Id);
+                var perms = repo.GetPermissionsForEntity(content.Id);
+                uow.Complete();
+                return perms;
             }
         }
 
@@ -238,7 +250,7 @@ namespace Umbraco.Core.Services
 
                 var contentType = GetContentType(contentTypeAlias);
                 if (contentType == null)
-                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
                 var content = new Content(name, parent, contentType);
                 CreateContent(uow, content, parent, userId, false);
@@ -266,11 +278,11 @@ namespace Umbraco.Core.Services
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
-                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
                 var parent = parentId > 0 ? GetById(parentId) : null; // + locks
                 if (parentId > 0 && parent == null)
-                    throw new ArgumentException("No content with that id.", nameof(parentId));
+                    throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
 
                 var content = parentId > 0 ? new Content(name, parent, contentType) : new Content(name, parentId, contentType);
                 CreateContent(uow, content, parent, userId, true);
@@ -300,7 +312,7 @@ namespace Umbraco.Core.Services
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
-                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
                 var content = new Content(name, parent, contentType);
                 CreateContent(uow, content, parent, userId, true);
@@ -365,7 +377,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.Get(id);
+                var content = repository.Get(id);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -383,7 +397,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetAll(idsA);
+                var content = repository.GetAll(idsA);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -400,7 +416,9 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Key == key);
                 var contents = repository.GetByQuery(query);
-                return contents.SingleOrDefault();
+                var content = contents.SingleOrDefault();
+                uow.Complete();
+                return content;
             }
         }
 
@@ -416,7 +434,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ContentTypeId == id);
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -427,7 +447,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ContentTypeId == id);
-                return repository.GetByPublishedVersion(query);
+                var content = repository.GetByPublishedVersion(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -444,7 +466,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Level == level && x.Trashed == false);
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -459,7 +483,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetByVersion(versionId);
+                var content = repository.GetByVersion(versionId);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -474,7 +500,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetAllVersions(id);
+                var content = repository.GetAllVersions(id);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -510,7 +538,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetAll(ids);
+                var ancestors = repository.GetAll(ids);
+                uow.Complete();
+                return ancestors;
             }
         }
 
@@ -526,7 +556,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id);
-                return repository.GetByQuery(query).OrderBy(x => x.SortOrder);
+                var children = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
+                uow.Complete();
+                return children;
             }
         }
 
@@ -542,7 +574,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id && x.Published);
-                return repository.GetByQuery(query).OrderBy(x => x.SortOrder);
+                var children = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
+                uow.Complete();
+                return children;
             }
         }
 
@@ -590,7 +624,9 @@ namespace Umbraco.Core.Services
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                     query.Where(x => x.ParentId == id);
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                var children = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                uow.Complete();
+                return children;
             }
         }
 
@@ -637,7 +673,7 @@ namespace Umbraco.Core.Services
                 if (id != Constants.System.Root)
                     query.Where(x => x.Path.SqlContains($",{id},", TextColumnType.NVarchar));
                 var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
-
+                uow.Complete();
                 return contents;
             }
         }
@@ -655,7 +691,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId && x.Name.Contains(name));
-                return repository.GetByQuery(query);
+                var children = repository.GetByQuery(query);
+                uow.Complete();
+                return children;
             }
         }
 
@@ -671,10 +709,16 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = GetById(id);
-                if (content == null) return Enumerable.Empty<IContent>();
+                if (content == null)
+                {
+                    uow.Complete(); // else causes rollback
+                    return Enumerable.Empty<IContent>();
+                }
                 var pathMatch = content.Path + ",";
                 var query = repository.Query.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return repository.GetByQuery(query);
+                var descendants = repository.GetByQuery(query);
+                uow.Complete();
+                return descendants;
             }
         }
 
@@ -691,7 +735,9 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var pathMatch = content.Path + ",";
                 var query = repository.Query.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return repository.GetByQuery(query);
+                var descendants = repository.GetByQuery(query);
+                uow.Complete();
+                return descendants;
             }
         }
 
@@ -755,7 +801,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == Constants.System.Root);
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -770,7 +818,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Trashed == false);
-                return repository.GetByPublishedVersion(query);
+                var content = repository.GetByPublishedVersion(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -785,7 +835,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -800,7 +852,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -815,7 +869,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
-                return repository.GetByQuery(query);
+                var content = repository.GetByQuery(query);
+                uow.Complete();
+                return content;
             }
         }
 
@@ -842,6 +898,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published && x.Id == id && x.Trashed == false);
                 var count = repository.Count(query);
+                uow.Complete();
                 return count > 0;
             }
         }
@@ -864,8 +921,10 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IContentRepository>();
                 var parent = repo.Get(content.ParentId);
                 if (parent == null)
-                    throw new Exception("Out of sync.");
-                return repo.IsPathPublished(parent);
+                    throw new Exception("Out of sync."); // causes rollback
+                var isPublishable = repo.IsPathPublished(parent);
+                uow.Complete();
+                return isPublishable;
             }
         }
 
@@ -875,7 +934,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repo = uow.CreateRepository<IContentRepository>();
-                return repo.IsPathPublished(content);
+                var isPathPublished = repo.IsPathPublished(content);
+                uow.Complete();
+                return isPathPublished;
             }
         }
 
@@ -1356,7 +1417,7 @@ namespace Umbraco.Core.Services
 
                 var originalPath = content.Path;
                 if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)), this))
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationStatus.Attempt.Cancel(evtMsgs); // causes rollback
 
                 // if it's published we may want to force-unpublish it - that would be backward-compatible... but...
                 // making a radical decision here: trashing is equivalent to moving under an unpublished node so
@@ -1407,11 +1468,10 @@ namespace Umbraco.Core.Services
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
-                    throw new InvalidOperationException("Parent does not exist or is trashed.");
+                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
-                if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(
-                    new MoveEventInfo<IContent>(content, content.Path, parentId)), this))
-                    return;
+                if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(content, content.Path, parentId)), this))
+                    return; // causes rollback
 
                 // if content was trashed, and since we're not moving to the recycle bin,
                 // indicate that the trashed status should be changed to false, else just
@@ -1512,7 +1572,7 @@ namespace Umbraco.Core.Services
 
                 // no idea what those events are for, keep a simplified version
                 if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType), this))
-                    return;
+                    return; // causes rollback
 
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
                 var query = repository.Query.Where(x => x.ParentId == Constants.System.RecycleBinContent);
@@ -1524,6 +1584,7 @@ namespace Umbraco.Core.Services
                 }
 
                 EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, true), this);
+                uow.Complete();
             }
 
             Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
@@ -1781,7 +1842,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return GetPublishedDescendantsLocked(repository, content);
+                var descendants = GetPublishedDescendantsLocked(repository, content);
+                uow.Complete();
+                return descendants;
             }
         }
 
@@ -1851,7 +1914,7 @@ namespace Umbraco.Core.Services
                 if (attempt.Success)
                     attempt = StrategyCanPublish(content, userId, evtMsgs);
                 if (attempt.Success == false)
-                    return new[] { attempt };
+                    return new[] { attempt }; // causes rollback
 
                 var contents = new List<IContent> { content }; //include parent item
                 contents.AddRange(GetDescendants(content));
@@ -1906,13 +1969,16 @@ namespace Umbraco.Core.Services
                 if (content.Version != newest.Version) // but use the original object if it's already the newest version
                     content = newest;
                 if (content.Published == false && content.HasPublishedVersion == false)
+                {
+                    uow.Complete();
                     return Attempt.Succeed(new UnPublishStatus(UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs, content)); // already unpublished
+                }
 
                 // strategy
                 var attempt = StrategyCanUnPublish(content, userId, evtMsgs);
-                if (attempt == false) return attempt;
+                if (attempt == false) return attempt; // causes rollback
                 attempt = StrategyUnPublish(content, true, userId, evtMsgs);
-                if (attempt == false) return attempt;
+                if (attempt == false) return attempt; // causes rollback
 
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
@@ -1987,7 +2053,7 @@ namespace Umbraco.Core.Services
 
             Published.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
 
-            // if was not published and now is... descendants that were 'published' (but 
+            // if was not published and now is... descendants that were 'published' (but
             // had an unpublished ancestor) are 're-published' ie not explicitely published
             // but back as 'published' nevertheless
             if (isNew == false && previouslyPublished == false)
@@ -2430,7 +2496,7 @@ namespace Umbraco.Core.Services
                 var contents = repository.GetByQuery(query).ToArray();
 
                 if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
-                    return;
+                    return; // causes rollback
 
                 // order by level, descending, so deepest first - that way, we cannot move
                 // a content of the deleted type, to the recycle bin (and then delete it...)
@@ -2456,6 +2522,8 @@ namespace Umbraco.Core.Services
                     // triggers the deleted event (and handles the files)
                     DeleteLocked(repository, content);
                 }
+
+                uow.Complete();
             }
 
             var moveInfos = moves
@@ -2478,7 +2546,9 @@ namespace Umbraco.Core.Services
                 var contentType = repository.GetByQuery(query).FirstOrDefault();
 
                 if (contentType == null)
-                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found");
+                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
+
+                uow.Complete();
                 return contentType;
             }
         }
@@ -2498,7 +2568,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetContentXml(contentId);
+                var elt = repository.GetContentXml(contentId);
+                uow.Complete();
+                return elt;
             }
         }
 
@@ -2514,7 +2586,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ContentTreeLock);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetContentPreviewXml(contentId, version);
+                var elt = repository.GetContentPreviewXml(contentId, version);
+                uow.Complete();
+                return elt;
             }
         }
 

@@ -23,7 +23,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.GetByQuery(repo.Query.Where(type => type.Alias == taskTypeAlias)).FirstOrDefault();
+                var type = repo.GetByQuery(repo.Query.Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
+                uow.Complete();
+                return type;
             }
         }
 
@@ -32,7 +34,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.Get(id);
+                var type = repo.Get(id);
+                uow.Complete();
+                return type;
             }
         }
 
@@ -61,7 +65,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.GetAll();
+                var types = repo.GetAll();
+                uow.Complete();
+                return types;
             }
         }
 
@@ -71,7 +77,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskRepository>();
-                return repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
+                var tasks = repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
+                uow.Complete();
+                return tasks;
             }
         }
 
@@ -104,7 +112,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskRepository>();
-                return repo.Get(id);
+                var task = repo.Get(id);
+                uow.Complete();
+                return task;
             }
         }
     }

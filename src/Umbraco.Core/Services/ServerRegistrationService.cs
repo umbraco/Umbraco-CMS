@@ -127,8 +127,8 @@ namespace Umbraco.Core.Services
             {
                 uow.WriteLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-
                 repo.DeactiveStaleServers(staleTimeout);
+                uow.Complete();
             }
         }
 
@@ -167,8 +167,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.System.ServersLock);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
-
-                return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+                var servers = repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+                uow.Complete();
+                return servers;
             }
         }
 

@@ -25,7 +25,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
-                return repo.GetAll();
+                var entries = repo.GetAll();
+                uow.Complete();
+                return entries;
             }
         }
 
@@ -73,6 +75,7 @@ namespace Umbraco.Core.Services
 
                 //This will retrieve from cache!                 
                 var entries = repo.GetAll().ToArray();
+                uow.Complete();
 
                 foreach (var id in ids)
                 {
@@ -123,7 +126,7 @@ namespace Umbraco.Core.Services
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return OperationStatus.Attempt.Cannot<PublicAccessEntry>(evtMsgs);
+                    return OperationStatus.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -136,12 +139,8 @@ namespace Umbraco.Core.Services
                     return OperationStatus.Attempt.Succeed(evtMsgs, entry);
                 }
 
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
-                {
-                    return OperationStatus.Attempt.Cancel(evtMsgs, entry);
-                }
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
+                    return OperationStatus.Attempt.Cancel(evtMsgs, entry); // causes rollback
 
                 repo.AddOrUpdate(entry);
 
@@ -167,15 +166,15 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationStatus>.Fail();
+                if (entry == null) return Attempt<OperationStatus>.Fail(); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationStatus>.Fail();
+                if (existingRule == null) return Attempt<OperationStatus>.Fail(); // causes rollback
 
                 entry.RemoveRule(existingRule);
 
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationStatus.Attempt.Cancel(evtMsgs); // causes rollback
 
                 repo.AddOrUpdate(entry);
                 uow.Complete();

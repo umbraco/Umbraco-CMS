@@ -281,7 +281,9 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.Get(id);
+                var item = repo.Get(id);
+                uow.Complete();
+                return item;
             }
         }
 
@@ -291,7 +293,9 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.Get(alias);
+                var item = repo.Get(alias);
+                uow.Complete();
+                return item;
             }
         }
 
@@ -301,7 +305,9 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.Get(id);
+                var item = repo.Get(id);
+                uow.Complete();
+                return item;
             }
         }
 
@@ -311,7 +317,9 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.GetAll(ids);
+                var items = repo.GetAll(ids);
+                uow.Complete();
+                return items;
             }
         }
 
@@ -322,7 +330,9 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
                 // IReadRepository<Guid, TEntity> is explicitely implemented, need to cast the repo
-                return ((IReadRepository<Guid, TItem>) repo).GetAll(ids);
+                var items = ((IReadRepository<Guid, TItem>) repo).GetAll(ids);
+                uow.Complete();
+                return items;
             }
         }
 
@@ -333,8 +343,9 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
                 var query = repo.Query.Where(x => x.ParentId == id);
-                var contentTypes = repo.GetByQuery(query);
-                return contentTypes;
+                var items = repo.GetByQuery(query);
+                uow.Complete();
+                return items;
             }
         }
 
@@ -347,8 +358,9 @@ namespace Umbraco.Core.Services
                 var found = Get(id);
                 if (found == null) return Enumerable.Empty<TItem>();
                 var query = repo.Query.Where(x => x.ParentId == found.Id);
-                var contentTypes = repo.GetByQuery(query);
-                return contentTypes;
+                var items = repo.GetByQuery(query);
+                uow.Complete();
+                return items;
             }
         }
 
@@ -360,6 +372,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds);
                 var query = repo.Query.Where(x => x.ParentId == id);
                 var count = repo.Count(query);
+                uow.Complete();
                 return count > 0;
             }
         }
@@ -374,6 +387,7 @@ namespace Umbraco.Core.Services
                 if (found == null) return false;
                 var query = repo.Query.Where(x => x.ParentId == found.Id);
                 var count = repo.Count(query);
+                uow.Complete();
                 return count > 0;
             }
         }
@@ -403,7 +417,9 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                return descendants.ToArray();
+                var descendantsA = descendants.ToArray();
+                uow.Complete();
+                return descendantsA;
             }
         }
 
@@ -434,7 +450,9 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                return composed.ToArray();
+                var composedA = composed.ToArray();
+                uow.Complete();
+                return composedA;
             }
         }
 
@@ -444,7 +462,9 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.Count(repo.Query);
+                var count = repo.Count(repo.Query);
+                uow.Complete();
+                return count;
             }
         }
 
@@ -668,7 +688,7 @@ namespace Umbraco.Core.Services
                     {
                         var container = containerRepository.Get(containerId);
                         if (container == null)
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
                     var alias = repo.GetUniqueAlias(copying.Alias);
 
@@ -691,12 +711,12 @@ namespace Umbraco.Core.Services
 
                     copy.ParentId = containerId;
                     repo.AddOrUpdate(copy);
+                    uow.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return OperationStatus.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, evtMsgs);
+                    return OperationStatus.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, evtMsgs); // causes rollback
                 }
-                uow.Complete();
             }
 
             return OperationStatus.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
@@ -728,15 +748,15 @@ namespace Umbraco.Core.Services
                     {
                         container = containerRepo.Get(containerId);
                         if (container == null)
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
                     moveInfo.AddRange(repo.Move(moving, container));
+                    uow.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs);
+                    return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs); // causes rollback
                 }
-                uow.Complete();
             }
 
             OnMoved(new MoveEventArgs<TItem>(false, evtMsgs, moveInfo.ToArray()));
@@ -770,7 +790,7 @@ namespace Umbraco.Core.Services
                     };
 
                     if (OnSavingContainerCancelled(new SaveEventArgs<EntityContainer>(container, evtMsgs)))
-                        return OperationStatus.Attempt.Cancel(evtMsgs, container);
+                        return OperationStatus.Attempt.Cancel(evtMsgs, container); // causes rollback
 
                     repo.AddOrUpdate(container);
                     uow.Complete();
@@ -831,6 +851,7 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
                 var container = repo.Get(containerId);
+                uow.Complete();
                 return container;
             }
         }
@@ -843,6 +864,7 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
                 var container = ((EntityContainerRepository) repo).Get(containerId);
+                uow.Complete();
                 return container;
             }
         }
@@ -854,7 +876,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds); // also for containers
 
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return repo.GetAll(containerIds);
+                var containers = repo.GetAll(containerIds);
+                uow.Complete();
+                return containers;
             }
         }
 
@@ -879,7 +903,9 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds); // also for containers
 
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return ((EntityContainerRepository) repo).Get(name, level);
+                var containers = ((EntityContainerRepository) repo).Get(name, level);
+                uow.Complete();
+                return containers;
             }
         }
 
@@ -896,7 +922,7 @@ namespace Umbraco.Core.Services
                 if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
 
                 if (OnDeletingContainerCancelled(new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
-                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs)); // causes rollback
 
                 repo.Delete(container);
                 uow.Complete();

@@ -76,6 +76,7 @@ namespace Umbraco.Core.Services
         {
             var result = _runtimeCache.GetCacheItem<int?>(CacheKeys.IdToKeyCacheKey + key, () =>
             {
+                int? id;
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     switch (umbracoObjectType)
@@ -89,11 +90,12 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
-                            return uow.Database.ExecuteScalar<int?>(
+                            id = uow.Database.ExecuteScalar<int?>(
                                  uow.Database.Sql()
                                     .Select("id")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.UniqueId == key));
+                            break;
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -104,6 +106,8 @@ namespace Umbraco.Core.Services
                         default:
                             throw new NotSupportedException();
                     }
+                    uow.Complete();
+                    return id;
                 }                
             });
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
@@ -121,6 +125,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
+                    Guid? guid;
                     switch (umbracoObjectType)
                     {
                         case UmbracoObjectTypes.Document:
@@ -131,11 +136,12 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
-                            return uow.Database.ExecuteScalar<Guid?>(
+                            guid = uow.Database.ExecuteScalar<Guid?>(
                                  uow.Database.Sql()
                                     .Select("uniqueID")
                                     .From<NodeDto>()
                                     .Where<NodeDto>(dto => dto.NodeId == id));
+                            break;
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -146,6 +152,8 @@ namespace Umbraco.Core.Services
                         default:
                             throw new NotSupportedException();
                     }
+                    uow.Complete();
+                    return guid;
                 }
             });
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<Guid>.Fail();
@@ -158,7 +166,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IEntityRepository>();
-                    return repository.GetByKey(key);
+                    var entity = repository.GetByKey(key);
+                    uow.Complete();
+                    return entity;
                 }
             }
 
@@ -189,7 +199,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IEntityRepository>();
-                    return repository.Get(id);
+                    var e = repository.Get(id);
+                    uow.Complete();
+                    return e;
                 }
             }
 
@@ -209,7 +221,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IEntityRepository>();
-                    return repository.GetByKey(key, objectTypeId);
+                    var entity = repository.GetByKey(key, objectTypeId);
+                    uow.Complete();
+                    return entity;
                 }
             }
 
@@ -241,7 +255,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IEntityRepository>();
-                    return repository.Get(id, objectTypeId);
+                    var e = repository.Get(id, objectTypeId);
+                    uow.Complete();
+                    return e;
                 }
             }
 
@@ -274,7 +290,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.CreateUnitOfWork())
                 {
                     var repository = uow.CreateRepository<IEntityRepository>();
-                    return repository.Get(id);
+                    var e = repository.Get(id);
+                    uow.Complete();
+                    return e;
                 }
             }
 
@@ -303,7 +321,9 @@ namespace Umbraco.Core.Services
                 if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
                     return null;
 
-                return repository.Get(entity.ParentId);
+                var e = repository.Get(entity.ParentId);
+                uow.Complete();
+                return e;
             }
         }
 
@@ -323,7 +343,9 @@ namespace Umbraco.Core.Services
                     return null;
 
                 var objectTypeId = umbracoObjectType.GetGuid();
-                return repository.Get(entity.ParentId, objectTypeId);
+                var e = repository.Get(entity.ParentId, objectTypeId);
+                uow.Complete();
+                return e;
             }
         }
 
@@ -339,7 +361,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query);
-
+                uow.Complete();
                 return contents;
             }
         }
@@ -358,7 +380,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query, objectTypeId).ToList(); // run within using!
-
+                uow.Complete();
                 return contents;
             }
         }
@@ -377,7 +399,7 @@ namespace Umbraco.Core.Services
                 var pathMatch = entity.Path + ",";
                 var query = repository.Query.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
                 var entities = repository.GetByQuery(query);
-
+                uow.Complete();
                 return entities;
             }
         }
@@ -397,7 +419,7 @@ namespace Umbraco.Core.Services
                 var entity = repository.Get(id);
                 var query = repository.Query.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
                 var entities = repository.GetByQuery(query, objectTypeId);
-
+                uow.Complete();
                 return entities;
             }
         }
@@ -415,7 +437,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IEntityRepository>();
                 var query = repository.Query.Where(x => x.ParentId == -1);
                 var entities = repository.GetByQuery(query, objectTypeId);
-
+                uow.Complete();
                 return entities;
             }
         }
@@ -458,7 +480,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                return repository.GetAll(objectTypeId, ids);
+                var entities = repository.GetAll(objectTypeId, ids);
+                uow.Complete();
+                return entities;
             }
         }
 
@@ -476,7 +500,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                return repository.GetAll(objectTypeId, keys);
+                var entities = repository.GetAll(objectTypeId, keys);
+                uow.Complete();
+                return entities;
             }
         }
 
@@ -500,7 +526,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                return repository.GetAll(objectTypeId, ids);
+                var entities = repository.GetAll(objectTypeId, ids);
+                uow.Complete();
+                return entities;
             }
         }
 
@@ -519,7 +547,9 @@ namespace Umbraco.Core.Services
                     .Where<NodeDto>(x => x.NodeId == id);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
-                return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+                var t = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+                uow.Complete();
+                return t;
             }
         }
 
@@ -538,7 +568,9 @@ namespace Umbraco.Core.Services
                     .Where<NodeDto>(x => x.UniqueId == key);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
-                return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+                var t = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+                uow.Complete();
+                return t;
             }
         }
 

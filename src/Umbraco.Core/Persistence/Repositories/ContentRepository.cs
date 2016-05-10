@@ -264,9 +264,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //ensure the default template is assigned
             if (entity.Template == null)
-            {
                 entity.Template = entity.ContentType.DefaultTemplate;
-            }
 
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);

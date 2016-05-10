@@ -42,7 +42,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetAll();
+                var groups = repository.GetAll();
+                uow.Complete();
+                return groups;
             }
         }
 
@@ -51,7 +53,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.Get(id);
+                var group = repository.Get(id);
+                uow.Complete();
+                return group;
             }
         }
 
@@ -60,7 +64,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetByName(name);
+                var group = repository.GetByName(name);
+                uow.Complete();
+                return group;
             }
         }
 
