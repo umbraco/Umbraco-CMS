@@ -1040,8 +1040,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 // save
                 using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
                 {
-                    var bytes = Encoding.UTF8.GetBytes(SaveXmlToString(xml));
-                    fs.Write(bytes, 0, bytes.Length);
+                    SaveXmlToStream(xml, fs);
                 }
 
                 LogHelper.Info<content>("Saved Xml to file.");
@@ -1055,47 +1054,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        // invoked by XmlCacheFilePersister ONLY and that one manages the MainDom, ie it
-        // will NOT try to save once the current app domain is not the main domain anymore
-        // (no need to test _released)
-        internal async Task SaveXmlToFileAsync()
-        {
-            LogHelper.Info<content>("Save Xml to file...");
-
-            try
-            {
-                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
-                if (xml == null) return;
-
-                // delete existing file, if any
-                DeleteXmlFile();
-
-                // ensure cache directory exists
-                var directoryName = Path.GetDirectoryName(_xmlFileName);
-                if (directoryName == null)
-                    throw new Exception(string.Format("Invalid XmlFileName \"{0}\".", _xmlFileName));
-                if (File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
-                    Directory.CreateDirectory(directoryName);
-
-                // save
-                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
-                {
-                    var bytes = Encoding.UTF8.GetBytes(SaveXmlToString(xml));
-                    await fs.WriteAsync(bytes, 0, bytes.Length);
-                }
-
-                LogHelper.Info<content>("Saved Xml to file.");
-            }
-            catch (Exception e)
-            {
-                // if something goes wrong remove the file
-                DeleteXmlFile();
-
-                LogHelper.Error<content>("Failed to save Xml to file.", e);
-            }
-        }
-
-        private string SaveXmlToString(XmlDocument xml)
+        private void SaveXmlToStream(XmlDocument xml, Stream writeStream)
         {
             // using that one method because we want to have proper indent
             // and in addition, writing async is never fully async because
@@ -1109,8 +1068,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // so ImportContent must also make sure of ignoring whitespaces!
 
-            var sb = new StringBuilder();
-            using (var xmlWriter = XmlWriter.Create(sb, new XmlWriterSettings
+            if (writeStream.CanSeek)
+            {
+                writeStream.Position = 0;
+            }
+
+            using (var xmlWriter = XmlWriter.Create(writeStream, new XmlWriterSettings
             {
                 Indent = true,
                 Encoding = Encoding.UTF8,
@@ -1120,7 +1083,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 //xmlWriter.WriteProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
                 xml.WriteTo(xmlWriter); // already contains the xml declaration
             }
-            return sb.ToString();
         }
 
         private XmlDocument LoadXmlFromFile()

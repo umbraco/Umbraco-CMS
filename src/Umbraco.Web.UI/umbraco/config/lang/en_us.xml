@@ -65,6 +65,7 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Clear selection</key>
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
@@ -148,6 +149,7 @@
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -198,6 +200,12 @@
     <key alias="restart">Restart</key>
     <key alias="visit">Visit</key>
     <key alias="welcome">Welcome</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Name</key>
@@ -291,6 +299,7 @@
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
+    <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="label">Label...</key>
@@ -298,6 +307,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
+    <key alias="email">Enter your email</key>
   </area>
 
   <area alias="editcontenttype">
@@ -483,8 +493,8 @@
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
     <key alias="current">current</key>
-    <key alias="move">Move</key>
     <key alias="embed">Embed</key>
+    <key alias="selected">selected</key>
   </area>
   <area alias="colors">
     <key alias="black">Black</key>
@@ -658,6 +668,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">Forgotten password?</key>
+    <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
+    <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+    <key alias="returnToLogin">Return to login form</key>
+    <key alias="setPasswordInstruction">Please provide a new password</key>
+    <key alias="setPasswordConfirmation">Your Password has been updated</key>
+    <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>

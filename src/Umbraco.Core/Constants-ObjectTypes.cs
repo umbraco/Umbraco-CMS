@@ -143,7 +143,10 @@ namespace Umbraco.Core
             /// </summary>
             public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
 
-            
+            /// <summary>
+            /// Guid for a Lock object.
+            /// </summary>
+            public static readonly Guid LockObjectGuid = new Guid(LockObject);
         }
     }
 }
