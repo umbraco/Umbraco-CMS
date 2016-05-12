@@ -1666,7 +1666,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                // fixme is this right?
+                // fixme tag & tree issue
                 // tags code handling has been removed here
                 // - tags should be handled by the content repository
                 // - a copy is unpublished and therefore has no impact on tags in DB
@@ -1900,7 +1900,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // fail fast + use in alreadyChecked below to avoid duplicate checks
-                var attempt = EnsurePublishable(content, evtMsgs); // fixme - what about CheckAndLogIsPublishable?
+                var attempt = EnsurePublishable(content, evtMsgs);
                 if (attempt.Success)
                     attempt = StrategyCanPublish(content, userId, evtMsgs);
                 if (attempt.Success == false)
@@ -2005,7 +2005,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                // fixme
+                // fixme - EnsurePublishable vs StrategyCanPublish?
                 // EnsurePublishable ensures that path published is ok
                 // StrategyCanPublish ensures other things including valid properties
                 // should we merge or?!
@@ -2018,8 +2018,6 @@ namespace Umbraco.Core.Services
                     // dates, trashed status...
                     status = StrategyPublish(content, false, userId, evtMsgs);
                 }
-
-                // fixme not changing to .Saving nor .Publishing or what?!
 
                 // save - always, even if not publishing (this is SaveAndPublish)
                 if (content.HasIdentity == false)
@@ -2036,8 +2034,7 @@ namespace Umbraco.Core.Services
 
             if (status.Success == false)
             {
-                // fixme what abuot the saved event?
-                //
+                // fixme what about the saved event?
                 return status;
             }
 
@@ -2054,21 +2051,6 @@ namespace Umbraco.Core.Services
                     Published.RaiseEvent(new PublishEventArgs<IContent>(descendants, false, false), this);
                 }
             }
-
-            // fixme - what shall we do with this?!
-            ////Save xml to db and call following method to fire event through PublishingStrategy to update cache
-            //if (published)
-            //{
-            //    _publishingStrategy.PublishingFinalized(content);
-            //}
-
-            ////We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-            //if (published && previouslyPublished == false && HasChildren(content.Id))
-            //{
-            //    var descendants = GetPublishedDescendants(content);
-
-            //    _publishingStrategy.PublishingFinalized(descendants, false);
-            //}
 
             Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
             return status;
@@ -2106,7 +2088,6 @@ namespace Umbraco.Core.Services
             }
 
             // fixme - should we do it - are we doing it for descendants too?
-            // fixme - what about CheckAndLogIsValid?
             if (content.IsValid() == false)
             {
                 Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because of invalid properties.");

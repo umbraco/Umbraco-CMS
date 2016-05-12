@@ -304,7 +304,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161
-            // var prepo = UnitOfWork.CreateRepository<IPermissionRepository<IContent>>(); // fixme STOP new-ing repos!
+            // fixme STOP new-ing repos everywhere!
+            // var prepo = UnitOfWork.CreateRepository<IPermissionRepository<IContent>>();
             var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
@@ -378,8 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var content = (Content) entity;
             var publishedState = content.PublishedState;
-            // fixme what's wrong with this?
-            //var publishedStateChanged = publishedState == PublishedState.Publishing || publishedState == PublishedState.Unpublishing;
+            var publishedStateChanged = publishedState == PublishedState.Publishing || publishedState == PublishedState.Unpublishing;
 
             //check if we need to make any database changes at all
             if (entity.RequiresSaving(publishedState) == false)
@@ -437,19 +437,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //a flag that we'll use later to create the tags in the tag db table
-            var publishedStateChanged = false;
-
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
             //if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
             if (entity.RequiresClearPublishedFlag(publishedState, requiresNewVersion))
-            {
                 ClearPublishedFlag(entity);
-
-                //this is a newly published version so we'll update the tags table too (end of this method)
-                publishedStateChanged = true;
-            }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
             ClearNewestFlag(entity);
