@@ -96,8 +96,8 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.1.0-u005\lib\net45\NPoco.dll</HintPath>
+    <Reference Include="NPoco, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.3.0-beta3\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
@@ -148,8 +148,6 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
     <Compile Include="AttemptOfT.cs" />
-    <Compile Include="Auditing\Audit.cs" />
-    <Compile Include="Auditing\AuditTypes.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -619,10 +617,10 @@
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
-    <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
-    <Compile Include="Packaging\Models\InstallationSummary.cs" />
-    <Compile Include="Packaging\Models\MetaData.cs" />
-    <Compile Include="Packaging\Models\PackageAction.cs" />
+    <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
+    <Compile Include="Models\Packaging\InstallationSummary.cs" />
+    <Compile Include="Models\Packaging\MetaData.cs" />
+    <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />

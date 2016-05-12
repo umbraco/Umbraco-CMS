@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Auditing;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.businesslogic.packager {
     public class InstalledPackage
@@ -62,7 +63,7 @@ namespace umbraco.cms.businesslogic.packager {
 
         public void Delete(int userId)
         {
-            Audit.Add(AuditTypes.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);
+            ApplicationContext.Current.Services.AuditService.Add(AuditType.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);            
             Delete();
         }
 

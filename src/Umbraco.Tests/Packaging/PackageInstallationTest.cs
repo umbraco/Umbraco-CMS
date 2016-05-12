@@ -1,8 +1,8 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Packaging

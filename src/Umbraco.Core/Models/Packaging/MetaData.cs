@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Packaging.Models
+namespace Umbraco.Core.Models.Packaging
 {
     [Serializable]
     [DataContract(IsReference = true)]

@@ -6,13 +6,14 @@ using System.Xml;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
-using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
+using Umbraco.Core.Models;
+using File = System.IO.File;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -272,9 +273,9 @@ namespace umbraco.cms.businesslogic.packager
                 // log that a user has install files
                 if (_currentUserId > -1)
                 {
-                    Audit.Add(AuditTypes.PackagerInstall,
+                    ApplicationContext.Current.Services.AuditService.Add(AuditType.PackagerInstall,
                                             string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
-                                            _currentUserId, -1);
+                                            _currentUserId, -1);                    
                 }
 
                 insPack.Save();
