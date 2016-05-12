@@ -385,6 +385,7 @@
     </Compile>
     <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockObjects.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockTable.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />

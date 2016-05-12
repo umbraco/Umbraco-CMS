@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public int Value { get; set; } = 1;
 
-        [Column("name)")]
+        [Column("name")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(64)]
         public string Name { get; set; }

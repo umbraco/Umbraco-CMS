@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("8.0.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("8.0.0", 101, GlobalSettings.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(ILogger logger)
@@ -15,15 +15,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
         public override void Up()
         {
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
-            if (tables.InvariantContains("umbracoLock") == false)
-            {
-                Create.Table("umbracoLock")
-                    .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoLock")
-                    .WithColumn("value").AsString(64).NotNullable()
-                    .WithColumn("name").AsString().NotNullable();
-            }
-
             // some may already exist, just ensure everything we need is here
             EnsureLockObject(Constants.Locks.Servers, "Servers");
             EnsureLockObject(Constants.Locks.ContentTypes, "ContentTypes");
@@ -42,18 +33,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
         private void EnsureLockObject(int id, string name)
         {
-            var exists = Context.Database.Exists<LockDto>(id);
-            if (exists) return;
-
-            // be safe: delete old umbracoNode lock objects if any
-            Delete
-                .FromTable("umbracoNode")
-                .Row(new { id });
-
-            Insert
-                .IntoTable("umbracoLock")
-                .EnableIdentityInsert()
-                .Row(new { id, name });
+            Execute.Code(db =>
+            {
+                var exists = db.Exists<LockDto>(id);
+                if (exists) return string.Empty;
+                // be safe: delete old umbracoNode lock objects if any
+                db.Execute($"DELETE FROM umbracoNode WHERE id={id};");
+                // then create umbracoLock object
+                db.Execute($"INSERT umbracoLock (id, name, value) VALUES ({id}, '{name}', 1);");
+                return string.Empty;
+            });
         }
     }
 }
