@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -14,6 +15,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
         public override void Up()
         {
+            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
+            if (tables.InvariantContains("umbracoLock") == false)
+            {
+                Create.Table("umbracoLock")
+                    .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoLock")
+                    .WithColumn("value").AsString(64).NotNullable()
+                    .WithColumn("name").AsString().NotNullable();
+            }
+
             // some may already exist, just ensure everything we need is here
             EnsureLockObject(Constants.Locks.Servers, "Servers");
             EnsureLockObject(Constants.Locks.ContentTypes, "ContentTypes");
