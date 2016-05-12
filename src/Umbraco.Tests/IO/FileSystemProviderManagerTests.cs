@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_Base_File_System()
         {
-            var fs = FileSystemProviderManager.Current.GetUnderlyingFileSystemProvider(FileSystemProviderConstants.Media);
+            var fs = FileSystemProviderManager.Current.GetUnderlyingFileSystemProvider(Constants.IO.MediaFileSystemProvider);
 
             Assert.NotNull(fs);
         }

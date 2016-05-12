@@ -14,34 +14,6 @@ namespace Umbraco.Web
 {
     internal static class MediaPropertyExtensions
     {
-
-        internal static void AutoPopulateFileMetaDataProperties(this IContentBase model, string propertyAlias, string relativefilePath = null)
-        {
-            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldConfigNode =
-                   UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
-                                       .FirstOrDefault(x => x.Alias == propertyAlias);
-
-            if (uploadFieldConfigNode != null && model.Properties.Contains(propertyAlias))
-            {
-                if (relativefilePath == null)
-                    relativefilePath = model.GetValue<string>(propertyAlias);
-
-                //now we need to check if there is a path
-                if (!string.IsNullOrEmpty(relativefilePath))
-                {
-                    var fullPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(relativefilePath));
-                    var umbracoFile = new UmbracoMediaFile(fullPath);
-                    FillProperties(uploadFieldConfigNode, model, umbracoFile);
-                }
-                else
-                {
-                    //for now I'm just resetting this
-                    ResetProperties(uploadFieldConfigNode, model);
-                }
-            }
-        }
-
         internal static void ResetFileMetaDataProperties(this IContentBase content, IImagingAutoFillUploadField uploadFieldConfigNode)
         {
             if (uploadFieldConfigNode == null) throw new ArgumentNullException("uploadFieldConfigNode");

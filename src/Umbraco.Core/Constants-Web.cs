@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace Umbraco.Core
 {
 	public static partial class Constants
-	{		
+	{	
         /// <summary>
         /// Defines the identifiers for Umbraco system nodes.
         /// </summary>
@@ -54,5 +54,10 @@ namespace Umbraco.Core
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
 
 	    }
+
+	    public static class IO
+	    {
+            public const string MediaFileSystemProvider = "media";
+        }
 	}
 }

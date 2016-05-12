@@ -29,13 +29,6 @@ namespace umbraco.uicontrols
             return icon;
         }
 
-        internal MenuSplitButton NewSplitButton()
-        {
-            var menu = new MenuSplitButton();
-            Icons.Add(menu);
-            return menu;
-        }
-
         public MenuButton NewButton(int index = -1)
         {
             MenuButton btn = new MenuButton();

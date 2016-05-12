@@ -20,30 +20,7 @@ namespace Umbraco.Core.IO
         internal bool ViewExists(ITemplate t)
         {
             return _viewFileSystem.FileExists(ViewPath(t.Alias));
-        }
-
-        [Obsolete("This is only used for legacy purposes and will be removed in future versions")]
-        internal string GetPhysicalFilePath(ITemplate t)
-        {
-            return _viewFileSystem.GetFullPath(ViewPath(t.Alias));
-        }
-
-        internal string GetFileContents(ITemplate t)
-        {
-            string viewContent = "";
-            string path = ViewPath(t.Alias);
-
-            if (_viewFileSystem.FileExists(path))
-            {
-                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
-                {
-                    viewContent = tr.ReadToEnd();
-                    tr.Close();
-                }
-            }
-
-            return viewContent;
-        }
+        }     
 
         public string CreateView(ITemplate t, bool overWrite = false)
         {
@@ -156,16 +133,6 @@ namespace Umbraco.Core.IO
                 _viewFileSystem.AddFile(path, ms, true);
             }
             return t.Content;
-        }
-
-        internal void RemoveViewFile(string alias)
-        {
-            if (string.IsNullOrWhiteSpace(alias) == false)
-            {
-                var file = ViewPath(alias);
-                if (_viewFileSystem.FileExists(file))
-                    _viewFileSystem.DeleteFile(file);
-            }
         }
 
         public string ViewPath(string alias)

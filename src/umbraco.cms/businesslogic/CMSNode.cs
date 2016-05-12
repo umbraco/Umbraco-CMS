@@ -323,11 +323,6 @@ namespace umbraco.cms.businesslogic
         {
             get { return LegacySqlHelper.SqlHelper; }
         }
-
-        internal static UmbracoDatabase Database
-        {
-            get { return ApplicationContext.Current.DatabaseContext.Database; }
-        }
         #endregion
 
         #region Constructors
@@ -449,10 +444,6 @@ namespace umbraco.cms.businesslogic
         public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
         {
             throw new NotSupportedException("DO NOT USE THIS METHOD, THIS NEEDS TO BE REMOVED FROM THE CODEBASE, REFACTOR ANYTHING THAT IS USING THIS IF YOU GET THIS EXCEPTION");
-
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, x, Deep);
-            return x;
         }
 
         public virtual XmlNode ToPreviewXml(XmlDocument xd)
@@ -1047,35 +1038,6 @@ order by level,sortOrder";
             _uniqueID = content.Key;
             _nodeObjectType = objectType;            
             _createDate = content.CreateDate;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void XmlPopulate(XmlDocument xd, XmlNode x, bool Deep)
-        {
-            // attributes
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "id", this.Id.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
-            if (this.Level > 1)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.ParentId.ToString()));
-            else
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "level", this.Level.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "writerID", this.User.Id.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "sortOrder", this.sortOrder.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", this.CreateDateTime.ToString("s")));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "nodeName", this.Text));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "path", this.Path));
-
-            if (Deep)
-            {
-                //store children array here because iterating over an Array property object is very inneficient.
-                var children = this.Children;
-                foreach (Content c in children)
-                    x.AppendChild(c.ToXml(xd, true));
-            }
         }
 
         #endregion

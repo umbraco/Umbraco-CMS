@@ -37,28 +37,6 @@ namespace Umbraco.Core.Logging
         {
             return new Logger();
         }
-
-		///<summary>
-		/// Returns a logger for the type specified
-		///</summary>
-		///<typeparam name="T"></typeparam>
-		///<returns></returns>
-		internal ILog LoggerFor<T>()
-		{
-			return LogManager.GetLogger(typeof(T));
-		}
-
-		/// <summary>
-		/// Returns a logger for the object's type
-		/// </summary>
-		/// <param name="getTypeFromInstance"></param>
-		/// <returns></returns>
-		internal ILog LoggerFor(object getTypeFromInstance)
-		{
-			if (getTypeFromInstance == null) throw new ArgumentNullException("getTypeFromInstance");
-			
-			return LogManager.GetLogger(getTypeFromInstance.GetType());
-		}
         
 		public void Error(Type callingType, string message, Exception exception)
 		{

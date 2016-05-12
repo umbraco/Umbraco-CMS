@@ -1002,25 +1002,7 @@ namespace Umbraco.Tests.CoreXml
             Root = new TestRootContent(type).WithChildren(1);
         }
     }
-
-    class TestSource3 : TestSourceBase
-    {
-        public TestSource3()
-        {
-            LastAttributeIndex = 1;
-
-            var prop1 = new TestPropertyType("prop1");
-            var prop2 = new TestPropertyType("prop2");
-            var prop3 = new TestPropertyType("prop3");
-            var type = new TestRootContentType(this, prop1, prop2);
-            var type1 = type.CreateType("type1", prop3);
-
-            Content[1] = new TestContent(type1, 1, 1).WithValues("1:p1", "1:p2", "1:p3").WithChildren(2);
-            Content[2] = new TestContent(type1, 2, 1).WithValues("2:p1", "2:p2", "2:p3");
-
-            Root = new TestRootContent(type).WithChildren(1);
-        }    
-    }
+    
 
     class TestSource4 : TestSourceBase
     {
