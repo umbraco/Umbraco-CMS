@@ -11,14 +11,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    [SqlSyntaxProviderAttribute(Constants.DbProviderNames.SqlCe)]
+    [SqlSyntaxProvider(Constants.DbProviderNames.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public SqlCeSyntaxProvider()
-        {
-            
-        }
-
         public override bool SupportsClustered()
         {
             return false;

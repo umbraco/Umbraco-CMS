@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
 
-        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
         protected DbTypes DbTypeMap = new DbTypes();
         protected void InitColumnTypeMap()

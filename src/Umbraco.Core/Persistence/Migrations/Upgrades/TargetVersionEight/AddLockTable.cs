@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             if (tables.InvariantContains("umbracoLock") == false)
             {
                 Create.Table("umbracoLock")
-                    .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoLock")
+                    .WithColumn("id").AsInt32().PrimaryKey("PK_umbracoLock")
                     .WithColumn("value").AsInt32().NotNullable()
                     .WithColumn("name").AsString(64).NotNullable();
             }
