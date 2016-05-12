@@ -8,7 +8,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -23,7 +22,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
-        private readonly IPublishingStrategy _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
@@ -36,17 +34,14 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IPublishingStrategy publishingStrategy,
             IDataTypeService dataTypeService,
             IUserService userService,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
             : base(provider, logger, eventMessagesFactory)
         {
-            if (publishingStrategy == null) throw new ArgumentNullException(nameof(publishingStrategy));
             if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
             if (userService == null) throw new ArgumentNullException(nameof(userService));
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
-            _publishingStrategy = publishingStrategy;
             _dataTypeService = dataTypeService;
             _userService = userService;
             _urlSegmentProviders = urlSegmentProviders;
@@ -74,7 +69,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var count = repo.CountPublished();
                 uow.Complete();
@@ -86,7 +81,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var count = repo.Count(contentTypeAlias);
                 uow.Complete();
@@ -98,7 +93,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var count = repo.CountChildren(parentId, contentTypeAlias);
                 uow.Complete();
@@ -110,7 +105,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var count = repo.CountDescendants(parentId, contentTypeAlias);
                 uow.Complete();
@@ -131,7 +126,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.ReplaceContentPermissions(permissionSet);
                 uow.Complete();
@@ -148,7 +143,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.AssignEntityPermission(entity, permission, userIds);
                 uow.Complete();
@@ -164,7 +159,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var perms = repo.GetPermissionsForEntity(content.Id);
                 uow.Complete();
@@ -274,7 +269,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 // locking the content tree secures content types too
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
@@ -308,7 +303,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 // locking the content tree secures content types too
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
@@ -375,7 +370,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = repository.Get(id);
                 uow.Complete();
@@ -395,7 +390,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = repository.GetAll(idsA);
                 uow.Complete();
@@ -412,7 +407,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Key == key);
                 var contents = repository.GetByQuery(query);
@@ -431,7 +426,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var content = repository.GetByQuery(query);
@@ -444,7 +439,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var content = repository.GetByPublishedVersion(query);
@@ -463,7 +458,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Level == level && x.Trashed == false);
                 var content = repository.GetByQuery(query);
@@ -481,7 +476,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = repository.GetByVersion(versionId);
                 uow.Complete();
@@ -498,7 +493,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = repository.GetAllVersions(id);
                 uow.Complete();
@@ -536,7 +531,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var ancestors = repository.GetAll(ids);
                 uow.Complete();
@@ -553,7 +548,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id);
                 var children = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
@@ -571,7 +566,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == id && x.Published);
                 var children = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
@@ -617,7 +612,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var query = repository.Query;
@@ -665,7 +660,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var query = repository.Query;
@@ -688,7 +683,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == parentId && x.Name.Contains(name));
                 var children = repository.GetByQuery(query);
@@ -706,7 +701,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var content = GetById(id);
                 if (content == null)
@@ -731,7 +726,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var pathMatch = content.Path + ",";
                 var query = repository.Query.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
@@ -798,7 +793,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.ParentId == Constants.System.Root);
                 var content = repository.GetByQuery(query);
@@ -815,7 +810,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Trashed == false);
                 var content = repository.GetByPublishedVersion(query);
@@ -832,7 +827,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
                 var content = repository.GetByQuery(query);
@@ -849,7 +844,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
                 var content = repository.GetByQuery(query);
@@ -866,7 +861,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
                 var content = repository.GetByQuery(query);
@@ -894,7 +889,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = repository.Query.Where(x => x.Published && x.Id == id && x.Trashed == false);
                 var count = repository.Count(query);
@@ -917,7 +912,7 @@ namespace Umbraco.Core.Services
             // not trashed and has a parent: publishable if the parent is path-published
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var parent = repo.Get(content.ParentId);
                 if (parent == null)
@@ -932,7 +927,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repo = uow.CreateRepository<IContentRepository>();
                 var isPathPublished = repo.IsPathPublished(content);
                 uow.Complete();
@@ -1012,7 +1007,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
 
                 var repository = uow.CreateRepository<IContentRepository>();
                 if (content.HasIdentity == false)
@@ -1069,7 +1064,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 foreach (var content in contentsA)
                 {
@@ -1273,7 +1268,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // if it's not trashed yet, and published, we should unpublish
@@ -1341,7 +1336,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 repository.DeleteVersions(id, versionDate);
                 uow.Complete();
@@ -1373,7 +1368,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 repository.DeleteVersion(versionId);
                 uow.Complete();
@@ -1412,7 +1407,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var originalPath = content.Path;
@@ -1463,7 +1458,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
@@ -1547,7 +1542,7 @@ namespace Umbraco.Core.Services
         private static void PerformMoveContentLocked(IContentRepository repository, IContent content, int userId,
             bool? trash)
         {
-            if (trash.HasValue) ((ContentBase)content).Trashed = trash.Value;
+            if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
             repository.AddOrUpdate(content);
         }
@@ -1563,7 +1558,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
@@ -1623,9 +1618,6 @@ namespace Umbraco.Core.Services
             var copy = content.DeepCloneWithResetIdentities();
             copy.ParentId = parentId;
 
-            // a copy should never be set to published automatically even if the original was.
-            copy.ChangePublishedState(PublishedState.Unpublished);
-
             if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
                 return null;
 
@@ -1633,7 +1625,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // a copy is .Saving and will be .Unpublished
@@ -1737,7 +1729,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // a rolled back version is .Saving and will be .Unpublished
@@ -1779,7 +1771,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var sortOrder = 0;
 
@@ -1840,7 +1832,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var descendants = GetPublishedDescendantsLocked(repository, content);
                 uow.Complete();
@@ -1883,8 +1875,6 @@ namespace Umbraco.Core.Services
             }
         }
 
-        // FIXME FIXME FIXME FIXME BELOW
-
         /// <summary>
         /// Publishes a <see cref="IContent"/> object and all its children
         /// </summary>
@@ -1906,7 +1896,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // fail fast + use in alreadyChecked below to avoid duplicate checks
@@ -1962,7 +1952,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var newest = GetById(content.Id); // ensure we have the newest version
@@ -2012,7 +2002,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // fixme
@@ -2488,7 +2478,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // fixme what about content that has the contenttype as part of its composition?
@@ -2539,7 +2529,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
 
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = repository.Query.Where(x => x.Alias == contentTypeAlias);
@@ -2566,7 +2556,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var elt = repository.GetContentXml(contentId);
                 uow.Complete();
@@ -2584,7 +2574,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ContentTreeLock);
+                uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var elt = repository.GetContentPreviewXml(contentId, version);
                 uow.Complete();
@@ -2603,7 +2593,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ContentTreeLock);
+                uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 repository.RebuildXmlStructures(
                     content => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content),

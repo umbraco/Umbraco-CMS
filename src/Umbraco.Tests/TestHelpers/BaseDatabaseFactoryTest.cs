@@ -120,7 +120,6 @@ namespace Umbraco.Tests.TestHelpers
                 repositoryFactory,
                 new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, Logger),
                 CacheHelper,
                 Logger,
                 evtMsgs,

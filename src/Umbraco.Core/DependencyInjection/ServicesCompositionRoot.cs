@@ -19,8 +19,6 @@ namespace Umbraco.Core.DependencyInjection
     {
         public void Compose(IServiceRegistry container)
         {
-            container.RegisterSingleton<IPublishingStrategy, PublishingStrategy>();
-
             //These will be replaced by the web boot manager when running in a web context
             container.Register<IEventMessagesFactory, TransientMessagesFactory>();
 

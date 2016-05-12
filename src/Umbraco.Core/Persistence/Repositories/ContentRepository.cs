@@ -90,7 +90,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
                                 .Where<DocumentDto>(x => x.Newest)
-                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                //.OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                .OrderBy<NodeDto>(x => x.Level)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
             return MapQueryDtos(Database.Fetch<DocumentDto>(sql));
@@ -355,7 +356,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //lastly, check if we are a creating a published version , then update the tags table
             if (entity.Published)
-                UpdatePropertyTags(entity, _tagRepository);
+                UpdateEntityTags(entity, _tagRepository);
 
             // published => update published version infos, else leave it blank
             if (entity.Published)
@@ -377,6 +378,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var content = (Content) entity;
             var publishedState = content.PublishedState;
+            // fixme what's wrong with this?
             //var publishedStateChanged = publishedState == PublishedState.Publishing || publishedState == PublishedState.Unpublishing;
 
             //check if we need to make any database changes at all
@@ -502,15 +504,33 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //lastly, check if we are a newly published version and then update the tags table
-            if (publishedStateChanged && entity.Published)
+            // tags:
+            if (HasTagProperty(entity))
             {
-                UpdatePropertyTags(entity, _tagRepository);
-            }
-            else if (publishedStateChanged && (entity.Trashed || entity.Published == false))
-            {
-                //it's in the trash or not published remove all entity tags
-                ClearEntityTags(entity, _tagRepository);
+                // if path-published, update tags, else clear tags
+                switch (content.PublishedState)
+                {
+                    case PublishedState.Publishing:
+                        // explicitely publishing, must update tags
+                        UpdateEntityTags(entity, _tagRepository);
+                        break;
+                    case PublishedState.Unpublishing:
+                        // explicitely unpublishing, must clear tags
+                        ClearEntityTags(entity, _tagRepository);
+                        break;
+                    case PublishedState.Saving:
+                        // saving, nothing to do
+                        break;
+                    case PublishedState.Published:
+                    case PublishedState.Unpublished:
+                        // no change, depends on path-published
+                        // that should take care of trashing and un-trashing
+                        if (IsPathPublished(entity)) // slightly expensive ;-(
+                            UpdateEntityTags(entity, _tagRepository);
+                        else
+                            ClearEntityTags(entity, _tagRepository);
+                        break;
+                }
             }
 
             // published => update published version infos,
@@ -634,7 +654,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId=@Id AND newest=@IsNewest", new { /*Id =*/ content.Id, IsNewest = true });
             foreach (var documentDto in documentDtos)
             {
-                documentDto.Published = false;
+                documentDto.Newest = false;
                 Database.Update(documentDto);
             }
         }

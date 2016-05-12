@@ -122,9 +122,10 @@ namespace Umbraco.Core.Models
         /// Sets the ParentId from the lazy integer id
         /// </summary>
         /// <param name="id">Id of the Parent</param>
-        internal void SetLazyParentId(Lazy<int> id)
+        internal protected void SetLazyParentId(Lazy<int> parentId)
         {
-            _parentId = id;
+            _parentId = parentId;
+            OnPropertyChanged(ParentIdSelector);
         }
 
         /// <summary>
@@ -491,8 +492,6 @@ namespace Umbraco.Core.Models
         {
             get { return _lastInvalidProperties; }
         }
-
-        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);
 
         #region Dirty property handling
 

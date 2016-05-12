@@ -72,12 +72,5 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>True if content is valid otherwise false</returns>
         bool IsValid();
-
-        /// <summary>
-        /// Changes the Trashed state of the content object
-        /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        void ChangeTrashedState(bool isTrashed, int parentId = -20);
     }
 }

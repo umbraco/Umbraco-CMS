@@ -112,7 +112,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
         /// <param name="parentId"> </param>
-        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
+        public void ChangeTrashedState(bool isTrashed, int parentId = -20)
         {
             Trashed = isTrashed;
             //The Media Recycle Bin Id is -21 so we correct that here

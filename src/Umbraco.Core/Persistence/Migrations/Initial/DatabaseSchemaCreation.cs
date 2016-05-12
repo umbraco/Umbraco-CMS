@@ -84,7 +84,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
-                                                                              {47, typeof (UmbracoDeployDependencyDto)}
+                                                                              {47, typeof (UmbracoDeployDependencyDto)},
+                                                                              {48, typeof (LockDto) }
                                                                           };
         #endregion
 

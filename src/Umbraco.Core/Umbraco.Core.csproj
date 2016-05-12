@@ -358,6 +358,7 @@
     <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
     <Compile Include="Models\ContentTypeAvailableCompositionsResults.cs" />
     <Compile Include="Models\EntityContainer.cs" />
+    <Compile Include="Models\Rdbms\LockDto.cs" />
     <Compile Include="ObjectResolution\ContainerLazyManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
@@ -380,6 +381,7 @@
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
+    <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -1203,7 +1205,6 @@
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Publishing\BasePublishingStrategy.cs" />
     <Compile Include="Publishing\IPublishingStrategy.cs" />
-    <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="Publishing\PublishStatus.cs" />
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="Dynamics\QueryableExtensions.cs" />

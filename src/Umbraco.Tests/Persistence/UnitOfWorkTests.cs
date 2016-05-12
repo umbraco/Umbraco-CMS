@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence
             var provider = new NPocoUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.System.ServersLock);
+                uow.ReadLock(Constants.Locks.Servers);
                 uow.Complete();
             }
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence
             var provider = new NPocoUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.System.ServersLock);
+                uow.WriteLock(Constants.Locks.Servers);
                 uow.Complete();
             }
         }

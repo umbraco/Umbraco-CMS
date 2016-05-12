@@ -87,7 +87,6 @@ namespace Umbraco.Tests.TestHelpers
         public static ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,
-            IPublishingStrategy publishingStrategy,
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
@@ -96,7 +95,6 @@ namespace Umbraco.Tests.TestHelpers
             if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(dbUnitOfWorkProvider));
             if (fileUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(fileUnitOfWorkProvider));
-            if (publishingStrategy == null) throw new ArgumentNullException(nameof(publishingStrategy));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
@@ -145,7 +143,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, publishingStrategy, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
             var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, repositoryFactory, logger));
             var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));

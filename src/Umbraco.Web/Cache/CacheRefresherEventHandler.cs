@@ -113,8 +113,8 @@ namespace Umbraco.Web.Cache
             ContentService.Trashed += ContentServiceTrashed;
             ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
 
-            PublishingStrategy.Published += PublishingStrategy_Published;
-            PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
+            ContentService.Published += ContentService_Published;
+            ContentService.UnPublished += ContentService_UnPublished;
 
             //public access events
             PublicAccessService.Saved += PublicAccessService_Saved;
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Cache
         
         #region Publishing
 
-        void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())
             {
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RemovePageCache(content);
         }
 
-        void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())
             {

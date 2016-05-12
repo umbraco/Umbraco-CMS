@@ -678,7 +678,7 @@ namespace Umbraco.Core.Services
                 media.ParentId = parentId;
                 if (media.Trashed)
                 {
-                    media.ChangeTrashedState(false, parentId);
+                    ((Models.Media)media).ChangeTrashedState(false, parentId);
                 }
                 Save(media, userId,
                     //no events!
@@ -976,7 +976,7 @@ namespace Umbraco.Core.Services
                 //Remove 'published' xml from the cmsContentXml table for the unpublished media
                 uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = media.Id });
 
-                media.ChangeTrashedState(true, Constants.System.RecycleBinMedia);
+                ((Models.Media)media).ChangeTrashedState(true, Constants.System.RecycleBinMedia);
                 repository.AddOrUpdate(media);
 
                 //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
@@ -985,7 +985,7 @@ namespace Umbraco.Core.Services
                     //Remove 'published' xml from the cmsContentXml table for the unpublished media
                     uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = descendant.Id });
 
-                    descendant.ChangeTrashedState(true, descendant.ParentId);
+                    ((Models.Media)descendant).ChangeTrashedState(true, descendant.ParentId);
                     repository.AddOrUpdate(descendant);
 
                     moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
@@ -1188,7 +1188,7 @@ namespace Umbraco.Core.Services
                 child.Level = parentLevel + 1;
                 if (parentTrashed != child.Trashed)
                 {
-                    child.ChangeTrashedState(parentTrashed, child.ParentId);
+                    ((Models.Media)child).ChangeTrashedState(parentTrashed, child.ParentId);
                 }
 
                 eventInfo.Add(new MoveEventInfo<IMedia>(child, originalPath, child.ParentId));

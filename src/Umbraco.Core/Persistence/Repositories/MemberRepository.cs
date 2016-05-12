@@ -257,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             ((Member)entity).ResetDirtyProperties();
         }
@@ -370,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             dirtyEntity.ResetDirtyProperties();
         }

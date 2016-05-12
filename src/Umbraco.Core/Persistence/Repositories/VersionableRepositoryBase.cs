@@ -230,7 +230,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="tagRepo"></param>
-        protected void UpdatePropertyTags(IContentBase entity, ITagRepository tagRepo)
+        protected void UpdateEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
             {
@@ -254,6 +254,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        protected bool HasTagProperty(IContentBase entity)
+        {
+            return entity.Properties.Any(x => x.TagSupport.Enable);
+        }
 
         private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
         {

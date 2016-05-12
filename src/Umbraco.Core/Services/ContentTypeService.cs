@@ -27,8 +27,8 @@ namespace Umbraco.Core.Services
 
 
         // beware! order is important to avoid deadlocks
-        protected override int[] ReadLockIds { get; } = { Constants.System.ContentTypesLock };
-        protected override int[] WriteLockIds { get; } = { Constants.System.ContentTreeLock, Constants.System.ContentTypesLock };
+        protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
+        protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
 
         // don't change or remove this, will need it later
         private IContentService ContentService => _contentService;
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 // that one is special because it works accross content, media and member types
-                uow.ReadLock(Constants.System.ContentTypesLock, Constants.System.MediaTypesLock, Constants.System.MemberTypesLock);
+                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
                 var aliases = repo.GetAllPropertyTypeAliases();
                 uow.Complete();
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 // that one is special because it works accross content, media and member types
-                uow.ReadLock(Constants.System.ContentTypesLock, Constants.System.MediaTypesLock, Constants.System.MemberTypesLock);
+                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
                 var aliases = repo.GetAllContentTypeAliases(guids);
                 uow.Complete();

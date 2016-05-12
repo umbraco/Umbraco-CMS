@@ -25,16 +25,6 @@
 		    public const int DefaultContentListViewDataTypeId = -95;
             public const int DefaultMediaListViewDataTypeId = -96;
             public const int DefaultMembersListViewDataTypeId = -97;
-
-            // identifiers for lock objects
-		    public const int ServersLock = -331;
-            public const int ContentTypesLock = -332;
-            public const int ContentTreeLock = -333;
-            public const int MediaTreeLock = -334;
-            public const int MemberTreeLock = -335;
-            public const int MediaTypesLock = -336;
-            public const int MemberTypesLock = -337;
-            public const int DomainsLock = -338;
         }
     }
 }
