@@ -323,14 +323,12 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="Cache\ICacheRefresher.cs" />
-    <Compile Include="DefaultHttpContextAccessor.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
-    <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
@@ -418,7 +416,7 @@
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
-    <Compile Include="RequestLifespanMessagesFactory.cs" />
+    <Compile Include="ScopeContextEventMessagesFactory.cs" />
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
@@ -435,7 +433,6 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Services\ApplicationTreeService.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
-    <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />

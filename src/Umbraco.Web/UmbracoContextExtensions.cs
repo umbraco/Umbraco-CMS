@@ -13,6 +13,9 @@ namespace Umbraco.Web
     /// </summary>
     public static class UmbracoContextExtensions
     {
+        // fixme - this class is generally ugly now that we have proper IoC
+        // the current umbraco context belongs to the ScopeContext not the HttpContext
+
         /// <summary>
         /// tries to get the Umbraco context from the HttpContext
         /// </summary>
@@ -53,10 +56,11 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static EventMessages GetCurrentEventMessages(this UmbracoContext umbracoContext)
         {
-            var msgs = umbracoContext.HttpContext.Items[typeof (RequestLifespanMessagesFactory).Name];
-            if (msgs == null) return null;
-            return (EventMessages) msgs;
+            // fixme - this is ugly
+            // the event messages factory should be injected / supplied by the container to whoever needs it!
+            var scopeContextAdapter = new DefaultScopeContextAdapter();
+            var eventMessagesFactory = new ScopeContextEventMessagesFactory(scopeContextAdapter);
+            return eventMessagesFactory.GetOrDefault();
         }
-
     }
 }

@@ -319,7 +319,7 @@
     <Compile Include="Events\MoveEventInfo.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
-    <Compile Include="Events\TransientMessagesFactory.cs" />
+    <Compile Include="Events\TransientEventMessagesFactory.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
     <Compile Include="Events\NewEventArgs.cs" />
