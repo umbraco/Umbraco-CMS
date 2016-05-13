@@ -16,6 +16,10 @@ IF [%2] NEQ [] (SET comment=%2) ELSE (IF [%1] NEQ [] (SET "comment="))
 
 SET version=%release%
 
+REM SET MSBUILD="%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
 ECHO Building Umbraco %version%
 
@@ -35,7 +39,7 @@ DEL /F /Q webpihash.txt
 ECHO Making sure Git is in the path so that the build can succeed
 CALL InstallGit.cmd
 ECHO Performing MSBuild and producing Umbraco binaries zip files
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
+%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
 
 ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
