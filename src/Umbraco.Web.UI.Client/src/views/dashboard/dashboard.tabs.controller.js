@@ -19,11 +19,11 @@ angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController"
 
 function FormsController($scope, $route, $cookieStore, packageResource) {
     $scope.installForms = function(){
-        $scope.state = "Installng package";
+        $scope.state = "Installing package";
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack){
-              $scope.state = "importing";
+              $scope.state = "Importing";
               return packageResource.import(pack);
             }, $scope.error)
             .then(function(pack){
@@ -31,7 +31,7 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
               return packageResource.installFiles(pack);
             }, $scope.error)
             .then(function(pack){
-              $scope.state = "Restarting, please hold...";
+              $scope.state = "Restarting";
               return packageResource.installData(pack);
             }, $scope.error)
             .then(function(pack){
