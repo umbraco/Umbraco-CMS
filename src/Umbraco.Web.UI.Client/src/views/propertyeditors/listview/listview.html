@@ -31,13 +31,14 @@
                    <umb-button
                        type="button"
                        label="Clear selection"
+                       label-key="buttons_clearSelection"
                        action="clearSelection()"
                        disabled="actionInProgress">
                    </umb-button>
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-                   <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} of {{ listViewResultSet.items.length }} selected</strong>
+                   <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
                    <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
                    <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
@@ -86,7 +87,7 @@
                        type="button"
                        button-style="link"
                        label="Publish"
-                       key="actions_publish"
+                       label-key="actions_publish"
                        icon="icon-globe"
                        action="publish()"
                        disabled="actionInProgress">
@@ -97,7 +98,7 @@
                        type="button"
                        button-style="link"
                        label="Unpublish"
-                       key="actions_unpublish"
+                       label-key="actions_unpublish"
                        icon="icon-block"
                        action="unpublish()"
                        disabled="actionInProgress">
@@ -108,7 +109,7 @@
                        type="button"
                        button-style="link"
                        label="Copy"
-                       key="actions_copy"
+                       label-key="actions_copy"
                        icon="icon-documents"
                        action="copy()"
                        disabled="actionInProgress">
@@ -119,7 +120,7 @@
                        type="button"
                        button-style="link"
                        label="Move"
-                       key="actions_move"
+                       label-key="actions_move"
                        icon="icon-enter"
                        action="move()"
                        disabled="actionInProgress">
@@ -129,8 +130,8 @@
                        ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
                        button-style="link"
-                       label="Delete"
-                       key="actions_delete"
+                       label="Delete"              
+                       label-key="actions_delete"
                        icon="icon-trash"
                        action="delete()"
                        disabled="actionInProgress">
