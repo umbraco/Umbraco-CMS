@@ -120,6 +120,7 @@ namespace umbraco
         private static readonly object DbReadSyncLock = new object();
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
+        private const string XmlContextClonedContentItemKey = "UmbracoXmlContextContent.cloned";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
 
@@ -685,11 +686,6 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             _persisterTask = _persisterTask.Touch(); // _persisterTask != null because SyncToXmlFile == true
         }
 
-        private static XmlDocument Clone(XmlDocument xmlDoc)
-        {
-            return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
-        }
-
         private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
         {
             string subset = null;
@@ -747,13 +743,6 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
             var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
-        }
-
-        // gets a locked safe read accses to the main xml
-        private async Task<SafeXmlReaderWriter> GetSafeXmlReaderAsync()
-        {
-            var releaser = await _xmlLock.LockAsync();
             return SafeXmlReaderWriter.GetReader(this, releaser);
         }
 
@@ -836,6 +825,28 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                     Commit();
                 _releaser.Dispose();
                 _releaser = null;
+            }
+
+            /// <summary>
+            /// This will clone the xml document - but we will try to only clone one time in a request
+            /// </summary>
+            /// <param name="xmlDoc"></param>
+            /// <returns></returns>
+            private XmlDocument Clone(XmlDocument xmlDoc)
+            {
+                if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
+                {
+                    //in this case we'll always clone
+                    return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
+                }
+
+                var clone = UmbracoContext.Current.HttpContext.Items[XmlContextClonedContentItemKey];
+                if (clone == null)
+                {
+                    UmbracoContext.Current.HttpContext.Items[XmlContextClonedContentItemKey] = xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);                    
+                }
+
+                return (XmlDocument)UmbracoContext.Current.HttpContext.Items[XmlContextClonedContentItemKey];
             }
         }
                 
