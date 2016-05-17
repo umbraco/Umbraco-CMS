@@ -32,19 +32,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // unless noted otherwise, no changes / 7.2.8
 
             var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
+            var unitOfWork = provider.CreateUnitOfWork();
             var repository = new PartialViewRepository(unitOfWork, _fileSystem);
 
             var partialView = new PartialView("test-path-1.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
             Assert.AreEqual("test-path-1.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
 
             partialView = new PartialView("path-2/test-path-2.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
             Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
             Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             partialView = new PartialView("path-2\\test-path-3.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
+            unitOfWork.Flush();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
             Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);

@@ -38,17 +38,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relateMemberToContent = new RelationType(new Guid(Constants.ObjectTypes.Member),
-                                                             new Guid(Constants.ObjectTypes.Document),
-                                                             "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
+                                                            new Guid(Constants.ObjectTypes.Document),
+                                                            "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
 
                 repository.AddOrUpdate(relateMemberToContent);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(relateMemberToContent.HasIdentity, Is.True);
@@ -61,16 +61,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relationType = repository.Get(3);
                 relationType.Alias = relationType.Alias + "Updated";
                 relationType.Name = relationType.Name + " Updated";
                 repository.AddOrUpdate(relationType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var relationTypeUpdated = repository.Get(3);
 
@@ -87,14 +87,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relationType = repository.Get(3);
                 repository.Delete(relationType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 
@@ -108,9 +108,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relationType = repository.Get(RelationTypeDto.NodeIdSeed);
@@ -128,9 +128,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relationTypes = repository.GetAll();
@@ -148,9 +148,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var relationTypes = repository.GetAll(2, 3);
@@ -168,9 +168,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(3);
@@ -187,9 +187,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IRelationType>(SqlSyntax, MappingResolver).Where(x => x.Alias.StartsWith("relate"));
@@ -205,9 +205,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
@@ -234,12 +234,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relateContentType = new RelationType(new Guid(Constants.ObjectTypes.DocumentType), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
 
-            repository.AddOrUpdate(relateContent);//Id 2
-            repository.AddOrUpdate(relateContentType);//Id 3
-            unitOfWork.Commit();
+                repository.AddOrUpdate(relateContent);//Id 2
+                repository.AddOrUpdate(relateContentType);//Id 3
+                unitOfWork.Complete();
+            }
         }
     }
 }

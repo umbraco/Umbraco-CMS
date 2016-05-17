@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Events
 {

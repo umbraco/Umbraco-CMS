@@ -37,10 +37,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -50,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get("Testing1235");
@@ -70,10 +69,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -83,7 +81,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Key);
@@ -103,10 +101,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -116,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
@@ -137,14 +134,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");                
 
                 repository.AddOrUpdate(dictionaryItem);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
@@ -164,9 +160,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dictionaryItem = repository.Get(1);
@@ -185,9 +181,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dictionaryItems = repository.GetAll(1, 2);
@@ -205,9 +201,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey == "Article");
@@ -225,9 +221,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey.StartsWith("Read"));
@@ -243,10 +239,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
 
                 var language = languageRepository.Get(1);
 
@@ -259,7 +255,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.AddOrUpdate(read);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(read.Id);
 
@@ -274,9 +270,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var item = repository.Get(1);
@@ -285,7 +281,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 item.Translations = translations;
 
                 repository.AddOrUpdate(item);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dictionaryItem = repository.Get(1);
 
@@ -301,27 +297,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = CreateRepository(unitOfWork);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork);
 
-            var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
-            ServiceContext.LocalizationService.Save(languageNo);
+                var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+                ServiceContext.LocalizationService.Save(languageNo);
 
-            // Act
-            var item = repository.Get(1);
-            var translations = item.Translations.ToList();
-            translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
-            item.Translations = translations;
+                // Act
+                var item = repository.Get(1);
+                var translations = item.Translations.ToList();
+                translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
+                item.Translations = translations;
 
-            repository.AddOrUpdate(item);
-            unitOfWork.Commit();
+                repository.AddOrUpdate(item);
+                unitOfWork.Flush();
 
-            var dictionaryItem = (DictionaryItem)repository.Get(1);
-            
-            // Assert
-            Assert.That(dictionaryItem, Is.Not.Null);
-            Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+                var dictionaryItem = (DictionaryItem) repository.Get(1);
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
+                Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+            }
         }
 
         [Test]
@@ -329,14 +327,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var item = repository.Get(1);
                 repository.Delete(item);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(1);
 
@@ -350,9 +348,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(1);

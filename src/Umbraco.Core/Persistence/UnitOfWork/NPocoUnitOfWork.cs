@@ -1,183 +1,97 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using NPoco;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-	/// <summary>
-	/// Represents the Unit of Work implementation for NPoco
-	/// </summary>
-	internal class NPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
-	{
-
-		/// <summary>
-		/// Used for testing
-		/// </summary>
-		internal Guid InstanceId { get; private set; }
-
-		private Guid _key;
-        private readonly Queue<Operation> _operations = new Queue<Operation>();
-
-		/// <summary>
-		/// Creates a new unit of work instance
-		/// </summary>
-		/// <param name="database"></param>
-		/// <remarks>
-		/// This should normally not be used directly and should be created with the UnitOfWorkProvider
-		/// </remarks>
-		internal NPocoUnitOfWork(UmbracoDatabase database)
-		{
-			Database = database;
-			_key = Guid.NewGuid();
-			InstanceId = Guid.NewGuid();
-		}
-
-		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />
-		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
-		public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
-		{
-            _operations.Enqueue(new Operation
-            {
-                Entity = entity,
-                Repository = repository,
-                Type = TransactionType.Insert
-            });
-		}
-
-		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be changed through this <see cref="UnitOfWork" />
-		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
-		public void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository)
-		{
-		    _operations.Enqueue(
-		        new Operation
-		        {
-		            Entity = entity,
-		            Repository = repository,
-		            Type = TransactionType.Update
-		        });
-		}
-
-		/// <summary>
-		/// Registers an <see cref="IEntity" /> instance to be removed through this <see cref="UnitOfWork" />
-		/// </summary>
-		/// <param name="entity">The <see cref="IEntity" /></param>
-		/// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
-		public void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository)
-		{
-		    _operations.Enqueue(
-		        new Operation
-		        {
-		            Entity = entity,
-		            Repository = repository,
-		            Type = TransactionType.Delete
-		        });
-		}
-
-		/// <summary>
-		/// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
-		/// </summary>
-		/// <remarks>
-		/// Unlike a typical unit of work, this UOW will let you commit more than once since a new transaction is creaed per
-		/// Commit() call instead of having one transaction per UOW. 
-		/// </remarks>
-		public void Commit()
-		{
-		    Commit(null);
-		}
+    /// <summary>
+    /// Implements IDatabaseUnitOfWork for NPoco.
+    /// </summary>
+    internal class NPocoUnitOfWork : UnitOfWorkBase, IDatabaseUnitOfWork
+    {
+        private ITransaction _transaction;
 
         /// <summary>
-        /// Commits all batched changes within the scope of a NPoco <see cref="Transaction"/>.
+        /// Initializes a new instance of the <see cref="NPocoUnitOfWork"/> class with a database and a repository factory.
         /// </summary>
-        /// <param name="transactionCompleting">
-        /// Allows you to set a callback which is executed before the transaction is committed, allow you to add additional SQL
-        /// operations to the overall commit process after the queue has been processed.
-        /// </param>
-        internal void Commit(Action<UmbracoDatabase> transactionCompleting)
+        /// <param name="database">A database.</param>
+        /// <param name="factory">A repository factory.</param>
+        /// <remarks>This should be used by the NPocoUnitOfWorkProvider exclusively.</remarks>
+        internal NPocoUnitOfWork(UmbracoDatabase database, RepositoryFactory factory)
+            : base(factory)
         {
-            using (var transaction = Database.GetTransaction())
-            {
-                while (_operations.Count > 0)
-                {
-                    var operation = _operations.Dequeue();
-                    switch (operation.Type)
-                    {
-                        case TransactionType.Insert:
-                            operation.Repository.PersistNewItem(operation.Entity);
-                            break;
-                        case TransactionType.Delete:
-                            operation.Repository.PersistDeletedItem(operation.Entity);
-                            break;
-                        case TransactionType.Update:
-                            operation.Repository.PersistUpdatedItem(operation.Entity);
-                            break;
-                    }
-                }
-
-                //Execute the callback if there is one
-                if (transactionCompleting != null)
-                {
-                    transactionCompleting(Database);    
-                }
-
-                transaction.Complete();
-            }
-
-            // Clear everything
-            _operations.Clear();
-            _key = Guid.NewGuid();
+            Database = database;
         }
 
-		public object Key
-		{
-			get { return _key; }
-		}
+        /// <summary>
+        /// Gets the unit of work underlying database.
+        /// </summary>
+        public UmbracoDatabase Database { get; }
 
-		public UmbracoDatabase Database { get; private set; }
+        /// <summary>
+        /// Creates a repository.
+        /// </summary>
+        /// <typeparam name="TRepository">The type of the repository.</typeparam>
+        /// <param name="name">The optional name of the repository.</param>
+        /// <returns>The created repository for the unit of work.</returns>
+        public override TRepository CreateRepository<TRepository>(string name = null)
+        {
+            return Factory.CreateRepository<TRepository>(this, name);
+        }
 
-		#region Operation
+        /// <summary>
+        /// Ensures that we have a transaction.
+        /// </summary>
+        /// <remarks>Isolation level is determined by the database, see UmbracoDatabase.DefaultIsolationLevel. Should be
+        /// at least IsolationLevel.RepeatablRead else the node locks will not work correctly.</remarks>
+        public override void Begin()
+        {
+            base.Begin();
 
-		/// <summary>
-		/// Provides a snapshot of an entity and the repository reference it belongs to.
-		/// </summary>
-		private sealed class Operation
-		{
-			/// <summary>
-			/// Gets or sets the entity.
-			/// </summary>
-			/// <value>The entity.</value>
-			public IEntity Entity { get; set; }
+            if (_transaction == null)
+                _transaction = Database.GetTransaction();
+        }
 
-			/// <summary>
-			/// Gets or sets the repository.
-			/// </summary>
-			/// <value>The repository.</value>
-			public IUnitOfWorkRepository Repository { get; set; }
+        protected override void DisposeResources()
+        {
+            base.DisposeResources();
 
-			/// <summary>
-			/// Gets or sets the type of operation.
-			/// </summary>
-			/// <value>The type of operation.</value>
-			public TransactionType Type { get; set; }
-		}
+            // no transaction, nothing to do
+            if (_transaction == null) return;
 
-		#endregion
+            // will either complete or abort NPoco transaction
+            // which means going one level up in the transaction stack
+            // and commit or rollback only if at top of stack
+            if (Completed)
+                _transaction.Complete(); // complete the transaction
+            else
+                _transaction.Dispose(); // abort the transaction
 
-		/// <summary>
-		/// Ensures disposable objects are disposed
-		/// </summary>		
-		/// <remarks>
-		/// Ensures that the Transaction instance is disposed of
-		/// </remarks>
-		protected override void DisposeResources()
-		{
-			_operations.Clear();
-		}
-	}
+            _transaction = null;
+        }
+
+        public void ReadLockNodes(params int[] lockIds)
+        {
+            Begin(); // we need a transaction
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+                Database.ExecuteScalar<int>("SELECT sortOrder FROM umbracoNode WHERE id=@id",
+                    new { @id = lockId });
+        }
+
+        public void WriteLockNodes(params int[] lockIds)
+        {
+            Begin(); // we need a transaction
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+                Database.Execute("UPDATE umbracoNode SET sortOrder = (CASE WHEN (sortOrder=1) THEN -1 ELSE 1 END) WHERE id=@id",
+                    new { @id = lockId });
+        }
+    }
 }

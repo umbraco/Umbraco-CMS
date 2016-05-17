@@ -39,12 +39,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Persist_Member_Type()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var sut = repository.Get(memberType.Id);
 
@@ -63,14 +64,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Persist_Member_Type_Without_Alias()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberType.Alias = null;
                 repository.AddOrUpdate(memberType);
 
-                Assert.Throws<InvalidOperationException>(unitOfWork.Commit);
+                Assert.Throws<InvalidOperationException>(unitOfWork.Flush);
             }
         }
 
@@ -78,18 +80,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All_Member_Types()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.GetAll();
 
@@ -102,18 +105,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All_Member_Types_By_Guid_Ids()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = ((IReadRepository<Guid, IMemberType>)repository).GetAll(memberType1.Key, memberType2.Key);
 
@@ -126,18 +130,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Member_Types_By_Guid_Id()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.Get(memberType1.Key);
 
@@ -153,20 +158,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All_Members_When_No_Properties_Assigned()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 memberType1.PropertyTypeCollection.Clear();
                 repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.PropertyTypeCollection.Clear();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.GetAll();
 
@@ -180,12 +186,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Member_Type_By_Id()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 memberType = repository.Get(memberType.Id);
                 Assert.That(memberType, Is.Not.Null);
             }
@@ -195,12 +202,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Member_Type_By_Guid_Id()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 memberType = repository.Get(memberType.Key);
                 Assert.That(memberType, Is.Not.Null);
             }
@@ -210,12 +218,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 memberType = repository.Get(memberType.Id);
 
@@ -230,14 +239,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 IMemberType memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 IMemberType memberType2 = MockedContentTypes.CreateSimpleMemberType("test2");
                 repository.AddOrUpdate(memberType1);
                 repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
                 var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
@@ -251,17 +261,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var contentType2 = repository.Get(memberType.Id);
                 repository.Delete(contentType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(memberType.Id);
 

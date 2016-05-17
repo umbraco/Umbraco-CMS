@@ -240,8 +240,8 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.1.0-u005\lib\net45\NPoco.dll</HintPath>
+    <Reference Include="NPoco, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.3.0-beta3\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -743,7 +743,6 @@
     <Compile Include="Strategies\Migrations\MigrationStartupHandler.cs" />
     <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Strategies\NotificationsHandler.cs" />
-    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />

@@ -36,12 +36,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void AddFolder(string folderPath)
         {
-            _work.RegisterAdded(new Folder(folderPath), this);
+            _work.RegisterCreated(new Folder(folderPath), this);
         }
 
         public virtual void DeleteFolder(string folderPath)
         {
-            _work.RegisterRemoved(new Folder(folderPath), this);
+            _work.RegisterDeleted(new Folder(folderPath), this);
         }
 
         #region Implementation of IRepository<TId,TEntity>
@@ -50,11 +50,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (FileSystem.FileExists(entity.OriginalPath) == false)
             {
-                _work.RegisterAdded(entity, this);
+                _work.RegisterCreated(entity, this);
             }
             else
             {
-                _work.RegisterChanged(entity, this);
+                _work.RegisterUpdated(entity, this);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (_work != null)
             {
-                _work.RegisterRemoved(entity, this);
+                _work.RegisterDeleted(entity, this);
             }
         }
 

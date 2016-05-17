@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;

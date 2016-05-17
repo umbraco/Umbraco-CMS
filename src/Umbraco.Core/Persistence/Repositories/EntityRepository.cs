@@ -34,11 +34,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected internal IDatabaseUnitOfWork UnitOfWork { get; }
 
-        /// <summary>
-        /// Internal for testing purposes
-        /// </summary>
-        internal Guid UnitKey => (Guid) UnitOfWork.Key;
-
         #region Query Methods
 
         public IQuery<IUmbracoEntity> Query => _queryFactory.Create<IUmbracoEntity>();

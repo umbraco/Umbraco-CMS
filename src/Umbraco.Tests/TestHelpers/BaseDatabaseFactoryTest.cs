@@ -107,7 +107,7 @@ namespace Umbraco.Tests.TestHelpers
             // use a mock factory; otherwise use a real factory.
             var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
                 ? TestObjects.GetIDatabaseFactoryMock()
-                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextFactory(), MappingResolver);
+                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
 
             // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
@@ -115,9 +115,10 @@ namespace Umbraco.Tests.TestHelpers
 
             var evtMsgs = new TransientMessagesFactory();
             var databaseContext = new DatabaseContext(databaseFactory, Logger);
+            var repositoryFactory = Container.GetInstance<RepositoryFactory>();
             var serviceContext = TestObjects.GetServiceContext(
-                Container.GetInstance<RepositoryFactory>(),
-                new NPocoUnitOfWorkProvider(databaseFactory),
+                repositoryFactory,
+                new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
                 new FileUnitOfWorkProvider(),
                 new PublishingStrategy(evtMsgs, Logger),
                 CacheHelper,

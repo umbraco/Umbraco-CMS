@@ -140,8 +140,8 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NPoco, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.1.0-u005\lib\net45\NPoco.dll</HintPath>
+    <Reference Include="NPoco, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.3.0-beta3\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
@@ -192,8 +192,6 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
     <Compile Include="Attempt{T}.cs" />
-    <Compile Include="Auditing\Audit.cs" />
-    <Compile Include="Auditing\AuditTypes.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -334,6 +332,7 @@
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="DefaultScopeContextAdapter.cs" />
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
     <Compile Include="DependencyInjection\CoreModelMappersCompositionRoot.cs" />
@@ -385,6 +384,7 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="DependencyInjection\LightInjectExtensions.cs" />
+    <Compile Include="IScopeContextAdapter.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
@@ -421,16 +421,12 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
-    <Compile Include="CallContextScope.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
-    <Compile Include="DefaultScopeContextFactory.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="HttpContextScope.cs" />
-    <Compile Include="IScopeContext.cs" />
-    <Compile Include="IScopeContextFactory.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseConfig.cs" />
+    <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
@@ -464,8 +460,6 @@
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
-    <Compile Include="Persistence\LockedRepository.cs" />
-    <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
@@ -514,17 +508,25 @@
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\DataTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\DocumentTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IDataTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IDocumentTypeContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IEntityContainerRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeCompositionRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMigrationEntryRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\MediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
@@ -532,6 +534,7 @@
     <Compile Include="Persistence\Repositories\TupleExtensions.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\NPocoSqlExtensions.cs" />
+    <Compile Include="Persistence\UnitOfWork\UnitOfWorkBase.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
@@ -652,10 +655,10 @@
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
-    <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
-    <Compile Include="Packaging\Models\InstallationSummary.cs" />
-    <Compile Include="Packaging\Models\MetaData.cs" />
-    <Compile Include="Packaging\Models\PackageAction.cs" />
+    <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
+    <Compile Include="Models\Packaging\InstallationSummary.cs" />
+    <Compile Include="Models\Packaging\MetaData.cs" />
+    <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
@@ -1094,7 +1097,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />

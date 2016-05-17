@@ -45,16 +45,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
 
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
 
                 // Act
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
@@ -66,19 +66,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
 
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
                 var use2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2");
 
                 // Act
                 repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 repository.AddOrUpdate(use2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(user1.HasIdentity, Is.True);
@@ -91,13 +91,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get((int)user.Id);
@@ -113,13 +114,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var resolved = (User)repository.Get((int)user.Id);
@@ -138,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.RemoveAllowedSection("content");
 
                 repository.AddOrUpdate(resolved);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var updatedItem = (User)repository.Get((int)user.Id);
 
                 // Assert
@@ -163,29 +165,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
 
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
 
                 // Act
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var id = user.Id;
 
-                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver))
-                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver))
-                {
-                    repository2.Delete(user);
-                    unitOfWork.Commit();
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver);
 
-                    var resolved = repository2.Get((int) id);
+                repository2.Delete(user);
+                unitOfWork.Flush();
 
-                    // Assert
-                    Assert.That(resolved, Is.Null);
-                }
+                var resolved = repository2.Get((int) id);
+
+                // Assert
+                Assert.That(resolved, Is.Null);
             }
         }
 
@@ -194,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //{
         //    // Arrange
         //    var provider = CreateUowProvider();
-        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var unitOfWork = provider.GetUnitOfWork())
         //    UserTypeRepository userTypeRepository;
         //using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
         //{
@@ -224,13 +225,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var user = MockedUser.CreateUser(CreateAndCommitUserType());
                 repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var updatedItem = repository.Get((int) user.Id);
@@ -245,10 +247,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -265,10 +268,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -286,10 +290,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -307,10 +312,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -326,10 +332,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -346,10 +353,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -365,7 +373,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(users[0]);
                 repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.GetAll((int) users[0].Id, (int) users[1].Id).ToArray();
@@ -381,10 +389,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -402,7 +411,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(users[0]);
                 repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.GetAll((int) users[0].Id, (int) users[1].Id, (int) users[2].Id).ToArray();
@@ -425,10 +434,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
@@ -437,7 +447,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 users[0].AddAllowedSection("settings");
 
                 repository.AddOrUpdate(users[0]);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 var result = repository.Get((int) users[0].Id);
@@ -453,17 +463,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                UserTypeRepository userTypeRepository;
+                var repository = CreateRepository(unitOfWork, out userTypeRepository);
+
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
                 var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2", "media", "settings");
                 var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3", "test", "settings");
                 repository.AddOrUpdate(user1);
                 repository.AddOrUpdate(user2);
                 repository.AddOrUpdate(user3);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
 
@@ -482,15 +493,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver))
-            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver);
 
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
                 repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.AreEqual(3, user1.DefaultPermissions.Count());
@@ -526,19 +537,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(user1);
             repository.AddOrUpdate(user2);
             repository.AddOrUpdate(user3);
-            unitOfWork.Commit();
+            unitOfWork.Complete();
             return new IUser[] { user1, user2, user3 };
         }
 
         private IUserType CreateAndCommitUserType()
         {
             var provider = CreateUowProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
                 return userType;
             }
         }

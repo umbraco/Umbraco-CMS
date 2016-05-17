@@ -663,19 +663,5 @@ AND umbracoNode.id <> @id",
                 return new PreValueCollection(dictionary);
             }
         }
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            _contentTypeRepository.Dispose();
-            _preValRepository.Dispose();
-        }
     }
-
-
 }
