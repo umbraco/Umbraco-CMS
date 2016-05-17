@@ -840,14 +840,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
+            // NOTE see sortby.prevalues.controller.js for possible values
+            // that need to be handled here or in VersionableRepositoryBase
+
             //Some custom ones
             switch (orderBy.ToUpperInvariant())
             {
-                case "NAME":
-                    return "cmsDocument.text";
                 case "UPDATER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "cmsDocument.documentUser";
+                    return GetDatabaseFieldNameForOrderBy("cmsDocument", "documentUser");
+                case "PUBLISHED":
+                    return GetDatabaseFieldNameForOrderBy("cmsDocument", "published");
+                case "CONTENTTYPEALIAS":
+                    throw new NotSupportedException("Don't know how to support ContentTypeAlias.");
             }
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);

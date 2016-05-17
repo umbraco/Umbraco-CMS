@@ -651,9 +651,11 @@ namespace Umbraco.Core.Persistence.Repositories
             switch (orderBy.ToUpperInvariant())
             {
                 case "EMAIL":
-                    return "cmsMember.Email";
+                    return GetDatabaseFieldNameForOrderBy("cmsMember", "email");
                 case "LOGINNAME":
-                    return "cmsMember.LoginName";
+                    return GetDatabaseFieldNameForOrderBy("cmsMember", "loginName");
+                case "USERNAME":
+                    return GetDatabaseFieldNameForOrderBy("cmsMember", "loginName"); // fixme or umbracoUser.userName?!
             }
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);

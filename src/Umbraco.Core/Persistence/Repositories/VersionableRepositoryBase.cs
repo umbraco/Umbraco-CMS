@@ -264,49 +264,60 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // apply filter
             if (filterSql != null)
-            {
                 psql.Append(filterSql);
-            }
 
-            // apply sort
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                if (orderBySystemField)
-                {
-                    // get the database field eg "[table].[column]"
-                    var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
+            // non-sorting, we're done
+            if (string.IsNullOrEmpty(orderBy))
+                return psql;
 
-                    // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
-                    // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
-                    // to be "NodeDto__Text" and NOT "umbracoNode.text".
-                    // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
-                    // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
-                    // queries to begin with.
-                    // thought about maintaining a map of columns-to-aliases in the sql context but that would
-                    // be expensive and most of the time, useless. so instead we parse the SQL looking for the
-                    // alias. somewhat expensive too but nothing's free.
+            // else apply sort
+            var dbfield = orderBySystemField
+                ? PrepareSqlForPagedResultsWithSystemField(ref psql, orderBy)
+                : PrepareSqlForPagedResultsWithNonSystemField(ref psql, orderBy);
 
-                    var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
-                    var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value == dbfield);
-                    if (match != null)
-                        dbfield = match.Groups[2].Value;
+            if (orderDirection == Direction.Ascending)
+                psql.OrderBy(dbfield);
+            else
+                psql.OrderByDescending(dbfield);
 
-                    var orderByParams = new object[] {dbfield};
-                    if (orderDirection == Direction.Ascending)
-                        psql.OrderBy(orderByParams);
-                    else
-                        psql.OrderByDescending(orderByParams);
-                }
-                else
-                {
-                    // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
-                    // from most recent content version for the given order by field
-                    var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
-                    var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
-                    var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar");
-                    var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+            return psql;
+        }
 
-                    var innerJoinTempTable = string.Format(@"INNER JOIN (
+        private string PrepareSqlForPagedResultsWithSystemField(ref Sql<SqlContext> sql, string orderBy)
+        {
+            // get the database field eg "[table].[column]"
+            var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
+
+            // fixme - ContentTypeAlias is not properly managed because it's not part of the query to begin with!
+
+            // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
+            // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
+            // to be "NodeDto__Text" and NOT "umbracoNode.text".
+            // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
+            // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
+            // queries to begin with.
+            // thought about maintaining a map of columns-to-aliases in the sql context but that would
+            // be expensive and most of the time, useless. so instead we parse the SQL looking for the
+            // alias. somewhat expensive too but nothing's free.
+
+            var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
+            if (match != null)
+                dbfield = match.Groups[2].Value;
+
+            return dbfield;
+        }
+
+        private string PrepareSqlForPagedResultsWithNonSystemField(ref Sql<SqlContext> sql, string orderBy)
+        {
+            // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+            // from most recent content version for the given order by field
+            var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
+            var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
+            var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar"); // fixme SqlSyntax!
+            var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+
+            var innerJoinTempTable = string.Format(@"INNER JOIN (
  	                SELECT CASE
  		                WHEN dataInt Is Not Null THEN {0}
                         WHEN dataDecimal Is Not Null THEN {1}
@@ -315,29 +326,27 @@ namespace Umbraco.Core.Persistence.Repositories
  	                END AS CustomPropVal,
                     cd.nodeId AS CustomPropValContentId
  	                FROM cmsDocument cd
-                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
+                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
 			        WHERE cpt.Alias = @2 AND cd.newest = 1) AS CustomPropData
                     ON CustomPropData.CustomPropValContentId = umbracoNode.id
 ", sortedInt, sortedDecimal, sortedDate, sortedString);
 
-                    //insert this just above the LEFT OUTER JOIN
-                    var newSql = psql.SQL.Insert(psql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);                    
-                    var newArgs = psql.Arguments.ToList();
-                    newArgs.Add(orderBy);
+            // insert the SQL fragment just above the LEFT OUTER JOIN [cmsDocument] [cmsDocument2] ...
+            // ensure it's there, 'cos, someone's going to edit the query, eventually!
+            var pos = sql.SQL.IndexOf("LEFT OUTER JOIN");
+            if (pos < 0) throw new Exception("Oops, LEFT OUTER JOIN not found.");
+            var newSql = sql.SQL.Insert(pos, innerJoinTempTable);
+            var newArgs = sql.Arguments.ToList();
+            newArgs.Add(orderBy);
 
-                    psql = new Sql<SqlContext>(psql.SqlContext, newSql, newArgs.ToArray());
+            // insert the SQL selected field, too, else ordering cannot work
+            if (sql.SQL.StartsWith("SELECT ") == false) throw new Exception("Oops, SELECT not found.");
+            newSql = newSql.Insert("SELECT ".Length, "CustomPropData.CustomPropVal, ");
 
-                    psql.OrderBy("CustomPropData.CustomPropVal");
-                    //psql.Append(innerJoinTempTable, orderBy);
-                    if (orderDirection == Direction.Descending)
-                    {
-                        psql.Append(" DESC");
-                    }
-                }
-            }
+            sql = new Sql<SqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
 
-            return psql;
+            return "CustomPropData.CustomPropVal";
         }
 
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
@@ -502,19 +511,29 @@ namespace Umbraco.Core.Persistence.Repositories
 
             switch (orderBy.ToUpperInvariant())
             {
+                case "VERSIONDATE":
                 case "UPDATEDATE":
-                    return SqlSyntax.GetQuotedTableName("cmsContentVersion") + "." + SqlSyntax.GetQuotedColumnName("VersionDate");
+                    return GetDatabaseFieldNameForOrderBy("cmsContentVersion", "versionDate");
+                case "CREATEDATE":
+                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "createDate");
                 case "NAME":
-                    return SqlSyntax.GetQuotedTableName("umbracoNode") + "." + SqlSyntax.GetQuotedColumnName("text");
+                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "text");
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return SqlSyntax.GetQuotedTableName("umbracoNode") + "." + SqlSyntax.GetQuotedColumnName("nodeUser");
+                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "nodeUser");
                 case "PATH":
-                    return SqlSyntax.GetQuotedTableName("umbracoNode") + "." + SqlSyntax.GetQuotedColumnName("path");
+                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "path");
+                case "SORTORDER":
+                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "sortOrder");
                 default:
                     //ensure invalid SQL cannot be submitted
                     return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
+        }
+
+        protected string GetDatabaseFieldNameForOrderBy(string tableName, string fieldName)
+        {
+            return SqlSyntax.GetQuotedTableName(tableName) + "." + SqlSyntax.GetQuotedColumnName(fieldName);
         }
 
         /// <summary>
