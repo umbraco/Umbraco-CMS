@@ -92,20 +92,30 @@ namespace umbraco.presentation.dialogs
 
         protected void doTranslation_Click(object sender, EventArgs e)
         {
-            // testing translate
-            cms.businesslogic.translation.Translation.MakeNew(
-                _currentPage,
-                getUser(),
-                BusinessLogic.User.GetUser(int.Parse(translator.SelectedValue)),
-                new cms.businesslogic.language.Language(int.Parse(language.SelectedValue)),
-                comment.Text, includeSubpages.Checked,
-                true);
+            int languageId;
+            if (int.TryParse(language.SelectedValue, out languageId))
+            {
+                cms.businesslogic.translation.Translation.MakeNew(
+                    _currentPage,
+                    getUser(),
+                    BusinessLogic.User.GetUser(int.Parse(translator.SelectedValue)),
+                    new cms.businesslogic.language.Language(languageId),
+                    comment.Text, includeSubpages.Checked,
+                    true);
 
-            pane_form.Visible = false;
-            pl_buttons.Visible = false;
+                pane_form.Visible = false;
+                pl_buttons.Visible = false;
 
-            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
-            feedback.type = uicontrols.Feedback.feedbacktype.success;
+                feedback.Text = ui.Text("translation", "pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) +
+                    "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" +
+                    ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
+                feedback.type = uicontrols.Feedback.feedbacktype.success;
+            }
+            else
+            {
+                feedback.Text = ui.Text("translation", "noLanguageSelected");
+                feedback.type = uicontrols.Feedback.feedbacktype.error;
+            }
         }
     }
 }

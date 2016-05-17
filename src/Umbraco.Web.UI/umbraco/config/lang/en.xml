@@ -1167,6 +1167,7 @@ To manage your website, simply open the Umbraco back office and start adding con
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]></key>
     <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
+    <key alias="noLanguageSelected">Please select the language that the content should be translated into</key>
     <key alias="sendToTranslate">Send the page '%0%' to translation</key>
     <key alias="taskAssignedBy">Assigned by</key>
     <key alias="taskOpened">Task opened</key>
