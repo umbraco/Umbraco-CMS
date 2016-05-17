@@ -528,12 +528,14 @@ where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDoc
 order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
 
                         XmlElement last = null;
+
                         var db = ApplicationContext.Current.DatabaseContext.Database;
                         //NOTE: Query creates a reader - does not load all into memory
                         foreach (var row in db.Query<dynamic>(sql, new { type  = new Guid(Constants.ObjectTypes.Document)}))
                         {
                             string parentId = ((int)row.parentID).ToInvariantString();
                             string xml = row.xml;
+                            int sortOrder = row.sortOrder;
 
                             //if the parentid is changing
                             if (last != null && last.GetAttribute("parentID") != parentId)
@@ -544,8 +546,11 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
 
                             var xmlDocFragment = xmlDoc.CreateDocumentFragment();
                             xmlDocFragment.InnerXml = xml;
-
+                            
                             last = (XmlElement)parent.AppendChild(xmlDocFragment);
+
+                            // fix sortOrder - see notes in UpdateSortOrder
+                            last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
                         }
 
                         LogHelper.Debug<content>("Done republishing Xml Index");
