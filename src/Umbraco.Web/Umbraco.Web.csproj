@@ -326,6 +326,7 @@
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\UserTypeController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
@@ -333,6 +334,10 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\ContentEditing\PermissionDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserTypeSave.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
@@ -341,6 +346,9 @@
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -951,9 +959,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1555,13 +1560,6 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
-    <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.cs">
-      <DependentUpon>EditUserType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.designer.cs">
-      <DependentUpon>EditUserType.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.cs">
       <DependentUpon>NodePermissions.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1581,7 +1579,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\UserPermissions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\users\UserTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
       <DependentUpon>CacheRefresher.asmx</DependentUpon>
@@ -1668,7 +1665,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
+    <Content Include="umbraco.presentation\umbraco\actions\delete.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\publish.aspx">
@@ -1759,9 +1758,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>

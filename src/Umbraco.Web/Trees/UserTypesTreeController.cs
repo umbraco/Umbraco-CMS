@@ -34,9 +34,7 @@ namespace Umbraco.Web.Trees
                         queryStrings,
                         userType.Name,
                         "icon-users",
-                        false,
-                        "/" + queryStrings.GetValue<string>("application") + "/framed/"
-                        + Uri.EscapeDataString("users/EditUserType.aspx?id=" + userType.Id)));
+                        false));
             }
 
             return nodes;
@@ -49,16 +47,14 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    .ConvertLegacyMenuItem(null, "userTypes", queryStrings.GetValue<string>("application"));
+                menu.Items.Add<CreateChildEntity, ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
 
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
             // delete user type
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                .ConvertLegacyMenuItem(null, "userTypes", queryStrings.GetValue<string>("application"));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
 
             return menu;
         }

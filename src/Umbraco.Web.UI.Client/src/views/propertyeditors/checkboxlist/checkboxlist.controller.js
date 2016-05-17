@@ -1,7 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
     function($scope) {
-        
-        if (angular.isObject($scope.model.config.items)) {
+
+        if (!angular.isArray($scope.model.config.items)) {
             
             //now we need to format the items in the dictionary because we always want to have an array
             var newItems = [];
@@ -33,10 +33,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 $scope.selectedItems.push({
                     checked: isChecked,
                     key: $scope.model.config.items[i].id,
-                    val: $scope.model.config.items[i].value
+                    val: $scope.model.config.items[i].value,
+                    localize: $scope.model.config.items[i].localize
                 });
             }
-
         }
 
         setupViewModel();

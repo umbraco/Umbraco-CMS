@@ -1,0 +1,60 @@
+<div ng-controller="Umbraco.Editors.UserTypes.EditController">
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="contentForm"
+          ng-submit="save()"
+          novalidate
+          val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-editor-header menu="page.menu"
+                               name="content.name"
+                               name-locked="page.nameLocked"
+                               hide-icon="true"
+                               hide-description="true"
+                               hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container class="form-horizontal">
+                <div class="umb-property">
+                    <ng-form name="propertyForm">
+                        <div class="control-group umb-control-group">
+                            <div class="umb-el-wrap">
+
+                                <label class="control-label" for="{{defaultPermissionsProperty.alias}}">
+                                    <localize key="default"/>
+                                    <localize key="rights" />
+                                </label>
+
+                                <div class="controls">
+                                    <umb-editor model="defaultPermissionsProperty"></umb-editor>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-form>
+                </div>
+            </umb-editor-container>
+
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+
+        </umb-editor-view>
+
+    </form>
+</div>
