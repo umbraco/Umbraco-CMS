@@ -10,6 +10,10 @@ namespace Umbraco.Web.Cache
 {
     public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {
+        public PublicAccessCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override PublicAccessCacheRefresher Instance
         {
             get { return this; }

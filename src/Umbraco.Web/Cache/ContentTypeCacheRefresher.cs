@@ -21,7 +21,7 @@ namespace Umbraco.Web.Cache
     {
         private readonly ApplicationContext _applicationContext;
 
-        public ContentTypeCacheRefresher(ApplicationContext applicationContext)
+        public ContentTypeCacheRefresher(ApplicationContext applicationContext) : base(applicationContext.ApplicationCache)
         {
             _applicationContext = applicationContext;
         }

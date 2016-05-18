@@ -15,6 +15,10 @@ namespace Umbraco.Web.Cache
     public sealed class DataTypeCacheRefresher : JsonCacheRefresherBase<DataTypeCacheRefresher>
     {
 
+        public DataTypeCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         #region Static helpers
         
         /// <summary>
@@ -98,13 +102,13 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMediaType>();
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             payloads.ForEach(payload =>
             {
                 //clears the prevalue cache
-                var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+                var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
                 if (dataTypeCache)
                     dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
                 

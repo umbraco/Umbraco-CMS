@@ -445,10 +445,10 @@ namespace Umbraco.Web.Cache
 
         #region Xslt Cache
 
-        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
+        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc, CacheHelper cacheHelper)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            cacheHelper.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
         }
 
         #endregion

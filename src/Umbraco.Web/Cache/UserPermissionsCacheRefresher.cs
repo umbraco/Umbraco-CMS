@@ -14,6 +14,10 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class UserPermissionsCacheRefresher : CacheRefresherBase<UserPermissionsCacheRefresher>
     {
+        public UserPermissionsCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override UserPermissionsCacheRefresher Instance
         {
             get { return this; }
@@ -52,7 +56,7 @@ namespace Umbraco.Web.Cache
 
         private Attempt<IRuntimeCacheProvider> UserPermissionsCache
         {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
+            get { return CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
         }
     }
 }

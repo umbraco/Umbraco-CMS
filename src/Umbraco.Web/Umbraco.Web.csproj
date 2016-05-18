@@ -479,8 +479,6 @@
     <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
-    <Compile Include="Cache\StylesheetCacheRefresher.cs" />
-    <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />

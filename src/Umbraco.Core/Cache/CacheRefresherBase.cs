@@ -13,6 +13,11 @@ namespace Umbraco.Core.Cache
     public abstract class CacheRefresherBase<TInstanceType> : ICacheRefresher
         where TInstanceType : ICacheRefresher
     {
+        protected CacheRefresherBase(CacheHelper cacheHelper)
+        {
+            CacheHelper = cacheHelper;
+        }
+
         /// <summary>
         /// An event that is raised when cache is updated on an individual server
         /// </summary>
@@ -44,6 +49,8 @@ namespace Umbraco.Core.Cache
 
         public abstract string Name { get; }
 
+        protected CacheHelper CacheHelper { get; }
+
         public virtual void RefreshAll()
         {
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
@@ -71,7 +78,7 @@ namespace Umbraco.Core.Cache
         internal void ClearAllIsolatedCacheByEntityType<TEntity>()
             where TEntity : class, IAggregateRoot
         {
-            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<TEntity>();
+            CacheHelper.IsolatedRuntimeCache.ClearCache<TEntity>();
         }
     }
 }
