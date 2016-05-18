@@ -506,7 +506,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
                     {
-                        currentName = nodeName + $" ({uniqueNumber})";
+                        currentName = $"{nodeName} ({uniqueNumber})";
                         uniqueNumber++;
                     }
                 }
