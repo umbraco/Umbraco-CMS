@@ -864,8 +864,10 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var uow = provider.CreateUnitOfWork();
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.CreateUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
 
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
@@ -875,8 +877,10 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.CreateUnitOfWork();
-            Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.CreateUnitOfWork())
+            {
+                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
         }
 
         /// <summary>
