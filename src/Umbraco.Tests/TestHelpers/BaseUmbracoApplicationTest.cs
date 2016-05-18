@@ -215,7 +215,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            var evtMsgs = new TransientMessagesFactory();
+            var evtMsgs = new TransientEventMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(

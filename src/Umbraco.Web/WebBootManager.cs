@@ -338,7 +338,6 @@ namespace Umbraco.Web
 
             //no need to declare as per request, it's lifetime is already managed as a singleton
             container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
-            container.RegisterSingleton<IHttpContextAccessor, DefaultHttpContextAccessor>();
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
             container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());
             container.RegisterSingleton<IPublishedMediaCache, PublishedMediaCache>();
@@ -348,7 +347,7 @@ namespace Umbraco.Web
             container.RegisterSingleton<UmbracoHelper>();
 
             //Replace services:
-            container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();
+            container.Register<IEventMessagesFactory, ScopeContextEventMessagesFactory>();
             container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             container.RegisterSingleton<ISectionService, SectionService>();
         }

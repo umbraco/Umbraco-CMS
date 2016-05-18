@@ -113,7 +113,7 @@ namespace Umbraco.Tests.TestHelpers
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
             // to the database to check the migrations ;-(
 
-            var evtMsgs = new TransientMessagesFactory();
+            var evtMsgs = new TransientEventMessagesFactory();
             var databaseContext = new DatabaseContext(databaseFactory, Logger);
             var repositoryFactory = Container.GetInstance<RepositoryFactory>();
             var serviceContext = TestObjects.GetServiceContext(

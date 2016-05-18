@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Services
 			//here we are going to override the ServiceContext because normally with our test cases we use a
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-		    var evtMsgs = new TransientMessagesFactory();
+		    var evtMsgs = new TransientEventMessagesFactory();
 		    ApplicationContext.Services = TestObjects.GetServiceContext(
                 repositoryFactory,
                 _uowProvider,
