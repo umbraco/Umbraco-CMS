@@ -1,8 +1,7 @@
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Publishing
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Represents the result of unpublishing a content item.

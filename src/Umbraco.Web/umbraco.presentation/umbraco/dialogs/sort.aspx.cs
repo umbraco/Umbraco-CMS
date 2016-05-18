@@ -144,7 +144,7 @@ namespace umbraco.cms.presentation
             return node;
         }
 
-        public struct SortableNode
+        public class SortableNode
         {
             public string id;
             public int sortOrder;

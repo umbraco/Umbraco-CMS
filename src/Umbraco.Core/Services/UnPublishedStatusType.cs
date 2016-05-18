@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Publishing
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// A status type of the result of unpublishing a content item

@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
@@ -64,6 +63,11 @@ namespace Umbraco.Core.Services
         IEnumerable<Attempt<PublishStatus>> PublishWithChildren(IContent content, int userId = 0, bool includeUnpublished = false);
 
         /// <summary>
+        /// Used to perform scheduled publishing/unpublishing
+        /// </summary>
+        IEnumerable<Attempt<PublishStatus>> PerformScheduledPublish();
+
+        /// <summary>
         /// Saves and Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
@@ -94,6 +98,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+
+
         /// <summary>
         /// Returns the persisted content's XML structure
         /// </summary>

@@ -499,8 +499,8 @@
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
-    <Compile Include="Publishing\UnPublishedStatusType.cs" />
-    <Compile Include="Publishing\UnPublishStatus.cs" />
+    <Compile Include="Services\UnPublishedStatusType.cs" />
+    <Compile Include="Services\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
@@ -1202,12 +1202,9 @@
     <Compile Include="ObjectResolution\ResolverBase.cs" />
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
-    <Compile Include="Publishing\BasePublishingStrategy.cs" />
-    <Compile Include="Publishing\IPublishingStrategy.cs" />
-    <Compile Include="Publishing\PublishStatus.cs" />
-    <Compile Include="Publishing\PublishStatusType.cs" />
+    <Compile Include="Services\PublishStatus.cs" />
+    <Compile Include="Services\PublishStatusType.cs" />
     <Compile Include="Dynamics\QueryableExtensions.cs" />
-    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />

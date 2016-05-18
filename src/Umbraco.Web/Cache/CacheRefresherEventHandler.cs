@@ -9,7 +9,6 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using System.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
