@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -221,7 +222,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Ancestors(this IContent content, IContentService contentService)
+        {
+            return contentService.GetAncestors(content);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Ancestors(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetAncestors(content);
@@ -231,7 +240,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current contents children.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Children(this IContent content, IContentService contentService)
+        {
+            return contentService.GetChildren(content.Id);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Children(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetChildren(content.Id);
@@ -241,7 +258,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current contents descendants, not including the content itself.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Descendants(this IContent content, IContentService contentService)
+        {
+            return contentService.GetDescendants(content);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Descendants(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetDescendants(content);
@@ -251,7 +276,15 @@ namespace Umbraco.Core.Models
         /// Returns the parent of the current content.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An <see cref="IContent"/> object</returns>
+        public static IContent Parent(this IContent content, IContentService contentService)
+        {
+            return contentService.GetById(content.ParentId);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IContent Parent(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
@@ -259,11 +292,20 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region IMedia
+
         /// <summary>
         /// Returns a list of the current medias ancestors, not including the media itself.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Ancestors(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetAncestors(media);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Ancestors(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetAncestors(media);
@@ -273,7 +315,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current medias children.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Children(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetChildren(media.Id);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Children(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetChildren(media.Id);
@@ -283,7 +333,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current medias descendants, not including the media itself.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Descendants(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetDescendants(media);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Descendants(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetDescendants(media);
@@ -293,7 +351,15 @@ namespace Umbraco.Core.Models
         /// Returns the parent of the current media.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An <see cref="IMedia"/> object</returns>
+        public static IMedia Parent(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetById(media.ParentId);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IMedia Parent(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
@@ -455,7 +521,8 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value, IDataTypeService dataTypeService)
         {
             // Ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
@@ -470,7 +537,14 @@ namespace Umbraco.Core.Models
                             .ToLower());
 
             if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
+                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream, dataTypeService);
+        }
+
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
+        {
+            content.SetValue(propertyTypeAlias, value, ApplicationContext.Current.Services.DataTypeService);
         }
 
         /// <summary>
@@ -479,6 +553,14 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value, IDataTypeService dataTypeService)
+        {
+            SetValue(content, propertyTypeAlias, new HttpPostedFileWrapper(value), dataTypeService);
+        }
+
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
             SetValue(content, propertyTypeAlias, (HttpPostedFileBase)new HttpPostedFileWrapper(value));
@@ -491,6 +573,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
         [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
             SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
@@ -503,15 +586,23 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="fileName">Name of the file</param>
         /// <param name="fileStream"><see cref="Stream"/> to save to disk</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream, IDataTypeService dataTypeService)
         {
             var name = IOHelper.SafeFileName(fileName);
 
             if (string.IsNullOrEmpty(name) == false && fileStream != null)
-                SetFileOnContent(content, propertyTypeAlias, name, fileStream);
+                SetFileOnContent(content, propertyTypeAlias, name, fileStream, dataTypeService);
         }
 
-        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream)
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
+        {
+            content.SetValue(propertyTypeAlias, fileName, fileStream, ApplicationContext.Current.Services.DataTypeService);
+        }
+
+        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream, IDataTypeService dataTypeService)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
             if (property == null)
@@ -558,7 +649,7 @@ namespace Umbraco.Core.Models
                     if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                     {
                         //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                        var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+                        var values = dataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
                         var thumbnailSizes = values.FirstOrDefault();
                         //Additional thumbnails configured as prevalues on the DataType
                         if (thumbnailSizes != null)
@@ -601,10 +692,9 @@ namespace Umbraco.Core.Models
 
         #region User/Profile methods
 
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
-        /// </summary>
+        
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IMedia media)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
@@ -617,11 +707,9 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(media.CreatorId);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content item.
-        /// </summary>
+        
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.CreatorId);
@@ -634,11 +722,9 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(content.CreatorId);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Writer of this content.
-        /// </summary>
+        
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetWriterProfile(this IContent content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
@@ -667,20 +753,7 @@ namespace Umbraco.Core.Models
 
         #region Tag methods
 
-        ///// <summary>
-        ///// Returns the tags for the given property
-        ///// </summary>
-        ///// <param name="content"></param>
-        ///// <param name="propertyTypeAlias"></param>
-        ///// <param name="tagGroup"></param>
-        ///// <returns></returns>
-        ///// <remarks>
-        ///// The tags returned are only relavent for published content & saved media or members
-        ///// </remarks>
-        //public static IEnumerable<ITag> GetTags(this IContentBase content, string propertyTypeAlias, string tagGroup = "default")
-        //{
-
-        //}
+       
 
         /// <summary>
         /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
@@ -807,11 +880,7 @@ namespace Umbraco.Core.Models
             return packagingService.Export(content, true, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+     
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content)
         {
@@ -829,11 +898,6 @@ namespace Umbraco.Core.Models
             return packagingService.Export(content, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMedia media)
         {
@@ -862,12 +926,6 @@ namespace Umbraco.Core.Models
             return packagingService.Export(media, true, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content, bool isPreview)
         {
@@ -890,11 +948,6 @@ namespace Umbraco.Core.Models
             return content.ToXml(packagingService);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IMember"/> object
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMember member)
         {

@@ -154,7 +154,7 @@ namespace Umbraco.Web.Editors
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
             var folderTypes = Services.MediaTypeService.GetAll().ToArray().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
 
-            var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children();
+            var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children(Services.MediaService);
             return children.Where(x => folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
@@ -506,7 +506,7 @@ namespace Umbraco.Web.Editors
                                 " returned null");
 
                         //look for matching folder
-                        folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                        folderMediaItem = mediaRoot.Children(Services.MediaService).FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
                         if (folderMediaItem == null)
                         {
                             //if null, create a folder
@@ -549,7 +549,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
+                        f.SetValue(Constants.Conventions.Media.File, fileName, fs, Services.DataTypeService);
                     }
 
                     var saveResult = mediaService.WithResult().Save(f, Security.CurrentUser.Id);

@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberBasic>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, ContentItemDto<IMember>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())

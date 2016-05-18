@@ -136,7 +136,7 @@ namespace Umbraco.Web.WebServices
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent();
+                            xcontent = xcontent.Parent(Services.ContentService);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);

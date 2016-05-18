@@ -113,7 +113,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private IEnumerable<IContentType> RemoveInvalidByChildrenDocumentTypesFromAlternatives(IEnumerable<IContentType> documentTypes)
         {
-            var docTypeIdsOfChildren = _content.Children()
+            var docTypeIdsOfChildren = _content.Children(Services.ContentService)
                 .Select(x => x.ContentType.Id)
                 .Distinct()
                 .ToList();

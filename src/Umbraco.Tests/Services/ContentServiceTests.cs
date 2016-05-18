@@ -923,7 +923,7 @@ namespace Umbraco.Tests.Services
             {
                 contentService.PublishWithChildren(c);
             }
-            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants(contentService)));
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
@@ -957,7 +957,7 @@ namespace Umbraco.Tests.Services
             {
                 contentService.PublishWithChildren(c);
             }
-            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants())).ToList();
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants(contentService))).ToList();
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new NPocoUnitOfWorkProvider(Logger);
 
@@ -1366,7 +1366,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, temp.Children().Count());
+            Assert.AreEqual(2, temp.Children(contentService).Count());
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, true, 0);
@@ -1376,10 +1376,10 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, copy.Children().Count());
+            Assert.AreEqual(2, copy.Children(contentService).Count());
 
             var child = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            var childCopy = copy.Children().First();
+            var childCopy = copy.Children(contentService).First();
             Assert.AreEqual(childCopy.Name, child.Name);
             Assert.AreNotEqual(childCopy.Id, child.Id);
             Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -1392,7 +1392,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, temp.Children().Count());
+            Assert.AreEqual(2, temp.Children(contentService).Count());
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, false, 0);
@@ -1402,7 +1402,7 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(0, copy.Children().Count());
+            Assert.AreEqual(0, copy.Children(contentService).Count());
         }
 
         [Test]

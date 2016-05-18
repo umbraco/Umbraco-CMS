@@ -1336,7 +1336,7 @@ namespace Umbraco.Core.Services
                 var c = stack.Peek();
                 IContent[] cc;
                 if (c.Level == level)
-                    while ((cc = c.Children().ToArray()).Length > 0)
+                    while ((cc = c.Children(this).ToArray()).Length > 0)
                     {
                         foreach (var ci in cc)
                             stack.Push(ci);
@@ -2104,7 +2104,7 @@ namespace Umbraco.Core.Services
             {
                 // ensure all ancestors are published
                 // because content may be new its Path may be null - start with parent
-                var path = content.Path ?? content.Parent().Path;
+                var path = content.Path ?? content.Parent(this).Path;
                 if (path != null) // if parent is also null, give up
                 {
                     var ancestorIds = path.Split(',')
