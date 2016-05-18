@@ -91,10 +91,10 @@ namespace Umbraco.Tests.Services
             mediaService.Save(media);
 
             var provider = new NPocoUnitOfWorkProvider(Logger);
-            var uow = provider.CreateUnitOfWork();
-
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
-
+            using (var uow = provider.CreateUnitOfWork())
+            {            
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+            }
         }
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
