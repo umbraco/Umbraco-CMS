@@ -1191,7 +1191,6 @@
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
     <Compile Include="_Legacy\PackageActions\PackageActionsResolver.cs" />
-    <Compile Include="ObjectResolution\LegacyTransientObjectsResolver.cs" />
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />

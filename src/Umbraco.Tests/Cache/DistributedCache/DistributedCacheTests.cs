@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             ServerMessengerResolver.Current = new ServerMessengerResolver(
                 container, factory => new TestServerMessenger());
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
+                container, Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
             Resolution.Freeze();
         }
 

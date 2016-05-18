@@ -62,9 +62,35 @@ namespace Umbraco.Core.Services
                     }
                     else
                     {
-                        //if a property was deleted or alias changed, then update all content of the current content type
-                        // and all of it's desscendant doc types.
-                        toUpdate.AddRange(contentType.DescendantsAndSelf());
+                        //TODO: This is pretty nasty, fix this
+                        var contentTypeService = this as IContentTypeService;
+                        if (contentTypeService != null)
+                        {
+                            //if a property was deleted or alias changed, then update all content of the current content type
+                            // and all of it's desscendant doc types.
+                            toUpdate.AddRange(((IContentType) contentType).DescendantsAndSelf(contentTypeService));
+                        }
+                        else
+                        {
+                            var mediaTypeService = this as IMediaTypeService;
+                            if (mediaTypeService != null)
+                            {
+                                //if a property was deleted or alias changed, then update all content of the current content type
+                                // and all of it's desscendant doc types.
+                                toUpdate.AddRange(((IMediaType) contentType).DescendantsAndSelf(mediaTypeService));
+                            }
+                            else
+                            {
+                                var memberTypeService = this as IMemberTypeService;
+                                if (memberTypeService != null)
+                                {
+                                    //if a property was deleted or alias changed, then update all content of the current content type
+                                    // and all of it's desscendant doc types.
+                                    toUpdate.AddRange(((IMemberType)contentType).DescendantsAndSelf(memberTypeService));
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -550,7 +576,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
-                var descendantsAndSelf = item.DescendantsAndSelf()
+                var descendantsAndSelf = item.DescendantsAndSelf(this)
                     .ToArray();
 
                 // delete content
@@ -587,7 +613,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
-                var allDescendantsAndSelf = itemsA.SelectMany(xx => xx.DescendantsAndSelf())
+                var allDescendantsAndSelf = itemsA.SelectMany(xx => xx.DescendantsAndSelf(this))
                     .Distinct()
                     .ToArray();
 
