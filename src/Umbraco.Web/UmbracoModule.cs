@@ -20,6 +20,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Sync;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;

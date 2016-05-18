@@ -11,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Security;
+using Umbraco.Core.Xml;
 
 namespace umbraco.presentation.webservices
 {

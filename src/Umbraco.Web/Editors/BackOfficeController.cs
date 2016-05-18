@@ -27,6 +27,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;

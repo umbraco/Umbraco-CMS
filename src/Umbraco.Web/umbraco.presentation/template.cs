@@ -18,6 +18,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using System.Web;
+using Umbraco.Core.Xml;
 
 namespace umbraco
 {

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.IO
 {	

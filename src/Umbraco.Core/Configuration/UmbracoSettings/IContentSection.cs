@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {

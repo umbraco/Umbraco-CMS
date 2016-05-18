@@ -1,6 +1,7 @@
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Xml;
 using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions

@@ -19,6 +19,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
+using Umbraco.Core.Plugins;
 using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;

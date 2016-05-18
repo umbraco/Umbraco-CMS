@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;

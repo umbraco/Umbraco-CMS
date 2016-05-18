@@ -46,7 +46,7 @@ using Umbraco.Web._Legacy.Actions;
 using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
-using TypeHelper = Umbraco.Core.TypeHelper;
+using TypeHelper = Umbraco.Core.Plugins.TypeHelper;
 
 
 namespace Umbraco.Web

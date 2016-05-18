@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 

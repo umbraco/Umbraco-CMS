@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Persistence.Querying
 {

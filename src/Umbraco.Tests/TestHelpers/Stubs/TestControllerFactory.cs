@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Plugins;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers.Stubs

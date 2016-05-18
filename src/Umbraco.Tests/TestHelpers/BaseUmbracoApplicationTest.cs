@@ -23,6 +23,7 @@ using Umbraco.Web;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers

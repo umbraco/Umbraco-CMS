@@ -14,6 +14,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
 using Lucene.Net.Analysis;
+using Umbraco.Core.Xml;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 

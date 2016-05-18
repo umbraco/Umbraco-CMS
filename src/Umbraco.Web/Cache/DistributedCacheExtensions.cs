@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache

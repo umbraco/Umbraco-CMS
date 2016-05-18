@@ -28,6 +28,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using Umbraco.Core.IO;
+using Umbraco.Core.Xml;
 using Language = umbraco.cms.businesslogic.language.Language;
 using Media = umbraco.cms.businesslogic.media.Media;
 using Member = umbraco.cms.businesslogic.member.Member;

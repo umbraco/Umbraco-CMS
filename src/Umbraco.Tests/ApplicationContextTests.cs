@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

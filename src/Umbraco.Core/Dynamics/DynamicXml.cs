@@ -11,6 +11,7 @@ using System.IO;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Core.Dynamics
 {

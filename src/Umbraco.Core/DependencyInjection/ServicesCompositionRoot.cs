@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using LightInject;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Web.Mvc
 {

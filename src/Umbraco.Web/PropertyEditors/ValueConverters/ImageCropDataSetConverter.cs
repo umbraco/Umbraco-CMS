@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters

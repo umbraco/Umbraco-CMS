@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using NPoco;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

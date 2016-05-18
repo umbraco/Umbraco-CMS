@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.Xml;
 using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic

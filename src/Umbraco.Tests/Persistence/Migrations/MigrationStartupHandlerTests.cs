@@ -10,6 +10,7 @@ using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;

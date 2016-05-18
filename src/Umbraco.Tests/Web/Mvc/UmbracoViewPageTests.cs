@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;

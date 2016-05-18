@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Plugins
 {
     /// <summary>
     /// Used to notify the TypeFinder to ignore any class attributed with this during it's discovery

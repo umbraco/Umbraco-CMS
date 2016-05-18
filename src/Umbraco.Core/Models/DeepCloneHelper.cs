@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Models
 {

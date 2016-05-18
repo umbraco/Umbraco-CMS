@@ -14,6 +14,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
 using System.Collections.Generic;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Web.Mvc
 {

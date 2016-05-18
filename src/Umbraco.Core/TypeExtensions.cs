@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core

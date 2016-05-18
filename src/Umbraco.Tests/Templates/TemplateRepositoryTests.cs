@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

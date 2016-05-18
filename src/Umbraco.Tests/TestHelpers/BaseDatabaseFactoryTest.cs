@@ -26,6 +26,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Core.Events;
+using Umbraco.Core.Plugins;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers

@@ -10,6 +10,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Plugins;
 using Umbraco.Tests.DynamicsAndReflection;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Models;
