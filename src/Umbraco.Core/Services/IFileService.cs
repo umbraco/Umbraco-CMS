@@ -196,7 +196,7 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        Attempt<OperationStatus<ITemplate, OperationStatusType>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
+        Attempt<OperationStatus<OperationStatusType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
 
         ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
 

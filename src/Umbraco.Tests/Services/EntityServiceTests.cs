@@ -185,18 +185,18 @@ namespace Umbraco.Tests.Services
                 base.CreateTestData();
 
                 //Create and Save folder-Media -> 1050
-                var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+                var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
                 var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);                
                 ServiceContext.MediaService.Save(folder, 0);
                 folderId = folder.Id;
 
                 //Create and Save image-Media -> 1051
-                var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+                var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
                 var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
                 ServiceContext.MediaService.Save(image, 0);
 
                 //Create and Save file-Media -> 1052
-                var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
+                var fileMediaType = ServiceContext.MediaTypeService.Get(1033);
                 var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
                 ServiceContext.MediaService.Save(file, 0);
 

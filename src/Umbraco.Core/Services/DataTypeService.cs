@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
 
         #region Containers
 
-        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -43,12 +43,8 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (SavingContainer.IsRaisedEventCancelled(
-                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
-                        this))
-                    {
-                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
-                    }
+                    if (SavingContainer.IsRaisedEventCancelled(new SaveEventArgs<EntityContainer>(container, evtMsgs), this))
+                        return OperationStatus.Attempt.Cancel(evtMsgs, container); // causes rollback
 
                     repo.AddOrUpdate(container);
                     uow.Complete();
@@ -56,11 +52,11 @@ namespace Umbraco.Core.Services
                     SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
                     //TODO: Audit trail ?
 
-                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                    return OperationStatus.Attempt.Succeed(evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
-                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                    return OperationStatus.Attempt.Fail<EntityContainer>(evtMsgs, ex);
                 }
             }
         }
@@ -71,6 +67,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
+                uow.Complete();
                 return container;
             }
         }
@@ -81,6 +78,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = ((EntityContainerRepository)repo).Get(containerId);
+                uow.Complete();
                 return container;
             }
         }
@@ -90,7 +88,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
-                return ((EntityContainerRepository)repo).Get(name, level);
+                var containers = ((EntityContainerRepository)repo).Get(name, level);
+                uow.Complete();
+                return containers;
             }
         }
 
@@ -114,7 +114,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
-                return repo.GetAll(containerIds);
+                var containers = repo.GetAll(containerIds);
+                uow.Complete();
+                return containers;
             }
         }
 
@@ -125,20 +127,20 @@ namespace Umbraco.Core.Services
             if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
             {
                 var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataTypeGuid + " container.");
-                return OperationStatus.Exception(evtMsgs, ex);
+                return OperationStatus.Attempt.Fail(evtMsgs, ex);
             }
 
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
             {
                 var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return OperationStatus.Exception(evtMsgs, ex);
+                return OperationStatus.Attempt.Fail(evtMsgs, ex);
             }
 
             if (SavingContainer.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
                         this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -152,7 +154,7 @@ namespace Umbraco.Core.Services
 
             //TODO: Audit trail ?
 
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
@@ -162,21 +164,17 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
-                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+                if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
 
-                if (DeletingContainer.IsRaisedEventCancelled(
-                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
-                        this))
-                {
-                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
-                }
+                if (DeletingContainer.IsRaisedEventCancelled(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this))
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs)); // causes rollback
 
                 repo.Delete(container);
                 uow.Complete();
 
                 DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
 
-                return OperationStatus.Success(evtMsgs);
+                return OperationStatus.Attempt.Succeed(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
@@ -193,7 +191,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
+                var def = repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
+                uow.Complete();
+                return def;
             }
         }
 
@@ -207,7 +207,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.Get(id);
+                var def = repository.Get(id);
+                uow.Complete();
+                return def;
             }
         }
 
@@ -222,8 +224,9 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = repository.Query.Where(x => x.Key == id);
-                var definitions = repository.GetByQuery(query);
-                return definitions.FirstOrDefault();
+                var definition = repository.GetByQuery(query).FirstOrDefault();
+                uow.Complete();
+                return definition;
             }
         }
 
@@ -239,6 +242,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = repository.Query.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
+                uow.Complete();
                 return definitions;
             }
         }
@@ -253,7 +257,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetAll(ids);
+                var defs = repository.GetAll(ids);
+                uow.Complete();
+                return defs;
             }
         }
 
@@ -272,6 +278,7 @@ namespace Umbraco.Core.Services
                 var list = collection.FormatAsDictionary()
                     .Select(x => x.Value.Value)
                     .ToList();
+                uow.Complete();
                 return list;
             }
         }
@@ -286,7 +293,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetPreValuesCollectionByDataTypeId(id);
+                var vals = repository.GetPreValuesCollectionByDataTypeId(id);
+                uow.Complete();
+                return vals;
             }
         }
 
@@ -300,7 +309,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetPreValueAsString(id);
+                var val = repository.GetPreValueAsString(id);
+                uow.Complete();
+                return val;
             }
         }
 
@@ -312,9 +323,7 @@ namespace Umbraco.Core.Services
                   new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
                   this))
             {
-                return Attempt.Fail(
-                    new OperationStatus<MoveOperationStatusType>(
-                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+                return OperationStatus.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
             }
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
@@ -330,22 +339,20 @@ namespace Umbraco.Core.Services
                     {
                         container = containerRepository.Get(parentId);
                         if (container == null)
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
                     moveInfo.AddRange(repository.Move(toMove, container));
+                    uow.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return Attempt.Fail(
-                        new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                    return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs);
                 }
-                uow.Complete();
             }
 
             Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this);
 
-            return Attempt.Succeed(
-                new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+            return OperationStatus.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
         /// <summary>
@@ -424,26 +431,21 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                using (var transaction = uow.Database.GetTransaction())
+                var sortOrderObj = uow.Database.ExecuteScalar<object>(
+                    "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
+
+                int sortOrder;
+                if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
+                    sortOrder = 1;
+
+                foreach (var value in values)
                 {
-                    var sortOrderObj =
-                    uow.Database.ExecuteScalar<object>(
-                        "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
-                    int sortOrder;
-                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                    {
-                        sortOrder = 1;
-                    }
-
-                    foreach (var value in values)
-                    {
-                        var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
-                        uow.Database.Insert(dto);
-                        sortOrder++;
-                    }
-
-                    transaction.Complete();
+                    var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
+                    uow.Database.Insert(dto);
+                    sortOrder++;
                 }
+
+                uow.Complete();
             }
         }
 

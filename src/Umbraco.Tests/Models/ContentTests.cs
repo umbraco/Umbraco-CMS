@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Models
         [TearDown]
         public void Dispose()
         {
-            
+
         }
 
         [TestCase("-1,-20,12,34,56", false)]
@@ -41,10 +41,19 @@ namespace Umbraco.Tests.Models
         {
             var mediaType = MockedContentTypes.CreateImageMediaType();
             var media = MockedMedia.CreateMediaFile(mediaType, -1);
+
+            // this is NOT how we should do it, we should "move to recycle bin"
+            // as it causes various things to change... IsInRecycleBin looks for
+            // the path but Trashed looks for the flag!
+            // fixme .Trashed is weird anyways, should be refactored
             media.Path = path;
+            ((Media)media).Trashed = isInBin;
+
             media.Id = 34;
 
             Assert.AreEqual(isInBin, media.IsInRecycleBin());
+            if (isInBin)
+                Assert.IsTrue(media.Trashed);
         }
 
         [TestCase("-1,-20,12,34,56", true)]
@@ -54,10 +63,19 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+
+            // this is NOT how we should do it, we should "move to recycle bin"
+            // as it causes various things to change... IsInRecycleBin looks for
+            // the path but Trashed looks for the flag!
+            // fixme .Trashed is weird anyways, should be refactored
             content.Path = path;
+            content.Trashed = isInBin;
+
             content.Id = 34;
 
             Assert.AreEqual(isInBin, content.IsInRecycleBin());
+            if (isInBin)
+                Assert.IsTrue(content.Trashed);
         }
 
         [Test]
@@ -67,7 +85,7 @@ namespace Umbraco.Tests.Models
             //add non-grouped properties
             contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            
+
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 
@@ -249,6 +267,13 @@ namespace Umbraco.Tests.Models
             var contentType = MockedContentTypes.CreateTextpageContentType();
             contentType.Id = 99;
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            // should not try to clone something that's not Published or Unpublished
+            // (and in fact it will not work)
+            // but we cannot directly set the state to Published - hence this trick
+            content.ChangePublishedState(PublishedState.Publishing);
+            content.ResetDirtyProperties(false); // => .Published
+
             var i = 200;
             foreach (var property in content.Properties)
             {
@@ -263,7 +288,6 @@ namespace Umbraco.Tests.Models
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
-            content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
@@ -366,7 +390,7 @@ namespace Umbraco.Tests.Models
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
-            content.ChangePublishedState(PublishedState.Published);
+            content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
@@ -642,28 +666,11 @@ namespace Umbraco.Tests.Models
 
             // Act
             content.ResetDirtyProperties();
-            content.ChangePublishedState(PublishedState.Published);
+            content.ChangePublishedState(PublishedState.Publishing);
 
             // Assert
             Assert.That(content.IsPropertyDirty("Published"), Is.True);
             Assert.That(content.Published, Is.True);
-            Assert.That(content.IsPropertyDirty("Name"), Is.False);
-        }
-
-        [Test]
-        public void Can_Verify_Content_Is_Trashed()
-        {
-            // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            // Act
-            content.ResetDirtyProperties();
-            content.ChangeTrashedState(true);
-
-            // Assert
-            Assert.That(content.IsPropertyDirty("Trashed"), Is.True);
-            Assert.That(content.Trashed, Is.True);
             Assert.That(content.IsPropertyDirty("Name"), Is.False);
         }
 
@@ -689,7 +696,7 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
-            contentType.ResetDirtyProperties(); //reset 
+            contentType.ResetDirtyProperties(); //reset
 
             // Act
             contentType.Alias = "newAlias";
@@ -719,7 +726,7 @@ namespace Umbraco.Tests.Models
             Assert.That(content.GetDirtyUserProperties().Count(), Is.EqualTo(1));
             Assert.That(content.Properties[0].IsDirty(), Is.True);
             Assert.That(content.Properties["title"].IsDirty(), Is.True);
-            
+
             content.ResetDirtyProperties(); //this would be like committing the entity
 
             // Assert
@@ -739,7 +746,7 @@ namespace Umbraco.Tests.Models
             var contentType = MockedContentTypes.CreateTextpageContentType();
 
             // Act
-            contentType.Alias = "newAlias";           
+            contentType.Alias = "newAlias";
 
             // Assert
             Assert.That(contentType.IsDirty(), Is.True);

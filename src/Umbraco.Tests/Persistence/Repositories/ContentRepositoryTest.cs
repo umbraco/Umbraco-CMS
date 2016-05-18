@@ -82,20 +82,20 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (var i = 0; i < 100; i++)
                 {
                     var c1 = MockedContent.CreateSimpleContent(contentType1);
-                    c1.ChangePublishedState(PublishedState.Published);
+                    c1.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
                 unitOfWork.Flush();
 
                 //now create some versions of this content - this shouldn't affect the xml structures saved
-                for (int i = 0; i < allCreated.Count; i++)
+                for (var i = 0; i < allCreated.Count; i++)
                 {
                     allCreated[i].Name = "blah" + i;
                     //IMPORTANT testing note here: We need to changed the published state here so that
                     // it doesn't automatically think this is simply publishing again - this forces the latest
                     // version to be Saved and not published
-                    allCreated[i].ChangePublishedState(PublishedState.Saved);
+                    allCreated[i].ChangePublishedState(PublishedState.Saving);
                     repository.AddOrUpdate(allCreated[i]);
                 }
                 unitOfWork.Flush();
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
-                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+                repository.RebuildXmlStructures(content => new XElement("test"), 10);
 
                 Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (var i = 0; i < 100; i++)
                 {
                     var c1 = MockedContent.CreateSimpleContent(contentType1);
-                    c1.ChangePublishedState(PublishedState.Published);
+                    c1.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
@@ -188,21 +188,21 @@ namespace Umbraco.Tests.Persistence.Repositories
                 for (var i = 0; i < 30; i++)
                 {
                     var c1 = MockedContent.CreateSimpleContent(contentType1);
-                    c1.ChangePublishedState(PublishedState.Published);
+                    c1.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
                 for (var i = 0; i < 30; i++)
                 {
                     var c1 = MockedContent.CreateSimpleContent(contentType2);
-                    c1.ChangePublishedState(PublishedState.Published);
+                    c1.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
                 for (var i = 0; i < 30; i++)
                 {
                     var c1 = MockedContent.CreateSimpleContent(contentType3);
-                    c1.ChangePublishedState(PublishedState.Published);
+                    c1.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(c1);
                     allCreated.Add(c1);
                 }
@@ -536,13 +536,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.GetAll().ToArray();
                 foreach (var content in result)
                 {
-                    content.ChangePublishedState(PublishedState.Saved);
+                    content.ChangePublishedState(PublishedState.Saving);
                     repository.AddOrUpdate(content);
                 }
                 unitOfWork.Flush();
                 foreach (var content in result)
                 {
-                    content.ChangePublishedState(PublishedState.Published);
+                    content.ChangePublishedState(PublishedState.Publishing);
                     repository.AddOrUpdate(content);
                 }
                 unitOfWork.Flush();

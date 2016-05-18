@@ -3,26 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContentType"/>
     /// </summary>
-    internal class ContentTypeRepository : ContentTypeBaseRepository<IContentType>, IContentTypeRepository
+    internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
         private readonly ITemplateRepository _templateRepository;
 
@@ -51,6 +46,23 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
+        protected override IContentType PerformGet(Guid id)
+        {
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Key == id);
+        }
+
+        protected override IContentType PerformGet(string alias)
+        {
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        }
+
+        protected override bool PerformExists(Guid id)
+        {
+            return GetAll().FirstOrDefault(x => x.Key == id) != null;
+        }
+
         protected override IEnumerable<IContentType> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
@@ -63,6 +75,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository);
         }
 
+
+        protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
+        {
+            // use the underlying GetAll which will force cache all content types
+            return ids.Any() ? GetAll().Where(x => ids.Contains(x.Key)) : GetAll();
+        }
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
         {
             var sqlClause = GetBaseQuery(false);
@@ -154,28 +172,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            var list = new List<string>
-                           {
-                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
-                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                               "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
-                               "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",
-                               "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id",
-                               "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id",
-                               "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
-                               "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
-                               "DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @Id",
-                               "DELETE FROM cmsContentType WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
-                           };
-            return list;
+            var l = (List<string>) base.GetDeleteClauses(); // we know it's a list
+            l.Add("DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @Id");
+            l.Add("DELETE FROM cmsContentType WHERE nodeId = @Id");
+            l.Add("DELETE FROM umbracoNode WHERE id = @Id");
+            return l;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.DocumentType); }
-        }
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentTypeGuid;
 
         /// <summary>
         /// Deletes a content type
@@ -289,37 +293,6 @@ namespace Umbraco.Core.Persistence.Repositories
             PersistTemplates(entity, true);
 
             entity.ResetDirtyProperties();
-        }
-
-        protected override IContentType PerformGet(Guid id)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetAll().FirstOrDefault(x => x.Key == id);
-        }
-
-        protected override IContentType PerformGet(string alias)
-        {
-            //use the underlying GetAll which will force cache all content types
-            return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-        }
-
-        protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
-        {
-            //use the underlying GetAll which will force cache all content types
-
-            if (ids.Any())
-            {
-                return GetAll().Where(x => ids.Contains(x.Key));
-            }
-            else
-            {
-                return GetAll();
-            }
-        }
-
-        protected override bool PerformExists(Guid id)
-        {
-            return GetAll().FirstOrDefault(x => x.Key == id) != null;
         }
     }
 }

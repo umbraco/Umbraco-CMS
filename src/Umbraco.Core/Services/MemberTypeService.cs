@@ -1,218 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class MemberTypeService : ContentTypeServiceBase, IMemberTypeService
+    internal class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
-        private readonly IMemberService _memberService;
+        private IMemberService _memberService;
 
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        
         public MemberTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
             : base(provider, logger, eventMessagesFactory)
         {
-            if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
         }
 
-        public IEnumerable<IMemberType> GetAll(params int[] ids)
+        // beware! order is important to avoid deadlocks
+        protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
+        protected override int[] WriteLockIds { get; } = { Constants.Locks.MemberTree, Constants.Locks.MemberTypes };
+
+        // don't remove, will need it later
+        private IMemberService MemberService => _memberService;
+        //// handle circular dependencies
+        //internal IMemberService MemberService
+        //{
+        //    get
+        //    {
+        //        if (_memberService == null)
+        //            throw new InvalidOperationException("MemberTypeService.MemberService has not been initialized.");
+        //        return _memberService;
+        //    }
+        //    set { _memberService = value; }
+        //}
+
+        protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberTypeGuid;
+
+        protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var repository = uow.CreateRepository<IMemberTypeRepository>();
-                return repository.GetAll(ids);
-            }
+            foreach (var typeId in typeIds)
+                MemberService.DeleteMembersOfType(typeId);
         }
 
-        /// <summary>
-        /// Gets an <see cref="IMemberType"/> object by its Id
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IMemberType"/> to retrieve</param>
-        /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType Get(int id)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var repository = uow.CreateRepository<IMemberTypeRepository>();
-                return repository.Get(id);
-            }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IMemberType"/> object by its Key
-        /// </summary>
-        /// <param name="key">Key of the <see cref="IMemberType"/> to retrieve</param>
-        /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType Get(Guid key)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var repository = uow.CreateRepository<IMemberTypeRepository>();
-                return repository.Get(key);
-            }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IMemberType"/> object by its Alias
-        /// </summary>
-        /// <param name="alias">Alias of the <see cref="IMemberType"/> to retrieve</param>
-        /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType Get(string alias)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var repository = uow.CreateRepository<IMemberTypeRepository>();
-                return repository.Get(alias);
-            }
-        }
-
-        public void Save(IMemberType memberType, int userId = 0)
-        {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this))
-                return;
-
-            using (new WriteLock(Locker))
-            {
-                using (var uow = UowProvider.CreateUnitOfWork())
-                {
-                    var repository = uow.CreateRepository<IMemberTypeRepository>();
-                    memberType.CreatorId = userId;
-                    repository.AddOrUpdate(memberType);
-
-                    uow.Complete();
-                }
-
-                UpdateContentXmlStructure(memberType);
-            }
-            Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this);
-        }
-
-        public void Save(IEnumerable<IMemberType> memberTypes, int userId = 0)
-        {
-            var asArray = memberTypes.ToArray();
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this))
-                return;
-
-            using (new WriteLock(Locker))
-            {
-                using (var uow = UowProvider.CreateUnitOfWork())
-                {
-                    var repository = uow.CreateRepository<IMemberTypeRepository>();
-                    foreach (var memberType in asArray)
-                    {
-                        memberType.CreatorId = userId;
-                        repository.AddOrUpdate(memberType);
-                    }
-
-                    //save it all in one go
-                    uow.Complete();
-                }
-
-                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
-            }
-            Saved.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this);
-        }
-
-        public void Delete(IMemberType memberType, int userId = 0)
-        {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this))
-                return;
-
-            using (new WriteLock(Locker))
-            {
-                _memberService.DeleteMembersOfType(memberType.Id);
-
-                using (var uow = UowProvider.CreateUnitOfWork())
-                {
-                    var repository = uow.CreateRepository<IMemberTypeRepository>();
-                    repository.Delete(memberType);
-                    uow.Complete();
-
-                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(memberType, false), this);
-                }
-            }
-        }
-
-        public void Delete(IEnumerable<IMemberType> memberTypes, int userId = 0)
-        {
-            var asArray = memberTypes.ToArray();
-
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this))
-                return;
-
-            using (new WriteLock(Locker))
-            {
-                foreach (var contentType in asArray)
-                {
-                    _memberService.DeleteMembersOfType(contentType.Id);
-                }
-
-                using (var uow = UowProvider.CreateUnitOfWork())
-                {
-                    var repository = uow.CreateRepository<IMemberTypeRepository>();
-                    foreach (var memberType in asArray)
-                    {
-                        repository.Delete(memberType);
-                    }
-
-                    uow.Complete();
-                }
-
-                Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
-            }
-        }
-
-        /// <summary>
-        /// This is called after an IContentType is saved and is used to update the content xml structures in the database
-        /// if they are required to be updated.
-        /// </summary>
-        /// <param name="contentTypes">A tuple of a content type and a boolean indicating if it is new (HasIdentity was false before committing)</param>
-        private void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
+        protected override void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
         {
 
             var toUpdate = GetContentTypesForXmlUpdates(contentTypes).ToArray();
+            if (toUpdate.Any() == false) return;
 
-            if (toUpdate.Any())
-            {
-                //if it is a media type then call the rebuilding methods for media
-                var typedMemberService = _memberService as MemberService;
-                if (typedMemberService != null)
-                {
-                    typedMemberService.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
-                }
-            }
-
+            var memberService = _memberService as MemberService;
+            memberService?.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
         }
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> Saved;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> Deleted;
     }
 }

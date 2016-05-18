@@ -1,10 +1,11 @@
 namespace Umbraco.Core.Publishing
 {
     /// <summary>
-    /// A status type of the result of publishing a content item
+    /// A value indicating the result of publishing a content item.
     /// </summary>
-    /// <remarks>
-    /// Anything less than 10 = Success!
+    /// <remarks>Do NOT compare against a hard-coded numeric value to check for success or failure,
+    /// but instead use the IsSuccess() extension method defined below - which should be the unique
+    /// place where the numeric test should take place.
     /// </remarks>
     public enum PublishStatusType
     {
@@ -14,40 +15,70 @@ namespace Umbraco.Core.Publishing
         Success = 0,
 
         /// <summary>
-        /// The item was already published
+        /// The item was already published.
         /// </summary>
         SuccessAlreadyPublished = 1,
 
+        // Values below this value indicate a success, values above it indicate a failure.
+        // This value is considered a failure.
+        //Reserved = 10,
+
         /// <summary>
-        /// The content could not be published because it's ancestor path isn't published
+        /// The content could not be published because it's ancestor path isn't published.
         /// </summary>
-        FailedPathNotPublished = 10,
+        FailedPathNotPublished = 11,
 
         /// <summary>
         /// The content item was scheduled to be un-published and it has expired so we cannot force it to be
         /// published again as part of a bulk publish operation.
         /// </summary>
-        FailedHasExpired = 11,
+        FailedHasExpired = 12,
 
         /// <summary>
         /// The content item is scheduled to be released in the future and therefore we cannot force it to 
         /// be published during a bulk publish operation.
         /// </summary>
-        FailedAwaitingRelease = 12,
+        FailedAwaitingRelease = 13,
 
         /// <summary>
-        /// The content item is in the trash, it cannot be published
+        /// The content item could not be published because it is in the trash.
         /// </summary>
-        FailedIsTrashed = 13,
+        FailedIsTrashed = 14,
 
         /// <summary>
-        /// The publish action has been cancelled by an event handler
+        /// The publish action has been cancelled by an event handler.
         /// </summary>
-        FailedCancelledByEvent = 14,
+        FailedCancelledByEvent = 15,
 
         /// <summary>
-        /// The content item contains invalid data (has not passed validation requirements)
+        /// The content item could not be published because it contains invalid data (has not passed validation requirements).
         /// </summary>
-        FailedContentInvalid = 15
+        FailedContentInvalid = 16
+    }
+
+    /// <summary>
+    /// Provides extension methods for the <see cref="PublishStatusType"/> enum.
+    /// </summary>
+    public static class PublicStatusTypeExtensions
+    {
+        /// <summary>
+        /// Gets a value indicating whether the status indicates a success.
+        /// </summary>
+        /// <param name="status">The status.</param>
+        /// <returns>A value indicating whether the status indicates a success.</returns>
+        public static bool IsSuccess(this PublishStatusType status)
+        {
+            return (int) status < 10;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the status indicates a failure.
+        /// </summary>
+        /// <param name="status">The status.</param>
+        /// <returns>A value indicating whether the status indicates a failure.</returns>
+        public static bool IsFailure(this PublishStatusType status)
+        {
+            return (int) status >= 10;
+        }
     }
 }

@@ -103,6 +103,14 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
+                // so... we are modifying content types here. the service will trigger Deleted event,
+                // which will propagate to DataTypeCacheRefresher which will clear almost every cache
+                // there is to clear... and in addition facade caches will clear themselves too, so
+                // this is probably safe alghough it looks... weird.
+                //
+                // what IS weird is that a content type is losing a property and we do NOT raise any
+                // content type event... so ppl better listen on the data type events too.
+
                 _contentTypeRepository.AddOrUpdate(contentType);
             }
 
@@ -281,8 +289,6 @@ AND umbracoNode.id <> @id",
         }
 
         #endregion
-
-
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
@@ -485,8 +491,6 @@ AND umbracoNode.id <> @id",
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-
-
             var sql = Sql()
                 .SelectAll()
                 .From<NodeDto>()

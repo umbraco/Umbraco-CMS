@@ -33,6 +33,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = repo.GetByQuery(repo.Query.Where(x => x.Id == objectId));
+                uow.Complete();
                 return result;
             }
         }
@@ -45,6 +46,7 @@ namespace Umbraco.Core.Services
                 var result = sinceDate.HasValue == false
                     ? repo.GetByQuery(repo.Query.Where(x => x.UserId == userId && x.AuditType == type))
                     : repo.GetByQuery(repo.Query.Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                uow.Complete();
                 return result;
             }
         }
@@ -57,6 +59,7 @@ namespace Umbraco.Core.Services
                 var result = sinceDate.HasValue == false
                     ? repo.GetByQuery(repo.Query.Where(x => x.AuditType == type))
                     : repo.GetByQuery(repo.Query.Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                uow.Complete();
                 return result;
             }
         }
@@ -67,6 +70,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 repo.CleanLogs(maximumAgeOfLogsInMinutes);
+                uow.Complete();
             }
         }
     }

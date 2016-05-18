@@ -29,7 +29,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntityById(id);
+                var entity = repository.GetTaggedEntityById(id);
+                uow.Complete();
+                return entity;
             } 
         }
 
@@ -38,7 +40,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntityByKey(key);
+                var entity = repository.GetTaggedEntityByKey(key);
+                uow.Complete();
+                return entity;
             } 
         }
 
@@ -53,7 +57,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
+                uow.Complete();
+                return entities;
             }         
         }
 
@@ -69,7 +75,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
+                uow.Complete();
+                return entities;
             }         
         }
 
@@ -84,7 +92,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
+                uow.Complete();
+                return entities;
             }    
         }
 
@@ -100,7 +110,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
+                uow.Complete();
+                return entities;
             }    
         }
 
@@ -115,7 +127,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
+                uow.Complete();
+                return entities;
             }    
         }
 
@@ -131,7 +145,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
+                var entities = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
+                uow.Complete();
+                return entities;
             }    
         }
 
@@ -145,7 +161,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
+                var tags = repository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
+                uow.Complete();
+                return tags;
             }  
         }
 
@@ -161,7 +179,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Content, tagGroup);
+                var tags = repository.GetTagsForEntityType(TaggableObjectTypes.Content, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -177,7 +197,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Media, tagGroup);
+                var tags = repository.GetTagsForEntityType(TaggableObjectTypes.Media, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -193,7 +215,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Member, tagGroup);
+                var tags = repository.GetTagsForEntityType(TaggableObjectTypes.Member, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -211,7 +235,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+                var tags = repository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -228,7 +254,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntity(contentId, tagGroup);
+                var tags = repository.GetTagsForEntity(contentId, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -246,7 +274,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+                var tags = repository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
 
@@ -263,7 +293,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ITagRepository>();
-                return repository.GetTagsForEntity(contentId, tagGroup);
+                var tags = repository.GetTagsForEntity(contentId, tagGroup);
+                uow.Complete();
+                return tags;
             }
         }
     }

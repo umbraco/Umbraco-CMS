@@ -30,7 +30,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IContent CreateNew(ContentItemSave model)
         {
-            var contentType = ApplicationContext.Services.ContentTypeService.GetContentType(model.ContentTypeAlias);
+            var contentType = ApplicationContext.Services.ContentTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);

@@ -9,7 +9,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
-        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0);
         Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);

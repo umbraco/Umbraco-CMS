@@ -227,7 +227,6 @@ namespace Umbraco.Tests.TestHelpers
                     Container.GetInstance<RepositoryFactory>(),
                     new NPocoUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
-                    new PublishingStrategy(evtMsgs, Logger),
                     CacheHelper,
                     Logger,
                     evtMsgs,

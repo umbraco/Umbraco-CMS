@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-            ServiceContext.ContentTypeService.Save(mediaType);
+            ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             ServiceContext.MediaService.Save(media, 0);

@@ -54,8 +54,10 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
-                var q = repository.Query.Where(macro => macro.Alias == alias);
-                return repository.GetByQuery(q).FirstOrDefault();
+                var q = repository.Query.Where(x => x.Alias == alias);
+                var macro = repository.GetByQuery(q).FirstOrDefault();
+                uow.Complete();
+                return macro;
             }
         }
 
@@ -82,7 +84,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.GetAll(ids);
+                var macros = repository.GetAll(ids);
+                uow.Complete();
+                return macros;
             }
         }
 
@@ -91,7 +95,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.Get(id);
+                var macro = repository.Get(id);
+                uow.Complete();
+                return macro;
             }
         }
 

@@ -213,9 +213,12 @@ namespace Umbraco.Web.Services
             lock (Locker)
             {
                 //delete the assigned applications
-                _uowProvider.CreateUnitOfWork().Database.Execute(
-                    "delete from umbracoUser2App where app = @appAlias",
-                    new { appAlias = section.Alias });
+                using (var uow = _uowProvider.CreateUnitOfWork())
+                {
+                    uow.Database.Execute("delete from umbracoUser2App where app = @appAlias",
+                        new { appAlias = section.Alias });
+                    uow.Complete();
+                }
 
                 //delete the assigned trees
                 var trees = _applicationTreeService.GetApplicationTrees(section.Alias);

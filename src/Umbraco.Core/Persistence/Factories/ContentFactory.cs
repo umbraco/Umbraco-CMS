@@ -48,7 +48,6 @@ namespace Umbraco.Core.Persistence.Factories
                 ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null,
                 ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null,
                 Version = dto.ContentVersionDto.VersionId,
-                PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished,
                 PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId
             };
             //on initial construction we don't want to have dirty properties tracked

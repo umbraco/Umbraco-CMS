@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Xml.Linq;
 using NPoco;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
@@ -19,7 +15,6 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -38,8 +33,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
             : base(work, cache, logger, contentSection, mappingResolver)
         {
-            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
+            if (memberTypeRepository == null) throw new ArgumentNullException(nameof(memberTypeRepository));
+            if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
@@ -60,7 +55,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId, sql);
+            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId);
 
             return content;
 
@@ -71,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
+                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
             }
 
             return MapQueryDtos(Database.Fetch<MemberDto>(sql));
@@ -117,8 +112,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = Sql();
 
-            sql = isCount 
-                ? sql.SelectCount() 
+            sql = isCount
+                ? sql.SelectCount()
                 : sql.Select<MemberDto>(r =>
                         r.Select<ContentVersionDto>(rr =>
                             rr.Select<ContentDto>(rrr =>
@@ -184,10 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.Member); }
-        }
+        protected override Guid NodeObjectTypeId => new Guid(Constants.ObjectTypes.Member);
 
         #endregion
 
@@ -205,18 +197,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
             //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
-            int level = parent.Level + 1;
-            int sortOrder =
+            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
+            var level = parent.Level + 1;
+            var sortOrder =
                 Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                                                      new { ParentId = ((IUmbracoEntity)entity).ParentId, NodeObjectType = NodeObjectTypeId });
+                                                      new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
 
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -265,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             ((Member)entity).ResetDirtyProperties();
         }
@@ -283,19 +275,19 @@ namespace Umbraco.Core.Persistence.Repositories
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (dirtyEntity.IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
-                ((IUmbracoEntity)entity).Path = string.Concat(parent.Path, ",", entity.Id);
-                ((IUmbracoEntity)entity).Level = parent.Level + 1;
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
                 var maxSortOrder =
                     Database.ExecuteScalar<int>(
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { ParentId = ((IUmbracoEntity)entity).ParentId, NodeObjectType = NodeObjectTypeId });
-                ((IUmbracoEntity)entity).SortOrder = maxSortOrder + 1;
+                        new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
             }
 
             var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
-            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { /*Id =*/ entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
             var dto = factory.BuildDto(entity);
 
@@ -312,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //In order to update the ContentVersion we need to retrieve its primary key id
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
             dto.ContentVersionDto.Id = contentVerDto.Id;
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
@@ -378,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             dirtyEntity.ResetDirtyProperties();
         }
@@ -386,90 +378,6 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
-
-        public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
-        {
-
-            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-            using (var tr = Database.GetTransaction())
-            {
-                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
-                if (contentTypeIds == null)
-                {
-                    var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                    var subQuery = Sql()
-                        .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>()
-                        .InnerJoin<NodeDto>()
-                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
-
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);
-                }
-                else
-                {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                        var subQuery = Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>()
-                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
-                            .Where<ContentDto>( dto => dto.ContentTypeId == id1);
-
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
-                }
-
-                //now insert the data, again if something fails here, the whole transaction is reversed
-                if (contentTypeIds == null)
-                {
-                    var query = Query;
-                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                }
-                else
-                {
-                    foreach (var contentTypeId in contentTypeIds)
-                    {
-                        //copy local
-                        var id = contentTypeId;
-                        var query = Query.Where(x => x.ContentTypeId == id && x.Trashed == false);
-                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }
-                }
-
-                tr.Complete();
-            }
-        }
-
-        private void RebuildXmlStructuresProcessQuery(Func<IMember, XElement> serializer, IQuery<IMember> query, ITransaction tr, int pageSize)
-        {
-            var pageIndex = 0;
-            var total = long.MinValue;
-            var processed = 0;
-            do
-            {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
-
-                var xmlItems = (from descendant in descendants
-                                let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
-
-                //bulk insert it into the database
-                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
-
-                processed += xmlItems.Length;
-
-                pageIndex++;
-            } while (processed < total);
-        }
 
         public override IMember GetByVersion(Guid versionId)
         {
@@ -534,7 +442,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     query.Where(member => member.Username.SqlWildcard(usernameToMatch, TextColumnType.NVarchar));
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("matchType");
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
             }
             var matchedMembers = GetByQuery(query).ToArray();
 
@@ -635,16 +543,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 filterSql);
         }
 
-        public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
-        {
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(content, xml));
-        }
-
-        public void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml)
-        {
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(content, xml));
-        }
-
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
             //Some custom ones
@@ -716,9 +614,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="dto"></param>
         /// <param name="versionId"></param>
-        /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId, Sql docSql)
+        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId)
         {
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
@@ -736,5 +633,103 @@ namespace Umbraco.Core.Persistence.Repositories
             ((Entity)member).ResetDirtyProperties(false);
             return member;
         }
+
+        #region Xml - Should Move!
+
+        public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
+        {
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(content, xml));
+        }
+
+        public void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml)
+        {
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(content, xml));
+        }
+
+        public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        {
+
+            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+            using (var tr = Database.GetTransaction())
+            {
+                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
+                if (contentTypeIds == null)
+                {
+                    var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                    var subQuery = Sql()
+                        .Select("DISTINCT cmsContentXml.nodeId")
+                        .From<ContentXmlDto>()
+                        .InnerJoin<NodeDto>()
+                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
+                }
+                else
+                {
+                    foreach (var id in contentTypeIds)
+                    {
+                        var id1 = id;
+                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                        var subQuery = Sql()
+                            .Select("DISTINCT cmsContentXml.nodeId")
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .InnerJoin<ContentDto>()
+                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
+                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+
+                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        Database.Execute(deleteSql);
+                    }
+                }
+
+                //now insert the data, again if something fails here, the whole transaction is reversed
+                if (contentTypeIds == null)
+                {
+                    var query = Query;
+                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                }
+                else
+                {
+                    foreach (var contentTypeId in contentTypeIds)
+                    {
+                        //copy local
+                        var id = contentTypeId;
+                        var query = Query.Where(x => x.ContentTypeId == id && x.Trashed == false);
+                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                    }
+                }
+
+                tr.Complete();
+            }
+        }
+
+        private void RebuildXmlStructuresProcessQuery(Func<IMember, XElement> serializer, IQuery<IMember> query, ITransaction tr, int pageSize)
+        {
+            var pageIndex = 0;
+            long total;
+            var processed = 0;
+            do
+            {
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
+
+                var xmlItems = (from descendant in descendants
+                                let xml = serializer(descendant)
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+
+                //bulk insert it into the database
+                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
+
+                processed += xmlItems.Length;
+
+                pageIndex++;
+            } while (processed < total);
+        }
+
+        #endregion
     }
 }

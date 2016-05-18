@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _transaction = null;
         }
 
-        public void ReadLockNodes(params int[] lockIds)
+        public void ReadLock(params int[] lockIds)
         {
             Begin(); // we need a transaction
 
@@ -78,11 +78,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
-                Database.ExecuteScalar<int>("SELECT sortOrder FROM umbracoNode WHERE id=@id",
+            {
+                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id",
                     new { @id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
         }
 
-        public void WriteLockNodes(params int[] lockIds)
+        public void WriteLock(params int[] lockIds)
         {
             Begin(); // we need a transaction
 
@@ -90,8 +94,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
-                Database.Execute("UPDATE umbracoNode SET sortOrder = (CASE WHEN (sortOrder=1) THEN -1 ELSE 1 END) WHERE id=@id",
+            {
+                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id",
                     new { @id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
         }
     }
 }

@@ -72,7 +72,7 @@ namespace umbraco.cms.businesslogic.web
         {
             try
             {
-                var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Alias);
+                var contentType = ApplicationContext.Current.Services.ContentTypeService.Get(Alias);
                 return new DocumentType(contentType.Id);
             }
             catch
@@ -104,7 +104,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetAllContentTypes()", false)]
         public static List<DocumentType> GetAllAsList()
         {
-            var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
+            var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAll();
             var documentTypes = contentTypes.Select(x => new DocumentType(x));
 
             return documentTypes.OrderBy(x => x.Text).ToList();
@@ -423,7 +423,7 @@ namespace umbraco.cms.businesslogic.web
 
         protected override void setupNode()
         {
-            var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+            var contentType = ApplicationContext.Current.Services.ContentTypeService.Get(Id);
             
             // If it's null, it's probably a folder
             if (contentType != null)
