@@ -22,11 +22,6 @@ namespace Umbraco.Core.Services
         /// </param>
         void RebuildXmlStructures(params int[] contentTypeIds);
 
-        [Obsolete("Use the overload with 'long' parameter types instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
-
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
@@ -182,10 +177,6 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         void DeleteMembersOfType(int memberTypeId);
-
-        [Obsolete("Use the overload with 'long' parameter types instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Finds Members based on their display name

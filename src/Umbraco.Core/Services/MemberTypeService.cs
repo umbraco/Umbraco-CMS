@@ -54,5 +54,23 @@ namespace Umbraco.Core.Services
             var memberService = _memberService as MemberService;
             memberService?.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
         }
+
+        public string GetDefault()
+        {
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.ReadLock(ReadLockIds);
+                var repo = uow.CreateRepository<IMemberTypeRepository>();
+                var e = repo.GetAll(new int[0]).GetEnumerator();
+                if (e.MoveNext() == false)
+                    throw new InvalidOperationException("No member types could be resolved");
+                var first = e.Current.Alias;
+                var current = true;
+                while (e.Current.Alias.InvariantEquals("Member") == false && (current = e.MoveNext()))
+                { }
+                uow.Complete();
+                return current ? e.Current.Alias : first;
+            }
+        }
     }
 }

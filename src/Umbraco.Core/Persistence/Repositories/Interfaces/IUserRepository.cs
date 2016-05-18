@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
+        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, string>> orderBy);
         
         
         /// <summary>

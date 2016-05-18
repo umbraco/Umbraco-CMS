@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Flush();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Flush();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 

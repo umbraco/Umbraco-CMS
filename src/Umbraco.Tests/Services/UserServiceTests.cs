@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Services
             customUser.Email = "hello@hello.com";
             ServiceContext.UserService.Save(customUser);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.UserService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Services
             customUser.Email = "hello@test.com";
             ServiceContext.UserService.Save(customUser);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.UserService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Services
             customUser.Email = "hello@test.com";
             ServiceContext.UserService.Save(customUser);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.UserService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Services
             customUser.Email = "hello@test.com";
             ServiceContext.UserService.Save(customUser);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.UserService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Services
             var users = MockedUser.CreateUser(userType, 10);
             ServiceContext.UserService.Save(users);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs);
 
             Assert.AreEqual(2, found.Count());
