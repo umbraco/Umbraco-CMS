@@ -129,6 +129,19 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
+        [HttpPost]
+        public HttpResponseMessage ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
+        {
+            var foundType = Services.ContentTypeService.GetContentType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         [UmbracoTreeAuthorize(
             Constants.Trees.DocumentTypes, Constants.Trees.Content,
             Constants.Trees.MediaTypes, Constants.Trees.Media,

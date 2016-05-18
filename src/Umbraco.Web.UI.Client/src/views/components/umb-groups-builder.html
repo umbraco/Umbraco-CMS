@@ -13,6 +13,15 @@
                 action="openCompositionsDialog()">
             </umb-button>
 
+            <umb-button 
+                ng-if="extractComposition !== false"
+                type="button"
+                button-style="link"
+                label-key="contentTypeEditor_extractComposition"
+                icon="icon-reply-arrow"
+                action="openExtractCompositionDialog()">
+            </umb-button>
+
             <umb-button
                 ng-if="sorting !== false"
                 type="button"
@@ -287,6 +296,12 @@
             model="compositionsDialogModel"
             position="right"
             view="compositionsDialogModel.view">
+    </umb-overlay>
+
+    <umb-overlay ng-if="extractCompositionDialogModel.show"
+                 model="extractCompositionDialogModel"
+                 position="right"
+                 view="extractCompositionDialogModel.view">
     </umb-overlay>
 
     <umb-overlay

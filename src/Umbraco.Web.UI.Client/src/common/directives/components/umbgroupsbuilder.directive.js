@@ -376,6 +376,21 @@
 
       };
 
+      scope.openExtractCompositionDialog = function () {
+          scope.extractCompositionDialogModel = {
+              title: "Extract Composition",
+              contentType: scope.model,
+              view: "views/common/overlays/contenttypeeditor/compositions/extractcomposition.html",
+              submit: function (model) {
+                  contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function () {
+                      console.log('Done');
+                  });
+              }
+          };
+
+          scope.extractCompositionDialogModel.show = true;
+      };
+
 
       /* ---------- GROUPS ---------- */
 
@@ -653,6 +668,7 @@
       scope: {
         model: "=",
         compositions: "=",
+        extractComposition: "=",
         sorting: "=",
         contentType: "@"
       },

@@ -312,5 +312,45 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return GetAll().FirstOrDefault(x => x.Key == id) != null;
         }
+
+        /// <summary>
+        /// Moves a property group to a new content type
+        /// </summary>
+        /// <param name="propertyGroupId">The property group Id</param>
+        /// <param name="sortOrder">The new sort order for the group</param>
+        /// <param name="contentTypeId">The Id of the content type to move to</param>
+        /// <returns>Id of newly created property group</returns>
+        public int CopyPropertyGroup(int propertyGroupId, int sortOrder, int contentTypeId)
+        {
+            var dto = Database.Single<PropertyTypeGroupDto>("WHERE id = @PropertyGroupId", new { PropertyGroupId = propertyGroupId });
+            dto.ContentTypeNodeId = contentTypeId;
+            dto.SortOrder = sortOrder;
+            dto.UniqueId = Guid.NewGuid();
+            return (int)(decimal)Database.Insert(dto);
+        }
+
+        /// <summary>
+        /// Moves a property to a new content type
+        /// </summary>
+        /// <param name="propertyId">The property Id</param>
+        /// <param name="propertyGroupId">The Id of the property group to move to</param>
+        /// <param name="contentTypeId">The Id of the content type to move to</param>
+        public void MovePropertyType(int propertyId, int propertyGroupId, int contentTypeId)
+        {
+            var dto = Database.Single<PropertyTypeDto>("WHERE id = @PropertyId", new { PropertyId = propertyId });
+            dto.ContentTypeId = contentTypeId;
+            dto.PropertyTypeGroupId = propertyGroupId;
+            Database.Update(dto);
+        }
+
+        /// <summary>
+        /// Creates a composition relation between two document types
+        /// </summary>
+        /// <param name="parentId">Parent type</param>
+        /// <param name="childId">Child type</param>
+        public void CreateCompositionRelation(int parentId, int childId)
+        {
+            Database.Insert(new ContentType2ContentTypeDto { ParentId = parentId, ChildId = childId });
+        }
     }
 }

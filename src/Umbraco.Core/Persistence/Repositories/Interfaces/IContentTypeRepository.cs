@@ -40,5 +40,29 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
         /// /// <remarks>Unique accross all content, media and member types.</remarks>
         string GetUniqueAlias(string alias);
+
+        /// <summary>
+        /// Moves a property group to a new content type
+        /// </summary>
+        /// <param name="propertyGroupId">The property group Id</param>
+        /// <param name="sortOrder">The new sort order for the group</param>
+        /// <param name="contentTypeId">The Id of the content type to move to</param>
+        /// <returns>Id of newly created property group</returns>
+        int CopyPropertyGroup(int propertyGroupId, int sortOrder, int contentTypeId);
+
+        /// <summary>
+        /// Moves a property to a new content type
+        /// </summary>
+        /// <param name="propertyId">The property Id</param>
+        /// <param name="propertyGroupId">The Id of the property group to move to</param>
+        /// <param name="contentTypeId">The Id of the content type to move to</param>
+        void MovePropertyType(int propertyId ,int propertyGroupId, int contentTypeId);
+
+        /// <summary>
+        /// Creates a composition relation between two document types
+        /// </summary>
+        /// <param name="parentId">Parent type</param>
+        /// <param name="childId">Child type</param>
+        void CreateCompositionRelation(int parentId, int childId);
     }
 }

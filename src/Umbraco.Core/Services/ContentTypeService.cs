@@ -853,6 +853,71 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Extracts a composition from a content type
+        /// </summary>
+        /// <param name="contentType"><see cref="IContentType"/> to extrac composition from</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        public void ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
+            {
+                // Create new composition type
+                var compositionType = new ContentType(contentType.ParentId)
+                {
+                    Alias = name.ToSafeAlias(true),
+                    Name = name,
+                    Icon = "icon-document",
+                };
+                repository.AddOrUpdate(compositionType);
+                uow.Commit();
+
+                // Copy property groups (tabs) for any properties selected to composition type
+                // Move properties to those groups on the composition type
+                var copiedPropertyGroups = new Dictionary<int, int>();
+                foreach (var propertyAlias in propertyAliases)
+                {
+                    var property = contentType.PropertyGroups
+                        .SelectMany(x => x.PropertyTypes)
+                        .SingleOrDefault(x => x.Alias == propertyAlias);
+                    if (property == null)
+                    {
+                        throw new NullReferenceException(
+                            string.Format(
+                                "Property with alias '{0}' selected to extract to a composition could not be found on the provided content type",
+                                propertyAlias));
+                    }
+
+                    var propertyGroup = contentType.PropertyGroups
+                        .Single(x => x.Id == property.PropertyGroupId.Value);
+
+                    // Copy the property group, if we haven't copied it already from another property, and
+                    // get the Id of the new property group on the composition
+                    int newPropertyGroupId;
+                    if (copiedPropertyGroups.ContainsKey(propertyGroup.Id) == false)
+                    {
+                        newPropertyGroupId = repository.CopyPropertyGroup(propertyGroup.Id, copiedPropertyGroups.Count, compositionType.Id);
+                        copiedPropertyGroups.Add(propertyGroup.Id, newPropertyGroupId);
+                    }
+                    else
+                    {
+                        newPropertyGroupId = copiedPropertyGroups[propertyGroup.Id];
+                    }
+
+                    // Move the property to the composition type within the composition
+                    repository.MovePropertyType(property.Id, newPropertyGroupId, compositionType.Id);
+                }
+
+                // Create the composition relation
+                repository.CreateCompositionRelation(compositionType.Id, contentType.Id);
+            }
+
+            Audit(AuditType.Custom, string.Format("Extract composition performed by user"), userId, -1);
+        }
+
+        /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IMediaType"/> to retrieve</param>

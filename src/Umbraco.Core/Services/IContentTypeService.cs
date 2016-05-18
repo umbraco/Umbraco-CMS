@@ -158,18 +158,27 @@ namespace Umbraco.Core.Services
         /// Deletes a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to delete</param>
-        /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         void Delete(IContentType contentType, int userId = 0);
 
         /// <summary>
         /// Deletes a collection of <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to delete</param>
-        /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         /// <param name="userId">Optional Id of the User deleting the ContentTypes</param>
+        /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         void Delete(IEnumerable<IContentType> contentTypes, int userId = 0);
-        
+
+        /// <summary>
+        /// Extracts a composition from a content tye
+        /// </summary>
+        /// <param name="contentType"><see cref="IContentType"/> to extrac composition from</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        void ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0);
+
         /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
         /// </summary>

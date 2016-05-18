@@ -1,0 +1,33 @@
+<div ng-controller="Umbraco.Overlays.ExtractCompositionOverlay as vm">
+
+    <div class="umb-control-group">
+        <small><localize key="contentTypeEditor_extractCompositionsDescription"></localize></small>
+    </div>
+
+    <div ng-repeat="tab in model.contentType.groups" ng-show="!$last">
+        <div>{{tab.name}}</div>
+
+        <ul class="umb-checkbox-list">
+            <li class="umb-checkbox-list__item"
+                ng-repeat="property in tab.properties" ng-show="!$last && !property.inherited">
+
+                <div class="umb-checkbox-list__item-checkbox">
+                    <input type="checkbox"
+                           id="umb-overlay-extract-comp-{{property.alias}}"
+                           checklist-model="model.selectedProperties"
+                           checklist-value="property.alias"/>
+                </div>
+
+                <label for="umb-overlay-extract-comp-{{property.alias}}" class="umb-checkbox-list__item-text">
+                    {{ property.label }}
+                </label>
+
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <label for="umb-overlay-extract-comp-name"><localize key="contentTypeEditor_newCompositionName"></localize></label>
+        <input type="text" ng-model="model.newCompositionName"/>
+    </div>
+</div>

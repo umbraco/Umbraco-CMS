@@ -39,6 +39,48 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#extractComposition
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Extracts a composition from an existing content type
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.extractComposition(1234, 'New Composition', ['propertyA', 'propertyB'])
+         *    .then(function(array) {
+         *        $scope.type = type;
+         *    });
+         * </pre>
+         * @param {Int} id - id of the content item
+         * @param {String} name - name of the new composition type
+         * @param {String array} propertyAliases - aliases of the fields to move to the composition
+         * @returns {Promise} resourcePromise object.
+         */
+        extractComposition: function (id, name, propertyAliases) {
+
+            if (name === "") {
+                throw "The name of the new composition must be provided";
+            }
+
+            if (!propertyAliases || propertyAliases.length === 0) {
+                throw "At least one property for the new composition must be provided";
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "ExtractComposition",
+                       {
+                           id: id,
+                           name: name,
+                           propertyAliases: propertyAliases
+                       })),
+               'Failed to extract composition from content type');
+        },
 
         /**
          * @ngdoc method
