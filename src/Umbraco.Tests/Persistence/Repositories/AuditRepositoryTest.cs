@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add_Audit_Entry()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, MappingResolver);

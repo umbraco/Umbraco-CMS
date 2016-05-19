@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger, MappingResolver);
             Assert.Throws<Exception>(() =>
             {
                 using (var uow = provider.CreateUnitOfWork())
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockExisting()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger, MappingResolver);
             using (var uow = provider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.Servers);
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger, MappingResolver);
             Assert.Throws<Exception>(() =>
             {
                 using (var uow = provider.CreateUnitOfWork())
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockExisting()
         {
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger, MappingResolver);
             using (var uow = provider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.Servers);

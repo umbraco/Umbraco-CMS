@@ -99,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
             // use a mock factory; otherwise use a real factory.
             var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
                 ? TestObjects.GetIDatabaseFactoryMock()
-                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter());
+                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
 
             // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
@@ -435,6 +435,11 @@ namespace Umbraco.Tests.TestHelpers
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
+        }
+
+        protected NPocoUnitOfWorkProvider CreateUowProvider()
+        {
+            return new NPocoUnitOfWorkProvider(Logger, MappingResolver);
         }
     }
 }

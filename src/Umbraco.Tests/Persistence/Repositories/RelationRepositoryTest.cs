@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -173,7 +173,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -234,7 +234,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 RelationTypeRepository repositoryType;
@@ -264,7 +264,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relateContent = new RelationType(new Guid(Constants.ObjectTypes.Document), new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
             var relateContentType = new RelationType(new Guid(Constants.ObjectTypes.DocumentType), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);

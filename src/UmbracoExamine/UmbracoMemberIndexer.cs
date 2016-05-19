@@ -8,15 +8,13 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using UmbracoExamine.Config;
 using System.Collections.Generic;
 using Examine;
 using System.IO;
-using UmbracoExamine.DataServices;
+using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
-using IContentService = Umbraco.Core.Services.IContentService;
-using IMediaService = Umbraco.Core.Services.IMediaService;
 
 namespace UmbracoExamine
 {
@@ -24,11 +22,9 @@ namespace UmbracoExamine
     /// <summary>
     /// Custom indexer for members
     /// </summary>
-    public class UmbracoMemberIndexer : UmbracoContentIndexer
+    public class UmbracoMemberIndexer : BaseUmbracoIndexer
     {
-
         private readonly IMemberService _memberService;
-        private readonly IDataTypeService _dataTypeService;
 
         /// <summary>
         /// Default constructor
@@ -37,37 +33,26 @@ namespace UmbracoExamine
             : base()
         {
             _memberService = ApplicationContext.Current.Services.MemberService;
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
         }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
-        /// <param name="indexerData"></param>
+        /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
-        /// <param name="memberService"></param>
-        /// <param name="dataService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="userService"></param>
-        /// <param name="urlSegmentProviders"></param>
+        /// <param name="profilingLogger"></param>
+        /// <param name="validator"></param>
+        /// <param name="memberService"></param>        
         /// <param name="analyzer"></param>
-        /// <param name="async"></param>
         public UmbracoMemberIndexer(
-            IIndexCriteria indexerData,
-            Directory luceneDirectory,
-            IMemberService memberService,
-            IDataService dataService,
-            IContentService contentService,
-            IMediaService mediaService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IEnumerable<FieldDefinition> fieldDefinitions,
+            Directory luceneDirectory,                      
             Analyzer analyzer,
-            bool async) :
-            base(indexerData, luceneDirectory, dataService, contentService, mediaService, dataTypeService, userService, urlSegmentProviders, analyzer, async)
-        {
+            ProfilingLogger profilingLogger,
+            IValueSetValidator validator,
+            IMemberService memberService) :
+            base(fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
+        {            
             if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
         }
@@ -77,8 +62,11 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="indexSet"></param>
         /// <returns></returns>
+        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
+            //TODO: This is only required for config based index delcaration - We need to change this!
+
             var indexerData = base.GetIndexerData(indexSet);
 
             if (CanInitialize())
@@ -109,14 +97,23 @@ namespace UmbracoExamine
         }
 
         /// <summary>
+        /// Overridden to ensure that the umbraco system field definitions are in place
+        /// </summary>
+        /// <param name="originalDefinitions"></param>
+        /// <returns></returns>
+        protected override IEnumerable<FieldDefinition> InitializeFieldDefinitions(IEnumerable<FieldDefinition> originalDefinitions)
+        {
+            var result = base.InitializeFieldDefinitions(originalDefinitions).ToList();
+            result.Add(new FieldDefinition("__key", FieldDefinitionTypes.Raw));
+            return result;
+        }
+
+        /// <summary>
         /// The supported types for this indexer
         /// </summary>
         protected override IEnumerable<string> SupportedTypes
         {
-            get
-            {
-                return new string[] { IndexTypes.Member };
-            }
+            get { return new[] {IndexTypes.Member}; }
         }
 
         /// <summary>
@@ -134,7 +131,7 @@ namespace UmbracoExamine
 
             IMember[] members;
 
-            if (IndexerData.IncludeNodeTypes.Any())
+            if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
             {
                 //if there are specific node types then just index those
                 foreach (var nodeType in IndexerData.IncludeNodeTypes)
@@ -144,7 +141,7 @@ namespace UmbracoExamine
                         long total;
                         members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
 
-                        AddNodesToIndex(GetSerializedMembers(members), type);
+                        IndexItems(GetValueSets(members));
 
                         pageIndex++;
                     } while (members.Length == pageSize);
@@ -158,58 +155,60 @@ namespace UmbracoExamine
                     int total;
                     members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
 
-                    AddNodesToIndex(GetSerializedMembers(members), type);
+                    IndexItems(GetValueSets(members));
 
                     pageIndex++;
                 } while (members.Length == pageSize);
             }
         }
 
-        private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
+        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IMember> member)
         {
-            var serializer = new EntityXmlSerializer();
-            return members.Select(member => serializer.Serialize(_dataTypeService, member));
-        }
-
-        protected override XDocument GetXDocument(string xPath, string type)
-        {
-            throw new NotSupportedException();
-        }
-
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
-
-            return fields;
-
-        }
-
-        /// <summary>
-        /// Add the special __key and _searchEmail fields
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
-        {
-            base.OnGatheringNodeData(e);
-
-            if (e.Node.Attribute("key") != null)
+            foreach (var m in member)
             {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
+                var values = new Dictionary<string, object[]>
+                {
+                    {"icon", new object[] {m.ContentType.Icon}},
+                    {"id", new object[] {m.Id}},
+                    {"key", new object[] {m.Key}},
+                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
+                    {"level", new object[] {m.Level}},
+                    {"creatorID", new object[] {m.CreatorId}},
+                    {"sortOrder", new object[] {m.SortOrder}},
+                    {"createDate", new object[] {m.CreateDate}},
+                    {"updateDate", new object[] {m.UpdateDate}},
+                    {"nodeName", new object[] {m.Name}},
+                    {"path", new object[] {m.Path}},
+                    {"nodeType", new object[] {m.ContentType.Id}},
+                    {"loginName", new object[] {m.Username}},
+                    {"email", new object[] {m.Email}},
+                };
+
+                foreach (var property in m.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                {
+                    values.Add(property.Alias, new[] { property.Value });
+                }
+
+                var vs = new ValueSet(m.Id, IndexTypes.Content, m.ContentType.Alias, values);
+
+                yield return vs;
+            }
+        }
+
+        protected override void OnTransformingIndexValues(TransformingIndexDataEventArgs e)
+        {
+            base.OnTransformingIndexValues(e);
+
+            if (e.OriginalValues.ContainsKey("key") && e.IndexItem.ValueSet.Values.ContainsKey("__key") == false)
+            {
+                e.IndexItem.ValueSet.Values["__key"] = new List<object> {e.OriginalValues["key"]};
+            }
+            if (e.OriginalValues.ContainsKey("email") && e.IndexItem.ValueSet.Values.ContainsKey("_searchEmail") == false)
+            {
+                e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { e.OriginalValues["email"].ToString().Replace(".", " ").Replace("@", " ") };
             }
 
-            if (e.Node.Attribute("email") != null)
-            {
-                //NOTE: the single underscore = it's not a 'special' field which means it will be indexed normally
-                if (e.Fields.ContainsKey("_searchEmail") == false)
-                    e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
-            }
-
-            if (e.Fields.ContainsKey(IconFieldName) == false)
-                e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
         }
+
     }
 }

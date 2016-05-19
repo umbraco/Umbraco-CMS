@@ -588,7 +588,16 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IContentRepository>();
+                IQuery<IContent> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = repository.QueryFactory.Create<IContent>().Where(x => x.Name.Contains(filter));
+                }
+                return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
+            }
         }
 
         /// <summary>
@@ -601,10 +610,10 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
@@ -617,7 +626,9 @@ namespace Umbraco.Core.Services
                 var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
+                {
                     query.Where(x => x.ParentId == id);
+                }
                 var children = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
                 uow.Complete();
                 return children;
@@ -637,7 +648,16 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IContentRepository>();
+                IQuery<IContent> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = repository.QueryFactory.Create<IContent>().Where(x => x.Name.Contains(filter));
+                }
+                return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
+            }
         }
 
         /// <summary>
@@ -650,9 +670,9 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter">Search filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
         {
             Mandate.ParameterCondition(pageIndex >= 0, nameof(pageIndex));
             Mandate.ParameterCondition(pageSize > 0, nameof(pageSize));
@@ -665,7 +685,9 @@ namespace Umbraco.Core.Services
                 var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
+                {
                     query.Where(x => x.Path.SqlContains($",{id},", TextColumnType.NVarchar));
+                }
                 var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
                 uow.Complete();
                 return contents;

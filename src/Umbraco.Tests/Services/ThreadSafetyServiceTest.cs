@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -20,6 +21,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Tests.Services
 {
@@ -34,12 +37,12 @@ namespace Umbraco.Tests.Services
 		public override void Initialize()
 		{
 			base.Initialize();
-
+            
             //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that
             //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
             //threading environment, or a single apartment threading environment will not work for this test because
             //it is multi-threaded.
-            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger);
+            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMappingResolver>());
             var repositoryFactory = new RepositoryFactory(Container);
             _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
 
@@ -230,8 +233,10 @@ namespace Umbraco.Tests.Services
             // them all in one call
 
 		    private readonly ILogger _logger;
+		    private readonly IMappingResolver _mappingResolver;
+            private IQueryFactory _queryFactory;
 
-		    private readonly DbProviderFactory _dbProviderFactory =
+            private readonly DbProviderFactory _dbProviderFactory =
 		        DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
 
 		    public bool Configured => true;
@@ -244,12 +249,15 @@ namespace Umbraco.Tests.Services
 
 		    public ISqlSyntaxProvider SqlSyntax { get; } = new SqlCeSyntaxProvider();
 
+		    public IQueryFactory QueryFactory => _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappingResolver));
+
 		    public DatabaseType DatabaseType => DatabaseType.SQLCe;
 
-            public PerThreadSqlCeDatabaseFactory(ILogger logger)
-		    {
+            public PerThreadSqlCeDatabaseFactory(ILogger logger, IMappingResolver mappingResolver)
+            {
                 _logger = logger;
-		    }
+                _mappingResolver = mappingResolver;
+            }
 
 		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>();
 

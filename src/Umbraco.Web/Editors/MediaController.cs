@@ -33,6 +33,7 @@ using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.UI;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
@@ -186,9 +187,20 @@ namespace Umbraco.Web.Editors
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
+                IQuery<IMedia> queryFilter = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    //add the default text filter                    
+                    queryFilter = DatabaseContext.QueryFactory.Create<IMedia>()
+                        .Where(x => x.Name.Contains(filter));
+                }
+
                 children = Services.MediaService
-                 .GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren
-                 , orderBy, orderDirection, orderBySystemField, filter).ToArray();
+                    .GetPagedChildren(
+                        id, (pageNumber - 1), pageSize,
+                        out totalChildren,
+                        orderBy, orderDirection, orderBySystemField,
+                        queryFilter).ToArray();
             }
             else
             {

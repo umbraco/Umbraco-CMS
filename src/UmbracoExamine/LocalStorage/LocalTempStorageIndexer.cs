@@ -37,6 +37,8 @@ namespace UmbracoExamine.LocalStorage
 
         public LocalTempStorageIndexer()
         {
+            throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
+
             IndexDeletionPolicy policy = new KeepOnlyLastCommitDeletionPolicy();
             Snapshotter = new SnapshotDeletionPolicy(policy);
         }
@@ -324,10 +326,10 @@ namespace UmbracoExamine.LocalStorage
                         var basePath = IOHelper.MapPath(configuredPath);
 
                         var commit = Snapshotter.Snapshot();
-                        var allSnapshotFiles = commit.GetFileNames()
+                        var allSnapshotFiles = commit.FileNames
                             .Concat(new[]
                             {
-                                commit.GetSegmentsFileName(), 
+                                commit.SegmentsFileName, 
                                 //we need to manually include the segments.gen file
                                 "segments.gen"
                             })

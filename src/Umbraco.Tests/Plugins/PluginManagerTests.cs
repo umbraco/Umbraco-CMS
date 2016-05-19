@@ -33,14 +33,14 @@ namespace Umbraco.Tests.Plugins
         public void Initialize()
         {
             //this ensures its reset
-            _manager = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
+            _manager = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             //TODO: Should probably update this so it only searches this assembly and add custom types to be found
             _manager.AssembliesToScan = new[]
 			    {
-			        this.GetType().Assembly, 
+			        this.GetType().Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Plugins
         public void Detect_Legacy_Plugin_File_List()
         {
             var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            
+
             var filePath= Path.Combine(tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
 
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Plugins
 <add type=""umbraco.macroCacheRefresh, umbraco, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null"" />
 </baseType>
 </plugins>");
-            
+
             Assert.IsTrue(_manager.DetectLegacyPluginListFile());
 
             File.Delete(filePath);
@@ -236,7 +236,7 @@ namespace Umbraco.Tests.Plugins
             var list1 = new[] { f1, f2, f3, f4, f5, f6 };
             var list2 = new[] { f1, f3, f5 };
             var list3 = new[] { f1, f3, f5, f7 };
-            
+
             //Act
             var hash1 = PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var hash2 = PluginManager.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
@@ -285,9 +285,9 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(8, trees.Count()); // 8 classes in the solution implement BaseTree
+            Assert.AreEqual(7, trees.Count()); // 7 classes in the solution implement BaseTree
         }
-        
+
         [Test]
         public void Resolves_XsltExtensions()
         {
@@ -317,7 +317,7 @@ namespace Umbraco.Tests.Plugins
 
             Assert.IsNull(shouldNotFind);
         }
-     
+
         [XsltExtension("Blah.Blah")]
         public class MyXsltExtension
         {

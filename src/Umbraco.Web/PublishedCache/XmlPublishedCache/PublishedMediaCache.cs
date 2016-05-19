@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
+using Examine.LuceneEngine;
+using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
 using Lucene.Net.Documents;
@@ -45,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="applicationContext"></param>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
-        internal PublishedMediaCache(ApplicationContext applicationContext, BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
+        internal PublishedMediaCache(ApplicationContext applicationContext, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider)
 	    {
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 	        if (searchProvider == null) throw new ArgumentNullException("searchProvider");
@@ -62,7 +64,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    }
 
         private readonly ApplicationContext _applicationContext;
-	    private readonly BaseSearchProvider _searchProvider;
+	    private readonly ILuceneSearcher _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
         public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
@@ -146,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return null;
 	    }
 
-	    private BaseSearchProvider GetSearchProviderSafe()
+	    private ILuceneSearcher GetSearchProviderSafe()
 		{
 			if (_searchProvider != null)
 				return _searchProvider;
@@ -157,7 +159,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			    try
 			    {
 			        //by default use the InternalSearcher
-			        return eMgr.SearchProviderCollection["InternalSearcher"];
+			        return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
 			    }
 			    catch (FileNotFoundException)
 			    {
@@ -247,53 +249,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
 		{
-			//NOTE: Some fields will not be included if the config section for the internal index has been
-            //mucked around with. It should index everything and so the index definition should simply be:
-            // <IndexSet SetName="InternalIndexSet" IndexPath="~/App_Data/TEMP/ExamineIndexes/Internal/" />
-
-
 			var values = new Dictionary<string, string>(searchResult.Fields);
-			//we need to ensure some fields exist, because of the above issue
-			if (!new []{"template", "templateId"}.Any(values.ContainsKey))
-				values.Add("template", 0.ToString());
-			if (!new[] { "sortOrder" }.Any(values.ContainsKey))
-				values.Add("sortOrder", 0.ToString());
-			if (!new[] { "urlName" }.Any(values.ContainsKey))
-				values.Add("urlName", "");
-			if (!new[] { "nodeType" }.Any(values.ContainsKey))
-				values.Add("nodeType", 0.ToString());
-			if (!new[] { "creatorName" }.Any(values.ContainsKey))
-				values.Add("creatorName", "");
-			if (!new[] { "writerID" }.Any(values.ContainsKey))
-				values.Add("writerID", 0.ToString());
-			if (!new[] { "creatorID" }.Any(values.ContainsKey))
-				values.Add("creatorID", 0.ToString());
-			if (!new[] { "createDate" }.Any(values.ContainsKey))
-				values.Add("createDate", default(DateTime).ToString("yyyy-MM-dd HH:mm:ss"));
-			if (!new[] { "level" }.Any(values.ContainsKey))
-			{
-				values.Add("level", values["__Path"].Split(',').Length.ToString());
-			}
-
-            // because, migration
-            if (values.ContainsKey("key") == false)
-                values["key"] = Guid.Empty.ToString();
-
-		    return new CacheValues
+            
+			return new CacheValues
 		    {
 		        Values = values,
                 FromExamine = true
 		    };
-
-            //var content = new DictionaryPublishedContent(values,
-            //                                      d => d.ParentId != -1 //parent should be null if -1
-            //                                               ? GetUmbracoMedia(d.ParentId)
-            //                                               : null,
-            //                                      //callback to return the children of the current node
-            //                                      d => GetChildrenMedia(d.Id),
-            //                                      GetProperty,
-            //                                      true);
-            //return content.CreateModel();
 		}
 
 		internal CacheValues ConvertFromXPathNavigator(XPathNavigator xpath, bool forceNav = false)
@@ -410,30 +372,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					try
 					{
 						//first check in Examine as this is WAY faster
-						var criteria = searchProvider.CreateSearchCriteria("media");
+						var criteria = searchProvider.CreateCriteria("media");
 
-                        var filter = criteria.ParentId(parentId).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                        var filter = criteria.ParentId(parentId).Not().Field(BaseUmbracoIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
                         //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
                         //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
 
-					    ISearchResults results;
+					    //sort with the Sort field
+                        var results = searchProvider.Find(
+                            filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
 
-                        //we want to check if the indexer for this searcher has "sortOrder" flagged as sortable.
-                        //if so, we'll use Lucene to do the sorting, if not we'll have to manually sort it (slower).
-                        var indexer = GetIndexProviderSafe();
-					    var useLuceneSort = indexer != null && indexer.IndexerData.StandardFields.Any(x => x.Name.InvariantEquals("sortOrder") && x.EnableSorting);
-                        if (useLuceneSort)
-                        {
-                            //we have a sortOrder field declared to be sorted, so we'll use Examine
-                            results = searchProvider.Search(
-                                filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
-                        }
-                        else
-                        {
-                            results = searchProvider.Search(filter.Compile());
-                        }
-
-						if (results.Any())
+                        if (results.Any())
 						{
                             // var medias = results.Select(ConvertFromSearchResult);
 						    var medias = results.Select(x =>
@@ -445,7 +394,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 						        return CreateFromCacheValues(cacheValues);
 						    });
 
-						    return useLuceneSort ? medias : medias.OrderBy(x => x.SortOrder);
+						    return medias;
 						}
 						else
 						{
@@ -561,17 +510,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				LoadedFromExamine = fromExamine;
 
 				ValidateAndSetProperty(valueDictionary, val => _id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-                ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
-				// wtf are we dealing with templates for medias?!
-                ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
+                ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");				
 				ValidateAndSetProperty(valueDictionary, val => _sortOrder = int.Parse(val), "sortOrder");
 				ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
 				ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-				ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", UmbracoContentIndexer.NodeTypeAliasFieldName);
+				ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.NodeTypeAliasFieldName);
 				ValidateAndSetProperty(valueDictionary, val => _documentTypeId = int.Parse(val), "nodeType");
-				ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
 				ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
-				ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
 				ValidateAndSetProperty(valueDictionary, val => _creatorId = int.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
 				ValidateAndSetProperty(valueDictionary, val => _path = val, "path", "__Path");
 				ValidateAndSetProperty(valueDictionary, val => _createDate = ParseDateTimeValue(val), "createDate");
@@ -627,15 +572,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			{
 				if (LoadedFromExamine)
 				{
-					try
-					{
-						//we might need to parse the date time using Lucene converters
-						return DateTools.StringToDate(val);
-					}
-					catch (FormatException)
-					{
-						//swallow exception, its not formatted correctly so revert to just trying to parse
-					}
+                    //we need to parse the date time using Lucene converters
+				    var ticks = long.Parse(val);
+                    return new DateTime(ticks);
 				}
 
 				return DateTime.Parse(val);
@@ -673,16 +612,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             public override Guid Key { get { return _key; } }
 
-			public override int TemplateId
-			{
-				get
-				{
-					//TODO: should probably throw a not supported exception since media doesn't actually support this.
-					return _templateId;
-				}
-			}
+		    public override int TemplateId
+		    {
+		        get { return 0; }
+		    }
 
-			public override int SortOrder
+		    public override int SortOrder
 			{
 				get { return _sortOrder; }
 			}
@@ -709,7 +644,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public override string WriterName
 			{
-				get { return _writerName; }
+				get { return _creatorName; }
 			}
 
 			public override string CreatorName
@@ -719,7 +654,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public override int WriterId
 			{
-				get { return _writerId; }
+				get { return _creatorId; }
 			}
 
 			public override int CreatorId
@@ -744,7 +679,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public override Guid Version
 			{
-				get { return _version; }
+				get { return Guid.Empty; }
 			}
 
 			public override int Level
@@ -813,20 +748,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			private readonly List<string> _keysAdded = new List<string>();
 			private int _id;
 		    private Guid _key;
-			private int _templateId;
 			private int _sortOrder;
 			private string _name;
 			private string _urlName;
 			private string _documentTypeAlias;
-			private int _documentTypeId;
-			private string _writerName;
+			private int _documentTypeId;			
 			private string _creatorName;
-			private int _writerId;
 			private int _creatorId;
 			private string _path;
 			private DateTime _createDate;
 			private DateTime _updateDate;
-			private Guid _version;
 			private int _level;
 			private readonly ICollection<IPublishedProperty> _properties;
 		    private readonly PublishedContentType _contentType;

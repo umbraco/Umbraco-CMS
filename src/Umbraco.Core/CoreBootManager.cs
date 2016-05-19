@@ -130,7 +130,11 @@ namespace Umbraco.Core
             {
                 try
                 {
-                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationInitialized", x.GetType())))
+                    using (ProfilingLogger.DebugDuration<CoreBootManager>(
+                        $"Executing {x.GetType()} in ApplicationInitialized",
+                        $"Executed {x.GetType()} in ApplicationInitialized",
+                        //only log if more than 150ms
+                        150))
                     {
                         x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
                     }
@@ -262,7 +266,11 @@ namespace Umbraco.Core
             {
                 try
                 {
-                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarting", x.GetType())))
+                    using (ProfilingLogger.DebugDuration<CoreBootManager>(
+                        $"Executing {x.GetType()} in ApplicationStarting",
+                        $"Executed {x.GetType()} in ApplicationStarting",
+                        //only log if more than 150ms
+                        150))
                     {
                         x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
                     }
@@ -311,7 +319,11 @@ namespace Umbraco.Core
             {
                 try
                 {
-                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarted", x.GetType())))
+                    using (ProfilingLogger.DebugDuration<CoreBootManager>(
+                        $"Executing {x.GetType()} in ApplicationStarted",
+                        $"Executed {x.GetType()} in ApplicationStarted", 
+                        //only log if more than 150ms
+                        150))
                     {
                         x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
                     }

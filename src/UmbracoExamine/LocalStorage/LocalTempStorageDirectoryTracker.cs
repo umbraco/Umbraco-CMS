@@ -6,7 +6,7 @@ namespace UmbracoExamine.LocalStorage
 {
     internal class LocalTempStorageDirectoryTracker
     {
-        private readonly static LocalTempStorageDirectoryTracker Instance = new LocalTempStorageDirectoryTracker();
+        private static readonly LocalTempStorageDirectoryTracker Instance = new LocalTempStorageDirectoryTracker();
         private readonly ConcurrentDictionary<string, LocalTempStorageDirectory> _directories = new ConcurrentDictionary<string, LocalTempStorageDirectory>();
 
         public static LocalTempStorageDirectoryTracker Current
