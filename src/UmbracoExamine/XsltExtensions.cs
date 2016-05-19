@@ -5,12 +5,12 @@ using System.Security;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Examine;
+using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Examine.Providers;
 using Umbraco.Core.Macros;
-using UmbracoExamine.DataServices;
 
 namespace UmbracoExamine
 {
@@ -32,7 +32,7 @@ namespace UmbracoExamine
         ///<param name="provider"></param>
         ///<param name="indexType"></param>
         ///<returns></returns>
-        internal static XPathNodeIterator Search(string searchText, bool useWildcards, BaseSearchProvider provider, string indexType)
+        internal static XPathNodeIterator Search(string searchText, bool useWildcards, LuceneSearcher provider, string indexType)
         {
             if (provider == null) throw new ArgumentNullException("provider");
 
@@ -50,7 +50,7 @@ namespace UmbracoExamine
         /// <returns></returns>
         public static XPathNodeIterator Search(string searchText, bool useWildcards, string providerName, string indexType)
         {
-            var provider = ExamineManager.Instance.SearchProviderCollection[providerName];
+            var provider = (LuceneSearcher)ExamineManager.Instance.SearchProviderCollection[providerName];
 
             return Search(searchText, useWildcards, provider, indexType);
         }
@@ -193,7 +193,7 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="results">The results.</param>
         /// <returns></returns>
-        private static XPathNodeIterator GetResultsAsXml(ISearchResults results)
+        private static XPathNodeIterator GetResultsAsXml(ILuceneSearchResults results)
         {
             // create the XDocument
             XDocument doc = new XDocument();

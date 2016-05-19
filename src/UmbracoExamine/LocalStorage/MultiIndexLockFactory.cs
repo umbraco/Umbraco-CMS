@@ -21,13 +21,13 @@ namespace UmbracoExamine.LocalStorage
 
         public override Lock MakeLock(string lockName)
         {
-            return new MultiIndexLock(_master.GetLockFactory().MakeLock(lockName), _child.GetLockFactory().MakeLock(lockName));
+            return new MultiIndexLock(_master.LockFactory.MakeLock(lockName), _child.LockFactory.MakeLock(lockName));
         }
         
         public override void ClearLock(string lockName)
         {
-            _master.GetLockFactory().ClearLock(lockName);
-            _child.GetLockFactory().ClearLock(lockName);
+            _master.LockFactory.ClearLock(lockName);
+            _child.LockFactory.ClearLock(lockName);
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Examine;
+using Examine.LuceneEngine;
+using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -89,8 +91,8 @@ namespace Umbraco.Web.Models.Mapping
                   .AfterMap((result, basic) =>
                       {
                           //get the icon if there is one
-                          basic.Icon = result.Fields.ContainsKey(UmbracoContentIndexer.IconFieldName) 
-                              ? result.Fields[UmbracoContentIndexer.IconFieldName] 
+                          basic.Icon = result.Fields.ContainsKey(BaseUmbracoIndexer.IconFieldName) 
+                              ? result.Fields[BaseUmbracoIndexer.IconFieldName] 
                               : "icon-document";
 
                           basic.Name = result.Fields.ContainsKey("nodeName") ? result.Fields["nodeName"] : "[no name]";
@@ -116,13 +118,13 @@ namespace Umbraco.Web.Models.Mapping
                           }
                           basic.Path = result.Fields.ContainsKey("__Path") ? result.Fields["__Path"] : "";
                           
-                          if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeTypeAliasFieldName))
+                          if (result.Fields.ContainsKey(LuceneIndexer.NodeTypeAliasFieldName))
                           {
-                              basic.AdditionalData.Add("contentType", result.Fields[UmbracoContentIndexer.NodeTypeAliasFieldName]);
+                              basic.AdditionalData.Add("contentType", result.Fields[LuceneIndexer.NodeTypeAliasFieldName]);
                           }
                       });
 
-            config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
+            config.CreateMap<ILuceneSearchResults, IEnumerable<EntityBasic>>()
                   .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
         }
     }

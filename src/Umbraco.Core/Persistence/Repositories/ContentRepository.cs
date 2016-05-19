@@ -679,14 +679,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null)
         {
+
             var filterSql = Sql().Append("AND (cmsDocument.newest = 1)");
-            if (filter.IsNullOrWhiteSpace() == false)
-                filterSql.Append("AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @0)", "%" + filter + "%");
+            if (filter != null)
+            {
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append($"AND ({filterClaus.Item1})", filterClaus.Item2);
+                }
+            }
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 MapQueryDtos,
@@ -733,14 +739,19 @@ WHERE (@path LIKE {5})",
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
+            // NOTE see sortby.prevalues.controller.js for possible values
+            // that need to be handled here or in VersionableRepositoryBase
+
             //Some custom ones
             switch (orderBy.ToUpperInvariant())
             {
-                case "NAME":
-                    return "cmsDocument.text";
                 case "UPDATER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "cmsDocument.documentUser";
+                    return GetDatabaseFieldNameForOrderBy("cmsDocument", "documentUser");
+                case "PUBLISHED":
+                    return GetDatabaseFieldNameForOrderBy("cmsDocument", "published");
+                case "CONTENTTYPEALIAS":
+                    throw new NotSupportedException("Don't know how to support ContentTypeAlias.");
             }
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);

@@ -540,9 +540,10 @@ namespace Umbraco.Core.Plugins
             {
                 var typesFound = new List<Type>();
 
-                using (_logger.TraceDuration<PluginManager>(
-                    String.Format("Starting resolution types of {0}", typeof(T).FullName),
-                    String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
+                using (_logger.DebugDuration<PluginManager>(
+                    $"Starting resolution types of {typeof(T).FullName}",
+                    $"Completed resolution of types of {typeof(T).FullName}, found {typesFound.Count}",
+                    50))
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
                     var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));

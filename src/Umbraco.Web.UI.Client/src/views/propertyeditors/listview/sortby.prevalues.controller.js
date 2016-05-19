@@ -1,5 +1,6 @@
 function sortByPreValsController($rootScope, $scope, localizationService) {
 
+    // beware: ensure that GetDatabaseFieldNameForOrderBy knows about those fields!
     $scope.sortByFields = [
         { value: "SortOrder", key: "general_sort" },
         { value: "Name", key: "general_name" },

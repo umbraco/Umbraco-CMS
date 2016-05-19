@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Key_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -200,7 +200,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork);
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -296,7 +296,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -326,7 +326,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -347,7 +347,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_DictionaryRepository()
         {
             // Arrange
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);

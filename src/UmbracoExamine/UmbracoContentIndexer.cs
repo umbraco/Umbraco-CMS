@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using Examine;
 using Lucene.Net.Documents;
@@ -9,12 +11,18 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
-using UmbracoExamine.Config;
+using Examine.LuceneEngine.Faceting;
+using Examine.LuceneEngine.Indexing;
+using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Lucene.Net.Store;
 using Umbraco.Core.Xml;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
@@ -22,15 +30,16 @@ using IMediaService = Umbraco.Core.Services.IMediaService;
 namespace UmbracoExamine
 {
     /// <summary>
-    /// 
+    /// An indexer for Umbraco content and media
     /// </summary>
     public class UmbracoContentIndexer : BaseUmbracoIndexer
     {
         protected IContentService ContentService { get; private set; }
         protected IMediaService MediaService { get; private set; }
-        protected IDataTypeService DataTypeService { get; private set; }
         protected IUserService UserService { get; private set; }
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders; 
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly IQueryFactory _queryFactory;
+        private int? _parentId;
 
         #region Constructors
 
@@ -42,90 +51,53 @@ namespace UmbracoExamine
         {
             ContentService = ApplicationContext.Current.Services.ContentService;
             MediaService = ApplicationContext.Current.Services.MediaService;
-            DataTypeService = ApplicationContext.Current.Services.DataTypeService;
             UserService = ApplicationContext.Current.Services.UserService;
             _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
+            _queryFactory = ApplicationContext.Current.DatabaseContext.QueryFactory;
         }
 
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="dataService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="userService"></param>
-        /// <param name="urlSegmentProviders"></param>
-        /// <param name="analyzer"></param>
-        /// <param name="async"></param>
-        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
+        public UmbracoContentIndexer(
+            IEnumerable<FieldDefinition> fieldDefinitions, 
+            Directory luceneDirectory, 
+            Analyzer defaultAnalyzer,
+            ProfilingLogger profilingLogger,
             IContentService contentService, 
-            IMediaService mediaService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            Analyzer analyzer, 
-            bool async)
-            : base(indexerData, luceneDirectory, dataService, analyzer, async)
+            IMediaService mediaService, 
+            IUserService userService, 
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
+            IValueSetValidator validator,
+            UmbracoContentIndexerOptions options,
+            IQueryFactory queryFactory,
+            FacetConfiguration facetConfiguration = null, 
+            IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null) 
+            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
         {
+            if (contentService == null) throw new ArgumentNullException("contentService");
+            if (mediaService == null) throw new ArgumentNullException("mediaService");
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
+            if (validator == null) throw new ArgumentNullException("validator");
+            if (options == null) throw new ArgumentNullException("options");
+            if (queryFactory == null) throw new ArgumentNullException(nameof(queryFactory));
+
+            SupportProtectedContent = options.SupportProtectedContent;
+            SupportUnpublishedContent = options.SupportUnpublishedContent;
+            ParentId = options.ParentId;
+            //backward compat hack:
+            IndexerData = new IndexCriteria(Enumerable.Empty<IIndexField>(), Enumerable.Empty<IIndexField>(), Enumerable.Empty<string>(), Enumerable.Empty<string>(), 
+                //hack to set the parent Id for backwards compat, when using this ctor the IndexerData will (should) always be null
+                options.ParentId);
+
             ContentService = contentService;
             MediaService = mediaService;
-            DataTypeService = dataTypeService;
             UserService = userService;
             _urlSegmentProviders = urlSegmentProviders;
+            _queryFactory = queryFactory;
         }
+    
 
         #endregion
-
-        #region Constants & Fields
-
         
-
-        /// <summary>
-        /// Used to store the path of a content object
-        /// </summary>
-        public const string IndexPathFieldName = "__Path";
-        public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
-        public const string IconFieldName = "__Icon";
-
-        /// <summary>
-        /// The prefix added to a field when it is duplicated in order to store the original raw value.
-        /// </summary>
-        public const string RawFieldPrefix = "__Raw_";
-
-        /// <summary>
-        /// A type that defines the type of index for each Umbraco field (non user defined fields)
-        /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
-        /// for retreival after searching.
-        /// </summary>
-        internal static readonly List<StaticField> IndexFieldPolicies
-            = new List<StaticField>
-            {
-                new StaticField("id", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField("key", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
-                new StaticField( "writerID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "creatorID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "nodeType", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "template", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "sortOrder", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
-                new StaticField( "createDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
-                new StaticField( "updateDate", FieldIndexTypes.NOT_ANALYZED, false, "DATETIME"),
-                new StaticField( "nodeName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "urlName", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
-                new StaticField( "writerName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "creatorName", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
-            };
-
-        #endregion
-
         #region Initialize
 
         /// <summary>
@@ -166,12 +138,7 @@ namespace UmbracoExamine
             else
                 SupportProtectedContent = false;
 
-
             base.Initialize(name, config);
-
-            
-
-            
         }
 
         #endregion
@@ -182,93 +149,35 @@ namespace UmbracoExamine
         /// By default this is false, if set to true then the indexer will include indexing content that is flagged as publicly protected.
         /// This property is ignored if SupportUnpublishedContent is set to true.
         /// </summary>
-        public bool SupportProtectedContent { get; protected internal set; }
+        public bool SupportProtectedContent { get; protected set; }
 
-        protected override IEnumerable<string> SupportedTypes
+        /// <summary>
+        /// Determines if the manager will call the indexing methods when content is saved or deleted as
+        /// opposed to cache being updated.
+        /// </summary>
+        public bool SupportUnpublishedContent { get; protected set; }
+
+        /// <summary>
+        /// If set this will filter the content items allowed to be indexed
+        /// </summary>
+        public int? ParentId
         {
             get
             {
-                return new string[] { IndexTypes.Content, IndexTypes.Media };
+                //fallback to the legacy data
+                return _parentId ?? (IndexerData == null ? (int?)null : IndexerData.ParentNodeId);
             }
+            protected set { _parentId = value; }
         }
+
+        protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Content, IndexTypes.Media};
 
         #endregion
 
-        #region Event handlers
-
-        protected override void OnIndexingError(IndexingErrorEventArgs e)
-        {
-            DataService.LogService.AddErrorLog(e.NodeId, string.Format("{0},{1}, IndexSet: {2}", e.Message, e.InnerException != null ? e.InnerException.ToString() : "", this.IndexSetName));
-            base.OnIndexingError(e);
-        }
-
-        /// <summary>
-        /// This ensures that the special __Raw_ fields are indexed
-        /// </summary>
-        /// <param name="docArgs"></param>
-
-        protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
-        {
-            var d = docArgs.Document;
-            foreach (var f in docArgs.Fields.Where(x => x.Key.StartsWith(RawFieldPrefix)))
-            {
-                d.Add(new Field(
-                   f.Key,
-                   f.Value,
-                   Field.Store.YES,
-                   Field.Index.NO, //don't index this field, we never want to search by it 
-                   Field.TermVector.NO));
-            }
-
-            base.OnDocumentWriting(docArgs);
-        }
-
-        protected override void OnNodeIndexed(IndexedNodeEventArgs e)
-        {
-            DataService.LogService.AddVerboseLog(e.NodeId, string.Format("Index created for node {0}", e.NodeId));
-            base.OnNodeIndexed(e);
-        }
-
-        protected override void OnIndexDeleted(DeleteIndexEventArgs e)
-        {
-            DataService.LogService.AddVerboseLog(-1, string.Format("Index deleted for term: {0} with value {1}", e.DeletedTerm.Key, e.DeletedTerm.Value));
-            base.OnIndexDeleted(e);
-        }
-
-        protected override void OnIndexOptimizing(EventArgs e)
-        {
-            DataService.LogService.AddInfoLog(-1, string.Format("Index is being optimized"));
-            base.OnIndexOptimizing(e);
-        }
-
-        #endregion
-
+     
         #region Public methods
 
-        
-
-
-        /// <summary>
-        /// Overridden for logging
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="type"></param>
-        public override void ReIndexNode(XElement node, string type)
-        {
-            if (!SupportedTypes.Contains(type))
-                return;
-
-            if (node.Attribute("id") != null)
-            {
-                DataService.LogService.AddVerboseLog((int)node.Attribute("id"), string.Format("ReIndexNode with type: {0}", type));
-                base.ReIndexNode(node, type);
-            }
-            else
-            {
-                DataService.LogService.AddErrorLog(-1, string.Format("ReIndexNode cannot proceed, the format of the XElement is invalid, the xml has no 'id' attribute. {0}", node));
-            }
-
-        }
+       
 
         /// <summary>
         /// Deletes a node from the index.                
@@ -281,23 +190,23 @@ namespace UmbracoExamine
         public override void DeleteFromIndex(string nodeId)
         {
             //find all descendants based on path
-            var descendantPath = string.Format(@"\-1\,*{0}\,*", nodeId);
-            var rawQuery = string.Format("{0}:{1}", IndexPathFieldName, descendantPath);
-            var c = InternalSearcher.CreateSearchCriteria();
+            var descendantPath = $@"\-1\,*{nodeId}\,*";
+            var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
+            var searcher = GetSearcher();
+            var c = searcher.CreateCriteria();
             var filtered = c.RawQuery(rawQuery);
-            var results = InternalSearcher.Search(filtered);
+            var results = searcher.Find(filtered);
 
-            DataService.LogService.AddVerboseLog(int.Parse(nodeId), string.Format("DeleteFromIndex with query: {0} (found {1} results)", rawQuery, results.Count()));
+            ProfilingLogger.Logger.Debug(GetType(), $"DeleteFromIndex with query: {rawQuery} (found {results.TotalItemCount} results)");
 
             //need to create a delete queue item for each one found
             foreach (var r in results)
             {
-                EnqueueIndexOperation(new IndexOperation()
-                    {
-                        Operation = IndexOperationType.Delete,
-                        Item = new IndexItem(null, "", r.Id.ToString())
-                    });
-                //SaveDeleteIndexQueueItem(new KeyValuePair<string, string>(IndexNodeIdFieldName, r.Id.ToString()));
+                ProcessIndexOperation(new IndexOperation()
+                {
+                    Operation = IndexOperationType.Delete,
+                    Item = new IndexItem(new ValueSet(r.LongId, string.Empty))
+                });
             }
 
             base.DeleteFromIndex(nodeId);
@@ -315,50 +224,57 @@ namespace UmbracoExamine
             switch (type)
             {
                 case IndexTypes.Content:
-                    if (this.SupportUnpublishedContent == false)
+
+                    var contentParentId = -1;
+                    if (ParentId.HasValue && ParentId.Value > 0)
                     {
-                        //use the base implementation which will use the published XML cache to perform the lookups
-                        base.PerformIndexAll(type);
+                        contentParentId = ParentId.Value;
                     }
-                    else
+                    IContent[] content;
+
+                    do
                     {
-                        var contentParentId = -1;
-                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                        long total;
+
+                        IEnumerable<IContent> descendants;
+                        if (SupportUnpublishedContent)
                         {
-                            contentParentId = IndexerData.ParentNodeId.Value;
+                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
                         }
-                        IContent[] content;
-
-                        do
+                        else
                         {
-                            long total;
-                            var descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                            //add the published filter
+                            var qry = _queryFactory.Create<IContent>().Where(x => x.Published == true);
 
-                            //if specific types are declared we need to post filter them
-                            //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                            if (IndexerData.IncludeNodeTypes.Any())
-                            {
-                                content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
-                            }
-                            else
-                            {
-                                content = descendants.ToArray();
-                            }
+                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, qry);
+                        }
 
-                            AddNodesToIndex(GetSerializedContent(content), type);
-                            pageIndex++;
+                        //if specific types are declared we need to post filter them
+                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
+                        {
+                            content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                        }
+                        else
+                        {
+                            content = descendants.ToArray();
+                        }
+
+                        IndexItems(GetValueSets(content));
+
+                        pageIndex++;
 
 
-                        } while (content.Length == pageSize);
+                    } while (content.Length == pageSize);
 
-                    }
+                    
                     break;
                 case IndexTypes.Media:
 
                     var mediaParentId = -1;
-                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                    if (ParentId.HasValue && ParentId.Value > 0)
                     {
-                        mediaParentId = IndexerData.ParentNodeId.Value;
+                        mediaParentId = ParentId.Value;
                     }
                     IMedia[] media;
                     
@@ -369,7 +285,7 @@ namespace UmbracoExamine
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData.IncludeNodeTypes.Any())
+                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
                         {
                             media = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
@@ -377,8 +293,9 @@ namespace UmbracoExamine
                         {
                             media = descendants.ToArray();
                         }
+
+                        IndexItems(GetValueSets(media));
                         
-                        AddNodesToIndex(GetSerializedMedia(media), type);
                         pageIndex++;
                     } while (media.Length == pageSize);
 
@@ -386,161 +303,77 @@ namespace UmbracoExamine
             }
         }
 
-        private IEnumerable<XElement> GetSerializedMedia(IEnumerable<IMedia> media)
+        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IContent> content)
         {
-            var serializer = new EntityXmlSerializer();
-            foreach (var m in media)
-            {
-                var xml = serializer.Serialize(
-                    MediaService,
-                    DataTypeService,
-                    UserService,
-                    _urlSegmentProviders,
-                    m);
-
-                //add a custom 'icon' attribute
-                if (m.ContentType.Icon.IsNullOrWhiteSpace() == false)
-                {
-                    xml.Add(new XAttribute("icon", m.ContentType.Icon));    
-                }
-                
-
-                yield return xml;
-            }
-        }
-
-        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content)
-        {
-            var serializer = new EntityXmlSerializer();
             foreach (var c in content)
             {
-                var xml = serializer.Serialize(
-                    ContentService,
-                    DataTypeService,
-                    UserService,
-                    _urlSegmentProviders,
-                    c);
-
-                //add a custom 'icon' attribute
-                xml.Add(new XAttribute("icon", c.ContentType.Icon));
-
-                yield return xml;
-            }
-        }
-
-        /// <summary>
-        /// Overridden for logging.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="type"></param>
-        protected override void AddSingleNodeToIndex(XElement node, string type)
-        {
-            DataService.LogService.AddVerboseLog((int)node.Attribute("id"), string.Format("AddSingleNodeToIndex with type: {0}", type));
-            base.AddSingleNodeToIndex(node, type);
-        }
-
-        public override void RebuildIndex()
-        {
-            DataService.LogService.AddVerboseLog(-1, "Rebuilding index");
-            base.RebuildIndex();
-        }
-
-        /// <summary>
-        /// Used to refresh the current IndexerData from the data in the DataService. This can be used
-        /// if there are more properties added/removed from the database
-        /// </summary>
-        public void RefreshIndexerDataFromDataService()
-        {
-            //TODO: This would be much better done if the IndexerData property had read/write locks applied
-            // to it! Unless we update the base class there's really no way to prevent the IndexerData from being
-            // changed during an operation that is reading from it.
-            var newIndexerData = GetIndexerData(IndexSets.Instance.Sets[IndexSetName]);
-            IndexerData = newIndexerData;
-        }
-
-        /// <summary>
-        /// Override this method to strip all html from all user fields before raising the event, then after the event 
-        /// ensure our special Path field is added to the collection
-        /// </summary>
-        /// <param name="e"></param>
-
-        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
-        {
-
-            //strip html of all users fields if we detect it has HTML in it. 
-            //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
-            //the value of the field 'as-is'.
-            // Get all user data that we want to index and store into a dictionary 
-            foreach (var field in IndexerData.UserFields)
-            {
-                if (e.Fields.ContainsKey(field.Name))
+                var urlValue = c.GetUrlSegment(_urlSegmentProviders);
+                var values = new Dictionary<string, object[]>
                 {
-                    //check if the field value has html
-                    if (XmlHelper.CouldItBeXml(e.Fields[field.Name]))
-                    {
-                        //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
-                        e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
-                        //now replace the original value with the stripped html
-                        e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);
-                    }
+                    {"icon", new object[] {c.ContentType.Icon}},
+                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},
+                    {"id", new object[] {c.Id}},
+                    {"key", new object[] {c.Key}},
+                    {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
+                    {"level", new object[] {c.Level}},
+                    {"creatorID", new object[] {c.CreatorId}},
+                    {"sortOrder", new object[] {c.SortOrder}},
+                    {"createDate", new object[] {c.CreateDate}},
+                    {"updateDate", new object[] {c.UpdateDate}},
+                    {"nodeName", new object[] {c.Name}},
+                    {"urlName", new object[] {urlValue}},
+                    {"path", new object[] {c.Path}},
+                    {"nodeType", new object[] {c.ContentType.Id}},
+                    {"creatorName", new object[] {c.GetCreatorProfile(UserService).Name}},
+                    {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},        
+                    {"writerID", new object[] {c.WriterId}},
+                    {"version", new object[] {c.Version}},
+                    {"template", new object[] {c.Template == null ? 0 : c.Template.Id}}
+                };
+
+                foreach (var property in c.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                {
+                    values.Add(property.Alias, new[] {property.Value});
                 }
+
+                var vs = new ValueSet(c.Id, IndexTypes.Content, c.ContentType.Alias, values);
+
+                yield return vs;
             }
-
-            base.OnGatheringNodeData(e);
-
-            //ensure the special path and node type alias fields is added to the dictionary to be saved to file
-            var path = e.Node.Attribute("path").Value;
-            if (!e.Fields.ContainsKey(IndexPathFieldName))
-                e.Fields.Add(IndexPathFieldName, path);
-
-            //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
-            var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
-            if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
-                e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
-
-            //add icon 
-            var icon = (string)e.Node.Attribute("icon");
-            if (!e.Fields.ContainsKey(IconFieldName))
-                e.Fields.Add(IconFieldName, icon);  
-            
         }
 
-        /// <summary>
-        /// Called when a duplicate field is detected in the dictionary that is getting indexed.
-        /// </summary>
-        /// <param name="nodeId"></param>
-        /// <param name="indexSetName"></param>
-        /// <param name="fieldName"></param>
-        protected override void OnDuplicateFieldWarning(int nodeId, string indexSetName, string fieldName)
+        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IMedia> media)
         {
-            base.OnDuplicateFieldWarning(nodeId, indexSetName, fieldName);
-
-            this.DataService.LogService.AddInfoLog(nodeId, "Field \"" + fieldName + "\" is listed multiple times in the index set \"" + indexSetName + "\". Please ensure all names are unique");
-        }
-
-        /// <summary>
-        /// Overridden to add the path property to the special fields to index
-        /// </summary>
-        /// <param name="allValuesForIndexing"></param>
-        /// <returns></returns>
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special path property to the index
-            fields.Add(IndexPathFieldName, allValuesForIndexing[IndexPathFieldName]);
-
-            //adds the special node type alias property to the index
-            fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
-
-            //icon
-            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            foreach (var m in media)
             {
-                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+                var urlValue = m.GetUrlSegment(_urlSegmentProviders);
+                var values = new Dictionary<string, object[]>
+                {
+                    {"icon", new object[] {m.ContentType.Icon}},
+                    {"id", new object[] {m.Id}},
+                    {"key", new object[] {m.Key}},
+                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
+                    {"level", new object[] {m.Level}},
+                    {"creatorID", new object[] {m.CreatorId}},
+                    {"sortOrder", new object[] {m.SortOrder}},
+                    {"createDate", new object[] {m.CreateDate}},
+                    {"updateDate", new object[] {m.UpdateDate}},
+                    {"nodeName", new object[] {m.Name}},
+                    {"urlName", new object[] {urlValue}},
+                    {"path", new object[] {m.Path}},
+                    {"nodeType", new object[] {m.ContentType.Id}},
+                    {"creatorName", new object[] {m.GetCreatorProfile(UserService).Name}}
+                };
+
+                foreach (var property in m.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                {
+                    values.Add(property.Alias, new[] { property.Value });
+                }
+
+                var vs = new ValueSet(m.Id, IndexTypes.Media, m.ContentType.Alias, values);
+
+                yield return vs;
             }
-
-            return fields;
-
         }
 
         /// <summary>
@@ -551,48 +384,17 @@ namespace UmbracoExamine
         /// <remarks>
         /// If we cannot initialize we will pass back empty indexer data since we cannot read from the database
         /// </remarks>
+        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
             if (CanInitialize())
             {
-                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
+                //NOTE: We are using a singleton here because: This is only ever used for configuration based scenarios, this is never
+                // used when the index is configured via code (the default), in which case IIndexCriteria is never used. When this is used
+                // the DI ctor is not used.
+                return indexSet.ToIndexCriteria(ApplicationContext.Current.Services.ContentTypeService);
             }
-            else
-            {
-                return base.GetIndexerData(indexSet);
-            }
-
-        }
-
-        /// <summary>
-        /// return the index policy for the field name passed in, if not found, return normal
-        /// </summary>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        protected override FieldIndexTypes GetPolicy(string fieldName)
-        {
-            var def = IndexFieldPolicies.Where(x => x.Name == fieldName).ToArray();
-            return (def.Any() == false ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
-        }
-
-        /// <summary>
-        /// Ensure that the content of this node is available for indexing (i.e. don't allow protected
-        /// content to be indexed when this is disabled).
-        /// <returns></returns>
-        /// </summary>
-        protected override bool ValidateDocument(XElement node)
-        {
-            var nodeId = int.Parse(node.Attribute("id").Value);
-            // Test for access if we're only indexing published content
-            // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
-            if (!SupportUnpublishedContent
-                && (!SupportProtectedContent
-                && DataService.ContentService.IsProtected(nodeId, node.Attribute("path").Value)))
-            {
-                return false;
-            }
-
-            return base.ValidateDocument(node);
+            return base.GetIndexerData(indexSet);
         }
 
         #endregion

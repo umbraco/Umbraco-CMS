@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    public class QueryFactory
+    public class QueryFactory : IQueryFactory
     {
         public ISqlSyntaxProvider SqlSyntax { get; }
         public IMappingResolver MappingResolver { get; }
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Querying
             MappingResolver = mappingResolver;
         }
 
-        public Query<T> Create<T>()
+        public IQuery<T> Create<T>()
         {
             return new Query<T>(SqlSyntax, MappingResolver);
         }

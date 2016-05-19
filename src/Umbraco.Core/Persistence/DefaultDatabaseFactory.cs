@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -26,6 +27,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
     {
+        private readonly IMappingResolver _mappingResolver;
         private readonly IScopeContextAdapter _scopeContextAdapter;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly ILogger _logger;
@@ -40,6 +42,7 @@ namespace Umbraco.Core.Persistence
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
+        private IQueryFactory _queryFactory;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         public bool Configured { get; private set; }
@@ -52,15 +55,25 @@ namespace Umbraco.Core.Persistence
             }
         }
 
+        public IQueryFactory QueryFactory
+        {
+            get
+            {
+                EnsureConfigured();
+                return _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappingResolver));
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDatabaseFactory"/> with the default connection, and a logger.
         /// </summary>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="scopeContextAdapter"></param>
+        /// <param name="mappingResolver"></param>
         /// <remarks>Used by LightInject.</remarks>
-        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, scopeContextAdapter)
+        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, scopeContextAdapter, mappingResolver)
         {
             if (Configured == false)
                 DatabaseContext.GiveLegacyAChance(this, logger);
@@ -73,14 +86,17 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
         /// <param name="scopeContextAdapter"></param>
+        /// <param name="mappingResolver"></param>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter)
+        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (scopeContextAdapter == null) throw new ArgumentNullException(nameof(scopeContextAdapter));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
+            if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
 
+            _mappingResolver = mappingResolver;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _scopeContextAdapter = scopeContextAdapter;
@@ -102,13 +118,16 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="scopeContextAdapter"></param>
+        /// <param name="mappingResolver"></param>
         /// <remarks>Used in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter)
+        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (scopeContextAdapter == null) throw new ArgumentNullException(nameof(scopeContextAdapter));
+            if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
 
+            _mappingResolver = mappingResolver;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _scopeContextAdapter = scopeContextAdapter;

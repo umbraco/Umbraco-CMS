@@ -1057,7 +1057,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = new NPocoUnitOfWorkProvider(Logger);
+            var provider = CreateUowProvider();
 
             using (var uow = provider.CreateUnitOfWork())
             {

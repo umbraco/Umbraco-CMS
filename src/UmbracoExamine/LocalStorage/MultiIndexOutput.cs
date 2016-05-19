@@ -41,18 +41,22 @@ namespace UmbracoExamine.LocalStorage
             }
         }
 
-        public override void Close()
+        protected override void Dispose(bool isDisposing)
         {
             foreach (var output in _outputs)
             {
-                output.Close();
+                output.Dispose();
             }
         }
 
-        public override long GetFilePointer()
+        public override long FilePointer
         {
-            //return the first
-            return _outputs.First().GetFilePointer();
+            get
+            {
+                //return the first
+                return _outputs[0].FilePointer;
+            }
+            
         }
 
         public override void Seek(long pos)
@@ -63,10 +67,14 @@ namespace UmbracoExamine.LocalStorage
             }
         }
 
-        public override long Length()
+        public override long Length
         {
-            //return the first
-            return _outputs.First().GetFilePointer();
+            get
+            {
+                //return the first
+                return _outputs[0].FilePointer;
+            }
+            
         }
     }
 }

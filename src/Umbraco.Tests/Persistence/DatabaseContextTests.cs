@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
-            var dbFactory = new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger, new TestScopeContextAdapter());
+            var dbFactory = new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger, new TestScopeContextAdapter(), Mock.Of<IMappingResolver>());
             _dbContext = new DatabaseContext(dbFactory, _logger);
 		}
 
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.Persistence
             engine.CreateDatabase();
 
             // re-create the database factory and database context with proper connection string
-            var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, new TestScopeContextAdapter());
+            var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, new TestScopeContextAdapter(), Mock.Of<IMappingResolver>());
             _dbContext = new DatabaseContext(dbFactory, _logger);
 
             // create application context

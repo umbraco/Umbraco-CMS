@@ -21,7 +21,10 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexDocumentCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+            if (searcher == null) return 0;
+            using (searcher)
+            using (var reader = searcher.IndexReader)
             {
                 return reader.NumDocs();
             }
@@ -34,7 +37,10 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+            if (searcher == null) return 0;
+            using (searcher)
+            using (var reader = searcher.IndexReader)
             {
                 return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
             }
@@ -47,7 +53,10 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static bool IsIndexOptimized(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+            if (searcher == null) return true;
+            using (searcher)
+            using (var reader = searcher.IndexReader)
             {
                 return reader.IsOptimized();
             }
@@ -74,9 +83,12 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetDeletedDocumentsCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
+            if (searcher == null) return 0;
+            using (searcher)
+            using (var reader = searcher.IndexReader)
             {
-                return reader.NumDeletedDocs();
+                return reader.NumDeletedDocs;
             }
         }
     }

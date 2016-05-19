@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
+using Examine.Session;
 using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -13,8 +14,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using UmbracoExamine;
-using Content = umbraco.cms.businesslogic.Content;
-using Document = umbraco.cms.businesslogic.web.Document;
 
 namespace Umbraco.Web.Search
 {
@@ -36,6 +35,10 @@ namespace Umbraco.Web.Search
 		{            
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
 
+            //TODO: For now we'll make this true, it means that indexes will be near real time
+            // we'll see about what implications this may have - should be great in most scenarios
+		    DefaultExamineSession.RequireImmediateConsistency = true;
+
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
@@ -51,7 +54,6 @@ namespace Umbraco.Web.Search
             CacheRefresherBase<PageCacheRefresher>.CacheUpdated += PublishedPageCacheRefresherCacheUpdated;
             CacheRefresherBase<MediaCacheRefresher>.CacheUpdated += MediaCacheRefresherCacheUpdated;
             CacheRefresherBase<MemberCacheRefresher>.CacheUpdated += MemberCacheRefresherCacheUpdated;
-            CacheRefresherBase<ContentTypeCacheRefresher>.CacheUpdated += ContentTypeCacheRefresherCacheUpdated;
             
 			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
 			if (contentIndexer != null)
@@ -64,24 +66,6 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
-
-        /// <summary>
-        /// This is used to refresh content indexers IndexData based on the DataService whenever a content type is changed since
-        /// properties may have been added/removed
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// See: http://issues.umbraco.org/issue/U4-4798
-        /// </remarks>
-	    static void ContentTypeCacheRefresherCacheUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs e)
-        {
-            var indexersToUpdated = ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>();
-            foreach (var provider in indexersToUpdated)
-            {
-                provider.RefreshIndexerDataFromDataService();
-            }
-        }
 
 	    static void MemberCacheRefresherCacheUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs e)
 	    {
@@ -389,7 +373,7 @@ namespace Umbraco.Web.Search
 
             ExamineManager.Instance.ReIndexNode(
                 xml, IndexTypes.Media,
-                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
 
                     //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
                     // then only index this for indexers supporting unpublished media
@@ -415,7 +399,7 @@ namespace Umbraco.Web.Search
                     //if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                     // otherwise if keepIfUnpublished == false then remove from all indexes
                 
-                    .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
+                    .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
 	                .Where(x => x.EnableDefaultEventHandler));
 	    }
 
@@ -434,7 +418,7 @@ namespace Umbraco.Web.Search
 
 	        ExamineManager.Instance.ReIndexNode(
                 xml, IndexTypes.Content,
-	            ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+	            ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
                     
 	                //Index this item for all indexers if the content is published, otherwise if the item is not published
 	                // then only index this for indexers supporting unpublished content
