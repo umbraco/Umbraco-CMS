@@ -320,6 +320,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTypes())
                             },
                             {
+                                "memberGroupApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
+                                    controller => controller.GetAllGroups())
+                            },
+                            {
                                 "updateCheckApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                     controller => controller.GetCheck())
                             },

@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MemberType.EditController
+ * @name Umbraco.Editors.MemberTypes.EditController
  * @function
  *
  * @description
