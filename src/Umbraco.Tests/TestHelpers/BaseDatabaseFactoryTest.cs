@@ -57,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
         private static Byte[] _dbBytes;
-        private DefaultDatabaseFactory dbFactory;
+        private DefaultDatabaseFactory _dbFactory;
 
         [SetUp]
         public override void Initialize()
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            dbFactory = new DefaultDatabaseFactory(
+            _dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                DatabaseContext.Initialize(_dbFactory.ProviderName, _dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
@@ -98,9 +98,9 @@ namespace Umbraco.Tests.TestHelpers
             var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(_dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
                 cacheHelper,
                 ProfilingLogger)
             {
