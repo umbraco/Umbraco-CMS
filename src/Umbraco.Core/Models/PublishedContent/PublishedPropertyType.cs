@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Core.Models.PublishedContent
 {

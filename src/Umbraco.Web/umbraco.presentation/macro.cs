@@ -41,6 +41,7 @@ using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 using System.Linq;
+using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Member = umbraco.cms.businesslogic.member.Member;
 

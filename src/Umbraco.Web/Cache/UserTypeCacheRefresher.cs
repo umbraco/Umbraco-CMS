@@ -12,6 +12,10 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public sealed class UserTypeCacheRefresher : CacheRefresherBase<UserTypeCacheRefresher>
     {
+        public UserTypeCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override UserTypeCacheRefresher Instance
         {
             get { return this; }
@@ -35,7 +39,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            var userTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserType>();
+            var userTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserType>();
             if (userTypeCache)
                 userTypeCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
             base.Refresh(id);
@@ -43,7 +47,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserType>();
+            var userTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserType>();
             if (userTypeCache)
                 userTypeCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
             base.Remove(id);

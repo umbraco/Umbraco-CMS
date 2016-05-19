@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,24 +14,17 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
-using Umbraco.Web.Models.Mapping;
-using umbraco.BusinessLogic;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
-using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -215,7 +206,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            var evtMsgs = new TransientMessagesFactory();
+            var evtMsgs = new TransientEventMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(
@@ -228,7 +219,6 @@ namespace Umbraco.Tests.TestHelpers
                     Container.GetInstance<RepositoryFactory>(),
                     new NPocoUnitOfWorkProvider(Logger, Mock.Of<IMappingResolver>()),
                     new FileUnitOfWorkProvider(),
-                    new PublishingStrategy(evtMsgs, Logger),
                     CacheHelper,
                     Logger,
                     evtMsgs,

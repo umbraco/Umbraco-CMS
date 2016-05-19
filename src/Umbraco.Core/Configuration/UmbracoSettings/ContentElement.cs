@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -180,19 +181,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                           (InnerTextConfigurationElement<MacroErrorBehaviour>)this["MacroErrors"],
                     //set the default
                           MacroErrorBehaviour.Inline); 
-            }
-        }
-
-        [Obsolete("This is here so that if this config element exists we won't get a YSOD, it is not used whatsoever and will be removed in future versions")]
-        [ConfigurationProperty("DocumentTypeIconList")]
-        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<IconPickerBehaviour>(
-                          (InnerTextConfigurationElement<IconPickerBehaviour>)this["DocumentTypeIconList"],
-                    //set the default
-                          IconPickerBehaviour.HideFileDuplicates);
             }
         }
 

@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
 
-        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
         protected DbTypes DbTypeMap = new DbTypes();
         protected void InitColumnTypeMap()
@@ -170,6 +170,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
             return string.Format("upper({0}) LIKE '{1}'", column, value.ToUpper());
+        }
+
+        public virtual string GetConcat(params string[] args)
+        {
+            return "concat(" + string.Join(",", args) + ")";
         }
 
         public virtual string GetQuotedTableName(string tableName)

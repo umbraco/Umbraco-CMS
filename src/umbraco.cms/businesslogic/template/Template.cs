@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Xml;
 
 namespace umbraco.cms.businesslogic.template
 {

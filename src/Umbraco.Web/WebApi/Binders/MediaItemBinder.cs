@@ -29,7 +29,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IMedia CreateNew(MediaItemSave model)
         {
-            var contentType = ApplicationContext.Services.ContentTypeService.GetMediaType(model.ContentTypeAlias);
+            var contentType = ApplicationContext.Services.MediaTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);

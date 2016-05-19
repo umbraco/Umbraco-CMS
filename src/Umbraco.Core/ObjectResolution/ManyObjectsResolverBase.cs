@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.ObjectResolution
 {

@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Services
             contentType1.RemovePropertyType(contentType1.PropertyTypes.First().Alias);
             ServiceContext.ContentTypeService.Save(contentType1);
 
-            var reQueried = ServiceContext.ContentTypeService.GetContentType(contentType1.Id);
+            var reQueried = ServiceContext.ContentTypeService.Get(contentType1.Id);
             var reContent = ServiceContext.ContentService.GetById(contentItems1.First().Id);
 
             foreach (var c in contentItems1)
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Services
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.Descendants();
+            var descendants = master.Descendants(ServiceContext.ContentTypeService);
 
             //Assert
             Assert.AreEqual(10, descendants.Count());
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Services
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.DescendantsAndSelf();
+            var descendants = master.DescendantsAndSelf(ServiceContext.ContentTypeService);
 
             //Assert
             Assert.AreEqual(11, descendants.Count());
@@ -149,10 +149,10 @@ namespace Umbraco.Tests.Services
         public void Get_With_Missing_Guid()
         {
             // Arrange
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var mediaTypeService = ServiceContext.MediaTypeService;
 
             //Act
-            var result = contentTypeService.GetMediaType(Guid.NewGuid());
+            var result = mediaTypeService.Get(Guid.NewGuid());
 
             //Assert
             Assert.IsNull(result);
@@ -333,8 +333,8 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(sut.HasIdentity, Is.True);
 
-            var contentType = service.GetContentType(sut.Id);
-            var category = service.GetContentType(categoryId);
+            var contentType = service.Get(sut.Id);
+            var category = service.Get(categoryId);
 
             Assert.That(contentType.CompositionAliases().Any(x => x.Equals("meta")), Is.True);
             Assert.AreEqual(contentType.ParentId, category.ParentId);
@@ -372,8 +372,8 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(clone.HasIdentity, Is.True);
 
-            var clonedContentType = service.GetContentType(clone.Id);
-            var originalContentType = service.GetContentType(simpleContentType.Id);
+            var clonedContentType = service.Get(clone.Id);
+            var originalContentType = service.Get(simpleContentType.Id);
 
             Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
             Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
@@ -410,8 +410,8 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(clone.HasIdentity, Is.True);
 
-            var cloned = service.GetContentType(clone.Id);
-            var original = service.GetContentType(categoryId);
+            var cloned = service.Get(clone.Id);
+            var original = service.Get(categoryId);
 
             Assert.That(cloned.CompositionAliases().Any(x => x.Equals("meta")), Is.False); //it's been copied to root
             Assert.AreEqual(cloned.ParentId, -1);
@@ -461,8 +461,8 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(clone.HasIdentity, Is.True);
 
-            var clonedContentType = service.GetContentType(clone.Id);
-            var originalContentType = service.GetContentType(simpleContentType.Id);
+            var clonedContentType = service.Get(clone.Id);
+            var originalContentType = service.Get(simpleContentType.Id);
 
             Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
             Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
@@ -510,7 +510,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(added, Is.True);
             Assert.Throws<InvalidCompositionException>(() => service.Save(composition));
-            Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
+            Assert.DoesNotThrow(() => service.Get("simpleChildPage"));
         }
 
         [Test]
@@ -559,10 +559,10 @@ namespace Umbraco.Tests.Services
             Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
             Assert.Throws<InvalidCompositionException>(() => service.Save(seoComposition));
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("meta"));
-            Assert.DoesNotThrow(() => service.GetContentType("seo"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("meta"));
+            Assert.DoesNotThrow(() => service.Get("seo"));
         }
 
         [Test]
@@ -623,8 +623,8 @@ namespace Umbraco.Tests.Services
 
             Assert.Throws<InvalidCompositionException>(() => service.Save(basePage));
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
         }
 
         [Test]
@@ -702,9 +702,9 @@ namespace Umbraco.Tests.Services
 
             Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("moreAdvancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("moreAdvancedPage"));
         }
 
         [Test]
@@ -786,9 +786,9 @@ namespace Umbraco.Tests.Services
 
             Assert.That(testAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("moreAdvancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("moreAdvancedPage"));
         }
 
         [Test]
@@ -836,8 +836,8 @@ namespace Umbraco.Tests.Services
             Assert.That(subtitleAdded, Is.True);
             Assert.That(authorAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
         }
 
         [Test]
@@ -889,8 +889,8 @@ namespace Umbraco.Tests.Services
 
             Assert.Throws<InvalidCompositionException>(() => service.Save(advancedPage));
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
         }
 
         [Test]
@@ -981,7 +981,7 @@ namespace Umbraco.Tests.Services
             Assert.That(firstOneAdded, Is.True);
             Assert.That(secondOneAdded, Is.True);
 
-            var contentType = service.GetContentType("contentPage");
+            var contentType = service.Get("contentPage");
             Assert.That(contentType, Is.Not.Null);
 
             var compositionPropertyGroups = contentType.CompositionPropertyGroups;
@@ -1055,10 +1055,10 @@ namespace Umbraco.Tests.Services
             Assert.That(descriptionAdded, Is.True);
             Assert.That(keywordsAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
 
-            var advancedPageReloaded = service.GetContentType("advancedPage");
+            var advancedPageReloaded = service.Get("advancedPage");
             var contentUnderscoreTabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
 
             // now is true, because we don't propagate renames anymore
@@ -1114,7 +1114,7 @@ namespace Umbraco.Tests.Services
             Assert.That(subtitleAdded, Is.True);
             Assert.That(authorAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
         }
 
         [Test]
@@ -1160,10 +1160,10 @@ namespace Umbraco.Tests.Services
             Assert.That(authorAdded, Is.True);
             Assert.That(compositionAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
 
-            var contentType = service.GetContentType("contentPage");
+            var contentType = service.Get("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
         }
 
@@ -1197,14 +1197,14 @@ namespace Umbraco.Tests.Services
 
             service.Save(basePage);
 
-            basePage = service.GetContentType(basePage.Id);
+            basePage = service.Get(basePage.Id);
 
             var totalPt = basePage.PropertyTypes.Count();
 
             basePage.RemovePropertyGroup("Content");
             service.Save(basePage);
 
-            basePage = service.GetContentType(basePage.Id);
+            basePage = service.Get(basePage.Id);
 
             Assert.AreEqual(totalPt, basePage.PropertyTypes.Count());
         }
@@ -1256,10 +1256,10 @@ namespace Umbraco.Tests.Services
             Assert.That(authorAdded, Is.True);
             Assert.That(compositionAdded, Is.True);
 
-            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
-            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.Get("contentPage"));
+            Assert.DoesNotThrow(() => service.Get("advancedPage"));
 
-            var contentType = service.GetContentType("contentPage");
+            var contentType = service.Get("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
 
             var numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
@@ -1275,7 +1275,7 @@ namespace Umbraco.Tests.Services
             service.Save(contentType);
             Assert.That(descriptionAdded, Is.True);
 
-            var contentPageReloaded = service.GetContentType("contentPage");
+            var contentPageReloaded = service.Get("contentPage");
             var propertyGroupReloaded = contentPageReloaded.PropertyGroups["Content"];
             var hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
             Assert.That(hasDescriptionPropertyType, Is.True);

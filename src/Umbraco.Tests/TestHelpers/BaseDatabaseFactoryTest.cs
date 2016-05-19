@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -13,28 +11,22 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
+using Umbraco.Core.Plugins;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -113,14 +105,13 @@ namespace Umbraco.Tests.TestHelpers
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
             // to the database to check the migrations ;-(
 
-            var evtMsgs = new TransientMessagesFactory();
+            var evtMsgs = new TransientEventMessagesFactory();
             var databaseContext = new DatabaseContext(databaseFactory, Logger);
             var repositoryFactory = Container.GetInstance<RepositoryFactory>();
             var serviceContext = TestObjects.GetServiceContext(
                 repositoryFactory,
                 new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, Logger),
                 CacheHelper,
                 Logger,
                 evtMsgs,

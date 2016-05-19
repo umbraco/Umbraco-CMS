@@ -27,14 +27,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            _logger.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>($"Creating data in table {tableName}");
 
             if(tableName.Equals("umbracoNode"))
             {
-                CreateUmbracNodeData();
+                CreateUmbracoNodeData();
             }
 
-            if(tableName.Equals("cmsContentType"))
+            if (tableName.Equals("umbracoLock"))
+            {
+                CreateUmbracoLockData();
+            }
+
+            if (tableName.Equals("cmsContentType"))
             {
                 CreateCmsContentTypeData();
             }
@@ -102,7 +107,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
-        private void CreateUmbracNodeData()
+        private void CreateUmbracoNodeData()
         {
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -1, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1", SortOrder = 0, UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"), Text = "SYSTEM DATA: umbraco master root", NodeObjectType = new Guid(Constants.ObjectTypes.SystemRoot), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -20, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-20", SortOrder = 0, UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"), Text = "Recycle Bin", NodeObjectType = new Guid(Constants.ObjectTypes.ContentRecycleBin), CreateDate = DateTime.Now });
@@ -135,13 +140,26 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1043, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1043", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1044", SortOrder = 0, UniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda"), Text = Constants.Conventions.MemberTypes.DefaultAlias, NodeObjectType = new Guid(Constants.ObjectTypes.MemberType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1045, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1045", SortOrder = 2, UniqueId = new Guid("7E3962CC-CE20-4FFC-B661-5897A894BA7E"), Text = "Multiple Media Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            
+
 
             //TODO: We're not creating these for 7.0
             //_database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1039, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1039", SortOrder = 2, UniqueId = new Guid("06f349a9-c949-4b6a-8660-59c10451af42"), Text = "Ultimate Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             //_database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1038, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1038", SortOrder = 2, UniqueId = new Guid("1251c96c-185c-4e9b-93f4-b48205573cbd"), Text = "Simple Editor", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            
+
             //_database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1042, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1042", SortOrder = 2, UniqueId = new Guid("0a452bd5-83f9-4bc3-8403-1286e13fb77e"), Text = "Macro Container", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });            
+        }
+
+        private void CreateUmbracoLockData()
+        {
+            // all lock objects
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.Servers, Name = "Servers" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.ContentTypes, Name = "ContentTypes" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.ContentTree, Name = "ContentTree" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.MediaTypes, Name = "MediaTypes" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.MediaTree, Name = "MediaTree" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.MemberTypes, Name = "MemberTypes" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.MemberTree, Name = "MemberTree" });
+            _database.Insert("umbracoLock", "id", false, new LockDto { Id = Constants.Locks.Domains, Name = "Domains" });
         }
 
         private void CreateCmsContentTypeData()

@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
-using Moq;
 using NPoco;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Services;
@@ -87,7 +86,6 @@ namespace Umbraco.Tests.TestHelpers
         public static ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,
-            IPublishingStrategy publishingStrategy,
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
@@ -96,7 +94,6 @@ namespace Umbraco.Tests.TestHelpers
             if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(dbUnitOfWorkProvider));
             if (fileUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(fileUnitOfWorkProvider));
-            if (publishingStrategy == null) throw new ArgumentNullException(nameof(publishingStrategy));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
@@ -145,20 +142,21 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, publishingStrategy, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
             var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, repositoryFactory, logger));
             var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
             var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, dataTypeService.Value));
             var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
-            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value, mediaService.Value));
+            var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
+            var mediaTypeService = new Lazy<IMediaTypeService>(() => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
             var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, logger, eventMessagesFactory));
             var localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, logger, eventMessagesFactory));
 
             var memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
             var entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, logger, eventMessagesFactory,
-                    contentService.Value, contentTypeService.Value, mediaService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
+                    contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
@@ -182,6 +180,7 @@ namespace Umbraco.Tests.TestHelpers
                 memberService,
                 mediaService,
                 contentTypeService,
+                mediaTypeService,
                 dataTypeService,
                 fileService,
                 localizationService,

@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
+using Umbraco.Core.Xml;
 
 namespace umbraco.cms.businesslogic.member
 {

@@ -187,12 +187,20 @@ namespace Umbraco.Web.PublishedCache
 
         public override string WriterName
         {
-            get { return _member.GetCreatorProfile().Name; }
+            get
+            {
+                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+                return _member.GetCreatorProfile().Name;
+            }
         }
 
         public override string CreatorName
         {
-            get { return _member.GetCreatorProfile().Name; }
+            get
+            {
+                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+                return _member.GetCreatorProfile().Name;
+            }
         }
 
         public override int WriterId

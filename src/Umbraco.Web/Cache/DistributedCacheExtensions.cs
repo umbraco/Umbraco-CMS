@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
@@ -304,13 +305,15 @@ namespace Umbraco.Web.Cache
         public static void RefreshContentTypeCache(this DistributedCache dc, IContentType contentType)
         {
             if (contentType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, contentType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(false, contentType));
         }
 
         public static void RemoveContentTypeCache(this DistributedCache dc, IContentType contentType)
         {
             if (contentType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, contentType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(true, contentType));
         }
 
         #endregion
@@ -320,13 +323,15 @@ namespace Umbraco.Web.Cache
         public static void RefreshMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
         {
             if (mediaType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, mediaType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(false, mediaType));
         }
 
         public static void RemoveMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
         {
             if (mediaType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
         }
 
         #endregion
@@ -336,13 +341,15 @@ namespace Umbraco.Web.Cache
         public static void RefreshMemberTypeCache(this DistributedCache dc, IMemberType memberType)
         {
             if (memberType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, memberType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(false, memberType));
         }
 
         public static void RemoveMemberTypeCache(this DistributedCache dc, IMemberType memberType)
         {
             if (memberType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, memberType));
+            var contentTypeCacheRefresher = (ContentTypeCacheRefresher)CacheRefreshersResolver.Current.GetById(DistributedCache.ContentTypeCacheRefresherGuid);
+            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, contentTypeCacheRefresher.SerializeToJsonPayload(true, memberType));
         }
 
         #endregion
@@ -439,10 +446,10 @@ namespace Umbraco.Web.Cache
 
         #region Xslt Cache
 
-        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
+        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc, CacheHelper cacheHelper)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            cacheHelper.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
         }
 
         #endregion

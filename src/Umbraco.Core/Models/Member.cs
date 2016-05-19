@@ -522,11 +522,6 @@ namespace Umbraco.Core.Models
             get { return _contentType; }
         }
 
-        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
-        {
-            throw new NotSupportedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
-        }
-
         /* Internal experiment - only used for mapping queries. 
          * Adding these to have first level properties instead of the Properties collection.
          */

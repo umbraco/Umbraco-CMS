@@ -16,6 +16,10 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public sealed class UnpublishedPageCacheRefresher : TypedCacheRefresherBase<UnpublishedPageCacheRefresher, IContent>, IJsonCacheRefresher
     {
+        public UnpublishedPageCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override UnpublishedPageCacheRefresher Instance
         {
             get { return this; }
@@ -139,7 +143,7 @@ namespace Umbraco.Web.Cache
 
         private void ClearRepositoryCacheItemById(int id)
         {
-            var contentCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IContent>();
+            var contentCache = CacheHelper.IsolatedRuntimeCache.GetCache<IContent>();
             if (contentCache)
             {
                 contentCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(id));

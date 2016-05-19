@@ -11,6 +11,10 @@ namespace Umbraco.Core.Cache
     public abstract class TypedCacheRefresherBase<TInstanceType, TEntityType> : CacheRefresherBase<TInstanceType>, ICacheRefresher<TEntityType>
         where TInstanceType : ICacheRefresher
     {
+        protected TypedCacheRefresherBase(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         public virtual void Refresh(TEntityType instance)
         {
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(instance, MessageType.RefreshByInstance));

@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
@@ -22,6 +23,13 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public class MediaCacheRefresher : JsonCacheRefresherBase<MediaCacheRefresher>
     {
+        private readonly IMediaService _mediaService;
+
+        public MediaCacheRefresher(CacheHelper cacheHelper, IMediaService mediaService) : base(cacheHelper)
+        {
+            _mediaService = mediaService;
+        }
+
         #region Static helpers
 
         /// <summary>
@@ -137,34 +145,34 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ClearCache(FromMedia(ApplicationContext.Current.Services.MediaService.GetById(id), OperationType.Saved));
+            ClearCache(FromMedia(_mediaService.GetById(id), OperationType.Saved));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(FromMedia(ApplicationContext.Current.Services.MediaService.GetById(id),
+            ClearCache(FromMedia(_mediaService.GetById(id),
                 //NOTE: we'll just default to trashed for this one.    
                 OperationType.Trashed));
             base.Remove(id);
         }
 
-        private static void ClearCache(params JsonPayload[] payloads)
+        private void ClearCache(params JsonPayload[] payloads)
         {
             if (payloads == null) return;
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            CacheHelper.ClearPartialViewCache();
 
             payloads.ForEach(payload =>
             {
-                var mediaCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMedia>();
+                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
 
                 //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
                 if (payload.Path.IsNullOrWhiteSpace())
                 {
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(
                         string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
                 }
                 else
@@ -177,12 +185,12 @@ namespace Umbraco.Web.Cache
                             mediaCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMedia>(idPartAsInt));
                         }
 
-                        ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                        CacheHelper.RuntimeCache.ClearCacheByKeySearch(
                             string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
 
                         // Also clear calls that only query this specific item!
                         if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
-                            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                            CacheHelper.RuntimeCache.ClearCacheByKeySearch(
                                 string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
                     }
                 }

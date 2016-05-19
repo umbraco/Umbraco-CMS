@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -28,7 +25,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
-                return repo.GetAll();
+                var entries = repo.GetAll();
+                uow.Complete();
+                return entries;
             }
         }
 
@@ -76,6 +75,7 @@ namespace Umbraco.Core.Services
 
                 //This will retrieve from cache!                 
                 var entries = repo.GetAll().ToArray();
+                uow.Complete();
 
                 foreach (var id in ids)
                 {
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationStatus<OperationStatusType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Services
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
+                    return OperationStatus.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -136,17 +136,11 @@ namespace Umbraco.Core.Services
                 else
                 {
                     //If they are both the same already then there's nothing to update, exit
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+                    return OperationStatus.Attempt.Succeed(evtMsgs, entry);
                 }
 
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
-                {
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail(
-                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.FailedCancelledByEvent, evtMsgs));
-                }
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
+                    return OperationStatus.Attempt.Cancel(evtMsgs, entry); // causes rollback
 
                 repo.AddOrUpdate(entry);
 
@@ -154,8 +148,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+            return OperationStatus.Attempt.Succeed(evtMsgs, entry);
         }
 
         /// <summary>
@@ -173,22 +166,22 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationStatus>.Fail();
+                if (entry == null) return Attempt<OperationStatus>.Fail(); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationStatus>.Fail();
+                if (existingRule == null) return Attempt<OperationStatus>.Fail(); // causes rollback
 
                 entry.RemoveRule(existingRule);
 
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs), this))
-                    return OperationStatus.Cancelled(evtMsgs);
+                    return OperationStatus.Attempt.Cancel(evtMsgs); // causes rollback
 
                 repo.AddOrUpdate(entry);
                 uow.Complete();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -202,7 +195,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -213,7 +206,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -227,7 +220,7 @@ namespace Umbraco.Core.Services
                     new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -238,7 +231,7 @@ namespace Umbraco.Core.Services
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>

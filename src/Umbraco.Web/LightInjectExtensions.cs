@@ -3,6 +3,7 @@ using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using LightInject;
 using Umbraco.Core;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Web
 {

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Web;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 
 namespace Umbraco.Core
 {

@@ -5,6 +5,7 @@ using System.Linq;
 using AutoMapper;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -27,8 +28,8 @@ namespace Umbraco.Tests.Models.Mapping
                 Logger,
                 typeListProducerList,
                 new ManifestBuilder(
-                    Core.CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
-                    new ManifestParser(Logger, new DirectoryInfo(TestHelper.CurrentAssemblyDirectory), Core.CacheHelper.CreateDisabledCacheHelper().RuntimeCache)));
+                    CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
+                    new ManifestParser(Logger, new DirectoryInfo(TestHelper.CurrentAssemblyDirectory), CacheHelper.CreateDisabledCacheHelper().RuntimeCache)));
 
             PropertyEditorResolver.Current = propertyEditorResolver;
 

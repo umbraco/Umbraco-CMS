@@ -1,6 +1,7 @@
 using System;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 
 namespace Umbraco.Tests.TestHelpers

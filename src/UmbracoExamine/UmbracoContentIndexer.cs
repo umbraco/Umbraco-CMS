@@ -18,6 +18,7 @@ using Examine.LuceneEngine.Indexing;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
+using Umbraco.Core.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;

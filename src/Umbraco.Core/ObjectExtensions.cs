@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core
 {

@@ -407,7 +407,7 @@ namespace Umbraco.Core.Services
                 var alias = documentType.Element("Info").Element("Alias").Value;
                 if (_importedContentTypes.ContainsKey(alias) == false)
                 {
-                    var contentType = _contentTypeService.GetContentType(alias);
+                    var contentType = _contentTypeService.Get(alias);
                     _importedContentTypes.Add(alias, contentType == null
                                                          ? CreateContentTypeFromXml(documentType)
                                                          : UpdateContentTypeFromXml(documentType, contentType));
@@ -470,18 +470,18 @@ namespace Umbraco.Core.Services
                     var folders = foldersAttribute.Value.Split('/');
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //level 1 = root level folders, there can only be one with the same name
-                    var current = _contentTypeService.GetContentTypeContainers(rootFolder, 1).FirstOrDefault();
+                    var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {
-                        var tryCreateFolder = _contentTypeService.CreateContentTypeContainer(-1, rootFolder);
+                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }
-                        var rootFolderId = tryCreateFolder.Result.Entity.Id;
-                        current = _contentTypeService.GetContentTypeContainer(rootFolderId);
+                        var rootFolderId = tryCreateFolder.Result.Value.Id;
+                        current = _contentTypeService.GetContainer(rootFolderId);
                     }
 
                     importedFolders.Add(alias, current.Id);
@@ -505,16 +505,16 @@ namespace Umbraco.Core.Services
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
-                return _contentTypeService.GetContentTypeContainer(containerId);
+                return _contentTypeService.GetContainer(containerId);
             }
 
-            var tryCreateFolder = _contentTypeService.CreateContentTypeContainer(current.Id, folderName);
+            var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result.Entity.Id);
+            return _contentTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
         }
 
         private IContentType CreateContentTypeFromXml(XElement documentType)
@@ -529,7 +529,7 @@ namespace Umbraco.Core.Services
                 var masterAlias = masterElement.Value;
                 parent = _importedContentTypes.ContainsKey(masterAlias)
                              ? _importedContentTypes[masterAlias]
-                             : _contentTypeService.GetContentType(masterAlias);
+                             : _contentTypeService.Get(masterAlias);
             }
 
             var alias = infoElement.Element("Alias").Value;
@@ -570,7 +570,7 @@ namespace Umbraco.Core.Services
                 var masterAlias = masterElement.Value;
                 IContentType parent = _importedContentTypes.ContainsKey(masterAlias)
                     ? _importedContentTypes[masterAlias]
-                    : _contentTypeService.GetContentType(masterAlias);
+                    : _contentTypeService.Get(masterAlias);
 
                 contentType.SetLazyParentId(new Lazy<int>(() => parent.Id));
             }
@@ -587,7 +587,7 @@ namespace Umbraco.Core.Services
                         var compositionAlias = composition.Value;
                         var compositionContentType = _importedContentTypes.ContainsKey(compositionAlias)
                             ? _importedContentTypes[compositionAlias]
-                            : _contentTypeService.GetContentType(compositionAlias);
+                            : _contentTypeService.Get(compositionAlias);
                         var added = contentType.AddContentType(compositionContentType);
                     }
                 }
@@ -791,14 +791,15 @@ namespace Umbraco.Core.Services
                 if (types.Any() == false)
                     throw new Exception(
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-                                      contentTypeAlias));
+                                      contentTypeAlias)); // causes rollback
 
                 var contentType = types.FirstOrDefault();
 
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-                                                      contentTypeAlias));
+                                                      contentTypeAlias)); // causes rollback
 
+                uow.Complete();
                 return contentType;
             }
         }
@@ -953,7 +954,7 @@ namespace Umbraco.Core.Services
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }                        
-                        current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
+                        current = _dataTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
                     }
 
                     importedFolders.Add(name, current.Id);
@@ -986,7 +987,7 @@ namespace Umbraco.Core.Services
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
+            return _dataTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
         }
 
         private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)

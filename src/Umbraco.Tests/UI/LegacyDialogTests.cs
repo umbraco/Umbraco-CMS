@@ -8,6 +8,7 @@ using Umbraco.Web.UI;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.user;
+using Umbraco.Core.Plugins;
 using Umbraco.Web._Legacy.UI;
 
 namespace Umbraco.Tests.UI

@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache

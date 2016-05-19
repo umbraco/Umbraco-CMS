@@ -63,7 +63,7 @@ namespace Umbraco.Web.Models
                 var hasDomain = domainHelper.NodeHasDomains(content.Id);
                 while (hasDomain == false && content != null)
                 {
-                    content = content.Parent();
+                    content = content.Parent(contentService);
                     hasDomain = content != null && domainHelper.NodeHasDomains(content.Id);
                 }
 

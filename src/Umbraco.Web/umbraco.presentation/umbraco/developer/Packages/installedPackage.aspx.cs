@@ -431,7 +431,7 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        var contentType = contentTypeService.GetContentType(nId);
+                        var contentType = contentTypeService.Get(nId);
                         if (contentType != null)
                         {
                             contentTypes.Add(contentType);

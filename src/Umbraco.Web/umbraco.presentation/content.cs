@@ -20,6 +20,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Xml;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;

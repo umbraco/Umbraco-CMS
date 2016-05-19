@@ -34,7 +34,7 @@ namespace umbraco.presentation.dialogs
 			int documentTypeId = Request.GetItemAs<int>("nodeID");
 			if (documentTypeId > 0)
 			{
-			    var contentType = Services.ContentTypeService.GetContentType(documentTypeId);
+			    var contentType = Services.ContentTypeService.Get(documentTypeId);
                 if (contentType == null) throw new NullReferenceException("No content type found with id " + documentTypeId);
                 
                 Response.AddHeader("Content-Disposition", "attachment;filename=" + contentType.Alias + ".udt");

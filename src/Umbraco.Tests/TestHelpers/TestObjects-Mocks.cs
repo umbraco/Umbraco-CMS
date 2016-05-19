@@ -43,6 +43,7 @@ namespace Umbraco.Tests.TestHelpers
                 new Mock<IContentService>().Object,
                 new Mock<IMediaService>().Object,
                 new Mock<IContentTypeService>().Object,
+                new Mock<IMediaTypeService>().Object,
                 new Mock<IDataTypeService>().Object,
                 new Mock<IFileService>().Object,
                 new Mock<ILocalizationService>().Object,

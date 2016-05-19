@@ -11,6 +11,7 @@ using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Xml;
 
 
 namespace umbraco.presentation.dialogs

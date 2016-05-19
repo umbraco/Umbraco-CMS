@@ -10,6 +10,10 @@ namespace Umbraco.Core.Cache
     public abstract class PayloadCacheRefresherBase<TInstance> : JsonCacheRefresherBase<TInstance>, IPayloadCacheRefresher
         where TInstance : ICacheRefresher
     {
+        protected PayloadCacheRefresherBase(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected abstract object Deserialize(string json);
 
         public override void Refresh(string json)

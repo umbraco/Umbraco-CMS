@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepository : IContentTypeCompositionRepository<IContentType>
+    public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentType>
     {
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
@@ -20,8 +20,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
-
-        IEnumerable<MoveEventInfo<IContentType>> Move(IContentType toMove, EntityContainer container);
 
         /// <summary>
         /// Gets all content type aliases

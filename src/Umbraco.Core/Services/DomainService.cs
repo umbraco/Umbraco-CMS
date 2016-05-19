@@ -23,7 +23,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
-                return repo.Exists(domainName);
+                var exists = repo.Exists(domainName);
+                uow.Complete();
+                return exists;
             }
         }
 
@@ -34,7 +36,7 @@ namespace Umbraco.Core.Services
                    new DeleteEventArgs<IDomain>(domain, evtMsgs),
                    this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -46,7 +48,7 @@ namespace Umbraco.Core.Services
 
             var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
             Deleted.RaiseEvent(args, this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         public IDomain GetByName(string name)
@@ -54,7 +56,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDomainRepository>();
-                return repository.GetByName(name);
+                var domain = repository.GetByName(name);
+                uow.Complete();
+                return domain;
             }
         }
 
@@ -63,7 +67,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
-                return repo.Get(id);
+                var domain = repo.Get(id);
+                uow.Complete();
+                return domain;
             }
         }
 
@@ -72,7 +78,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
-                return repo.GetAll(includeWildcards);
+                var domains = repo.GetAll(includeWildcards);
+                uow.Complete();
+                return domains;
             }
         }
 
@@ -81,7 +89,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDomainRepository>();
-                return repo.GetAssignedDomains(contentId, includeWildcards);
+                var domains = repo.GetAssignedDomains(contentId, includeWildcards);
+                uow.Complete();
+                return domains;
             }
         }
 
@@ -92,7 +102,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IDomain>(domainEntity, evtMsgs),
                     this))
             {
-                return OperationStatus.Cancelled(evtMsgs);
+                return OperationStatus.Attempt.Cancel(evtMsgs);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -103,7 +113,7 @@ namespace Umbraco.Core.Services
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            return OperationStatus.Attempt.Succeed(evtMsgs);
         }
 
         #region Event Handlers

@@ -17,12 +17,31 @@ namespace Umbraco.Core.Events
             Files = new List<string>();
         }
 
+        public RecycleBinEventArgs(Guid nodeObjectType, bool emptiedSuccessfully)
+            : base(false)
+        {
+            AllPropertyData = new Dictionary<int, IEnumerable<Property>>();
+            NodeObjectType = nodeObjectType;
+            Ids = new int[0];
+            RecycleBinEmptiedSuccessfully = emptiedSuccessfully;
+            Files = new List<string>();
+        }
+
         public RecycleBinEventArgs(Guid nodeObjectType, Dictionary<int, IEnumerable<Property>> allPropertyData)
             : base(true)
         {
             AllPropertyData = allPropertyData;
             NodeObjectType = nodeObjectType;
             Ids = AllPropertyData.Select(x => x.Key);
+            Files = new List<string>();
+        }
+
+        public RecycleBinEventArgs(Guid nodeObjectType)
+            : base(true)
+        {
+            AllPropertyData = new Dictionary<int, IEnumerable<Property>>();
+            NodeObjectType = nodeObjectType;
+            Ids = new int[0];
             Files = new List<string>();
         }
 

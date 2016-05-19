@@ -6,11 +6,19 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
     {
+        private readonly IMemberGroupService _memberGroupService;
+
+        public MemberGroupCacheRefresher(CacheHelper cacheHelper, IMemberGroupService memberGroupService) : base(cacheHelper)
+        {
+            _memberGroupService = memberGroupService;
+        }
+
         #region Static helpers
 
         /// <summary>
@@ -90,13 +98,13 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ClearCache(FromMemberGroup(ApplicationContext.Current.Services.MemberGroupService.GetById(id)));
+            ClearCache(FromMemberGroup(_memberGroupService.GetById(id)));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(FromMemberGroup(ApplicationContext.Current.Services.MemberGroupService.GetById(id)));
+            ClearCache(FromMemberGroup(_memberGroupService.GetById(id)));
             base.Remove(id);
         }
 
@@ -104,7 +112,7 @@ namespace Umbraco.Web.Cache
         {
             if (payloads == null) return;
 
-            var memberGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMemberGroup>();
+            var memberGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMemberGroup>();
             payloads.ForEach(payload =>
             {
                 if (payload != null && memberGroupCache)

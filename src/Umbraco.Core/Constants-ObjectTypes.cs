@@ -70,6 +70,11 @@ namespace Umbraco.Core
             public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
 
             /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentGuid = new Guid(Document);
+
+            /// <summary>
             /// Guid for a Document Type object.
             /// </summary>
             public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
@@ -83,6 +88,11 @@ namespace Umbraco.Core
             /// Guid for a Media object.
             /// </summary>
             public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
+
+            /// <summary>
+            /// Guid for a Media object.
+            /// </summary>
+            public static readonly Guid MediaGuid = new Guid(Media);
 
             /// <summary>
             /// Guid for the Media Recycle Bin.
@@ -143,7 +153,10 @@ namespace Umbraco.Core
             /// </summary>
             public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
 
-            
+            /// <summary>
+            /// Guid for a Lock object.
+            /// </summary>
+            public static readonly Guid LockObjectGuid = new Guid(LockObject);
         }
     }
 }

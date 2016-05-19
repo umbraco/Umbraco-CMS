@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Tests.Plugins
 {

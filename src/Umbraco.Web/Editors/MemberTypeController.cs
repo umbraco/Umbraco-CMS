@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]    
-    public class MemberTypeController : ContentTypeControllerBase
+    public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         /// <summary>
         /// Constructor
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Editors
 
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
                 saveContentType:            type => Services.MemberTypeService.Save(type));

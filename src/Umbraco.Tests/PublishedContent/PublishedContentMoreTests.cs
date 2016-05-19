@@ -11,6 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 

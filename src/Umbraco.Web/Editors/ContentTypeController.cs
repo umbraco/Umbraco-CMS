@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [EnableOverrideAuthorization]
-    public class ContentTypeController : ContentTypeControllerBase
+    public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         /// <summary>
         /// Constructor
@@ -55,12 +55,12 @@ namespace Umbraco.Web.Editors
 
         public int GetCount()
         {
-            return Services.ContentTypeService.CountContentTypes();
+            return Services.ContentTypeService.Count();
         }
 
         public DocumentTypeDisplay GetById(int id)
         {
-            var ct = Services.ContentTypeService.GetContentType(id);
+            var ct = Services.ContentTypeService.Get(id);
             if (ct == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundType = Services.ContentTypeService.GetContentType(id);
+            var foundType = Services.ContentTypeService.Get(id);
             if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -163,14 +163,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteContainer(int id)
         {
-            Services.ContentTypeService.DeleteContentTypeContainer(id, Security.CurrentUser.Id);
+            Services.ContentTypeService.DeleteContainer(id, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
-            var result = Services.ContentTypeService.CreateContentTypeContainer(parentId, name, Security.CurrentUser.Id);
+            var result = Services.ContentTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
@@ -179,9 +179,9 @@ namespace Umbraco.Web.Editors
 
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IContentType, DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
+            var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
                 contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.GetContentType(i),
+                getContentType:     i => Services.ContentTypeService.Get(i),
                 saveContentType:    type => Services.ContentTypeService.Save(type),
                 beforeCreateNew:    ctSave =>
                 {
@@ -199,7 +199,7 @@ namespace Umbraco.Web.Editors
                                     () => ctSave.Alias,
                                     () => tryCreateTemplate.Result.StatusType);
                             }
-                            template = tryCreateTemplate.Result.Entity;
+                            template = tryCreateTemplate.Result.Value;
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back
@@ -227,7 +227,7 @@ namespace Umbraco.Web.Editors
             IContentType ct;
             if (parentId != Constants.System.Root)
             {
-                var parent = Services.ContentTypeService.GetContentType(parentId);
+                var parent = Services.ContentTypeService.Get(parentId);
                 ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
             }
             else
@@ -245,7 +245,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
         {
-            var types = Services.ContentTypeService.GetAllContentTypes();
+            var types = Services.ContentTypeService.GetAll();
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
 
             return basics.Select(basic =>
@@ -269,7 +269,7 @@ namespace Umbraco.Web.Editors
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {
-                types = Services.ContentTypeService.GetAllContentTypes().ToList();
+                types = Services.ContentTypeService.GetAll().ToList();
 
                 //if no allowed root types are set, just return everything
                 if (types.Any(x => x.AllowedAsRoot))
@@ -287,7 +287,7 @@ namespace Umbraco.Web.Editors
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAllContentTypes(ids).ToList();
+                types = Services.ContentTypeService.GetAll(ids).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
@@ -311,8 +311,8 @@ namespace Umbraco.Web.Editors
         {
             return PerformMove(
                 move,
-                getContentType: i => Services.ContentTypeService.GetContentType(i),
-                doMove: (type, i) => Services.ContentTypeService.MoveContentType(type, i));
+                getContentType: i => Services.ContentTypeService.Get(i),
+                doMove: (type, i) => Services.ContentTypeService.Move(type, i));
         }
 
         /// <summary>
@@ -324,8 +324,8 @@ namespace Umbraco.Web.Editors
         {
             return PerformCopy(
                 copy,
-                getContentType: i => Services.ContentTypeService.GetContentType(i),
-                doCopy: (type, i) => Services.ContentTypeService.CopyContentType(type, i));
+                getContentType: i => Services.ContentTypeService.Get(i),
+                doCopy: (type, i) => Services.ContentTypeService.Copy(type, i));
         }
     }
 }

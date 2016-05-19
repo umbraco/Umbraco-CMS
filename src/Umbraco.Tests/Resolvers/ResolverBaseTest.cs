@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Profiling;
 using Umbraco.Core._Legacy.PackageActions;
 

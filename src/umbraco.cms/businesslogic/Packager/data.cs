@@ -6,6 +6,7 @@ using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Xml;
 
 namespace umbraco.cms.businesslogic.packager
 {

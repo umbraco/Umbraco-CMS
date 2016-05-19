@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Tests.PublishedContent
 {

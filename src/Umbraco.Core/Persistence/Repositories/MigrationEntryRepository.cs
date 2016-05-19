@@ -4,6 +4,7 @@ using System.Linq;
 using LightInject;
 using NPoco;
 using Semver;
+using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

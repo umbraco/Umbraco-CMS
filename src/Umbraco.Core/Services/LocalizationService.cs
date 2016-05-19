@@ -72,9 +72,7 @@ namespace Umbraco.Core.Services
                 {
                     var parent = GetDictionaryItemById(parentId.Value);
                     if (parent == null)
-                    {
-                        throw new ArgumentException("No parent dictionary item was found with id " + parentId.Value);
-                    }
+                        throw new ArgumentException("No parent dictionary item was found with id " + parentId.Value); // causes rollback
                 }
 
                 item = new DictionaryItem(parentId, key);
@@ -90,7 +88,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(item), this))
-                    return item;
+                    return item; // causes rollback
 
                 repository.AddOrUpdate(item);
                 uow.Complete();
@@ -116,6 +114,7 @@ namespace Umbraco.Core.Services
                 var item = repository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
+                uow.Complete();
                 return item;
             }
         }
@@ -133,6 +132,7 @@ namespace Umbraco.Core.Services
                 var item = repository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
+                uow.Complete();
                 return item;
             }
         }
@@ -150,6 +150,7 @@ namespace Umbraco.Core.Services
                 var item = repository.Get(key);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
+                uow.Complete();
                 return item;
             }
         }
@@ -168,6 +169,7 @@ namespace Umbraco.Core.Services
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);
+                uow.Complete();
                 return items;
             }
         }
@@ -185,6 +187,7 @@ namespace Umbraco.Core.Services
                 var items = repository.GetDictionaryItemDescendants(parentId).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);
+                uow.Complete();
                 return items;
             }
         }
@@ -202,6 +205,7 @@ namespace Umbraco.Core.Services
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 items.ForEach(EnsureDictionaryItemLanguageCallback);
+                uow.Complete();
                 return items;
             }
         }
@@ -216,7 +220,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                return repository.Get(key) != null;
+                var item = repository.Get(key);
+                uow.Complete();
+                return item != null;
             }
         }
 
@@ -276,7 +282,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.Get(id);
+                var lang = repository.Get(id);
+                uow.Complete();
+                return lang;
             }
         }
 
@@ -290,7 +298,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetByCultureName(cultureName);
+                var lang = repository.GetByCultureName(cultureName);
+                uow.Complete();
+                return lang;
             }
         }
 
@@ -304,7 +314,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetByIsoCode(isoCode);
+                var lang = repository.GetByIsoCode(isoCode);
+                uow.Complete();
+                return lang;
             }
         }
 
@@ -317,8 +329,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                var languages = repository.GetAll();
-                return languages;
+                var langs = repository.GetAll();
+                uow.Complete();
+                return langs;
             }
         }
 

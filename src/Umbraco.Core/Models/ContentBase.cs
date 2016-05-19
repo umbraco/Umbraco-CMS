@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Web;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -116,6 +117,16 @@ namespace Umbraco.Core.Models
                 _parentId = new Lazy<int>(() => value);
                 OnPropertyChanged(ParentIdSelector);
             }
+        }
+
+        /// <summary>
+        /// Sets the ParentId from the lazy integer id
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        internal protected void SetLazyParentId(Lazy<int> parentId)
+        {
+            _parentId = parentId;
+            OnPropertyChanged(ParentIdSelector);
         }
 
         /// <summary>
@@ -426,6 +437,14 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
+        /// <param name="dataTypeService"></param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value, IDataTypeService dataTypeService)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value, dataTypeService);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
@@ -482,8 +501,6 @@ namespace Umbraco.Core.Models
         {
             get { return _lastInvalidProperties; }
         }
-
-        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);
 
         #region Dirty property handling
 

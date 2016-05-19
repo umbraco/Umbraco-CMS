@@ -10,12 +10,13 @@ namespace Umbraco.Core.Models
         /// Get all descendant content types
         /// </summary>
         /// <param name="contentType"></param>
+        /// <param name="contentTypeService"></param>
         /// <returns></returns>
-        public static IEnumerable<IContentTypeBase> Descendants(this IContentTypeBase contentType)
-        {
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var descendants = contentTypeService.GetContentTypeChildren(contentType.Id)
-                                                .SelectRecursive(type => contentTypeService.GetContentTypeChildren(type.Id));
+        public static IEnumerable<TItem> Descendants<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService) 
+            where TItem : IContentTypeComposition
+        {            
+            var descendants = contentTypeService.GetChildren(contentType.Id)
+                                                .SelectRecursive(type => contentTypeService.GetChildren(type.Id));
             return descendants;
         }
 
@@ -23,22 +24,14 @@ namespace Umbraco.Core.Models
         /// Get all descendant and self content types
         /// </summary>
         /// <param name="contentType"></param>
+        /// <param name="contentTypeService"></param>
         /// <returns></returns>
-        public static IEnumerable<IContentTypeBase> DescendantsAndSelf(this IContentTypeBase contentType)
+        public static IEnumerable<TItem> DescendantsAndSelf<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService) 
+            where TItem : IContentTypeComposition
         {
-            var descendantsAndSelf = new[] { contentType }.Concat(contentType.Descendants());
+            var descendantsAndSelf = new[] { contentType }.Concat(contentType.Descendants<TItem>(contentTypeService));
             return descendantsAndSelf;
         }
-
-        ///// <summary>
-        ///// Returns the descendant content type Ids for the given content type
-        ///// </summary>
-        ///// <param name="contentType"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<int> DescendantIds(this IContentTypeBase contentType)
-        //{
-        //    return ((ContentTypeService) ApplicationContext.Current.Services.ContentTypeService)
-        //        .GetDescendantContentTypeIds(contentType.Id);
-        //}
+        
     }
 }

@@ -11,6 +11,10 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public sealed class DictionaryCacheRefresher : CacheRefresherBase<DictionaryCacheRefresher>
     {
+        public DictionaryCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override DictionaryCacheRefresher Instance
         {
             get { return this; }

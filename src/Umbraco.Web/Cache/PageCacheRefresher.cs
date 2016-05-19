@@ -17,6 +17,9 @@ namespace Umbraco.Web.Cache
     /// </remarks>    
     public class PageCacheRefresher : TypedCacheRefresherBase<PageCacheRefresher, IContent>
     {
+        public PageCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
 
         protected override PageCacheRefresher Instance
         {
@@ -59,10 +62,10 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(id);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer(CacheHelper);
             base.Refresh(id);
         }
 
@@ -72,30 +75,30 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(id);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer(CacheHelper);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Remove(id);
         }
 
         public override void Refresh(IContent instance)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer(CacheHelper);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Refresh(instance);
         }
 
         public override void Remove(IContent instance)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer(CacheHelper);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Remove(instance);
         }

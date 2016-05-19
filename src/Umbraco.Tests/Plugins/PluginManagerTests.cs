@@ -18,6 +18,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
+using Umbraco.Core.Plugins;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 

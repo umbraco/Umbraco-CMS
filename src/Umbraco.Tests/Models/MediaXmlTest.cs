@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-            ServiceContext.ContentTypeService.Save(mediaType);
+            ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             ServiceContext.MediaService.Save(media, 0);
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
             Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
-            Assert.AreEqual(media.GetCreatorProfile().Name, (string)element.Attribute("writerName"));
+            Assert.AreEqual(media.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
             Assert.AreEqual(media.Version.ToString(), (string)element.Attribute("version"));
             Assert.AreEqual("0", (string)element.Attribute("template"));

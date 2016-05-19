@@ -63,6 +63,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// If any operation is added to the unit of work after it has been completed, then its completion
         /// status is resetted. So in a way it could be possible to always complete and never flush, but flush
         /// is preferred when appropriate to indicate that you understand what you are doing.
+        /// Every units of work should be completed, unless a rollback is required. That is, even if the unit of
+        /// work contains only read operations, that do not need to be "commited", the unit of work should be
+        /// properly completed, else it may force an unexpected rollback of a higher-level transaction.
         /// </remarks>
         void Complete();
 

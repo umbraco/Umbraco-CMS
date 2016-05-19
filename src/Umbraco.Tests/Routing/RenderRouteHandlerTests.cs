@@ -13,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 

@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using umbraco;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Xml;
 using Umbraco.Tests.Models;
 
 namespace Umbraco.Tests

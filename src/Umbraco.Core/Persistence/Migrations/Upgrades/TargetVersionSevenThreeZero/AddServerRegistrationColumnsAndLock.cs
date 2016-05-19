@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 Create.Column("isMaster").OnTable("umbracoServer").AsBoolean().NotNullable().WithDefaultValue(0);
             }
 
-            EnsureLockObject(Constants.System.ServersLock, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
+            EnsureLockObject(Constants.Locks.Servers, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
         }
 
         public override void Down()
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                     sortOrder = 0,
                     uniqueId = new Guid(uniqueId),
                     text = text,
-                    nodeObjectType = new Guid(Constants.ObjectTypes.LockObject),
+                    nodeObjectType = Constants.ObjectTypes.LockObjectGuid,
                     createDate = DateTime.Now
                 });
         }

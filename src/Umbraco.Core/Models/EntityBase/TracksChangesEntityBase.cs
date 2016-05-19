@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Models.EntityBase
 {

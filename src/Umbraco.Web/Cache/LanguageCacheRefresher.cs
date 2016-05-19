@@ -11,6 +11,10 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public sealed class LanguageCacheRefresher : CacheRefresherBase<LanguageCacheRefresher>
     {
+        public LanguageCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override LanguageCacheRefresher Instance
         {
             get { return this; }
