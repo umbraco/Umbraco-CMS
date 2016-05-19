@@ -314,19 +314,73 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
+        /// Extracts a set of properties from a content type into a new composition type
+        /// </summary>
+        /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
+        /// <param name="compositionContentType"><see cref="IContentType"/> to extract composition to</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        public void ExtractComposition(IContentType contentType, IContentType compositionContentType, string[] propertyAliases)
+        {
+            using (var trans = Database.GetTransaction())
+            {
+                // Copy property groups (tabs) for any properties selected to composition type
+                // Move properties to those groups on the composition type
+                var copiedPropertyGroups = new Dictionary<int, int>();
+                foreach (var propertyAlias in propertyAliases)
+                {
+                    var property = contentType.PropertyGroups
+                        .SelectMany(x => x.PropertyTypes)
+                        .SingleOrDefault(x => x.Alias == propertyAlias);
+                    if (property == null)
+                    {
+                        throw new NullReferenceException(
+                            string.Format(
+                                "Property with alias '{0}' selected to extract to a composition could not be found on the provided content type",
+                                propertyAlias));
+                    }
+
+                    var propertyGroup = contentType.PropertyGroups
+                        .Single(x => x.Id == property.PropertyGroupId.Value);
+
+                    // Copy the property group, if we haven't copied it already from another property, and
+                    // get the Id of the new property group on the composition
+                    int newPropertyGroupId;
+                    if (copiedPropertyGroups.ContainsKey(propertyGroup.Id) == false)
+                    {
+                        newPropertyGroupId = CopyPropertyGroup(propertyGroup.Id, copiedPropertyGroups.Count, compositionContentType.Id);
+                        copiedPropertyGroups.Add(propertyGroup.Id, newPropertyGroupId);
+                    }
+                    else
+                    {
+                        newPropertyGroupId = copiedPropertyGroups[propertyGroup.Id];
+                    }
+
+                    // Move the property to the composition type within the composition
+                    MovePropertyType(property.Id, newPropertyGroupId, compositionContentType.Id);
+                }
+
+                // Create the composition relation
+                CreateCompositionRelation(compositionContentType.Id, contentType.Id);
+
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
         /// Moves a property group to a new content type
         /// </summary>
         /// <param name="propertyGroupId">The property group Id</param>
         /// <param name="sortOrder">The new sort order for the group</param>
         /// <param name="contentTypeId">The Id of the content type to move to</param>
         /// <returns>Id of newly created property group</returns>
-        public int CopyPropertyGroup(int propertyGroupId, int sortOrder, int contentTypeId)
+        private int CopyPropertyGroup(int propertyGroupId, int sortOrder, int contentTypeId)
         {
             var dto = Database.Single<PropertyTypeGroupDto>("WHERE id = @PropertyGroupId", new { PropertyGroupId = propertyGroupId });
             dto.ContentTypeNodeId = contentTypeId;
             dto.SortOrder = sortOrder;
             dto.UniqueId = Guid.NewGuid();
-            return (int)(decimal)Database.Insert(dto);
+            Database.Insert(dto);
+            return dto.Id;
         }
 
         /// <summary>
@@ -335,7 +389,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyId">The property Id</param>
         /// <param name="propertyGroupId">The Id of the property group to move to</param>
         /// <param name="contentTypeId">The Id of the content type to move to</param>
-        public void MovePropertyType(int propertyId, int propertyGroupId, int contentTypeId)
+        private void MovePropertyType(int propertyId, int propertyGroupId, int contentTypeId)
         {
             var dto = Database.Single<PropertyTypeDto>("WHERE id = @PropertyId", new { PropertyId = propertyId });
             dto.ContentTypeId = contentTypeId;
@@ -348,7 +402,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="parentId">Parent type</param>
         /// <param name="childId">Child type</param>
-        public void CreateCompositionRelation(int parentId, int childId)
+        private void CreateCompositionRelation(int parentId, int childId)
         {
             Database.Insert(new ContentType2ContentTypeDto { ParentId = parentId, ChildId = childId });
         }

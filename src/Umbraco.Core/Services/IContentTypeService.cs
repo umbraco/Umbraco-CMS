@@ -173,7 +173,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Extracts a composition from a content tye
         /// </summary>
-        /// <param name="contentType"><see cref="IContentType"/> to extrac composition from</param>
+        /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
         /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>

@@ -42,27 +42,11 @@ namespace Umbraco.Core.Persistence.Repositories
         string GetUniqueAlias(string alias);
 
         /// <summary>
-        /// Moves a property group to a new content type
+        /// Extracts a set of properties from a content type into a new composition type
         /// </summary>
-        /// <param name="propertyGroupId">The property group Id</param>
-        /// <param name="sortOrder">The new sort order for the group</param>
-        /// <param name="contentTypeId">The Id of the content type to move to</param>
-        /// <returns>Id of newly created property group</returns>
-        int CopyPropertyGroup(int propertyGroupId, int sortOrder, int contentTypeId);
-
-        /// <summary>
-        /// Moves a property to a new content type
-        /// </summary>
-        /// <param name="propertyId">The property Id</param>
-        /// <param name="propertyGroupId">The Id of the property group to move to</param>
-        /// <param name="contentTypeId">The Id of the content type to move to</param>
-        void MovePropertyType(int propertyId ,int propertyGroupId, int contentTypeId);
-
-        /// <summary>
-        /// Creates a composition relation between two document types
-        /// </summary>
-        /// <param name="parentId">Parent type</param>
-        /// <param name="childId">Child type</param>
-        void CreateCompositionRelation(int parentId, int childId);
+        /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
+        /// <param name="compositionContentType"><see cref="IContentType"/> to extract composition to</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        void ExtractComposition(IContentType contentType, IContentType compositionContentType, string[] propertyAliases);
     }
 }
