@@ -179,6 +179,7 @@
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
+    <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -920,6 +921,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cssSavedHeader">Stylesheet saved</key>
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="dataTypeSaved">Datatype saved</key>
+    <key alias="memberGroupSaved">Member group saved</key>
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
     <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>

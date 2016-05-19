@@ -1,18 +1,18 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MemberTypes.DeleteController
+ * @name Umbraco.Editors.MemberGroups.DeleteController
  * @function
  *
  * @description
- * The controller for deleting content
+ * The controller for deleting member groups
  */
-function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
+function MemberGroupsDeleteController($scope, memberGroupResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
-        memberTypeResource.deleteById($scope.currentNode.id).then(function () {
+        memberGroupResource.deleteById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
             //get the root node before we remove it
@@ -30,4 +30,4 @@ function MemberTypesDeleteController($scope, memberTypeResource, treeService, na
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.DeleteController", MemberTypesDeleteController);
+angular.module("umbraco").controller("Umbraco.Editors.MemberGroups.DeleteController", MemberGroupsDeleteController);

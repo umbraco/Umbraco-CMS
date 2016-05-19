@@ -156,6 +156,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
+
+            //FROM IMemberGroup TO MemberGroupDisplay
+            config.CreateMap<IMemberGroup, MemberGroupDisplay>()
+                .ForMember(x => x.Path, expression => expression.MapFrom(group => "-1," + group.Id));
         }
 
         /// <summary>

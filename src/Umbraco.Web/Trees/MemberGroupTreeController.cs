@@ -7,13 +7,15 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
-    [Tree(Constants.Applications.Members, Constants.Trees.MemberTypes, null, sortOrder: 1)]
-    public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase
+    [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
+    [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, null, sortOrder: 2)]
+    [Mvc.PluginController("UmbracoTrees")]
+    [CoreTree]
+    public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
     {
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormDataCollection queryStrings)
         {
-            return Services.MemberTypeService.GetAll()
+            return Services.MemberGroupService.GetAll()
                 .OrderBy(x => x.Name)
                 .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false));
         }
