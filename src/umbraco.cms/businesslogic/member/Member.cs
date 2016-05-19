@@ -56,7 +56,7 @@ namespace umbraco.cms.businesslogic.member
 
         #region Private members
 
-        private Hashtable _groups = null;
+        private Dictionary<int, IMemberGroup> _groups = null;
         protected internal IMember MemberItem;
 
         #endregion
@@ -510,7 +510,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// A list of groups the member are member of
         /// </summary>
-        public Hashtable Groups
+        public Dictionary<int, IMemberGroup> Groups
         {
             get
             {
@@ -671,14 +671,20 @@ namespace umbraco.cms.businesslogic.member
 
         private void PopulateGroups()
         {
-            var temp = new Hashtable();
+            var temp = new Dictionary<int, IMemberGroup>();
             using (var dr = SqlHelper.ExecuteReader(
                 "select memberGroup from cmsMember2MemberGroup where member = @id",
                 SqlHelper.CreateParameter("@id", Id)))
             {
                 while (dr.Read())
-                    temp.Add(dr.GetInt("memberGroup"),
-                        new MemberGroup(dr.GetInt("memberGroup")));
+                {
+                    var group = ApplicationContext.Current.Services.MemberGroupService.GetById(dr.GetInt("memberGroup"));
+                    if (group != null)
+                    {
+                        temp.Add(dr.GetInt("memberGroup"), group);
+                    }                    
+                }
+                    
             }
             _groups = temp;
         }

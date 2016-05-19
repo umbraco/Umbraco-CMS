@@ -228,9 +228,6 @@
     <Compile Include="businesslogic\member\Member.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\member\MemberGroup.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\member\MemberType.cs">
       <SubType>Code</SubType>
     </Compile>
