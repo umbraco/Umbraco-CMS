@@ -1257,23 +1257,28 @@ namespace umbraco
                 //int languageId = GetCurrentLanguageId();
                 int languageId = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name).id;
 
-                Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(Key);
+                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(Key);
+                if (di == null)
+                {
+                    return xd.CreateNavigator().Select("/");
+                }
 
-                foreach (Dictionary.DictionaryItem item in di.Children)
+                var children = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemChildren(di.Key);
+                foreach (var item in children)
                 {
                     XmlNode xe;
                     try
                     {
                         if (languageId != 0)
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value(languageId));
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetTranslatedValue(languageId));
                         else
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value());
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetDefaultValue());
                     }
                     catch
                     {
                         xe = XmlHelper.AddTextNode(xd, "DictionaryItem", string.Empty);
                     }
-                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.key));
+                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.ItemKey));
                     xd.DocumentElement.AppendChild(xe);
                 }
             }

@@ -156,11 +156,11 @@ namespace umbraco.cms.businesslogic.propertytype
                         Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                         if (lang != null)
                         {
-                            if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
+                            
+                            if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_description.Substring(1, _description.Length - 1)))
                             {
-                                var di =
-                                    new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
-                                return di.Value(lang.id);
+                                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_description.Substring(1, _description.Length - 1));
+                                return di.GetTranslatedValue(lang.id);
                             }
                         }
                     }
@@ -224,10 +224,11 @@ namespace umbraco.cms.businesslogic.propertytype
                     Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
                     {
-                        if (Dictionary.DictionaryItem.hasKey(_name.Substring(1, _name.Length - 1)))
+                        
+                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_name.Substring(1, _name.Length - 1)))
                         {
-                            var di = new Dictionary.DictionaryItem(_name.Substring(1, _name.Length - 1));
-                            return di.Value(lang.id);
+                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_name.Substring(1, _name.Length - 1));
+                            return di.GetTranslatedValue(lang.id);
                         }
                     }
 

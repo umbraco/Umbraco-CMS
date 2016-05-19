@@ -1,6 +1,7 @@
 using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -148,17 +149,18 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Dictionary Items*/
-                    Dictionary.DictionaryItem[] umbDictionary = Dictionary.getTopMostItems;
-                    foreach (Dictionary.DictionaryItem d in umbDictionary)
+                    var umbDictionary = Services.LocalizationService.GetRootDictionaryItems();
+                    foreach (var d in umbDictionary)
                     {
 
-                        string liName = d.key;
-                        if (d.hasChildren)
+                        string liName = d.ItemKey;
+                        var children = Services.LocalizationService.GetDictionaryItemChildren(d.Key);
+                        if (children.Any())
                             liName += " <small>(Including all child items)</small>";
 
-                        ListItem li = new ListItem(liName, d.id.ToString());
+                        var li = new ListItem(liName, d.Id.ToString());
 
-                        if (pack.DictionaryItems.Contains(d.id.ToString()))
+                        if (pack.DictionaryItems.Contains(d.Id.ToString()))
                             li.Selected = true;
 
                         dictionary.Items.Add(li);

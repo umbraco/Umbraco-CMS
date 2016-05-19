@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Core;
@@ -10,27 +11,32 @@ namespace umbraco
         public override bool PerformSave()
         {
             //check to see if key is already there
-            if (cms.businesslogic.Dictionary.DictionaryItem.hasKey(Alias))
+            if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(Alias))
                 return false;
 
             // Create new dictionary item if name no already exist
             if (ParentID > 0)
             {
-                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "", new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key);
-                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(ParentID);
+                if (di == null) throw new NullReferenceException("No dictionary item found by id " + ParentID);                
+                var item = ApplicationContext.Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(Alias, di.Key);                
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", item.Id);
             }
             else
             {
-                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "");
-                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var item = ApplicationContext.Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(Alias, null);                
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", item.Id);
             }
             return true;
         }
 
         public override bool PerformDelete()
         {
-			LogHelper.Debug<dictionaryTasks>(TypeID.ToString() + " " + ParentID.ToString() + " deleting " + Alias);
-            new cms.businesslogic.Dictionary.DictionaryItem(ParentID).delete();
+			LogHelper.Debug<dictionaryTasks>(TypeID + " " + ParentID + " deleting " + Alias);
+            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(ParentID);
+            if (di == null) return true;
+
+            ApplicationContext.Current.Services.LocalizationService.Delete(di);            
             return true;
         }
 
