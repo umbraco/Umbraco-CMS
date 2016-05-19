@@ -334,6 +334,7 @@
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
+    <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
@@ -1496,7 +1497,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadRelationTypes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NodeActionsEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeRequestParams.cs" />
