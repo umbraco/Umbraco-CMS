@@ -9,10 +9,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -173,8 +175,12 @@ namespace Umbraco.Tests.Models
             postedFileMock.Setup(x => x.FileName).Returns("sample.txt");
             postedFileMock.Setup(x => x.InputStream).Returns(stream);
 
+            // note: must pass a data type service, the "dynamic" SetValue that accepts an object
+            // arg and does not get a dataTypeService is trying to get the service from app context
+            var dataTypeService = Mock.Of<IDataTypeService>();
+
             // Assert
-            content.SetValue("title", postedFileMock.Object);
+            content.SetValue("title", postedFileMock.Object, dataTypeService);
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);

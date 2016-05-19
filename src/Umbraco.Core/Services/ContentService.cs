@@ -849,12 +849,17 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.Query.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-                var content = repository.GetByQuery(query);
+                var content = GetContentForExpiration(uow);
                 uow.Complete();
                 return content;
             }
+        }
+
+        private IEnumerable<IContent> GetContentForExpiration(IDatabaseUnitOfWork uow)
+        {
+            var repository = uow.CreateRepository<IContentRepository>();
+            var query = repository.Query.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
+            return repository.GetByQuery(query);
         }
 
         /// <summary>
@@ -866,12 +871,17 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-                var content = repository.GetByQuery(query);
+                var content = GetContentForRelease(uow);
                 uow.Complete();
                 return content;
             }
+        }
+
+        private IEnumerable<IContent> GetContentForRelease(IDatabaseUnitOfWork uow)
+        {
+            var repository = uow.CreateRepository<IContentRepository>();
+            var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+            return repository.GetByQuery(query);
         }
 
         /// <summary>
@@ -1250,10 +1260,10 @@ namespace Umbraco.Core.Services
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
 
-                foreach (var d in GetContentForRelease())
+                foreach (var d in GetContentForRelease(uow))
                 {
                     d.ReleaseDate = null;
-                    var result = SaveAndPublishWithStatus(d, (int)d.GetWriterProfile(_userService).Id);
+                    var result = ((IContentServiceOperations) this).SaveAndPublish(d, d.WriterId);
                     if (result.Success == false)
                     {
                         if (result.Exception != null)
@@ -1267,12 +1277,12 @@ namespace Umbraco.Core.Services
                     }
                     yield return result;
                 }
-                foreach (var d in GetContentForExpiration())
+                foreach (var d in GetContentForExpiration(uow))
                 {
                     try
                     {
                         d.ExpireDate = null;
-                        UnPublish(d, (int)d.GetWriterProfile(_userService).Id);
+                        ((IContentServiceOperations) this).UnPublish(d, d.WriterId);
                     }
                     catch (Exception ee)
                     {
