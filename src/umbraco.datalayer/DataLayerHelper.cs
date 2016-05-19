@@ -132,12 +132,7 @@ namespace umbraco.DataLayer
             _connectionString = connectionStringSettings.ConnectionString;
 
             var provider = connectionStringSettings.ProviderName;
-
-            if (provider.StartsWith("MySql"))
-            {
-                _dataHelperTypeName = "MySql";
-            }
-
+            
             if (provider.StartsWith("System.Data.SqlServerCe"))
             {
                 _dataHelperTypeName = "SQLCE4Umbraco.SqlCEHelper";

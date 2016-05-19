@@ -104,9 +104,6 @@
     <Compile Include="ISqlHelper.cs" />
     <Compile Include="IParameterContainer.cs" />
     <Compile Include="SqlHelperException.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlInstaller.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlParser.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlUtility.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerTableUtility.cs" />
     <Compile Include="SqlParser.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerInstaller.cs" />
@@ -127,9 +124,6 @@
     <Compile Include="Utility\Table\ITableUtility.cs" />
     <Compile Include="Utility\Installer\IInstallerUtility.cs" />
     <Compile Include="Utility\IUtilitySet.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlDataReader.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlHelper.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlParameter.cs" />
     <Compile Include="SqlParameterAdapter.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
