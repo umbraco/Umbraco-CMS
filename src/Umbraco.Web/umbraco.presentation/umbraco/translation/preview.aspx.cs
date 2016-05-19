@@ -1,17 +1,7 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic;
+using System.Linq;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.relation;
 using Umbraco.Core;
 using Umbraco.Web;
 
@@ -37,10 +27,11 @@ namespace umbraco.presentation.translation
 
             translatedUrl = string.Format("../dialogs/preview.aspx?id={0}", translated.Id.ToString());
 
-            var orgRel = Relation.GetRelations(t.Node.Id, RelationType.GetByAlias("relateDocumentOnCopy"));
+            var orgRel = Services.RelationService.GetByParentOrChildId(t.Node.Id, "relateDocumentOnCopy").ToArray();
+            
             if (orgRel.Length > 0)
             {
-                var original = new Document(orgRel[0].Parent.Id);
+                var original = new Document(orgRel[0].ParentId);
                 originalUrl = String.Format("../dialogs/preview.aspx?id={0}", original.Id.ToString());
             }
             else
