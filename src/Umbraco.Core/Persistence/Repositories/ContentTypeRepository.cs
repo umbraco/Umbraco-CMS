@@ -406,5 +406,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             Database.Insert(new ContentType2ContentTypeDto { ParentId = parentId, ChildId = childId });
         }
+
+        /// <summary>
+        /// Checks to see if a given content type is used as a composition on other content types
+        /// </summary>
+        /// <param name="contentTypeId">Id of content type</param>
+        /// <returns>True if used as a composition on another type, otherwise false</returns>
+        public bool IsUsedAsComposition(int contentTypeId)
+        {
+            return Database.FirstOrDefault<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @ContentTypeId", new { ContentTypeId = contentTypeId }) != null;
+        }
     }
 }

@@ -174,9 +174,9 @@ namespace Umbraco.Core.Services
         /// Extracts a composition from a content tye
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
-        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         void ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0);
 
         /// <summary>
@@ -283,6 +283,20 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IContentType"/></param>
         /// <returns>True if the content type has any children otherwise False</returns>
         bool HasChildren(Guid id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item is used in a composition
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type is used in a composition otherwise False</returns>
+        bool IsUsedInComposition(int id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item is used in a composition
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type is used in a composition otherwise False</returns>
+        bool IsUsedInComposition(Guid id);
 
         /// <summary>
         /// Checks whether an <see cref="IMediaType"/> item has any children

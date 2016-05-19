@@ -48,5 +48,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="compositionContentType"><see cref="IContentType"/> to extract composition to</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
         void ExtractComposition(IContentType contentType, IContentType compositionContentType, string[] propertyAliases);
+
+        /// <summary>
+        /// Checks to see if a given content type is used as a composition on other content types
+        /// </summary>
+        /// <param name="contentTypeId">Id of content type</param>
+        /// <returns>True if used as a composition on another type, otherwise false</returns>
+        bool IsUsedAsComposition(int contentTypeId);
     }
 }

@@ -38,6 +38,11 @@
           localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function(value) {
               tabNoSortOrderTranslated = value;
           });
+
+          // Check if content type already used in a composition (if it is, can't extract one from it)
+          contentTypeResource.isUsedInComposition(scope.model.id).then(function (result) {
+              scope.model.isUsedInComposition = result === 'true';
+          });
       }
 
       function setSortingOptions() {
@@ -201,7 +206,7 @@
             });
         }
 
-      /* ---------- DELETE PROMT ---------- */
+      /* ---------- DELETE PROMPT ---------- */
 
       scope.togglePrompt = function (object) {
           object.deletePrompt = !object.deletePrompt;

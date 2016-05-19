@@ -14,7 +14,7 @@
             </umb-button>
 
             <umb-button 
-                ng-if="extractComposition !== false"
+                ng-if="extractComposition !== false && model.id > 0 && !model.isUsedInComposition"
                 type="button"
                 button-style="link"
                 label-key="contentTypeEditor_extractComposition"

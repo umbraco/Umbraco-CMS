@@ -129,6 +129,12 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
+        /// <summary>
+        /// Extracts a composition from a content type
+        /// </summary>
+        /// <param name="id">Id of content type</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
         [HttpPost]
         public HttpResponseMessage ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
         {
@@ -140,6 +146,23 @@ namespace Umbraco.Web.Editors
 
             Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Checks whether a content type is used in a composition
+        /// </summary>
+        /// <param name="id">Id of the content type</param>
+        /// <returns>True if the content type is used in a composition otherwise false</returns>
+        [HttpGet]
+        public bool IsUsedInComposition(int id)
+        {
+            var foundType = Services.ContentTypeService.GetContentType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Services.ContentTypeService.IsUsedInComposition(id);
         }
 
         [UmbracoTreeAuthorize(

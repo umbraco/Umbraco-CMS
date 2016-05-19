@@ -575,6 +575,34 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        public bool IsUsedInComposition(int id)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.IsUsedAsComposition(id);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        public bool IsUsedInComposition(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetContentType(id);
+                if (found == null) return false;
+                return repository.IsUsedAsComposition(found.Id);
+            }
+        }
+
+        /// <summary>
         /// This is called after an IContentType is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.
         /// </summary>
@@ -856,9 +884,9 @@ namespace Umbraco.Core.Services
         /// Extracts a composition from a content type
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
-        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         public void ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();

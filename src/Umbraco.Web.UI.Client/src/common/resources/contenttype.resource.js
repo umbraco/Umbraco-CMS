@@ -84,6 +84,37 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#extractComposition
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Extracts a composition from an existing content type
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.isUsedInComposition(1234)
+         *    .then(function(array) {
+         *        $scope.type = type;
+         *    });
+         * </pre>
+         * @param {Int} id - id of the content item
+         * @returns {Promise} resourcePromise object.
+         */
+        isUsedInComposition: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "IsUsedInComposition",
+                       {
+                           id: id,
+                       })),
+               'Failed to check if content type is used in a composition');
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.contentTypeResource#getAllowedTypes
          * @methodOf umbraco.resources.contentTypeResource
          *
