@@ -65,6 +65,7 @@
                     label-key="{{model.submitButtonLabelKey}}"
                     label="{{model.submitButtonLabel}}"
                     ng-if="model.submit && model.hideSubmitButton !== true"
+                    disabled="model.disableSubmitButton"
                     type="button"
                     action="submitForm(model)">
                 </umb-button>
