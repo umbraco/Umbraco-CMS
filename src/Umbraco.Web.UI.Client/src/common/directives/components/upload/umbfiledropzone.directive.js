@@ -49,14 +49,28 @@ angular.module("umbraco.directives")
 		},
 
 		link: function(scope, element, attrs) {
-
+			
 			scope.queue = [];
 			scope.done = [];
 			scope.rejected = [];
+			// todo: dummydata, replace with the real thing 
+			scope.allowedTypes = [
+				{
+					alias: 'wine',
+					icon: 'icon-wine-glass',
+					name: 'Wine',					
+				},
+				{
+					alias: 'heavy',
+					icon: 'icon-weight',
+					name: 'Heavy',
+					description: 'Only the heavy stuff'
+				}
+			];
 			scope.currentFile = undefined;
 
 			function _filterFile(file) {
-
+				
 				var ignoreFileNames = ['Thumbs.db'];
 				var ignoreFileTypes = ['directory'];
 
@@ -89,16 +103,31 @@ angular.module("umbraco.directives")
 					}
 
 				});
-
+				
 				//when queue is done, kick the uploader
 				if(!scope.working){
-					_processQueueItem();
-				}
+					
+					// One allowed mediaType, pick this one 
+					if(scope.allowedTypes.length === 1){
+						scope.contentTypeAlias = scope.allowedTypes[0].alias;
+						_processQueueItem();
+					}
+					
+					// More than one, open dialog
+					if(scope.allowedTypes.length > 1){
+						_chooseMediaType();
+					}
+					
+					// Default
+					if(!scope.allowedTypes.length){
+						_processQueueItem();
+					}	
+				}				
 			}
 
 
 			function _processQueueItem(){
-
+											
 				if(scope.queue.length > 0){
 					scope.currentFile = scope.queue.shift();
 					_upload(scope.currentFile);
@@ -118,10 +147,10 @@ angular.module("umbraco.directives")
 			}
 
 			function _upload(file) {
-
+							
 				scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
 				scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
-
+				
 				Upload.upload({
 					url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
 					fields: {
@@ -204,13 +233,44 @@ angular.module("umbraco.directives")
 				});
 			}
 
+			function _chooseMediaType() {
+				
+				scope.mediatypepickerOverlay = {
+					view: "mediatypepicker",
+					title: "Choose media type",
+					allowedTypes: scope.allowedTypes,
+					show: true,
+					submit: function(model) {
+						console.log(model);
+						
+						scope.contentTypeAlias = model.selectedType.alias;
+																					  
+						scope.mediatypepickerOverlay.show = false;
+						scope.mediatypepickerOverlay = null;
+						
+						_processQueueItem();
+						
+					},
+					close: function(oldModel) {
+						console.log('close');
+						console.log(model);
+						
+						// not sure what to do here
+
+						scope.mediatypepickerOverlay.show = false;
+						scope.mediatypepickerOverlay = null;
+						
+					}
+				};				
+            
+            }
 
 			scope.handleFiles = function(files, event){
 				if(scope.filesQueued){
 					scope.filesQueued(files, event);
 				}
-
-				_filesQueued(files, event);
+				
+				_filesQueued(files, event);				
 
 			};
 
