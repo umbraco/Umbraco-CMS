@@ -57,6 +57,7 @@ namespace Umbraco.Tests.TestHelpers
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
         private static Byte[] _dbBytes;
+        private DefaultDatabaseFactory _dbFactory;
 
         [SetUp]
         public override void Initialize()
@@ -66,27 +67,11 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
-            var dbFactory = new DefaultDatabaseFactory(
+            _dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
-
-            var evtMsgs = new TransientMessagesFactory();
-            _appContext = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
-                //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
-                cacheHelper,
-                ProfilingLogger)
-            {
-                IsReady = true
-            };
 
             base.Initialize();
 
@@ -94,7 +79,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                DatabaseContext.Initialize(_dbFactory.ProviderName, _dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
@@ -103,14 +88,30 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected override ApplicationContext CreateApplicationContext()
+        {
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
+
+            var evtMsgs = new TransientMessagesFactory();
+            _appContext = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(_dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                //assign the service context
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
+                cacheHelper,
+                ProfilingLogger)
+            {
+                IsReady = true
+            };
+            return _appContext;
+        }
+
         protected virtual ISqlSyntaxProvider SqlSyntax
         {
             get { return new SqlCeSyntaxProvider(); }
-        }
-
-        protected override void SetupApplicationContext()
-        {
-            ApplicationContext.Current = _appContext;
         }
 
         /// <summary>
