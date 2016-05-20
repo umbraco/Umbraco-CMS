@@ -6,7 +6,10 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
 {
-    [Migration("7.5.0", 10, GlobalSettings.UmbracoMigrationName)]
+    // This migration exists for 7.3.0 but it seems like it was not always running properly
+    // if you're upgrading from 7.3.0 or higher than we add this migration, if you're upgrading 
+    // from 7.3.0 or lower then you will already get this migration in the migration to get to 7.3.0
+    [Migration("7.3.0", "7.5.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class EnsureServersLockObject : MigrationBase
     {
         public EnsureServersLockObject(ISqlSyntaxProvider sqlSyntax, ILogger logger)
