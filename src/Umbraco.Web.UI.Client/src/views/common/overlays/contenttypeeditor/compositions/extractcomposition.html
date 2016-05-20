@@ -24,10 +24,12 @@
 
             </li>
         </ul>
+        <div ng-show="model.showValidationErrorForMissingName">Please select a name for the composition</div>
     </div>
 
     <div>
         <label for="umb-overlay-extract-comp-name"><localize key="contentTypeEditor_newCompositionName"></localize></label>
         <input type="text" ng-model="model.newCompositionName"/>
+        <div ng-show="model.showValidationErrorForMissingProperties">At least one property for the new composition must be provided</div>
     </div>
 </div>

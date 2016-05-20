@@ -387,9 +387,22 @@
               contentType: scope.model,
               view: "views/common/overlays/contenttypeeditor/compositions/extractcomposition.html",
               submit: function (model) {
-                  contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function () {
-                      console.log('Done');
-                  });
+                  var isValid = true;
+                  if (!model.newCompositionName) {
+                      model.showValidationErrorForMissingName = true;
+                      isValid = false;
+                  }
+
+                  if (!model.selectedProperties || model.selectedProperties.length === 0) {
+                      model.showValidationErrorForMissingProperties = true;
+                      isValid = false;
+                  }
+
+                  if (isValid) {
+                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function() {
+                          console.log('Done');
+                      });
+                  }
               }
           };
 

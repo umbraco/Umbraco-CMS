@@ -60,15 +60,6 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          * @returns {Promise} resourcePromise object.
          */
         extractComposition: function (id, name, propertyAliases) {
-
-            if (name === "") {
-                throw "The name of the new composition must be provided";
-            }
-
-            if (!propertyAliases || propertyAliases.length === 0) {
-                throw "At least one property for the new composition must be provided";
-            }
-
             return umbRequestHelper.resourcePromise(
                $http.post(
                    umbRequestHelper.getApiUrl(
