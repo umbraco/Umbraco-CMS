@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
         [HttpPost]
-        public HttpResponseMessage ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
+        public DocumentTypeDisplay ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
         {
             var foundType = Services.ContentTypeService.GetContentType(id);
             if (foundType == null)
@@ -148,15 +148,15 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+                var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(compositionType);
+                return dto;
             }
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("name", ex.Message);
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
-
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>

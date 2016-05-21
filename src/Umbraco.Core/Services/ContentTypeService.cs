@@ -887,13 +887,15 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
         /// <param name="userId">Optional Id of the User deleting the ContentType</param>
-        public void ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
+        /// <returns>The created composition type</returns>
+        public IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
         {
+            IContentType compositionType;
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
             {
                 // Create new composition type
-                var compositionType = new ContentType(contentType.ParentId)
+                compositionType = new ContentType(contentType.ParentId)
                 {
                     Alias = name.ToSafeAlias(true),
                     Name = name,
@@ -902,10 +904,12 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(compositionType);
                 uow.Commit();
 
+                // Extract provided properties into the composition
                 repository.ExtractComposition(contentType, compositionType, propertyAliases);
             }
 
             Audit(AuditType.Custom, string.Format("Extract composition performed by user"), userId, -1);
+            return compositionType;
         }
 
         /// <summary>

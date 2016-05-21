@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, navigationService, $route) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -40,9 +40,11 @@
           });
 
           // Check if content type already used in a composition (if it is, can't extract one from it)
-          contentTypeResource.isUsedInComposition(scope.model.id).then(function (result) {
-              scope.model.isUsedInComposition = result === 'true';
-          });
+          if (scope.model.id > 0) {
+              contentTypeResource.isUsedInComposition(scope.model.id).then(function(result) {
+                  scope.model.isUsedInComposition = result === 'true';
+              });
+          }
       }
 
       function setSortingOptions() {
@@ -403,9 +405,18 @@
                   }
 
                   if (isValid) {
-                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function () {
-                          // TODO: refresh page and tree
-                          console.log("Done");
+                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function (compositionType) {
+
+                          // Load the new composition type into the tree
+                          navigationService.syncTree({ tree: "documentTypes", path: compositionType.path, activate: false });
+
+                          // Remove overlay
+                          scope.extractCompositionDialogModel.show = false;
+                          scope.extractCompositionDialogModel = null;
+
+                          // Reload the view to visualise the composition for the current type
+                          $route.reload();
+
                       }, function (err) {
                           model.modelStateError = err.data.ModelState.name[0];
                           model.showValidationErrorForModelState = true;
