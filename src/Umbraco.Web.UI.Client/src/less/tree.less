@@ -208,7 +208,9 @@
 	content: "\e165";
 }
 
-.umb-tree .umb-tree-node-checked i {
+.umb-tree .umb-tree-node-checked i[class^="icon-"],
+.umb-tree .umb-tree-node-checked i[class*=" icon-"] {
+    font-family: icomoon !important;
     color:@blue !important;
 }
 .umb-tree .umb-tree-node-checked i:before {
