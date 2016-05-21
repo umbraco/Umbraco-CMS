@@ -181,6 +181,16 @@ namespace Umbraco.Core.Services
         IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0);
 
         /// <summary>
+        /// Extracts a composition from a media tye
+        /// </summary>
+        /// <param name="contentType"><see cref="IMediaType"/> to extract composition from</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        /// <returns>The created composition type</returns>
+        IMediaType ExtractComposition(IMediaType contentType, string name, string[] propertyAliases, int userId = 0);
+
+        /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IMediaType"/> to retrieve</param>

@@ -1,27 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Web.Http;
 using System.Net;
-using Umbraco.Core.PropertyEditors;
-using System;
 using System.Net.Http;
-using System.Text;
 using Umbraco.Web.WebApi;
-using ContentType = System.Net.Mime.ContentType;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
+    using System.Data;
+
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
@@ -244,6 +238,51 @@ namespace Umbraco.Web.Editors
                 copy,
                 getContentType: i => Services.ContentTypeService.GetMediaType(i),
                 doCopy: (type, i) => Services.ContentTypeService.CopyMediaType(type, i));
+        }
+
+        /// <summary>
+        /// Extracts a composition from a content type
+        /// </summary>
+        /// <param name="id">Id of content type</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        [HttpPost]
+        public MediaTypeDisplay ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
+        {
+            var foundType = Services.ContentTypeService.GetMediaType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            try
+            {
+                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+                var dto = Mapper.Map<IMediaType, MediaTypeDisplay>((IMediaType)compositionType);
+                return dto;
+            }
+            catch (DuplicateNameException ex)
+            {
+                ModelState.AddModelError("name", ex.Message);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+        }
+
+        /// <summary>
+        /// Checks whether a content type is used in a composition
+        /// </summary>
+        /// <param name="id">Id of the content type</param>
+        /// <returns>True if the content type is used in a composition otherwise false</returns>
+        [HttpGet]
+        public bool IsUsedInComposition(int id)
+        {
+            var foundType = Services.ContentTypeService.GetMediaType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Services.ContentTypeService.IsUsedInComposition(id);
         }
     }
 }

@@ -886,7 +886,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
         /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
-        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        /// <param name="userId">Optional Id of the User performing the action</param>
         /// <returns>The created composition type</returns>
         public IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
         {
@@ -905,11 +905,60 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 // Extract provided properties into the composition
-                repository.ExtractComposition(contentType, compositionType, propertyAliases);
+                ExtractCompositionProperties(uow, contentType, compositionType, propertyAliases);
             }
 
-            Audit(AuditType.Custom, string.Format("Extract composition performed by user"), userId, -1);
+            Audit(AuditType.Custom, string.Format("Extract content type composition performed by user"), userId, -1);
             return compositionType;
+        }
+
+        /// <summary>
+        /// Extracts a composition from a content type
+        /// </summary>
+        /// <param name="mediaType"><see cref="IMediaType"/> to extract composition from</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="userId">Optional Id of the User performing the action</param>
+        /// <returns>The created composition type</returns>
+        public IMediaType ExtractComposition(IMediaType mediaType, string name, string[] propertyAliases, int userId = 0)
+        {
+            IMediaType compositionType;
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
+            {
+                // Create new composition type
+                compositionType = new MediaType(mediaType.ParentId)
+                {
+                    Alias = name.ToSafeAlias(true),
+                    Name = name,
+                    Icon = "icon-document",
+                };
+                repository.AddOrUpdate(compositionType);
+                uow.Commit();
+
+                // Extract provided properties into the composition
+                ExtractCompositionProperties(uow, mediaType, compositionType, propertyAliases);
+            }
+
+            Audit(AuditType.Custom, string.Format("Extract media type composition performed by user"), userId, -1);
+            return compositionType;
+        }
+
+        /// <summary>
+        /// Helper to extract the composition properties for content and media types
+        /// </summary>
+        /// <param name="uow">Unit of work instance</param>
+        /// <param name="contentType"><see cref="IContentTypeComposition"/> to extract composition from</param>
+        /// <param name="compositionType">Created type for the composition</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        private void ExtractCompositionProperties(IDatabaseUnitOfWork uow, 
+            IContentTypeComposition contentType, IContentTypeComposition compositionType, 
+            string[] propertyAliases)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
+            {
+                repository.ExtractComposition(contentType, compositionType, propertyAliases);
+            }
         }
 
         /// <summary>

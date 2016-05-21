@@ -41,6 +41,69 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#extractComposition
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Extracts a composition from an existing content type
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.extractComposition(1234, 'New Composition', ['propertyA', 'propertyB'])
+         *    .then(function(compositionType) {
+         *    });
+         * </pre>
+         * @param {Int} id - id of the content item
+         * @param {String} name - name of the new composition type
+         * @param {String array} propertyAliases - aliases of the fields to move to the composition
+         * @returns {Promise} resourcePromise object.
+         */
+        extractComposition: function (id, name, propertyAliases) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "ExtractComposition",
+                       {
+                           id: id,
+                           name: name,
+                           propertyAliases: propertyAliases
+                       })),
+               'Failed to extract composition from content type');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#extractComposition
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Extracts a composition from an existing content type
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.isUsedInComposition(1234)
+         *    .then(function(value) {
+         *    });
+         * </pre>
+         * @param {Int} id - id of the content item
+         * @returns {Promise} resourcePromise object.
+         */
+        isUsedInComposition: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "IsUsedInComposition",
+                       {
+                           id: id,
+                       })),
+               'Failed to check if content type is used in a composition');
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.mediaTypeResource#getAllowedTypes
          * @methodOf umbraco.resources.mediaTypeResource
          *

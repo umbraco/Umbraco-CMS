@@ -41,7 +41,8 @@
 
           // Check if content type already used in a composition (if it is, can't extract one from it)
           if (scope.model.id > 0) {
-              contentTypeResource.isUsedInComposition(scope.model.id).then(function(result) {
+              var resourceMethod = scope.contentType === "documentType" ? contentTypeResource.isUsedInComposition : mediaTypeResource.isUsedInComposition;
+              resourceMethod(scope.model.id).then(function (result) {
                   scope.model.isUsedInComposition = result === 'true';
               });
           }
@@ -405,10 +406,11 @@
                   }
 
                   if (isValid) {
-                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function (compositionType) {
+                      var resourceMethod = scope.contentType === "documentType" ? contentTypeResource.extractComposition : mediaTypeResource.extractComposition;
+                      resourceMethod(scope.model.id, model.newCompositionName, model.selectedProperties).then(function (compositionType) {
 
                           // Load the new composition type into the tree
-                          navigationService.syncTree({ tree: "documentTypes", path: compositionType.path, activate: false });
+                          navigationService.syncTree({ tree: scope.contentType + "s", path: compositionType.path, activate: false });
 
                           // Remove overlay
                           scope.extractCompositionDialogModel.show = false;

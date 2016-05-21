@@ -50,8 +50,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          * ##usage
          * <pre>
          * contentTypeResource.extractComposition(1234, 'New Composition', ['propertyA', 'propertyB'])
-         *    .then(function(array) {
-         *        $scope.type = type;
+         *    .then(function(compositionType) {
          *    });
          * </pre>
          * @param {Int} id - id of the content item
@@ -84,8 +83,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          * ##usage
          * <pre>
          * contentTypeResource.isUsedInComposition(1234)
-         *    .then(function(array) {
-         *        $scope.type = type;
+         *    .then(function(value) {
          *    });
          * </pre>
          * @param {Int} id - id of the content item

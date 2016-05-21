@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -12,14 +10,10 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
-using umbraco;
 using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -129,51 +123,6 @@ namespace Umbraco.Web.Editors
                     allowed = x.Item2
                 });
             return Request.CreateResponse(result);
-        }
-
-        /// <summary>
-        /// Extracts a composition from a content type
-        /// </summary>
-        /// <param name="id">Id of content type</param>
-        /// <param name="name">Name of new composition type</param>
-        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
-        [HttpPost]
-        public DocumentTypeDisplay ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
-        {
-            var foundType = Services.ContentTypeService.GetContentType(id);
-            if (foundType == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            try
-            {
-                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
-                var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(compositionType);
-                return dto;
-            }
-            catch (DuplicateNameException ex)
-            {
-                ModelState.AddModelError("name", ex.Message);
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
-            }
-        }
-
-        /// <summary>
-        /// Checks whether a content type is used in a composition
-        /// </summary>
-        /// <param name="id">Id of the content type</param>
-        /// <returns>True if the content type is used in a composition otherwise false</returns>
-        [HttpGet]
-        public bool IsUsedInComposition(int id)
-        {
-            var foundType = Services.ContentTypeService.GetContentType(id);
-            if (foundType == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return Services.ContentTypeService.IsUsedInComposition(id);
         }
 
         [UmbracoTreeAuthorize(
@@ -373,6 +322,51 @@ namespace Umbraco.Web.Editors
                 copy,
                 getContentType: i => Services.ContentTypeService.GetContentType(i),
                 doCopy: (type, i) => Services.ContentTypeService.CopyContentType(type, i));
+        }
+
+        /// <summary>
+        /// Extracts a composition from a content type
+        /// </summary>
+        /// <param name="id">Id of content type</param>
+        /// <param name="name">Name of new composition type</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        [HttpPost]
+        public DocumentTypeDisplay ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
+        {
+            var foundType = Services.ContentTypeService.GetContentType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            try
+            {
+                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+                var dto = Mapper.Map<IContentType, DocumentTypeDisplay>((IContentType)compositionType);
+                return dto;
+            }
+            catch (DuplicateNameException ex)
+            {
+                ModelState.AddModelError("name", ex.Message);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+        }
+
+        /// <summary>
+        /// Checks whether a content type is used in a composition
+        /// </summary>
+        /// <param name="id">Id of the content type</param>
+        /// <returns>True if the content type is used in a composition otherwise false</returns>
+        [HttpGet]
+        public bool IsUsedInComposition(int id)
+        {
+            var foundType = Services.ContentTypeService.GetContentType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Services.ContentTypeService.IsUsedInComposition(id);
         }
     }
 }
