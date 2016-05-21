@@ -15,7 +15,7 @@
 
             <ul class="umb-checkbox-list">
                 <li class="umb-checkbox-list__item"
-                    ng-repeat="property in tab.properties" ng-show="!$last && !property.inherited">
+                    ng-repeat="property in tab.properties" ng-show="!$last && property.id && !property.inherited">
 
                     <div class="umb-checkbox-list__item-checkbox">
                         <input type="checkbox"
