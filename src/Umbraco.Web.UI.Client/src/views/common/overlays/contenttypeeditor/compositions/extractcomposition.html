@@ -4,32 +4,35 @@
         <small><localize key="contentTypeEditor_extractCompositionsDescription"></localize></small>
     </div>
 
-    <div ng-repeat="tab in model.contentType.groups" ng-show="!$last">
-        <div>{{tab.name}}</div>
-
-        <ul class="umb-checkbox-list">
-            <li class="umb-checkbox-list__item"
-                ng-repeat="property in tab.properties" ng-show="!$last && !property.inherited">
-
-                <div class="umb-checkbox-list__item-checkbox">
-                    <input type="checkbox"
-                           id="umb-overlay-extract-comp-{{property.alias}}"
-                           checklist-model="model.selectedProperties"
-                           checklist-value="property.alias"/>
-                </div>
-
-                <label for="umb-overlay-extract-comp-{{property.alias}}" class="umb-checkbox-list__item-text">
-                    {{ property.label }}
-                </label>
-
-            </li>
-        </ul>
-        <div ng-show="model.showValidationErrorForMissingName">Please select a name for the composition</div>
-    </div>
-
-    <div>
-        <label for="umb-overlay-extract-comp-name"><localize key="contentTypeEditor_newCompositionName"></localize></label>
+    <umb-control-group alias="name" label="Composition name">
         <input type="text" ng-model="model.newCompositionName"/>
-        <div ng-show="model.showValidationErrorForMissingProperties">At least one property for the new composition must be provided</div>
-    </div>
+        <div class="text-error" ng-show="model.showValidationErrorForMissingName"><localize key="contentTypeEditor_extractCompositionNameRequired"></localize></div>
+    </umb-control-group>
+
+    <umb-control-group alias="properties" label="Properties to extract to composition">
+        <div ng-repeat="tab in model.contentType.groups" ng-show="!$last">
+            <h5>{{tab.name}}</h5>
+
+            <ul class="umb-checkbox-list">
+                <li class="umb-checkbox-list__item"
+                    ng-repeat="property in tab.properties" ng-show="!$last && !property.inherited">
+
+                    <div class="umb-checkbox-list__item-checkbox">
+                        <input type="checkbox"
+                               id="umb-overlay-extract-comp-{{property.alias}}"
+                               checklist-model="model.selectedProperties"
+                               checklist-value="property.alias"/>
+                    </div>
+
+                    <label for="umb-overlay-extract-comp-{{property.alias}}" class="umb-checkbox-list__item-text">
+                        {{ property.label }}
+                    </label>
+
+                </li>
+            </ul>
+        </div>
+        <div class="text-error" ng-show="model.showValidationErrorForMissingProperties"><localize key="contentTypeEditor_extractCompositionPropertiesRequired"></localize></div>
+    </umb-control-group>
+
+    <div class="text-error" ng-show="model.showValidationErrorForModelState"><localize key="contentTypeEditor_extractCompositionFailed"></localize>: {{model.modelStateError}}</div>
 </div>

@@ -23,6 +23,8 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
+    using System.Data;
+
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like
@@ -144,7 +146,16 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+            try
+            {
+                Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+            }
+            catch (DuplicateNameException ex)
+            {
+                ModelState.AddModelError("name", ex.Message);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 

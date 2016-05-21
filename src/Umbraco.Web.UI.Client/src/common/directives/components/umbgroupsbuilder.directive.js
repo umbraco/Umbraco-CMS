@@ -388,6 +388,10 @@
               view: "views/common/overlays/contenttypeeditor/compositions/extractcomposition.html",
               submit: function (model) {
                   var isValid = true;
+                  model.showValidationErrorForMissingName = false;
+                  model.showValidationErrorForMissingProperties = false;
+                  model.showValidationErrorForModelState = false;
+
                   if (!model.newCompositionName) {
                       model.showValidationErrorForMissingName = true;
                       isValid = false;
@@ -399,8 +403,12 @@
                   }
 
                   if (isValid) {
-                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function() {
-                          console.log('Done');
+                      contentTypeResource.extractComposition(scope.model.id, model.newCompositionName, model.selectedProperties).then(function () {
+                          // TODO: refresh page and tree
+                          console.log("Done");
+                      }, function (err) {
+                          model.modelStateError = err.data.ModelState.name[0];
+                          model.showValidationErrorForModelState = true;
                       });
                   }
               }
