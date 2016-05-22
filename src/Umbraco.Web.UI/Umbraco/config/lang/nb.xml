@@ -192,7 +192,7 @@
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
-    <area alias="bulk">
+  <area alias="bulk">
     <key alias="done">Done</key>
     
     <key alias="deletedItem">Deleted %0% item</key>
