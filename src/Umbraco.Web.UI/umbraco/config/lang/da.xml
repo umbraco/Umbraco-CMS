@@ -644,9 +644,9 @@
     <key alias="noNodeSelected">Intet element valgt, vælg et element i listen ovenfor før der klikkes 'fortsæt'</key>
     <key alias="notAllowedByContentType">Det nuværende element kan ikke lægges under denne pga. sin type</key>
     <key alias="notAllowedByPath">Det nuværende element kan ikke ligge under en af dens undersider</key>
-	  <key alias="notAllowedAtRoot">Dette element må ikke findes på rodniveau</key>
+    <key alias="notAllowedAtRoot">Dette element må ikke findes på rodniveau</key>
     <key alias="notValid">Denne handling er ikke tilladt fordi du ikke har de fornødne rettigheder på et eller flere af under-dokumenterne</key>
-	<key alias="relateToOriginal">Relater det kopierede element til originalen</key>
+    <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
