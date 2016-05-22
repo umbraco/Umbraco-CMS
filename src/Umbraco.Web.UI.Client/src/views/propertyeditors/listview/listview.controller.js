@@ -208,7 +208,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       $timeout(function () {
          $scope.bulkStatus = "";
          $scope.actionInProgress = false;
-      }, 0);
+      }, 500);
 
       if (reload === true) {
          $scope.reloadView($scope.contentId);
