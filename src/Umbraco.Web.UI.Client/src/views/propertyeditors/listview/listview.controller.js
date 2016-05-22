@@ -208,7 +208,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       $timeout(function () {
          $scope.bulkStatus = "";
          $scope.actionInProgress = false;
-      }, 500);
+      }, 0);
 
       if (reload === true) {
          $scope.reloadView($scope.contentId);
@@ -220,7 +220,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          }
       }
       else if (successMsg) {
-         notificationsService.success("Done", successMsg);
+         localizationService.localize("bulk_done").then(function (v) {
+             notificationsService.success(v, successMsg);
+         });
       }
    }
 
@@ -368,28 +370,67 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.delete = function () {
       applySelected(
              function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-             function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
+             function (count, total) {
+                 return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
+                 //localizationService.localize(key, [count, total]).then(function (value) {
+                 //    return value;
+                 //});
+             },
+             function (total) {
+                 return "Deleted " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
+                 //localizationService.localize(key, [total]).then(function (value) {
+                 //    return value;
+                 //});
+             },
+             //localizationService.localize("defaultdialogs_confirmdelete") + "?"
              "Sure you want to delete?");
    };
 
-   $scope.publish = function () {
+   $scope.publish = function () {        
       applySelected(
              function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-             function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Published " + total + " item" + (total > 1 ? "s" : ""); });
+             function (count, total) {
+                return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+                //var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
+                //localizationService.localize(key, [count, total]).then(function (value) {
+                //    console.log(key, value);
+                //    return value;
+                //});
+             },
+             function (total) {
+                 return "Published " + total + " item" + (total > 1 ? "s" : "");
+                //var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
+                //localizationService.localize(key, [total]).then(function (value) {
+                //    console.log(key, value);
+                //    return value;
+                //});
+             });
    };
 
    $scope.unpublish = function () {
       applySelected(
              function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
-             function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : ""); });
+             function (count, total) {
+                 return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
+                 //localizationService.localize(key, [count, total]).then(function (value) {
+                 //    return value;
+                 //});
+             },
+             function (total) {
+                 return "Unpublished " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
+                 //localizationService.localize(key, [total]).then(function (value) {
+                 //    return value;
+                 //});
+             });
    };
 
    $scope.move = function () {
       $scope.moveDialog = {};
-      $scope.moveDialog.title = "Move";
+      $scope.moveDialog.title = localizationService.localize("general_move");
       $scope.moveDialog.section = $scope.entityType;
       $scope.moveDialog.currentNode = $scope.contentId;
       $scope.moveDialog.view = "move";
@@ -416,13 +457,25 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
       applySelected(
              function (selected, index) { return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) }); },
-             function (count, total) { return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Moved " + total + " item" + (total > 1 ? "s" : ""); });
+             function (count, total) {
+                 return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_movedItemOfItem" : "bulk_movedItemOfItems");
+                 //localizationService.localize(key, [count, total]).then(function (value) {
+                 //    return value;
+                 //});
+             },
+             function (total) {
+                 return "Moved " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_movedItem" : "bulk_movedItems");
+                 //localizationService.localize(key, [total]).then(function (value) {
+                 //    return value;
+                 //});
+             });
    }
 
    $scope.copy = function () {
       $scope.copyDialog = {};
-      $scope.copyDialog.title = "Copy";
+      $scope.copyDialog.title = localizationService.localize("general_copy");
       $scope.copyDialog.section = $scope.entityType;
       $scope.copyDialog.currentNode = $scope.contentId;
       $scope.copyDialog.view = "copy";
@@ -447,8 +500,20 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    function performCopy(target, relateToOriginal) {
       applySelected(
              function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
-             function (count, total) { return "Copied " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Copied " + total + " item" + (total > 1 ? "s" : ""); });
+             function (count, total) {
+                 return "Copied " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
+                 //localizationService.localize(key, [count, total]).then(function (value) {
+                 //    return value;
+                 //});
+             },
+             function (total) {
+                 return "Copied " + total + " item" + (total > 1 ? "s" : "");
+                 //var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
+                 //localizationService.localize(key, [total]).then(function (value) {
+                 //    return value;
+                 //});
+             });
    }
 
    function getCustomPropertyValue(alias, properties) {
