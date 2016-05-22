@@ -890,6 +890,10 @@ namespace Umbraco.Core.Services
         /// <returns>The created composition type</returns>
         public IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
         {
+            Mandate.ParameterNotNull(contentType, "contantType");
+            Mandate.ParameterNotNullOrEmpty(name, "name");
+            Mandate.ParameterNotNullOrEmpty(propertyAliases, "propertyAliases");
+
             IContentType compositionType;
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))

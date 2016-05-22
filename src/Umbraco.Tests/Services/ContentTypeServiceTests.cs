@@ -1,4 +1,3 @@
-using System.Runtime.Remoting;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -7,14 +6,12 @@ using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class ContentTypeServiceTests : BaseServiceTest
@@ -1283,6 +1280,64 @@ namespace Umbraco.Tests.Services
 
             var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
             Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);
+        }
+
+        [Test]
+        public void Can_Extract_Composition_From_Content_Type_With_Service()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+
+            // Act
+            var compositeContentType = service.ExtractComposition(contentType, "Extracted Content Type", new [] { "title", "bodyText"});
+
+            // Assert
+            Assert.That(compositeContentType.HasIdentity, Is.True);
+            var originalContentType = service.GetContentType(contentType.Id);
+            compositeContentType = service.GetContentType(compositeContentType.Id);
+
+            // - both content types should have the same tabs
+            Assert.AreEqual(1, contentType.PropertyGroups.Count());
+            Assert.AreEqual("Content", contentType.PropertyGroups.First().Name);
+
+            Assert.AreEqual(1, compositeContentType.PropertyGroups.Count);
+            Assert.AreEqual("Content", compositeContentType.PropertyGroups.First().Name);
+
+            // - selected properties should have moved
+            Assert.AreEqual(1, originalContentType.PropertyTypes.Count());
+            Assert.IsNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNotNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+
+            Assert.AreEqual(2, compositeContentType.PropertyTypes.Count());
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+
+            // - composition type relation should be in place
+            Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("extractedContentType")), Is.True);
+        }
+
+        [Test]
+        public void Is_Used_In_Composition()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+            var compositeContentType = service.ExtractComposition(contentType, "Extracted Content Type", new[] { "title", "bodyText" });
+
+            // Act
+            var resultForOriginalContentType = service.IsUsedInComposition(contentType.Id);
+            var resultForCompositeContentType = service.IsUsedInComposition(compositeContentType.Id);
+
+            // Assert
+            Assert.That(resultForOriginalContentType, Is.False);
+            Assert.That(resultForCompositeContentType, Is.True);
         }
 
         private ContentType CreateComponent()
