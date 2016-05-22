@@ -28,7 +28,7 @@
     <key alias="publish">Udgiv</key>
     <key alias="unpublish">Fortryd udgivelse</key>
     <key alias="refreshNode">Genindlæs elementer</key>
-    <key alias="republish">Genudgiv hele siten</key>
+    <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
@@ -262,7 +262,7 @@
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
-    <key alias="siterepublished">Siten er nu genudgivet</key>
+    <key alias="siterepublished">Sitet er nu genudgivet</key>
     <key alias="siterepublishHelp">Websitets cache vil blive genopfrisket. Alt udgivet indhold vil blive opdateret, mens upubliceret indhold vil forblive upubliceret.</key>
     <key alias="tableColumns">Antal kolonner</key>
     <key alias="tableRows">Antal rækker</key>
