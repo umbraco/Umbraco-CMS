@@ -1575,30 +1575,26 @@ namespace umbraco
         /// <summary>
         /// Sends an e-mail using the System.Net.Mail.MailMessage object
         /// </summary>
-        /// <param name="FromMail">The sender of the e-mail</param>
-        /// <param name="ToMail">The recipient of the e-mail</param>
-        /// <param name="Subject">E-mail subject</param>
-        /// <param name="Body">The complete content of the e-mail</param>
-        /// <param name="IsHtml">Set to true when using Html formatted mails</param>
-        public static void SendMail(string FromMail, string ToMail, string Subject, string Body, bool IsHtml)
+        /// <param name="fromMail">The sender of the e-mail</param>
+        /// <param name="toMail">The recipient(s) of the e-mail, add multiple email addresses by using a semicolon between them</param>
+        /// <param name="subject">E-mail subject</param>
+        /// <param name="body">The complete content of the e-mail</param>
+        /// <param name="isHtml">Set to true when using Html formatted mails</param>
+        public static void SendMail(string fromMail, string toMail, string subject, string body, bool isHtml)
         {
             try
             {
-                // create the mail message 
-                MailMessage mail = new MailMessage(FromMail.Trim(), ToMail.Trim());
-
-                // populate the message
-                mail.Subject = Subject;
-                if (IsHtml)
-                    mail.IsBodyHtml = true;
-                else
-                    mail.IsBodyHtml = false;
-
-                mail.Body = Body;
-
-                // send it
-                SmtpClient smtpClient = new SmtpClient();
-                smtpClient.Send(mail);
+                using (var mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(fromMail.Trim());
+                    foreach (var mailAddress in toMail.Split(';'))
+                        mail.To.Add(new MailAddress(mailAddress.Trim()));
+                    mail.Subject = subject;
+                    mail.IsBodyHtml = isHtml;
+                    mail.Body = body;
+                    using (var smtpClient = new SmtpClient())
+                        smtpClient.Send(mail);
+                }
             }
             catch (Exception ee)
             {
