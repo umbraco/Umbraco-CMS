@@ -367,7 +367,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Moves a property group to a new content type
+        /// Copies a property group to a new content type
         /// </summary>
         /// <param name="propertyGroupId">The property group Id</param>
         /// <param name="sortOrder">The new sort order for the group</param>

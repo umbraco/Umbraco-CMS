@@ -17,8 +17,6 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
-    using System.Data;
-
     /// <summary>
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>

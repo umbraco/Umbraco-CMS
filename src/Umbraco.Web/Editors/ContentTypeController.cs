@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -17,8 +18,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
-    using System.Data;
-
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like

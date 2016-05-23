@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Models;
@@ -14,8 +15,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
-    using System.Data;
-
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.

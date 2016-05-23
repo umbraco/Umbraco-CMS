@@ -909,7 +909,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 // Extract provided properties into the composition
-                ExtractCompositionProperties(uow, contentType, compositionType, propertyAliases);
+                ExtractPropertiesToComposition(uow, contentType, compositionType, propertyAliases);
             }
 
             Audit(AuditType.Custom, string.Format("Extract content type composition performed by user"), userId, -1);
@@ -941,7 +941,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 // Extract provided properties into the composition
-                ExtractCompositionProperties(uow, mediaType, compositionType, propertyAliases);
+                ExtractPropertiesToComposition(uow, mediaType, compositionType, propertyAliases);
             }
 
             Audit(AuditType.Custom, string.Format("Extract media type composition performed by user"), userId, -1);
@@ -955,7 +955,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentType"><see cref="IContentTypeComposition"/> to extract composition from</param>
         /// <param name="compositionType">Created type for the composition</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
-        private void ExtractCompositionProperties(IDatabaseUnitOfWork uow, 
+        private void ExtractPropertiesToComposition(IDatabaseUnitOfWork uow, 
             IContentTypeComposition contentType, IContentTypeComposition compositionType, 
             string[] propertyAliases)
         {
