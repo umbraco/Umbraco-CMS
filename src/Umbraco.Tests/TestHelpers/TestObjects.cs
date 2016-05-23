@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using LightInject;
+using Moq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
@@ -75,7 +79,6 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="dbUnitOfWorkProvider">A database unit of work provider.</param>
         /// <param name="fileUnitOfWorkProvider">A file unit of work provider.</param>
-        /// <param name="publishingStrategy">A publishing strategy.</param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
@@ -195,6 +198,15 @@ namespace Umbraco.Tests.TestHelpers
                 memberGroupService,
                 notificationService,
                 externalLoginService);
+        }
+
+        public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger)
+        {
+            var adapter = new DefaultScopeContextAdapter();
+            var mappingResolver = Mock.Of<IMappingResolver>();
+            var databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, adapter, mappingResolver);
+            var repositoryFactory = new RepositoryFactory(Mock.Of<IServiceContainer>());
+            return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
         }
     }
 }

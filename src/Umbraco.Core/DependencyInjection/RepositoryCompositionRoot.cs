@@ -63,7 +63,7 @@ namespace Umbraco.Core.DependencyInjection
             // the disabled one is used by those repositories that have an annotated ctor parameter
             container.RegisterSingleton(factory => CacheHelper.CreateDisabledCacheHelper(), DisabledCache);
 
-            // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is 
+            // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
             // the container, 'info' describes the ctor argument, and 'args' contains the args that
             // were passed to GetInstance() - use first arg if it is the right type,
             //
