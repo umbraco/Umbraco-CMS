@@ -33,7 +33,6 @@ using Language = umbraco.cms.businesslogic.language.Language;
 using Media = umbraco.cms.businesslogic.media.Media;
 using Member = umbraco.cms.businesslogic.member.Member;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
-using Relation = umbraco.cms.businesslogic.relation.Relation;
 
 namespace umbraco
 {
@@ -1257,23 +1256,28 @@ namespace umbraco
                 //int languageId = GetCurrentLanguageId();
                 int languageId = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name).id;
 
-                Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(Key);
+                var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(Key);
+                if (di == null)
+                {
+                    return xd.CreateNavigator().Select("/");
+                }
 
-                foreach (Dictionary.DictionaryItem item in di.Children)
+                var children = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemChildren(di.Key);
+                foreach (var item in children)
                 {
                     XmlNode xe;
                     try
                     {
                         if (languageId != 0)
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value(languageId));
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetTranslatedValue(languageId));
                         else
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value());
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetDefaultValue());
                     }
                     catch
                     {
                         xe = XmlHelper.AddTextNode(xd, "DictionaryItem", string.Empty);
                     }
-                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.key));
+                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.ItemKey));
                     xd.DocumentElement.AppendChild(xe);
                 }
             }
@@ -1716,9 +1720,9 @@ namespace umbraco
             return HttpUtility.HtmlEncode(Text);
         }
 
-        public static Relation[] GetRelatedNodes(int NodeId)
+        public static IRelation[] GetRelatedNodes(int nodeId)
         {
-            return new CMSNode(NodeId).Relations;
+            return ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(nodeId).ToArray();
         }
 
         [Obsolete("Use DistributedCache.Instance.RemoveMediaCache instead")]
@@ -1758,24 +1762,49 @@ namespace umbraco
         /// </returns>
         public static XPathNodeIterator GetRelatedNodesAsXml(int NodeId)
         {
+            var xmlSerializer = new EntityXmlSerializer();
+
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<relations/>");
-            var rels = new CMSNode(NodeId).Relations;
-            foreach (Relation r in rels)
+            var rels = ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(NodeId);                
+            foreach (var r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
                 n.AppendChild(XmlHelper.AddCDataNode(xd, "comment", r.Comment));
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeId", r.RelType.Id.ToString()));
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeName", r.RelType.Name));
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", r.CreateDate.ToString()));
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "parentId", r.Parent.Id.ToString()));
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "childId", r.Child.Id.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeId", r.RelationTypeId.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeName", r.RelationType.Name));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", r.CreateDate.ToString(CultureInfo.InvariantCulture)));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "parentId", r.ParentId.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "childId", r.ChildId.ToString()));
 
                 // Append the node that isn't the one we're getting the related nodes from
-                if (NodeId == r.Child.Id)
-                    n.AppendChild(r.Parent.ToXml(xd, false));
+                if (NodeId == r.ChildId)
+                {
+                    var parent = ApplicationContext.Current.Services.ContentService.GetById(r.ParentId);
+                    if (parent != null)
+                    {
+                        var x = xmlSerializer.Serialize(
+                            ApplicationContext.Current.Services.ContentService,
+                            ApplicationContext.Current.Services.DataTypeService,
+                            ApplicationContext.Current.Services.UserService,
+                            UrlSegmentProviderResolver.Current.Providers, parent).GetXmlNode(xd);
+                        n.AppendChild(x);
+                    }
+                }
                 else
-                    n.AppendChild(r.Child.ToXml(xd, false));
+                {
+                    var child = ApplicationContext.Current.Services.ContentService.GetById(r.ChildId);
+                    if (child != null)
+                    {
+                        var x = xmlSerializer.Serialize(
+                            ApplicationContext.Current.Services.ContentService,
+                            ApplicationContext.Current.Services.DataTypeService,
+                            ApplicationContext.Current.Services.UserService,
+                            UrlSegmentProviderResolver.Current.Providers, child).GetXmlNode(xd);
+                        n.AppendChild(x);
+                    }
+                }
+                    
                 xd.DocumentElement.AppendChild(n);
             }
             XPathNavigator xp = xd.CreateNavigator();

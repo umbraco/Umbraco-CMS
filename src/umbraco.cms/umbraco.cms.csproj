@@ -194,9 +194,6 @@
     <Compile Include="businesslogic\ContentType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\Dictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -231,9 +228,6 @@
     <Compile Include="businesslogic\member\Member.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\member\MemberGroup.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\member\MemberType.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -244,12 +238,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\propertytype\propertytype.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\relation\Relation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\relation\RelationType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\task\Task.cs" />

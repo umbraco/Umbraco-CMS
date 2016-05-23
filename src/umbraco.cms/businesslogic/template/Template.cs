@@ -88,12 +88,11 @@ namespace umbraco.cms.businesslogic.template
                 {
                     language.Language lang = language.Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
-                    {
-                        if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
+                    {                        
+                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(tempText.Substring(1, tempText.Length - 1)))
                         {
-                            Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
-                            if (di != null)
-                                return di.Value(lang.id);
+                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(tempText.Substring(1, tempText.Length - 1));
+                            return di.GetTranslatedValue(lang.id);
                         }
                     }
 

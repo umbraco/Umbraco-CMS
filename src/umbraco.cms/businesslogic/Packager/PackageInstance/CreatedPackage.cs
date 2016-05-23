@@ -250,8 +250,10 @@ namespace umbraco.cms.businesslogic.packager
             {
                 if (int.TryParse(dictionaryId, out outInt))
                 {
-                    var di = new Dictionary.DictionaryItem(outInt);
-                    dictionaryItems.AppendChild(di.ToXml(_packageManifest));
+                    var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(outInt);
+                    var entitySerializer = new EntityXmlSerializer();
+                    var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);                    
+                    dictionaryItems.AppendChild(xmlNode);
                 }
             }
             AppendElement(dictionaryItems);
