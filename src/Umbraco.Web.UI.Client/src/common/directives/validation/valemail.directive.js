@@ -29,12 +29,16 @@ function valEmail(valEmailExpression) {
                 }
             };
 
-            //we need to remove the existing parsers = the default angular one which is created by
-            // type="email", but this has a regex issue, so we'll remove that and add our custom one
-            ctrl.$parsers.pop();
-            //we also need to remove the existing formatter - the default angular one will not render
-            // what it thinks is an invalid email address, so it will just be blank
-            ctrl.$formatters.pop();
+            //if there is an attribute: type="email" then we need to remove those formatters and parsers
+            if (attrs.type === "email") {
+                //we need to remove the existing parsers = the default angular one which is created by
+                // type="email", but this has a regex issue, so we'll remove that and add our custom one
+                ctrl.$parsers.pop();
+                //we also need to remove the existing formatter - the default angular one will not render
+                // what it thinks is an invalid email address, so it will just be blank
+                ctrl.$formatters.pop();
+            }
+            
             ctrl.$parsers.push(patternValidator);
         }
     };
