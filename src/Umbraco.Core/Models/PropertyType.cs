@@ -436,7 +436,7 @@ namespace Umbraco.Core.Models
         {
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(_propertyEditorAlias);
             return propertyEditor.PreValueEditor.Fields
-                .SingleOrDefault(x => x.Key == Constants.PropertyEditors.DataValueTypePreValueKey) != null;
+                .SingleOrDefault(x => x.Key == Constants.PropertyEditors.PreValueKeys.DataValueType) != null;
         }
 
         /// <summary>

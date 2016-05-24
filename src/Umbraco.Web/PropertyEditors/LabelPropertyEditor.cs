@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return new LabelPreValueEditor();
         }
-        
+
         /// <summary>
         /// Custom value editor to mark it as readonly
         /// </summary>
@@ -52,10 +52,10 @@ namespace Umbraco.Web.PropertyEditors
                     Key = LegacyPropertyEditorValuesKey
                 });
 
-                ValueType = PropertyEditorValueTypes.StringType;
+                ValueType = PropertyEditorValueTypes.String;
             }
 
-            [PreValueField(Constants.PropertyEditors.DataValueTypePreValueKey, "Value type", "valuetype")]
+            [PreValueField(Constants.PropertyEditors.PreValueKeys.DataValueType, "Value type", "valuetype")]
             public string ValueType { get; set; }
 
             /// <summary>
@@ -70,23 +70,23 @@ namespace Umbraco.Web.PropertyEditors
                 var existing = base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
 
                 // Check for a saved value type.  If not found set to default string type.
-                var valueType = PropertyEditorValueTypes.StringType;
-                if (existing.ContainsKey(Constants.PropertyEditors.DataValueTypePreValueKey))
+                var valueType = PropertyEditorValueTypes.String;
+                if (existing.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
                 {
-                    valueType = (string)existing[Constants.PropertyEditors.DataValueTypePreValueKey];
+                    valueType = (string)existing[Constants.PropertyEditors.PreValueKeys.DataValueType];
                 }
 
                 // Convert any other values from a legacy property editor to a list, easier to enumerate on the editor.
                 // Make sure to exclude values defined on the label property editor itself.
                 var asList = existing
                     .Select(e => new KeyValuePair<string, object>(e.Key, e.Value))
-                    .Where(e => e.Key != Constants.PropertyEditors.DataValueTypePreValueKey)
+                    .Where(e => e.Key != Constants.PropertyEditors.PreValueKeys.DataValueType)
                     .ToList();
 
-                var result = new Dictionary<string, object> { { Constants.PropertyEditors.DataValueTypePreValueKey, valueType } };
+                var result = new Dictionary<string, object> { { Constants.PropertyEditors.PreValueKeys.DataValueType, valueType } };
                 if (asList.Any())
                 {
-                    result.Add("values", asList);
+                    result.Add(LegacyPropertyEditorValuesKey, asList);
                 }
 
                 return result;
@@ -100,6 +100,20 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
             {
+                // notes (from the PR):
+                //
+                // "All stemmed from the fact that even though the label property editor could have pre-values (from a legacy type),
+                // they couldn't up to now be edited and saved through the UI. Now that a "true" pre-value has been added, it can,
+                // which led to some odd behaviour.
+                //
+                // Firstly there would be a pre-value record saved for legacy values even if there aren't any (the key would exist
+                // but with no value). In that case I remove that pre-value so it's not saved(likely does no harm, but it's not
+                // necessary - we only need this legacy values pre-value record if there are any).
+                //
+                // Secondly if there are legacy values, I found on each save the JSON structure containing them would get repeatedly
+                // nested (an outer JSON wrapper would be added each time). So what I'm doing is if there are legacy pre-values,
+                // I'm converting what comes in "wrapped" like (below) into the legacy property editor values."
+
                 if (editorValue.ContainsKey(LegacyPropertyEditorValuesKey))
                 {
                     // If provided value contains an empty legacy property editor values, don't save it
@@ -110,8 +124,8 @@ namespace Umbraco.Web.PropertyEditors
                     else
                     {
                         // If provided value contains legacy property editor values, unwrap the value to save so it doesn't get repeatedly nested on saves.
-                        // This is a bit funky - but basically needing to parse out the original value from a JSON structure that is passed in 
-                        // looking like: 
+                        // This is a bit funky - but basically needing to parse out the original value from a JSON structure that is passed in
+                        // looking like:
                         //   Value = {[
                         //   {
                         //      "Key": "values",

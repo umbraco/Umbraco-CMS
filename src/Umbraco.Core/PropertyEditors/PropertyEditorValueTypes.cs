@@ -1,25 +1,34 @@
-﻿namespace Umbraco.Core.PropertyEditors
+﻿using System;
+
+namespace Umbraco.Core.PropertyEditors
 {
     public static class PropertyEditorValueTypes
     {
-        public const string DateType = "DATE";
+        // mapped to DataTypeDatabaseType in DataTypeService.OverrideDatabaseTypeIfProvidedInPreValues
+        // BUT what about those that are not mapped?
+        //
+        // also mapped to DataTypeDatabaseType in PropertyValueEditor
+        // and this time the "+" are mapped
 
-        public const string DateTimeType = "DATETIME";
+        public const string Date = "DATE"; // +Date
 
-        public const string DecimalType = "DECIMAL";
+        public const string DateTime = "DATETIME"; // Date
 
-        public const string IntegerType = "INT";
+        public const string Decimal = "DECIMAL"; // Decimal
 
-        public const string IntegerTypeAlternative = "INTEGER";
+        public const string Integer = "INT"; // Integer
 
-        public const string JsonType = "JSON";
+        [Obsolete("Use Integer.", false)]
+        public const string IntegerAlternative = "INTEGER"; // +Integer
 
-        public const string TextType = "TEXT";
+        public const string Json = "JSON"; // +NText
 
-        public const string TimeType = "TIME";
+        public const string Text = "TEXT"; // NText
 
-        public const string StringType = "STRING";
+        public const string Time = "TIME"; // +Date
 
-        public const string XmlType = "XML";
+        public const string String = "STRING"; // NVarchar
+
+        public const string Xml = "XML"; // +NText
     }
 }

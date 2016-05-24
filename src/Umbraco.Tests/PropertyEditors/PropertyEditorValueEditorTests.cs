@@ -41,7 +41,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueEditor = new PropertyValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.StringType
+                    ValueType = PropertyEditorValueTypes.String
             };
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = new PropertyValueEditor
             {
-                ValueType = PropertyEditorValueTypes.DecimalType
+                ValueType = PropertyEditorValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType("12.34");
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = new PropertyValueEditor
             {
-                ValueType = PropertyEditorValueTypes.DecimalType
+                ValueType = PropertyEditorValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType("12,34");
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = new PropertyValueEditor
             {
-                ValueType = PropertyEditorValueTypes.DecimalType
+                ValueType = PropertyEditorValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType(string.Empty);
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = new PropertyValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.DateType
+                    ValueType = PropertyEditorValueTypes.Date
             };
 
             var result = valueEditor.TryConvertValueToCrlType("2010-02-05");
@@ -120,12 +120,12 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(new DateTime(2010, 2, 5), result.Result);
         }
 
-        [TestCase(PropertyEditorValueTypes.StringType, "hello", "hello")]
-        [TestCase(PropertyEditorValueTypes.TextType, "hello", "hello")]
-        [TestCase(PropertyEditorValueTypes.IntegerType, 123, "123")]
-        [TestCase(PropertyEditorValueTypes.IntegerTypeAlternative, 123, "123")]
-        [TestCase(PropertyEditorValueTypes.IntegerType, "", "")] //test empty string for int        
-        [TestCase(PropertyEditorValueTypes.DateTimeType, "", "")] //test empty string for date
+        [TestCase(PropertyEditorValueTypes.String, "hello", "hello")]
+        [TestCase(PropertyEditorValueTypes.Text, "hello", "hello")]
+        [TestCase(PropertyEditorValueTypes.Integer, 123, "123")]
+        [TestCase(PropertyEditorValueTypes.IntegerAlternative, 123, "123")]
+        [TestCase(PropertyEditorValueTypes.Integer, "", "")] //test empty string for int        
+        [TestCase(PropertyEditorValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
             var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Nvarchar), val);
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.PropertyEditors
             var value = 12.34M;
             var valueEditor = new PropertyValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.DecimalType
+                    ValueType = PropertyEditorValueTypes.Decimal
             };
 
             var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Decimal), value);
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = new PropertyValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.DecimalType
+                    ValueType = PropertyEditorValueTypes.Decimal
             };
 
             var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Decimal), string.Empty);
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.PropertyEditors
             var now = DateTime.Now;
             var valueEditor = new PropertyValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.DateType
+                    ValueType = PropertyEditorValueTypes.Date
             };
 
             var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Date), now);
