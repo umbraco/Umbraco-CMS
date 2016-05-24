@@ -15,7 +15,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = "JSON", HideLabel = false, Group="media", Icon="icon-crop")]
+    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.JsonType, HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor
     {
 

@@ -16,7 +16,7 @@ using UmbracoExamine;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = "JSON", Group="rich content", Icon="icon-layout")]
+    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.JsonType, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor
     {
         /// <summary>
