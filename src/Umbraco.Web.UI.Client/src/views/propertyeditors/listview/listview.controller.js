@@ -366,11 +366,24 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    }
 
    $scope.delete = function () {
-      applySelected(
-             function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-             function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
-             "Sure you want to delete?");
+
+       var attempt =
+           applySelected(
+               function(selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+               function(count, total) {
+                   return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+               },
+               function(total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
+               "Sure you want to delete?");
+       if (attempt) {
+           attempt.then(function () {
+               //executes if all is successful, let's sync the tree
+               var activeNode = appState.getTreeState("selectedNode");
+               if (activeNode) {
+                   navigationService.reloadNode(activeNode);
+               }
+           });
+       }
    };
 
    $scope.publish = function () {
@@ -412,6 +425,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    };
 
+
    function performMove(target) {
 
        //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return 
@@ -425,9 +439,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                        return path;
                    });
                },
-               function(count, total) {
-                   return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
-               },
+               function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : "");},
                function(total) { return "Moved " + total + " item" + (total > 1 ? "s" : ""); })
            .then(function() {  
                //executes if all is successful, let's sync the tree
