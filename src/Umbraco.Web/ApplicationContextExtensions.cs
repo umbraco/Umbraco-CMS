@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Threading;
+using System.Web;
 using Umbraco.Core;
 
 namespace Umbraco.Web
@@ -17,8 +18,13 @@ namespace Umbraco.Web
             // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
             http.Application.Add("AppPoolRestarting", true);
 
-            // unload app domain
-			HttpRuntime.UnloadAppDomain();
+            // unload app domain - we must null out all identities otherwise we get serialization errors
+            // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
+            http.User = null;
+            if (HttpContext.Current != null)
+                HttpContext.Current.User = null;
+            Thread.CurrentPrincipal = null;
+            HttpRuntime.UnloadAppDomain();
 		}
 	}
 }
