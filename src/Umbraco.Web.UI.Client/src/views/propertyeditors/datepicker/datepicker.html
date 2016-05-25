@@ -18,6 +18,9 @@
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">Invalid date</span>
         
+        <p ng-if="model.config.offsetTime === '1' && model.value" class="muted">
+            <small>Server time: {{serverTime}}</small>
+        </p>
         <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
             <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
         </p>
