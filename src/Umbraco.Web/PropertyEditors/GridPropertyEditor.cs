@@ -60,15 +60,21 @@ namespace Umbraco.Web.PropertyEditors
 
                                     foreach (var areaVal in areaVals)
                                     {
-                                        var str = areaVal.Value<string>();
-                                        str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
-                                        sb.Append(str);
-                                        sb.Append(" ");
+                                        //TODO: If it's not a string, then it's a json formatted value - 
+                                        // we cannot really index this in a smart way since it could be 'anything'
+                                        if (areaVal.Type == JTokenType.String)
+                                        {
+                                            var str = areaVal.Value<string>();
+                                            str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
+                                            sb.Append(str);
+                                            sb.Append(" ");
 
-                                        //add the row name as an individual field
-                                        e.Document.Add(
-                                            new Field(
-                                                string.Format("{0}.{1}", field.Name, rowName), str, Field.Store.YES, Field.Index.ANALYZED));                                        
+                                            //add the row name as an individual field
+                                            e.Document.Add(
+                                                new Field(
+                                                    string.Format("{0}.{1}", field.Name, rowName), str, Field.Store.YES, Field.Index.ANALYZED));
+                                        }
+                                        
                                     }
                                 }
 
