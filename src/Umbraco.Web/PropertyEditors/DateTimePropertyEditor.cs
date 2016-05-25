@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = "DATETIME", Icon="icon-time")]
+    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = PropertyEditorValueTypes.DateTime, Icon="icon-time")]
     public class DateTimePropertyEditor : PropertyEditor
     {
         public DateTimePropertyEditor()
