@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -437,7 +438,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var cache = new NullCacheProvider();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            _service = new FacadeService(svcCtx, provider, cache, true, false); // no events
+            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
             

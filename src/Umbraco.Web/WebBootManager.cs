@@ -39,6 +39,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
 using Umbraco.Web._Legacy.Actions;
@@ -335,7 +336,8 @@ namespace Umbraco.Web
             container.RegisterSingleton<IFacadeService>(factory => new FacadeService(
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-                factory.GetInstance<CacheHelper>().RequestCache));
+                factory.GetInstance<CacheHelper>().RequestCache,
+                factory.GetAllInstances<IUrlSegmentProvider>()));
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register(factory => UmbracoContext.Current);

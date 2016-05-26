@@ -119,9 +119,14 @@ namespace Umbraco.Tests
                CacheHelper.CreateDisabledCacheHelper(),
                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
+            var facade = new Mock<IFacade>();
+            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var facadeService = new Mock<IFacadeService>();
+            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(), appCtx,
-                Mock.Of<IFacadeService>(),
+                facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -146,10 +151,15 @@ namespace Umbraco.Tests
             var appCtx = new ApplicationContext(
                CacheHelper.CreateDisabledCacheHelper(),
                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            
+
+            var facade = new Mock<IFacade>();
+            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var facadeService = new Mock<IFacadeService>();
+            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(), appCtx,
-                Mock.Of<IFacadeService>(),
+                facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),

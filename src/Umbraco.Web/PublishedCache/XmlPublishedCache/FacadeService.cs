@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
@@ -25,31 +26,41 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Constructors
 
-        // used in StandaloneBootManager only, should get rid of that one eventually
-        internal FacadeService(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, ICacheProvider requestCache)
-            : this(serviceContext, uowProvider, requestCache, null, false, true)
-        { }
-
-        // used in some tests + in WebBootManager
-        internal FacadeService(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, ICacheProvider requestCache,
-            bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, uowProvider, requestCache, null, testing, enableRepositoryEvents)
+        // used in WebBootManager + tests
+        public FacadeService(ServiceContext serviceContext,
+            IDatabaseUnitOfWorkProvider uowProvider, 
+            ICacheProvider requestCache, 
+            IEnumerable<IUrlSegmentProvider> segmentProviders,
+            bool testing = false, bool enableRepositoryEvents = true)
+            : this(serviceContext, uowProvider, requestCache, segmentProviders, null, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
-        internal FacadeService(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, ICacheProvider requestCache,
-            PublishedContentTypeCache contentTypeCache, bool testing, bool enableRepositoryEvents)
+        internal FacadeService(ServiceContext serviceContext, 
+            IDatabaseUnitOfWorkProvider uowProvider, 
+            ICacheProvider requestCache,
+            PublishedContentTypeCache contentTypeCache, 
+            bool testing, bool enableRepositoryEvents)
+            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), contentTypeCache, testing, enableRepositoryEvents)
+        { }
+
+        private FacadeService(ServiceContext serviceContext, 
+            IDatabaseUnitOfWorkProvider uowProvider, 
+            ICacheProvider requestCache,
+            IEnumerable<IUrlSegmentProvider> segmentProviders,
+            PublishedContentTypeCache contentTypeCache, 
+            bool testing, bool enableRepositoryEvents)
         {
             _routesCache = new RoutesCache();
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService);
 
-            var providers = UrlSegmentProviderResolver.Current.Providers; // fixme - inject!
-            _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, providers, testing, enableRepositoryEvents);
+            _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, segmentProviders, testing, enableRepositoryEvents);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
+
             _requestCache = requestCache;
         }
 

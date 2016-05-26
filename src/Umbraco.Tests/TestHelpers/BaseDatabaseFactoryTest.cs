@@ -11,6 +11,7 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -431,9 +432,8 @@ namespace Umbraco.Tests.TestHelpers
                 ApplicationContext,
                 service,
                 new WebSecurity(httpContext, ApplicationContext),
-                null,
-                Enumerable.Empty<IUrlProvider>(), 
-                null);
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>());
 
             if (setSingleton)
             {

@@ -103,9 +103,14 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
+            var facade = new Mock<IFacade>();
+            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var facadeService = new Mock<IFacadeService>();
+            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object, appCtx,
-                Mock.Of<IFacadeService>(),
+                facadeService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
