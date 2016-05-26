@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if Property was changed, otherwise False. Returns false if the entity had not been previously changed.</returns>
         public virtual bool WasPropertyDirty(string propertyName)
         {
-            return WasDirty() && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
+            return WasDirty() && _lastPropertyChangedInfo!= null && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
@@ -133,7 +133,9 @@ namespace Umbraco.Core.Models.EntityBase
             if (rememberPreviouslyChangedProperties)
             {
                 //copy the changed properties to the last changed properties
-                _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
+                _lastPropertyChangedInfo = _propertyChangedInfo == null 
+                    ? null 
+                    : _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
             }
 
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
