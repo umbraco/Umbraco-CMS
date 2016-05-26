@@ -42,8 +42,7 @@ namespace Umbraco.Tests.Membership
                     new PublishedPropertyType("author", 0, "?")
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
-
+            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
         }
 
         [Test]
@@ -64,7 +63,8 @@ namespace Umbraco.Tests.Membership
             member.LastPasswordChangeDate = date.AddMinutes(4);
             member.PasswordQuestion = "test question";
 
-            var mpc = new MemberPublishedContent(member);                
+            var mpt = ContentTypesCache.Get(PublishedItemType.Member, member.ContentTypeAlias);
+            var mpc = new PublishedMember(member, mpt);
 
             var d = mpc.AsDynamic();
 
@@ -101,7 +101,8 @@ namespace Umbraco.Tests.Membership
             member.LastPasswordChangeDate = date.AddMinutes(4);
             member.PasswordQuestion = "test question";
 
-            var mpc = new MemberPublishedContent(member);
+            var mpt = ContentTypesCache.Get(PublishedItemType.Member, member.ContentTypeAlias); 
+            var mpc = new PublishedMember(member, mpt);
 
             var d = mpc.AsDynamic();
 
@@ -141,7 +142,9 @@ namespace Umbraco.Tests.Membership
             member.Properties["title"].Value = "Test Value 1";
             member.Properties["bodyText"].Value = "Test Value 2";
             member.Properties["author"].Value = "Test Value 3";
-            var mpc = new MemberPublishedContent(member);
+
+            var mpt = ContentTypesCache.Get(PublishedItemType.Member, member.ContentTypeAlias);
+            var mpc = new PublishedMember(member, mpt);
 
             var d = mpc.AsDynamic();
 

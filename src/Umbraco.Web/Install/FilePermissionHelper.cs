@@ -5,6 +5,8 @@ using System.Web;
 using System.IO;
 using Umbraco.Core.IO;
 using umbraco;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Install
 {
@@ -95,13 +97,18 @@ namespace Umbraco.Web.Install
         public static bool TestContentXml(out List<string> errorReport)
         {
             errorReport = new List<string>();
+
+            // makes sense for xml cache only
+            var svc = FacadeServiceResolver.Current.Service as FacadeService;
+            if (svc == null) return true;
+
             // Test creating/saving/deleting a file in the same location as the content xml file
             // NOTE: We cannot modify the xml file directly because a background thread is responsible for 
             // that and we might get lock issues.
             try
             {
-                var xmlFile = content.GetUmbracoXmlDiskFileName() + ".tmp";
-                SaveAndDeleteFile(xmlFile);
+                // xml cache will persist file, other caches may do something else
+                svc.XmlStore.EnsureFilePermission();
                 return true;
             }
             catch

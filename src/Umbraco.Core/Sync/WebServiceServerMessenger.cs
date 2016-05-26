@@ -191,11 +191,11 @@ namespace Umbraco.Core.Sync
                         switch (messageType)
                         {
                             case MessageType.RefreshByJson:
-                                asyncResults.Add(client.BeginRefreshByJson(refresher.UniqueIdentifier, jsonPayload, Login, Password, null, null));
+                                asyncResults.Add(client.BeginRefreshByJson(refresher.RefresherUniqueId, jsonPayload, Login, Password, null, null));
                                 break;
 
                             case MessageType.RefreshAll:
-                                asyncResults.Add(client.BeginRefreshAll(refresher.UniqueIdentifier, Login, Password, null, null));
+                                asyncResults.Add(client.BeginRefreshAll(refresher.RefresherUniqueId, Login, Password, null, null));
                                 break;
 
                             case MessageType.RefreshById:
@@ -206,14 +206,14 @@ namespace Umbraco.Core.Sync
                                 {
                                     // bulk of ints is supported
                                     var json = JsonConvert.SerializeObject(ids.Cast<int>().ToArray());
-                                    var result = client.BeginRefreshByIds(refresher.UniqueIdentifier, json, Login, Password, null, null);
+                                    var result = client.BeginRefreshByIds(refresher.RefresherUniqueId, json, Login, Password, null, null);
                                     asyncResults.Add(result);
                                 }
                                 else // must be guids
                                 {
                                     // bulk of guids is not supported, iterate
                                     asyncResults.AddRange(ids.Select(i => 
-                                        client.BeginRefreshByGuid(refresher.UniqueIdentifier, (Guid)i, Login, Password, null, null)));
+                                        client.BeginRefreshByGuid(refresher.RefresherUniqueId, (Guid)i, Login, Password, null, null)));
                                 }
 
                                 break;
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Sync
 
                                 // must be ints
                                 asyncResults.AddRange(ids.Select(i => 
-                                    client.BeginRemoveById(refresher.UniqueIdentifier, (int)i, Login, Password, null, null)));
+                                    client.BeginRemoveById(refresher.RefresherUniqueId, (int)i, Login, Password, null, null)));
                                 break;
                         }
                     }

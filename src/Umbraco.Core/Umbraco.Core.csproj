@@ -380,6 +380,7 @@
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
     <Compile Include="Models\DictionaryItemExtensions.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
@@ -545,6 +546,12 @@
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="Services\Changes\ContentTypeChange.cs" />
+    <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
+    <Compile Include="Services\Changes\ContentTypeChangeTypes.cs" />
+    <Compile Include="Services\Changes\TreeChange.cs" />
+    <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
+    <Compile Include="Services\Changes\TreeChangeTypes.cs" />
     <Compile Include="Services\UnPublishedStatusType.cs" />
     <Compile Include="Services\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
@@ -562,7 +569,6 @@
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
-    <Compile Include="Macros\PartialViewMacroResult.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />

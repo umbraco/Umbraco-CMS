@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
         {
             if (propertyType.IsDetachedOrNested == false)
                 throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
-            var property = UmbracoContext.Current.ContentCache.InnerCache.CreateDetachedProperty(propertyType, value, isPreviewing);
+            var property = UmbracoContext.Current.ContentCache.CreateDetachedProperty(propertyType, value, isPreviewing);
             return property;
         }
 

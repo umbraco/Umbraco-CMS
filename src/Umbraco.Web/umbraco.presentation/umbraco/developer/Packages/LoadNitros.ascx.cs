@@ -61,7 +61,10 @@ namespace umbraco.presentation.developer.packages {
 
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
             ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
-            library.RefreshContent();
+
+            // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+            // but it should be managed automatically by services and caches!
+            //DistributedCache.Instance.RefreshAllFacade();
 
             loadNitros.Visible = false;
 

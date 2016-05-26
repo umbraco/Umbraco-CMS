@@ -103,33 +103,23 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
         internal class TestCacheRefresher : ICacheRefresher
         {
-            public Guid UniqueIdentifier
-            {
-                get { return Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"); }
-            }
-            public string Name
-            {
-                get { return "Test"; }
-            }
+            public static readonly Guid UniqueId = Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73");
+
+            public Guid RefresherUniqueId => UniqueId;
+
+            public string Name => "Test Cache Refresher";
+
             public void RefreshAll()
-            {
-                
-            }
+            { }
 
             public void Refresh(int id)
-            {
-                
-            }
+            { }
 
             public void Remove(int id)
-            {
-                
-            }
+            { }
 
             public void Refresh(Guid id)
-            {
-               
-            }
+            { }
         }
 
         internal class TestServerMessenger : IServerMessenger
@@ -142,7 +132,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             public List<string> PayloadsRefreshed = new List<string>(); 
             public int CountOfFullRefreshes = 0;
 
-            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+            public void PerformRefresh<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload)
             {
                 // doing nothing
             }

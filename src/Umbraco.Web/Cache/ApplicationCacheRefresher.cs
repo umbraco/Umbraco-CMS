@@ -1,33 +1,27 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Handles Application cache invalidation/refreshing
-    /// </summary>
     public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCacheRefresher>
     {
-        
-        public ApplicationCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
-        {
-        }
+        public ApplicationCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        protected override ApplicationCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Define
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.ApplicationCacheRefresherId); }
-        }
+        protected override ApplicationCacheRefresher Instance => this;
 
-        public override string Name
-        {
-            get { return "Applications cache refresher"; }
-        }
+        public static readonly Guid UniqueId = Guid.Parse("B15F34A1-BC1D-4F8B-8369-3222728AB4C8");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Application Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
@@ -47,5 +41,6 @@ namespace Umbraco.Web.Cache
             base.Remove(id);
         }
 
+        #endregion
     }
 }

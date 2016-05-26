@@ -11,6 +11,7 @@ using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
 using Umbraco.Web;
+using Umbraco.Web.Macros;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco
@@ -21,146 +22,28 @@ namespace umbraco
     [Obsolete("This needs to be removed, do not use")]
     public class helper
     {
-        public static bool IsNumeric(string Number)
+        public static bool IsNumeric(string number)
         {
             int result;
-            return int.TryParse(Number, out result);
+            return int.TryParse(number, out result);
         }        
 
-        public static String FindAttribute(IDictionary attributes, String key)
+        public static string FindAttribute(IDictionary attributes, string key)
         {
             return FindAttribute(null, attributes, key);
         }
 
-        public static String FindAttribute(IDictionary pageElements, IDictionary attributes, String key)
+        public static string FindAttribute(IDictionary pageElements, IDictionary attributes, string key)
         {
             // fix for issue 14862: lowercase for case insensitive matching
             key = key.ToLower();
 
-            string attributeValue = string.Empty;
+            var attributeValue = string.Empty;
             if (attributes[key] != null)
                 attributeValue = attributes[key].ToString();
 
-            attributeValue = parseAttribute(pageElements, attributeValue);
+            attributeValue = MacroRenderer.ParseAttribute(pageElements, attributeValue);
             return attributeValue;
         }
-
-        /// <summary>
-        /// This method will parse the attribute value to look for some special syntax such as
-        ///     [@requestKey]
-        ///     [%sessionKey]
-        ///     [#pageElement]
-        ///     [$recursiveValue]
-        /// </summary>
-        /// <param name="pageElements"></param>
-        /// <param name="attributeValue"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// You can even apply fallback's separated by comma's like:
-        /// 
-        ///     [@requestKey],[%sessionKey]
-        /// 
-        /// </remarks>
-        public static string parseAttribute(IDictionary pageElements, string attributeValue)
-        {
-            // Check for potential querystring/cookie variables
-            // SD: not sure why we are checking for len 3 here?
-            if (attributeValue.Length > 3 && attributeValue.StartsWith("["))
-            {
-                var attributeValueSplit = (attributeValue).Split(',');
-
-                // before proceeding, we don't want to process anything here unless each item starts/ends with a [ ]
-                // this is because the attribute value could actually just be a json array like [1,2,3] which we don't want to parse
-                //
-                // however, the last one can be a literal, must take care of this!
-                // so here, don't check the last one, which can be just anything
-                if (attributeValueSplit.Take(attributeValueSplit.Length - 1).All(x =>
-                    //must end with [
-                    x.EndsWith("]") &&
-                    //must start with [ and a special char
-                    (x.StartsWith("[@") || x.StartsWith("[%") || x.StartsWith("[#") || x.StartsWith("[$"))) == false)
-                {
-                    return attributeValue;
-                }
-
-                foreach (var attributeValueItem in attributeValueSplit)
-                {
-                    attributeValue = attributeValueItem;
-                    var trimmedValue = attributeValue.Trim();
-
-                    // Check for special variables (always in square-brackets like [name])
-                    if (trimmedValue.StartsWith("[") &&
-                        trimmedValue.EndsWith("]"))
-                    {
-                        attributeValue = trimmedValue;
-
-                        // find key name
-                        var keyName = attributeValue.Substring(2, attributeValue.Length - 3);
-                        var keyType = attributeValue.Substring(1, 1);
-
-                        switch (keyType)
-                        {
-                            case "@":
-                                attributeValue = HttpContext.Current.Request[keyName];
-                                break;
-                            case "%":
-                                attributeValue = HttpContext.Current.Session[keyName] != null ? HttpContext.Current.Session[keyName].ToString() : null;
-                                if (string.IsNullOrEmpty(attributeValue))
-                                    attributeValue = HttpContext.Current.Request.GetCookieValue(keyName);
-                                break;
-                            case "#":
-                                if (pageElements[keyName] != null)
-                                    attributeValue = pageElements[keyName].ToString();
-                                else
-                                    attributeValue = "";
-                                break;
-                            case "$":
-                                if (pageElements[keyName] != null && pageElements[keyName].ToString() != string.Empty)
-                                {
-                                    attributeValue = pageElements[keyName].ToString();
-                                }
-                                else
-                                {
-                                    // reset attribute value in case no value has been found on parents
-                                    attributeValue = String.Empty;
-                                    XmlDocument umbracoXML = global::umbraco.content.Instance.XmlContent;
-
-                                    String[] splitpath = (String[])pageElements["splitpath"];
-                                    for (int i = 0; i < splitpath.Length - 1; i++)
-                                    {
-                                        XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
-                                        if (element == null)
-                                            continue;
-                                        string xpath = "{0}";
-                                        XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
-                                            keyName));
-                                        if (currentNode != null && currentNode.FirstChild != null &&
-                                           !string.IsNullOrEmpty(currentNode.FirstChild.Value) &&
-                                           !string.IsNullOrEmpty(currentNode.FirstChild.Value.Trim()))
-                                        {
-                                            HttpContext.Current.Trace.Write("parameter.recursive", "Item loaded from " + splitpath[splitpath.Length - i - 1]);
-                                            attributeValue = currentNode.FirstChild.Value;
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                        }
-
-                        if (attributeValue != null)
-                        {
-                            attributeValue = attributeValue.Trim();
-                            if (attributeValue != string.Empty)
-                                break;
-                        }
-                        else
-                            attributeValue = string.Empty;
-                    }
-                }
-            }
-
-            return attributeValue;
-        }
-
     }
 }

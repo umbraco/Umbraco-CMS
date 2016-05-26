@@ -33,7 +33,7 @@ namespace Umbraco.Core.Sync
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType)
         {
-            RefresherId = refresher.UniqueIdentifier;
+            RefresherId = refresher.RefresherUniqueId;
             RefreshType = refreshType;
         }
 

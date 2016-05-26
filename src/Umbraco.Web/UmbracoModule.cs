@@ -22,6 +22,7 @@ using Umbraco.Web.Security;
 using umbraco;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Sync;
+using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
@@ -63,11 +64,13 @@ namespace Umbraco.Web
 
             // create the UmbracoContext singleton, one per request, and assign
             // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
-            UmbracoContext.EnsureContext(
-                httpContext,
-                ApplicationContext.Current,
-                new WebSecurity(httpContext, ApplicationContext.Current),
-                true);
+		    UmbracoContext.EnsureContext(
+		        httpContext, ApplicationContext.Current,
+                FacadeServiceResolver.Current.Service,
+		        new WebSecurity(httpContext, ApplicationContext.Current),
+		        UmbracoConfig.For.UmbracoSettings(),
+		        UrlProviderResolver.Current.Providers,
+		        true);
 		}
 
 		/// <summary>

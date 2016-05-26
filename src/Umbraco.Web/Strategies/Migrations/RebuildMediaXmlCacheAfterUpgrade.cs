@@ -4,6 +4,8 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -27,8 +29,11 @@ namespace Umbraco.Web.Strategies.Migrations
 
             if (e.ConfiguredVersion <= target70)
             {
-                var mediasvc = (MediaService)ApplicationContext.Current.Services.MediaService;
-                mediasvc.RebuildXmlStructures();
+                // maintain - for backward compatibility?
+                //var mediasvc = (MediaService)ApplicationContext.Current.Services.MediaService;
+                //mediasvc.RebuildMediaXml();
+                var svc = FacadeServiceResolver.Current.Service as FacadeService;
+                svc?.RebuildMediaXml();
             }
         }
     }

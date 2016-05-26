@@ -29,10 +29,10 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>        
+        /// </summary>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         Attempt<OperationStatus> Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -99,32 +99,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
-
-
-        /// <summary>
-        /// Returns the persisted content's XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        XElement GetContentXml(int contentId);
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        XElement GetContentPreviewXml(int contentId, Guid version);
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all documents
-        /// </summary>
-        /// <param name="contentTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all content
-        /// </param>
-        void RebuildXmlStructures(params int[] contentTypeIds);
-
         int CountPublished(string contentTypeAlias = null);
         int Count(string contentTypeAlias = null);
         int CountChildren(int parentId, string contentTypeAlias = null);
@@ -222,7 +196,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetChildren(int id);
-        
+
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
@@ -251,7 +225,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
-        
+
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
@@ -323,7 +297,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>        
+        /// </summary>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
@@ -443,13 +417,6 @@ namespace Umbraco.Core.Services
         bool HasPublishedVersion(int id);
 
         /// <summary>
-        /// Re-Publishes all Content
-        /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool RePublishAll(int userId = 0);
-
-        /// <summary>
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
@@ -520,11 +487,11 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Optional Id of the User deleting the Content</param>        
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
         void Delete(IContent content, int userId = 0);
 
         /// <summary>
-        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
         /// to the new copy, which is returned. Recursively copies all children.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
@@ -535,7 +502,7 @@ namespace Umbraco.Core.Services
         IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
-        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
         /// to the new copy which is returned.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>

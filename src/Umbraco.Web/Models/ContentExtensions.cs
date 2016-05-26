@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
+using Domain = Umbraco.Web.Routing.Domain;
 
 namespace Umbraco.Web.Models
 {
@@ -48,8 +49,11 @@ namespace Umbraco.Web.Models
                 ? null // for tests only
                 : umbracoContext.ContentCache.GetRouteById(contentId); // cached
 
-            var domainHelper = new DomainHelper(domainService);
-            IDomain domain;
+            var domainCache = umbracoContext == null
+                ? new PublishedCache.XmlPublishedCache.DomainCache(domainService) // for tests only
+                : umbracoContext.Facade.DomainCache; // default
+            var domainHelper = new DomainHelper(domainCache);
+            Domain domain;
 
             if (route == null)
             {
@@ -67,7 +71,7 @@ namespace Umbraco.Web.Models
                     hasDomain = content != null && domainHelper.NodeHasDomains(content.Id);
                 }
 
-                domain = hasDomain ? domainHelper.DomainForNode(content.Id, current).UmbracoDomain : null;
+                domain = hasDomain ? domainHelper.DomainForNode(content.Id, current) : null;
             }
             else
             {
@@ -77,14 +81,14 @@ namespace Umbraco.Web.Models
                 var pos = route.IndexOf('/');
                 domain = pos == 0
                     ? null
-                    : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current).UmbracoDomain;
+                    : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
             }
 
-            var rootContentId = domain == null ? -1 : domain.RootContentId;
-            var wcDomain = DomainHelper.FindWildcardDomainInPath(domainService.GetAll(true), contentPath, rootContentId);
+            var rootContentId = domain == null ? -1 : domain.ContentId;
+            var wcDomain = DomainHelper.FindWildcardDomainInPath(domainCache.GetAll(true), contentPath, rootContentId);
 
-            if (wcDomain != null) return new CultureInfo(wcDomain.LanguageIsoCode);
-            if (domain != null) return new CultureInfo(domain.LanguageIsoCode);
+            if (wcDomain != null) return wcDomain.Culture;
+            if (domain != null) return domain.Culture;
             return GetDefaultCulture(localizationService);
         }
 

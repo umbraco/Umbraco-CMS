@@ -18,6 +18,12 @@
         /// defined in Application_OnError. If no such error handler is defined
         /// then you'll see the Yellow Screen Of Death (YSOD) error page.
         /// </summary>
-        Throw
+        Throw,
+
+        /// <summary>
+        /// Silently eat the error and display the custom content reported in
+        /// the error event args
+        /// </summary>
+        Content
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
     public class ContentFinderByNiceUrl : IContentFinder
     {
-	    protected ILogger Logger { get; private set; }
+	    protected ILogger Logger { get; }
 
 	    public ContentFinderByNiceUrl(ILogger logger)
 	    {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
         {
 			string route;
 			if (docRequest.HasDomain)
-				route = docRequest.Domain.RootNodeId + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.GetAbsolutePathDecoded());
+				route = docRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(docRequest.Domain.Uri, docRequest.Uri.GetAbsolutePathDecoded());
 			else
 				route = docRequest.Uri.GetAbsolutePathDecoded();
 

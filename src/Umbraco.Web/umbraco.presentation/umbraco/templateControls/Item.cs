@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Macros;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.presentation.templateControls
@@ -227,7 +228,7 @@ namespace umbraco.presentation.templateControls
         {
             if (!String.IsNullOrEmpty(NodeId))
             {
-                string tempNodeId = helper.parseAttribute(PageElements, NodeId);
+                string tempNodeId = MacroRenderer.ParseAttribute(PageElements, NodeId);
                 int nodeIdInt = 0;
                 if (int.TryParse(tempNodeId, out nodeIdInt))
                 {

@@ -120,9 +120,8 @@ namespace Umbraco.Web.Routing
         /// </summary>
 	    internal void OnPreparing()
 	    {
-	        var handler = Preparing;
-            if (handler != null) handler(this, EventArgs.Empty);
-	        _readonlyUri = true;
+            Preparing?.Invoke(this, EventArgs.Empty);
+            _readonlyUri = true;
 	    }
 
 		/// <summary>
@@ -130,8 +129,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		internal void OnPrepared()
 		{
-            var handler = Prepared;
-            if (handler != null) handler(this, EventArgs.Empty);
+            Prepared?.Invoke(this, EventArgs.Empty);
 
 		    if (HasPublishedContent == false)
                 Is404 = true; // safety
@@ -385,17 +383,11 @@ namespace Umbraco.Web.Routing
 
 		#region Domain and Culture
 
-	    [Obsolete("Do not use this property, use the non-legacy UmbracoDomain property instead")]
-	    public Domain Domain
-	    {
-	        get { return new Domain(UmbracoDomain); }
-	    }
-
         //TODO: Should we publicize the setter now that we are using a non-legacy entity??
         /// <summary>
         /// Gets or sets the content request's domain.
         /// </summary>
-        public IDomain UmbracoDomain { get; internal set; }
+        public DomainAndUri Domain { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the content request's domain Uri.
@@ -408,7 +400,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public bool HasDomain
 		{
-			get { return UmbracoDomain != null; }
+            get { return Domain != null; }
 		}
 
 	    private CultureInfo _culture;

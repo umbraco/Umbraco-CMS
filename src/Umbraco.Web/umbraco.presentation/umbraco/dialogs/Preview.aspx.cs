@@ -1,21 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Configuration;
-using System.Data;
-using System.Globalization;
-using System.Linq;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 using Umbraco.Web;
-using umbraco.cms.businesslogic.web;
-using umbraco.presentation.preview;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Web.PublishedCache;
 
 namespace umbraco.presentation.dialogs
 {
@@ -23,19 +10,21 @@ namespace umbraco.presentation.dialogs
     {
         public Preview()
         {
-            CurrentApp = Constants.Applications.Content.ToString();
+            CurrentApp = Constants.Applications.Content;
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var d = new Document(Request.GetItemAs<int>("id"));
-            var pc = new PreviewContent(Security.CurrentUser, Guid.NewGuid(), false);
-            pc.PrepareDocument(Security.CurrentUser, d, true);
-            pc.SavePreviewSet();
-            docLit.Text = d.Text;
-            changeSetUrl.Text = pc.PreviewsetPath;
-            pc.ActivatePreviewCookie();
-            Response.Redirect("../../" + d.Id.ToString(CultureInfo.InvariantCulture) + ".aspx", true);
+            var user = UmbracoContext.Security.CurrentUser;
+            var contentId = Request.GetItemAs<int>("id");
+
+            var facadeService = FacadeServiceResolver.Current.Service;
+            var previewToken = facadeService.EnterPreview(user, contentId);
+
+            UmbracoContext.HttpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+
+            // use a numeric url because content may not be in cache and so .Url would fail
+            Response.Redirect($"../../{contentId}.aspx", true);
         }
     }
 }

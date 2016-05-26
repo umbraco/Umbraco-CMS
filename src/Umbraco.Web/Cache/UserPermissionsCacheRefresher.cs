@@ -1,43 +1,34 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Used only to invalidate the user permissions cache
-    /// </summary>
-    /// <remarks>
-    /// The UserCacheRefresher will also clear a user's permissions cache, this refresher is for invalidating only permissions
-    /// for users/content, not the users themselves.
-    /// </remarks>
     public sealed class UserPermissionsCacheRefresher : CacheRefresherBase<UserPermissionsCacheRefresher>
     {
-        public UserPermissionsCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
-        {
-        }
+        public UserPermissionsCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        protected override UserPermissionsCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Define
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.UserPermissionsCacheRefresherId); }
-        }
+        protected override UserPermissionsCacheRefresher Instance => this;
 
+        public static readonly Guid UniqueId = Guid.Parse("840AB9C5-5C0B-48DB-A77E-29FE4B80CD3A");
 
-        public override string Name
-        {
-            get { return "User permissions cache refresher"; }
-        }
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "User Permissions Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
-            if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);    
+            var userPermissionCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
+            if (userPermissionCache)
+                userPermissionCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);    
             base.RefreshAll();
         }
 
@@ -49,14 +40,12 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
+            var userPermissionCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
+            if (userPermissionCache)
+                userPermissionCache.Result.ClearCacheByKeySearch($"{CacheKeys.UserPermissionsCacheKey}{id}");
             base.Remove(id);
         }
 
-        private Attempt<IRuntimeCacheProvider> UserPermissionsCache
-        {
-            get { return CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
-        }
+        #endregion
     }
 }

@@ -6,9 +6,11 @@ using System.Web.UI.WebControls;
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.templateControls
 {
@@ -149,39 +151,40 @@ namespace umbraco.presentation.templateControls
             int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
 
             if ((!String.IsNullOrEmpty(Language) && Text != "") || !string.IsNullOrEmpty(FileLocation)) {
-                var tempMacro = new macro();
-                tempMacro.GenerateMacroModelPropertiesFromAttributes(MacroAttributes);
+                var tempMacro = new MacroModel();
+                MacroRenderer.GenerateMacroModelPropertiesFromAttributes(tempMacro, MacroAttributes);
                 if (string.IsNullOrEmpty(FileLocation)) {
-                    tempMacro.Model.ScriptCode = Text;
-                    tempMacro.Model.ScriptLanguage = Language;
+                    tempMacro.ScriptCode = Text;
+                    tempMacro.ScriptLanguage = Language;
                 } else {
-                    tempMacro.Model.ScriptName = FileLocation;
+                    tempMacro.ScriptName = FileLocation;
                 }
                 
-                tempMacro.Model.MacroType = MacroTypes.PartialView;
+                tempMacro.MacroType = MacroTypes.PartialView;
 
                 if (!String.IsNullOrEmpty(Attributes["Cache"])) {
                     var cacheDuration = 0;
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))
-                        tempMacro.Model.CacheDuration = cacheDuration;
+                        tempMacro.CacheDuration = cacheDuration;
                     else
                         Context.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
-                var c = tempMacro.RenderMacro((Hashtable)Context.Items["pageElements"], pageId);
+                var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                var c = renderer.Render(tempMacro, (Hashtable) Context.Items["pageElements"], pageId).GetAsControl();
                 if (c != null)
                 {
-                    Exceptions = tempMacro.Exceptions;
-
+                    Exceptions = renderer.Exceptions;
                     Controls.Add(c);
                 }
                 else
                     Context.Trace.Warn("Template", "Result of inline macro scripting is null");
             
             } else {
-                var tempMacro = macro.GetMacro(Alias);
+                var tempMacro = MacroRenderer.GetMacroModel(Alias);
                 if (tempMacro != null) {
                     try {
-                        var c = tempMacro.RenderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
+                        var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                        var c = renderer.Render(tempMacro, (Hashtable)Context.Items["pageElements"], pageId, MacroAttributes).GetAsControl();
                         if (c != null)
                             Controls.Add(c);
                         else

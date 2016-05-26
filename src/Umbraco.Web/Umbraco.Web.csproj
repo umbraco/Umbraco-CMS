@@ -361,7 +361,7 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
-    <Compile Include="Cache\ICacheRefresher.cs" />
+    <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
@@ -371,11 +371,33 @@
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Macros\MacroContent.cs" />
+    <Compile Include="Macros\MacroModel.cs" />
+    <Compile Include="Macros\MacroPropertyModel.cs" />
+    <Compile Include="Macros\MacroRenderer.cs" />
+    <Compile Include="Macros\UserControlMacroEngine.cs" />
+    <Compile Include="Macros\XsltMacroEngine.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
+    <Compile Include="PublishedCache\FacadeServiceBase.cs" />
+    <Compile Include="PublishedCache\FacadeServiceResolver.cs" />
+    <Compile Include="PublishedCache\IDomainCache.cs" />
+    <Compile Include="PublishedCache\IFacade.cs" />
+    <Compile Include="PublishedCache\IFacadeService.cs" />
+    <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\PublishedCacheBase.cs" />
+    <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\Facade.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\FacadeService.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
+    <Compile Include="Routing\Domain.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
@@ -522,10 +544,8 @@
     <Compile Include="Cache\MediaCacheRefresher.cs" />
     <Compile Include="Cache\MemberCacheRefresher.cs" />
     <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
-    <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
-    <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
@@ -621,7 +641,7 @@
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
-    <Compile Include="PublishedCache\MemberPublishedContent.cs" />
+    <Compile Include="PublishedCache\PublishedMember.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
@@ -780,7 +800,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheFilePersister.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -932,16 +951,9 @@
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="ContextualPublishedCacheExtensions.cs" />
+    <Compile Include="IPublishedContentCacheExtensions.cs" />
     <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedCacheOfT.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedMediaCache.cs" />
-    <Compile Include="PublishedCache\PublishedCachesResolver.cs" />
-    <Compile Include="PublishedCache\IPublishedCaches.cs" />
-    <Compile Include="PublishedCache\PublishedCaches.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
@@ -1229,9 +1241,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\content.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1241,7 +1250,6 @@
     <Compile Include="umbraco.presentation\library.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\macro.cs" />
     <Compile Include="umbraco.presentation\page.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1349,7 +1357,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\preview\PreviewContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

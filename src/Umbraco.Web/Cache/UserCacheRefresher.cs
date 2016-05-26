@@ -1,41 +1,36 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
-
 using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Handles User cache invalidation/refreshing
-    /// </summary>
     public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresher>
     {
-        public UserCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
-        {
-        }
+        public UserCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        protected override UserCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Define
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.UserCacheRefresherId); }
-        }
+        protected override UserCacheRefresher Instance => this;
 
-        public override string Name
-        {
-            get { return "User cache refresher"; }
-        }
+        public static readonly Guid UniqueId = Guid.Parse("E057AF6D-2EE6-41F4-8045-3694010F0AA6");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "User Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUser>();
-            if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
+            var userPermissionsCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
+            if (userPermissionsCache)
+                userPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             base.RefreshAll();
         }
 
@@ -51,16 +46,13 @@ namespace Umbraco.Web.Cache
             if (userCache)
                 userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
 
-            if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
-            
+            var userPermissionsCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
+            if (userPermissionsCache)
+                userPermissionsCache.Result.ClearCacheByKeySearch($"{CacheKeys.UserPermissionsCacheKey}{id}");
+
             base.Remove(id);
         }
 
-        private Attempt<IRuntimeCacheProvider> UserPermissionsCache
-        {
-            get { return CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
-        }
-
+        #endregion
     }
 }

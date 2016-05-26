@@ -33,43 +33,30 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
         protected void visualizeDo_Click(object sender, EventArgs e)
         {
-
             // get xslt file
-            string xslt = "";
+            string xslt;
             if (xsltSelection.Value.Contains("<xsl:stylesheet"))
             {
+                // assume xslt contains everything we need
                 xslt = xsltSelection.Value;
             }
             else
             {
-                System.IO.StreamReader xsltFile =
-                System.IO.File.OpenText(
-                    IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/clean.xslt")
-                );
-
-                xslt = xsltFile.ReadToEnd();
-                xsltFile.Close();
-
-                // parse xslt
+                // read clean xslt, paste selection, and prepare support for XSLT extensions
+                xslt = File.ReadAllText(IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/clean.xslt"));
                 xslt = xslt.Replace("<!-- start writing XSLT -->", xsltSelection.Value);
-
-                // prepare support for XSLT extensions
-                xslt = macro.AddXsltExtensionsToHeader(xslt);
-
+                xslt = Umbraco.Web.Macros.XsltMacroEngine.AddXsltExtensionsToHeader(xslt);
             }
 
-            Dictionary<string, object> parameters = new Dictionary<string, object>(1);
-            parameters.Add("currentPage", library.GetXmlNodeById(contentPicker.Value));
+            int pageId;
+            if (int.TryParse(contentPicker.Value, out pageId) == false)
+                pageId = -1;
 
-
-            // apply the XSLT transformation
-            string xsltResult = "";
-            XmlTextReader xslReader = null;
+            // transform
+            string xsltResult;
             try
             {
-                xslReader = new XmlTextReader(new StringReader(xslt));
-                System.Xml.Xsl.XslCompiledTransform xsl = macro.CreateXsltTransform(xslReader, false);
-                xsltResult = macro.GetXsltTransformResult(new XmlDocument(), xsl, parameters);
+                xsltResult = Umbraco.Web.Macros.XsltMacroEngine.TestXsltTransform(ApplicationContext.Current.ProfilingLogger, xslt, pageId);
             }
             catch (Exception ee)
             {
@@ -77,10 +64,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
                     "<div class=\"error\"><h3>Error parsing the XSLT:</h3><p>{0}</p></div>",
                     ee.ToString());
             }
-            finally
-            {
-                xslReader.Close();
-            }
+
             visualizeContainer.Visible = true;
 
             // update output

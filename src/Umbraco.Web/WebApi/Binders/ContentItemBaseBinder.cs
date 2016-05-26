@@ -20,6 +20,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using IModelBinder = System.Web.Http.ModelBinding.IModelBinder;
@@ -98,12 +100,16 @@ namespace Umbraco.Web.WebApi.Binders
         {
             var request = actionContext.Request;
 
-            //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
+            // IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
             var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
+
             UmbracoContext.EnsureContext(
-                httpContext, 
-                ApplicationContext.Current,
-                new WebSecurity(httpContext, ApplicationContext.Current));
+                httpContext, ApplicationContext.Current,
+                FacadeServiceResolver.Current.Service,
+                new WebSecurity(httpContext, ApplicationContext.Current),
+                Core.Configuration.UmbracoConfig.For.UmbracoSettings(), 
+                UrlProviderResolver.Current.Providers,
+                false);
 
             var content = request.Content;
 

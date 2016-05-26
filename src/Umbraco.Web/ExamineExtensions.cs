@@ -14,16 +14,15 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class ExamineExtensions
 	{
-        internal static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results,
-			ContextualPublishedCache cache)
+        internal static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
 		{
-			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent, 
-			// however this is currently not the case: 
+			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent,
+			// however this is currently not the case:
 			// http://examine.codeplex.com/workitem/10350
 
 		    var list = new List<IPublishedContent>();
             var set = new PublishedContentSet<IPublishedContent>(list);
-			
+
 			foreach (var result in results.OrderByDescending(x => x.Score))
 			{
 				var content = cache.GetById(result.Id);

@@ -10,8 +10,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
+    internal abstract class RecycleBinRepository<TId, TEntity, TRepository> : VersionableRepositoryBase<TId, TEntity, TRepository>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
+        where TRepository :  class, IRepository
     {
         protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMappingResolver mappingResolver)
             : base(work, cache, logger, contentSection, mappingResolver)
@@ -23,74 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual IEnumerable<TEntity> GetEntitiesInRecycleBin()
         {
             return GetByQuery(Query.Where(entity => entity.Trashed));
-        }
-
-        /// <summary>
-        /// Empties the Recycle Bin by running single bulk-Delete queries
-        /// against the Content- or Media's Recycle Bin.
-        /// </summary>
-        /// <returns></returns>
-        public virtual bool EmptyRecycleBin()
-        {
-            var db = this.Database;
-
-            //Construct and execute delete statements for all trashed items by 'nodeObjectType'
-            var deletes = new List<string>
-            {
-                FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
-                FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
-                @"DELETE FROM umbracoAccessRule WHERE umbracoAccessRule.accessId IN (
-                    SELECT TB1.id FROM umbracoAccess as TB1 
-                    INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id 
-                    WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
-                FormatDeleteStatement("umbracoAccess", "nodeId"),
-                FormatDeleteStatement("umbracoRelation", "parentId"),
-                FormatDeleteStatement("umbracoRelation", "childId"),
-                FormatDeleteStatement("cmsTagRelationship", "nodeId"),
-                FormatDeleteStatement("umbracoDomains", "domainRootStructureID"),
-                FormatDeleteStatement("cmsDocument", "nodeId"),
-                FormatDeleteStatement("cmsPropertyData", "contentNodeId"),
-                FormatDeleteStatement("cmsPreviewXml", "nodeId"),
-                FormatDeleteStatement("cmsContentVersion", "ContentId"),
-                FormatDeleteStatement("cmsContentXml", "nodeId"),
-                FormatDeleteStatement("cmsContent", "nodeId"),
-                "UPDATE umbracoNode SET parentID = '" + RecycleBinId + "' WHERE trashed = '1' AND nodeObjectType = @NodeObjectType",
-                "DELETE FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType"
-            };
-
-            //Wraps in transaction - this improves performance and also ensures
-            // that if any of the deletions fails that the whole thing is rolled back.
-            using (var trans = db.GetTransaction())
-            {
-                try
-                {
-                    foreach (var delete in deletes)
-                    {
-                        db.Execute(delete, new { NodeObjectType = NodeObjectTypeId });
-                    }
-
-                    trans.Complete();
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // transaction will rollback
-                    Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
-                    throw;
-                }
-            }
-        }
-
-        private string FormatDeleteStatement(string tableName, string keyName)
-        {
-            //This query works with sql ce and sql server:
-            //DELETE FROM umbracoUser2NodeNotify WHERE umbracoUser2NodeNotify.nodeId IN 
-            //(SELECT nodeId FROM umbracoUser2NodeNotify as TB1 INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = 'C66BA18E-EAF3-4CFF-8A22-41B16D66A972')
-            return
-                string.Format(
-                    "DELETE FROM {0} WHERE {0}.{1} IN (SELECT TB1.{1} FROM {0} as TB1 INNER JOIN umbracoNode as TB2 ON TB1.{1} = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
-                    tableName, keyName);
         }
 
         /// <summary>

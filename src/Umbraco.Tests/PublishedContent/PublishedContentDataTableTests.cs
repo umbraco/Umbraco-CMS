@@ -22,11 +22,6 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			base.Initialize();
 
-            // need to specify a custom callback for unit tests
-            // AutoPublishedContentTypes generates properties automatically
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
-
             // need to specify a different callback for testing
 			PublishedContentExtensions.GetPropertyAliasesAndNames = s =>
 				{

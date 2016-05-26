@@ -14,15 +14,6 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : IAggregateRoot
     {
         /// <summary>
-        /// Rebuilds the xml structures for all TEntity if no content type ids are specified, otherwise rebuilds the xml structures
-        /// for only the content types specified
-        /// </summary>
-        /// <param name="serializer">The serializer to convert TEntity to Xml</param>
-        /// <param name="groupSize">Structures will be rebuilt in chunks of this size</param>
-        /// <param name="contentTypeIds"></param>
-        void RebuildXmlStructures(Func<TEntity, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null);
-
-        /// <summary>
         /// Get the total count of entities
         /// </summary>
         /// <param name="contentTypeAlias"></param>

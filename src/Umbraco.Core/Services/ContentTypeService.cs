@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -25,6 +21,7 @@ namespace Umbraco.Core.Services
             _contentService = contentService;
         }
 
+        protected override IContentTypeService Instance => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
@@ -86,70 +83,6 @@ namespace Umbraco.Core.Services
                 var aliases = repo.GetAllContentTypeAliases(guids);
                 uow.Complete();
                 return aliases;
-            }
-        }
-
-        /// <summary>
-        /// Generates the complete (simplified) XML DTD.
-        /// </summary>
-        /// <returns>The DTD as a string</returns>
-        public string GetDtd()
-        {
-            var dtd = new StringBuilder();
-            dtd.AppendLine("<!DOCTYPE root [ ");
-
-            dtd.AppendLine(GetContentTypesDtd());
-            dtd.AppendLine("]>");
-
-            return dtd.ToString();
-        }
-
-        /// <summary>
-        /// Generates the complete XML DTD without the root.
-        /// </summary>
-        /// <returns>The DTD as a string</returns>
-        public string GetContentTypesDtd()
-        {
-            var dtd = new StringBuilder();
-            try
-            {
-                var strictSchemaBuilder = new StringBuilder();
-
-                var contentTypes = GetAll(new int[0]);
-                foreach (ContentType contentType in contentTypes)
-                {
-                    string safeAlias = contentType.Alias.ToSafeAlias();
-                    if (safeAlias != null)
-                    {
-                        strictSchemaBuilder.AppendLine($"<!ELEMENT {safeAlias} ANY>");
-                        strictSchemaBuilder.AppendLine($"<!ATTLIST {safeAlias} id ID #REQUIRED>");
-                    }
-                }
-
-                // Only commit the strong schema to the container if we didn't generate an error building it
-                dtd.Append(strictSchemaBuilder);
-            }
-            catch (Exception exception)
-            {
-                LogHelper.Error<ContentTypeService>("Error while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
-            }
-            return dtd.ToString();
-        }
-
-        protected override void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
-        {
-            var toUpdate = GetContentTypesForXmlUpdates(contentTypes).ToArray();
-            if (toUpdate.Any() == false) return;
-
-            var contentService = _contentService as ContentService;
-            if (contentService != null)
-            {
-                contentService.RePublishAll(toUpdate.Select(x => x.Id).ToArray());
-            }
-            else
-            {
-                //this should never occur, the content service should always be typed but we'll check anyways.
-                _contentService.RePublishAll();
             }
         }
     }

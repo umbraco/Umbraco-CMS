@@ -59,20 +59,5 @@ namespace Umbraco.Core.Persistence.Repositories
         //IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
         //    Sql sql, int pageIndex, int pageSize, out int totalRecords,
         //    Func<IEnumerable<TDto>, int[]> resolveIds);
-
-        /// <summary>
-        /// Used to add/update published xml for the media item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml);
-
-        /// <summary>
-        /// Used to add/update preview xml for the content item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml);
-
     }
 }

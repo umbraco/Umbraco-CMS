@@ -13,6 +13,7 @@ namespace Umbraco.Tests.Services
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
+    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class MemberTypeServiceTests : BaseServiceTest
     {
         [SetUp]
@@ -150,7 +151,7 @@ namespace Umbraco.Tests.Services
 
             var alias = contentType1.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias;
             var elementToMatch = "<" + alias + ">";
-            
+
             foreach (var c in contentItems1)
             {
                 var xml = DatabaseContext.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
@@ -158,7 +159,7 @@ namespace Umbraco.Tests.Services
                 Assert.IsTrue(xml.Xml.Contains(elementToMatch)); //verify that it is there before we remove the property
             }
 
-            //remove a property (NOT ONE OF THE DEFAULTS)            
+            //remove a property (NOT ONE OF THE DEFAULTS)
             contentType1.RemovePropertyType(alias);
             ServiceContext.MemberTypeService.Save(contentType1);
 

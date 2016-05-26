@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -22,7 +20,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -48,8 +45,9 @@ namespace Umbraco.Core.Persistence.Repositories
         }
     }
 
-    internal abstract class VersionableRepositoryBase<TId, TEntity> : NPocoRepositoryBase<TId, TEntity>
+    internal abstract class VersionableRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
+        where TRepository : class, IRepository
     {
         private readonly IContentSection _contentSection;
 
@@ -58,6 +56,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _contentSection = contentSection;
         }
+
+        protected abstract TRepository Instance { get; }
 
         #region IRepositoryVersionable Implementation
 
@@ -103,10 +103,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var list =
                 Database.Fetch<ContentVersionDto>(
                     "WHERE versionId <> @VersionId AND (ContentId = @Id AND VersionDate < @VersionDate)",
-                    new {VersionId = latestVersionDto.VersionId, Id = id, VersionDate = versionDate});
+                    new { /*VersionId =*/ latestVersionDto.VersionId, Id = id, VersionDate = versionDate});
             if (list.Any() == false) return;
 
-            using (var transaction = Database.GetTransaction())
+            using (var transaction = Database.GetTransaction()) // fixme - though... already in a unit of work?
             {
                 foreach (var dto in list)
                 {
@@ -479,7 +479,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     if (result.ContainsKey(def.Id))
                     {
-                        Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                        Logger.Warn<VersionableRepositoryBase<TId, TEntity, TRepository>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
                     }
                     result[def.Id] = new PropertyCollection(properties);
                 }
@@ -541,7 +541,60 @@ namespace Umbraco.Core.Persistence.Repositories
             return SqlSyntax.GetQuotedTableName(tableName) + "." + SqlSyntax.GetQuotedColumnName(fieldName);
         }
 
+        #region UnitOfWork Events
+
+        public class UnitOfWorkEntityEventArgs : EventArgs
+        {
+            public UnitOfWorkEntityEventArgs(IDatabaseUnitOfWork unitOfWork, TEntity entity)
+            {
+                UnitOfWork = unitOfWork;
+                Entity = entity;
+            }
+
+            public IDatabaseUnitOfWork UnitOfWork { get; }
+
+            public TEntity Entity { get; }
+        }
+
+        public class UnitOfWorkVersionEventArgs : EventArgs
+        {
+            public UnitOfWorkVersionEventArgs(IDatabaseUnitOfWork unitOfWork, int entityId, Guid versionId)
+            {
+                UnitOfWork = unitOfWork;
+                EntityId = entityId;
+                VersionId = versionId;
+            }
+
+            public IDatabaseUnitOfWork UnitOfWork { get; private set; }
+
+            public int EntityId { get; }
+
+            public Guid VersionId { get; }
+        }
+
+        public static event TypedEventHandler<TRepository, UnitOfWorkEntityEventArgs> UowRefreshedEntity;
+        public static event TypedEventHandler<TRepository, UnitOfWorkEntityEventArgs> UowRemovingEntity;
+        public static event TypedEventHandler<TRepository, UnitOfWorkVersionEventArgs> UowRemovingVersion;
+
+        protected void OnUowRefreshedEntity(UnitOfWorkEntityEventArgs args)
+        {
+            UowRefreshedEntity.RaiseEvent(args, Instance);
+        }
+
+        protected void OnUowRemovingEntity(UnitOfWorkEntityEventArgs args)
+        {
+            UowRemovingEntity.RaiseEvent(args, Instance);
+        }
+
+        protected void OnUowRemovingVersion(UnitOfWorkVersionEventArgs args)
+        {
+            UowRemovingVersion.RaiseEvent(args, Instance);
+        }
+
+        #endregion
+
         /// <summary>
+        /// 
         /// Deletes all media files passed in.
         /// </summary>
         /// <param name="files"></param>
@@ -578,7 +631,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<VersionableRepositoryBase<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    Logger.Error<VersionableRepositoryBase<TId, TEntity, TRepository>>("An error occurred while deleting file attached to nodes: " + file, e);
                     allsuccess = false;
                 }
             });

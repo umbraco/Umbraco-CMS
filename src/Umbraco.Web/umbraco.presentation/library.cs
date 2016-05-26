@@ -29,6 +29,8 @@ using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Language = umbraco.cms.businesslogic.language.Language;
 using Media = umbraco.cms.businesslogic.media.Media;
 using Member = umbraco.cms.businesslogic.member.Member;
@@ -38,8 +40,8 @@ namespace umbraco
 {
     /// <summary>
     /// Function library for umbraco. Includes various helper-methods and methods to
-    /// save and load data from umbraco. 
-    /// 
+    /// save and load data from umbraco.
+    ///
     /// Especially usefull in XSLT where any of these methods can be accesed using the umbraco.library name-space. Example:
     /// &lt;xsl:value-of select="umbraco.library:NiceUrl(@id)"/&gt;
     /// </summary>
@@ -71,7 +73,7 @@ namespace umbraco
         private page _page;
 
         #endregion
-        
+
         #region Constructors
 
         /// <summary>
@@ -83,7 +85,8 @@ namespace umbraco
 
         public library(int id)
         {
-            _page = new page(((System.Xml.IHasXmlNode)GetXmlNodeById(id.ToString()).Current).GetNode());
+            var content = GetSafeContentCache().GetById(id);
+            _page = new page(content);
         }
 
         /// <summary>
@@ -93,85 +96,6 @@ namespace umbraco
         public library(page page)
         {
             _page = page;
-        }
-
-        #endregion       
-
-        #region Publish Helper Methods
-
-        
-        /// <summary>
-        /// Unpublish a node, by removing it from the runtime xml index. Note, prior to this the Document should be 
-        /// marked unpublished by setting the publish property on the document object to false
-        /// </summary>
-        /// <param name="DocumentId">The Id of the Document to be unpublished</param>
-        [Obsolete("This method is no longer used, a document's cache will be removed automatically when the document is deleted or unpublished")]
-        public static void UnPublishSingleNode(int DocumentId)
-        {
-            DistributedCache.Instance.RemovePageCache(DocumentId);
-        }
-
-        /// <summary>
-        /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
-        /// marked published by calling Publish(User u) on the document object.
-        /// </summary>
-        /// <param name="documentId">The Id of the Document to be published</param>
-        [Obsolete("This method is no longer used, a document's cache will be updated automatically when the document is published")]
-        public static void UpdateDocumentCache(int documentId)
-        {
-            DistributedCache.Instance.RefreshPageCache(documentId);
-        }
-
-        /// <summary>
-        /// Publishes the single node, this method is obsolete
-        /// </summary>
-        /// <param name="DocumentId">The document id.</param>
-        [Obsolete("Please use: umbraco.library.UpdateDocumentCache")]
-        public static void PublishSingleNode(int DocumentId)
-        {
-            UpdateDocumentCache(DocumentId);
-        }
-        
-        /// <summary>
-        /// Refreshes the xml cache for all nodes
-        /// </summary>
-        public static void RefreshContent()
-        {
-            DistributedCache.Instance.RefreshAllPageCache();
-        }
-
-        /// <summary>
-        /// Re-publishes all nodes under a given node
-        /// </summary>
-        /// <param name="nodeID">The ID of the node and childnodes that should be republished</param>
-        [Obsolete("Please use: umbraco.library.RefreshContent")]
-        public static string RePublishNodes(int nodeID)
-        {
-            DistributedCache.Instance.RefreshAllPageCache();
-
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Re-publishes all nodes under a given node
-        /// </summary>
-        /// <param name="nodeID">The ID of the node and childnodes that should be republished</param>
-        [Obsolete("Please use: umbraco.library.RefreshContent")]
-        public static void RePublishNodesDotNet(int nodeID)
-        {
-            DistributedCache.Instance.RefreshAllPageCache();
-        }
-
-        /// <summary>
-        /// Refreshes the runtime xml index. 
-        /// Note: This *doesn't* mark any non-published document objects as published
-        /// </summary>
-        /// <param name="nodeID">Always use -1</param>
-        /// <param name="SaveToDisk">Not used</param>
-        [Obsolete("Please use: content.Instance.RefreshContentFromDatabaseAsync")]
-        public static void RePublishNodesDotNet(int nodeID, bool SaveToDisk)
-        {
-            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         #endregion
@@ -201,8 +125,8 @@ namespace umbraco
                 xd.LoadXml(string.Format("<error>Could not convert JSON to XML. Error: {0}</error>", ex));
                 return xd.CreateNavigator().Select("/error");
             }
-        }        
-        
+        }
+
         /// <summary>
         /// Returns a string with a friendly url from a node.
         /// IE.: Instead of having /482 (id) as an url, you can have
@@ -212,48 +136,36 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-        	return GetUmbracoHelper().NiceUrl(nodeID);            
+        	return GetUmbracoHelper().NiceUrl(nodeID);
         }
 
         /// <summary>
-        /// This method will always add the root node to the path. You should always use NiceUrl, as that is the
-        /// only one who checks for toplevel node settings in the web.config
+        /// This method will always add the domain to the path if the hostnames are set up correctly.
         /// </summary>
-        /// <param name="nodeID">Identifier for the node that should be returned</param>
-        /// <returns>String with a friendly url from a node</returns>
-        [Obsolete]
-        public static string NiceUrlFullPath(int nodeID)
-        {
-            throw new NotImplementedException("It was broken anyway...");
-        }
-
-        /// <summary>
-        /// This method will always add the domain to the path if the hostnames are set up correctly. 
-        /// </summary>
-        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <param name="nodeId">Identifier for the node that should be returned</param>
         /// <returns>String with a friendly url with full domain from a node</returns>
-        public static string NiceUrlWithDomain(int nodeID)
+        public static string NiceUrlWithDomain(int nodeId)
         {
-        	return GetUmbracoHelper().NiceUrlWithDomain(nodeID);
+        	return GetUmbracoHelper().NiceUrlWithDomain(nodeId);
         }
 
         /// <summary>
-        /// This method will always add the domain to the path. 
+        /// This method will always add the domain to the path.
         /// </summary>
-        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <param name="nodeId">Identifier for the node that should be returned</param>
         /// <param name="ignoreUmbracoHostNames">Ignores the umbraco hostnames and returns the url prefixed with the requested host (including scheme and port number)</param>
         /// <returns>String with a friendly url with full domain from a node</returns>
-        internal static string NiceUrlWithDomain(int nodeID, bool ignoreUmbracoHostNames)
+        internal static string NiceUrlWithDomain(int nodeId, bool ignoreUmbracoHostNames)
         {
             if (ignoreUmbracoHostNames)
-                return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + NiceUrl(nodeID);
+                return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + NiceUrl(nodeId);
 
-            return NiceUrlWithDomain(nodeID);
+            return NiceUrlWithDomain(nodeId);
         }
 
         public static string ResolveVirtualPath(string path)
         {
-			return Umbraco.Core.IO.IOHelper.ResolveUrl(path);
+			return IOHelper.ResolveUrl(path);
         }
 
 
@@ -263,12 +175,12 @@ namespace umbraco
         /// getItem(1, nodeName) will return a string with the name of the node with id=1 even though
         /// nodeName is a property and not an element (data-field).
         /// </summary>
-        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <param name="nodeId">Identifier for the node that should be returned</param>
         /// <param name="alias">The element that should be returned</param>
         /// <returns>Returns a string with the data from the given element of a node</returns>
-        public static string GetItem(int nodeID, String alias)
+        public static string GetItem(int nodeId, string alias)
         {
-	        var doc = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(nodeID);
+	        var doc = UmbracoContext.Current.ContentCache.GetById(nodeId);
 
 			if (doc == null)
 				return string.Empty;
@@ -318,11 +230,11 @@ namespace umbraco
         /// <summary>
         /// Checks with the Assigned domains settings and retuns an array the the Domains matching the node
         /// </summary>
-        /// <param name="NodeId">Identifier for the node that should be returned</param>
+        /// <param name="nodeId">Identifier for the node that should be returned</param>
         /// <returns>A Domain array with all the Domains that matches the nodeId</returns>
-        public static Domain[] GetCurrentDomains(int NodeId)
+        public static Domain[] GetCurrentDomains(int nodeId)
         {
-            string[] pathIds = GetItem(NodeId, "path").Split(',');
+            string[] pathIds = GetItem(nodeId, "path").Split(',');
             for (int i = pathIds.Length - 1; i > 0; i--)
             {
                 Domain[] retVal = Domain.GetDomainsById(int.Parse(pathIds[i]));
@@ -342,7 +254,7 @@ namespace umbraco
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public static string GetItem(String alias)
+        public static string GetItem(string alias)
         {
             try
             {
@@ -359,15 +271,15 @@ namespace umbraco
         /// <summary>
         /// Returns that name of a generic property
         /// </summary>
-        /// <param name="ContentTypeAlias">The Alias of the content type (ie. Document Type, Member Type or Media Type)</param>
-        /// <param name="PropertyTypeAlias">The Alias of the Generic property (ie. bodyText or umbracoNaviHide)</param>
+        /// <param name="contentTypeAlias">The Alias of the content type (ie. Document Type, Member Type or Media Type)</param>
+        /// <param name="propertyTypeAlias">The Alias of the Generic property (ie. bodyText or umbracoNaviHide)</param>
         /// <returns>A string with the name. If nothing matches the alias, an empty string is returned</returns>
-        public static string GetPropertyTypeName(string ContentTypeAlias, string PropertyTypeAlias)
+        public static string GetPropertyTypeName(string contentTypeAlias, string propertyTypeAlias)
         {
             try
             {
-                umbraco.cms.businesslogic.ContentType ct = umbraco.cms.businesslogic.ContentType.GetByAlias(ContentTypeAlias);
-                PropertyType pt = ct.getPropertyType(PropertyTypeAlias);
+                umbraco.cms.businesslogic.ContentType ct = umbraco.cms.businesslogic.ContentType.GetByAlias(contentTypeAlias);
+                PropertyType pt = ct.getPropertyType(propertyTypeAlias);
                 return pt.Name;
             }
             catch
@@ -379,15 +291,15 @@ namespace umbraco
         /// <summary>
         /// Returns the Member Name from an umbraco member object
         /// </summary>
-        /// <param name="MemberId">The identifier of the Member</param>
+        /// <param name="memberId">The identifier of the Member</param>
         /// <returns>The Member name matching the MemberId, an empty string is member isn't found</returns>
-        public static string GetMemberName(int MemberId)
+        public static string GetMemberName(int memberId)
         {
-            if (MemberId != 0)
+            if (memberId != 0)
             {
                 try
                 {
-                    Member m = new Member(MemberId);
+                    Member m = new Member(memberId);
                     return m.Text;
                 }
                 catch
@@ -403,31 +315,30 @@ namespace umbraco
         /// Get a media object as an xml object
         /// </summary>
         /// <param name="MediaId">The identifier of the media object to be returned</param>
-        /// <param name="Deep">If true, children of the media object is returned</param>
+        /// <param name="deep">If true, children of the media object is returned</param>
         /// <returns>An umbraco xml node of the media (same format as a document node)</returns>
-        public static XPathNodeIterator GetMedia(int MediaId, bool Deep)
+        public static XPathNodeIterator GetMedia(int MediaId, bool deep)
         {
             try
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
                     var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
-                        string.Format(
-                            "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
+                        $"{CacheKeys.MediaCacheKey}_{MediaId}_{deep}",
                         timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        getCacheItem:   () => GetMediaDo(MediaId, Deep));
+                        getCacheItem:   () => GetMediaDo(MediaId, deep).Item1);
 
                     if (xml != null)
-                    {                   
+                    {
                         //returning the root element of the Media item fixes the problem
                         return xml.CreateNavigator().Select("/");
                     }
-                        
+
                 }
                 else
                 {
-                    var xml = GetMediaDo(MediaId, Deep);
-                    
+                    var xml = GetMediaDo(MediaId, deep).Item1;
+
                     //returning the root element of the Media item fixes the problem
                     return xml.CreateNavigator().Select("/");
                 }
@@ -443,19 +354,19 @@ namespace umbraco
             return errorXml.CreateNavigator().Select("/");
         }
 
-        private static XElement GetMediaDo(int mediaId, bool deep)
+        private static Tuple<XElement, string> GetMediaDo(int mediaId, bool deep)
         {
             var media = ApplicationContext.Current.Services.MediaService.GetById(mediaId);
             if (media == null) return null;
             var serializer = new EntityXmlSerializer();
             var serialized = serializer.Serialize(
-                ApplicationContext.Current.Services.MediaService, 
+                ApplicationContext.Current.Services.MediaService,
                 ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.UserService,      
+                ApplicationContext.Current.Services.UserService,
                 UrlSegmentProviderResolver.Current.Providers,
-                media, 
+                media,
                 deep);
-            return serialized;
+            return Tuple.Create(serialized, media.Path);
         }
 
         /// <summary>
@@ -518,10 +429,9 @@ namespace umbraco
             Member m = Member.GetCurrentMember();
             if (m != null)
             {
-                XmlDocument mXml = new XmlDocument();
-                mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
-                XPathNavigator xp = mXml.CreateNavigator();
-                return xp.Select("/node()");
+                var n = global::Umbraco.Web.UmbracoContext.Current.Facade.MemberCache.CreateNodeNavigator(m.Id, false);
+                if (n != null)
+                    return n.Select("."); // vs "/node" vs "/node()" ?
             }
 
             XmlDocument xd = new XmlDocument();
@@ -926,7 +836,7 @@ namespace umbraco
 
         /// <summary>
         /// Renders the content of a macro. Uses the normal template umbraco macro markup as input.
-        /// This only works properly with xslt macros. 
+        /// This only works properly with xslt macros.
         /// Python and .ascx based macros will not render properly, as viewstate is not included.
         /// </summary>
         /// <param name="Text">The macro markup to be rendered.</param>
@@ -936,7 +846,7 @@ namespace umbraco
         {
             try
             {
-                page p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
+                var p = new page(GetSafeContentCache().GetById(PageId));
                 template t = new template(p.Template);
                 Control c = t.parseStringBuilder(new StringBuilder(Text), p);
 
@@ -980,18 +890,17 @@ namespace umbraco
             }
             else
             {
-
-                var p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
+                var p = new page(GetSafeContentCache().GetById(PageId));
                 p.RenderPage(TemplateId);
                 var c = p.PageContentControl;
-                
+
 				using (var sw = new StringWriter())
                 using(var hw = new HtmlTextWriter(sw))
                 {
 					c.RenderControl(hw);
-					return sw.ToString();    
+					return sw.ToString();
                 }
-                
+
             }
         }
 
@@ -1197,7 +1106,7 @@ namespace umbraco
         /// <returns>Returns the prevalues as a XPathNodeIterator in the format:
         ///     <preValues>
         ///         <prevalue id="[id]">[value]</prevalue>
-        ///     </preValues> 
+        ///     </preValues>
         ///</returns>
         public static XPathNodeIterator GetPreValues(int DataTypeId)
         {
@@ -1212,7 +1121,7 @@ namespace umbraco
                 n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
                 xd.DocumentElement.AppendChild(n);
             }
-          
+
             XPathNavigator xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
@@ -1298,7 +1207,7 @@ namespace umbraco
         /// <returns>A dictionary items value as a string.</returns>
         public static string GetDictionaryItem(string Key)
         {
-	        return GetUmbracoHelper().GetDictionaryValue(Key);			
+	        return GetUmbracoHelper().GetDictionaryValue(Key);
         }
 
         /// <summary>
@@ -1309,7 +1218,7 @@ namespace umbraco
         {
             try
             {
-                var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.GetXPathNavigator();
+                var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.CreateNavigator();
                 nav.MoveToId(HttpContext.Current.Items["pageID"].ToString());
                 return nav.Select(".");
             }
@@ -1330,28 +1239,40 @@ namespace umbraco
         /// <returns>Returns the node with the specified id as xml in the form of a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlNodeById(string id)
         {
-            // 4.7.1 UmbracoContext is null if we're running in publishing thread which we need to support
-            XmlDocument xmlDoc = GetThreadsafeXmlDocument();
+            var nav = GetSafeContentCache().CreateNavigator();
 
-            if (xmlDoc.GetElementById(id) != null)
+            if (nav.MoveToId(id))
+                return nav.Select(".");
+
+            var xd = new XmlDocument();
+            xd.LoadXml(string.Format("<error>No published item exist with id {0}</error>", id));
+            return xd.CreateNavigator().Select(".");
+        }
+
+        // legacy would access the raw XML from content.Instance ie a static thing
+        // now that we use a FacadeService, we need to have a "context" to handle a cache.
+        // UmbracoContext does it for most cases but in some cases we might not have an
+        // UmbracoContext. For backward compatibility, try to do something here...
+        internal static PublishedContentCache GetSafeContentCache()
+        {
+            PublishedContentCache contentCache;
+
+            if (UmbracoContext.Current != null)
             {
-                XPathNavigator xp = xmlDoc.CreateNavigator();
-                xp.MoveToId(id);
-                return xp.Select(".");
+                contentCache = UmbracoContext.Current.ContentCache as PublishedContentCache;
             }
             else
             {
-                XmlDocument xd = new XmlDocument();
-                xd.LoadXml(string.Format("<error>No published item exist with id {0}</error>", id));
-                return xd.CreateNavigator().Select(".");
+                // FIXME inject!
+                var caches = FacadeServiceResolver.Current.Service.GetFacade()
+                    ?? FacadeServiceResolver.Current.Service.CreateFacade(null);
+                contentCache = caches.ContentCache as PublishedContentCache;
             }
-        }
 
-        //TODO: WTF, why is this here? This won't matter if there's an UmbracoContext or not, it will call the same underlying method!
-        // only difference is that the UmbracoContext way will check if its in preview mode.
-        private static XmlDocument GetThreadsafeXmlDocument()
-        {
-            return content.Instance.XmlContent;
+            if (contentCache == null)
+                throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
+            return contentCache;
         }
 
         /// <summary>
@@ -1361,9 +1282,7 @@ namespace umbraco
         /// <returns>Returns nodes matching the xpath query as a XpathNodeIterator</returns>
         public static XPathNodeIterator GetXmlNodeByXPath(string xpathQuery)
         {
-            XPathNavigator xp = GetThreadsafeXmlDocument().CreateNavigator();
-
-            return xp.Select(xpathQuery);
+            return GetSafeContentCache().CreateNavigator().Select(xpathQuery);
         }
 
         /// <summary>
@@ -1372,8 +1291,7 @@ namespace umbraco
         /// <returns>Returns the entire umbraco Xml cache as a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlAll()
         {
-            XPathNavigator xp = GetThreadsafeXmlDocument().CreateNavigator();
-            return xp.Select("/root");
+            return GetSafeContentCache().CreateNavigator().Select("/root");
         }
 
         /// <summary>
@@ -1464,21 +1382,23 @@ namespace umbraco
         /// <returns>The Xpath query for the node with the specified id as a string</returns>
         public static string QueryForNode(string id)
         {
-            string XPathQuery = string.Empty;
-            if (content.Instance.XmlContent.GetElementById(id) != null)
+            var xpathQuery = string.Empty;
+            var preview = UmbracoContext.Current != null && UmbracoContext.Current.InPreviewMode;
+            var xml = GetSafeContentCache().GetXml(preview);
+            var elt = xml.GetElementById(id);
+
+            if (elt == null) return xpathQuery;
+
+            var path = elt.Attributes["path"].Value.Split((",").ToCharArray());
+            for (var i = 1; i < path.Length; i++)
             {
-                string[] path =
-                    content.Instance.XmlContent.GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
-                for (int i = 1; i < path.Length; i++)
-                {
-                    if (i > 1)
-                        XPathQuery += "/node [@id = " + path[i] + "]";
-                    else
-                        XPathQuery += " [@id = " + path[i] + "]";
-                }
+                if (i > 1)
+                    xpathQuery += "/node [@id = " + path[i] + "]";
+                else
+                    xpathQuery += " [@id = " + path[i] + "]";
             }
 
-            return XPathQuery;
+            return xpathQuery;
         }
 
         /// <summary>
@@ -1516,7 +1436,7 @@ namespace umbraco
         {
             try
             {
-                // create the mail message 
+                // create the mail message
                 MailMessage mail = new MailMessage(FromMail.Trim(), ToMail.Trim());
 
                 // populate the message
@@ -1538,17 +1458,17 @@ namespace umbraco
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// These random methods are from Eli Robillards blog - kudos for the work :-)
         /// http://weblogs.asp.net/erobillard/archive/2004/05/06/127374.aspx
-        /// 
-        /// Get a Random object which is cached between requests. 
-        /// The advantage over creating the object locally is that the .Next 
-        /// call will always return a new value. If creating several times locally 
-        /// with a generated seed (like millisecond ticks), the same number can be 
-        /// returned. 
-        /// </summary> 
-        /// <returns>A Random object which is cached between calls.</returns> 
+        ///
+        /// Get a Random object which is cached between requests.
+        /// The advantage over creating the object locally is that the .Next
+        /// call will always return a new value. If creating several times locally
+        /// with a generated seed (like millisecond ticks), the same number can be
+        /// returned.
+        /// </summary>
+        /// <returns>A Random object which is cached between calls.</returns>
         public static Random GetRandom(int seed)
         {
             Random r = (Random)HttpContext.Current.Cache.Get("RandomNumber");
@@ -1563,10 +1483,10 @@ namespace umbraco
             return r;
         }
 
-        /// <summary> 
-        /// GetRandom with no parameters. 
-        /// </summary> 
-        /// <returns>A Random object which is cached between calls.</returns> 
+        /// <summary>
+        /// GetRandom with no parameters.
+        /// </summary>
+        /// <returns>A Random object which is cached between calls.</returns>
         public static Random GetRandom()
         {
             return GetRandom(0);
@@ -1701,7 +1621,7 @@ namespace umbraco
         }
 
         /// <summary>
-        /// URL-encodes a string 
+        /// URL-encodes a string
         /// </summary>
         /// <param name="Text">The string to be encoded</param>
         /// <returns>A URL-encoded string</returns>
@@ -1711,7 +1631,7 @@ namespace umbraco
         }
 
         /// <summary>
-        /// HTML-encodes a string 
+        /// HTML-encodes a string
         /// </summary>
         /// <param name="Text">The string to be encoded</param>
         /// <returns>A HTML-encoded string</returns>
@@ -1723,30 +1643,6 @@ namespace umbraco
         public static IRelation[] GetRelatedNodes(int nodeId)
         {
             return ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(nodeId).ToArray();
-        }
-
-        [Obsolete("Use DistributedCache.Instance.RemoveMediaCache instead")]
-        public static void ClearLibraryCacheForMedia(int mediaId)
-        {
-            DistributedCache.Instance.RemoveMediaCache(mediaId);      
-        }
-
-        [Obsolete("Use DistributedCache.Instance.RemoveMediaCache instead")]
-        public static void ClearLibraryCacheForMediaDo(int mediaId)
-        {
-            DistributedCache.Instance.RemoveMediaCache(mediaId);
-        }
-
-        [Obsolete("Use DistributedCache.Instance.RefreshMemberCache instead")]
-        public static void ClearLibraryCacheForMember(int mediaId)
-        {
-            DistributedCache.Instance.RefreshMemberCache(mediaId);
-        }
-
-        [Obsolete("Use DistributedCache.Instance.RefreshMemberCache instead")]
-        public static void ClearLibraryCacheForMemberDo(int memberId)
-        {
-            DistributedCache.Instance.RefreshMemberCache(memberId);
         }
 
         /// <summary>
@@ -1766,7 +1662,7 @@ namespace umbraco
 
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<relations/>");
-            var rels = ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(NodeId);                
+            var rels = ApplicationContext.Current.Services.RelationService.GetByParentOrChildId(NodeId);
             foreach (var r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
@@ -1804,7 +1700,7 @@ namespace umbraco
                         n.AppendChild(x);
                     }
                 }
-                    
+
                 xd.DocumentElement.AppendChild(n);
             }
             XPathNavigator xp = xd.CreateNavigator();
@@ -1854,7 +1750,7 @@ namespace umbraco
         }
 
 
-        
+
 
         #endregion
 

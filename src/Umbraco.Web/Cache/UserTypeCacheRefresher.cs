@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 
@@ -7,29 +6,25 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Handles User type cache invalidation/refreshing
-    /// </summary>
     public sealed class UserTypeCacheRefresher : CacheRefresherBase<UserTypeCacheRefresher>
     {
-        public UserTypeCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
-        {
-        }
+        public UserTypeCacheRefresher(CacheHelper cacheHelper) 
+            : base(cacheHelper)
+        { }
 
-        protected override UserTypeCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Define
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.UserTypeCacheRefresherId); }
-        }
+        protected override UserTypeCacheRefresher Instance => this;
 
-        public override string Name
-        {
-            get { return "User type cache refresher"; }
-        }
+        public static readonly Guid UniqueId = Guid.Parse("7E707E21-0195-4522-9A3C-658CC1761BD4");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "User Type Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
@@ -53,5 +48,6 @@ namespace Umbraco.Web.Cache
             base.Remove(id);
         }
 
+        #endregion
     }
 }

@@ -7,31 +7,48 @@ namespace Umbraco.Core.Models
     internal static class ContentTypeExtensions
     {
         /// <summary>
-        /// Get all descendant content types
+        /// Gets all descendant content types of a specified content type.
         /// </summary>
-        /// <param name="contentType"></param>
-        /// <param name="contentTypeService"></param>
-        /// <returns></returns>
-        public static IEnumerable<TItem> Descendants<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService) 
+        /// <param name="contentType">The content type.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>The descendant content types.</returns>
+        /// <remarks>Descendants corresponds to the parent-child relationship, and has
+        /// nothing to do with compositions, though a child should always be composed
+        /// of its parent.</remarks>
+        public static IEnumerable<TItem> Descendants<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService)
             where TItem : IContentTypeComposition
-        {            
-            var descendants = contentTypeService.GetChildren(contentType.Id)
-                                                .SelectRecursive(type => contentTypeService.GetChildren(type.Id));
-            return descendants;
+        {
+            return contentTypeService.GetDescendants(contentType.Id, false);
         }
 
         /// <summary>
-        /// Get all descendant and self content types
+        /// Gets all descendant and self content types of a specified content type.
         /// </summary>
-        /// <param name="contentType"></param>
-        /// <param name="contentTypeService"></param>
-        /// <returns></returns>
-        public static IEnumerable<TItem> DescendantsAndSelf<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService) 
+        /// <param name="contentType">The content type.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>The descendant and self content types.</returns>
+        /// <remarks>Descendants corresponds to the parent-child relationship, and has
+        /// nothing to do with compositions, though a child should always be composed
+        /// of its parent.</remarks>
+        public static IEnumerable<TItem> DescendantsAndSelf<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService)
             where TItem : IContentTypeComposition
         {
-            var descendantsAndSelf = new[] { contentType }.Concat(contentType.Descendants<TItem>(contentTypeService));
-            return descendantsAndSelf;
+            return contentTypeService.GetDescendants(contentType.Id, true);
         }
-        
+
+        /// <summary>
+        /// Gets all content types directly or indirectly composed of a specified content type.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>The content types directly or indirectly composed of the content type.</returns>
+        /// <remarks>This corresponds to the composition relationship and has nothing to do
+        /// with the parent-child relationship, though a child should always be composed of
+        /// its parent.</remarks>
+        public static IEnumerable<TItem> ComposedOf<TItem>(this TItem contentType, IContentTypeServiceBase<TItem> contentTypeService)
+            where TItem : IContentTypeComposition
+        {
+            return contentTypeService.GetComposedOf(contentType.Id);
+        }
     }
 }

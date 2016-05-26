@@ -28,6 +28,7 @@ namespace Umbraco.Tests.Services
     /// </summary>
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
+    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class ContentServiceTests : BaseServiceTest
     {
         [SetUp]
@@ -880,106 +881,6 @@ namespace Umbraco.Tests.Services
             using (var uow = provider.CreateUnitOfWork())
             {
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
-            }
-        }
-
-        /// <summary>
-        /// This test is ignored because the way children are handled when
-        /// parent is unpublished is treated differently now then from when this test
-        /// was written.
-        /// The correct case is now that Root is UnPublished removing the children
-        /// from cache, but still having them "Published" in the "background".
-        /// Once the Parent is Published the Children should re-appear as published.
-        /// </summary>
-        [Test, NUnit.Framework.Ignore]
-        public void Can_UnPublish_Root_Content_And_Verify_Children_Is_UnPublished()
-        {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
-            var published = contentService.RePublishAll(0);
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
-
-            // Act
-            bool unpublished = contentService.UnPublish(content, 0);
-            var children = contentService.GetChildren(NodeDto.NodeIdSeed + 1).ToList();
-
-            // Assert
-            Assert.That(published, Is.True);//Verify that everything was published
-
-            //Verify that content with Id (NodeDto.NodeIdSeed + 1) was unpublished
-            Assert.That(unpublished, Is.True);
-            Assert.That(content.Published, Is.False);
-
-            //Verify that all children was unpublished
-            Assert.That(children.Any(x => x.Published), Is.False);
-            Assert.That(children.First(x => x.Id == NodeDto.NodeIdSeed + 2).Published, Is.False);//Released 5 mins ago, but should be unpublished
-            Assert.That(children.First(x => x.Id == NodeDto.NodeIdSeed + 2).ReleaseDate.HasValue, Is.False);//Verify that the release date has been removed
-            Assert.That(children.First(x => x.Id == NodeDto.NodeIdSeed + 3).Published, Is.False);//Expired 5 mins ago, so isn't be published
-        }
-
-        [Test]
-        public void Can_RePublish_All_Content()
-        {
-            // Arrange
-            var contentService = (ContentService)ServiceContext.ContentService;
-            var rootContent = contentService.GetRootContent().ToList();
-            foreach (var c in rootContent)
-            {
-                contentService.PublishWithChildren(c);
-            }
-            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants(contentService)));
-            //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-            using (var uow = provider.CreateUnitOfWork())
-            {
-                uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");
-            }
-
-
-            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
-            //that it's published version still makes it into the cmsContentXml table!
-            contentService.Save(allContent.Last());
-
-            // Act
-            var published = contentService.RePublishAll(0);
-
-            // Assert
-            Assert.IsTrue(published);
-            using (var uow = provider.CreateUnitOfWork())
-            {
-                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
-            }
-        }
-
-        [Test]
-        public void Can_RePublish_All_Content_Of_Type()
-        {
-            // Arrange
-            var contentService = (ContentService)ServiceContext.ContentService;
-            var rootContent = contentService.GetRootContent().ToList();
-            foreach (var c in rootContent)
-            {
-                contentService.PublishWithChildren(c);
-            }
-            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants(contentService))).ToList();
-            //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-
-            using (var uow = provider.CreateUnitOfWork())
-            {
-                uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");
-            }
-            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
-            //that it's published version still makes it into the cmsContentXml table!
-            contentService.Save(allContent.Last());
-
-            // Act
-            contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
-
-            // Assert
-            using (var uow = provider.CreateUnitOfWork())
-            {
-                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
             }
         }
 

@@ -11,15 +11,12 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
-using Examine.Config;
 using LightInject;
-using Examine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
@@ -27,7 +24,6 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -41,6 +37,9 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services.Changes;
+using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
 using Umbraco.Web._Legacy.Actions;
 using Action = System.Action;
@@ -56,17 +55,13 @@ namespace Umbraco.Web
     /// </summary>
     public class WebBootManager : CoreBootManager
     {
-        private readonly bool _isForTesting;
-
         //TODO: Fix this - we need to manually perform re-indexing on startup when necessary Examine lib no longer does this
         //NOTE: see the Initialize method for what this is used for
         //private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>();
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : base(umbracoApplication)
-        {
-            _isForTesting = false;
-        }
+        { }
 
         /// <summary>
         /// Constructor for unit tests, ensures some resolvers are not initialized
@@ -76,9 +71,7 @@ namespace Umbraco.Web
         /// <param name="isForTesting"></param>
         internal WebBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger, bool isForTesting)
             : base(umbracoApplication, logger)
-        {
-            _isForTesting = isForTesting;
-        }
+        { }
 
         /// <summary>
         /// Initialize objects before anything during the boot cycle happens
@@ -135,12 +128,14 @@ namespace Umbraco.Web
         {
             base.FreezeResolution();
 
+            IFacadeService facadeService;
+
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
             var httpContext = new HttpContextWrapper(UmbracoApplication.Context);
             UmbracoContext.EnsureContext(
-                httpContext,
-                ApplicationContext,
+                httpContext, ApplicationContext,
+                FacadeServiceResolver.Current.Service,
                 new WebSecurity(httpContext, ApplicationContext),
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviderResolver.Current.Providers,
@@ -335,11 +330,15 @@ namespace Umbraco.Web
             //no need to declare as per request, it's lifetime is already managed as a singleton
             container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
-            container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());
-            container.RegisterSingleton<IPublishedMediaCache, PublishedMediaCache>();
+
+            // register the facade service
+            container.RegisterSingleton<IFacadeService>(factory => new FacadeService(
+                factory.GetInstance<ServiceContext>(),
+                factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
+                factory.GetInstance<CacheHelper>().RequestCache));
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton
-            container.Register<UmbracoContext>(factory => UmbracoContext.Current);
+            container.Register(factory => UmbracoContext.Current);
             container.RegisterSingleton<UmbracoHelper>();
 
             //Replace services:
@@ -424,7 +423,18 @@ namespace Umbraco.Web
                         InitializingCallbacks = new Action[]
                         {
                             //rebuild the xml cache file if the server is not synced
-                            () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
+                            () =>
+                            {
+                                // rebuild the facade caches entirely, if the server is not synced
+                                // this is equivalent to DistributedCache RefreshAllFacade but local only
+                                // (we really should have a way to reuse RefreshAllFacade... locally)
+                                // note: refresh all content & media caches does refresh content types too
+    					        IFacadeService svc = FacadeServiceResolver.Current.Service;
+                                bool ignored1, ignored2;
+                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainCacheRefresher.ChangeTypes.RefreshAll) });
+                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
+                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1);
+                            },
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
@@ -452,11 +462,11 @@ namespace Umbraco.Web
             // (the limited one, defined in Core, is there for tests)
             PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
             // same for other converters
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.ImageCropperValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<TextStringValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<MarkdownEditorValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<ImageCropperValueConverter>();
 
-            PublishedCachesResolver.Current = new PublishedCachesResolver(Container, typeof(PublishedCaches));
+            FacadeServiceResolver.Current = new FacadeServiceResolver(Container);
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 ServiceProvider, ProfilingLogger.Logger,
@@ -490,9 +500,6 @@ namespace Umbraco.Web
             );
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container, typeof(SiteDomainHelper));
-
-            // ain't that a bit dirty? YES
-            PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 Container, ProfilingLogger.Logger,

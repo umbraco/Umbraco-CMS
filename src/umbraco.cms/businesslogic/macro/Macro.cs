@@ -429,25 +429,6 @@ namespace umbraco.cms.businesslogic.macro
 	        return MacroTypes.Unknown;
         }
 
-        public static string GenerateCacheKeyFromCode(string input)
-        {
-            if (String.IsNullOrEmpty(input))
-                throw new ArgumentNullException("input", "An MD5 hash cannot be generated when 'input' parameter is null!");
-
-            // step 1, calculate MD5 hash from input
-            var md5 = MD5.Create();
-            var inputBytes = Encoding.ASCII.GetBytes(input);
-            var hash = md5.ComputeHash(inputBytes);
-
-            // step 2, convert byte array to hex string
-            var sb = new StringBuilder();
-            for (var i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("X2"));
-            }
-            return sb.ToString();
-        }
-
         #region Macro Refactor
         
         private static string GetCacheKey(string alias)

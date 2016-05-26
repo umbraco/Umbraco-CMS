@@ -145,12 +145,12 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory));
             var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, repositoryFactory, logger));
             var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
-            var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, dataTypeService.Value));
-            var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory, dataTypeService.Value, userService.Value, urlSegmentProviders));
+            var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value));
+            var mediaService = new Lazy<IMediaService>(() => new MediaService(provider, logger, eventMessagesFactory));
             var contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
             var mediaTypeService = new Lazy<IMediaTypeService>(() => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
             var fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, logger, eventMessagesFactory));

@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PublishedCache
@@ -19,25 +13,21 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    public sealed class MemberPublishedContent : PublishedContentWithKeyBase
+    public sealed class PublishedMember : PublishedContentWithKeyBase
     {
-
         private readonly IMember _member;
         private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
-        public MemberPublishedContent(IMember member)
+        public PublishedMember(IMember member, PublishedContentType publishedMemberType)
         {
-            if (member == null) throw new ArgumentNullException("member");            
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            if (publishedMemberType == null) throw new ArgumentNullException(nameof(publishedMemberType));
 
             _member = member;
             _membershipUser = member;
-            _publishedMemberType = PublishedContentType.Get(PublishedItemType.Member, _member.ContentTypeAlias);
-            if (_publishedMemberType == null)
-            {
-                throw new InvalidOperationException("Could not get member type with alias " + _member.ContentTypeAlias);
-            }
+            _publishedMemberType = publishedMemberType;
 
             _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
                 (t, v) => new RawValueProperty(t, v ?? string.Empty))
@@ -89,7 +79,7 @@ namespace Umbraco.Web.PublishedCache
         public DateTime LastPasswordChangedDate
         {
             get { return _membershipUser.LastPasswordChangeDate; }
-        } 
+        }
         #endregion
 
         #region IPublishedContent
@@ -236,7 +226,7 @@ namespace Umbraco.Web.PublishedCache
         public override int Level
         {
             get { return _member.Level; }
-        } 
+        }
         #endregion
     }
 }

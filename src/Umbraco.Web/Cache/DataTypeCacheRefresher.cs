@@ -1,121 +1,107 @@
 ﻿using System;
-using System.Web.Script.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.PublishedCache;
 
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// A cache refresher to ensure member cache is updated when members change
-    /// </summary>    
-    public sealed class DataTypeCacheRefresher : JsonCacheRefresherBase<DataTypeCacheRefresher>
+    public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
     {
+        private readonly IFacadeService _facadeService;
 
-        public DataTypeCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        public DataTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+            : base(cacheHelper)
         {
+            _facadeService = facadeService;
         }
 
-        #region Static helpers
-        
-        /// <summary>
-        /// Converts the json to a JsonPayload object
-        /// </summary>
-        /// <param name="json"></param>
-        /// <returns></returns>
-        private static JsonPayload[] DeserializeFromJsonPayload(string json)
-        {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
-            return jsonObject;
-        }   
+        #region Define
 
-        /// <summary>
-        /// Creates the custom Json payload used to refresh cache amongst the servers
-        /// </summary>
-        /// <param name="dataTypes"></param>
-        /// <returns></returns>
-        internal static string SerializeToJsonPayload(params IDataTypeDefinition[] dataTypes)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = dataTypes.Select(FromDataTypeDefinition).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
-   
-        /// <summary>
-        /// Converts a macro to a jsonPayload object
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-        private static JsonPayload FromDataTypeDefinition(IDataTypeDefinition dataType)
-        {
-            var payload = new JsonPayload
-            {
-                UniqueId = dataType.Key,
-                Id = dataType.Id
-            };
-            return payload;
-        }
-        
-        #endregion
+        protected override DataTypeCacheRefresher Instance => this;
 
-        #region Sub classes
+        public static readonly Guid UniqueId = Guid.Parse("35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2");
 
-        private class JsonPayload
-        {
-            public Guid UniqueId { get; set; }
-            public int Id { get; set; }
-        }
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Data Type Cache Refresher";
 
         #endregion
 
-        protected override DataTypeCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Refresher
 
-        public override Guid UniqueIdentifier
+        public override void Refresh(JsonPayload[] payloads)
         {
-            get { return new Guid(DistributedCache.DataTypeCacheRefresherId); }
-        }
-
-        public override string Name
-        {
-            get { return "Clears data type cache"; }
-        }
-
-        public override void Refresh(string jsonPayload)
-        {
-            var payloads = DeserializeFromJsonPayload(jsonPayload);
-
             //we need to clear the ContentType runtime cache since that is what caches the
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
-            
+
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
             ClearAllIsolatedCacheByEntityType<IMedia>();
             ClearAllIsolatedCacheByEntityType<IMediaType>();
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
+
             CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
-            payloads.ForEach(payload =>
-            {
-                //clears the prevalue cache
-                var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
-                if (dataTypeCache)
-                    dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
-                
-                PublishedContentType.ClearDataType(payload.Id);
-            });
+            var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
 
-            base.Refresh(jsonPayload);
+            //clears the prevalue cache
+            if (dataTypeCache)
+                foreach (var payload in payloads)
+                    dataTypeCache.Result.ClearCacheByKeySearch($"{CacheKeys.DataTypePreValuesCacheKey}{payload.Id}");
+
+            // notify
+            _facadeService.Notify(payloads);
+
+            base.Refresh(payloads);
         }
+
+        // these events should never trigger
+        // everything should be PAYLOAD/JSON
+
+        public override void RefreshAll()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Refresh(int id)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Refresh(Guid id)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Remove(int id)
+        {
+            throw new NotSupportedException();
+        }
+
+        #endregion
+
+        #region Json
+
+        public class JsonPayload
+        {
+            public JsonPayload(int id, Guid key, bool removed)
+            {
+                Id = id;
+                Key = key;
+                Removed = removed;
+            }
+
+            public int Id { get; }
+
+            public Guid Key { get; }
+
+            public bool Removed { get; }
+        }
+
+        #endregion
     }
 }

@@ -1,16 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -30,7 +23,7 @@ namespace Umbraco.Tests.PublishedContent
                     new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
 
             var rCtx = GetRoutingContext("/test", 1234);
             UmbracoContext.Current = rCtx.UmbracoContext;
@@ -48,9 +41,6 @@ namespace Umbraco.Tests.PublishedContent
                             typeof(TinyMceValueConverter),
                             typeof(YesNoValueConverter)
                         });    
-
-            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
-                new PublishedContentCache(), new PublishedMediaCache(ApplicationContext)));
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

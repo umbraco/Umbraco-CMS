@@ -17,6 +17,7 @@ using Umbraco.Web.WebServices;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Macros;
 using Umbraco.Web._Legacy.UI;
 
 
@@ -243,11 +244,14 @@ namespace umbraco.presentation.webservices
             
             // Test the xslt
             var errorMessage = "";
-            if (!ignoreDebugging)
+            if (ignoreDebugging == false)
             {
                 try
                 {
+                    if (UmbracoContext.ContentCache.HasContent())
+                        XsltMacroEngine.TestXsltTransform(ApplicationContext.ProfilingLogger, fileContents);
 
+                    /*
                     // Check if there's any documents yet
                     if (content.Instance.XmlContent.SelectNodes("/root/node").Count > 0)
                     {
@@ -284,6 +288,7 @@ namespace umbraco.presentation.webservices
                             macroResult.Close();
                         }
                     }
+                    */
                     else
                     {
                         errorMessage = "stub";

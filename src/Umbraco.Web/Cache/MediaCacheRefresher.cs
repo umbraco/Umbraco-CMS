@@ -1,205 +1,149 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
+using System.Xml.Linq;
 using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Core.Services.Changes;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// A cache refresher to ensure media cache is updated
-    /// </summary>
-    /// <remarks>
-    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
-    /// </remarks>
-    public class MediaCacheRefresher : JsonCacheRefresherBase<MediaCacheRefresher>
+    public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
     {
-        private readonly IMediaService _mediaService;
+        private readonly IFacadeService _facadeService;
 
-        public MediaCacheRefresher(CacheHelper cacheHelper, IMediaService mediaService) : base(cacheHelper)
+        public MediaCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+            : base(cacheHelper)
         {
-            _mediaService = mediaService;
+            _facadeService = facadeService;
         }
 
-        #region Static helpers
+        #region Define
 
-        /// <summary>
-        /// Converts the json to a JsonPayload object
-        /// </summary>
-        /// <param name="json"></param>
-        /// <returns></returns>
-        public static JsonPayload[] DeserializeFromJsonPayload(string json)
-        {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
-            return jsonObject;
-        }
+        protected override MediaCacheRefresher Instance => this;
 
-        /// <summary>
-        /// Creates the custom Json payload used to refresh cache amongst the servers
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="media"></param>
-        /// <returns></returns>
-        internal static string SerializeToJsonPayload(OperationType operation, params IMedia[] media)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = media.Select(x => FromMedia(x, operation)).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
+        public static readonly Guid UniqueId = Guid.Parse("B29286DD-2D40-4DDB-B325-681226589FEC");
 
-        internal static string SerializeToJsonPayloadForMoving(OperationType operation, MoveEventInfo<IMedia>[] media)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = media.Select(x => new JsonPayload
-            {
-                Id = x.Entity.Id,
-                Operation = operation,
-                Path = x.OriginalPath
-            }).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
+        public override Guid RefresherUniqueId => UniqueId;
 
-        internal static string SerializeToJsonPayloadForPermanentDeletion(params int[] mediaIds)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = mediaIds.Select(x => new JsonPayload
-            {
-                Id = x,
-                Operation = OperationType.Deleted
-            }).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
-
-        /// <summary>
-        /// Converts a macro to a jsonPayload object
-        /// </summary>
-        /// <param name="media"></param>
-        /// <param name="operation"></param>
-        /// <returns></returns>
-        internal static JsonPayload FromMedia(IMedia media, OperationType operation)
-        {
-            if (media == null) return null;
-
-            var payload = new JsonPayload
-            {
-                Id = media.Id,
-                Path = media.Path,
-                Operation = operation
-            };
-            return payload;
-        }
+        public override string Name => "Media Cache Refresher";
 
         #endregion
 
-        #region Sub classes
+        #region Refresher
 
-        public enum OperationType
+        public override void Refresh(JsonPayload[] payloads)
         {
-            Saved,
-            Trashed,
-            Deleted
+            bool anythingChanged;
+            _facadeService.Notify(payloads, out anythingChanged);
+
+            if (anythingChanged)
+            {
+                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
+
+                ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+
+                foreach (var payload in payloads)
+                {
+                    // note: ClearCacheByKeySearch - does StartsWith(...)
+
+                    // legacy alert!
+                    //
+                    // library cache library.GetMedia(int mediaId, bool deep) maintains a cache
+                    // of media xml - and of *deep* media xml - using the key
+                    // MediaCacheKey + "_" + mediaId + "_" + deep
+                    //
+                    // this clears the non-deep xml for the current media
+                    //
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                        $"{CacheKeys.MediaCacheKey}_{payload.Id}_False");
+
+                    // and then, for the entire path, we have to clear whatever might contain the media
+                    // bearing in mind there are probably nasty race conditions here - this is all legacy
+                    var k = $"{CacheKeys.MediaCacheKey}_{payload.Id}_";
+                    var x = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem(k)
+                        as Tuple<XElement, string>;
+                    if (x == null) continue;
+                    var path = x.Item2;
+
+                    foreach (var pathId in path.Split(',').Skip(1).Select(int.Parse))
+                    {
+                        // this clears the deep xml for the medias in the path (skipping -1)
+                        ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                            $"{CacheKeys.MediaCacheKey}_{pathId}_True");
+                    }
+
+                    // repository cache
+                    // it *was* done for each pathId but really that does not make sense
+                    // only need to do it for the current media
+                    mediaCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMedia>(payload.Id));
+
+                    // remove those that are in the branch
+                    if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
+                    {
+                        var pathid = "," + payload.Id + ",";
+                        mediaCache.Result.ClearCacheObjectTypes<IMedia>((_, v) => v.Path.Contains(pathid));
+                    }
+                }
+            }
+
+            base.Refresh(payloads);
         }
 
-        public class JsonPayload
-        {
-            public string Path { get; set; }
-            public int Id { get; set; }
-            public OperationType Operation { get; set; }
-        }
+        // these events should never trigger
+        // everything should be JSON
 
-        #endregion
-
-        protected override MediaCacheRefresher Instance
+        public override void RefreshAll()
         {
-            get { return this; }
-        }
-
-        public override Guid UniqueIdentifier
-        {
-            get { return new Guid(DistributedCache.MediaCacheRefresherId); }
-        }
-
-        public override string Name
-        {
-            get { return "Clears Media Cache from umbraco.library"; }
-        }
-
-        public override void Refresh(string jsonPayload)
-        {
-            ClearCache(DeserializeFromJsonPayload(jsonPayload));
-            base.Refresh(jsonPayload);
+            throw new NotSupportedException();
         }
 
         public override void Refresh(int id)
         {
-            ClearCache(FromMedia(_mediaService.GetById(id), OperationType.Saved));
-            base.Refresh(id);
+            throw new NotSupportedException();
+        }
+
+        public override void Refresh(Guid id)
+        {
+            throw new NotSupportedException();
         }
 
         public override void Remove(int id)
         {
-            ClearCache(FromMedia(_mediaService.GetById(id),
-                //NOTE: we'll just default to trashed for this one.    
-                OperationType.Trashed));
-            base.Remove(id);
+            throw new NotSupportedException();
         }
 
-        private void ClearCache(params JsonPayload[] payloads)
+        #endregion
+
+        #region Json
+
+        public class JsonPayload
         {
-            if (payloads == null) return;
-
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-            CacheHelper.ClearPartialViewCache();
-
-            payloads.ForEach(payload =>
+            public JsonPayload(int id, TreeChangeTypes changeTypes)
             {
-                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
+                Id = id;
+                ChangeTypes = changeTypes;
+            }
 
-                //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
-                if (payload.Path.IsNullOrWhiteSpace())
-                {
-                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(
-                        string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
-                }
-                else
-                {
-                    foreach (var idPart in payload.Path.Split(','))
-                    {
-                        int idPartAsInt;
-                        if (int.TryParse(idPart, out idPartAsInt) && mediaCache)
-                        {
-                            mediaCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMedia>(idPartAsInt));
-                        }
+            public int Id { get; }
 
-                        CacheHelper.RuntimeCache.ClearCacheByKeySearch(
-                            string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
-
-                        // Also clear calls that only query this specific item!
-                        if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
-                            CacheHelper.RuntimeCache.ClearCacheByKeySearch(
-                                string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
-                    }
-                }
-
-                // published cache...
-                PublishedMediaCache.ClearCache(payload.Id);
-            });
-
-
+            public TreeChangeTypes ChangeTypes { get; }
         }
+
+        #endregion
+
+        #region Indirect
+
+        public static void RefreshMediaTypes(CacheHelper cacheHelper)
+        {
+            cacheHelper.IsolatedRuntimeCache.ClearCache<IMedia>();
+        }
+
+        #endregion
     }
 }

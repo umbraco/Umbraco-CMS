@@ -41,9 +41,9 @@ namespace Umbraco.Tests
                     new PublishedPropertyType("content", 0, "?"), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
             Console.WriteLine("INIT LIB {0}",
-                PublishedContentType.Get(PublishedItemType.Content, "anything")
+                ContentTypesCache.Get(PublishedItemType.Content, "anything")
                     .PropertyTypes.Count());
             
             var routingContext = GetRoutingContext("/test", 1234);
@@ -158,9 +158,9 @@ namespace Umbraco.Tests
 		/// <returns></returns>
 		private string LegacyGetItem(int nodeId, string alias)
 		{
-            var cache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+            var cache = UmbracoContext.Current.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-            var umbracoXML = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
+            var umbracoXML = cache.GetXml(UmbracoContext.Current.InPreviewMode);
 
             string xpath = "./{0}";
 			if (umbracoXML.GetElementById(nodeId.ToString()) != null)

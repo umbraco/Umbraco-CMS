@@ -123,7 +123,11 @@ namespace umbraco
             {
                 var content = "";
 
-                var umbracoXml = global::umbraco.content.Instance.XmlContent;
+                var umbracoContext = UmbracoContext.Current;
+                var cache = umbracoContext.ContentCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+                if (cache == null)
+                    throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                var umbracoXml = cache.GetXml(umbracoContext.InPreviewMode);
 
                 var splitpath = (String[])elements["splitpath"];
                 for (int i = 0; i < splitpath.Length - 1; i++)

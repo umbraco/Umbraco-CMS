@@ -8,6 +8,7 @@ using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.Editors
 {
@@ -86,15 +87,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            //need to get a legacy macro object - eventually we'll have a new format but nto yet
-            var macro = new macro(macroAlias);
+            var macro = MacroRenderer.GetMacroModel(macroAlias);
             if (macro == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
 
             //if it isn't supposed to be rendered in the editor then return an empty string
-            if (macro.DontRenderInEditor)
+            if (macro.RenderInEditor == false)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as html since this controller has been configured

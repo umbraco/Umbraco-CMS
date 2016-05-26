@@ -41,11 +41,10 @@ namespace Umbraco.Web.Install.InstallSteps
                 security.PerformLogin(0);
             }
 
-            //This is synonymous with library.RefreshContent() - but we don't want to use library
-            // for anything anymore so welll use the method that it is wrapping. This will just make sure
-            // the correct xml structure exists in the xml cache file. This is required by some upgrade scripts
-            // that may modify the cmsContentXml table directly.
-            DistributedCache.Instance.RefreshAllPageCache();
+            // Some upgrade scripts "may modify the database (cmsContentXml...) tables directly" - not sure
+            // that is still true but the idea is that after an upgrade we want to reset the local facade, on
+            // all LB nodes of course, so we need to use the distributed cache, and refresh everything.
+            DistributedCache.Instance.RefreshAllFacade();
 
             // Update configurationStatus
             GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();

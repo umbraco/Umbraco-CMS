@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
 using Umbraco.Core.Cache;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web
 {
@@ -117,7 +118,7 @@ namespace Umbraco.Web
             if (alias == null) throw new ArgumentNullException("alias");
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
 
-            var m = macro.GetMacro(alias);
+            var m = MacroRenderer.GetMacroModel(alias);
             if (m == null)
             {
                 throw new KeyNotFoundException("Could not find macro with alias " + alias);
@@ -133,10 +134,10 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
         /// <returns></returns>
-        internal IHtmlString RenderMacro(macro m, IDictionary<string, object> parameters, page umbracoPage)
+        internal IHtmlString RenderMacro(MacroModel m, IDictionary<string, object> parameters, page umbracoPage)
         {
-            if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
-            if (m == null) throw new ArgumentNullException("m");
+            if (umbracoPage == null) throw new ArgumentNullException(nameof(umbracoPage));
+            if (m == null) throw new ArgumentNullException(nameof(m));
 
             if (_umbracoContext.PageId == null)
             {
@@ -153,9 +154,8 @@ namespace Umbraco.Web
                 //NOTE: the value could have html encoded values, so we need to deal with that
                 macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
-            var macroControl = m.RenderMacro(macroProps,
-                umbracoPage.Elements,
-                _umbracoContext.PageId.Value);
+            var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+            var macroControl = renderer.Render(m, umbracoPage.Elements, _umbracoContext.PageId.Value, macroProps).GetAsControl();
 
             string html;
             if (macroControl is LiteralControl)

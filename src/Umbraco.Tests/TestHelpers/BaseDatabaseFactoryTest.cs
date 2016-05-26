@@ -27,6 +27,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Core.Events;
 using Umbraco.Core.Plugins;
+using Umbraco.Web.Routing;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -38,6 +39,8 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
     {
+        protected PublishedContentTypeCache ContentTypesCache;
+
         //This is used to indicate that this is the first test to run in the test session, if so, we always
         //ensure a new database file is used.
         private static volatile bool _firstRunInTestSession = true;
@@ -45,15 +48,17 @@ namespace Umbraco.Tests.TestHelpers
         private bool _firstTestInFixture = true;
 
         //Used to flag if its the first test in the current session
-        private bool _isFirstRunInTestSession = false;
+        private bool _isFirstRunInTestSession;
         //Used to flag if its the first test in the current fixture
-        private bool _isFirstTestInFixture = false;
+        private bool _isFirstTestInFixture;
 
         private ApplicationContext _appContext;
+        private IFacadeService _facadeService;
+        private IDatabaseUnitOfWorkProvider _uowProvider;
 
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
-        private static Byte[] _dbBytes;
+        private static byte[] _dbBytes;
 
         [SetUp]
         public override void Initialize()
@@ -74,10 +79,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         private CacheHelper _disabledCacheHelper;
-        protected CacheHelper DisabledCache
-        {
-            get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
-        }
+        protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
         protected override void SetupApplicationContext()
         {
@@ -110,7 +112,7 @@ namespace Umbraco.Tests.TestHelpers
             var repositoryFactory = Container.GetInstance<RepositoryFactory>();
             var serviceContext = TestObjects.GetServiceContext(
                 repositoryFactory,
-                new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
+                _uowProvider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory),
                 new FileUnitOfWorkProvider(),
                 CacheHelper,
                 Logger,
@@ -244,6 +246,48 @@ namespace Umbraco.Tests.TestHelpers
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
+            // ensure we have a FacadeService
+            if (_facadeService == null)
+            {
+                var behavior = GetType().GetCustomAttribute<TestSetup.FacadeServiceAttribute>(false);
+                var cache = new NullCacheProvider();
+
+                var enableRepositoryEvents = behavior != null && behavior.EnableRepositoryEvents;
+                if (enableRepositoryEvents && LoggerResolver.HasCurrent == false)
+                {
+                    // XmlStore wants one if handling events
+                    LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
+                    {
+                        CanResolveBeforeFrozen = true
+                    };
+                    ProfilerResolver.Current = new ProfilerResolver(new LogProfiler(Mock.Of<ILogger>()))
+                    {
+                        CanResolveBeforeFrozen = true
+                    };
+                }
+
+                ContentTypesCache = new PublishedContentTypeCache(
+                        ApplicationContext.Services.ContentTypeService,
+                        ApplicationContext.Services.MediaTypeService, 
+                        ApplicationContext.Services.MemberTypeService);
+
+                // testing=true so XmlStore will not use the file nor the database
+                var service = new FacadeService(
+                    ApplicationContext.Services,
+                    _uowProvider, 
+                    cache, ContentTypesCache, true, enableRepositoryEvents);
+
+                // initialize PublishedCacheService content with an Xml source
+                service.XmlStore.GetXmlDocument = () => 
+                {
+                    var doc = new XmlDocument();
+                    doc.LoadXml(GetXmlContent(0));
+                    return doc;
+                };
+
+                _facadeService = service;
+            }
+
             base.FreezeResolution();
         }
 
@@ -298,6 +342,8 @@ namespace Umbraco.Tests.TestHelpers
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
+                // make sure we dispose of the service to unbind events
+                _facadeService?.Dispose();
             }
 
             base.TearDown();
@@ -356,10 +402,7 @@ namespace Umbraco.Tests.TestHelpers
                 LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
-                if (onFail != null)
-                {
-                    onFail(ex);
-                }
+                onFail?.Invoke(ex);
             }
         }
 
@@ -369,21 +412,28 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
-            var cache = new PublishedContentCache((context, preview) =>
+            // ensure we have a PublishedCachesService
+            var service = _facadeService as FacadeService;
+            if (service == null)
+                throw new Exception("Not a proper XmlPublishedCache.PublishedCachesService.");
+
+            // re-initialize PublishedCacheService content with an Xml source with proper template id
+            service.XmlStore.GetXmlDocument = () =>
             {
                 var doc = new XmlDocument();
                 doc.LoadXml(GetXmlContent(templateId));
                 return doc;
-            });
-
-            PublishedContentCache.UnitTesting = true;
+            };
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-            var ctx = new UmbracoContext(
+            var ctx = UmbracoContext.CreateContext(
                 httpContext,
                 ApplicationContext,
-                new PublishedCaches(cache, new PublishedMediaCache(ApplicationContext)),
-                new WebSecurity(httpContext, ApplicationContext));
+                service,
+                new WebSecurity(httpContext, ApplicationContext),
+                null,
+                Enumerable.Empty<IUrlProvider>(), 
+                null);
 
             if (setSingleton)
             {

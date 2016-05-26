@@ -21,8 +21,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class MemberService : RepositoryService, IMemberService
     {
-        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;
         private readonly IMemberGroupService _memberGroupService;
         private IMemberTypeService _memberTypeService;
 
@@ -32,14 +30,11 @@ namespace Umbraco.Core.Services
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IMemberGroupService memberGroupService,
-            IDataTypeService dataTypeService)
+            IMemberGroupService memberGroupService)
             : base(provider, logger, eventMessagesFactory)
         {
             if (memberGroupService == null) throw new ArgumentNullException(nameof(memberGroupService));
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
             _memberGroupService = memberGroupService;
-            _dataTypeService = dataTypeService;
         }
 
         // don't change or remove this, will need it later
@@ -315,12 +310,6 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreateRepository<IMemberRepository>();
                 repository.AddOrUpdate(member);
-
-                // fixme kill
-                repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
-                // generate preview for blame history?
-                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                    repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
 
                 Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
             }
@@ -909,13 +898,6 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(member);
 
-                // fixme get rid of xml
-                repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
-
-                // generate preview for blame history?
-                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                    repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
-
                 uow.Complete();
             }
 
@@ -942,16 +924,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 foreach (var member in membersA)
-                {
                     repository.AddOrUpdate(member);
-
-                    // fixme get rid of xml stuff
-                    repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
-
-                    // generate preview for blame history?
-                    if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                        repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
-                }
 
                 uow.Complete();
             }
@@ -1366,32 +1339,6 @@ namespace Umbraco.Core.Services
         public string GetDefaultMemberType()
         {
             return MemberTypeService.GetDefault();
-        }
-
-        #endregion
-
-        #region Xml - Should Move!
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all members
-        /// </summary>
-        /// <param name="memberTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all members = USE WITH CARE!
-        /// </param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        public void RebuildXmlStructures(params int[] memberTypeIds)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var repository = uow.CreateRepository<IMemberRepository>();
-                repository.RebuildXmlStructures(
-                    member => _entitySerializer.Serialize(_dataTypeService, member),
-                    contentTypeIds: memberTypeIds.Length == 0 ? null : memberTypeIds);
-                uow.Complete();
-            }
-
-            Audit(AuditType.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
         #endregion

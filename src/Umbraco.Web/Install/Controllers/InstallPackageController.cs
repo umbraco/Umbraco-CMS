@@ -8,6 +8,7 @@ using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
 
@@ -175,7 +176,9 @@ namespace Umbraco.Web.Install.Controllers
             installer.LoadConfig(model.PackageFile);
             installer.InstallCleanUp(model.ManifestId, model.PackageFile);
 
-			library.RefreshContent();
+            // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+            // but it should be managed automatically by services and caches!
+            //DistributedCache.Instance.RefreshAllFacade();
 
 			return Json(new
 			{

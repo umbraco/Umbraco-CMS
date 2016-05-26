@@ -9,6 +9,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services
 {
@@ -17,87 +18,6 @@ namespace Umbraco.Core.Services
         protected ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
-
-        /// <summary>
-        /// This is called after an content type is saved and is used to update the content xml structures in the database
-        /// if they are required to be updated.
-        /// </summary>
-        /// <param name="contentTypes"></param>
-        internal IEnumerable<IContentTypeBase> GetContentTypesForXmlUpdates(params IContentTypeBase[] contentTypes)
-        {
-
-            var toUpdate = new List<IContentTypeBase>();
-
-            foreach (var contentType in contentTypes)
-            {
-                //we need to determine if we need to refresh the xml content in the database. This is to be done when:
-                // - the item is not new (already existed in the db) AND
-                //      - a content type changes it's alias OR
-                //      - if a content type has it's property removed OR
-                //      - if a content type has a property whose alias has changed
-                //here we need to check if the alias of the content type changed or if one of the properties was removed.
-                var dirty = contentType as IRememberBeingDirty;
-                if (dirty == null) continue;
-
-                //check if any property types have changed their aliases (and not new property types)
-                var hasAnyPropertiesChangedAlias = contentType.PropertyTypes.Any(propType =>
-                    {
-                        var dirtyProperty = propType as IRememberBeingDirty;
-                        if (dirtyProperty == null) return false;
-                        return dirtyProperty.WasPropertyDirty("HasIdentity") == false   //ensure it's not 'new'
-                               && dirtyProperty.WasPropertyDirty("Alias");              //alias has changed
-                    });
-
-                if (dirty.WasPropertyDirty("HasIdentity") == false //ensure it's not 'new'
-                    && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") || hasAnyPropertiesChangedAlias))
-                {
-                    //If the alias was changed then we only need to update the xml structures for content of the current content type.
-                    //If a property was deleted or a property alias was changed then we need to update the xml structures for any
-                    // content of the current content type and any of the content type's child content types.
-                    if (dirty.WasPropertyDirty("Alias")
-                        && dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") == false && hasAnyPropertiesChangedAlias == false)
-                    {
-                        //if only the alias changed then only update the current content type
-                        toUpdate.Add(contentType);
-                    }
-                    else
-                    {
-                        //TODO: This is pretty nasty, fix this
-                        var contentTypeService = this as IContentTypeService;
-                        if (contentTypeService != null)
-                        {
-                            //if a property was deleted or alias changed, then update all content of the current content type
-                            // and all of it's desscendant doc types.
-                            toUpdate.AddRange(((IContentType) contentType).DescendantsAndSelf(contentTypeService));
-                        }
-                        else
-                        {
-                            var mediaTypeService = this as IMediaTypeService;
-                            if (mediaTypeService != null)
-                            {
-                                //if a property was deleted or alias changed, then update all content of the current content type
-                                // and all of it's desscendant doc types.
-                                toUpdate.AddRange(((IMediaType) contentType).DescendantsAndSelf(mediaTypeService));
-                            }
-                            else
-                            {
-                                var memberTypeService = this as IMemberTypeService;
-                                if (memberTypeService != null)
-                                {
-                                    //if a property was deleted or alias changed, then update all content of the current content type
-                                    // and all of it's desscendant doc types.
-                                    toUpdate.AddRange(((IMemberType)contentType).DescendantsAndSelf(memberTypeService));
-                                }
-                            }
-                        }
-                        
-                    }
-                }
-            }
-
-            return toUpdate;
-
-        }
     }
 
     internal abstract class ContentTypeServiceBase<TItem, TService> : ContentTypeServiceBase
@@ -106,29 +26,40 @@ namespace Umbraco.Core.Services
     {
         protected ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
+        { }
+
+        protected abstract TService Instance { get; }
+
+        internal static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> Changed;
+
+        protected void OnChanged(ContentTypeChange<TItem>.EventArgs args)
         {
-            _this = this as TService;
-            if (_this == null) throw new Exception("Oops.");
+            Changed.RaiseEvent(args, Instance);
         }
 
-        private readonly TService _this;
+        public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> UowRefreshedEntity;
+
+        protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
+        {
+            UowRefreshedEntity.RaiseEvent(args, Instance);
+        }
 
         public static event TypedEventHandler<TService, SaveEventArgs<TItem>> Saving;
         public static event TypedEventHandler<TService, SaveEventArgs<TItem>> Saved;
 
         protected void OnSaving(SaveEventArgs<TItem> args)
         {
-            Saving.RaiseEvent(args, _this);
+            Saving.RaiseEvent(args, Instance);
         }
 
         protected bool OnSavingCancelled(SaveEventArgs<TItem> args)
         {
-            return Saving.IsRaisedEventCancelled(args, _this);
+            return Saving.IsRaisedEventCancelled(args, Instance);
         }
 
         protected void OnSaved(SaveEventArgs<TItem> args)
         {
-            Saved.RaiseEvent(args, _this);
+            Saved.RaiseEvent(args, Instance);
         }
 
         public static event TypedEventHandler<TService, DeleteEventArgs<TItem>> Deleting;
@@ -136,12 +67,12 @@ namespace Umbraco.Core.Services
 
         protected void OnDeleting(DeleteEventArgs<TItem> args)
         {
-            Deleting.RaiseEvent(args, _this);
+            Deleting.RaiseEvent(args, Instance);
         }
 
         protected bool OnDeletingCancelled(DeleteEventArgs<TItem> args)
         {
-            return Deleting.IsRaisedEventCancelled(args, _this);
+            return Deleting.IsRaisedEventCancelled(args, Instance);
         }
 
         protected void OnDeleted(DeleteEventArgs<TItem> args)
@@ -154,17 +85,17 @@ namespace Umbraco.Core.Services
 
         protected void OnMoving(MoveEventArgs<TItem> args)
         {
-            Moving.RaiseEvent(args, _this);
+            Moving.RaiseEvent(args, Instance);
         }
 
         protected bool OnMovingCancelled(MoveEventArgs<TItem> args)
         {
-            return Moving.IsRaisedEventCancelled(args, _this);
+            return Moving.IsRaisedEventCancelled(args, Instance);
         }
 
         protected void OnMoved(MoveEventArgs<TItem> args)
         {
-            Moved.RaiseEvent(args, _this);
+            Moved.RaiseEvent(args, Instance);
         }
 
         public static event TypedEventHandler<TService, SaveEventArgs<EntityContainer>> SavingContainer;
@@ -172,17 +103,17 @@ namespace Umbraco.Core.Services
 
         protected void OnSavingContainer(SaveEventArgs<EntityContainer> args)
         {
-            SavingContainer.RaiseEvent(args, _this);
+            SavingContainer.RaiseEvent(args, Instance);
         }
 
         protected bool OnSavingContainerCancelled(SaveEventArgs<EntityContainer> args)
         {
-            return SavingContainer.IsRaisedEventCancelled(args, _this);
+            return SavingContainer.IsRaisedEventCancelled(args, Instance);
         }
 
         protected void OnSavedContainer(SaveEventArgs<EntityContainer> args)
         {
-            SavedContainer.RaiseEvent(args, _this);
+            SavedContainer.RaiseEvent(args, Instance);
         }
 
         public static event TypedEventHandler<TService, DeleteEventArgs<EntityContainer>> DeletingContainer;
@@ -190,26 +121,18 @@ namespace Umbraco.Core.Services
 
         protected void OnDeletingContainer(DeleteEventArgs<EntityContainer> args)
         {
-            DeletingContainer.RaiseEvent(args, _this);
+            DeletingContainer.RaiseEvent(args, Instance);
         }
 
         protected bool OnDeletingContainerCancelled(DeleteEventArgs<EntityContainer> args)
         {
-            return DeletingContainer.IsRaisedEventCancelled(args, _this);
+            return DeletingContainer.IsRaisedEventCancelled(args, Instance);
         }
 
         protected void OnDeletedContainer(DeleteEventArgs<EntityContainer> args)
         {
-            DeletedContainer.RaiseEvent(args, _this);
+            DeletedContainer.RaiseEvent(args, Instance);
         }
-
-        // for later usage
-        //public static event TypedEventHandler<TService, Change.EventArgs> TxRefreshed;
-
-        //protected void OnTxRefreshed(Change.EventArgs args)
-        //{
-        //    TxRefreshed.RaiseEvent(args, this);
-        //}
     }
 
     internal abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
@@ -297,6 +220,92 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Composition
+
+        internal IEnumerable<ContentTypeChange<TItem>> ComposeContentTypeChanges(params TItem[] contentTypes)
+        {
+            // find all content types impacted by the changes,
+            // - content type alias changed
+            // - content type property removed, or alias changed
+            // - content type composition removed (not testing if composition had properties...)
+            //
+            // because these are the changes that would impact the raw content data
+
+            // note
+            // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
+            // instead of IsPropertyDirty() since dirty properties have been resetted already
+
+            var changes = new List<ContentTypeChange<TItem>>();
+
+            foreach (var contentType in contentTypes)
+            {
+                var dirty = (IRememberBeingDirty)contentType;
+
+                // skip new content types
+                var isNewContentType = dirty.WasPropertyDirty("HasIdentity");
+                if (isNewContentType)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+                    continue;
+                }
+
+                // alias change?
+                var hasAliasChanged = dirty.WasPropertyDirty("Alias");
+
+                // existing property alias change?
+                var hasAnyPropertyChangedAlias = contentType.PropertyTypes.Any(propertyType =>
+                {
+                    var dirtyProperty = propertyType as IRememberBeingDirty;
+                    if (dirtyProperty == null) throw new Exception("oops");
+
+                    // skip new properties
+                    var isNewProperty = dirtyProperty.WasPropertyDirty("HasIdentity");
+                    if (isNewProperty) return false;
+
+                    // alias change?
+                    var hasPropertyAliasBeenChanged = dirtyProperty.WasPropertyDirty("Alias");
+                    return hasPropertyAliasBeenChanged;
+                });
+
+                // removed properties?
+                var hasAnyPropertyBeenRemoved = dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved");
+
+                // removed compositions?
+                var hasAnyCompositionBeenRemoved = dirty.WasPropertyDirty("HasCompositionTypeBeenRemoved");
+
+                // main impact on properties?
+                var hasPropertyMainImpact = hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
+
+                if (hasAliasChanged || hasPropertyMainImpact)
+                {
+                    // add that one, as a main change
+                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+
+                    if (hasPropertyMainImpact)
+                        foreach (var c in contentType.ComposedOf(this))
+                            AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                }
+                else
+                {
+                    // add that one, as an other change
+                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+                }
+            }
+
+            return changes;
+        }
+
+        // ensures changes contains no duplicates
+        private static void AddChange(ICollection<ContentTypeChange<TItem>> changes, TItem contentType, ContentTypeChangeTypes changeTypes)
+        {
+            var change = changes.FirstOrDefault(x => x.Item == contentType);
+            if (change == null)
+            {
+                changes.Add(new ContentTypeChange<TItem>(contentType, changeTypes));
+                return;
+            }
+            change.ChangeTypes |= changeTypes;
+        }
+        
         #endregion
 
         #region Get, Has, Is, Count
@@ -514,14 +523,14 @@ namespace Umbraco.Core.Services
                 item.CreatorId = userId;
                 repo.AddOrUpdate(item); // also updates content/media/member items
                 uow.Flush(); // to db but no commit yet
-
-                // ...
-
+                
+                // figure out impacted content types
+                var changes = ComposeContentTypeChanges(item).ToArray();
+                var args = changes.ToEventArgs();
+                OnUowRefreshedEntity(args);
                 uow.Complete();
+                OnChanged(args);
             }
-
-            // todo: should use TxRefreshed event within the transaction instead, see CC branch
-            UpdateContentXmlStructure(item);
 
             OnSaved(new SaveEventArgs<TItem>(item, false));
             Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
@@ -552,10 +561,13 @@ namespace Umbraco.Core.Services
 
                 //save it all in one go
                 uow.Complete();
-            }
 
-            // todo: should use TxRefreshed event within the transaction instead, see CC branch
-            UpdateContentXmlStructure(itemsA.Cast<IContentTypeBase>().ToArray());
+                // figure out impacted content types
+                var changes = ComposeContentTypeChanges(itemsA).ToArray();
+                var args = changes.ToEventArgs();
+                OnUowRefreshedEntity(args);
+                OnChanged(args);
+            }
 
             OnSaved(new SaveEventArgs<TItem>(itemsA, false));
             Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
@@ -579,6 +591,14 @@ namespace Umbraco.Core.Services
                 var descendantsAndSelf = item.DescendantsAndSelf(this)
                     .ToArray();
 
+                // all impacted (through composition) probably lose some properties
+                // don't try to be too clever here, just report them all
+                // do this before anything is deleted
+                var changed = descendantsAndSelf.SelectMany(xx => xx.ComposedOf(this))
+                    .Distinct()
+                    .Except(descendantsAndSelf)
+                    .ToArray();
+
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
@@ -592,8 +612,13 @@ namespace Umbraco.Core.Services
                 uow.Flush(); // to db but no commit yet
 
                 //...
+                var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
+                var args = changes.ToEventArgs();
 
+                OnUowRefreshedEntity(args);
                 uow.Complete();
+                OnChanged(args);
             }
 
             OnDeleted(new DeleteEventArgs<TItem>(item, false));
@@ -617,6 +642,14 @@ namespace Umbraco.Core.Services
                     .Distinct()
                     .ToArray();
 
+                // all impacted (through composition) probably lose some properties
+                // don't try to be too clever here, just report them all
+                // do this before anything is deleted
+                var changed = allDescendantsAndSelf.SelectMany(x => x.ComposedOf(this))
+                    .Distinct()
+                    .Except(allDescendantsAndSelf)
+                    .ToArray();
+
                 // delete content
                 DeleteItemsOfTypes(allDescendantsAndSelf.Select(x => x.Id));
 
@@ -627,10 +660,15 @@ namespace Umbraco.Core.Services
 
                 uow.Flush(); // to db but no commit yet
 
-                // ...
-
+                var changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
+                var args = changes.ToEventArgs();
+                
                 uow.Complete();
+                
+                OnUowRefreshedEntity(args);
 
+                OnChanged(args);
             }
 
             OnDeleted(new DeleteEventArgs<TItem>(itemsA, false));
@@ -784,6 +822,10 @@ namespace Umbraco.Core.Services
                     return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs); // causes rollback
                 }
             }
+
+
+            // FIXME should raise Changed events for the content type that is MOVED and ALL ITS CHILDREN IF ANY
+            // FIXME at the moment we don't have no MoveContainer don't we?!
 
             OnMoved(new MoveEventArgs<TItem>(false, evtMsgs, moveInfo.ToArray()));
 
@@ -973,12 +1015,6 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
         }
-
-        #endregion
-
-        #region Xml - Should Move!
-
-        protected abstract void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes);
 
         #endregion
     }

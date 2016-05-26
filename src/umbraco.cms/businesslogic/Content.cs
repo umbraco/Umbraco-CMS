@@ -9,6 +9,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.Events;
+using Umbraco.Core.Persistence;
 using File = System.IO.File;
 
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -17,13 +19,13 @@ namespace umbraco.cms.businesslogic
 {
     /// <summary>
     /// Content is an intermediate layer between CMSNode and class'es which will use generic data.
-    /// 
+    ///
     /// Content is a datastructure that holds generic data defined in its corresponding ContentType. Content can in some
     /// sence be compared to a row in a database table, it's contenttype hold a definition of the columns and the Content
     /// contains the data
-    /// 
+    ///
     /// Note that Content data in umbraco is *not* tablular but in a treestructure.
-    /// 
+    ///
     /// </summary>
     [Obsolete("Obsolete, Use Umbraco.Core.Models.Content or Umbraco.Core.Models.Media", false)]
     public class Content : CMSNode
@@ -50,7 +52,7 @@ namespace umbraco.cms.businesslogic
         public Content(int id) : base(id) { }
 
         protected Content(int id, bool noSetup) : base(id, noSetup) { }
-       
+
         protected Content(Guid id) : base(id) { }
 
         protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
@@ -158,10 +160,10 @@ namespace umbraco.cms.businesslogic
         /// <remarks>
         /// This is here for performance reasons only. If the _contentTypeIcon is manually set
         /// then a database call is not made to initialize the ContentType.
-        /// 
+        ///
         /// The data layer has slightly changed in 4.1 so that for Document and Media, the ContentType
         /// is automatically initialized with one SQL call when creating the documents/medias so using this
-        /// method or the ContentType.IconUrl property when accessing the icon from Media or Document 
+        /// method or the ContentType.IconUrl property when accessing the icon from Media or Document
         /// won't affect performance.
         /// </remarks>
         public string ContentTypeIcon
@@ -185,36 +187,13 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                if (!_versionDateInitialized)
-                {
-                    // A Media item only contains a single version (which relates to it's creation) so get this value from the media xml fragment instead
-                    if (this is media.Media)
-                    {
-                        // get the xml fragment from cmsXmlContent
-                        string xmlFragment = SqlHelper.ExecuteScalar<string>(@"SELECT [xml] FROM cmsContentXml WHERE nodeId = " + this.Id);
-                        if (!string.IsNullOrWhiteSpace(xmlFragment))
-                        {
-                            XmlDocument xmlDocument = new XmlDocument();
-                            xmlDocument.LoadXml(xmlFragment);                            
+                if (_versionDateInitialized) return _versionDate;
 
-                            _versionDateInitialized = DateTime.TryParse(xmlDocument.SelectSingleNode("//*[1]").Attributes["updateDate"].Value, out _versionDate);
-                        }
-                    }
-
-                    if (!_versionDateInitialized)
-                    {
-                        object o = SqlHelper.ExecuteScalar<object>(
-                            "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
-                        if (o == null)
-                        {
-                            _versionDate = DateTime.Now;
-                        }
-                        else
-                        {
-                            _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
-                        }
-                    }
-                }
+                // content & media have a version date in cmsContentVersion that is updated when saved - use it
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                _versionDate = db.ExecuteScalar<DateTime>("SELECT versionDate FROM cmsContentVersion WHERE versionId=@versionId",
+                    new { @versionId = Version });
+                _versionDateInitialized = true;
                 return _versionDate;
             }
             set
@@ -258,21 +237,10 @@ namespace umbraco.cms.businesslogic
         /// Used to persist object changes to the database. This ensures that the properties are re-loaded from the database.
         /// </summary>
         public override void Save()
-        {            
+        {
             base.Save();
 
         }
-
-
-
-        /// <summary>
-        /// Removes the Xml cached in the database - unpublish and cleaning
-        /// </summary>
-        public virtual void XmlRemoveFromDB()
-        {
-            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-        }
-        
 
         /// <summary>
         /// Deletes the current Content object, must be overridden in the child class.
@@ -283,14 +251,10 @@ namespace umbraco.cms.businesslogic
             // Delete all data associated with this content
             this.deleteAllProperties();
 
-            // Remove all content preview xml
-            SqlHelper.ExecuteNonQuery("delete from cmsPreviewXml where nodeId = " + Id);
+            OnDeletedContent(new ContentDeleteEventArgs(ApplicationContext.Current.DatabaseContext.Database, Id));
 
             // Delete version history
             SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
-
-            // Delete xml
-            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
 
             // Delete Contentspecific data ()
             SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
@@ -337,29 +301,6 @@ namespace umbraco.cms.businesslogic
             _contentTypeIcon = InitContentTypeIcon;
         }
 
-   
-      
-        /// <summary>
-        /// Saves the XML document to the data source.
-        /// </summary>
-        /// <param name="node">The XML Document.</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected virtual void SaveXmlDocument(XmlNode node)
-        {
-            // Method is synchronized so exists remains consistent (avoiding race condition)
-            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
-                                           SqlHelper.CreateParameter("@nodeId", Id)) > 0;
-            string query;
-            if (exists)
-                query = "UPDATE cmsContentXml SET xml = @xml WHERE nodeId = @nodeId";
-            else
-                query = "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
-            SqlHelper.ExecuteNonQuery(query,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@xml", node.OuterXml));
-        }
-
-       
         #endregion
 
         #region Private Methods
@@ -376,6 +317,29 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
-     
+        #region Change Events
+
+        // this is temp. until we get rid of Content
+
+        internal protected class ContentDeleteEventArgs : EventArgs
+        {
+            public ContentDeleteEventArgs(UmbracoDatabase database, int id)
+            {
+                Database = database;
+                Id = id;
+            }
+
+            public int Id { get; private set; }
+            public UmbracoDatabase Database { get; private set; }
+        }
+
+        internal static event TypedEventHandler<Content, ContentDeleteEventArgs> DeletedContent;
+
+        internal protected void OnDeletedContent(ContentDeleteEventArgs args)
+        {
+            DeletedContent?.Invoke(this, args);
+        }
+
+        #endregion
     }
 }

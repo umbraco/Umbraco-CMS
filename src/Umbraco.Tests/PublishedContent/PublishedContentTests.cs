@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,8 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 
@@ -45,15 +42,15 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias), 
-                    new PublishedPropertyType("selectedNodes", 0, "?"), 
-                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
-                    new PublishedPropertyType("testRecursive", 0, "?"), 
+                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias),
+                    new PublishedPropertyType("selectedNodes", 0, "?"),
+                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"),
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+                    new PublishedPropertyType("testRecursive", 0, "?"),
                 };
             var compositionAliases = new[] {"MyCompositionAlias"};
             var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
         }
 
         public override void TearDown()
@@ -74,7 +71,7 @@ namespace Umbraco.Tests.PublishedContent
 	    protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -88,14 +85,14 @@ namespace Umbraco.Tests.PublishedContent
 		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<testRecursive><![CDATA[]]></testRecursive>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
 				<testRecursive><![CDATA[]]></testRecursive>
-			</Home>			
+			</Home>
 			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
 			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
             <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
@@ -212,8 +209,8 @@ namespace Umbraco.Tests.PublishedContent
         [PublishedContentModel("Home")]
         internal class Home : PublishedContentModel
         {
-            public Home(IPublishedContent content) 
-                : base(content) 
+            public Home(IPublishedContent content)
+                : base(content)
             {}
         }
 
@@ -672,7 +669,7 @@ namespace Umbraco.Tests.PublishedContent
 	    public void CreateDetachedContentSample()
 	    {
             bool previewing = false;
-            var t = PublishedContentType.Get(PublishedItemType.Content, "detachedSomething");
+            var t = ContentTypesCache.Get(PublishedItemType.Content, "detachedSomething");
             var values = new Dictionary<string, object>();
             var properties = t.PropertyTypes.Select(x =>
             {

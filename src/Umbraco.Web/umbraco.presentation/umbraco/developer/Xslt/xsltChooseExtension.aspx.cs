@@ -95,7 +95,7 @@ namespace umbraco.developer
             SortedList<string, List<string>> _tempAssemblies = new SortedList<string, List<string>>();
 
             // add all extensions definied by macro
-            foreach(KeyValuePair<string, object> extension in macro.GetXsltExtensions())
+            foreach(KeyValuePair<string, object> extension in Umbraco.Web.Macros.XsltMacroEngine.GetXsltExtensions())
                 _tempAssemblies.Add(extension.Key, GetStaticMethods(extension.Value.GetType()));
 
             // add the Umbraco library (not included in macro extensions)

@@ -12,20 +12,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IMedia GetMediaByPath(string mediaPath);
 
         /// <summary>
-        /// Used to add/update published xml for the media item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml);
-
-        /// <summary>
-        /// Used to add/update preview xml for the content item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml);
-
-        /// <summary>
         /// Gets paged media results
         /// </summary>
         /// <param name="query">Query to excute</param>

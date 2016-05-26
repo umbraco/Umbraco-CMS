@@ -1,13 +1,10 @@
-using System.Configuration;
 using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
@@ -20,7 +17,7 @@ namespace Umbraco.Tests.TestHelpers
 	    ///  </summary>
 	    ///  <param name="url"></param>
 	    ///  <param name="templateId">
-	    ///  The template Id to insert into the Xml cache file for each node, this is helpful for unit testing with templates but you		 
+	    ///  The template Id to insert into the Xml cache file for each node, this is helpful for unit testing with templates but you
 	    ///  should normally create the template in the database with this id
 	    /// </param>
 	    ///  <param name="routeData"></param>
@@ -73,7 +70,5 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			return GetRoutingContext(url, 1234, routeData);
 		}
-
-		
 	}
 }

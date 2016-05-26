@@ -18,10 +18,10 @@ namespace Umbraco.Core.DependencyInjection
             // boot manager when running in a web context
             container.Register<IEventMessagesFactory, TransientEventMessagesFactory>();
 
-            //the context
+            // register the service context
             container.RegisterSingleton<ServiceContext>();
 
-            //now the services...
+            // register the services
             container.RegisterSingleton<IMigrationEntryService, MigrationEntryService>();
             container.RegisterSingleton<IPublicAccessService, PublicAccessService>();
             container.RegisterSingleton<ITaskService, TaskService>();

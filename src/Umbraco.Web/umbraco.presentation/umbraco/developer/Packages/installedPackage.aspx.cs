@@ -9,7 +9,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.web;
-using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Web.UI.Pages;
@@ -556,7 +555,9 @@ namespace umbraco.presentation.developer.packages
             // refresh cache
             if (refreshCache)
             {
-                library.RefreshContent();
+                // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+                // but it should be managed automatically by services and caches!
+                //DistributedCache.Instance.RefreshAllFacade();
             }
 
             //ensure that all tree's are refreshed after uninstall

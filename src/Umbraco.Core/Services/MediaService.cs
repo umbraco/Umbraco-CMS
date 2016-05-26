@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -11,7 +10,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Strings;
+using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services
 {
@@ -20,10 +19,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class MediaService : RepositoryService, IMediaService, IMediaServiceOperations
     {
-        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IUserService _userService;
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private IMediaTypeService _mediaTypeService;
 
         #region Constructors
@@ -31,19 +26,9 @@ namespace Umbraco.Core.Services
         public MediaService(
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
-        {
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
-            _dataTypeService = dataTypeService;
-            _userService = userService;
-            _urlSegmentProviders = urlSegmentProviders;
-        }
+        { }
 
         // don't change or remove this, will need it later
         private IMediaTypeService MediaTypeService => _mediaTypeService;
@@ -275,10 +260,9 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateRepository<IMediaRepository>();
                 repo.AddOrUpdate(media);
-                // FIXME contentXml?!
-                repo.AddOrUpdatePreviewXml(media, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+                TreeChanged.RaiseEvent(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs(), this);
             }
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, media.ContentType.Alias, parent), this);
@@ -566,7 +550,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>        
+        /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter)
         {
@@ -753,6 +737,8 @@ namespace Umbraco.Core.Services
             if (raiseEvents && Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media, evtMsgs), this))
                 return OperationStatus.Attempt.Cancel(evtMsgs);
 
+            var isNew = media.IsNewEntity();
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MediaTree);
@@ -761,17 +747,13 @@ namespace Umbraco.Core.Services
                 if (media.HasIdentity == false)
                     media.CreatorId = userId;
                 repository.AddOrUpdate(media);
-                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
-
-                // generate preview for blame history?
-                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
-
                 uow.Complete();
             }
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false, evtMsgs), this);
+            var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
+            TreeChanged.RaiseEvent(new TreeChange<IMedia>(media, changeType).ToEventArgs(), this);
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
 
             return OperationStatus.Attempt.Succeed(evtMsgs);
@@ -802,6 +784,9 @@ namespace Umbraco.Core.Services
             if (raiseEvents && Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(mediasA, evtMsgs), this))
                 return OperationStatus.Attempt.Cancel(evtMsgs);
 
+            var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x,
+                x.IsNewEntity() ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode));
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MediaTree);
@@ -811,11 +796,6 @@ namespace Umbraco.Core.Services
                     if (media.HasIdentity == false)
                         media.CreatorId = userId;
                     repository.AddOrUpdate(media);
-                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
-
-                    // generate preview for blame history?
-                    if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
                 }
 
                 uow.Complete();
@@ -823,6 +803,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(mediasA, false, evtMsgs), this);
+            TreeChanged.RaiseEvent(treeChanges.ToEventArgs(), this);
             Audit(AuditType.Save, "Bulk Save media performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
             return OperationStatus.Attempt.Succeed(evtMsgs);
@@ -870,6 +851,7 @@ namespace Umbraco.Core.Services
 
                 DeleteLocked(repository, media);
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IMedia>(media, TreeChangeTypes.Remove).ToEventArgs(), this);
             }
 
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
@@ -1004,6 +986,7 @@ namespace Umbraco.Core.Services
 
                 PerformMoveLocked(repository, media, Constants.System.RecycleBinMedia, null, userId, moves, true);
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             }
 
             var moveInfo = moves
@@ -1053,6 +1036,7 @@ namespace Umbraco.Core.Services
                 PerformMoveLocked(repository, media, parentId, parent, userId, moves, trashed);
 
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             }
 
             var moveInfo = moves //changes
@@ -1145,6 +1129,7 @@ namespace Umbraco.Core.Services
 
                 EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, true), this);
                 uow.Complete();
+                TreeChanged.RaiseEvent(deleted.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.Remove)).ToEventArgs(), this);
             }
 
             Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, Constants.System.RecycleBinMedia);
@@ -1193,11 +1178,6 @@ namespace Umbraco.Core.Services
                     // save
                     saved.Add(media);
                     repository.AddOrUpdate(media);
-                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
-
-                    // generate preview for blame history?
-                    if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
-                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, m));
                 }
 
                 uow.Complete();
@@ -1205,6 +1185,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(saved, false), this);
+            TreeChanged.RaiseEvent(saved.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode)).ToEventArgs(), this);
             Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);
 
             return true;
@@ -1303,6 +1284,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptiedRecycleBin;
 
+        /// <summary>
+        /// Occurs after change.
+        /// </summary>
+        internal static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
+
         #endregion
 
         #region Content Types
@@ -1322,6 +1308,7 @@ namespace Umbraco.Core.Services
             // The main problem with this is that for every content item being deleted, events are raised...
             // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
+            var changes = new List<TreeChange<IMedia>>();
             var moves = new List<Tuple<IMedia, string>>();
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -1348,11 +1335,13 @@ namespace Umbraco.Core.Services
                     {
                         // see MoveToRecycleBin
                         PerformMoveLocked(repository, child, Constants.System.RecycleBinMedia, null, userId, moves, true);
+                        changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
                     }
 
                     // delete media
                     // triggers the deleted event (and handles the files)
                     DeleteLocked(repository, media);
+                    changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.Remove));
                 }
 
                 uow.Complete();
@@ -1363,6 +1352,7 @@ namespace Umbraco.Core.Services
                 .ToArray();
             if (moveInfos.Length > 0)
                 Trashed.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfos), this);
+            TreeChanged.RaiseEvent(changes.ToEventArgs(), this);
 
             Audit(AuditType.Delete, $"Delete Media of Type {mediaTypeId} performed by user", userId, Constants.System.Root);
         }
@@ -1385,32 +1375,6 @@ namespace Umbraco.Core.Services
                 uow.Complete();
                 return mediaType;
             }
-        }
-
-        #endregion
-
-        #region Xml - Should Move!
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all media
-        /// </summary>
-        /// <param name="contentTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all media
-        /// </param>
-        public void RebuildXmlStructures(params int[] contentTypeIds)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.WriteLock(Constants.Locks.MediaTree);
-                var repository = uow.CreateRepository<IMediaRepository>();
-                repository.RebuildXmlStructures(
-                    media => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, media),
-                    contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
-                uow.Complete();
-            }
-
-            Audit(AuditType.Publish, "MediaService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
         #endregion

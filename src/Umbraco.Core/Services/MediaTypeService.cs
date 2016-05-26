@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -18,6 +17,8 @@ namespace Umbraco.Core.Services
         {
             _mediaService = mediaService;
         }
+
+        protected override IMediaTypeService Instance => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };
@@ -43,15 +44,6 @@ namespace Umbraco.Core.Services
         {
             foreach (var typeId in typeIds)
                 MediaService.DeleteMediaOfType(typeId);
-        }
-
-        protected override void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
-        {
-            var toUpdate = GetContentTypesForXmlUpdates(contentTypes).ToArray();
-            if (toUpdate.Any() == false) return;
-
-            var mediaService = _mediaService as MediaService;
-            mediaService?.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
         }
     }
 }

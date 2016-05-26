@@ -8,7 +8,7 @@
         /// <summary>
         /// Refreshes, clears, etc... any cache based on the information provided in the json
         /// </summary>
-        /// <param name="jsonPayload"></param>
-        void Refresh(string jsonPayload);
+        /// <param name="json"></param>
+        void Refresh(string json);
     }
 }

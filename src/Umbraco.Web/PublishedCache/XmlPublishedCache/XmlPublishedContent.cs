@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -21,33 +22,41 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
 	internal class XmlPublishedContent : PublishedContentWithKeyBase
 	{
-		/// <summary>
-		/// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node.
-		/// </summary>
-		/// <param name="xmlNode">The Xml node.</param>
-        /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
-        public XmlPublishedContent(XmlNode xmlNode, bool isPreviewing)
+	    /// <summary>
+	    /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node.
+	    /// </summary>
+	    /// <param name="xmlNode">The Xml node.</param>
+	    /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
+	    /// <param name="cacheProvider">A cache provider.</param>
+        /// <param name="contentTypeCache">A content type cache.</param>
+        public XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
 		{
 			_xmlNode = xmlNode;
 		    _isPreviewing = isPreviewing;
+		    _cacheProvider = cacheProvider;
+            _contentTypeCache = contentTypeCache;
 			InitializeStructure();
 			Initialize();
             InitializeChildren();
 		}
 
-        /// <summary>
-        /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node,
-        /// and a value indicating whether to lazy-initialize the instance.
-        /// </summary>
-        /// <param name="xmlNode">The Xml node.</param>
-        /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
-        /// <param name="lazyInitialize">A value indicating whether to lazy-initialize the instance.</param>
-        /// <remarks>Lazy-initializationg is NOT thread-safe.</remarks>
-        internal XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, bool lazyInitialize)
+	    /// <summary>
+	    /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node,
+	    /// and a value indicating whether to lazy-initialize the instance.
+	    /// </summary>
+	    /// <param name="xmlNode">The Xml node.</param>
+	    /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
+	    /// <param name="cacheProvider">A cache provider.</param>
+	    /// <param name="contentTypeCache">A content type cache.</param>
+	    /// <param name="lazyInitialize">A value indicating whether to lazy-initialize the instance.</param>
+	    /// <remarks>Lazy-initializationg is NOT thread-safe.</remarks>
+	    internal XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache, bool lazyInitialize)
 		{
 			_xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
-			InitializeStructure();
+            _cacheProvider = cacheProvider;
+	        _contentTypeCache = contentTypeCache;
+            InitializeStructure();
             if (lazyInitialize == false)
             {
                 Initialize();
@@ -56,6 +65,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		}
 
         private readonly XmlNode _xmlNode;
+	    private readonly ICacheProvider _cacheProvider;
+	    private readonly PublishedContentTypeCache _contentTypeCache;
         
         private bool _initialized;
 	    private bool _childrenInitialized;
@@ -109,21 +120,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             if (recurse == false) return GetProperty(alias);
 
-            var cache = UmbracoContextCache.Current;
+            var key = string.Format("XmlPublishedCache.PublishedContentCache:RecursiveProperty-{0}-{1}", Id, alias.ToLowerInvariant());
+            var cacheProvider = _cacheProvider;
+            return cacheProvider.GetCacheItem<IPublishedProperty>(key, () => base.GetProperty(alias, true));
 
-            if (cache == null)
-                return base.GetProperty(alias, true);
-
-            var key = string.Format("RECURSIVE_PROPERTY::{0}::{1}", Id, alias.ToLowerInvariant());
-            var value = cache.GetOrAdd(key, k => base.GetProperty(alias, true));
-            if (value == null) 
-                return null;
-
-            var property = value as IPublishedProperty;
-            if (property == null)
-                throw new InvalidOperationException("Corrupted cache.");
-
-            return property;
+            // note: cleared by PublishedContentCache.Resync - any change here must be applied there
         }
 
 		public override PublishedItemType ItemType
@@ -349,7 +350,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (parent == null) return;
 
 		    if (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null)
-		        _parent = (new XmlPublishedContent(parent, _isPreviewing, true)).CreateModel();
+		        _parent = (new XmlPublishedContent(parent, _isPreviewing, _cacheProvider, _contentTypeCache, true)).CreateModel();
 		}
 
 		private void Initialize()
@@ -409,7 +410,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var dataXPath = "* [not(@isDoc)]";
 		    var nodes = _xmlNode.SelectNodes(dataXPath);
 
-		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
+            _contentType = _contentTypeCache.Get(PublishedItemType.Content, _docTypeAlias);
 
 		    var propertyNodes = new Dictionary<string, XmlNode>();
             if (nodes != null)
@@ -443,7 +444,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var iterator = nav.Select(expr);
             while (iterator.MoveNext())
 		        _children.Add(
-                    (new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), _isPreviewing, true)).CreateModel());
+                    (new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), _isPreviewing, _cacheProvider, _contentTypeCache, true)).CreateModel());
             
             // warn: this is not thread-safe
             _childrenInitialized = true;

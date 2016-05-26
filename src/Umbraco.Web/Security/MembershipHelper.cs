@@ -28,6 +28,7 @@ namespace Umbraco.Web.Security
         private readonly RoleProvider _roleProvider;
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
+        private readonly IPublishedMemberCache _memberCache;
 
         #region Constructors
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
@@ -37,14 +38,15 @@ namespace Umbraco.Web.Security
 
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
         {
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-            if (roleProvider == null) throw new ArgumentNullException("roleProvider");
+            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
+            if (roleProvider == null) throw new ArgumentNullException(nameof(roleProvider));
             _applicationContext = applicationContext;
             _httpContext = httpContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
+            _memberCache = UmbracoContext.Current?.Facade?.MemberCache; // fixme
         }   
 
         public MembershipHelper(UmbracoContext umbracoContext)
@@ -54,13 +56,14 @@ namespace Umbraco.Web.Security
 
         public MembershipHelper(UmbracoContext umbracoContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-            if (roleProvider == null) throw new ArgumentNullException("roleProvider");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
+            if (roleProvider == null) throw new ArgumentNullException(nameof(roleProvider));
             _httpContext = umbracoContext.HttpContext;
             _applicationContext = umbracoContext.Application;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
+            _memberCache = umbracoContext.Facade.MemberCache;
         }
         #endregion
 
@@ -242,66 +245,22 @@ namespace Umbraco.Web.Security
 
         public virtual IPublishedContent GetByProviderKey(object key)
         {
-            return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
-                GetCacheKey("GetByProviderKey", key), () =>
-                {
-                    var provider = _membershipProvider;
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
-
-                    var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
-                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+            return _memberCache.GetByProviderKey(key);
         }
 
         public virtual IPublishedContent GetById(int memberId)
         {
-            return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
-                GetCacheKey("GetById", memberId), () =>
-                {
-                    var provider = _membershipProvider;
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
-
-                    var result = _applicationContext.Services.MemberService.GetById(memberId);
-                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+            return _memberCache.GetById(memberId);
         }
 
         public virtual IPublishedContent GetByUsername(string username)
         {
-            return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
-                GetCacheKey("GetByUsername", username), () =>
-                {
-                    var provider = _membershipProvider;
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
-
-                    var result = _applicationContext.Services.MemberService.GetByUsername(username);
-                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+            return _memberCache.GetByUsername(username);
         }
 
         public virtual IPublishedContent GetByEmail(string email)
         {
-            return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
-                GetCacheKey("GetByEmail", email), () =>
-                {
-                    var provider = _membershipProvider;
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
-
-                    var result = _applicationContext.Services.MemberService.GetByEmail(email);
-                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+            return _memberCache.GetByEmail(email);
         }
 
         /// <summary>
@@ -315,7 +274,7 @@ namespace Umbraco.Web.Security
                 return null;
             }
             var result = GetCurrentPersistedMember();
-            return result == null ? null : new MemberPublishedContent(result).CreateModel();
+            return result == null ? null : _memberCache.GetByMember(result);
         }
 
         /// <summary>

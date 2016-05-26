@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.Mvc;
-using umbraco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
@@ -13,28 +12,25 @@ namespace Umbraco.Web.WebServices
     [AdminTokenAuthorize]
     public class ScheduledPublishController : UmbracoController
     {
-        private static bool _isPublishingRunning = false;
+        private static bool _isPublishingRunning;
+        private static readonly object Locker = new object();
 
         [HttpPost]
         public JsonResult Index()
         {
-            if (_isPublishingRunning)
-                return null;
-            _isPublishingRunning = true;
+            lock (Locker)
+            {
+                if (_isPublishingRunning)
+                    return null;
+                _isPublishingRunning = true;
+            }
 
             try
             {
-                // DO not run publishing if content is re-loading
-                if (content.Instance.isInitializing == false)
-                {
-                    Services.ContentService.WithResult().PerformScheduledPublish();
-                }
-
-                return Json(new
-                {
-                    success = true
-                });
-
+                // ensure we have everything we need
+                if (ApplicationContext.IsReady == false) return null;
+                Services.ContentService.WithResult().PerformScheduledPublish();
+                return Json(new { success = true });
             }
             catch (Exception ee)
             {
@@ -50,7 +46,10 @@ namespace Umbraco.Web.WebServices
             }
             finally
             {
-                _isPublishingRunning = false;
+                lock (Locker)
+                {
+                    _isPublishingRunning = false;
+                }
             }
         }
     }

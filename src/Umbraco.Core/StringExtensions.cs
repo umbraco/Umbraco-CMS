@@ -101,8 +101,8 @@ namespace Umbraco.Core
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.
-                    return resolvedUrlResult.Success 
-                        ? resolvedUrlResult 
+                    return resolvedUrlResult.Success
+                        ? resolvedUrlResult
                         : Attempt.Succeed(input);
                 }
             }
@@ -111,7 +111,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing 
+        /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing
         /// a try/catch when deserializing when it is not json.
         /// </summary>
         /// <param name="input"></param>
@@ -221,7 +221,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         /// <remarks>
         /// This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
-        /// delimited properly with '&' 
+        /// delimited properly with '&'
         /// </remarks>
         internal static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
         {
@@ -667,6 +667,16 @@ namespace Umbraco.Core
             return compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
         }
 
+        public static int InvariantIndexOf(this string s, string value)
+        {
+            return s.IndexOf(value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static int InvariantLastIndexOf(this string s, string value)
+        {
+            return s.LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Determines if the string is a Guid
         /// </summary>
@@ -1038,7 +1048,7 @@ namespace Umbraco.Core
         }
 
         // FORMAT STRINGS
-        
+
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
@@ -1125,7 +1135,7 @@ namespace Umbraco.Core
         /// Cleans a string.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
@@ -1138,7 +1148,7 @@ namespace Umbraco.Core
         /// Cleans a string, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
@@ -1152,7 +1162,7 @@ namespace Umbraco.Core
         /// Cleans a string in the context of a specified culture.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
@@ -1165,7 +1175,7 @@ namespace Umbraco.Core
         /// Cleans a string in the context of a specified culture, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
@@ -1222,7 +1232,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// An extension method that returns a new string in which all occurrences of a 
+        /// An extension method that returns a new string in which all occurrences of a
         /// specified string in the current instance are replaced with another specified string.
         /// StringComparison specifies the type of search to use for the specified string.
         /// </summary>
@@ -1235,7 +1245,7 @@ namespace Umbraco.Core
         {
             // This initialisation ensures the first check starts at index zero of the source. On successive checks for
             // a match, the source is skipped to immediately after the last replaced occurrence for efficiency
-            // and to avoid infinite loops when oldString and newString compare equal. 
+            // and to avoid infinite loops when oldString and newString compare equal.
             int index = -1 * newString.Length;
 
             // Determine if there are any matches left in source, starting from just after the result of replacing the last match.
@@ -1344,12 +1354,12 @@ namespace Umbraco.Core
 
 
         /// <summary>
-        /// An extension method that returns a new string in which all occurrences of an 
-        /// unicode characters that are invalid in XML files are replaced with an empty string. 
+        /// An extension method that returns a new string in which all occurrences of an
+        /// unicode characters that are invalid in XML files are replaced with an empty string.
         /// </summary>
         /// <param name="text">Current instance of the string</param>
         /// <returns>Updated string</returns>
-        /// 
+        ///
         /// <summary>
         /// removes any unusual unicode characters that can't be encoded into XML
         /// </summary>

@@ -15,6 +15,7 @@ namespace Umbraco.Tests.Services
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
+    [TestSetup.FacadeService(EnableRepositoryEvents = true)]
     public class MediaServiceTests : BaseServiceTest
     {
         [SetUp]

@@ -4,6 +4,8 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -12,75 +14,53 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class XmlDataIntegrityController : UmbracoAuthorizedApiController
     {
+        private readonly FacadeService _facadeService;
+
+        public XmlDataIntegrityController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService as FacadeService;
+            if (_facadeService == null)
+                throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
+
+        }
+
         [HttpPost]
         public bool FixContentXmlTable()
         {
-            Services.ContentService.RebuildXmlStructures();
-            return CheckContentXmlTable();
+            _facadeService.RebuildContentAndPreviewXml();
+            return _facadeService.VerifyContentAndPreviewXml();
         }
 
         [HttpPost]
         public bool FixMediaXmlTable()
         {
-            Services.MediaService.RebuildXmlStructures();
-            return CheckMediaXmlTable();
+            _facadeService.RebuildMediaXml();
+            return _facadeService.VerifyMediaXml();
         }
 
         [HttpPost]
         public bool FixMembersXmlTable()
         {
-            Services.MemberService.RebuildXmlStructures();
-            return CheckMembersXmlTable();
+            _facadeService.RebuildMemberXml();
+            return _facadeService.VerifyMemberXml();
         }
 
         [HttpGet]
         public bool CheckContentXmlTable()
         {
-            var totalPublished = Services.ContentService.CountPublished();
-            
-            var subQuery = DatabaseContext.Sql()
-                .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>()
-                .InnerJoin<DocumentDto>()
-                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
-
-            var totalXml = DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
-
-            return totalXml == totalPublished;
+            return _facadeService.VerifyContentAndPreviewXml();
         }
-        
+
         [HttpGet]
         public bool CheckMediaXmlTable()
         {
-            var total = Services.MediaService.Count();
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = DatabaseContext.Sql()
-                .SelectCount()
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
-            var totalXml = DatabaseContext.Database.ExecuteScalar<int>(subQuery);
-
-            return totalXml == total;
+            return _facadeService.VerifyMediaXml();
         }
 
         [HttpGet]
         public bool CheckMembersXmlTable()
         {
-            var total = Services.MemberService.Count();
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = DatabaseContext.Sql()
-                .SelectCount()
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
-            var totalXml = DatabaseContext.Database.ExecuteScalar<int>(subQuery);
-
-            return totalXml == total;
+            return _facadeService.VerifyMemberXml();
         }
-
-        
     }
 }

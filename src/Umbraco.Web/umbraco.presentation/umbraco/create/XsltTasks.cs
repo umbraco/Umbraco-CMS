@@ -51,9 +51,9 @@ namespace umbraco
                     xsltFile.Close();    
 				}
 
-				// prepare support for XSLT extensions
-				xslt = macro.AddXsltExtensionsToHeader(xslt);
-				var xsltWriter = System.IO.File.CreateText(xsltNewFilename);
+                // prepare support for XSLT extensions
+                xslt = Umbraco.Web.Macros.XsltMacroEngine.AddXsltExtensionsToHeader(xslt);
+                var xsltWriter = System.IO.File.CreateText(xsltNewFilename);
 				xsltWriter.Write(xslt);
 				xsltWriter.Flush();
 				xsltWriter.Close();

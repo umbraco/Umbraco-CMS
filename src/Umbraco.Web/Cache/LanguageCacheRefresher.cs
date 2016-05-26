@@ -1,34 +1,28 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 
-
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// A cache refresher to ensure language cache is refreshed when languages change
-    /// </summary>
     public sealed class LanguageCacheRefresher : CacheRefresherBase<LanguageCacheRefresher>
     {
-        public LanguageCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
-        {
-        }
+        public LanguageCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        protected override LanguageCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        #region Define
 
-        public override Guid UniqueIdentifier
-        {
-            get { return new Guid(DistributedCache.LanguageCacheRefresherId); }
-        }
+        protected override LanguageCacheRefresher Instance => this;
 
-        public override string Name
-        {
-            get { return "Language cache refresher"; }
-        }
+        public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Language Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void Refresh(int id)
         {
@@ -43,5 +37,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
             base.Remove(id);
         }
+
+        #endregion
     }
 }

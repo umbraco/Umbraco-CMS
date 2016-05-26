@@ -24,14 +24,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>.
     /// </summary>
-    internal class ContentRepository : RecycleBinRepository<int, IContent>, IContentRepository
+    internal class ContentRepository : RecycleBinRepository<int, IContent, ContentRepository>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
         private readonly CacheHelper _cacheHelper;
-        private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
-        private readonly ContentXmlRepository<IContent> _contentXmlRepository;
 
         public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
             : base(work, cacheHelper, logger, contentSection, mappingResolver)
@@ -43,11 +41,11 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
 
             EnsureUniqueNaming = true;
         }
+
+        protected override ContentRepository Instance => this;
 
         public bool EnsureUniqueNaming { get; set; }
 
@@ -233,7 +231,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
-            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            // raise event first else potential FK issues
+            OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
+
             Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
@@ -245,6 +245,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(IContent entity)
         {
+            // raise event first else potential FK issues
+            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
             var subQuery = Sql()
@@ -371,6 +374,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 };
                 ((Content)entity).PublishedVersionGuid = dto.VersionId;
             }
+
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -551,6 +556,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 content.PublishedVersionGuid = default(Guid);
             }
 
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+
             entity.ResetDirtyProperties();
         }
 
@@ -682,16 +689,16 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null)
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null, bool newest = true)
         {
+            var filterSql = Sql();
+            if (newest)
+                filterSql.Append("AND (cmsDocument.newest = 1)");
 
-            var filterSql = Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter != null)
             {
                 foreach (var filterClaus in filter.GetWhereClauses())
-                {
                     filterSql.Append($"AND ({filterClaus.Item1})", filterClaus.Item2);
-                }
             }
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
@@ -896,151 +903,5 @@ WHERE (@path LIKE {5})",
 
             return currentName;
         }
-
-        #region Xml - Should Move!
-
-        public void RebuildXmlStructures(Func<IContent, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
-        {
-
-            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-            using (var tr = Database.GetTransaction())
-            {
-                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
-                if (contentTypeIds == null)
-                {
-                    var subQuery = Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<DocumentDto>()
-                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
-
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);
-                }
-                else
-                {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var subQuery = Sql()
-                            .Select("cmsDocument.nodeId")
-                            .From<DocumentDto>()
-                            .InnerJoin<ContentDto>()
-                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<DocumentDto>(dto => dto.Published)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
-
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
-                }
-
-                //now insert the data, again if something fails here, the whole transaction is reversed
-                if (contentTypeIds == null)
-                {
-                    var query = Query.Where(x => x.Published);
-                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                }
-                else
-                {
-                    foreach (var contentTypeId in contentTypeIds)
-                    {
-                        //copy local
-                        var id = contentTypeId;
-                        var query = Query.Where(x => x.Published && x.ContentTypeId == id && x.Trashed == false);
-                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }
-                }
-
-                tr.Complete();
-            }
-        }
-
-        private void RebuildXmlStructuresProcessQuery(Func<IContent, XElement> serializer, IQuery<IContent> query, ITransaction tr, int pageSize)
-        {
-            var pageIndex = 0;
-            long total;
-            var processed = 0;
-            do
-            {
-                //NOTE: This is an important call, we cannot simply make a call to:
-                //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
-                // because that method is used to query 'latest' content items where in this case we don't necessarily
-                // want latest content items because a pulished content item might not actually be the latest.
-                // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
-                var descendants = GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out total,
-                    MapQueryDtos, "Path", Direction.Ascending, true);
-
-                var xmlItems = (from descendant in descendants
-                                let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
-
-                //bulk insert it into the database
-                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
-
-                processed += xmlItems.Length;
-
-                pageIndex++;
-            } while (processed < total);
-        }
-
-        /// <summary>
-        /// Adds/updates content/published xml
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
-        }
-
-        /// <summary>
-        /// Used to remove the content xml for a content item
-        /// </summary>
-        /// <param name="content"></param>
-        public void DeleteContentXml(IContent content)
-        {
-            _contentXmlRepository.Delete(new ContentXmlEntity<IContent>(content));
-        }
-
-        /// <summary>
-        /// Adds/updates preview xml
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        public void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml)
-        {
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(content, xml));
-        }
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        public XElement GetContentXml(int contentId)
-        {
-            var sql = Sql().SelectAll().From<ContentXmlDto>().Where<ContentXmlDto>(d => d.NodeId == contentId);
-            var dto = Database.SingleOrDefault<ContentXmlDto>(sql);
-            if (dto == null) return null;
-            return XElement.Parse(dto.Xml);
-        }
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        public XElement GetContentPreviewXml(int contentId, Guid version)
-        {
-            var sql = Sql().SelectAll().From<PreviewXmlDto>()
-                .Where<PreviewXmlDto>(d => d.NodeId == contentId && d.VersionId == version);
-            var dto = Database.SingleOrDefault<PreviewXmlDto>(sql);
-            if (dto == null) return null;
-            return XElement.Parse(dto.Xml);
-        }
-
-        #endregion
     }
 }

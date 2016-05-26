@@ -442,7 +442,7 @@ namespace Umbraco.Core.Sync
         {
             var jsonRefresher = refresher as IJsonCacheRefresher;
             if (jsonRefresher == null)
-                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.UniqueIdentifier + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
+                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.RefresherUniqueId + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
             return jsonRefresher;
         }
 

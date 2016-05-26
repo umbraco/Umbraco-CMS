@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -18,6 +17,8 @@ namespace Umbraco.Core.Services
         {
             _memberService = memberService;
         }
+
+        protected override IMemberTypeService Instance => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
@@ -43,16 +44,6 @@ namespace Umbraco.Core.Services
         {
             foreach (var typeId in typeIds)
                 MemberService.DeleteMembersOfType(typeId);
-        }
-
-        protected override void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
-        {
-
-            var toUpdate = GetContentTypesForXmlUpdates(contentTypes).ToArray();
-            if (toUpdate.Any() == false) return;
-
-            var memberService = _memberService as MemberService;
-            memberService?.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
         }
 
         public string GetDefault()

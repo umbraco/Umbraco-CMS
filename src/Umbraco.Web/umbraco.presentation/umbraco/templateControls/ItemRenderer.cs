@@ -110,10 +110,14 @@ namespace umbraco.presentation.templateControls
                 if (tempNodeId != null && tempNodeId.Value != 0)
                 {
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-                    var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-                    if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
-                    var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
-                    var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
+                    // stop using GetXml
+                    //var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                    //if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                    //var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
+                    //var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
+                    var c = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(tempNodeId.Value);
+                    var itemPage = new page(c);
+
                     tempElementContent = 
                         new item(item.ContentItem, itemPage.Elements, item.LegacyAttributes).FieldContent;
                 }
@@ -212,7 +216,7 @@ namespace umbraco.presentation.templateControls
                 // prepare support for XSLT extensions
                 StringBuilder namespaceList = new StringBuilder();
                 StringBuilder namespaceDeclaractions = new StringBuilder();
-                foreach (KeyValuePair<string, object> extension in macro.GetXsltExtensions())
+                foreach (KeyValuePair<string, object> extension in Umbraco.Web.Macros.XsltMacroEngine.GetXsltExtensions())
                 {
                     namespaceList.Append(extension.Key).Append(' ');
                     namespaceDeclaractions.AppendFormat("xmlns:{0}=\"urn:{0}\" ", extension.Key);
@@ -227,10 +231,11 @@ namespace umbraco.presentation.templateControls
                 parameters.Add("itemData", itemData);
 
                 // apply the XSLT transformation
-                XmlTextReader xslReader = new XmlTextReader(new StringReader(xslt));
-                System.Xml.Xsl.XslCompiledTransform xsl = macro.CreateXsltTransform(xslReader, false);
-                itemData = macro.GetXsltTransformResult(new XmlDocument(), xsl, parameters);
-                xslReader.Close();
+                using (var xslReader = new XmlTextReader(new StringReader(xslt)))
+                {
+                    var transform = Umbraco.Web.Macros.XsltMacroEngine.GetXsltTransform(xslReader, false);
+                    return Umbraco.Web.Macros.XsltMacroEngine.ExecuteItemRenderer(ApplicationContext.Current.ProfilingLogger, transform, itemData);
+                }
             }
             return itemData;
         }

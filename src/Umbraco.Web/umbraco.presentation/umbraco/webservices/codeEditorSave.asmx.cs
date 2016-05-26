@@ -21,6 +21,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using System.Net;
 using System.Collections;
+using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.webservices
 {
@@ -56,10 +57,14 @@ namespace umbraco.presentation.webservices
                 // Test the xslt
                 string errorMessage = "";
 
-                if (!ignoreDebugging)
+                if (ignoreDebugging == false)
                 {
                     try
                     {
+                        if (UmbracoContext.ContentCache.HasContent())
+                            XsltMacroEngine.TestXsltTransform(ApplicationContext.ProfilingLogger, fileContents);
+
+                        /*
                         // Check if there's any documents yet
                         string xpath = "/root/*";
                         if (content.Instance.XmlContent.SelectNodes(xpath).Count > 0)
@@ -98,6 +103,7 @@ namespace umbraco.presentation.webservices
                                 File.Delete(tempFileName);
                             }
                         }
+                        */
                         else
                         {
                             //errorMessage = Services.TextService.Localize("developer/xsltErrorNoNodesPublished");

@@ -16,22 +16,21 @@ namespace Umbraco.Web.Routing
     {
         public ContentFinderByNiceUrlAndTemplate(ILogger logger)
             : base(logger)
-        {
-        }
+        { }
 
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
-        /// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+        /// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
         public override bool TryFindContent(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
-            string path = docRequest.Uri.GetAbsolutePathDecoded();
+            var path = docRequest.Uri.GetAbsolutePathDecoded();
 
             if (docRequest.HasDomain)
-                path = DomainHelper.PathRelativeToDomain(docRequest.DomainUri, path);
+                path = DomainHelper.PathRelativeToDomain(docRequest.Domain.Uri, path);
 
             if (path != "/") // no template if "/"
             {
@@ -44,7 +43,7 @@ namespace Umbraco.Web.Routing
                 {
                     Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
-                    var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
+                    var route = docRequest.HasDomain ? (docRequest.Domain.ContentId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
 
                     if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false && node != null)

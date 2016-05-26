@@ -12,12 +12,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<TEntity> GetEntitiesInRecycleBin();
-        
-        /// <summary>
-        /// Called to empty the recycle bin
-        /// </summary>
-        /// <returns></returns>
-        bool EmptyRecycleBin();
-       
     }
 }

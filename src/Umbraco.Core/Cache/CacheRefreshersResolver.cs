@@ -38,7 +38,7 @@ namespace Umbraco.Core.Cache
 	    /// <returns>The value of the type uniquely identified by <paramref name="id"/>.</returns>
 	    public ICacheRefresher GetById(Guid id)
 	    {
-	        return Values.FirstOrDefault(x => x.UniqueIdentifier == id);
+	        return Values.FirstOrDefault(x => x.RefresherUniqueId == id);
 	    }
         
 	}

@@ -170,7 +170,6 @@
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\LegacySqlHelper.cs" />
-    <Compile Include="businesslogic\macro\MacroModel.cs" />
     <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">

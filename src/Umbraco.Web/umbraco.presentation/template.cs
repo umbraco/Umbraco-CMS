@@ -19,6 +19,7 @@ using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using System.Web;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Macros;
 
 namespace umbraco
 {
@@ -278,19 +279,20 @@ namespace umbraco
                         }
                         else
                         {
-                            macro tempMacro;
+                            MacroModel tempMacro;
                             String macroID = helper.FindAttribute(attributes, "macroid");
                             if (macroID != String.Empty)
                                 tempMacro = GetMacro(macroID);
                             else
-                                tempMacro = macro.GetMacro(helper.FindAttribute(attributes, "macroalias"));
+                                tempMacro = MacroRenderer.GetMacroModel(helper.FindAttribute(attributes, "macroalias"));
 
                             if (tempMacro != null)
                             {
 
                                 try
                                 {
-                                    Control c = tempMacro.RenderMacro(attributes, umbPage.Elements, umbPage.PageID);
+                                    var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                                    var c = renderer.Render(tempMacro, umbPage.Elements, umbPage.PageID, attributes).GetAsControl();
                                     if (c != null)
                                         pageContent.Controls.Add(c);
                                     else
@@ -407,8 +409,9 @@ namespace umbraco
                     String macroID = helper.FindAttribute(attributes, "macroid");
                     if (macroID != "")
                     {
-                        macro tempMacro = GetMacro(macroID);
-                        _templateOutput.Replace(tag.Value.ToString(), tempMacro.MacroContent.ToString());
+                        // fixme - wtf? in 7.4 *nothing* ever writes to macro.MacroContent!
+                        //macro tempMacro = GetMacro(macroID);
+                        _templateOutput.Replace(tag.Value.ToString(), "" /*tempMacro.MacroContent.ToString()*/);
                     }
                 }
                 else
@@ -425,8 +428,9 @@ namespace umbraco
                                 String macroID = helper.FindAttribute(tempAttributes, "macroid");
                                 if (Convert.ToInt32(macroID) > 0)
                                 {
-                                    macro tempContentMacro = GetMacro(macroID);
-                                    _templateOutput.Replace(tag.Value.ToString(), tempContentMacro.MacroContent.ToString());
+                                    // fixme - wtf? in 7.4 *nothing* ever writes to macro.MacroContent!
+                                    //macro tempContentMacro = GetMacro(macroID);
+                                    _templateOutput.Replace(tag.Value.ToString(), "" /*tempContentMacro.MacroContent.ToString()*/);
                                 }
 
                             }
@@ -450,10 +454,11 @@ namespace umbraco
 
         #region private methods
 
-        private static macro GetMacro(String macroID)
+        private static MacroModel GetMacro(string macroId)
         {
-            System.Web.HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroID.ToString() + ")");
-            return macro.GetMacro(Convert.ToInt16(macroID));
+            HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroId + ")");
+            var id = int.Parse(macroId);
+            return MacroRenderer.GetMacroModel(id);
         }
 
         #endregion

@@ -8,7 +8,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public interface ICacheRefresher
     {
-        Guid UniqueIdentifier { get; }
+        Guid RefresherUniqueId { get; }
         string Name { get; }
         void RefreshAll();
         void Refresh(int id);

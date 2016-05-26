@@ -57,26 +57,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
 
         /// <summary>
-        /// Used to add/update published xml for the content item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml);
-
-        /// <summary>
-        /// Used to remove the content xml for a content item
-        /// </summary>
-        /// <param name="content"></param>
-        void DeleteContentXml(IContent content);
-
-        /// <summary>
-        /// Used to add/update preview xml for the content item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="xml"></param>
-        void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml);
-
-        /// <summary>
         /// Gets paged content results
         /// </summary>
         /// <param name="query">Query to excute</param>
@@ -87,23 +67,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter"></param>
+        /// <param name="newest">A value indicating whether to get the 'newest' or all of them.</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null);
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        XElement GetContentXml(int contentId);
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        XElement GetContentPreviewXml(int contentId, Guid version);
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null, bool newest = true);
     }
 }

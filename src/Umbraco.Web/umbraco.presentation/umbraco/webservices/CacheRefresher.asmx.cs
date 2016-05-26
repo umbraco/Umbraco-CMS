@@ -56,7 +56,7 @@ namespace umbraco.presentation.webservices
         {
             var jsonRefresher = refresher as IJsonCacheRefresher;
             if (jsonRefresher == null)
-                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.UniqueIdentifier + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
+                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.RefresherUniqueId + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
             return jsonRefresher;
         }
 
@@ -182,7 +182,7 @@ namespace umbraco.presentation.webservices
 			foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
 			{
 				var n = XmlHelper.AddTextNode(xd, "cacheRefresher", cr.Name);
-				n.Attributes.Append(XmlHelper.AddAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
+				n.Attributes.Append(XmlHelper.AddAttribute(xd, "uniqueIdentifier", cr.RefresherUniqueId.ToString()));
 				xd.DocumentElement.AppendChild(n);
 			}
 			return xd;

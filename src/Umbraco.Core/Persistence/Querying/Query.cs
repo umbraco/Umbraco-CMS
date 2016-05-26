@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -37,6 +38,18 @@ namespace Umbraco.Core.Persistence.Querying
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
+            }
+            return this;
+        }
+
+        public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable values)
+        {
+            if (fieldSelector != null)
+            {
+                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappingResolver);
+                string whereExpression = expressionHelper.Visit(fieldSelector);
+
+                _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { @values = values } }));
             }
             return this;
         }

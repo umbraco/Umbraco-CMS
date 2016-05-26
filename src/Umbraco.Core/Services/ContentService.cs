@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
@@ -21,10 +22,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
-        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IUserService _userService;
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private IContentTypeService _contentTypeService;
 
         #region Constructors
@@ -32,18 +29,9 @@ namespace Umbraco.Core.Services
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         {
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
-            _dataTypeService = dataTypeService;
-            _userService = userService;
-            _urlSegmentProviders = urlSegmentProviders;
         }
 
         // don't change or remove this, will need it later
@@ -343,9 +331,9 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.AddOrUpdate(content);
-                repo.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+                TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs(), this);
             }
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent), this);
@@ -591,7 +579,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var filterQuery = filter.IsNullOrWhiteSpace() 
+                var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
                     : repository.QueryFactory.Create<IContent>().Where(x => x.Name.Contains(filter));
                 return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
@@ -965,48 +953,6 @@ namespace Umbraco.Core.Services
         #region Save, Publish, Unpublish
 
         /// <summary>
-        /// This will rebuild the xml structures for content in the database.
-        /// </summary>
-        /// <param name="userId">This is not used for anything</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        /// <remarks>
-        /// This is used for when a document type alias or a document type property is changed, the xml will need to
-        /// be regenerated.
-        /// </remarks>
-        public bool RePublishAll(int userId = 0)
-        {
-            try
-            {
-                RebuildXmlStructures();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error<ContentService>("An error occurred executing RePublishAll", ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// This will rebuild the xml structures for content in the database.
-        /// </summary>
-        /// <param name="contentTypeIds">
-        /// If specified will only rebuild the xml for the content type's specified, otherwise will update the structure
-        /// for all published content.
-        /// </param>
-        internal void RePublishAll(params int[] contentTypeIds)
-        {
-            try
-            {
-                RebuildXmlStructures(contentTypeIds);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error<ContentService>("An error occurred executing RePublishAll", ex);
-            }
-        }
-
-        /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
@@ -1030,6 +976,8 @@ namespace Umbraco.Core.Services
             if (raiseEvents && Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content, evtMsgs), this))
                 return OperationStatus.Attempt.Cancel(evtMsgs);
 
+            var isNew = content.IsNewEntity();
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1045,14 +993,14 @@ namespace Umbraco.Core.Services
                     content.ChangePublishedState(PublishedState.Saving);
 
                 repository.AddOrUpdate(content);
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 uow.Complete();
             }
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
-
+            var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(content, changeType).ToEventArgs(), this);
             Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 
             return OperationStatus.Attempt.Succeed(evtMsgs);
@@ -1087,6 +1035,9 @@ namespace Umbraco.Core.Services
             if (raiseEvents && Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(contentsA, evtMsgs), this))
                 return OperationStatus.Attempt.Cancel(evtMsgs);
 
+            var treeChanges = contentsA.Select(x => new TreeChange<IContent>(x,
+                x.IsNewEntity() ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode));
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1103,7 +1054,6 @@ namespace Umbraco.Core.Services
                         content.ChangePublishedState(PublishedState.Saving);
 
                     repository.AddOrUpdate(content);
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 }
 
                 uow.Complete();
@@ -1111,6 +1061,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(contentsA, false, evtMsgs), this);
+            TreeChanged.RaiseEvent(treeChanges.ToEventArgs(), this);
             Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
             return OperationStatus.Attempt.Succeed(evtMsgs);
@@ -1348,6 +1299,7 @@ namespace Umbraco.Core.Services
 
                 DeleteLocked(repository, content);
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs(), this);
             }
 
             Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
@@ -1491,6 +1443,7 @@ namespace Umbraco.Core.Services
 
                 PerformMoveLocked(repository, content, Constants.System.RecycleBinContent, null, userId, moves, true);
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             }
 
             var moveInfo = moves
@@ -1555,6 +1508,7 @@ namespace Umbraco.Core.Services
                 PerformMoveLocked(repository, content, parentId, parent, userId, moves, trashed);
 
                 uow.Complete();
+                TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             }
 
             var moveInfo = moves //changes
@@ -1649,6 +1603,7 @@ namespace Umbraco.Core.Services
 
                 EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, true), this);
                 uow.Complete();
+                TreeChanged.RaiseEvent(deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs(), this);
             }
 
             Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
@@ -1707,7 +1662,6 @@ namespace Umbraco.Core.Services
 
                 // save
                 repository.AddOrUpdate(copy);
-                repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 uow.Flush(); // ensure copy has an ID - fixme why?
 
@@ -1729,7 +1683,6 @@ namespace Umbraco.Core.Services
                         dcopy.WriterId = userId;
 
                         repository.AddOrUpdate(dcopy);
-                        repository.AddOrUpdatePreviewXml(dcopy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                         copyIds[descendant.Id] = dcopy;
                     }
@@ -1743,6 +1696,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this);
             Audit(AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
             return copy;
@@ -1805,11 +1759,12 @@ namespace Umbraco.Core.Services
                 content.ChangePublishedState(PublishedState.Saving);
 
                 repository.AddOrUpdate(content);
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Complete();
             }
 
             RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs(), this);
+
             Audit(AuditType.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
 
             return content;
@@ -1868,11 +1823,7 @@ namespace Umbraco.Core.Services
                     // save
                     saved.Add(content);
                     repository.AddOrUpdate(content);
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 }
-
-                foreach (var content in published)
-                    repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 uow.Complete();
             }
@@ -1882,6 +1833,8 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents && published.Any())
                 Published.RaiseEvent(new PublishEventArgs<IContent>(published, false, false), this);
+
+            TreeChanged.RaiseEvent(saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs(), this);
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1992,8 +1945,6 @@ namespace Umbraco.Core.Services
                     var publishedItem = status.ContentItem;
                     publishedItem.WriterId = userId;
                     repository.AddOrUpdate(publishedItem);
-                    repository.AddOrUpdatePreviewXml(publishedItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
-                    repository.AddOrUpdateContentXml(publishedItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     publishedItems.Add(publishedItem);
                 }
 
@@ -2001,6 +1952,7 @@ namespace Umbraco.Core.Services
             }
 
             Published.RaiseEvent(new PublishEventArgs<IContent>(publishedItems, false, false), this);
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
             Audit(AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
             return attempts;
         }
@@ -2041,13 +1993,13 @@ namespace Umbraco.Core.Services
 
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
-                // fixme delete xml from database! was in  _publishingStrategy.UnPublishingFinalized(content);
-                repository.DeleteContentXml(content);
 
                 uow.Complete();
             }
 
             UnPublished.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
+            Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
             return Attempt.Succeed(new UnPublishStatus(UnPublishedStatusType.Success, evtMsgs, content));
         }
 
@@ -2066,8 +2018,9 @@ namespace Umbraco.Core.Services
                 return Attempt.Fail(new PublishStatus(PublishStatusType.FailedCancelledByEvent, evtMsgs, content));
 
             var isNew = content.IsNewEntity();
+            var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
             var previouslyPublished = content.HasIdentity && content.HasPublishedVersion;
-            var status = default(Attempt<PublishStatus>);
+            Attempt<PublishStatus> status;
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -2094,9 +2047,6 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
 
                 repository.AddOrUpdate(content);
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
-                if (content.Published)
-                    repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 uow.Complete();
             }
@@ -2104,6 +2054,7 @@ namespace Umbraco.Core.Services
             if (status.Success == false)
             {
                 // fixme what about the saved event?
+                TreeChanged.RaiseEvent(new TreeChange<IContent>(content, changeType).ToEventArgs(), this);
                 return status;
             }
 
@@ -2120,6 +2071,9 @@ namespace Umbraco.Core.Services
                     Published.RaiseEvent(new PublishEventArgs<IContent>(descendants, false, false), this);
                 }
             }
+
+            // invalidate the node/branch
+            TreeChanged.RaiseEvent(new TreeChange<IContent>(content, changeType).ToEventArgs(), this);
 
             Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
             return status;
@@ -2297,6 +2251,11 @@ namespace Umbraco.Core.Services
         /// Occurs after unpublish
         /// </summary>
         public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> UnPublished;
+
+        /// <summary>
+        /// Occurs after change.
+        /// </summary>
+        internal static event TypedEventHandler<IContentService, TreeChange<IContent>.EventArgs> TreeChanged;
 
         #endregion
 
@@ -2524,6 +2483,7 @@ namespace Umbraco.Core.Services
             // The main problem with this is that for every content item being deleted, events are raised...
             // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
+            var changes = new List<TreeChange<IContent>>();
             var moves = new List<Tuple<IContent, string>>();
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -2556,11 +2516,13 @@ namespace Umbraco.Core.Services
                     {
                         // see MoveToRecycleBin
                         PerformMoveLocked(repository, child, Constants.System.RecycleBinContent, null, userId, moves, true);
+                        changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
                     }
 
                     // delete content
                     // triggers the deleted event (and handles the files)
                     DeleteLocked(repository, content);
+                    changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
                 }
 
                 uow.Complete();
@@ -2571,6 +2533,7 @@ namespace Umbraco.Core.Services
                 .ToArray();
             if (moveInfos.Length > 0)
                 Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfos), this);
+            TreeChanged.RaiseEvent(changes.ToEventArgs(), this);
 
             Audit(AuditType.Delete, $"Delete Content of Type {contentTypeId} performed by user", userId, Constants.System.Root);
         }
@@ -2593,67 +2556,6 @@ namespace Umbraco.Core.Services
                 uow.Complete();
                 return contentType;
             }
-        }
-
-        #endregion
-
-        #region Xml - Should Move!
-
-        /// <summary>
-        /// Returns the persisted content's XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        public XElement GetContentXml(int contentId)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                var elt = repository.GetContentXml(contentId);
-                uow.Complete();
-                return elt;
-            }
-        }
-
-        /// <summary>
-        /// Returns the persisted content's preview XML structure
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="version"></param>
-        /// <returns></returns>
-        public XElement GetContentPreviewXml(int contentId, Guid version)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                var elt = repository.GetContentPreviewXml(contentId, version);
-                uow.Complete();
-                return elt;
-            }
-        }
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all documents
-        /// </summary>
-        /// <param name="contentTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all content
-        /// </param>
-        public void RebuildXmlStructures(params int[] contentTypeIds)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                repository.RebuildXmlStructures(
-                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content),
-                    contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
-                uow.Complete();
-            }
-
-            Audit(AuditType.Publish, "ContentService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, Constants.System.Root);
         }
 
         #endregion
