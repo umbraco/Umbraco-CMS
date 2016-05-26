@@ -1,27 +1,33 @@
-##We cannot continue if sandcastle is not installed determined by env variable: SHFBROOT
+$PSScriptFilePath = (Get-Item $MyInvocation.MyCommand.Path);
+$RepoRoot = (get-item $PSScriptFilePath).Directory.Parent.FullName;
+$SolutionRoot = Join-Path -Path $RepoRoot "src";
+$ToolsRoot = Join-Path -Path $RepoRoot "tools";
+$DocFx = Join-Path -Path $ToolsRoot "docfx\docfx.exe"
+$DocFxFolder = (Join-Path -Path $ToolsRoot "docfx")
+$DocFxJson = Join-Path -Path $RepoRoot "build\docfx.json"
 
-if (-not (Test-Path Env:\SHFBROOT))
-{
-	throw "The docs cannot be build, install Sandcastle help file builder"
+# Go get docfx if we don't hae it
+$FileExists = Test-Path $DocFx 
+If ($FileExists -eq $False) {
+
+	If(!(Test-Path $DocFxFolder))
+	{
+		New-Item $DocFxFolder -type directory
+	}	
+	
+	$DocFxZip = Join-Path -Path $ToolsRoot "docfx\docfx.zip"
+	$DocFxSource = "https://github.com/dotnet/docfx/releases/download/v1.9.4/docfx.zip"
+	Invoke-WebRequest $DocFxSource -OutFile $DocFxZip
+
+	#unzip it
+	$7Zip = Join-Path -Path $ToolsRoot "7zip\7za.exe"
+	& $7Zip e $DocFxZip "-o$DocFxFolder"
 }
 
-$PSScriptFilePath = (Get-Item $MyInvocation.MyCommand.Path).FullName
-$BuildRoot = Split-Path -Path $PSScriptFilePath -Parent
-$OutputPath = Join-Path -Path $BuildRoot -ChildPath "ApiDocs\Output"
-$ProjFile = Join-Path -Path $BuildRoot -ChildPath "ApiDocs\csharp-api-docs.shfbproj"
+#copy the docfx.json file to the tool folder
 
-"Building docs with project file:  $ProjFile"
+#Copy-Item $DocFxJson $DocFxFolder
 
-$MSBuild = "$Env:SYSTEMROOT\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
-
-# build it!
-& $MSBuild "$ProjFile"
-
-# remove files left over
-Remove-Item $BuildRoot\* -include csharp-api-docs.shfbproj_*
-
-# copy our custom styles in
-Copy-Item $BuildRoot\ApiDocs\TOC.css $OutputPath\TOC.css
-
-""
-"Done!"
+# run it!
+& $DocFx metadata $DocFxJson
+& $DocFx build $DocFxJson

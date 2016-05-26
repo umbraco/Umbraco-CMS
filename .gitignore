@@ -133,3 +133,6 @@ build/UmbracoCms.*/
 src/.vs/
 src/Umbraco.Web.UI/umbraco/js/install.loader.js
 src/Umbraco.Tests/media
+tools/docfx/*
+apidocs/csharp/*
+apidocs/_site/*
