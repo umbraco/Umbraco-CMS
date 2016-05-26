@@ -4,8 +4,8 @@
       "src": [
         {
           "files": [
-            "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Web/Umbraco.Web.csproj"
+            "csharp/Umbraco.Core/Umbraco.Core.csproj",
+            "csharp/Umbraco.Web/Umbraco.Web.csproj"
           ],
           "exclude": [
             "**/obj/**",
@@ -15,7 +15,7 @@
           "cwd": "../src/"
         }
       ],
-      "dest": "../apidocs/csharp",
+      "dest": "../apidocs",
       "filter": "docfx.filter.yml"
     }
   ],
@@ -35,6 +35,7 @@
           "toc.yml",
           "*.md"
         ],
+        "cwd": "../apidocs",
         "exclude": [
           "obj/**",
           "_site/**"
@@ -46,6 +47,7 @@
         "files": [
           "images/**"
         ],
+        "cwd": "../apidocs",
         "exclude": [
           "obj/**",
           "_site/**"
@@ -55,14 +57,19 @@
     "overwrite": [
       {
         "files": [
-          "apidoc/**.md"
+          "**.md"
         ],
+        "cwd": "../apidocs",
         "exclude": [
           "obj/**",
           "_site/**"
         ]
       }
     ],
+    "globalMetadata": {
+      "_appTitle": "Umbraco c# Api docs",
+      "_enableSearch": true
+    },
     "dest": "../apidocs/_site",
     "template": [
       "default"
