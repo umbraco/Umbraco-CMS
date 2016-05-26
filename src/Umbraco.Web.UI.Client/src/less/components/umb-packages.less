@@ -4,20 +4,39 @@
 }
 
 .umb-package {
-    flex: 0 0 25%;
+    flex: 0 0 100%;
 
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 20px;
 
     box-sizing: border-box;
+
+    @media (min-width: 768px) {
+        flex: 0 0 50%;
+    }
+
+    @media (min-width: 1024px) {
+        flex: 0 0 33.33%;
+    }
+
+    @media (min-width: 1260px) {
+        flex: 0 0 25%;
+    }
+
+    @media (min-width: 1600px) {
+        flex: 0 0 20%;
+    }
+
+    @media (min-width: 2000px) {
+        flex: 0 0 16.66%;
+    }
 }
 
 .umb-package-link {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-
-    padding: 20px;
 
     background: whitesmoke;
     border: 2px solid #ececec;
@@ -28,15 +47,109 @@
 
 
 .umb-package-icon {
-    padding: 20px;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px;
     text-align: center;
+    border-bottom: 2px solid #ececec;
+    background-color: white;
+
+    min-height: 120px;
 }
+
+.umb-package-icon img {
+    opacity: .1;
+}
+
+.umb-package-info {
+    padding-top: 10px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+}
+
 
 .umb-package-name {
     font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .umb-package-numbers {
     display: flex;
     flex-wrap: wrap;
+
+    margin-bottom: 20px;
+
+    opacity: .6;
+}
+
+.umb-package-link:hover .umb-package-numbers {
+    opacity: 1;
+}
+
+.umb-package-link:hover .umb-era-button {
+    background: #2e8aea;
+	color: white;
+
+    &:hover {
+        background-color: #287dd6;
+    }
+}
+
+/* umb-buttons-era */
+.umb-era-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: capitalize;
+
+    height: 38px;
+    line-height: 38px;
+
+
+    max-width: 100%;
+    padding: 0 18px;
+
+    color: #484848;
+    background-color: #e0e0e0;
+
+    text-decoration: none !important;
+    user-select: none;
+
+    white-space: nowrap;
+    overflow: hidden;
+
+    border-radius: 3px;
+    border: 0 none;
+
+    transition: background-color 80ms ease, color 80ms ease;
+}
+
+
+.umb-era-button:hover,
+.umb-era-button:active {
+    color: #484848;
+    background-color: #d3d3d3;
+    outline: none;
+    text-decoration: none;
+}
+
+
+.umb-era-button:focus {
+    outline: none;
+}
+
+.umb-era-button.-blue {
+	background: #2e8aea;
+	color: white;
+}
+
+.umb-era-button.-blue:hover {
+	background-color: #287dd6;
 }

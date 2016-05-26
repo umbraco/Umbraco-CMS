@@ -26,30 +26,34 @@
 
                 <div class="umb-packages">
 
-                    <div class="umb-package" ng-repeat="package in vm.packages"> <!-- Repeated -->
+                    <div class="umb-package" ng-repeat="package in vm.packages">
                         <a class="umb-package-link" href="#">
+
                             <div class="umb-package-icon">
-                                {{ package.icon }}
+                                <!-- {{ package.icon }} -->
+                                <img src="https://d30y9cdsu7xlg0.cloudfront.net/noun-svg/101926.svg?Expires=1464265384&Signature=D60eudkbPYX-ZKXzcjL0BxpH1-YG0PuDTFFmXY6yZl7cV2hzqDFsczK~~cPJsV9rNUdvpvGqkUsywM6BWCvnkf6Mav9X9ukTveytWZibVRt6ZjmhEIROO0JRqBvXC1y31dFTzAIkQSnV3CGQG~gEdjAgUmuGDZ47SQYk~7pkZGs_&Key-Pair-Id=APKAI5ZVHAXN65CHVU2Q" alt="" />
                             </div>
 
                             <div class="umb-package-info">
-                                <div class="umb-package-name">
+                                <h4 class="umb-package-name">
                                     {{ package.name }}
-                                </div>
+                                </h4>
 
                                 <div class="umb-package-numbers">
                                     <div class="umb-package-downloads">
-                                        {{ package.downloads }}
+                                        Downloads <strong>{{ package.downloads }}</strong>
                                     </div>
                                     <div class="umb-package-karma">
-                                        {{ package.karma }}
+                                        Karma <strong>{{ package.karma }}</strong>
                                     </div>
                                 </div>
 
+                                <div href="#" class="umb-era-button">
+                                    Install
+                                </div>
                             </div>
                         </a>
-
-                    </div>
+                    </div> <!-- end package -->
 
                 </div>
 
