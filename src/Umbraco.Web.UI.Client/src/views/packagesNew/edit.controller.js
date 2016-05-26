@@ -8,6 +8,33 @@
         vm.page = {};
         vm.page.name = "Packages";
 
+        vm.categories = [
+            {
+                "icon": "icon-male-and-female",
+                "name": "Collaboration"
+            },
+            {
+                "icon": "icon-molecular-network",
+                "name": "Backoffice extensions"
+            },
+            {
+                "icon": "icon-brackets",
+                "name": "Developer tools"
+            },
+            {
+                "icon": "icon-wand",
+                "name": "Starter kits"
+            },
+            {
+                "icon": "icon-medal",
+                "name": "Umbraco Pro"
+            },
+            {
+                "icon": "icon-wrench",
+                "name": "Website utilities"
+            }
+        ];
+
         vm.packages = [
             {
                 "name": "Test App",

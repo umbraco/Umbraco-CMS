@@ -21,7 +21,10 @@
                 </div>
 
                 <div class="umb-packages-categories">
-
+                    <a href="" class="umb-packages-category" ng-repeat="category in vm.categories">
+                        <i class="umb-packages-category-icon" ng-class="category.icon"></i>
+                        <div>{{ category.name }}</div>
+                    </a>
                 </div>
 
                 <div class="umb-packages">
