@@ -17,7 +17,7 @@
             <umb-editor-container>
 
                 <div class="umb-packages-search">
-
+                    <input class="-full-width-input" type="text" name="name" value="" placeholder="Search for packages">
                 </div>
 
                 <div class="umb-packages-categories">
@@ -27,14 +27,15 @@
                     </a>
                 </div>
 
+
+                <h5>Popular</h5>
                 <div class="umb-packages">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
                         <a class="umb-package-link" href="#">
 
                             <div class="umb-package-icon">
-                                <!-- {{ package.icon }} -->
-                                <img src="https://d30y9cdsu7xlg0.cloudfront.net/noun-svg/82522.svg?Expires=1464267230&Signature=CY9MWZomFHWHZSuRpkweLqIXgLV8~kjjfYyf24UyAGctSwRHzzL94Dh510NbWEJZuvm5LzNaiJziJkmBovHCKspGgnCVwLZgiJ7zKo1DwXXaiHqYkTlnb0CuB2D59vO3d7u6esc2d6sRjN1zz8iLYK21TZTiZ9pFCLpqFIsW2uA_&Key-Pair-Id=APKAI5ZVHAXN65CHVU2Q" alt="" />
+                                <img src="{{ package.icon }}" alt="" />
                             </div>
 
                             <div class="umb-package-info">
@@ -50,11 +51,47 @@
                                         Karma <strong>{{ package.karma }}</strong>
                                     </small>
                                 </div>
+
+                                <div class="umb-era-button">
+                                    Install
+                                </div>
+
                             </div>
                         </a>
                     </div> <!-- end package -->
 
-                </div>
+                </div> <!-- end packages -->
+
+
+                <h5>Latest</h5>
+                <div class="umb-packages">
+
+                    <div class="umb-package" ng-repeat="package in vm.packages">
+                        <a class="umb-package-link" href="#">
+
+                            <div class="umb-package-icon">
+                                <img src="{{ package.icon }}" alt="" />
+                            </div>
+
+                            <div class="umb-package-info">
+                                <h4 class="umb-package-name">
+                                    {{ package.name }}
+                                </h4>
+
+                                <div class="umb-package-numbers">
+                                    <small class="umb-package-downloads">
+                                        Downloads <strong>{{ package.downloads }}</strong>
+                                    </small>
+                                    <small class="umb-package-karma">
+                                        Karma <strong>{{ package.karma }}</strong>
+                                    </small>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div> <!-- end package -->
+
+                </div> <!-- end packages -->
 
             </umb-editor-container>
 

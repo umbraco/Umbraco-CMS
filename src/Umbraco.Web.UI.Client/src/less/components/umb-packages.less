@@ -1,3 +1,25 @@
+.umb-packages-search {
+    width: 100%;
+
+    margin-top: 40px;
+    margin-bottom: 30px;
+}
+
+.umb-packages-search input {
+    border-width: 2px;
+    border-radius: 3px;
+    min-height: 44px;
+
+    padding: 4px 10px;
+    font-size: 16px;
+    border-color: #ececec;
+
+    &:hover, &:focus {
+        border-color: @grayLight;
+    }
+}
+
+
 .umb-packages {
     display: flex;
     flex-wrap: wrap;
@@ -8,33 +30,10 @@
 
 // List
 .umb-package {
-    flex: 0 0 100%;
+    height: 260px;
+    width: 200px;
 
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 20px;
-
-    box-sizing: border-box;
-
-    @media (min-width: 768px) {
-        flex: 0 0 50%;
-    }
-
-    @media (min-width: 1024px) {
-        flex: 0 0 33.33%;
-    }
-
-    @media (min-width: 1260px) {
-        flex: 0 0 25%;
-    }
-
-    @media (min-width: 1600px) {
-        flex: 0 0 20%;
-    }
-
-    @media (min-width: 2000px) {
-        flex: 0 0 16.66%;
-    }
+    padding: 20px;
 }
 
 
@@ -43,8 +42,11 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
+    justify-content: center;
 
-    background: whitesmoke;
+    height: 100%;
+    width: 100%;
+
     border: 2px solid #ececec;
     border-radius: 3px;
 
@@ -66,40 +68,62 @@
     justify-content: center;
     align-items: center;
 
-    padding: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+
     text-align: center;
-    border-bottom: 2px solid #ececec;
     background-color: white;
 
-    min-height: 120px;
+    min-height: 80px;
 }
 
 .umb-package-icon img {
-    opacity: .1;
+    max-width: 70px;
+    height: auto;
 }
 
 
 // Info
 .umb-package-info {
-    padding-top: 10px;
     padding-right: 20px;
     padding-bottom: 20px;
     padding-left: 20px;
+
+    text-align: center;
 }
 
 
 // Name
 .umb-package-name {
+    max-width: 250px;
+
     font-weight: bold;
+
     margin-bottom: 10px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    line-height: normal;
 }
 
 // Numbers
 .umb-package-numbers {
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
 
     opacity: .6;
+
+    margin-bottom: 20px;
+}
+
+.umb-package-numbers small {
+    padding: 0 5px;
+    display: block;
 }
 
 .umb-package-link:hover .umb-package-numbers {
@@ -180,15 +204,22 @@
     flex: 1 0 auto;
     max-width: 25%;
     background-color: @blue;
-    padding: 10px;
-    font-size: 12px;
+    padding: 40px 10px;
+    font-size: 13px;
     border-radius: 3px;
     color: @white;
-    font-weight: bold;
     box-sizing: border-box;
     flex: 1 0 auto;
     margin: 5px;
     justify-content: center;
+
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+
+    &:hover {
+        background-color: @blueDark;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
 }
 
 .umb-packages-category:hover,
@@ -200,4 +231,6 @@
 .umb-packages-category-icon {
     font-size: 20px;
     margin-right: 5px;
+
+    display: none;
 }
