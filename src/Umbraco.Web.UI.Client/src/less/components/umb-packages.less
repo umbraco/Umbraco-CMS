@@ -43,6 +43,12 @@
     border-radius: 3px;
 
     text-decoration: none !important;
+
+    transition: border-color 100ms ease;
+
+    &:hover {
+        border-color: @blue;
+    }
 }
 
 
@@ -91,11 +97,11 @@
 }
 
 .umb-package-link:hover .umb-era-button {
-    background: #2e8aea;
+    background: @blue;
 	color: white;
 
     &:hover {
-        background-color: #287dd6;
+        background-color: @blueDark;
     }
 }
 
@@ -146,10 +152,10 @@
 }
 
 .umb-era-button.-blue {
-	background: #2e8aea;
+	background: @blue;
 	color: white;
 }
 
 .umb-era-button.-blue:hover {
-	background-color: #287dd6;
+	background-color: @blueDark;
 }
