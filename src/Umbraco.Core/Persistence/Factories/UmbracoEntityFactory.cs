@@ -28,44 +28,52 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var asDictionary = (IDictionary<string, object>)d;
 
-            var entity = new UmbracoEntity(d.trashed)
-            {
-                CreateDate = d.createDate,
-                CreatorId = d.nodeUser,
-                Id = d.id,
-                Key = d.uniqueID,
-                Level = d.level,
-                Name = d.text,
-                NodeObjectTypeId = d.nodeObjectType,
-                ParentId = d.parentID,
-                Path = d.path,
-                SortOrder = d.sortOrder,
-                HasChildren = d.children > 0,
-                ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty,
-                ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty,
-                ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty,
-            };
+            var entity = new UmbracoEntity(d.trashed);
 
-            var publishedVersion = default(Guid);            
-            //some content items don't have a published version
-            if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
+            try
             {
-                Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);    
-            }
-            var newestVersion = default(Guid);
-            if (asDictionary.ContainsKey("newestVersion") && d.newestVersion != null)
-            {
-                Guid.TryParse(d.newestVersion.ToString(), out newestVersion);    
-            }
+                entity.DisableChangeTracking();
 
-            entity.IsPublished = publishedVersion != default(Guid) || (newestVersion != default(Guid) && publishedVersion == newestVersion);
-            entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
-            entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
-            
-            //Now we can assign the additional data!                        
-            AddAdditionalData(entity, asDictionary);
-            
-            return entity;
+                entity.CreateDate = d.createDate;
+                entity.CreatorId = d.nodeUser;
+                entity.Id = d.id;
+                entity.Key = d.uniqueID;
+                entity.Level = d.level;
+                entity.Name = d.text;
+                entity.NodeObjectTypeId = d.nodeObjectType;
+                entity.ParentId = d.parentID;
+                entity.Path = d.path;
+                entity.SortOrder = d.sortOrder;
+                entity.HasChildren = d.children > 0;
+                entity.ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty;
+                entity.ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty;
+                entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
+
+                var publishedVersion = default(Guid);
+                //some content items don't have a published version
+                if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
+                {
+                    Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);
+                }
+                var newestVersion = default(Guid);
+                if (asDictionary.ContainsKey("newestVersion") && d.newestVersion != null)
+                {
+                    Guid.TryParse(d.newestVersion.ToString(), out newestVersion);
+                }
+
+                entity.IsPublished = publishedVersion != default(Guid) || (newestVersion != default(Guid) && publishedVersion == newestVersion);
+                entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
+                entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
+
+                //Now we can assign the additional data!                        
+                AddAdditionalData(entity, asDictionary);
+
+                return entity;
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
         }
 
         public UmbracoEntity BuildEntity(EntityRepository.UmbracoEntityDto dto)

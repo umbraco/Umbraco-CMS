@@ -349,7 +349,7 @@ namespace UmbracoExamine
 
         protected override void PerformIndexAll(string type)
         {
-            const int pageSize = 5000;
+            const int pageSize = 10000;
             var pageIndex = 0;
 
             switch (type)

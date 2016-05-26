@@ -16,17 +16,26 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IRelation BuildEntity(RelationDto dto)
         {
-            var entity = new Relation(dto.ParentId, dto.ChildId, _relationType)
+            var entity = new Relation(dto.ParentId, dto.ChildId, _relationType);
+
+            try
             {
-                Comment = dto.Comment,
-                CreateDate = dto.Datetime,
-                Id = dto.Id,
-                UpdateDate = dto.Datetime
-            };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
-            return entity;
+                entity.DisableChangeTracking();
+
+                entity.Comment = dto.Comment;
+                entity.CreateDate = dto.Datetime;
+                entity.Id = dto.Id;
+                entity.UpdateDate = dto.Datetime;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                entity.ResetDirtyProperties(false);
+                return entity;
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
         }
 
         public RelationDto BuildDto(IRelation entity)

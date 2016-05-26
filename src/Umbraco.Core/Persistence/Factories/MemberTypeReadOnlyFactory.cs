@@ -12,48 +12,56 @@ namespace Umbraco.Core.Persistence.Factories
         public IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
         {
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
-            
-            var memberType = new MemberType(dto.ParentId)
-                             {
-                                 Alias = dto.Alias,
-                                 AllowedAsRoot = dto.AllowAtRoot,
-                                 CreateDate = dto.CreateDate,
-                                 CreatorId = dto.UserId.HasValue ? dto.UserId.Value : 0,
-                                 Description = dto.Description,
-                                 Icon = dto.Icon,
-                                 Id = dto.NodeId,
-                                 IsContainer = dto.IsContainer,
-                                 Key = dto.UniqueId.Value,
-                                 Level = dto.Level,
-                                 Name = dto.Text,
-                                 Path = dto.Path,
-                                 SortOrder = dto.SortOrder,
-                                 Thumbnail = dto.Thumbnail,
-                                 Trashed = dto.Trashed,
-                                 UpdateDate = dto.CreateDate,
-                                 AllowedContentTypes = Enumerable.Empty<ContentTypeSort>()
-                             };
 
-            var propertyTypeGroupCollection = GetPropertyTypeGroupCollection(dto, memberType, standardPropertyTypes);
-            memberType.PropertyGroups = propertyTypeGroupCollection;
+            var memberType = new MemberType(dto.ParentId);
 
-            var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
-
-            //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.            
-            foreach (var standardPropertyType in standardPropertyTypes)
+            try
             {
-                if(dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
-                
-                //Add the standard PropertyType to the current list
-                propertyTypes.Add(standardPropertyType.Value);
+                memberType.DisableChangeTracking();
 
-                //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
-                memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
-                    new MemberTypePropertyProfileAccess(false, false));
+                memberType.Alias = dto.Alias;
+                memberType.AllowedAsRoot = dto.AllowAtRoot;
+                memberType.CreateDate = dto.CreateDate;
+                memberType.CreatorId = dto.UserId.HasValue ? dto.UserId.Value : 0;
+                memberType.Description = dto.Description;
+                memberType.Icon = dto.Icon;
+                memberType.Id = dto.NodeId;
+                memberType.IsContainer = dto.IsContainer;
+                memberType.Key = dto.UniqueId.Value;
+                memberType.Level = dto.Level;
+                memberType.Name = dto.Text;
+                memberType.Path = dto.Path;
+                memberType.SortOrder = dto.SortOrder;
+                memberType.Thumbnail = dto.Thumbnail;
+                memberType.Trashed = dto.Trashed;
+                memberType.UpdateDate = dto.CreateDate;
+                memberType.AllowedContentTypes = Enumerable.Empty<ContentTypeSort>();
+
+                var propertyTypeGroupCollection = GetPropertyTypeGroupCollection(dto, memberType, standardPropertyTypes);
+                memberType.PropertyGroups = propertyTypeGroupCollection;
+
+                var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
+
+                //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.            
+                foreach (var standardPropertyType in standardPropertyTypes)
+                {
+                    if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
+
+                    //Add the standard PropertyType to the current list
+                    propertyTypes.Add(standardPropertyType.Value);
+
+                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+                    memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
+                        new MemberTypePropertyProfileAccess(false, false));
+                }
+                memberType.NoGroupPropertyTypes = propertyTypes;
+
+                return memberType;
             }
-            memberType.NoGroupPropertyTypes = propertyTypes;
-
-            return memberType;
+            finally
+            {
+                memberType.EnableChangeTracking();
+            }
         }
 
         private PropertyGroupCollection GetPropertyTypeGroupCollection(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)

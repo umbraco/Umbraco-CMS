@@ -138,18 +138,18 @@ namespace Umbraco.Core.Models.EntityBase
             _propertyChangedInfo = new Dictionary<string, bool>();
         }
 
-        protected void ResetChangeTrackingCollections()
+        public void ResetChangeTrackingCollections()
         {
             _propertyChangedInfo = new Dictionary<string, bool>();
             _lastPropertyChangedInfo = new Dictionary<string, bool>();
         }
 
-        protected void DisableChangeTracking()
+        public void DisableChangeTracking()
         {
             _changeTrackingEnabled = false;
         }
 
-        protected void EnableChangeTracking()
+        public void EnableChangeTracking()
         {
             _changeTrackingEnabled = true;
         }
