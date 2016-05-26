@@ -1,27 +1,62 @@
 <div ng-controller="Umbraco.Editors.Packages.EditController as vm">
 
-   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-   <form name="packagesForm"
-      ng-submit="save()"
-      novalidate>
+    <form name="packagesForm" ng-submit="save()" novalidate>
 
-       <umb-editor-view ng-if="!page.loading">
+        <umb-editor-view ng-if="!page.loading">
 
-          <umb-editor-header
-             name="vm.page.name"
-             name-locked="true"
-             hide-icon="true"
-             hide-description="true"
-             hide-alias="true">
-          </umb-editor-header>
+            <umb-editor-header
+                name="vm.page.name"
+                name-locked="true"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
 
-          <umb-editor-container>
-              This is my new package repository
-          </umb-editor-container>
+            <umb-editor-container>
 
-       </umb-editor-view>
+                <div class="umb-packages-search">
 
-   </form>
+                </div>
+
+                <div class="umb-packages-categories">
+
+                </div>
+
+                <div class="umb-packages">
+
+                    <div class="umb-package" ng-repeat="package in vm.packages"> <!-- Repeated -->
+                        <a class="umb-package-link" href="#">
+                            <div class="umb-package-icon">
+                                {{ package.icon }}
+                            </div>
+
+                            <div class="umb-package-info">
+                                <div class="umb-package-name">
+                                    {{ package.name }}
+                                </div>
+
+                                <div class="umb-package-numbers">
+                                    <div class="umb-package-downloads">
+                                        {{ package.downloads }}
+                                    </div>
+                                    <div class="umb-package-karma">
+                                        {{ package.karma }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </umb-editor-container>
+
+        </umb-editor-view>
+
+    </form>
 
 </div>
