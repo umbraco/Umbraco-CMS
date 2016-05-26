@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Security;
@@ -361,10 +362,11 @@ namespace UmbracoExamine
         /// <param name="type"></param>
         protected override void PerformIndexAll(string type)
         {
-            //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
+            //NOTE: the logic below is NOT used, this method is overridden
             // and we query directly against the umbraco service layer.
+            // This is here for backwards compat only.
 
-            if (!SupportedTypes.Contains(type))
+            if (SupportedTypes.Contains(type) == false)
                 return;
 
             var xPath = "//*[(number(@id) > 0 and (@isDoc or @nodeTypeAlias)){0}]"; //we'll add more filters to this below if needed
@@ -417,16 +419,11 @@ namespace UmbracoExamine
             AddNodesToIndex(xPath, type);
         }
 
-        /// <summary>
-        /// Returns an XDocument for the entire tree stored for the IndexType specified.
-        /// </summary>
-        /// <param name="xPath">The xpath to the node.</param>
-        /// <param name="type">The type of data to request from the data service.</param>
-        /// <returns>Either the Content or Media xml. If the type is not of those specified null is returned</returns>
+        [Obsolete("This method is not be used, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual XDocument GetXDocument(string xPath, string type)
         {
-            //TODO: We need to get rid of this! it will now only ever be called for published content - but we're keeping the other
-            // logic here for backwards compatibility in case inheritors are calling this for some reason.
+            //TODO: We need to get rid of this! This does not get called by our code
 
             if (type == IndexTypes.Content)
             {
@@ -447,12 +444,9 @@ namespace UmbracoExamine
         }
         #endregion
 
-        #region Private
-        /// <summary>
-        /// Adds all nodes with the given xPath root.
-        /// </summary>
-        /// <param name="xPath">The x path.</param>
-        /// <param name="type">The type.</param>
+        
+        [Obsolete("This method is not be used, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         private void AddNodesToIndex(string xPath, string type)
         {
             // Get all the nodes of nodeTypeAlias == nodeTypeAlias
@@ -476,9 +470,5 @@ namespace UmbracoExamine
             }
 
         }
-
-        
-
-        #endregion
     }
 }

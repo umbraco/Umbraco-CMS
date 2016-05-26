@@ -235,13 +235,29 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
         {
-            //copy to var so that the original isn't changed
-            var filteredSql = new Sql(sql.SQL, sql.Arguments);
+            Sql filteredSql;
+            
             // Apply filter
             if (defaultFilter != null)
             {
                 var filterResult = defaultFilter();
-                filteredSql.Append(filterResult.Item1, filterResult.Item2);
+
+                //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
+                // instance a couple of times to get the parameter order correct, for some reason the first
+                // time the arguments don't show up correctly but the SQL argument parameter names are actually updated
+                // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
+
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+                var args = filteredSql.Arguments.Concat(filterResult.Item2).ToArray();
+                filteredSql = new Sql(
+                    string.Format("{0} {1}", filteredSql.SQL, filterResult.Item1),
+                    args);
+                filteredSql = new Sql(filteredSql.SQL, args);
+            }
+            else
+            {
+                //copy to var so that the original isn't changed
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
             }
             return filteredSql;
         }

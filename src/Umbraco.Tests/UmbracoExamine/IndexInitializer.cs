@@ -10,6 +10,7 @@ using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using UmbracoExamine;
 using UmbracoExamine.Config;
@@ -41,7 +42,48 @@ namespace Umbraco.Tests.UmbracoExamine
             }
             if (contentService == null)
             {
-                contentService = Mock.Of<IContentService>();
+                long longTotalRecs;
+                int intTotalRecs;
+
+                var allRecs = dataService.ContentService.GetLatestContentByXPath("//*[@isDoc]")
+                    .Root
+                    .Elements()
+                    .Select(x => Mock.Of<IContent>(
+                        m =>
+                            m.Id == (int)x.Attribute("id") &&
+                            m.ParentId == (int)x.Attribute("parentID") &&
+                            m.Level == (int)x.Attribute("level") &&
+                            m.CreatorId == 0 &&
+                            m.SortOrder == (int)x.Attribute("sortOrder") &&
+                            m.CreateDate == (DateTime)x.Attribute("createDate") &&
+                            m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
+                            m.Name == (string)x.Attribute("nodeName") &&
+                            m.Path == (string)x.Attribute("path") &&
+                            m.Properties == new PropertyCollection() &&
+                            m.ContentType == Mock.Of<IContentType>(mt =>
+                                mt.Alias == x.Name.LocalName &&
+                                mt.Id == (int)x.Attribute("nodeType") &&
+                                mt.Icon == "test")))
+                    .ToArray();
+
+
+                contentService = Mock.Of<IContentService>(
+                    x => x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>())
+                        ==
+                        allRecs
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        ==
+                        allRecs
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        ==
+                        allRecs
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
+                        ==
+                        allRecs);
             }
             if (userService == null)
             {
@@ -86,7 +128,6 @@ namespace Umbraco.Tests.UmbracoExamine
                         It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
                         ==
                         allRecs);
-                
             }
             if (dataTypeService == null)
             {
