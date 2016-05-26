@@ -1,13 +1,17 @@
 .umb-packages {
     display: flex;
     flex-wrap: wrap;
+
+    margin: 0 -5px;
 }
 
+
+// List
 .umb-package {
     flex: 0 0 100%;
 
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
     padding-bottom: 20px;
 
     box-sizing: border-box;
@@ -33,6 +37,8 @@
     }
 }
 
+
+// Link (Wrapper)
 .umb-package-link {
     display: flex;
     flex-wrap: wrap;
@@ -52,6 +58,8 @@
 }
 
 
+
+// Icon
 .umb-package-icon {
     display: flex;
 
@@ -70,6 +78,8 @@
     opacity: .1;
 }
 
+
+// Info
 .umb-package-info {
     padding-top: 10px;
     padding-right: 20px;
@@ -78,16 +88,16 @@
 }
 
 
+// Name
 .umb-package-name {
     font-weight: bold;
     margin-bottom: 10px;
 }
 
+// Numbers
 .umb-package-numbers {
     display: flex;
     flex-wrap: wrap;
-
-    margin-bottom: 20px;
 
     opacity: .6;
 }
@@ -96,14 +106,7 @@
     opacity: 1;
 }
 
-.umb-package-link:hover .umb-era-button {
-    background: @blue;
-	color: white;
 
-    &:hover {
-        background-color: @blueDark;
-    }
-}
 
 /* umb-buttons-era */
 .umb-era-button {
