@@ -18,7 +18,9 @@ namespace Umbraco.Core.Models.EntityBase
         //TODO: This needs to go on to ICanBeDirty http://issues.umbraco.org/issue/U4-5662
         public virtual IEnumerable<string> GetDirtyProperties()
         {
-            return _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
+            return _propertyChangedInfo == null
+                ? Enumerable.Empty<string>()
+                : _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
         }
 
         private bool _changeTrackingEnabled = true;
@@ -26,12 +28,12 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
-        private IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
+        private IDictionary<string, bool> _propertyChangedInfo;
 
         /// <summary>
         /// Tracks the properties that we're changed before the last commit (or last call to ResetDirtyProperties)
         /// </summary>
-        private IDictionary<string, bool> _lastPropertyChangedInfo = null;
+        private IDictionary<string, bool> _lastPropertyChangedInfo;
 
         /// <summary>
         /// Property changed event
@@ -47,12 +49,12 @@ namespace Umbraco.Core.Models.EntityBase
             //return if we're not tracking changes
             if (_changeTrackingEnabled == false) return;
 
+            if (_propertyChangedInfo == null)
+                _propertyChangedInfo = new Dictionary<string, bool>();
+
             _propertyChangedInfo[propertyInfo.Name] = true;
 
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyInfo.Name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if Property is dirty, otherwise False</returns>
         public virtual bool IsPropertyDirty(string propertyName)
         {
-            return _propertyChangedInfo.Any(x => x.Key == propertyName);
+            return _propertyChangedInfo != null && _propertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if entity is dirty, otherwise False</returns>
         public virtual bool IsDirty()
         {
-            return _propertyChangedInfo.Any();
+            return _propertyChangedInfo != null && _propertyChangedInfo.Any();
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Umbraco.Core.Models.EntityBase
         {
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
-            _lastPropertyChangedInfo = new Dictionary<string, bool>();
+            _lastPropertyChangedInfo = null;
         }
 
         /// <summary>
@@ -135,13 +137,13 @@ namespace Umbraco.Core.Models.EntityBase
 
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
-            _propertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = null;
         }
 
         public void ResetChangeTrackingCollections()
         {
-            _propertyChangedInfo = new Dictionary<string, bool>();
-            _lastPropertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = null;
+            _lastPropertyChangedInfo = null;
         }
 
         public void DisableChangeTracking()
@@ -179,7 +181,6 @@ namespace Umbraco.Core.Models.EntityBase
                     //Standard Equals comparison
                     (arg1, arg2) => Equals(arg1, arg2),
                     arg => arg.GetHashCode()));
-
         }
 
         /// <summary>
@@ -204,14 +205,10 @@ namespace Umbraco.Core.Models.EntityBase
             //don't track changes, just set the value (above)
             if (_changeTrackingEnabled == false) return false;
 
-            if (comparer.Equals(initVal, newVal) == false)
-            {
-                OnPropertyChanged(propertySelector);
-                return true;
-            }
-            return false;
+            if (comparer.Equals(initVal, newVal)) return false;
+
+            OnPropertyChanged(propertySelector);
+            return true;
         }
-
-
     }
 }
