@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -35,8 +36,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
-                appCtx,
+                new Mock<HttpContextBase>().Object, appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -59,8 +60,8 @@ namespace Umbraco.Tests.Web.Mvc
             ApplicationContext.EnsureContext(appCtx, true);
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
-                appCtx,
+                new Mock<HttpContextBase>().Object, appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -83,8 +84,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
-                appCtx,
+                new Mock<HttpContextBase>().Object, appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -103,8 +104,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
-                appCtx,
+                new Mock<HttpContextBase>().Object, appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
@@ -141,8 +142,8 @@ namespace Umbraco.Tests.Web.Mvc
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
-                appCtx,
+                new Mock<HttpContextBase>().Object, appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),

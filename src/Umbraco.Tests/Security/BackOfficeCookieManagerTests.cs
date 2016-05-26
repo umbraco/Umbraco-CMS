@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Identity;
@@ -39,8 +40,8 @@ namespace Umbraco.Tests.Security
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
 
@@ -64,8 +65,8 @@ namespace Umbraco.Tests.Security
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
 

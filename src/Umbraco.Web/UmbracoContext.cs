@@ -104,7 +104,7 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            bool? preview)
+            bool? preview = null)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));

@@ -3,11 +3,13 @@ using System.Xml;
 using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Cache.PublishedCache
@@ -18,7 +20,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private ContextualPublishedContentCache _cache;
+		private IPublishedContentCache _cache;
 	    private XmlDocument _xml;
 
 		private string GetXml()
@@ -57,17 +59,27 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		    SettingsForTests.ConfigureSettings(settings);
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
-		    var cache = new PublishedContentCache((context, preview) => _xml);
+		    var xmlStore = new XmlStore(() => _xml);
+		    var cacheProvider = new StaticCacheProvider();
+            var domainCache = new DomainCache(ServiceContext.DomainService);
+		    var facade = new Facade(
+		        new PublishedContentCache(xmlStore, domainCache, cacheProvider, ContentTypesCache, null, null),
+		        new PublishedMediaCache(xmlStore, ServiceContext.MediaService, cacheProvider, ContentTypesCache),
+		        new PublishedMemberCache(null, cacheProvider, ApplicationContext.Services.MemberService, ContentTypesCache),
+		        domainCache);
+		    var facadeService = new Mock<IFacadeService>();
+		    facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
-		    _umbracoContext = new UmbracoContext(
-                _httpContextFactory.HttpContext,
-                ApplicationContext,
-                new PublishedCaches(cache, new PublishedMediaCache(ApplicationContext)),
-                new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext));
+		    _umbracoContext = UmbracoContext.CreateContext(
+		        _httpContextFactory.HttpContext, ApplicationContext,
+		        facadeService.Object,
+		        new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext),
+		        settings,
+		        Enumerable.Empty<IUrlProvider>(),
+		        null);
 
 		    _cache = _umbracoContext.ContentCache;
         }
-
 
 	    protected override void FreezeResolution()
 	    {

@@ -78,46 +78,7 @@ namespace umbraco.cms.businesslogic.macro
         /// <value>The macro.</value>
         public Macro Macro { get; set; }
 
-        private MacroPropertyType _type;
         private string _parameterEditorAlias;
-
-        /// <summary>
-        /// The basetype which defines which component is used in the UI for editing content
-        /// </summary>
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        public MacroPropertyType Type
-        {
-            get
-            {
-                if (_type == null)
-                {
-                    //we'll try to create one based on the resolved new parameter editors
-                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias);
-                    if (found == null)
-                    {
-                        return null;
-                    }
-                    var type = new MacroPropertyType
-                        {
-                            Alias = ParameterEditorAlias,
-                            Id = 0,
-                            Assembly = found.GetType().Namespace,
-                            //NOTE: In v6 macro parameter's stored in the database used to 
-                            // expose a CLR type but we no longer support that, instead we'll just attempt
-                            // to convert the value to the CLR type - It's also important to note that the
-                            // ONLY place this BaseType is ever used is to assign to the umbraco.cms.businesslogic.macro.MacroPropertyModel.CLRType
-                            // property, which is then used when attempting to render a UserControl macro. So basically
-                            // it is completely pointless since we already know the CLR property type of the UserControl
-                            // property and we're just going to do the conversion anyways since it is always essentially a string.
-                            BaseType = "String",
-                            Type = found.GetType().Name
-                        };
-                    _type = type;
-                }
-                return _type;
-            }
-            set { _type = Type; }
-        }
 
         /// <summary>
         /// The macro parameter editor alias used to render the editor
@@ -151,7 +112,6 @@ namespace umbraco.cms.businesslogic.macro
                     SortOrder = (int)dr.GetByte("macroPropertySortOrder");
                     Alias = dr.GetString("macroPropertyAlias");
                     Name = dr.GetString("macroPropertyName");
-                    Type = null;
                     ParameterEditorAlias = dr.GetString("editorAlias");
                 }
                 else
@@ -228,13 +188,6 @@ namespace umbraco.cms.businesslogic.macro
         }
 
         
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        [Obsolete("This method is no longer supported because MacroPropertyType no longer has a function")]
-        public static MacroProperty MakeNew(Macro macro, bool show, string alias, string name, MacroPropertyType propertyType)
-        {
-            return MakeNew(macro, alias, name, propertyType.Alias);
-        }
-
         /// <summary>
         /// Creates a new MacroProperty on a macro
         /// </summary>

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
@@ -31,8 +32,18 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
-    public class UmbracoViewPageTests
+    public class UmbracoViewPageTests : BaseUmbracoConfigurationTest
     {
+        private FacadeService _service;
+
+        [TearDown]
+        public override void TearDown()
+        {
+            if (_service == null) return;
+            _service.Dispose();
+            _service = null;
+        }
+
         #region RenderModel To ...
 
         [Test]
@@ -414,18 +425,6 @@ namespace Umbraco.Tests.Web.Mvc
 
         protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
-            var cache = new PublishedContentCache();
-
-            //cache.GetXmlDelegate = (context, preview) =>
-            //{
-            //    var doc = new XmlDocument();
-            //    doc.LoadXml(GetXmlContent(templateId));
-            //    return doc;
-            //};
-
-            //PublishedContentCache.UnitTesting = true;
-
-            // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
             var svcCtx = GetServiceContext();
 
             var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
@@ -436,12 +435,18 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };
 
+            var cache = new NullCacheProvider();
+            var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
+            _service = new FacadeService(svcCtx, provider, cache, true, false); // no events
+
             var http = GetHttpContextFactory(url, routeData).HttpContext;
-            var ctx = new UmbracoContext(
-                GetHttpContextFactory(url, routeData).HttpContext,
-                appCtx,
-                new PublishedCaches(cache, new PublishedMediaCache(appCtx)),
-                new WebSecurity(http, appCtx));
+            
+            var ctx = UmbracoContext.CreateContext(
+                GetHttpContextFactory(url, routeData).HttpContext, appCtx,
+                _service,
+                new WebSecurity(http, appCtx),
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>());
 
             //if (setSingleton)
             //{

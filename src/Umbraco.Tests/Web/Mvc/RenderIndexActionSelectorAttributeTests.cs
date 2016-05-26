@@ -15,6 +15,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -45,8 +46,8 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(), appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -68,8 +69,8 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(),appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -91,8 +92,8 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(),appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -114,8 +115,8 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<HttpContextBase>(),
-                appCtx,
+                Mock.Of<HttpContextBase>(),appCtx,
+                Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),

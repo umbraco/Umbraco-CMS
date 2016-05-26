@@ -10,10 +10,10 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using umbraco;
-using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Macros;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 
@@ -65,10 +65,15 @@ namespace Umbraco.Tests.Macros
         public void SetUserControlProperty(string val, string macroPropName, Type convertTo)
         {
             var ctrl = new UserControlTest();
-            var macroModel = new MacroModel("test", "test", "", "", "~/usercontrols/menu.ascx", 0, false, false);
+            var macroModel = new MacroModel
+            {
+                Name = "test",
+                Alias = "test",
+                ScriptName = "~/usercontrols/menu.ascx"
+            };
             macroModel.Properties.Add(new MacroPropertyModel(macroPropName, val));
 
-            macro.UpdateControlProperties(ctrl, macroModel);
+            UserControlMacroEngine.UpdateControlProperties(ctrl, macroModel);
 
             var ctrlType = ctrl.GetType();
             var prop = ctrlType.GetProperty(macroPropName);
@@ -98,8 +103,16 @@ namespace Umbraco.Tests.Macros
         [TestCase("", "", "~/usercontrols/menu.ascx", "~/usercontrols/menu.ascx")]
         public void Get_Macro_File(string xslt, string scriptFile, string scriptType, string expectedResult)
         {
-            var model = new MacroModel("Test", "test", scriptType, xslt, scriptFile, 0, false, false);
-            var file = macro.GetMacroFile(model);
+            var model = new MacroModel
+            {
+                Name = "Test",
+                Alias = "test",
+                TypeName = scriptType,
+                Xslt = xslt,
+                ScriptName = scriptFile,
+                MacroType = MacroModel.FindMacroType(xslt, scriptFile, scriptType)
+            };
+            var file = MacroRenderer.GetMacroFile(model);
             Assert.AreEqual(expectedResult, file);
         }
 
@@ -107,45 +120,30 @@ namespace Umbraco.Tests.Macros
         [TestCase("PartialView", true)]
         [TestCase("UserControl", true)]
         [TestCase("Unknown", false)]
-        public void Macro_Is_File_Based(string macroType, bool expectedResult)
+        public void Macro_Is_File_Based(string macroTypeString, bool expectedNonNull)
         {
-            var mType = Enum<MacroTypes>.Parse(macroType);
-            var model = new MacroModel("Test", "test", "", "", "", 0, false, false);
-            model.MacroType = mType; //force the type
-            Assert.AreEqual(expectedResult, macro.MacroIsFileBased(model));
+            var macroType = Enum<MacroTypes>.Parse(macroTypeString);
+            var model = new MacroModel
+            {
+                MacroType = macroType,
+                Xslt = "anything",
+                ScriptName = "anything",
+                TypeName = "anything"
+            };
+            var filename = MacroRenderer.GetMacroFileName(model);
+            if (expectedNonNull)
+                Assert.IsNotNull(filename);
+            else
+                Assert.IsNull(filename);
         }
 
-        [TestCase("Xslt", true)]
-        [TestCase("PartialView", true)]
-        [TestCase("UserControl", false)]
-        [TestCase("Unknown", false)]
-        public void Can_Cache_As_String(string macroType, bool expectedResult)
+        //[TestCase(-5, true)] //the cache DateTime will be older than the file date
+        //[TestCase(5, false)] //the cache DateTime will be newer than the file date
+        public void Macro_Needs_Removing_Based_On_Macro_File(int minutesToNow, bool expectedNull)
         {
-            var mType = Enum<MacroTypes>.Parse(macroType);
-            var model = new MacroModel("Test", "test", "", "", "",  0, false, false);
-            model.MacroType = mType; //force the type
-            Assert.AreEqual(expectedResult, macro.CacheMacroAsString(model));
-        }
-
-        [TestCase(-5, true)] //the cache DateTime will be older than the file date
-        [TestCase(5, false)] //the cache DateTime will be newer than the file date
-        public void Macro_Needs_Removing_Based_On_Macro_File(int minutesToNow, bool expectedResult)
-        {
-            var now = DateTime.Now;
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
-                "TestDate",
-                priority:       CacheItemPriority.NotRemovable,
-                timeout:        new TimeSpan(0, 0, 60),
-                getCacheItem:   () => now.AddMinutes(minutesToNow)); //add a datetime value of 'now' with the minutes offset
-
-            //now we need to update a file's date to 'now' to compare
-            var path = Path.Combine(TestHelpers.TestHelper.CurrentAssemblyDirectory, "temp.txt");
-            File.CreateText(path).Close();
-
-            //needs to be file based (i.e. xslt)
-            var model = new MacroModel("Test", "test", "", "test.xslt", "", 0, false, false);
-
-            Assert.AreEqual(expectedResult, macro.MacroNeedsToBeClearedFromCache(model, "TestDate", new FileInfo(path)));
+            // macro has been refactored, and macro.GetMacroContentFromCache() will
+            // take care of the macro file, if any. It requires a web environment,
+            // so we cannot really test this anymore.
         }
 
         public void Get_Macro_Cache_Identifier()

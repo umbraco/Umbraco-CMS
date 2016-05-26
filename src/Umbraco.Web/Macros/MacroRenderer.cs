@@ -185,7 +185,7 @@ namespace Umbraco.Web.Macros
 
         // gets the macro source file name
         // null if the macro is not file-based
-        private static string GetMacroFileName(MacroModel model)
+        internal static string GetMacroFileName(MacroModel model)
         {
             string filename;
 
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Macros
 
         // gets the macro source file
         // null if macro is not file-based
-        private static FileInfo GetMacroFile(MacroModel model)
+        internal static FileInfo GetMacroFile(MacroModel model)
         {
             var filename = GetMacroFileName(model);
             if (filename == null) return null;

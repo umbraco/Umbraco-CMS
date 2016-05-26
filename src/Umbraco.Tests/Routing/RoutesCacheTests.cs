@@ -18,13 +18,14 @@ namespace Umbraco.Tests.Routing
         {
             //var routingContext = GetRoutingContext("/test", 1111);
             var umbracoContext = GetUmbracoContext("/test", 0);
-            var cache = umbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            var cache = umbracoContext.Facade.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
-            PublishedContentCache.UnitTesting = false; // else does not write to routes cache
-            Assert.IsFalse(PublishedContentCache.UnitTesting);
+            // fixme not sure?
+            //PublishedContentCache.UnitTesting = false; // else does not write to routes cache
+            //Assert.IsFalse(PublishedContentCache.UnitTesting);
 
-            var z = cache.GetByRoute(umbracoContext, false, "/home/sub1");
+            var z = cache.GetByRoute(false, "/home/sub1");
             Assert.IsNotNull(z);
             Assert.AreEqual(1173, z.Id);
 

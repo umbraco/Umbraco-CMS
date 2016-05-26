@@ -170,7 +170,6 @@
     </Compile>
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\LegacySqlHelper.cs" />
-    <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -203,9 +202,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\macro\MacroProperty.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\macro\macroPropertyType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\Packager\data.cs" />

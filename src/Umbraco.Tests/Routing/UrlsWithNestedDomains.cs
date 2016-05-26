@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, true));
 
 			// check that the proper route has been cached
-		    var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
+		    var cache = routingContext.UmbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 		    var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);

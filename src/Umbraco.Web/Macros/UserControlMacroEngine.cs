@@ -75,7 +75,7 @@ namespace Umbraco.Web.Macros
         }
 
         // set the control properties according to the model properties ie parameters
-        private static void UpdateControlProperties(Control control, MacroModel model)
+        internal static void UpdateControlProperties(Control control, MacroModel model)
         {
             var type = control.GetType();
 

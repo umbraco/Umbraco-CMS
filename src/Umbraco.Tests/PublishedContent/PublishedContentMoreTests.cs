@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.ObjectModel;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -11,8 +12,11 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Plugins;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.PublishedContent
@@ -59,12 +63,16 @@ namespace Umbraco.Tests.PublishedContent
 
             var caches = CreatePublishedContent();
 
+            var facadeService = new Mock<IFacadeService>();
+
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var ctx = new UmbracoContext(
-                httpContext,
-                ApplicationContext,
-                caches,
-                new WebSecurity(httpContext, ApplicationContext));
+            var ctx = UmbracoContext.CreateContext(
+                httpContext, ApplicationContext,
+                facadeService.Object,
+                new WebSecurity(httpContext, ApplicationContext),
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
+                null);
 
             UmbracoContext.Current = ctx;
         }
@@ -225,10 +233,10 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result[1].Id);
         }
 
-        static SolidPublishedCaches CreatePublishedContent()
+        static SolidFacade CreatePublishedContent()
         {
-            var caches = new SolidPublishedCaches();
-            var cache = caches.ContentCache;
+            var caches = new SolidFacade();
+            var cache = caches.InnerContentCache;
 
             var props = new[]
                     {
