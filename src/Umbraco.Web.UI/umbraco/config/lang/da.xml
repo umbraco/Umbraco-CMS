@@ -119,12 +119,12 @@
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hvordan ville du f.eks. beskrive billedet via telefonen?)</key>
     <key alias="alternativeUrls">Alternative links</key>
-    <key alias="clickToEdit">Klik på musen for at redigere dette punkt</key>
+    <key alias="clickToEdit">Klik for at redigere dette punkt</key>
     <key alias="createBy">Oprettet af</key>
     <key alias="createByDesc" version="7.0">Oprindelig forfatter</key>
     <key alias="updatedBy" version="7.0">Opdateret af</key>
     <key alias="createDate">Oprettet den</key>
-    <key alias="createDateDesc" version="7.0">tidspunkt for oprettelse</key>
+    <key alias="createDateDesc" version="7.0">Tidspunkt for oprettelse</key>
     <key alias="documentType">Dokumenttype</key>
     <key alias="editing">Redigerer</key>
     <key alias="expireDate">Nedtagningsdato</key>
