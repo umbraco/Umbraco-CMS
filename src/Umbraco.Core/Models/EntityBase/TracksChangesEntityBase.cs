@@ -54,7 +54,8 @@ namespace Umbraco.Core.Models.EntityBase
 
             _propertyChangedInfo[propertyInfo.Name] = true;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
+            if (PropertyChanged != null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
         }
 
         /// <summary>
@@ -165,8 +166,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// <param name="propertySelector"></param>
         /// <returns>returns true if the value changed</returns>
         /// <remarks>
-        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we 
-        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set 
+        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we
+        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
         internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector)
@@ -193,8 +194,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// <param name="comparer">The equality comparer to use</param>
         /// <returns>returns true if the value changed</returns>
         /// <remarks>
-        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we 
-        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set 
+        /// This is required because we don't want a property to show up as "dirty" if the value is the same. For example, when we
+        /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
         internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
