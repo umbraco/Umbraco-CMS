@@ -873,7 +873,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMemberSaved">Medlem gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
     <key alias="editStylesheetSaved">Stylesheet gemt</key>
-    <key alias="editTemplateSaved">Template gemt</key>
+    <key alias="editTemplateSaved">Skabelon gemt</key>
     <key alias="editUserError">Der er opstået en fejl under redigering</key>
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
