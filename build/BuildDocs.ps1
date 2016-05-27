@@ -15,13 +15,14 @@ $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 
 ################ Do the UI docs
 Install-Product node 4.4.5
-npm install -g npm
-npm install
-npm install -g grunt-cli
+"Installing node"
+& npm install -g npm
+"Installing grunt"
+& npm install -g grunt-cli
 
 & grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
 
-## zip it
+# zip it
 
 & $7Zip a -tzip ui-docs.zip $NgDocsSiteOutput -r
 
