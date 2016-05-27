@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Macros
         }
 
         [TestCase("text.xslt", "", "", "~/xslt/text.xslt")]
-        [TestCase("", "razor-script.cshtml", "", "~/macroScripts/razor-script.cshtml")]
+        //[TestCase("", "razor-script.cshtml", "", "~/macroScripts/razor-script.cshtml")] // gone in v8
         [TestCase("", "~/Views/MacroPartials/test.cshtml", "", "~/Views/MacroPartials/test.cshtml")]
         [TestCase("", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml", "", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml")]
         [TestCase("", "", "~/usercontrols/menu.ascx", "~/usercontrols/menu.ascx")]
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Macros
                 ScriptName = scriptFile,
                 MacroType = MacroModel.FindMacroType(xslt, scriptFile, scriptType)
             };
-            var file = MacroRenderer.GetMacroFile(model);
+            var file = MacroRenderer.GetMacroFileName(model);
             Assert.AreEqual(expectedResult, file);
         }
 

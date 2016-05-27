@@ -1503,16 +1503,14 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-
-            using (var uow = provider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
 
             contentService.Publish(content);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
@@ -1527,11 +1525,9 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-
-            using (var uow = provider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new{nodeId = content.Id, versionId = content.Version}) != null);
+                Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId", new{nodeId = content.Id}) != null);
             }
         }
 

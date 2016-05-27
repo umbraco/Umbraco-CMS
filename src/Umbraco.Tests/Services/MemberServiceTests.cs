@@ -1058,14 +1058,10 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-
-            using (var uow = provider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
             }
-
         }
-
     }
 }

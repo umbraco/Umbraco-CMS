@@ -2070,6 +2070,7 @@ namespace Umbraco.Core.Services
                     var descendants = GetPublishedDescendants(content).ToArray();
                     Published.RaiseEvent(new PublishEventArgs<IContent>(descendants, false, false), this);
                 }
+                changeType = TreeChangeTypes.RefreshBranch; // whole branch
             }
 
             // invalidate the node/branch

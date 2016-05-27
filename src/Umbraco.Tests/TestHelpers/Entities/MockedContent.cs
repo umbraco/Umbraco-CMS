@@ -24,7 +24,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId)
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1)
         {
             var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
             object obj =

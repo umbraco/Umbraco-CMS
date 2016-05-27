@@ -224,6 +224,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\RefresherTests.cs" />
+    <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />

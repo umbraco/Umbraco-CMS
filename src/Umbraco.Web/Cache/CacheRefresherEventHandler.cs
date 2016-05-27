@@ -24,7 +24,11 @@ namespace Umbraco.Web.Cache
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             LogHelper.Info<CacheRefresherEventHandler>("Initializing Umbraco internal event handlers for cache refreshing.");
+            AddHandlers();
+        }
 
+        internal void AddHandlers()
+        {
             // bind to application tree events
             ApplicationTreeService.Deleted += ApplicationTreeDeleted;
             ApplicationTreeService.Updated += ApplicationTreeUpdated;
@@ -94,6 +98,79 @@ namespace Umbraco.Web.Cache
             // bind to public access events
             PublicAccessService.Saved += PublicAccessServiceSaved;
             PublicAccessService.Deleted += PublicAccessServiceDeleted;
+        }
+
+        internal void RemoveHandlers()
+        {
+            // bind to application tree events
+            ApplicationTreeService.Deleted -= ApplicationTreeDeleted;
+            ApplicationTreeService.Updated -= ApplicationTreeUpdated;
+            ApplicationTreeService.New -= ApplicationTreeNew;
+
+            // bind to application events
+            SectionService.Deleted -= ApplicationDeleted;
+            SectionService.New -= ApplicationNew;
+
+            // bind to user / user type events
+            UserService.SavedUserType -= UserServiceSavedUserType;
+            UserService.DeletedUserType -= UserServiceDeletedUserType;
+            UserService.SavedUser -= UserServiceSavedUser;
+            UserService.DeletedUser -= UserServiceDeletedUser;
+
+            // bind to dictionary events
+            LocalizationService.DeletedDictionaryItem -= LocalizationServiceDeletedDictionaryItem;
+            LocalizationService.SavedDictionaryItem -= LocalizationServiceSavedDictionaryItem;
+
+            // bind to data type events
+            // NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+            DataTypeService.Deleted -= DataTypeServiceDeleted;
+            DataTypeService.Saved -= DataTypeServiceSaved;
+
+            // bind to stylesheet events
+            FileService.SavedStylesheet -= FileServiceSavedStylesheet;
+            FileService.DeletedStylesheet -= FileServiceDeletedStylesheet;
+
+            // bind to domain events
+            DomainService.Saved -= DomainServiceSaved;
+            DomainService.Deleted -= DomainServiceDeleted;
+
+            // bind to language events
+            LocalizationService.SavedLanguage -= LocalizationServiceSavedLanguage;
+            LocalizationService.DeletedLanguage -= LocalizationServiceDeletedLanguage;
+
+            // bind to content type events
+            ContentTypeService.Changed -= ContentTypeServiceChanged;
+            MediaTypeService.Changed -= ContentTypeServiceChanged;
+            MemberTypeService.Changed -= ContentTypeServiceChanged;
+
+            // bind to permission events
+            PermissionRepository<IContent>.AssignedPermissions -= PermissionRepositoryAssignedPermissions;
+
+            // bind to template events
+            FileService.SavedTemplate -= FileServiceSavedTemplate;
+            FileService.DeletedTemplate -= FileServiceDeletedTemplate;
+
+            // bind to macro events
+            MacroService.Saved -= MacroServiceSaved;
+            MacroService.Deleted -= MacroServiceDeleted;
+
+            // bind to member events
+            MemberService.Saved -= MemberServiceSaved;
+            MemberService.Deleted -= MemberServiceDeleted;
+            MemberGroupService.Saved -= MemberGroupServiceSaved;
+            MemberGroupService.Deleted -= MemberGroupServiceDeleted;
+
+            // bind to media events
+            MediaService.TreeChanged -= MediaServiceChanged; // handles all media changes
+
+            // bind to content events
+            ContentService.Saved -= ContentServiceSaved; // needed for permissions
+            ContentService.Copied -= ContentServiceCopied; // needed for permissions
+            ContentService.TreeChanged -= ContentServiceChanged; // handles all content changes
+
+            // bind to public access events
+            PublicAccessService.Saved -= PublicAccessServiceSaved;
+            PublicAccessService.Deleted -= PublicAccessServiceDeleted;
         }
 
         #region PublicAccessService

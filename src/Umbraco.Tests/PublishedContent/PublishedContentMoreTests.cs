@@ -61,9 +61,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             RouteData routeData = null;
 
-            var caches = CreatePublishedContent();
+            var facade = CreateFacade();
 
             var facadeService = new Mock<IFacadeService>();
+            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
             var ctx = UmbracoContext.CreateContext(
@@ -233,7 +234,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result[1].Id);
         }
 
-        static SolidFacade CreatePublishedContent()
+        static SolidFacade CreateFacade()
         {
             var caches = new SolidFacade();
             var cache = caches.InnerContentCache;

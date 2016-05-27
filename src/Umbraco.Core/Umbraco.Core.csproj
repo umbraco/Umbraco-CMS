@@ -1238,6 +1238,7 @@
     <Compile Include="IBootManager.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
+    <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
     <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
     <Compile Include="_Legacy\PackageActions\PackageActionsResolver.cs" />
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />

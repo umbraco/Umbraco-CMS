@@ -77,10 +77,13 @@ namespace Umbraco.Tests.TestHelpers
             base.ConfigureContainer();
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            Container.Register<IFacadeService>(factory => _facadeService);
         }
 
         private CacheHelper _disabledCacheHelper;
         protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
+
+        protected IDatabaseUnitOfWorkProvider UowProvider => _uowProvider;
 
         protected override void SetupApplicationContext()
         {
@@ -228,7 +231,6 @@ namespace Umbraco.Tests.TestHelpers
 
         }
 
-
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
@@ -345,6 +347,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 // make sure we dispose of the service to unbind events
                 _facadeService?.Dispose();
+                _facadeService = null;
             }
 
             base.TearDown();

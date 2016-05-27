@@ -4,7 +4,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents an Umbraco domain and its normalized uri.
+    /// Represents a facade domain with its normalized uri.
     /// </summary>
     /// <remarks>
     /// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>
@@ -12,9 +12,8 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class DomainAndUri : Domain
     {
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.
+        /// Initializes a new instance of the <see cref="DomainAndUri"/> class.
         /// </summary>
         /// <param name="domain">The original domain.</param>
         /// <param name="currentUri">The context current Uri.</param>
@@ -38,14 +37,10 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets the normalized uri of the domain.
+        /// Gets the normalized uri of the domain, within the current context.
         /// </summary>
         public Uri Uri { get; }
 
-        /// <summary>
-        /// Gets a string that represents the <see cref="DomainAndUri"/> instance.
-        /// </summary>
-        /// <returns>A string that represents the current <see cref="DomainAndUri"/> instance.</returns>
         public override string ToString()
         {
             return $"{{ \"{Name}\", \"{Uri}\" }}";

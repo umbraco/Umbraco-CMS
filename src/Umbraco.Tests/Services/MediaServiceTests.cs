@@ -91,8 +91,7 @@ namespace Umbraco.Tests.Services
 
             mediaService.Save(media);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
-            using (var uow = provider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork())
             {            
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
             }
