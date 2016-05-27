@@ -138,3 +138,4 @@ apidocs/_site/*
 apidocs/api/*
 build/docs.zip
 build/ui-docs.zip
+build/csharp-docs.zip
