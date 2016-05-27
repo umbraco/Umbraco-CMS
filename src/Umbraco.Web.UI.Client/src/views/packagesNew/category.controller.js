@@ -13,7 +13,13 @@
         vm.categories = [
             {
                 "icon": "icon-male-and-female",
-                "name": "Collaboration"
+                "name": "All",
+                "active": false
+            },
+            {
+                "icon": "icon-male-and-female",
+                "name": "Collaboration",
+                "active": true
             },
             {
                 "icon": "icon-molecular-network",

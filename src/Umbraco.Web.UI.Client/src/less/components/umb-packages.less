@@ -27,7 +27,7 @@
 
 
 .umb-packages {
-    margin: 0 -10px;
+    // margin: 0 -10px;
 }
 
 
@@ -225,31 +225,32 @@
     margin-bottom: 30px;
 }
 
+
+
 .umb-packages-category {
     display: flex;
     align-items: center;
     flex: 1 0 auto;
-    max-width: 25%;
-    background-color: @blue;
-    padding: 10px;
-    font-size: 13px;
-    border-radius: 3px;
-    color: @white;
-    box-sizing: border-box;
-    flex: 1 0 auto;
-    margin: 5px;
     justify-content: center;
 
-    &:hover {
-        background-color: @blueDark;
-        //box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    }
+    opacity: .6;
+
+    max-width: 25%;
+
+    font-size: 13px;
+    font-weight: bold;
+    color: @black;
+
+    box-sizing: border-box;
+
+    justify-content: center;
 }
+
 
 .umb-packages-category:hover,
 .umb-packages-category:focus {
     text-decoration: none;
-    color: @white;
+    opacity: 1;
 }
 
 .umb-packages-category-icon {
@@ -257,4 +258,27 @@
     margin-right: 5px;
 
     display: none;
+}
+
+// Collapsed
+.umb-packages-categories.-collapsed {
+    margin-bottom: 0;
+}
+
+.umb-packages-categories.-collapsed .umb-packages-category {
+    margin-right: 20px;
+
+    &:last-child {
+        margin-right: 0;
+    }
+}
+
+.-ma0 {
+    margin: 0 !important;
+}
+
+.-collapsed .umb-packages-category.-active {
+    color: @black;
+    opacity: 1;
+    border-bottom: 2px solid @black;
 }
