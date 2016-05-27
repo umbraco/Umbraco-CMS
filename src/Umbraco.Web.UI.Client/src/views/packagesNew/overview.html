@@ -32,7 +32,7 @@
                 <div class="umb-packages clearfix">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
-                        <a class="umb-package-link" href="#">
+                        <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
                                 <img ng-src="{{package.icon}}" alt="" />
@@ -61,7 +61,7 @@
                 <div class="umb-packages clearfix">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
-                        <a class="umb-package-link" href="#">
+                        <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
                                 <img src="{{ package.icon }}" alt="" />

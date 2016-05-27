@@ -9,6 +9,7 @@
         vm.page.name = "Packages";
 
         vm.selectCategory = selectCategory;
+        vm.showPackageDetails = showPackageDetails;
 
         vm.categories = [
             {
@@ -86,6 +87,13 @@
             var section = $route.current.params.section;
             var tree = $route.current.params.tree;
             var path = "/" + section + "/" + tree + "/category";
+            $location.path(path);
+        }
+
+        function showPackageDetails(selectedPackage) {
+            var section = $route.current.params.section;
+            var tree = $route.current.params.tree;
+            var path = "/" + section + "/" + tree + "/details";
             $location.path(path);
         }
 

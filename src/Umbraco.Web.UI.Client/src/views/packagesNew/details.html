@@ -1,0 +1,35 @@
+<div ng-controller="Umbraco.Editors.Packages.DetailsController as vm">
+
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="packagesForm" ng-submit="save()" novalidate>
+
+        <umb-editor-view footer="false" ng-if="!page.loading">
+
+            <umb-editor-header
+                name="vm.package.name"
+                name-locked="true"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <pre>{{ vm.package | json }}</pre>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+                    Breadcrumbs here
+                </umb-editor-footer-content-left>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>
