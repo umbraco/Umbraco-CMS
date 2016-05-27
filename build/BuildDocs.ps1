@@ -8,6 +8,22 @@ $DocFxJson = Join-Path -Path $RepoRoot "apidocs\docfx.json"
 $7Zip = Join-Path -Path $ToolsRoot "7zip\7za.exe"
 $DocSiteOutput = Join-Path -Path $RepoRoot "apidocs\_site\*.*"
 
+$ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
+$MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
+
+# Build the solution in debug mode
+$SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "umbraco.sln"
+& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount /t:Clean
+if (-not $?)
+{
+	throw "The MSBuild process returned an error code."
+}
+& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount
+if (-not $?)
+{
+	throw "The MSBuild process returned an error code."
+}
+
 # Go get docfx if we don't hae it
 $FileExists = Test-Path $DocFx 
 If ($FileExists -eq $False) {
