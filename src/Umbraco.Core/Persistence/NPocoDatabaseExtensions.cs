@@ -125,6 +125,9 @@ namespace Umbraco.Core.Persistence
                     // failed: exists (due to race cond RC1)
                     // RC2 race cond here: another thread may remove the record
 
+                    // fixme - debugging, ok?
+                    throw;
+
                     // try to update
                     rowCount = updateCommand.IsNullOrWhiteSpace()
                         ? db.Update(poco)

@@ -335,11 +335,17 @@ namespace Umbraco.Web
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
 
             // register the facade service
-            container.RegisterSingleton<IFacadeService>(factory => new FacadeService(
+            //container.RegisterSingleton<IFacadeService>(factory => new FacadeService(
+            //    factory.GetInstance<ServiceContext>(),
+            //    factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
+            //    factory.GetInstance<CacheHelper>().RequestCache,
+            //    factory.GetAllInstances<IUrlSegmentProvider>()));
+            container.RegisterSingleton<IFacadeService>(factory => new PublishedCache.NuCache.FacadeService(
+                new PublishedCache.NuCache.FacadeService.Options { FacadeCacheIsApplicationRequestCache = true },
+                factory.GetInstance<ApplicationContext>().MainDom,
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-                factory.GetInstance<CacheHelper>().RequestCache,
-                factory.GetAllInstances<IUrlSegmentProvider>()));
+                factory.GetInstance<ILogger>()));
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register(factory => UmbracoContext.Current);

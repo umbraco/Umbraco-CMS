@@ -35,7 +35,8 @@
     "semver": "1.*",
     "SharpZipLib": "0.86.0",
     "UrlRewritingNet.UrlRewriter": "2.0.7",
-    "xmlrpcnet": "2.5.0"
+    "xmlrpcnet": "2.5.0",
+    "CSharpTest.Net.Collections": "14.906.1403.1082"
   },
   "frameworks": {
     "net461": {}

@@ -363,6 +363,14 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "facadeStatusBaseUrl", Url.GetUmbracoApiServiceBaseUrl<FacadeStatusController>(
+                                    controller => controller.GetFacadeStatusUrl())
+                            },
+                            {
+                               "nuCacheStatusBaseUrl", Url.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
+                                   controller => controller.GetStatus())
                             }
                         }
                     },
