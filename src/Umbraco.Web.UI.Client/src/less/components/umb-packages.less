@@ -47,6 +47,8 @@
     flex-direction: column;
     justify-content: center;
 
+    position: relative;
+
     height: 100%;
     width: 100%;
 
@@ -118,22 +120,44 @@
 .umb-package-numbers {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
 
     opacity: .6;
+
+    margin-top: 10px;
 }
 
 .umb-package-numbers small {
     padding: 0 5px;
-    display: block;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.umb-package-numbers i {
+    font-size: 14px;
 }
 
 .umb-package-link:hover .umb-package-numbers {
     opacity: 1;
 }
 
+.umb-package-link:hover .umb-package-numbers .icon-hearts {
+    color: red !important;
+}
 
+// Version
+.umb-package-version {
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 1px 5px;
+    background: #ececec;
+    border-radius: 3px;
+    color: black;
+}
 
 /* umb-buttons-era */
 .umb-era-button {
