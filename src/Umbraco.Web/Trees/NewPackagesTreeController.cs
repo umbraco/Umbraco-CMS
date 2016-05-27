@@ -26,10 +26,13 @@ namespace Umbraco.Web.Trees
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            var baseUrl = Constants.Applications.Developer + "/packagesNew/";
+
             var nodes = new TreeNodeCollection();
 
             var node = CreateTreeNode("1", id, queryStrings, "Name", "icon-folder", false, "");
             node.Path = "path";
+            node.RoutePath = baseUrl + "overview";
             //node.NodeType = "container";
             //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
             //node.AdditionalData["jsClickCallback"] = "javascript:void(0);";

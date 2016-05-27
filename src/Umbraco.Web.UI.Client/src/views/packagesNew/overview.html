@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Packages.EditController as vm">
+<div ng-controller="Umbraco.Editors.Packages.OverviewController as vm">
 
     <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="umb-packages-categories">
-                    <a href="" class="umb-packages-category" ng-repeat="category in vm.categories">
+                    <a href="" class="umb-packages-category" ng-click="vm.selectCategory(category)" ng-repeat="category in vm.categories">
                         <i class="umb-packages-category-icon" ng-class="category.icon"></i>
                         <div>{{ category.name }}</div>
                     </a>
