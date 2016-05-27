@@ -6,10 +6,21 @@ $DocFx = Join-Path -Path $ToolsRoot "docfx\docfx.exe"
 $DocFxFolder = (Join-Path -Path $ToolsRoot "docfx")
 $DocFxJson = Join-Path -Path $RepoRoot "apidocs\docfx.json"
 $7Zip = Join-Path -Path $ToolsRoot "7zip\7za.exe"
-$DocSiteOutput = Join-Path -Path $RepoRoot "apidocs\_site\*.*"
+$DocFxSiteOutput = Join-Path -Path $RepoRoot "apidocs\_site\*.*"
+$NgDocsSiteOutput = Join-Path -Path $RepoRoot "src\Umbraco.Web.UI.Client\docs\api\*.*"
 
 $ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
 $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
+
+
+################ Do the UI docs
+& grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
+
+## zip it
+
+& $7Zip a -tzip ui-docs.zip $NgDocsSiteOutput -r
+
+################ Do the c# docs
 
 # Build the solution in debug mode
 $SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "umbraco.sln"
@@ -44,7 +55,7 @@ If ($FileExists -eq $False) {
 #clear site
 If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
 {
-	Remove-Item $DocSiteOutput -recurse
+	Remove-Item $DocFxSiteOutput -recurse
 }
 
 # run it!
@@ -53,4 +64,4 @@ If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
 
 # zip it
 
-& $7Zip a -tzip csharp-docs.zip $DocSiteOutput -r
+& $7Zip a -tzip csharp-docs.zip $DocFxSiteOutput -r
