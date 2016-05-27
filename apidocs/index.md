@@ -3,5 +3,5 @@
 
 ## Quick Links:
 
-### [Umbraco.Core](csharp/Umbraco.Core.html) docs
-### [Umbraco.Web](csharp/Umbraco.Web.html) docs
+### [Umbraco.Core](api/Umbraco.Core.html) docs
+### [Umbraco.Web](api/Umbraco.Web.html) docs
