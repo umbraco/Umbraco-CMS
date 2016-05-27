@@ -17,7 +17,7 @@ $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 Install-Product node 4.4.5
 npm install -g npm
 npm install
-npm install grunt -g
+npm install -g grunt-cli
 
 & grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
 
