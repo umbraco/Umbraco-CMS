@@ -14,7 +14,7 @@ $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 
 
 ################ Do the UI docs
-Install-Product node 4.4.5
+Install-Product node ''
 "Installing node"
 & npm install -g npm
 "Installing grunt"
