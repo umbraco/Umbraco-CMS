@@ -53,4 +53,4 @@ If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
 
 # zip it
 
-& $7Zip a -tzip docs.zip $DocSiteOutput -r
+& $7Zip a -tzip csharp-docs.zip $DocSiteOutput -r
