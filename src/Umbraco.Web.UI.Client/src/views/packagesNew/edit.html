@@ -28,21 +28,18 @@
                 </div>
 
 
-                <h5>Popular</h5>
-                <div class="umb-packages">
+                <h4><strong>Popular</strong></h4>
+                <div class="umb-packages clearfix">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
                         <a class="umb-package-link" href="#">
 
                             <div class="umb-package-icon">
-                                <img src="{{ package.icon }}" alt="" />
+                                <img ng-src="{{package.icon}}" alt="" />
                             </div>
 
                             <div class="umb-package-info">
-                                <h4 class="umb-package-name">
-                                    {{ package.name }}
-                                </h4>
-
+                                <div class="umb-package-name">{{ package.name }}</div>
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
                                         Downloads <strong>{{ package.downloads }}</strong>
@@ -52,10 +49,6 @@
                                     </small>
                                 </div>
 
-                                <div class="umb-era-button">
-                                    Install
-                                </div>
-
                             </div>
                         </a>
                     </div> <!-- end package -->
@@ -63,8 +56,8 @@
                 </div> <!-- end packages -->
 
 
-                <h5>Latest</h5>
-                <div class="umb-packages">
+                <h4><strong>Latest</strong></h4>
+                <div class="umb-packages clearfix">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
                         <a class="umb-package-link" href="#">

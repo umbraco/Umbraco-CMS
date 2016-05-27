@@ -2,7 +2,11 @@
     width: 100%;
 
     margin-top: 40px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    background: @grayLighter;
+    border-radius: 3px;
+    padding: 30px;
+    box-sizing: border-box;
 }
 
 .umb-packages-search input {
@@ -13,6 +17,8 @@
     padding: 4px 10px;
     font-size: 16px;
     border-color: #ececec;
+    margin-bottom: 0;
+    border-color: @grayLight;
 
     &:hover, &:focus {
         border-color: @grayLight;
@@ -21,19 +27,16 @@
 
 
 .umb-packages {
-    display: flex;
-    flex-wrap: wrap;
-
-    margin: 0 -5px;
+    margin: 0 -10px;
 }
 
 
 // List
 .umb-package {
-    height: 260px;
-    width: 200px;
-
-    padding: 20px;
+    float: left;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 20%;
 }
 
 
@@ -71,6 +74,7 @@
     padding-top: 10px;
     padding-right: 10px;
     padding-left: 10px;
+    padding-bottom: 10px;
 
     text-align: center;
     background-color: white;
@@ -86,27 +90,28 @@
 
 // Info
 .umb-package-info {
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
     text-align: center;
 }
 
 
 // Name
 .umb-package-name {
+    font-size: 15px;
     max-width: 250px;
+    margin-bottom: 5px;
 
     font-weight: bold;
-
-    margin-bottom: 10px;
 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
     line-height: normal;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 // Numbers
@@ -117,8 +122,6 @@
     justify-content: center;
 
     opacity: .6;
-
-    margin-bottom: 20px;
 }
 
 .umb-package-numbers small {
@@ -204,7 +207,7 @@
     flex: 1 0 auto;
     max-width: 25%;
     background-color: @blue;
-    padding: 40px 10px;
+    padding: 10px;
     font-size: 13px;
     border-radius: 3px;
     color: @white;
@@ -213,12 +216,9 @@
     margin: 5px;
     justify-content: center;
 
-    text-transform: uppercase;
-    letter-spacing: 1.3px;
-
     &:hover {
         background-color: @blueDark;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        //box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     }
 }
 
