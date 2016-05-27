@@ -26,8 +26,10 @@ If ($FileExists -eq $False) {
 }
 
 #clear site
-
-Remove-Item $DocSiteOutput -recurse
+If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
+{
+	Remove-Item $DocSiteOutput -recurse
+}
 
 # run it!
 & $DocFx metadata $DocFxJson
