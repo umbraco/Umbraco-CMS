@@ -14,60 +14,75 @@ $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 
 
 ################ Do the UI docs
-Install-Product node ''
+
+"Changing to Umbraco.Web.UI.Client folder"
+cd ..
+cd src\Umbraco.Web.UI.Client
+Write-Host $(Get-Location)
+
 "Installing node"
-& npm install -g npm
+Install-Product node ''
+
+"Installing node modules"
+& npm install
+
 "Installing grunt"
 & npm install -g grunt-cli
 
-& grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
+"Moving back to build folder"
+cd ..
+cd ..
+cd build
+Write-Host $(Get-Location)
 
-# zip it
+# & grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
 
-& $7Zip a -tzip ui-docs.zip $NgDocsSiteOutput -r
+## zip it
 
-################ Do the c# docs
+#& $7Zip a -tzip ui-docs.zip $NgDocsSiteOutput -r
 
-# Build the solution in debug mode
-$SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "umbraco.sln"
-& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount /t:Clean
-if (-not $?)
-{
-	throw "The MSBuild process returned an error code."
-}
-& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount
-if (-not $?)
-{
-	throw "The MSBuild process returned an error code."
-}
+################# Do the c# docs
 
-# Go get docfx if we don't hae it
-$FileExists = Test-Path $DocFx 
-If ($FileExists -eq $False) {
+## Build the solution in debug mode
+#$SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "umbraco.sln"
+#& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount /t:Clean
+#if (-not $?)
+#{
+#	throw "The MSBuild process returned an error code."
+#}
+#& $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount
+#if (-not $?)
+#{
+#	throw "The MSBuild process returned an error code."
+#}
 
-	If(!(Test-Path $DocFxFolder))
-	{
-		New-Item $DocFxFolder -type directory
-	}	
+## Go get docfx if we don't hae it
+#$FileExists = Test-Path $DocFx 
+#If ($FileExists -eq $False) {
+
+#	If(!(Test-Path $DocFxFolder))
+#	{
+#		New-Item $DocFxFolder -type directory
+#	}	
 	
-	$DocFxZip = Join-Path -Path $ToolsRoot "docfx\docfx.zip"
-	$DocFxSource = "https://github.com/dotnet/docfx/releases/download/v1.9.4/docfx.zip"
-	Invoke-WebRequest $DocFxSource -OutFile $DocFxZip
+#	$DocFxZip = Join-Path -Path $ToolsRoot "docfx\docfx.zip"
+#	$DocFxSource = "https://github.com/dotnet/docfx/releases/download/v1.9.4/docfx.zip"
+#	Invoke-WebRequest $DocFxSource -OutFile $DocFxZip
 
-	#unzip it	
-	& $7Zip e $DocFxZip "-o$DocFxFolder"
-}
+#	#unzip it	
+#	& $7Zip e $DocFxZip "-o$DocFxFolder"
+#}
 
-#clear site
-If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
-{
-	Remove-Item $DocFxSiteOutput -recurse
-}
+##clear site
+#If(Test-Path(Join-Path -Path $RepoRoot "apidocs\_site"))
+#{
+#	Remove-Item $DocFxSiteOutput -recurse
+#}
 
-# run it!
-& $DocFx metadata $DocFxJson
-& $DocFx build $DocFxJson
+## run it!
+#& $DocFx metadata $DocFxJson
+#& $DocFx build $DocFxJson
 
-# zip it
+## zip it
 
-& $7Zip a -tzip csharp-docs.zip $DocFxSiteOutput -r
+#& $7Zip a -tzip csharp-docs.zip $DocFxSiteOutput -r
