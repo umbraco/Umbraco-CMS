@@ -8,7 +8,6 @@ $DocFxJson = Join-Path -Path $RepoRoot "apidocs\docfx.json"
 $7Zip = Join-Path -Path $ToolsRoot "7zip\7za.exe"
 $DocFxSiteOutput = Join-Path -Path $RepoRoot "apidocs\_site\*.*"
 $NgDocsSiteOutput = Join-Path -Path $RepoRoot "src\Umbraco.Web.UI.Client\docs\api\*.*"
-
 $ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
 $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 
@@ -20,8 +19,17 @@ cd ..
 cd src\Umbraco.Web.UI.Client
 Write-Host $(Get-Location)
 
+"Creating build folder so MSBuild doesn't run the whole grunt build"
+if (-Not (Test-Path "build")) {
+    md "build"
+}
+
 "Installing node"
-Install-Product node ''
+# Check if Install-Product exists, should only exist on the build server
+if (Get-Command Install-Product -errorAction SilentlyContinue)
+{
+    Install-Product node ''
+}
 
 "Installing node modules"
 & npm install
@@ -37,6 +45,10 @@ Write-Host $(Get-Location)
 
  & grunt --gruntfile ../src/umbraco.web.ui.client/gruntfile.js docs
 
+# change baseUrl
+$BaseUrl = "https://our.umbraco.org/apidocs/ui/"
+$IndexPath = "../src/umbraco.web.ui.client/docs/api/index.html"
+(Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 # zip it
 
 & $7Zip a -tzip ui-docs.zip $NgDocsSiteOutput -r
