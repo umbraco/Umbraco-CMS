@@ -323,13 +323,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var trans = Database.GetTransaction())
             {
-                // Copy property groups (tabs) for any properties selected to composition type
-                // Move properties to those groups on the composition type
+                // Copy property groups (tabs) for any properties selected to composition type (if they don't already exist) and
+                // move properties to those groups on the composition type
                 var copiedPropertyGroups = new Dictionary<int, int>();
                 foreach (var propertyAlias in propertyAliases)
                 {
-                    var property = contentType.PropertyGroups
-                        .SelectMany(x => x.PropertyTypes)
+                    var property = contentType.PropertyTypes
                         .SingleOrDefault(x => x.Alias == propertyAlias);
                     if (property == null)
                     {
@@ -342,21 +341,56 @@ namespace Umbraco.Core.Persistence.Repositories
                     var propertyGroup = contentType.PropertyGroups
                         .Single(x => x.Id == property.PropertyGroupId.Value);
 
-                    // Copy the property group, if we haven't copied it already from another property, and
+                    // Copy the property group, if we haven't copied it already from another property or if it doesn't already exist, and
                     // get the Id of the new property group on the composition
-                    int newPropertyGroupId;
+                    int compositeGroupId;
                     if (copiedPropertyGroups.ContainsKey(propertyGroup.Id) == false)
                     {
-                        newPropertyGroupId = CopyPropertyGroup(propertyGroup.Id, copiedPropertyGroups.Count, compositionContentType.Id);
-                        copiedPropertyGroups.Add(propertyGroup.Id, newPropertyGroupId);
+                        // We haven't copied this one yet, but could be it already exists if we are extracting to an existing type
+                        var compositePropertyGroup = compositionContentType.PropertyGroups
+                            .SingleOrDefault(x => x.Name == propertyGroup.Name);
+                        if (compositePropertyGroup == null)
+                        {
+                            compositeGroupId = CopyPropertyGroup(propertyGroup.Id, copiedPropertyGroups.Count, compositionContentType.Id);
+                        }
+                        else
+                        {
+                            compositeGroupId = compositePropertyGroup.Id;
+                        }
+
+                        copiedPropertyGroups.Add(propertyGroup.Id, compositeGroupId);
                     }
                     else
                     {
-                        newPropertyGroupId = copiedPropertyGroups[propertyGroup.Id];
+                        compositeGroupId = copiedPropertyGroups[propertyGroup.Id];
                     }
 
-                    // Move the property to the composition type within the composition
-                    MovePropertyType(property.Id, newPropertyGroupId, compositionContentType.Id);
+                    // Before we move the property type to the composite, we need to check if one already exists with the same alias, which
+                    // if could if we are extracting to an existing type
+                    var existingProperty = compositionContentType.PropertyTypes
+                        .SingleOrDefault(x => x.Alias == propertyAlias);
+                    if (existingProperty == null)
+                    {
+                        // Move the property to the composition type within the composition
+                        MovePropertyType(property.Id, compositeGroupId, compositionContentType.Id);
+                    }
+                    else
+                    {
+                        // We've got a clashing alias, let's check if the data types match - if so we'll combine the properties and
+                        // any associated content
+                        if (existingProperty.DataTypeDefinitionId == property.DataTypeDefinitionId)
+                        {
+                            MoveContentBetweenPropertyTypes(property.Id, existingProperty.Id);
+                            DeletePropertyType(property.Id);
+                        }
+                        else
+                        {
+                            // Aliases are the same but the data types are different, can't combine these so we need to change the alias
+                            var alias = CreateUniqueAlias(propertyAlias,
+                                compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray());
+                            MovePropertyType(property.Id, compositeGroupId, compositionContentType.Id, alias);
+                        }
+                    }
                 }
 
                 // Create the composition relation
@@ -389,12 +423,44 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyId">The property Id</param>
         /// <param name="propertyGroupId">The Id of the property group to move to</param>
         /// <param name="contentTypeId">The Id of the content type to move to</param>
-        private void MovePropertyType(int propertyId, int propertyGroupId, int contentTypeId)
+        /// <param name="updatedAlias">New alias to use (if provided)</param>
+        private void MovePropertyType(int propertyId, int propertyGroupId, int contentTypeId, string updatedAlias = "")
         {
             var dto = Database.Single<PropertyTypeDto>("WHERE id = @PropertyId", new { PropertyId = propertyId });
             dto.ContentTypeId = contentTypeId;
             dto.PropertyTypeGroupId = propertyGroupId;
+            if (string.IsNullOrEmpty(updatedAlias) == false)
+            {
+                dto.Alias = updatedAlias;
+            }
+
             Database.Update(dto);
+        }
+
+        /// <summary>
+        /// Moves all content associated with a property type to another
+        /// </summary>
+        /// <param name="fromPropertyId">The property Id to move content from</param>
+        /// <param name="toPropertyId">The property Id to move content to</param>
+        private void MoveContentBetweenPropertyTypes(int fromPropertyId, int toPropertyId)
+        {
+            Database.Execute("UPDATE cmsPropertyData " +
+                             "SET propertytypeid = @ToPropertyId " +
+                             "WHERE propertytypeid = @FromPropertyId", 
+                new
+                {
+                    FromPropertyId = fromPropertyId,
+                    ToPropertyId = toPropertyId,
+                });
+        }
+
+        /// <summary>
+        /// Deletes a property from a new content type
+        /// </summary>
+        /// <param name="propertyId">The property Id</param>
+        private void DeletePropertyType(int propertyId)
+        {
+            Database.Delete<PropertyTypeDto>("WHERE id = @PropertyId", new { PropertyId = propertyId });
         }
 
         /// <summary>
@@ -405,6 +471,25 @@ namespace Umbraco.Core.Persistence.Repositories
         private void CreateCompositionRelation(int parentId, int childId)
         {
             Database.Insert(new ContentType2ContentTypeDto { ParentId = parentId, ChildId = childId });
+        }
+
+        /// <summary>
+        /// Helper to generate a unique alias
+        /// </summary>
+        /// <param name="alias">Alias that has a duplicate in the list of aliases for the content type</param>
+        /// <param name="existingAliases">The list of existing aliases</param>
+        /// <returns>Generated unique alias</returns>
+        private string CreateUniqueAlias(string alias, string[] existingAliases)
+        {
+            var suffix = 2;
+            var uniqueAliasAttempt = alias;
+            while (existingAliases.Contains(uniqueAliasAttempt))
+            {
+                uniqueAliasAttempt = alias + suffix;
+                suffix++;
+            }
+
+            return uniqueAliasAttempt;
         }
 
         /// <summary>

@@ -174,21 +174,25 @@ namespace Umbraco.Core.Services
         /// Extracts a composition from a content tye
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
-        /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="extractIntoType"><see cref="IContentType"/> to extract composition into</param>
+        /// <param name="nameOfNewType">Name of new composition type if creating a new one</param>
         /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <returns>The created composition type</returns>
-        IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0);
+        IContentType ExtractComposition(IContentType contentType, string[] propertyAliases, 
+            IContentType extractIntoType = null, string nameOfNewType = null, int userId = 0);
 
         /// <summary>
         /// Extracts a composition from a media tye
         /// </summary>
-        /// <param name="contentType"><see cref="IMediaType"/> to extract composition from</param>
-        /// <param name="name">Name of new composition type</param>
+        /// <param name="mediaType"><see cref="IMediaType"/> to extract composition from</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        /// <param name="extractIntoType"><see cref="IMediaType"/> to extract composition into</param>
+        /// <param name="nameOfNewType">Name of new composition type if creating a new one</param>
         /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <returns>The created composition type</returns>
-        IMediaType ExtractComposition(IMediaType contentType, string name, string[] propertyAliases, int userId = 0);
+        IMediaType ExtractComposition(IMediaType mediaType, string[] propertyAliases,
+            IMediaType extractIntoType = null, string nameOfNewType = null, int userId = 0);
 
         /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id

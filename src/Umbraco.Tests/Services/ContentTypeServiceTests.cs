@@ -1283,7 +1283,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Extract_Composition_From_Content_Type_With_Service()
+        public void Can_Extract_Composition_From_Content_Type_To_New_Type()
         {
             // Arrange
             var service = ServiceContext.ContentTypeService;
@@ -1292,7 +1292,8 @@ namespace Umbraco.Tests.Services
             service.Save(contentType);
 
             // Act
-            var compositeContentType = service.ExtractComposition(contentType, "Extracted Content Type", new [] { "title", "bodyText"});
+            var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText" }, 
+                nameOfNewType: "Extracted Content Type");
 
             // Assert
             Assert.That(compositeContentType.HasIdentity, Is.True);
@@ -1300,8 +1301,8 @@ namespace Umbraco.Tests.Services
             compositeContentType = service.GetContentType(compositeContentType.Id);
 
             // - both content types should have the same tabs
-            Assert.AreEqual(1, contentType.PropertyGroups.Count());
-            Assert.AreEqual("Content", contentType.PropertyGroups.First().Name);
+            Assert.AreEqual(1, originalContentType.PropertyGroups.Count());
+            Assert.AreEqual("Content", originalContentType.PropertyGroups.First().Name);
 
             Assert.AreEqual(1, compositeContentType.PropertyGroups.Count);
             Assert.AreEqual("Content", compositeContentType.PropertyGroups.First().Name);
@@ -1322,6 +1323,154 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Extract_Composition_From_Content_Type_To_Existing_Type()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+            var existingContentType = MockedContentTypes.CreateSimpleContentType("existingContentType", "Existing Content Type", randomizeAliases: true);
+            service.Save(existingContentType);
+
+            // Act
+            var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText" }, 
+                extractIntoType: existingContentType);
+
+            // Assert
+            Assert.That(compositeContentType.HasIdentity, Is.True);
+            var originalContentType = service.GetContentType(contentType.Id);
+            compositeContentType = service.GetContentType(compositeContentType.Id);
+
+            // - both content types should have the same tabs
+            Assert.AreEqual(1, contentType.PropertyGroups.Count());
+            Assert.AreEqual("Content", contentType.PropertyGroups.First().Name);
+
+            Assert.AreEqual(1, compositeContentType.PropertyGroups.Count);
+            Assert.AreEqual("Content", compositeContentType.PropertyGroups.First().Name);
+
+            // - selected properties should have moved
+            Assert.AreEqual(1, originalContentType.PropertyTypes.Count());
+            Assert.IsNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNotNull(originalContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+
+            Assert.AreEqual(5, compositeContentType.PropertyTypes.Count());
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+
+            // - composition type relation should be in place
+            Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("existingContentType")), Is.True);
+        }
+
+        [Test]
+        public void Can_Extract_Composition_From_Content_Type_To_Existing_Type_With_Clashing_Alias_Of_Same_Data_Type()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+            var existingContentType = MockedContentTypes.CreateSimpleContentType("existingContentType", "Existing Content Type");
+            service.Save(existingContentType);
+
+            // Act
+            var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText", "author" },
+                extractIntoType: existingContentType);
+
+            // Assert
+            Assert.That(compositeContentType.HasIdentity, Is.True);
+            var originalContentType = service.GetContentType(contentType.Id);
+            compositeContentType = service.GetContentType(compositeContentType.Id);
+
+            // - both content types should have the same tabs
+            Assert.AreEqual(1, contentType.PropertyGroups.Count());
+            Assert.AreEqual("Content", contentType.PropertyGroups.First().Name);
+
+            Assert.AreEqual(1, compositeContentType.PropertyGroups.Count);
+            Assert.AreEqual("Content", compositeContentType.PropertyGroups.First().Name);
+
+            // - selected properties should have been deleted from the original type and still be in place on the composite
+            Assert.AreEqual(0, originalContentType.PropertyTypes.Count());
+
+            Assert.AreEqual(3, compositeContentType.PropertyTypes.Count());
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+
+            // - composition type relation should be in place
+            Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("existingContentType")), Is.True);
+        }
+
+        [Test]
+        public void Can_Extract_Composition_From_Content_Type_To_Existing_Type_With_Clashing_Alias_Of_Different_Data_Type()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+            var existingContentType = MockedContentTypes.CreateSimpleContentType("existingContentType", "Existing Content Type");
+
+            // - swap the bodyText and author aliases, so we have clashing aliases of different data types
+            var bodyTextProperty = existingContentType.PropertyTypes
+                .Single(x => x.Alias == "bodyText");
+            var authorProperty = existingContentType.PropertyTypes
+                .Single(x => x.Alias == "author");
+            bodyTextProperty.Alias = "author";
+            authorProperty.Alias = "bodyText";
+            service.Save(existingContentType);
+
+            // Act
+            var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText", "author" },
+                extractIntoType: existingContentType);
+
+            // Assert
+            Assert.That(compositeContentType.HasIdentity, Is.True);
+            var originalContentType = service.GetContentType(contentType.Id);
+            compositeContentType = service.GetContentType(compositeContentType.Id);
+
+            // - both content types should have the same tabs
+            Assert.AreEqual(1, contentType.PropertyGroups.Count());
+            Assert.AreEqual("Content", contentType.PropertyGroups.First().Name);
+
+            Assert.AreEqual(1, compositeContentType.PropertyGroups.Count);
+            Assert.AreEqual("Content", compositeContentType.PropertyGroups.First().Name);
+
+            // - selected properties of same data type should have been deleted from the original type and still be in place on the composite,
+            //   but those of different data types will exist as well with amended aliases
+            Assert.AreEqual(0, originalContentType.PropertyTypes.Count());
+
+            Assert.AreEqual(5, compositeContentType.PropertyTypes.Count());
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "title"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "bodyText2"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author"));
+            Assert.IsNotNull(compositeContentType.PropertyTypes.SingleOrDefault(x => x.Alias == "author2"));
+
+            // - composition type relation should be in place
+            Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("existingContentType")), Is.True);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Cannot_Extract_Composition_From_Content_Type_To_Existing_Type_With_Clashing_Alias_That_Is_Not_Selected()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
+            service.Save(contentType);
+            var existingContentType = MockedContentTypes.CreateSimpleContentType("existingContentType", "Existing Content Type");
+            service.Save(existingContentType);
+
+            // Act (omit "author")
+            service.ExtractComposition(contentType, new[] { "title", "bodyText" },
+                extractIntoType: existingContentType);
+        }
+
+        [Test]
         public void Is_Used_In_Composition()
         {
             // Arrange
@@ -1329,7 +1478,8 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
             service.Save(contentType);
-            var compositeContentType = service.ExtractComposition(contentType, "Extracted Content Type", new[] { "title", "bodyText" });
+            var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText" }, 
+                nameOfNewType: "Extracted Content Type");
 
             // Act
             var resultForOriginalContentType = service.IsUsedInComposition(contentType.Id);

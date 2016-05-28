@@ -881,70 +881,125 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Extracts a composition from a content type
+        /// Extracts a composition from a content tye
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to extract composition from</param>
-        /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
-        /// <param name="userId">Optional Id of the User performing the action</param>
+        /// <param name="extractIntoType"><see cref="IContentType"/> to extract composition into</param>
+        /// <param name="nameOfNewType">Name of new composition type if creating a new one</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <returns>The created composition type</returns>
-        public IContentType ExtractComposition(IContentType contentType, string name, string[] propertyAliases, int userId = 0)
+        public IContentType ExtractComposition(IContentType contentType, string[] propertyAliases,
+            IContentType extractIntoType = null, string nameOfNewType = null, int userId = 0)
         {
             Mandate.ParameterNotNull(contentType, "contantType");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
             Mandate.ParameterNotNullOrEmpty(propertyAliases, "propertyAliases");
+            if (extractIntoType == null && string.IsNullOrEmpty(nameOfNewType))
+            {
+                throw new InvalidOperationException(
+                    "When extracting a content type either the type to extract into or the name for a new one must be provided.");
+            }
+
+            if (extractIntoType != null && extractIntoType.CompositionAliases().Any())
+            {
+                throw new InvalidOperationException(
+                    "Cannot extract a composition to a type that already contains compositions.");
+            }
+
+            // If we're extracting into an existing type, which has clashing aliases with the current one, and those
+            // aliases have NOT been selected as part of the extraction, then we'd end up in a situation with the composite and
+            // the composed type having properties of the same alias.  That won't work so can't allow that.
+            if (extractIntoType != null)
+            {
+                var clashingAliases = contentType.PropertyTypes
+                    .Select(x => x.Alias)
+                    .Intersect(extractIntoType.PropertyTypes
+                        .Select(x => x.Alias))
+                    .ToArray();
+                if (clashingAliases.Any() &&
+                    clashingAliases.Intersect(propertyAliases).Count() < clashingAliases.Count())
+                {
+                    throw new InvalidOperationException(
+                        "The selected type to extract a composition into contains properties with aliases matching those of the current type. " +
+                        "In that situation those properties must be selected as part of the extract composition operation.");
+                }
+            }
 
             IContentType compositionType;
             var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
+            if (extractIntoType == null)
             {
-                // Create new composition type
-                compositionType = new ContentType(contentType.ParentId)
+                using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                 {
-                    Alias = name.ToSafeAlias(true),
-                    Name = name,
-                    Icon = "icon-document",
-                };
-                repository.AddOrUpdate(compositionType);
-                uow.Commit();
-
-                // Extract provided properties into the composition
-                ExtractPropertiesToComposition(uow, contentType, compositionType, propertyAliases);
+                    // Create new composition type
+                    compositionType = new ContentType(contentType.ParentId)
+                    {
+                        Alias = nameOfNewType.ToSafeAlias(true),
+                        Name = nameOfNewType,
+                        Icon = "icon-document",
+                    };
+                    repository.AddOrUpdate(compositionType);
+                    uow.Commit();
+                }
+            }
+            else
+            {
+                compositionType = extractIntoType;
             }
 
-            Audit(AuditType.Custom, string.Format("Extract content type composition performed by user"), userId, -1);
+            // Extract provided properties into the composition
+            ExtractPropertiesToComposition(uow, contentType, compositionType, propertyAliases);
+
+            Audit(AuditType.Custom, "Extract content type composition performed by user", userId, -1);
             return compositionType;
         }
 
         /// <summary>
-        /// Extracts a composition from a content type
+        /// Extracts a composition from a content tye
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to extract composition from</param>
-        /// <param name="name">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
-        /// <param name="userId">Optional Id of the User performing the action</param>
+        /// <param name="extractIntoType"><see cref="IMediaType"/> to extract composition into</param>
+        /// <param name="nameOfNewType">Name of new composition type if creating a new one</param>
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
         /// <returns>The created composition type</returns>
-        public IMediaType ExtractComposition(IMediaType mediaType, string name, string[] propertyAliases, int userId = 0)
+        public IMediaType ExtractComposition(IMediaType mediaType, string[] propertyAliases,
+            IMediaType extractIntoType = null, string nameOfNewType = null, int userId = 0)
         {
-            IMediaType compositionType;
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
+            Mandate.ParameterNotNull(mediaType, "mediaType");
+            Mandate.ParameterNotNullOrEmpty(propertyAliases, "propertyAliases");
+            if (extractIntoType == null && string.IsNullOrEmpty(nameOfNewType))
             {
-                // Create new composition type
-                compositionType = new MediaType(mediaType.ParentId)
-                {
-                    Alias = name.ToSafeAlias(true),
-                    Name = name,
-                    Icon = "icon-document",
-                };
-                repository.AddOrUpdate(compositionType);
-                uow.Commit();
-
-                // Extract provided properties into the composition
-                ExtractPropertiesToComposition(uow, mediaType, compositionType, propertyAliases);
+                throw new InvalidOperationException(
+                    "When extracting a media type either the type to extract into or the name for a new one must be provided.");
             }
 
-            Audit(AuditType.Custom, string.Format("Extract media type composition performed by user"), userId, -1);
+            IMediaType compositionType;
+            var uow = UowProvider.GetUnitOfWork();
+            if (extractIntoType == null)
+            {
+                using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
+                {
+                    // Create new composition type
+                    compositionType = new MediaType(mediaType.ParentId)
+                    {
+                        Alias = nameOfNewType.ToSafeAlias(true),
+                        Name = nameOfNewType,
+                        Icon = "icon-document",
+                    };
+                    repository.AddOrUpdate(compositionType);
+                    uow.Commit();
+                }
+            }
+            else
+            {
+                compositionType = extractIntoType;
+            }
+
+            // Extract provided properties into the composition
+            ExtractPropertiesToComposition(uow, mediaType, compositionType, propertyAliases);
+
+            Audit(AuditType.Custom, "Extract media type composition performed by user", userId, -1);
             return compositionType;
         }
 

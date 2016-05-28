@@ -18,6 +18,8 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
+    using System;
+
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like
@@ -327,10 +329,11 @@ namespace Umbraco.Web.Editors
         /// Extracts a composition from a content type
         /// </summary>
         /// <param name="id">Id of content type</param>
-        /// <param name="name">Name of new composition type</param>
+        /// <param name="extractIntoTypeId">Id of content type to extract into</param>
+        /// <param name="nameOfNewType">Name of new composition type</param>
         /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
         [HttpPost]
-        public DocumentTypeDisplay ExtractComposition(int id, string name, [FromUri]string[] propertyAliases)
+        public DocumentTypeDisplay ExtractComposition(int id, int? extractIntoTypeId, string nameOfNewType, [FromUri]string[] propertyAliases)
         {
             var foundType = Services.ContentTypeService.GetContentType(id);
             if (foundType == null)
@@ -338,15 +341,31 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            IContentType extractIntoType = null;
+            if (extractIntoTypeId.HasValue && extractIntoTypeId.Value > 0)
+            {
+                extractIntoType = Services.ContentTypeService.GetContentType(extractIntoTypeId.Value);
+                if (extractIntoType == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+            }
+
             try
             {
-                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, name, propertyAliases, Security.CurrentUser.Id);
+                var compositionType = Services.ContentTypeService.ExtractComposition(foundType, propertyAliases,
+                    extractIntoType, nameOfNewType, Security.CurrentUser.Id);
                 var dto = Mapper.Map<IContentType, DocumentTypeDisplay>((IContentType)compositionType);
                 return dto;
             }
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("name", ex.Message);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("propertyAliases", ex.Message);
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
         }
