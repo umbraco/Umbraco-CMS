@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -398,8 +392,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 trans.Complete();
 
-                // Clear the content type cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two content types provided)
+                // Clear the content type cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two content types provided and update the related content)
                 RuntimeCache.ClearAllCache();
+                var contentRuntimeCache = RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
+                contentRuntimeCache.ClearAllCache();
             }
         }
 
