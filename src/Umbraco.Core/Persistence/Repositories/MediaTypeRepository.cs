@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -192,6 +186,22 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //use the underlying GetAll which will force cache all content types
             return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        }
+
+        /// <summary>
+        /// Extracts a set of properties from a media type into a new composition type
+        /// </summary>
+        /// <param name="mediaType"><see cref="IMediaType"/> to extract composition from</param>
+        /// <param name="compositionMediaType"><see cref="IMediaType"/> to extract composition to</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        public void ExtractComposition(IMediaType mediaType, IMediaType compositionMediaType, string[] propertyAliases)
+        {
+            ExtractContentTypeComposition(mediaType, compositionMediaType, propertyAliases);
+
+            // Clear the cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two media types provided and update the related media)
+            RuntimeCache.ClearAllCache();
+            var mediaRuntimeCache = RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<IMedia>();
+            mediaRuntimeCache.ClearAllCache();
         }
     }
 }

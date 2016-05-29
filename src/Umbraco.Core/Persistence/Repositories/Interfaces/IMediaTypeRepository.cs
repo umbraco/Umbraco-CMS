@@ -23,5 +23,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
         /// <remarks>Unique accross all content, media and member types.</remarks>
         string GetUniqueAlias(string alias);
+
+        /// <summary>
+        /// Extracts a set of properties from a media type into a new composition type
+        /// </summary>
+        /// <param name="mediaType"><see cref="IMediaType"/> to extract composition from</param>
+        /// <param name="compositionMediaType"><see cref="IMediaType"/> to extract composition to</param>
+        /// <param name="propertyAliases">Aliases of properties to move to composition type</param>
+        void ExtractComposition(IMediaType mediaType, IMediaType compositionMediaType, string[] propertyAliases);
+
+        /// <summary>
+        /// Checks to see if a given media type is used as a composition on other content types
+        /// </summary>
+        /// <param name="mediaTypeId">Id of content type</param>
+        /// <returns>True if used as a composition on another type, otherwise false</returns>
+        bool IsUsedAsComposition(int mediaTypeId);
     }
 }
