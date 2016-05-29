@@ -1369,11 +1369,16 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var service = ServiceContext.ContentTypeService;
+            var contentService = ServiceContext.ContentService;
 
             var contentType = MockedContentTypes.CreateSimpleContentType("testContentType", "Test Content Type");
             service.Save(contentType);
             var existingContentType = MockedContentTypes.CreateSimpleContentType("existingContentType", "Existing Content Type");
             service.Save(existingContentType);
+
+            var content = contentService.CreateContent("Test Content", -1, "testContentType");
+            content.SetValue("title", "Page title");
+            contentService.SaveAndPublishWithStatus(content);
 
             // Act
             var compositeContentType = service.ExtractComposition(contentType, new[] { "title", "bodyText", "author" },
@@ -1401,6 +1406,14 @@ namespace Umbraco.Tests.Services
 
             // - composition type relation should be in place
             Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("existingContentType")), Is.True);
+
+            // - content should still be in place though moved to different property Id
+            content = contentService.GetById(content.Id);
+            Assert.AreEqual("Page title", content.GetValue("title"));
+            Assert.AreEqual(compositeContentType.PropertyTypes
+                    .Single(x => x.Alias == "title").Id, 
+                content.Properties
+                    .Single(x => x.Alias == "title").PropertyType.Id);
         }
 
         [Test]
@@ -1451,6 +1464,8 @@ namespace Umbraco.Tests.Services
 
             // - composition type relation should be in place
             Assert.That(originalContentType.CompositionAliases().Any(x => x.Equals("existingContentType")), Is.True);
+
+            // - content should still be in place
         }
 
         [Test]

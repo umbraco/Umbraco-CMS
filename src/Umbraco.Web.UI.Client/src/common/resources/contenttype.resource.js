@@ -49,16 +49,17 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *
          * ##usage
          * <pre>
-         * contentTypeResource.extractComposition(1234, 'New Composition', ['propertyA', 'propertyB'])
+         * contentTypeResource.extractComposition(1234, ['propertyA', 'propertyB'], '', 'New Composition')
          *    .then(function(compositionType) {
          *    });
          * </pre>
          * @param {Int} id - id of the content item
-         * @param {String} name - name of the new composition type
          * @param {String array} propertyAliases - aliases of the fields to move to the composition
+         * @param {Int} extractIntoTypeId - id of type to extract into
+         * @param {String} nameOfNewType - name of the new composition type
          * @returns {Promise} resourcePromise object.
          */
-        extractComposition: function (id, name, propertyAliases) {
+        extractComposition: function (id, propertyAliases, extractIntoTypeId, nameOfNewType) {
             return umbRequestHelper.resourcePromise(
                $http.post(
                    umbRequestHelper.getApiUrl(
@@ -66,8 +67,9 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "ExtractComposition",
                        {
                            id: id,
-                           name: name,
-                           propertyAliases: propertyAliases
+                           propertyAliases: propertyAliases,
+                           extractIntoTypeId: extractIntoTypeId,
+                           nameOfNewType: nameOfNewType
                        })),
                'Failed to extract composition from content type');
         },

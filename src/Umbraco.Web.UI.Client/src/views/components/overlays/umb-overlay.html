@@ -26,7 +26,7 @@
             <div ng-if="model.confirmSubmit.show">
 
                 <h5 class="red" ng-if="model.confirmSubmit.title"><i class="icon-alert"></i> {{ model.confirmSubmit.title }}</h5>
-                <p ng-if="model.confirmSubmit.description">{{ model.confirmSubmit.description }}</p>
+                <p ng-if="model.confirmSubmit.description" ng-bind-html-unsafe="model.confirmSubmit.description"></p>
 
                 <label class="checkbox no-indent">
                     <input type="checkbox" ng-model="directive.enableConfirmButton" />

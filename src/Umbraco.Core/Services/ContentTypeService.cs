@@ -926,29 +926,34 @@ namespace Umbraco.Core.Services
             }
 
             IContentType compositionType;
-            var uow = UowProvider.GetUnitOfWork();
-            if (extractIntoType == null)
+            using (new WriteLock(Locker))
             {
-                using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
+                var uow = UowProvider.GetUnitOfWork();
+                if (extractIntoType == null)
                 {
-                    // Create new composition type
-                    compositionType = new ContentType(contentType.ParentId)
+                    using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
                     {
-                        Alias = nameOfNewType.ToSafeAlias(true),
-                        Name = nameOfNewType,
-                        Icon = "icon-document",
-                    };
-                    repository.AddOrUpdate(compositionType);
-                    uow.Commit();
+                        // Create new composition type
+                        compositionType = new ContentType(contentType.ParentId)
+                        {
+                            Alias = nameOfNewType.ToSafeAlias(true),
+                            Name = nameOfNewType,
+                            Icon = "icon-document",
+                        };
+                        repository.AddOrUpdate(compositionType);
+                        uow.Commit();
+                    }
                 }
-            }
-            else
-            {
-                compositionType = extractIntoType;
-            }
+                else
+                {
+                    compositionType = extractIntoType;
+                }
 
-            // Extract provided properties into the composition
-            ExtractPropertiesToComposition(uow, contentType, compositionType, propertyAliases);
+                // Extract provided properties into the composition
+                ExtractPropertiesToComposition(uow, contentType, compositionType, propertyAliases);
+
+                UpdateContentXmlStructure(contentType);
+            }
 
             Audit(AuditType.Custom, "Extract content type composition performed by user", userId, -1);
             return compositionType;
@@ -975,29 +980,34 @@ namespace Umbraco.Core.Services
             }
 
             IMediaType compositionType;
-            var uow = UowProvider.GetUnitOfWork();
-            if (extractIntoType == null)
+            using (new WriteLock(Locker))
             {
-                using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
+                var uow = UowProvider.GetUnitOfWork();
+                if (extractIntoType == null)
                 {
-                    // Create new composition type
-                    compositionType = new MediaType(mediaType.ParentId)
+                    using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
                     {
-                        Alias = nameOfNewType.ToSafeAlias(true),
-                        Name = nameOfNewType,
-                        Icon = "icon-document",
-                    };
-                    repository.AddOrUpdate(compositionType);
-                    uow.Commit();
+                        // Create new composition type
+                        compositionType = new MediaType(mediaType.ParentId)
+                        {
+                            Alias = nameOfNewType.ToSafeAlias(true),
+                            Name = nameOfNewType,
+                            Icon = "icon-document",
+                        };
+                        repository.AddOrUpdate(compositionType);
+                        uow.Commit();
+                    }
                 }
-            }
-            else
-            {
-                compositionType = extractIntoType;
-            }
+                else
+                {
+                    compositionType = extractIntoType;
+                }
 
-            // Extract provided properties into the composition
-            ExtractPropertiesToComposition(uow, mediaType, compositionType, propertyAliases);
+                // Extract provided properties into the composition
+                ExtractPropertiesToComposition(uow, mediaType, compositionType, propertyAliases);
+
+                UpdateContentXmlStructure(mediaType);
+            }
 
             Audit(AuditType.Custom, "Extract media type composition performed by user", userId, -1);
             return compositionType;

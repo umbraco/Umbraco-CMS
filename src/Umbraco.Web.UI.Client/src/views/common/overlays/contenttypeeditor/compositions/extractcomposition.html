@@ -4,12 +4,18 @@
         <small><localize key="contentTypeEditor_extractCompositionsDescription"></localize></small>
     </div>
 
-    <umb-control-group alias="name" label="Composition name">
+    <umb-control-group alias="type" label="Extract into:">
+        <select ng-model="model.extractIntoType" ng-options="ct.contentType.name for ct in model.contentTypes">
+            <option value=""><localize key="contentTypeEditor_pleaseSelect"></localize></option>
+        </select>
+    </umb-control-group>
+
+    <umb-control-group alias="name" label="Or create new type with name:">
         <input type="text" ng-model="model.newCompositionName"/>
         <div class="text-error" ng-show="model.showValidationErrorForMissingName"><localize key="contentTypeEditor_extractCompositionNameRequired"></localize></div>
     </umb-control-group>
 
-    <umb-control-group alias="properties" label="Properties to extract to composition">
+    <umb-control-group alias="properties" label="Properties to extract to composition:">
         <div ng-repeat="tab in model.contentType.groups" ng-show="!$last">
             <h5>{{tab.name}}</h5>
 

@@ -389,13 +389,18 @@
               title: "Extract Composition",
               contentType: scope.model,
               view: "views/common/overlays/contenttypeeditor/compositions/extractcomposition.html",
-              submit: function (model) {
+              confirmSubmit: {
+                  title: "Please confirm",
+                  checkboxLabel: "OK",
+                  enable: true
+              },
+              submit: function (model, oldModel, confirmed) {
                   var isValid = true;
                   model.showValidationErrorForMissingName = false;
                   model.showValidationErrorForMissingProperties = false;
                   model.showValidationErrorForModelState = false;
 
-                  if (!model.newCompositionName) {
+                  if (!model.extractIntoType && !model.newCompositionName) {
                       model.showValidationErrorForMissingName = true;
                       isValid = false;
                   }
@@ -406,28 +411,98 @@
                   }
 
                   if (isValid) {
-                      var resourceMethod = scope.contentType === "documentType" ? contentTypeResource.extractComposition : mediaTypeResource.extractComposition;
-                      resourceMethod(scope.model.id, model.newCompositionName, model.selectedProperties).then(function (compositionType) {
+                      if (confirmed) {
+                          var resourceMethod = scope.contentType === "documentType" ? contentTypeResource.extractComposition : mediaTypeResource.extractComposition;
+                          resourceMethod(scope.model.id, model.selectedProperties, model.extractIntoType ? model.extractIntoType.contentType.id : null, model.newCompositionName).then(function(compositionType) {
 
-                          // Load the new composition type into the tree
-                          navigationService.syncTree({ tree: scope.contentType + "s", path: compositionType.path, activate: false });
+                              // Load the new composition type into the tree
+                              navigationService.syncTree({ tree: scope.contentType + "s", path: compositionType.path, activate: false });
 
-                          // Remove overlay
-                          scope.extractCompositionDialogModel.show = false;
-                          scope.extractCompositionDialogModel = null;
+                              // Remove overlay
+                              scope.extractCompositionDialogModel.show = false;
+                              scope.extractCompositionDialogModel = null;
 
-                          // Reload the view to visualise the composition for the current type
-                          $route.reload();
+                              // Reload the view to visualise the composition for the current type
+                              $route.reload();
 
-                      }, function (err) {
-                          model.modelStateError = err.data.ModelState.name[0];
-                          model.showValidationErrorForModelState = true;
-                      });
+                          }, function(err) {
+                              model.modelStateError = err.data.ModelState.name[0];
+                              model.showValidationErrorForModelState = true;
+                          });
+                      } else {
+                          scope.extractCompositionDialogModel.confirmSubmit.description = "The selected properties will be extracted to " +
+                              (model.extractIntoType ? "the existing content type <strong>" + model.extractIntoType.contentType.name + "</strong>" : "a new content type named <strong>" + model.newCompositionName + "</strong>") + ".";
+
+                          if (model.extractIntoType) {
+
+                              // Display confirmation message for aliases clashing with the selected composition type:
+                              // - for those with the same data type, we'll combine them so there's only one on the composition type
+                              // - for those with differing data types, we'll move them with a new alias so having both on the composition type
+                              var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
+                              resourceLookup(model.extractIntoType.contentType.id).then(function (contentType) {
+
+                                  // Helper to retrieve a property from a content type
+                                  var getMatchingPropertyOnContentType = function (ct, alias) {
+                                      for (var i = 0; i < ct.groups.length; i++) {
+                                          for (var j = 0; j < ct.groups[i].properties.length; j++) {
+                                              if (ct.groups[i].properties[j].alias === alias) {
+                                                  return ct.groups[i].properties[j];
+                                              }
+                                          }
+                                      }
+
+                                      return null;
+                                  };
+
+                                  // Find all the clashing aliases and arrange into two lists, for those with the same and different data types
+                                  var clashingPropertyAliasesOfSameDataType = [];
+                                  var clashingPropertyAliasesOfDifferentDataType = [];
+                                  for (var i = 0; i < model.selectedProperties.length; i++) {
+                                      var matchingPropertyOnExtractIntoType = getMatchingPropertyOnContentType(contentType, model.selectedProperties[i]);
+                                      if (matchingPropertyOnExtractIntoType) {
+                                          var propertyOnContentType = getMatchingPropertyOnContentType(scope.model, model.selectedProperties[i]);
+                                          if (propertyOnContentType.dataTypeId === matchingPropertyOnExtractIntoType.dataTypeId) {
+                                              clashingPropertyAliasesOfSameDataType.push(model.selectedProperties[i]);
+                                          } else {
+                                              clashingPropertyAliasesOfDifferentDataType.push(model.selectedProperties[i]);
+                                          }
+                                      }
+                                  }
+
+                                  // Add to the confirmation
+                                  var addToConfirmation = function(clashingPropertyAliases, message) {
+                                      if (clashingPropertyAliases.length > 0) {
+                                          scope.extractCompositionDialogModel.confirmSubmit.description += message + "<ul>";
+                                          for (var i = 0; i < clashingPropertyAliases.length; i++) {
+                                              scope.extractCompositionDialogModel.confirmSubmit.description += "<li>" + clashingPropertyAliases[i] + "</li>"
+                                          }
+
+                                          scope.extractCompositionDialogModel.confirmSubmit.description += "</ul>";
+                                      }
+                                  };
+
+                                  if (clashingPropertyAliasesOfSameDataType.length > 0 || clashingPropertyAliasesOfDifferentDataType.length > 0) {
+                                      scope.extractCompositionDialogModel.confirmSubmit.description += "<br/><br/>";
+                                  }
+
+                                  addToConfirmation(clashingPropertyAliasesOfSameDataType, "The following properties have matching aliases and data types on the type selected to extract into. They will be moved to the composition and combined.");
+                                  addToConfirmation(clashingPropertyAliasesOfDifferentDataType, "The following properties have matching aliases on the type selected to extract into but different datatypes, and so can't be combined. They will be moved to the composition as a second property with a modified alias.");
+
+                                  scope.extractCompositionDialogModel.confirmSubmit.show = true;
+                              });
+                          } else {
+                              scope.extractCompositionDialogModel.confirmSubmit.show = true;
+                          }
+                      }
                   }
               }
           };
 
-          scope.extractCompositionDialogModel.show = true;
+          var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+          availableContentTypeResource(scope.model.id).then(function (result) {
+              scope.extractCompositionDialogModel.contentTypes = result;
+              scope.extractCompositionDialogModel.show = true;
+          });
       };
 
 

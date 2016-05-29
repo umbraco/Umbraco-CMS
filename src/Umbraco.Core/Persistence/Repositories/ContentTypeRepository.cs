@@ -397,6 +397,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 CreateCompositionRelation(compositionContentType.Id, contentType.Id);
 
                 trans.Complete();
+
+                // Clear the content type cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two content types provided)
+                RuntimeCache.ClearAllCache();
             }
         }
 
@@ -464,13 +467,22 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Creates a composition relation between two document types
+        /// Creates a composition relation between two document types if it doesn't already exist
         /// </summary>
         /// <param name="parentId">Parent type</param>
         /// <param name="childId">Child type</param>
         private void CreateCompositionRelation(int parentId, int childId)
         {
-            Database.Insert(new ContentType2ContentTypeDto { ParentId = parentId, ChildId = childId });
+            var dto = Database.SingleOrDefault<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @ParentId AND childContentTypeId = @ChildId", 
+                new
+                {
+                    ParentId = parentId,
+                    ChildId = childId
+                });
+            if (dto == null)
+            {
+                Database.Insert(new ContentType2ContentTypeDto {ParentId = parentId, ChildId = childId});
+            }
         }
 
         /// <summary>

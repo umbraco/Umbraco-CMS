@@ -1069,9 +1069,12 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
       <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
 
-      <key alias="extractCompositionsDescription">Select the properties you wish to extract to a new composition and provide a name for it.  Only properties that have been saved and are defined directly on the content type are available for selection.</key>
-      <key alias="newCompositionName">Composition name</key>
-      <key alias="extractCompositionNameRequired">Please select a name for the composition</key>
+      <key alias="extractCompositionsDescription">Select the properties you wish to extract to a composition and either select the type to extract into or provide a name for a new one.  Only types that aren't already made up of composites, and properties that have been saved and are defined directly on the content type, are available for selection.</key>
+      <key alias="type">Extract into:</key>
+      <key alias="name">Or create new type with name:</key>
+      <key alias="properties">Properties to extract to composition:</key>
+      <key alias="pleaseSelect">Please select...</key>
+      <key alias="extractCompositionNameRequired">Please select either a type to extract the composition into or a name for a new composition type</key>
       <key alias="extractCompositionPropertiesRequired">At least one property for the new composition must be provided</key>
       <key alias="extractCompositionFailed">Extract composition operation failed</key>
 
