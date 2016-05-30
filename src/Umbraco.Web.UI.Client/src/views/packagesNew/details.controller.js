@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackageDetailsController($scope) {
+    function PackageDetailsController($scope, $routeParams) {
 
         var vm = this;
 
