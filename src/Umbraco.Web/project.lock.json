@@ -36,16 +36,17 @@
           "lib/dotless.Core.dll": {}
         }
       },
-      "Examine/0.1.68": {
+      "Examine/2.0.0-beta2": {
         "type": "package",
         "dependencies": {
-          "Lucene.Net": "2.9.4.1"
+          "Lucene.Net": "3.0.3",
+          "Lucene.Net.Contrib": "3.0.3"
         },
         "compile": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         },
         "runtime": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         }
       },
       "HtmlAgilityPack/1.4.9": {
@@ -124,16 +125,46 @@
           "lib/net45-full/log4net.dll": {}
         }
       },
-      "Lucene.Net/2.9.4.1": {
+      "Lucene.Net/3.0.3": {
         "type": "package",
         "dependencies": {
           "SharpZipLib": "0.86.0"
         },
         "compile": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
         },
         "runtime": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
+        }
+      },
+      "Lucene.Net.Contrib/3.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Lucene.Net": "3.0.3"
+        },
+        "compile": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
         }
       },
       "Markdown/1.14.5": {
@@ -349,17 +380,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -451,16 +480,17 @@
           "lib/dotless.Core.dll": {}
         }
       },
-      "Examine/0.1.68": {
+      "Examine/2.0.0-beta2": {
         "type": "package",
         "dependencies": {
-          "Lucene.Net": "2.9.4.1"
+          "Lucene.Net": "3.0.3",
+          "Lucene.Net.Contrib": "3.0.3"
         },
         "compile": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         },
         "runtime": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         }
       },
       "HtmlAgilityPack/1.4.9": {
@@ -539,16 +569,46 @@
           "lib/net45-full/log4net.dll": {}
         }
       },
-      "Lucene.Net/2.9.4.1": {
+      "Lucene.Net/3.0.3": {
         "type": "package",
         "dependencies": {
           "SharpZipLib": "0.86.0"
         },
         "compile": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
         },
         "runtime": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
+        }
+      },
+      "Lucene.Net.Contrib/3.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Lucene.Net": "3.0.3"
+        },
+        "compile": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
         }
       },
       "Markdown/1.14.5": {
@@ -764,17 +824,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -866,16 +924,17 @@
           "lib/dotless.Core.dll": {}
         }
       },
-      "Examine/0.1.68": {
+      "Examine/2.0.0-beta2": {
         "type": "package",
         "dependencies": {
-          "Lucene.Net": "2.9.4.1"
+          "Lucene.Net": "3.0.3",
+          "Lucene.Net.Contrib": "3.0.3"
         },
         "compile": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         },
         "runtime": {
-          "lib/Examine.dll": {}
+          "lib/net45/Examine.dll": {}
         }
       },
       "HtmlAgilityPack/1.4.9": {
@@ -954,16 +1013,46 @@
           "lib/net45-full/log4net.dll": {}
         }
       },
-      "Lucene.Net/2.9.4.1": {
+      "Lucene.Net/3.0.3": {
         "type": "package",
         "dependencies": {
           "SharpZipLib": "0.86.0"
         },
         "compile": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
         },
         "runtime": {
-          "lib/net40/Lucene.Net.dll": {}
+          "lib/NET40/Lucene.Net.dll": {}
+        }
+      },
+      "Lucene.Net.Contrib/3.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Lucene.Net": "3.0.3"
+        },
+        "compile": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Lucene.Net.Contrib.Analyzers.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Core.dll": {},
+          "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Highlighter.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Memory.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Queries.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Regex.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll": {},
+          "lib/net40/Lucene.Net.Contrib.Snowball.dll": {},
+          "lib/net40/Lucene.Net.Contrib.SpellChecker.dll": {}
         }
       },
       "Markdown/1.14.5": {
@@ -1179,17 +1268,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -1290,14 +1377,14 @@
         "tool/dotless.compiler.exe"
       ]
     },
-    "Examine/0.1.68": {
-      "sha512": "gdoyYnhK3+ogAFdfq49ttVXA3qSGA0iRbXIbuXcdlx1LZ70hM8bj6VOwMUxGeb4dofVnMqvuJISfVuJOLuqrMQ==",
+    "Examine/2.0.0-beta2": {
+      "sha512": "ozczUB12827LhOINGdvcNtgyQwuOTdVNN+d/gZOf2Fhtcjue4mRxeUdEQDTIt8fymvyONwDihw0JcNTo/kj5sw==",
       "type": "package",
       "files": [
-        "Examine.0.1.68.nupkg.sha512",
+        "Examine.2.0.0-beta2.nupkg.sha512",
         "Examine.nuspec",
-        "lib/Examine.dll",
-        "lib/Examine.pdb"
+        "lib/net45/Examine.dll",
+        "lib/net45/Examine.pdb"
       ]
     },
     "HtmlAgilityPack/1.4.9": {
@@ -1446,14 +1533,86 @@
         "log4net.nuspec"
       ]
     },
-    "Lucene.Net/2.9.4.1": {
-      "sha512": "GwICd+T4QgKpvnqMR832c8dJyz3iC8QurxnUYko7yDcAoB6upPdXuoLdohnvtAm9hPrbOkYSMAL5HDzDfE1k4g==",
+    "Lucene.Net/3.0.3": {
+      "sha512": "A/70q4eDcuuafQeDB9eaiDP9FQG7X29T4VIYRphS7Wk8kAM9gNcfVqYyd0H8BJ1BTpA5C1ORm9RzFn4BiNavrw==",
       "type": "package",
       "files": [
-        "Lucene.Net.2.9.4.1.nupkg.sha512",
+        "Lucene.Net.3.0.3.nupkg.sha512",
         "Lucene.Net.nuspec",
-        "lib/net40/Lucene.Net.XML",
-        "lib/net40/Lucene.Net.dll"
+        "lib/NET35/Lucene.Net.XML",
+        "lib/NET35/Lucene.Net.dll",
+        "lib/NET35/Lucene.Net.pdb",
+        "lib/NET40/Lucene.Net.XML",
+        "lib/NET40/Lucene.Net.dll",
+        "lib/NET40/Lucene.Net.pdb"
+      ]
+    },
+    "Lucene.Net.Contrib/3.0.3": {
+      "sha512": "4aFMsm5657tIIAXWOh3wYxSfPwWFDjrUomXnE3lxKPOuJDjmvLg3CEuTaPYuLvBMKwRaj/C4EwyPM5/pmIwytw==",
+      "type": "package",
+      "files": [
+        "Lucene.Net.Contrib.3.0.3.nupkg.sha512",
+        "Lucene.Net.Contrib.nuspec",
+        "lib/net35/Lucene.Net.Contrib.Analyzers.XML",
+        "lib/net35/Lucene.Net.Contrib.Analyzers.dll",
+        "lib/net35/Lucene.Net.Contrib.Analyzers.pdb",
+        "lib/net35/Lucene.Net.Contrib.Core.XML",
+        "lib/net35/Lucene.Net.Contrib.Core.dll",
+        "lib/net35/Lucene.Net.Contrib.Core.pdb",
+        "lib/net35/Lucene.Net.Contrib.FastVectorHighlighter.dll",
+        "lib/net35/Lucene.Net.Contrib.FastVectorHighlighter.pdb",
+        "lib/net35/Lucene.Net.Contrib.FastVectorHighlighter.xml",
+        "lib/net35/Lucene.Net.Contrib.Highlighter.XML",
+        "lib/net35/Lucene.Net.Contrib.Highlighter.dll",
+        "lib/net35/Lucene.Net.Contrib.Highlighter.pdb",
+        "lib/net35/Lucene.Net.Contrib.Memory.XML",
+        "lib/net35/Lucene.Net.Contrib.Memory.dll",
+        "lib/net35/Lucene.Net.Contrib.Memory.pdb",
+        "lib/net35/Lucene.Net.Contrib.Queries.XML",
+        "lib/net35/Lucene.Net.Contrib.Queries.dll",
+        "lib/net35/Lucene.Net.Contrib.Queries.pdb",
+        "lib/net35/Lucene.Net.Contrib.Regex.dll",
+        "lib/net35/Lucene.Net.Contrib.Regex.pdb",
+        "lib/net35/Lucene.Net.Contrib.Regex.xml",
+        "lib/net35/Lucene.Net.Contrib.SimpleFacetedSearch.dll",
+        "lib/net35/Lucene.Net.Contrib.SimpleFacetedSearch.pdb",
+        "lib/net35/Lucene.Net.Contrib.SimpleFacetedSearch.xml",
+        "lib/net35/Lucene.Net.Contrib.Snowball.XML",
+        "lib/net35/Lucene.Net.Contrib.Snowball.dll",
+        "lib/net35/Lucene.Net.Contrib.Snowball.pdb",
+        "lib/net35/Lucene.Net.Contrib.SpellChecker.XML",
+        "lib/net35/Lucene.Net.Contrib.SpellChecker.dll",
+        "lib/net35/Lucene.Net.Contrib.SpellChecker.pdb",
+        "lib/net40/Lucene.Net.Contrib.Analyzers.XML",
+        "lib/net40/Lucene.Net.Contrib.Analyzers.dll",
+        "lib/net40/Lucene.Net.Contrib.Analyzers.pdb",
+        "lib/net40/Lucene.Net.Contrib.Core.XML",
+        "lib/net40/Lucene.Net.Contrib.Core.dll",
+        "lib/net40/Lucene.Net.Contrib.Core.pdb",
+        "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.dll",
+        "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.pdb",
+        "lib/net40/Lucene.Net.Contrib.FastVectorHighlighter.xml",
+        "lib/net40/Lucene.Net.Contrib.Highlighter.XML",
+        "lib/net40/Lucene.Net.Contrib.Highlighter.dll",
+        "lib/net40/Lucene.Net.Contrib.Highlighter.pdb",
+        "lib/net40/Lucene.Net.Contrib.Memory.XML",
+        "lib/net40/Lucene.Net.Contrib.Memory.dll",
+        "lib/net40/Lucene.Net.Contrib.Memory.pdb",
+        "lib/net40/Lucene.Net.Contrib.Queries.XML",
+        "lib/net40/Lucene.Net.Contrib.Queries.dll",
+        "lib/net40/Lucene.Net.Contrib.Queries.pdb",
+        "lib/net40/Lucene.Net.Contrib.Regex.dll",
+        "lib/net40/Lucene.Net.Contrib.Regex.pdb",
+        "lib/net40/Lucene.Net.Contrib.Regex.xml",
+        "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.dll",
+        "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.pdb",
+        "lib/net40/Lucene.Net.Contrib.SimpleFacetedSearch.xml",
+        "lib/net40/Lucene.Net.Contrib.Snowball.XML",
+        "lib/net40/Lucene.Net.Contrib.Snowball.dll",
+        "lib/net40/Lucene.Net.Contrib.Snowball.pdb",
+        "lib/net40/Lucene.Net.Contrib.SpellChecker.XML",
+        "lib/net40/Lucene.Net.Contrib.SpellChecker.dll",
+        "lib/net40/Lucene.Net.Contrib.SpellChecker.pdb"
       ]
     },
     "Markdown/1.14.5": {
@@ -1657,11 +1816,11 @@
         "tools/install.ps1"
       ]
     },
-    "NPoco/3.1.0-u005": {
-      "sha512": "pDnfsS1I9ufz2etOSawqJDBreuqIOeiTz1wf1mEHDlFpuRS6IlBtjWOSfRAEXlJGxyQVNMSicUjUDHzE8Vxtcw==",
+    "NPoco/3.3.0-beta3": {
+      "sha512": "opQd/qdHy7AKFxO+4GeEjvIBEoUZGlM5nJqSuCmCVHmO/oc5/tYHR61uoWy9tiWCnzjU+5W7Ni9oK3CtV2BxOg==",
       "type": "package",
       "files": [
-        "NPoco.3.1.0-u005.nupkg.sha512",
+        "NPoco.3.3.0-beta3.nupkg.sha512",
         "NPoco.nuspec",
         "lib/dnx451/NPoco.dll",
         "lib/dnx451/NPoco.xml",
@@ -1733,14 +1892,14 @@
     "": [
       "AutoMapper >= 4.2.*",
       "ClientDependency >= 1.8.*",
-      "Examine >= 0.1.68",
+      "Examine >= 2.0.0-beta2",
       "HtmlAgilityPack >= 1.4.*",
       "LightInject >= 4.0.*",
       "LightInject.Annotation >= 1.0.*",
       "LightInject.Mvc >= 1.0.*",
       "LightInject.Web >= 1.0.*",
       "LightInject.WebApi >= 1.0.*",
-      "Lucene.Net >= 2.9.4.1",
+      "Lucene.Net >= 3.0.3",
       "Markdown >= 1.*",
       "Microsoft.AspNet.Identity.Core >= 2.2.1",
       "Microsoft.AspNet.Identity.Owin >= 2.2.1",
@@ -1758,7 +1917,7 @@
       "Microsoft.Owin.Security.OAuth >= 3.0.*",
       "Microsoft.Web.Infrastructure >= 1.0.0",
       "MiniProfiler >= 3.2.*",
-      "NPoco >= 3.1.0-u005",
+      "NPoco >= 3.3.0-beta3",
       "Newtonsoft.Json >= 8.0.*",
       "Owin >= 1.0.*",
       "SharpZipLib >= 0.86.0",

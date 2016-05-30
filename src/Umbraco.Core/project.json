@@ -11,7 +11,7 @@
     "Microsoft.Owin.Security.Cookies": "3.0.*",
     "MiniProfiler": "3.2.*",
     "Newtonsoft.Json": "8.0.*",
-    "NPoco": "3.1.0-u005",
+    "NPoco": "3.3.0-beta3",
     "semver": "1.*",
     "SqlServerCE": "4.*",
     "SharpZipLib": "0.86.0",

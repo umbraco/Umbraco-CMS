@@ -162,17 +162,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -383,17 +381,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -604,17 +600,15 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "NPoco/3.1.0-u005": {
+      "NPoco/3.3.0-beta3": {
         "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "7.0.1"
-        },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "System",
           "System.Core",
           "System.Data",
           "System.Runtime.Caching",
+          "System.Runtime.Serialization",
           "System.XML",
           "System.configuration",
           "mscorlib"
@@ -893,11 +887,11 @@
         "tools/install.ps1"
       ]
     },
-    "NPoco/3.1.0-u005": {
-      "sha512": "pDnfsS1I9ufz2etOSawqJDBreuqIOeiTz1wf1mEHDlFpuRS6IlBtjWOSfRAEXlJGxyQVNMSicUjUDHzE8Vxtcw==",
+    "NPoco/3.3.0-beta3": {
+      "sha512": "opQd/qdHy7AKFxO+4GeEjvIBEoUZGlM5nJqSuCmCVHmO/oc5/tYHR61uoWy9tiWCnzjU+5W7Ni9oK3CtV2BxOg==",
       "type": "package",
       "files": [
-        "NPoco.3.1.0-u005.nupkg.sha512",
+        "NPoco.3.3.0-beta3.nupkg.sha512",
         "NPoco.nuspec",
         "lib/dnx451/NPoco.dll",
         "lib/dnx451/NPoco.xml",
@@ -986,7 +980,7 @@
       "Microsoft.Owin.Security.OAuth >= 3.0.*",
       "MiniProfiler >= 3.2.*",
       "MySql.Data >= 6.9.*",
-      "NPoco >= 3.1.0-u005",
+      "NPoco >= 3.3.0-beta3",
       "Newtonsoft.Json >= 8.0.*",
       "SharpZipLib >= 0.86.0",
       "SqlServerCE >= 4.*",
