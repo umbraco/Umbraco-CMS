@@ -46,6 +46,6 @@ notifications:
   auth_token:
     secure: v2csJi2V5ghR0rPdODK8GJdOGNCA+XaK84iQ9MdPOClqB+VU+40ybdKp6gPirGSH
   channel: '#build-umbraco-core'
-  on_build_success: true
+  on_build_success: false
   on_build_failure: true
   on_build_status_changed: false
