@@ -169,8 +169,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                // locking the media tree secures media types too
-                uow.WriteLock(Constants.Locks.MediaTree);
+                // locking the member tree secures member types too
+                uow.WriteLock(Constants.Locks.MemberTree);
 
                 var memberType = GetMemberType(memberTypeAlias); // + locks
                 if (memberType == null)
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.MediaTree);
+                uow.WriteLock(Constants.Locks.MemberTree);
 
                 // ensure it all still make sense
                 var memberType = GetMemberType(memberTypeAlias); // + locks
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.MediaTree);
+                uow.WriteLock(Constants.Locks.MemberTree);
 
                 // ensure it all still make sense
                 var vrfy = GetMemberType(memberType.Alias); // + locks
