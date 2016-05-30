@@ -328,6 +328,8 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.AddOrUpdate(content);
+
+                uow.Flush(); // need everything so we can serialize
                 repo.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);

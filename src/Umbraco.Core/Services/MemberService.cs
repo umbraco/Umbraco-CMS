@@ -302,6 +302,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(member);
 
                 // fixme kill
+                uow.Flush(); // need everything so we can serialize
                 repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                 // generate preview for blame history?
                 if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)

@@ -261,6 +261,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IMediaRepository>();
                 repo.AddOrUpdate(media);
                 // FIXME contentXml?!
+                uow.Flush(); // need everything so we can serialize
                 repo.AddOrUpdatePreviewXml(media, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
