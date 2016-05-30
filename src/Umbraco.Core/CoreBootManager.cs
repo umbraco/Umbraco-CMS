@@ -154,6 +154,9 @@ namespace Umbraco.Core
         /// </summary>
         internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
+            // configure the temp. Current
+            Current.Container = container;
+
             container.Register<IServiceContainer>(factory => container);
 
             //Logging

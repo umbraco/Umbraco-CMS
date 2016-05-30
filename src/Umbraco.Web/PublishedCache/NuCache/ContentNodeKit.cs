@@ -11,11 +11,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentData DraftData;
         public ContentData PublishedData;
 
-        public bool IsEmpty { get { return Node == null; } }
+        public bool IsEmpty => Node == null;
 
-        public void Build(PublishedContentType contentType)
+        public void Build(PublishedContentType contentType, IFacadeAccessor facadeAccessor)
         {
-            Node.SetContentTypeAndData(contentType, DraftData, PublishedData);
+            Node.SetContentTypeAndData(contentType, DraftData, PublishedData, facadeAccessor);
         }
     }
 }

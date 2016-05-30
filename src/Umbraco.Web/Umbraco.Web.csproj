@@ -159,6 +159,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
+    <Compile Include="Current.cs" />
     <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="PublishedCache\FacadeServiceResolver.cs" />
     <Compile Include="PublishedCache\IDomainCache.cs" />
     <Compile Include="PublishedCache\IFacade.cs" />
+    <Compile Include="PublishedCache\IFacadeAccessor.cs" />
     <Compile Include="PublishedCache\IFacadeService.cs" />
     <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
     <Compile Include="PublishedCache\NuCache\CacheKeys.cs" />
@@ -240,6 +242,7 @@
     <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
     <Compile Include="PublishedCache\PublishedCacheBase.cs" />
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
+    <Compile Include="PublishedCache\UmbracoContextFacadeAccessor.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\Facade.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\FacadeService.cs" />
@@ -261,6 +264,9 @@
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebServices\FacadeStatusController.cs" />
     <Compile Include="WebServices\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />

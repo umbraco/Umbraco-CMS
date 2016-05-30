@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -14,13 +15,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
     class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore2.Snapshot _snapshot;
+        private readonly ICacheProvider _facadeCache;
+        private readonly ICacheProvider _snapshotCache;
 
         #region Constructors
 
-        public MediaCache(bool previewDefault, ContentStore2.Snapshot snapshot)
+        public MediaCache(bool previewDefault, ContentStore2.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache)
             : base(previewDefault)
         {
             _snapshot = snapshot;
+            _facadeCache = facadeCache;
+            _snapshotCache = snapshotCache;
         }
 
         #endregion
@@ -30,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override IPublishedContent GetById(bool preview, int contentId)
         {
             var n = _snapshot.Get(contentId);
-            return n == null ? null : n.Published;
+            return n?.Published;
         }
 
         public override bool HasById(bool preview, int contentId)
@@ -44,12 +49,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (FacadeService.CacheContentCacheRoots == false)
                 return GetAtRootNoCache(preview);
 
-            var facade = Facade.Current;
-            var cache = (facade == null)
-                ? null
-                : (preview == false || FacadeService.FullCacheWhenPreviewing
-                    ? facade.SnapshotCache
-                    : facade.FacadeCache);
+            var cache = preview == false || FacadeService.FullCacheWhenPreviewing
+                ? _snapshotCache
+                : _facadeCache;
 
             if (cache == null)
                 return GetAtRootNoCache(preview);

@@ -17,13 +17,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         private readonly IMember _member;
 
-        private PublishedMember(IMember member, ContentNode contentNode, ContentData contentData)
-            : base(contentNode, contentData)
+        private PublishedMember(IMember member, ContentNode contentNode, ContentData contentData, IFacadeAccessor facadeAccessor)
+            : base(contentNode, contentData, facadeAccessor)
         {
             _member = member;
         }
 
-        public static IPublishedContent Create(IMember member, PublishedContentType contentType, bool previewing)
+        public static IPublishedContent Create(IMember member, PublishedContentType contentType, bool previewing, IFacadeAccessor facadeAccessor)
         {
             var d = new ContentData
             {
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 member.Level, member.Path, member.SortOrder,
                 member.ParentId,
                 member.CreateDate, member.CreatorId);
-            return new PublishedMember(member, n, d).CreateModel();
+            return new PublishedMember(member, n, d, facadeAccessor).CreateModel();
         }
 
         private static Dictionary<string, object> GetPropertyValues(PublishedContentType contentType, IMember member)

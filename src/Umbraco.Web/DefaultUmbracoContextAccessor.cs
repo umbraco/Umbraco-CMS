@@ -11,9 +11,6 @@ namespace Umbraco.Web
             _umbracoContext = umbracoContext;
         }
 
-        public UmbracoContext Value
-        {
-            get { return _umbracoContext(); }
-        }
+        public UmbracoContext UmbracoContext => _umbracoContext();
     }
 }

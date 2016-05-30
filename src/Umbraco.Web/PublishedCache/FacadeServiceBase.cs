@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Cache;
 
@@ -7,30 +6,18 @@ namespace Umbraco.Web.PublishedCache
 {
     abstract class FacadeServiceBase : IFacadeService
     {
-        // FIXME need a facade accessor of some sort? to init the facade service! of course!
-        private Func<IFacade> _getFacadeFunc = () => UmbracoContext.Current == null ? null : UmbracoContext.Current.Facade;
+        private IFacadeAccessor _facadeAccessor;
 
-        public Func<IFacade> GetFacadeFunc
+        protected FacadeServiceBase(IFacadeAccessor facadeAccessor)
         {
-            get { return _getFacadeFunc; }
-            set
-            {
-                using (Resolution.Configuration)
-                {
-                    _getFacadeFunc = value;
-                }
-            }
+            _facadeAccessor = facadeAccessor;
         }
 
+        // note: NOT setting _facadeAccessor.Facade here because it is the
+        // responsibility of the caller to manage what the 'current' facade is
         public abstract IFacade CreateFacade(string previewToken);
 
-        public IFacade GetFacade()
-        {
-            var caches = _getFacadeFunc();
-            if (caches == null)
-                throw new Exception("Carrier's caches is null.");
-            return caches;
-        }
+        protected IFacade CurrentFacade => _facadeAccessor.Facade;
 
         public abstract string EnterPreview(IUser user, int contentId);
         public abstract void RefreshPreview(string previewToken, int contentId);

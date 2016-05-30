@@ -37,13 +37,6 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>A facade.</returns>
         IFacade CreateFacade(string previewToken);
 
-        /// <summary>
-        /// Gets the current facade.
-        /// </summary>
-        /// <returns>The current facade.</returns>
-        /// <remarks></remarks>
-        IFacade GetFacade();
-
         #endregion
 
         #region Preview

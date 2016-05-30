@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using log4net;
 using LightInject;
-using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -18,16 +14,16 @@ namespace Umbraco.Core
     /// The abstract class for the Umbraco HttpApplication
     /// </summary>
     /// <remarks>
-    /// This is exposed in the core so that we can have the IApplicationEventHandler in the core project so that 
+    /// This is exposed in the core so that we can have the IApplicationEventHandler in the core project so that
     /// IApplicationEventHandler's can fire/execute outside of the web contenxt (i.e. in console applications)
     /// </remarks>
-    public abstract class UmbracoApplicationBase : System.Web.HttpApplication
+    public abstract class UmbracoApplicationBase : HttpApplication
     {
 
         /// <summary>
         /// Umbraco application's IoC container
         /// </summary>
-        internal ServiceContainer Container { get; private set; }
+        internal ServiceContainer Container { get; }
 
         private ILogger _logger;
 
@@ -53,14 +49,14 @@ namespace Umbraco.Core
         public static event EventHandler ApplicationInit;
         public static event EventHandler ApplicationError;
         public static event EventHandler ApplicationEnd;
-        
+
 
         /// <summary>
         /// Boots up the Umbraco application
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
-            //take care of unhandled exceptions - there is nothing we can do to 
+            //take care of unhandled exceptions - there is nothing we can do to
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -123,7 +119,7 @@ namespace Umbraco.Core
                     throw;
                 }
             }
-                
+
         }
 
         /// <summary>
@@ -191,7 +187,7 @@ namespace Umbraco.Core
             {
                 return;
             }
-            
+
             Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
 
             OnApplicationError(sender, e);

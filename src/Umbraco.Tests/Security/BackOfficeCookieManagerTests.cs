@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Security
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
 
-            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.Value == umbCtx));
+            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx));
 
             var result = mgr.ShouldAuthenticateRequest(Mock.Of<IOwinContext>(), new Uri("http://localhost/umbraco"));
 
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Security
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
 
-            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.Value == umbCtx));
+            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx));
 
             var request = new Mock<OwinRequest>();
             request.Setup(owinRequest => owinRequest.Uri).Returns(new Uri("http://localhost/umbraco"));

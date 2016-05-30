@@ -40,17 +40,5 @@
         /// Gets the <see cref="IDomainCache"/>.
         /// </summary>
         public IDomainCache DomainCache { get; }
-
-        public static void ResyncCurrent()
-        {
-            if (FacadeServiceResolver.HasCurrent == false) return;
-            var service = FacadeServiceResolver.Current.Service as FacadeService;
-            var facade = service?.GetFacade() as Facade;
-            if (facade == null) return;
-            ((PublishedContentCache) facade.ContentCache).Resync();
-            ((PublishedMediaCache)facade.MediaCache).Resync();
-
-            // not trying to resync members or domains, which are not cached really
-        }
     }
 }

@@ -1263,10 +1263,9 @@ namespace umbraco
             }
             else
             {
-                // FIXME inject!
-                var caches = FacadeServiceResolver.Current.Service.GetFacade()
+                var facade = Umbraco.Web.Current.Facade
                     ?? FacadeServiceResolver.Current.Service.CreateFacade(null);
-                contentCache = caches.ContentCache as PublishedContentCache;
+                contentCache = facade.ContentCache as PublishedContentCache;
             }
 
             if (contentCache == null)

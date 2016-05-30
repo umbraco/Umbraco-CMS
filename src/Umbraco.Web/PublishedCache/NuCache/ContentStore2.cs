@@ -17,6 +17,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // most of the snapshots management code, etc is an exact copy
         // SnapDictionary has unit tests to ensure it all works correctly
 
+        private readonly IFacadeAccessor _facadeAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
@@ -40,8 +41,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Ctor
 
-        public ContentStore2(ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
+        public ContentStore2(IFacadeAccessor facadeAccessor, ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
         {
+            _facadeAccessor = facadeAccessor;
             _logger = logger;
             _localDb = localDb;
 
@@ -270,7 +272,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _contentNodes.TryGetValue(id, out link);
                         if (link == null || link.Value == null)
                             continue;
-                        var node = new ContentNode(link.Value, contentType);
+                        var node = new ContentNode(link.Value, contentType, _facadeAccessor);
                         SetValueLocked(_contentNodes, id, node);
                         if (_localDb != null)
                             _localDb[id] = node.ToKit();
@@ -302,7 +304,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentTypeNodes[kit.ContentTypeId].Add(kit.Node.Id);
 
             // and use
-            kit.Build(link.Value);
+            kit.Build(link.Value, _facadeAccessor);
 
             return true;
         }
@@ -511,7 +513,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = GetParentLink(content);
                 var parent = link.Value;
                 if (link.Gen < _liveGen)
-                    parent = parent.CloneParent();
+                    parent = parent.CloneParent(_facadeAccessor);
                 parent.ChildContentIds.Remove(content.Id);
                 if (link.Gen < _liveGen)
                     SetValueLocked(_contentNodes, parent.Id, parent);
@@ -541,7 +543,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = GetParentLink(content);
                 var parent = link.Value;
                 if (link.Gen < _liveGen)
-                    parent = parent.CloneParent();
+                    parent = parent.CloneParent(_facadeAccessor);
                 parent.ChildContentIds.Add(content.Id);
                 if (link.Gen < _liveGen)
                     SetValueLocked(_contentNodes, parent.Id, parent);

@@ -1,7 +1,5 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -37,54 +35,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private FacadeElements Elements
-        {
-            get
-            {
-                // no lock - facades are single-thread
-                return _elements ?? (_elements = _service.GetElements(_defaultPreview));
-            }
-        }
+        private FacadeElements Elements => _elements ?? (_elements = _service.GetElements(_defaultPreview));
 
         public void Resync()
         {
             // no lock - facades are single-thread
-            if (_elements != null)
-                _elements.Dispose();
+            _elements?.Dispose();
             _elements = null;
-        }
-
-        #endregion
-
-        #region Current - for tests
-
-        private static Func<Facade> _getCurrentFacadeFunc = () =>
-        {
-#if DEBUG
-            if (FacadeServiceResolver.HasCurrent == false) return null;
-            var service = FacadeServiceResolver.Current.Service as FacadeService;
-            if (service == null) return null;
-            return (Facade) service.GetFacadeFunc();
-#else
-            return (Facade) ((FacadeService) FacadeServiceResolver.Current.Service).GetFacadeFunc();
-#endif
-        };
-
-        public static Func<Facade> GetCurrentFacadeFunc
-        {
-            get { return _getCurrentFacadeFunc; }
-            set
-            {
-                using (Resolution.Configuration)
-                {
-                    _getCurrentFacadeFunc = value;
-                }
-            }
-        }
-
-        public static Facade Current
-        {
-            get { return _getCurrentFacadeFunc(); }
         }
 
         #endregion
@@ -93,19 +50,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public ICacheProvider FacadeCache { get; private set; }
 
-        public ICacheProvider SnapshotCache { get { return Elements.SnapshotCache; } }
+        public ICacheProvider SnapshotCache => Elements.SnapshotCache;
 
         #endregion
 
         #region IFacade
 
-        public IPublishedContentCache ContentCache { get { return Elements.ContentCache; } }
+        public IPublishedContentCache ContentCache => Elements.ContentCache;
 
-        public IPublishedMediaCache MediaCache { get { return Elements.MediaCache; } }
+        public IPublishedMediaCache MediaCache => Elements.MediaCache;
 
-        public IPublishedMemberCache MemberCache { get { return Elements.MemberCache; } }
+        public IPublishedMemberCache MemberCache => Elements.MemberCache;
 
-        public IDomainCache DomainCache { get { return Elements.DomainCache; } }
+        public IDomainCache DomainCache => Elements.DomainCache;
 
         #endregion
 
@@ -117,8 +74,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_disposed) return;
             _disposed = true;
-            if (_elements != null)
-                _elements.Dispose();
+            _elements?.Dispose();
         }
 
         #endregion

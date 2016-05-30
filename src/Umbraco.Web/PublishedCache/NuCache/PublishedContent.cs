@@ -12,30 +12,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     internal class PublishedContent : PublishedContentWithKeyBase
     {
+        private readonly IFacadeAccessor _facadeAccessor;
         private readonly ContentNode _contentNode;
         // ReSharper disable once InconsistentNaming
         internal readonly ContentData _contentData; // internal for ContentNode cloning
 
-        private readonly IPublishedProperty[] _properties;
         private readonly string _urlName;
-        private readonly bool _isPreviewing;
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData)
+        public PublishedContent(ContentNode contentNode, ContentData contentData, IFacadeAccessor facadeAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
+            _facadeAccessor = facadeAccessor;
 
             _urlName = _contentData.Name.ToUrlSegment();
-            _isPreviewing = _contentData.Published == false;
-            _properties = CreateProperties(this, contentData.Properties);
+            IsPreviewing = _contentData.Published == false;
+            PropertiesArray = CreateProperties(this, contentData.Properties);
         }
 
-        private static string GetProfileNameById(int id)
+        private string GetProfileNameById(int id)
         {
-            var facade = Facade.Current;
-            var cache = facade == null ? null : facade.FacadeCache;
+            var cache = GetCurrentFacadeCache();
             return cache == null
                 ? GetProfileNameByIdNoCache(id)
                 : (string) cache.GetCacheItem(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
@@ -45,8 +44,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
 #if DEBUG
             var context = ApplicationContext.Current;
-            var servicesContext = context == null ? null : context.Services;
-            var userService = servicesContext == null ? null : servicesContext.UserService;
+            var servicesContext = context?.Services;
+            var userService = servicesContext?.UserService;
             if (userService == null) return "[null]"; // for tests
 #else
             // we don't want each published content to hold a reference to the service
@@ -54,10 +53,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var userService = ApplicationContext.Current.Services.UserService;
 #endif
             var user = userService.GetProfileById(id);
-            return user == null ? null : user.Name;
+            return user?.Name;
         }
 
-        private static IPublishedProperty[] CreateProperties(PublishedContent content, IDictionary<string, object> values)
+        private IPublishedProperty[] CreateProperties(PublishedContent content, IDictionary<string, object> values)
         {
             return content._contentNode.ContentType
                 .PropertyTypes
@@ -65,38 +64,40 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     object value;
                     return values.TryGetValue(propertyType.PropertyTypeAlias, out value)
-                        ? (IPublishedProperty) new Property(propertyType, content, value)
-                        : (IPublishedProperty) new Property(propertyType, content);
+                        ? new Property(propertyType, content, value, _facadeAccessor) as IPublishedProperty
+                        : new Property(propertyType, content, _facadeAccessor) as IPublishedProperty;
                 })
                 .ToArray();
         }
 
         // (see ContentNode.CloneParent)
-        public PublishedContent(ContentNode contentNode, PublishedContent origin)
+        public PublishedContent(ContentNode contentNode, PublishedContent origin, IFacadeAccessor facadeAccessor)
         {
             _contentNode = contentNode;
+            _facadeAccessor = facadeAccessor;
             _contentData = origin._contentData;
 
             _urlName = origin._urlName;
-            _isPreviewing = origin._isPreviewing;
+            IsPreviewing = origin.IsPreviewing;
 
             // here is the main benefit: we do not re-create properties so if anything
             // is cached locally, we share the cache - which is fine - if anything depends
             // on the tree structure, it should not be cached locally to begin with
-            _properties = origin._properties;
+            PropertiesArray = origin.PropertiesArray;
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        private PublishedContent(PublishedContent origin)
+        private PublishedContent(PublishedContent origin, IFacadeAccessor facadeAccessor)
         {
+            _facadeAccessor = facadeAccessor;
             _contentNode = origin._contentNode;
             _contentData = origin._contentData;
 
             _urlName = origin._urlName;
-            _isPreviewing = true;
+            IsPreviewing = true;
 
             // clone properties so _isPreviewing is true
-            _properties = origin._properties.Select(x => (IPublishedProperty) new Property((Property) x)).ToArray();
+            PropertiesArray = origin.PropertiesArray.Select(x => (IPublishedProperty) new Property((Property) x)).ToArray();
         }
 
         #endregion
@@ -128,14 +129,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private static IPublishedContent GetContentById(bool previewing, int id)
+        private IPublishedContent GetContentById(bool previewing, int id)
         {
-            return _getContentByIdFunc(Facade.Current, previewing, id);
+            return _getContentByIdFunc(_facadeAccessor.Facade, previewing, id);
         }
 
-        private static IEnumerable<IPublishedContent> GetContentByIds(bool previewing, IEnumerable<int> ids)
+        private IEnumerable<IPublishedContent> GetContentByIds(bool previewing, IEnumerable<int> ids)
         {
-            var facade = Facade.Current;
+            var facade = _facadeAccessor.Facade;
 
             // beware! the loop below CANNOT be converted to query such as:
             //return ids.Select(x => _getContentByIdFunc(facade, previewing, x)).Where(x => x != null);
@@ -151,14 +152,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private static IPublishedContent GetMediaById(bool previewing, int id)
+        private IPublishedContent GetMediaById(bool previewing, int id)
         {
-            return _getMediaByIdFunc(Facade.Current, previewing, id);
+            return _getMediaByIdFunc(_facadeAccessor.Facade, previewing, id);
         }
 
-        private static IEnumerable<IPublishedContent> GetMediaByIds(bool previewing, IEnumerable<int> ids)
+        private IEnumerable<IPublishedContent> GetMediaByIds(bool previewing, IEnumerable<int> ids)
         {
-            var facade = Facade.Current;
+            var facade = _facadeAccessor.Facade;
 
             // see note above for content
 
@@ -174,42 +175,30 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region IPublishedContent
 
-        public override int Id { get { return _contentNode.Id; } }
-        public override Guid Key { get { return _contentNode.Uid; } }
-        public override int DocumentTypeId { get { return _contentNode.ContentType.Id; } }
-        public override string DocumentTypeAlias { get { return _contentNode.ContentType.Alias; } }
-        public override PublishedItemType ItemType { get { return _contentNode.ContentType.ItemType; } }
+        public override int Id => _contentNode.Id;
+        public override Guid Key => _contentNode.Uid;
+        public override int DocumentTypeId => _contentNode.ContentType.Id;
+        public override string DocumentTypeAlias => _contentNode.ContentType.Alias;
+        public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
-        public override string Name { get { return _contentData.Name; } }
-        public override int Level { get { return _contentNode.Level; } }
-        public override string Path { get { return _contentNode.Path; } }
-        public override int SortOrder { get { return _contentNode.SortOrder; } }
-        public override Guid Version { get { return _contentData.Version; } }
-        public override int TemplateId { get { return _contentData.TemplateId; } }
+        public override string Name => _contentData.Name;
+        public override int Level => _contentNode.Level;
+        public override string Path => _contentNode.Path;
+        public override int SortOrder => _contentNode.SortOrder;
+        public override Guid Version => _contentData.Version;
+        public override int TemplateId => _contentData.TemplateId;
 
-        public override string UrlName { get { return _urlName; } }
+        public override string UrlName => _urlName;
 
-        public override DateTime CreateDate { get { return _contentNode.CreateDate; } }
-        public override DateTime UpdateDate { get { return _contentData.VersionDate; } }
+        public override DateTime CreateDate => _contentNode.CreateDate;
+        public override DateTime UpdateDate => _contentData.VersionDate;
 
-        public override int CreatorId { get { return _contentNode.CreatorId; } }
-        public override string CreatorName { get { return GetProfileNameById(_contentNode.CreatorId); } }
-        public override int WriterId { get { return _contentData.WriterId; } }
-        public override string WriterName { get { return GetProfileNameById(_contentData.WriterId); } }
+        public override int CreatorId => _contentNode.CreatorId;
+        public override string CreatorName => GetProfileNameById(_contentNode.CreatorId);
+        public override int WriterId => _contentData.WriterId;
+        public override string WriterName => GetProfileNameById(_contentData.WriterId);
 
-        public override bool IsDraft { get { return _contentData.Published == false; } }
-
-        // beware what you use that one for - you don't want to cache its result
-        private ICacheProvider GetAppropriateFacadeCache()
-        {
-            var facade = Facade.Current;
-            var cache = facade == null
-                ? null
-                : ((_isPreviewing == false || FacadeService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
-                    ? facade.SnapshotCache
-                    : facade.FacadeCache);
-            return cache;
-        }
+        public override bool IsDraft => _contentData.Published == false;
 
         public override IPublishedContent Parent
         {
@@ -220,9 +209,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 switch (_contentNode.ContentType.ItemType)
                 {
                     case PublishedItemType.Content:
-                        return GetContentById(_isPreviewing, _contentNode.ParentContentId);
+                        return GetContentById(IsPreviewing, _contentNode.ParentContentId);
                     case PublishedItemType.Media:
-                        return GetMediaById(_isPreviewing, _contentNode.ParentContentId);
+                        return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
                     default:
                         throw new Exception("oops");
                 }
@@ -231,16 +220,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private string _childrenCacheKey;
 
-        private string ChildrenCacheKey
-        {
-            get { return _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, _isPreviewing)); }
-        }
+        private string ChildrenCacheKey => _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, IsPreviewing));
 
         public override IEnumerable<IPublishedContent> Children
         {
             get
             {
-                var cache = GetAppropriateFacadeCache();
+                var cache = GetAppropriateCurrentFacadeCache();
                 if (cache == null || FacadeService.CachePublishedContentChildren == false)
                     return GetChildren();
                 
@@ -255,10 +241,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             switch (_contentNode.ContentType.ItemType)
             {
                 case PublishedItemType.Content:
-                    c = GetContentByIds(_isPreviewing, _contentNode.ChildContentIds);
+                    c = GetContentByIds(IsPreviewing, _contentNode.ChildContentIds);
                     break;
                 case PublishedItemType.Media:
-                    c = GetMediaByIds(_isPreviewing, _contentNode.ChildContentIds);
+                    c = GetMediaByIds(IsPreviewing, _contentNode.ChildContentIds);
                     break;
                 default:
                     throw new Exception("oops");
@@ -272,12 +258,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 
-        public override ICollection<IPublishedProperty> Properties { get { return _properties; } }
+        public override ICollection<IPublishedProperty> Properties => PropertiesArray;
 
         public override IPublishedProperty GetProperty(string alias)
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
-            var property = index < 0 ? null : _properties[index];
+            var property = index < 0 ? null : PropertiesArray[index];
             return property;
         }
 
@@ -286,7 +272,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var property = GetProperty(alias);
             if (recurse == false) return property;
 
-            var cache = GetAppropriateFacadeCache();
+            var cache = GetAppropriateCurrentFacadeCache();
             if (cache == null)
                 return base.GetProperty(alias, true);
 
@@ -294,9 +280,28 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return (Property) cache.GetCacheItem(key, () => base.GetProperty(alias, true));
         }
 
-        public override PublishedContentType ContentType
+        public override PublishedContentType ContentType => _contentNode.ContentType;
+
+        #endregion
+
+        #region Caching
+
+        // beware what you use that one for - you don't want to cache its result
+        private ICacheProvider GetAppropriateCurrentFacadeCache()
         {
-            get { return _contentNode.ContentType; }
+            var facade = (Facade) _facadeAccessor.Facade;
+            var cache = facade == null
+                ? null
+                : ((IsPreviewing == false || FacadeService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
+                    ? facade.SnapshotCache
+                    : facade.FacadeCache);
+            return cache;
+        }
+
+        private ICacheProvider GetCurrentFacadeCache()
+        {
+            var facade = (Facade) _facadeAccessor.Facade;
+            return facade?.FacadeCache;
         }
 
         #endregion
@@ -304,38 +309,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Internal
 
         // used by navigable content
-        internal IPublishedProperty[] PropertiesArray { get { return _properties; } }
+        internal IPublishedProperty[] PropertiesArray { get; }
 
         // used by navigable content
-        internal int ParentId { get { return _contentNode.ParentContentId; } }
+        internal int ParentId => _contentNode.ParentContentId;
 
         // used by navigable content
         // includes all children, published or unpublished
         // NavigableNavigator takes care of selecting those it wants
-        internal IList<int> ChildIds { get { return _contentNode.ChildContentIds; } }
+        internal IList<int> ChildIds => _contentNode.ChildContentIds;
 
         // used by Property
         // gets a value indicating whether the content or media exists in
         // a previewing context or not, ie whether its Parent, Children, and
         // properties should refer to published, or draft content
-        internal bool IsPreviewing { get { return _isPreviewing; } }
+        internal bool IsPreviewing { get; }
 
         private string _asPreviewingCacheKey;
 
-        private string AsPreviewingCacheKey
-        {
-            get { return _asPreviewingCacheKey ?? (_asPreviewingCacheKey = CacheKeys.PublishedContentAsPreviewing(Key)); }
-        }
+        private string AsPreviewingCacheKey => _asPreviewingCacheKey ?? (_asPreviewingCacheKey = CacheKeys.PublishedContentAsPreviewing(Key));
 
         // used by ContentCache
         internal IPublishedContent AsPreviewingModel()
         {
-            if (_isPreviewing)
+            if (IsPreviewing)
                 return this;
 
-            var cache = GetAppropriateFacadeCache();
-            if (cache == null) return new PublishedContent(this).CreateModel();
-            return (IPublishedContent) cache.GetCacheItem(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
+            var cache = GetAppropriateCurrentFacadeCache();
+            if (cache == null) return new PublishedContent(this, _facadeAccessor).CreateModel();
+            return (IPublishedContent) cache.GetCacheItem(AsPreviewingCacheKey, () => new PublishedContent(this, _facadeAccessor).CreateModel());
         }
 
         // used by Navigable.Source,...

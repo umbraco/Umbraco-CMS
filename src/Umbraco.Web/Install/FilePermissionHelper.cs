@@ -99,6 +99,7 @@ namespace Umbraco.Web.Install
             errorReport = new List<string>();
 
             // makes sense for xml cache only
+            // fixme and to nucache that writes files too?
             var svc = FacadeServiceResolver.Current.Service as FacadeService;
             if (svc == null) return true;
 

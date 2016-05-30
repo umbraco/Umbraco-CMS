@@ -49,6 +49,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private bool _withRepositoryEvents;
         private bool _withOtherEvents;
 
+        private readonly IFacadeAccessor _facadeAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
@@ -61,15 +62,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database,
         /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache, IEnumerable<IUrlSegmentProvider> segmentProviders)
-            : this(serviceContext, uowProvider, routesCache, contentTypeCache, segmentProviders, false, false)
+        public XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache, IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor)
+            : this(serviceContext, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, false, false)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
         internal XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, bool testing, bool enableRepositoryEvents)
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, bool testing, bool enableRepositoryEvents)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -78,6 +79,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _uowProvider = uowProvider;
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
+            _facadeAccessor = facadeAccessor;
 
             InitializeSerializers(segmentProviders);
 
@@ -1310,7 +1312,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 if (publishedChanged)
                 {
                     safeXml.Commit(); // not auto!
-                    Facade.ResyncCurrent();
+                    ResyncCurrentFacade();
                 }
             }
         }
@@ -1341,7 +1343,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
             // ignore media and member types - we're not caching them
 
-            Facade.ResyncCurrent();
+            ResyncCurrentFacade();
         }
 
         public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
@@ -1361,7 +1363,17 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
             // ignore media and member types - we're not caching them
 
-            Facade.ResyncCurrent();
+            ResyncCurrentFacade();
+        }
+
+        private void ResyncCurrentFacade()
+        {
+            var facade = (Facade) _facadeAccessor.Facade;
+            if (facade == null) return;
+            ((PublishedContentCache) facade.ContentCache).Resync();
+            ((PublishedMediaCache) facade.MediaCache).Resync();
+
+            // not trying to resync members or domains, which are not cached really
         }
 
         #endregion

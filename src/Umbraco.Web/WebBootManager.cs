@@ -325,12 +325,15 @@ namespace Umbraco.Web
         {
             base.ConfigureCoreServices(container);
 
+            // configure the temp. Current
+            Current.Container = container;
+
             //ModelMappers
             container.RegisterFrom<WebModelMappersCompositionRoot>();
 
             container.EnablePerWebRequestScope();
 
-            //no need to declare as per request, it's lifetime is already managed as a singleton
+            // no need to declare as per request, it's lifetime is already managed as a singleton
             container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
 
@@ -345,6 +348,7 @@ namespace Umbraco.Web
                 factory.GetInstance<ApplicationContext>().MainDom,
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
+                new UmbracoContextFacadeAccessor(new SingletonUmbracoContextAccessor()),  // fixme inject!
                 factory.GetInstance<ILogger>()));
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton

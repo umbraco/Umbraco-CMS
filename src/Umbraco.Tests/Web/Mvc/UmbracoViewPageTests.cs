@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             Assert.Throws<ModelBindingException>(() =>view.SetViewDataX(viewData));
         }
-        
+
         [Test]
         public void ContentType1_To_ContentType1()
         {
@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
-        
+
         #endregion
 
         #region Test elements
@@ -409,7 +409,7 @@ namespace Umbraco.Tests.Web.Mvc
             umbracoContext.RoutingContext = routingContext;
 
             var request = new PublishedContentRequest(
-                new Uri("http://localhost/dang"), 
+                new Uri("http://localhost/dang"),
                 routingContext,
                settings.WebRouting,
                 s => Enumerable.Empty<string>());
@@ -438,10 +438,10 @@ namespace Umbraco.Tests.Web.Mvc
 
             var cache = new NullCacheProvider();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), true, false); // no events
+            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
-            
+
             var ctx = UmbracoContext.CreateContext(
                 GetHttpContextFactory(url, routeData).HttpContext, appCtx,
                 _service,
@@ -462,7 +462,7 @@ namespace Umbraco.Tests.Web.Mvc
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-            
+
             return factory;
         }
 

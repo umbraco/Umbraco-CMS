@@ -293,10 +293,11 @@ namespace Umbraco.Tests.TestHelpers
                         ApplicationContext.Services.MemberTypeService);
 
                 // testing=true so XmlStore will not use the file nor the database
+                var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
                     ApplicationContext.Services,
                     _uowProvider, 
-                    cache, ContentTypesCache, true, enableRepositoryEvents);
+                    cache, facadeAccessor, ContentTypesCache, true, enableRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () => 

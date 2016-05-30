@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Services
 
 		[TearDown]
 		public override void TearDown()
-		{   
+		{
       		base.TearDown();
 		}
 
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Services
                     }
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
                 }
-                
+
             }
 
             using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content optimized"))
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Services
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
-                    
+
                     //get all content items that are published of this type
                     var published = contentSvc.GetContentOfContentType(contentTypeId).Where(content => content.Published);
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Services
             //chuck lots of data in the db
             var nodes = PrimeDbWithLotsOfContentXmlRecords(customObjectType);
 
-            //now we need to test the difference between truncating all records and re-inserting them as we do now, 
+            //now we need to test the difference between truncating all records and re-inserting them as we do now,
             //vs updating them (which might result in checking if they exist for or listening on an exception).
             using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
             {
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Services
                 {
                     //clear all the xml entries
                     DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Services
 
             //now, isntead of truncating, we'll attempt to update and if it doesn't work then we insert
             using (DisposableTimer.DebugDuration<PerformanceTests>("Starting update test"))
-            {           
+            {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Services
                 {
                     //clear all the xml entries
                     DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
@@ -212,31 +212,31 @@ namespace Umbraco.Tests.Services
                     {
                         //clear all the xml entries
                         DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
+                        DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems);
 
                         tr.Complete();
                     }
                 }
             }
-            
+
 
         }
 
         private IEnumerable<IContent> PrimeDbWithLotsOfContent()
         {
             var contentType1 = MockedContentTypes.CreateSimpleContentType();
-            contentType1.AllowedAsRoot = true;            
+            contentType1.AllowedAsRoot = true;
             ServiceContext.ContentTypeService.Save(contentType1);
             contentType1.AllowedContentTypes = new List<ContentTypeSort>
                 {
                     new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias)
                 };
             var result = new List<IContent>();
-            ServiceContext.ContentTypeService.Save(contentType1);            
+            ServiceContext.ContentTypeService.Save(contentType1);
             IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
             ServiceContext.ContentService.SaveAndPublish(lastParent);
             result.Add(lastParent);
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Services
                     //only publish evens
                     if (j % 2 == 0)
                     {
-                        ServiceContext.ContentService.SaveAndPublish(content);        
+                        ServiceContext.ContentService.SaveAndPublish(content);
                     }
                     else
                     {
@@ -259,12 +259,12 @@ namespace Umbraco.Tests.Services
                     }
                     result.Add(content);
                 }
-                
+
                 //assign the last one as the next parent
                 lastParent = content;
             }
             return result;
-        } 
+        }
 
         private IEnumerable<NodeDto> PrimeDbWithLotsOfContentXmlRecords(Guid customObjectType)
         {

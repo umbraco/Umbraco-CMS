@@ -43,14 +43,14 @@ namespace Umbraco.Web.Security.Identity
         /// <returns></returns>
         string ICookieManager.GetRequestCookie(IOwinContext context, string key)
         {
-            if (_umbracoContextAccessor.Value == null || context.Request.Uri.IsClientSideRequest())
+            if (_umbracoContextAccessor.UmbracoContext == null || context.Request.Uri.IsClientSideRequest())
             {
                 return null;
             }
             
             return ShouldAuthenticateRequest(
                 context, 
-                _umbracoContextAccessor.Value.OriginalRequestUrl) == false 
+                _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl) == false 
                 //Don't auth request, don't return a cookie
                 ? null 
                 //Return the default implementation
@@ -73,8 +73,8 @@ namespace Umbraco.Web.Security.Identity
         /// </remarks>
         internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
-            if (_umbracoContextAccessor.Value.Application.IsConfigured == false
-                && _umbracoContextAccessor.Value.Application.DatabaseContext.IsDatabaseConfigured == false)
+            if (_umbracoContextAccessor.UmbracoContext.Application.IsConfigured == false
+                && _umbracoContextAccessor.UmbracoContext.Application.DatabaseContext.IsDatabaseConfigured == false)
             {
                 //Do not authenticate the request if we don't have a db and we are not configured - since we will never need
                 // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues

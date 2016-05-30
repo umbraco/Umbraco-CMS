@@ -32,6 +32,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     class FacadeService : FacadeServiceBase
     {
+        private readonly IFacadeAccessor _facadeAccessor;
         private readonly ServiceContext _serviceContext;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly Database _dataSource;
@@ -70,8 +71,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public FacadeService(Options options, MainDom mainDom, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, ILogger logger)
+        public FacadeService(Options options, MainDom mainDom, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger)
+            : base(facadeAccessor)
         {
+            _facadeAccessor = facadeAccessor;
             _serviceContext = serviceContext;
             _uowProvider = uowProvider;
             _dataSource = new Database();
@@ -120,13 +123,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore2(logger, _localContentDb);
-                _mediaStore = new ContentStore2(logger, _localMediaDb);
+                _contentStore = new ContentStore2(facadeAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore2(facadeAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore2(logger);
-                _mediaStore = new ContentStore2(logger);
+                _contentStore = new ContentStore2(facadeAccessor, logger);
+                _mediaStore = new ContentStore2(facadeAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -477,7 +480,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             publishedChanged = publishedChanged2;
 
             if (draftChanged || publishedChanged)
-                Facade.Current.Resync();
+                ((Facade)CurrentFacade).Resync();
         }
 
         private void NotifyLocked(IEnumerable<ContentCacheRefresher.JsonPayload> payloads, out bool draftChanged, out bool publishedChanged)
@@ -575,7 +578,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             anythingChanged = anythingChanged2;
 
             if (anythingChanged)
-                Facade.Current.Resync();
+                ((Facade)CurrentFacade).Resync();
         }
 
         private void NotifyLocked(IEnumerable<MediaCacheRefresher.JsonPayload> payloads, out bool anythingChanged)
@@ -697,7 +700,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     RefreshMediaTypesLocked(removedIds, refreshedIds);
                 });
 
-            Facade.Current.Resync();
+            ((Facade)CurrentFacade).Resync();
         }
 
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
@@ -735,7 +738,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                 }));
 
-            Facade.Current.Resync();
+            ((Facade) CurrentFacade).Resync();
         }
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -926,8 +929,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return new Facade.FacadeElements
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, facadeCache, snapshotCache, new DomainHelper(domainCache)),
-                MediaCache = new MediaCache(previewDefault, mediaSnap),
-                MemberCache = new MemberCache(previewDefault, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache),
+                MediaCache = new MediaCache(previewDefault, mediaSnap, facadeCache, snapshotCache),
+                MemberCache = new MemberCache(previewDefault, facadeCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, _facadeAccessor),
                 DomainCache = domainCache,
                 FacadeCache = facadeCache,
                 SnapshotCache = snapshotCache

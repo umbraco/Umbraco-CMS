@@ -177,7 +177,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // we add this check - we look for the document matching "/" and if it's not us, then
             // we do not hide the top level path
             // it has to be taken care of in GetByRoute too so if
-            // "/foo" fails (looking for "/*/foo") we try also "/foo". 
+            // "/foo" fails (looking for "/*/foo") we try also "/foo".
             // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (content.Parent == null)
@@ -222,12 +222,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (FacadeService.CacheContentCacheRoots == false)
                 return GetAtRootNoCache(preview);
 
-            var facade = Facade.Current;
-            var cache = (facade == null)
-                ? null
-                : (preview == false || FacadeService.FullCacheWhenPreviewing
-                    ? facade.SnapshotCache
-                    : facade.FacadeCache);
+            var cache = preview == false || FacadeService.FullCacheWhenPreviewing
+                ? _snapshotCache
+                : _facadeCache;
 
             if (cache == null)
                 return GetAtRootNoCache(preview);
@@ -253,7 +250,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal static IPublishedContent GetPublishedContentAsPreviewing(IPublishedContent content /*, bool preview*/)
         {
             if (content == null /*|| preview == false*/) return null; //content;
-            
+
             // an object in the cache is either an IPublishedContentOrMedia,
             // or a model inheriting from PublishedContentExtended - in which
             // case we need to unwrap to get to the original IPublishedContentOrMedia.

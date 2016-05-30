@@ -15,13 +15,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     class MemberCache : IPublishedMemberCache, INavigableData
     {
+        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly ICacheProvider _facadeCache;
         private readonly IMemberService _memberService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
 
-        public MemberCache(bool previewDefault, IMemberService memberService, IDataTypeService dataTypeService, PublishedContentTypeCache contentTypeCache)
+        public MemberCache(bool previewDefault, ICacheProvider facadeCache, IMemberService memberService, IDataTypeService dataTypeService, PublishedContentTypeCache contentTypeCache, IFacadeAccessor facadeAccessor)
         {
+            _facadeCache = facadeCache;
+            _facadeAccessor = facadeAccessor;
             _memberService = memberService;
             _dataTypeService = dataTypeService;
             _previewDefault = previewDefault;
@@ -38,11 +42,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //        : (T) cache.GetCacheItem(cacheKey);
         //}
 
-        private static T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        private T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
             where T : class
         {
-            var facade = Facade.Current;
-            var cache = facade == null ? null : facade.FacadeCache;
+            var cache = _facadeCache;
             return cache == null
                 ? getCacheItem()
                 : cache.GetCacheItem<T>(cacheKey, getCacheItem);
@@ -68,14 +71,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var member = _memberService.GetById(memberId);
                     return member == null 
                         ? null 
-                        : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault);
+                        : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _facadeAccessor);
                 });
         }
 
         private IPublishedContent /*IPublishedMember*/ GetById(IMember member, bool previewing)
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, member.Id), () =>
-                PublishedMember.Create(member, GetContentType(member.ContentTypeId), previewing));
+                PublishedMember.Create(member, GetContentType(member.ContentTypeId), previewing, _facadeAccessor));
         }
 
         public IPublishedContent /*IPublishedMember*/ GetByProviderKey(object key)
@@ -110,7 +113,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IPublishedContent /*IPublishedMember*/ GetByMember(IMember member)
         {
-            return PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault);
+            return PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _facadeAccessor);
         }
 
         public IEnumerable<IPublishedContent> GetAtRoot(bool preview)
@@ -118,7 +121,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // because members are flat (not a tree) everything is at root
             // because we're loading everything... let's just not cache?
             var members = _memberService.GetAllMembers();
-            return members.Select(m => PublishedMember.Create(m, GetContentType(m.ContentTypeId), preview));
+            return members.Select(m => PublishedMember.Create(m, GetContentType(m.ContentTypeId), preview, _facadeAccessor));
         }
 
         public XPathNavigator CreateNavigator()
