@@ -25,7 +25,6 @@ namespace Umbraco.Core.Services
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private IContentTypeService _contentTypeService;
 
         #region Constructors
 
@@ -45,20 +44,6 @@ namespace Umbraco.Core.Services
             _userService = userService;
             _urlSegmentProviders = urlSegmentProviders;
         }
-
-        // don't change or remove this, will need it later
-        private IContentTypeService ContentTypeService => _contentTypeService;
-        //// handle circular dependencies
-        //internal IContentTypeService ContentTypeService
-        //{
-        //    get
-        //    {
-        //        if (_contentTypeService == null)
-        //            throw new InvalidOperationException("ContentService.ContentTypeService has not been initialized.");
-        //        return _contentTypeService;
-        //    }
-        //    set { _contentTypeService = value; }
-        //}
 
         #endregion
 
@@ -2581,7 +2566,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
+                uow.ReadLock(Constants.Locks.ContentTypes);
 
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = repository.Query.Where(x => x.Alias == contentTypeAlias);

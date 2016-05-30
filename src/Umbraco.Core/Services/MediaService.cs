@@ -24,7 +24,6 @@ namespace Umbraco.Core.Services
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private IMediaTypeService _mediaTypeService;
 
         #region Constructors
 
@@ -44,20 +43,6 @@ namespace Umbraco.Core.Services
             _userService = userService;
             _urlSegmentProviders = urlSegmentProviders;
         }
-
-        // don't change or remove this, will need it later
-        private IMediaTypeService MediaTypeService => _mediaTypeService;
-        //// handle circular dependencies
-        //internal IMediaTypeService MediaTypeService
-        //{
-        //    get
-        //    {
-        //        if (_mediaTypeService == null)
-        //            throw new InvalidOperationException("MediaService.MediaTypeService has not been initialized.");
-        //        return _mediaTypeService;
-        //    }
-        //    set { _mediaTypeService = value; }
-        //}
 
         #endregion
 
@@ -1373,7 +1358,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.Locks.MediaTree);
+                uow.ReadLock(Constants.Locks.MediaTypes);
 
                 var repository = uow.CreateRepository<IMediaTypeRepository>();
                 var query = repository.Query.Where(x => x.Alias == mediaTypeAlias);

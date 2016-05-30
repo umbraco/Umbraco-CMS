@@ -11,31 +11,17 @@ namespace Umbraco.Core.Services
 {
     internal class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
-        private IMemberService _memberService;
-
         public MemberTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
             : base(provider, logger, eventMessagesFactory)
         {
-            _memberService = memberService;
+            MemberService = memberService;
         }
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
         protected override int[] WriteLockIds { get; } = { Constants.Locks.MemberTree, Constants.Locks.MemberTypes };
 
-        // don't remove, will need it later
-        private IMemberService MemberService => _memberService;
-        //// handle circular dependencies
-        //internal IMemberService MemberService
-        //{
-        //    get
-        //    {
-        //        if (_memberService == null)
-        //            throw new InvalidOperationException("MemberTypeService.MemberService has not been initialized.");
-        //        return _memberService;
-        //    }
-        //    set { _memberService = value; }
-        //}
+        private IMemberService MemberService { get; }
 
         protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberTypeGuid;
 
@@ -51,7 +37,7 @@ namespace Umbraco.Core.Services
             var toUpdate = GetContentTypesForXmlUpdates(contentTypes).ToArray();
             if (toUpdate.Any() == false) return;
 
-            var memberService = _memberService as MemberService;
+            var memberService = MemberService as MemberService;
             memberService?.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
         }
 

@@ -24,7 +24,6 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IMemberGroupService _memberGroupService;
-        private IMemberTypeService _memberTypeService;
 
         #region Constructor
 
@@ -41,20 +40,6 @@ namespace Umbraco.Core.Services
             _memberGroupService = memberGroupService;
             _dataTypeService = dataTypeService;
         }
-
-        // don't change or remove this, will need it later
-        private IMemberTypeService MemberTypeService => _memberTypeService;
-        //// handle circular dependencies
-        //internal IMemberTypeService MemberTypeService
-        //{
-        //    get
-        //    {
-        //        if (_memberTypeService == null)
-        //            throw new InvalidOperationException("MemberService.MemberTypeService has not been initialized.");
-        //        return _memberTypeService;
-        //    }
-        //    set { _memberTypeService = value; }
-        //}
 
         #endregion
 
@@ -1356,16 +1341,21 @@ namespace Umbraco.Core.Services
 
         private IMemberType GetMemberType(string memberTypeAlias)
         {
-            var memberType = MemberTypeService.Get(memberTypeAlias);
-            if (memberType == null)
-                throw new Exception(string.Format("No MemberType matching alias: \"{0}\".", memberTypeAlias));
-            return memberType;
-        }
+            Mandate.ParameterNotNullOrEmpty(memberTypeAlias, nameof(memberTypeAlias));
 
-        [Obsolete("use MemberTypeService.GetDefault()")] // fixme kill!
-        public string GetDefaultMemberType()
-        {
-            return MemberTypeService.GetDefault();
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.ReadLock(Constants.Locks.MemberTypes);
+
+                var repository = uow.CreateRepository<IMemberTypeRepository>();
+                var memberType = repository.Get(memberTypeAlias);
+
+                if (memberType == null)
+                    throw new Exception($"No MemberType matching the passed in Alias: '{memberTypeAlias}' was found"); // causes rollback
+
+                uow.Complete();
+                return memberType;
+            }
         }
 
         #endregion
