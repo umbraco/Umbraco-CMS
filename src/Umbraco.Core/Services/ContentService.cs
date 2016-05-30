@@ -22,7 +22,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
-        private IContentTypeService _contentTypeService;
 
         #region Constructors
 
@@ -33,20 +32,6 @@ namespace Umbraco.Core.Services
             : base(provider, logger, eventMessagesFactory)
         {
         }
-
-        // don't change or remove this, will need it later
-        private IContentTypeService ContentTypeService => _contentTypeService;
-        //// handle circular dependencies
-        //internal IContentTypeService ContentTypeService
-        //{
-        //    get
-        //    {
-        //        if (_contentTypeService == null)
-        //            throw new InvalidOperationException("ContentService.ContentTypeService has not been initialized.");
-        //        return _contentTypeService;
-        //    }
-        //    set { _contentTypeService = value; }
-        //}
 
         #endregion
 
@@ -331,6 +316,8 @@ namespace Umbraco.Core.Services
 
                 var repo = uow.CreateRepository<IContentRepository>();
                 repo.AddOrUpdate(content);
+
+                uow.Flush(); // need everything so we can serialize
 
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
                 TreeChanged.RaiseEvent(new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs(), this);
@@ -2545,7 +2532,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
+                uow.ReadLock(Constants.Locks.ContentTypes);
 
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = repository.Query.Where(x => x.Alias == contentTypeAlias);

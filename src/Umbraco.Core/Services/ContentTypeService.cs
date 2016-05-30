@@ -13,33 +13,18 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
-	    private IContentService _contentService;
-
         public ContentTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService)
             : base(provider, logger, eventMessagesFactory)
         {
-            _contentService = contentService;
+            ContentService = contentService;
         }
 
         protected override IContentTypeService Instance => this;
-
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
         protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
 
-        // don't change or remove this, will need it later
-        private IContentService ContentService => _contentService;
-        //// handle circular dependencies
-        //internal IContentService ContentService
-        //{
-        //    get
-        //    {
-        //        if (_contentService == null)
-        //            throw new InvalidOperationException("ContentTypeService.ContentService has not been initialized.");
-        //        return _contentService;
-        //    }
-        //    set { _contentService = value; }
-        //}
+        private IContentService ContentService { get; }
 
         protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentTypeGuid;
 

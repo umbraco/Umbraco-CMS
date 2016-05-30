@@ -72,6 +72,7 @@ namespace Umbraco.Web.Security.Identity
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     appContext.Services.UserService,
+                    appContext.Services.MemberTypeService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
 
