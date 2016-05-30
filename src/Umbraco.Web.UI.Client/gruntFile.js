@@ -380,8 +380,12 @@ module.exports = function (grunt) {
             options: {
                 dest: 'docs/api',
                 startPage: '/api',
-                title: "Umbraco 7",
+                title: "Umbraco Backoffice UI API Documentation",
                 html5Mode: false,
+                styles: [
+                    'docs/umb-docs.css'
+                ],
+                image: "https://our.umbraco.org/assets/images/logo.svg"
             },
             api: {
                 src: ['src/common/**/*.js', 'docs/src/api/**/*.ngdoc'],
@@ -390,7 +394,7 @@ module.exports = function (grunt) {
             tutorials: {
                 src: [],
                 title: ''
-            }
+            }            
         },
 
         eslint:{
