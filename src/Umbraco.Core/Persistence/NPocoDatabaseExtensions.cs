@@ -163,15 +163,17 @@ namespace Umbraco.Core.Persistence
 
         // fixme - NPoco has BulkInsert now?
 
-        public static void BulkInsertRecords<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
+        public static void BulkInsertRecordsWithTransaction<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
                 return;
 
+            // no need to "try...catch", if the transaction is not completed it will rollback!
             using (var tr = db.GetTransaction())
             {
-                db.BulkInsertRecords(sqlSyntax, collection, tr, true);
+                db.BulkInsertRecords(sqlSyntax, collection);
+                tr.Complete();
             }
         }
 
@@ -183,54 +185,36 @@ namespace Umbraco.Core.Persistence
         /// <param name="db"></param>
         /// <param name="sqlSyntax"></param>
         /// <param name="collection"></param>
-        /// <param name="tr"></param>
-        /// <param name="commitTrans"></param>
-        public static void BulkInsertRecords<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection, ITransaction tr, bool commitTrans = false)
+        public static void BulkInsertRecords<T>(this IDatabase db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
                 return;
 
-            try
+            //if it is sql ce or it is a sql server version less than 2008, we need to do individual inserts.
+            var sqlServerSyntax = sqlSyntax as SqlServerSyntaxProvider;
+            if ((sqlServerSyntax != null && (int) sqlServerSyntax.ServerVersion.ProductVersionName < (int) SqlServerSyntaxProvider.VersionName.V2008)
+                || sqlSyntax is SqlCeSyntaxProvider)
             {
-                //if it is sql ce or it is a sql server version less than 2008, we need to do individual inserts.
-                var sqlServerSyntax = sqlSyntax as SqlServerSyntaxProvider;
-                if ((sqlServerSyntax != null && (int) sqlServerSyntax.ServerVersion.ProductVersionName < (int) SqlServerSyntaxProvider.VersionName.V2008)
-                    || sqlSyntax is SqlCeSyntaxProvider)
-                {
-                    //SqlCe doesn't support bulk insert statements!
+                //SqlCe doesn't support bulk insert statements!
 
-                    foreach (var poco in collection)
-                    {
-                        db.Insert(poco);
-                    }
-                }
-                else
+                foreach (var poco in collection)
                 {
-                    string[] sqlStatements;
-                    var cmds = db.GenerateBulkInsertCommand(collection, db.Connection, out sqlStatements);
-                    for (var i = 0; i < sqlStatements.Length; i++)
-                    {
-                        using (var cmd = cmds[i])
-                        {
-                            cmd.CommandText = sqlStatements[i];
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-
-                if (commitTrans)
-                {
-                    tr.Complete();
+                    db.Insert(poco);
                 }
             }
-            catch
+            else
             {
-                if (commitTrans)
+                string[] sqlStatements;
+                var cmds = db.GenerateBulkInsertCommand(collection, db.Connection, out sqlStatements);
+                for (var i = 0; i < sqlStatements.Length; i++)
                 {
-                    tr.Dispose();
+                    using (var cmd = cmds[i])
+                    {
+                        cmd.CommandText = sqlStatements[i];
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-                throw;
             }
         }
 

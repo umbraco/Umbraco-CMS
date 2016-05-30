@@ -58,6 +58,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.Begin();
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.SaveUserLogins(userId, logins);
                 uow.Complete();
@@ -72,6 +73,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.Begin();
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.DeleteUserLogins(userId);
                 uow.Complete();

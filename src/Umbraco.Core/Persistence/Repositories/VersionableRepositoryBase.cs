@@ -88,12 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if(latestVersionDto.VersionId == dto.VersionId)
                 return;
 
-            using (var transaction = Database.GetTransaction())
-            {
-                PerformDeleteVersion(dto.NodeId, versionId);
-
-                transaction.Complete();
-            }
+            PerformDeleteVersion(dto.NodeId, versionId);
         }
 
         public virtual void DeleteVersions(int id, DateTime versionDate)
@@ -106,14 +101,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     new { /*VersionId =*/ latestVersionDto.VersionId, Id = id, VersionDate = versionDate});
             if (list.Any() == false) return;
 
-            using (var transaction = Database.GetTransaction()) // fixme - though... already in a unit of work?
+            foreach (var dto in list)
             {
-                foreach (var dto in list)
-                {
-                    PerformDeleteVersion(id, dto.VersionId);
-                }
-
-                transaction.Complete();
+                PerformDeleteVersion(id, dto.VersionId);
             }
         }
 

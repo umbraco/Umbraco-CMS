@@ -199,12 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (dto == null) return;
 
-            using (var transaction = Database.GetTransaction())
-            {
-                PerformDeleteVersion(dto.NodeId, versionId);
-
-                transaction.Complete();
-            }
+            PerformDeleteVersion(dto.NodeId, versionId);
         }
 
         public override void DeleteVersions(int id, DateTime versionDate)
@@ -219,14 +214,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = Database.Fetch<DocumentDto>(sql);
             if (list.Any() == false) return;
 
-            using (var transaction = Database.GetTransaction())
+            foreach (var dto in list)
             {
-                foreach (var dto in list)
-                {
-                    PerformDeleteVersion(id, dto.VersionId);
-                }
-
-                transaction.Complete();
+                PerformDeleteVersion(id, dto.VersionId);
             }
         }
 

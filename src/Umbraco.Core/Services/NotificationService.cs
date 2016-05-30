@@ -261,6 +261,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
+                uow.Begin();
                 var notifications = repository.SetNotifications(user, entity, actions);
                 uow.Complete();
                 return notifications;

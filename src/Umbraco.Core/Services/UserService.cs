@@ -579,6 +579,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.Begin();
                 var repository = uow.CreateRepository<IUserRepository>();
                 repository.ReplaceUserPermissions(userId, permissions, entityIds);
                 uow.Complete();
@@ -595,6 +596,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
+                uow.Begin();
                 var repository = uow.CreateRepository<IUserRepository>();
                 repository.AssignUserPermission(userId, permission, entityIds);
                 uow.Complete();

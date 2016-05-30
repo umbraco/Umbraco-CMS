@@ -1867,7 +1867,7 @@ WHERE cmsContentXml.nodeId IN (
                 // because we already have the condition on the content being published
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true, newest: false);
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml = _xmlContentSerializer(c).ToDataString() }).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }
@@ -1942,7 +1942,7 @@ WHERE cmsPreviewXml.nodeId IN (
                     NodeId = c.Id,
                     Xml = _xmlContentSerializer(c).ToDataString()
                 }).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }
@@ -2011,7 +2011,7 @@ WHERE cmsContentXml.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = _xmlMediaSerializer(m).ToDataString() }).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }
@@ -2080,7 +2080,7 @@ WHERE cmsContentXml.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = _xmlMemberSerializer(m).ToDataString() }).ToArray();
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }

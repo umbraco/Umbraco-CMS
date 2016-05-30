@@ -1233,8 +1233,7 @@ WHERE cmsContentNu.nodeId IN (
                 }
                 items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
 
-                // ReSharper disable once RedundantArgumentDefaultValue
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Count;
             } while (processed < total);
         }
@@ -1293,8 +1292,7 @@ WHERE cmsContentNu.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, true)).ToArray();
-                // ReSharper disable once RedundantArgumentDefaultValue
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }
@@ -1353,8 +1351,7 @@ WHERE cmsContentNu.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, true)).ToArray();
-                // ReSharper disable once RedundantArgumentDefaultValue
-                db.BulkInsertRecords(db.SqlSyntax, items, null, false); // run within the current transaction and do NOT commit
+                db.BulkInsertRecords(db.SqlSyntax, items);
                 processed += items.Length;
             } while (processed < total);
         }

@@ -145,30 +145,26 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup CreateIfNotExists(string roleName)
         {
-            using (var transaction = Database.GetTransaction())
+            var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var result = GetByQuery(qry);
+
+            if (result.Any()) return null;
+
+            var grp = new MemberGroup
             {
-                var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
-                var result = GetByQuery(qry);
+                Name = roleName
+            };
+            PersistNewItem(grp);
 
-                if (result.Any()) return null;
-
-                var grp = new MemberGroup
-                {
-                    Name = roleName
-                };
-                PersistNewItem(grp);
-
-                if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this))
-                {
-                    return null;
-                }
-
-                transaction.Complete();
-
-                SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
-
-                return grp;
+            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this))
+            {
+                return null;
             }
+
+            // fixme - in a repository?!
+            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
+
+            return grp;
         }
 
         public IEnumerable<IMemberGroup> GetMemberGroupsForMember(int memberId)
@@ -219,53 +215,41 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
-            using (var transaction = Database.GetTransaction())
-            {
-                //first get the member ids based on the usernames
-                var memberObjectType = new Guid(Constants.ObjectTypes.Member);
+            //first get the member ids based on the usernames
+            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
 
-                var memberSql = Sql()
-                    .Select("umbracoNode.id")
-                    .From<NodeDto>()
-                    .InnerJoin<MemberDto>()
-                    .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                    .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
-                var memberIds = Database.Fetch<int>(memberSql).ToArray();
+            var memberSql = Sql()
+                .Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
+            var memberIds = Database.Fetch<int>(memberSql).ToArray();
 
-                AssignRolesInternal(memberIds, roleNames);
-                transaction.Complete();
-            }
+            AssignRolesInternal(memberIds, roleNames);
         }
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            using (var transaction = Database.GetTransaction())
-            {
-                //first get the member ids based on the usernames
-                var memberObjectType = new Guid(Constants.ObjectTypes.Member);
+            //first get the member ids based on the usernames
+            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
 
-                var memberSql = Sql()
-                    .Select("umbracoNode.id")
-                    .From<NodeDto>()
-                    .InnerJoin<MemberDto>()
-                    .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                    .Where<NodeDto>( x => x.NodeObjectType == memberObjectType)
-                    .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
-                var memberIds = Database.Fetch<int>(memberSql).ToArray();
+            var memberSql = Sql()
+                .Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>( x => x.NodeObjectType == memberObjectType)
+                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
+            var memberIds = Database.Fetch<int>(memberSql).ToArray();
 
-                DissociateRolesInternal(memberIds, roleNames);
-                transaction.Complete();
-            }
+            DissociateRolesInternal(memberIds, roleNames);
         }
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
-            using (var transaction = Database.GetTransaction())
-            {
-                AssignRolesInternal(memberIds, roleNames);
-                transaction.Complete();
-            }
+            AssignRolesInternal(memberIds, roleNames);
         }
 
         public void AssignRolesInternal(int[] memberIds, string[] roleNames)
@@ -333,11 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            using (var transaction = Database.GetTransaction())
-            {
-                DissociateRolesInternal(memberIds, roleNames);
-                transaction.Complete();
-            }
+            DissociateRolesInternal(memberIds, roleNames);
         }
 
         private void DissociateRolesInternal(int[] memberIds, string[] roleNames)

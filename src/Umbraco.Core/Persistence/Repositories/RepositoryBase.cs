@@ -196,7 +196,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return PerformCount(query);
         }
-        
+
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
@@ -223,7 +223,6 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
         }
-        
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);

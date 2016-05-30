@@ -431,62 +431,53 @@ namespace Umbraco.Core.Persistence.Repositories
             // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up
             // with quite a few additional queries.
 
-            //do all this in one transaction
-            using (var trans = Database.GetTransaction())
+            var tagSetSql = GetTagSet(asArray);
+
+            //adds any tags found in the collection that aren't in cmsTag
+            var insertTagsSql = string.Concat("insert into cmsTags (Tag,",
+                                                SqlSyntax.GetQuotedColumnName("group"),
+                                                ") ",
+                                                " select TagSet.Tag, TagSet.",
+                                                SqlSyntax.GetQuotedColumnName("group"),
+                                                " from ",
+                                                tagSetSql,
+                                                " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.",
+                                                SqlSyntax.GetQuotedColumnName("group"),
+                                                " = cmsTags.",
+                                                SqlSyntax.GetQuotedColumnName("group"),
+                                                ")",
+                                                " where cmsTags.Id is null ");
+            //insert the tags that don't exist
+            Database.Execute(insertTagsSql);
+
+            if (replaceTags)
             {
-                //var factory = new TagFactory();
-
-                var tagSetSql = GetTagSet(asArray);
-
-                //adds any tags found in the collection that aren't in cmsTag
-                var insertTagsSql = string.Concat("insert into cmsTags (Tag,",
-                                                  SqlSyntax.GetQuotedColumnName("group"),
-                                                  ") ",
-                                                  " select TagSet.Tag, TagSet.",
-                                                  SqlSyntax.GetQuotedColumnName("group"),
-                                                  " from ",
-                                                  tagSetSql,
-                                                  " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.",
-                                                  SqlSyntax.GetQuotedColumnName("group"),
-                                                  " = cmsTags.",
-                                                  SqlSyntax.GetQuotedColumnName("group"),
-                                                  ")",
-                                                  " where cmsTags.Id is null ");
-                //insert the tags that don't exist
-                Database.Execute(insertTagsSql);
-
-                if (replaceTags)
-                {
-                    //if we are replacing the tags then remove them first
-                    Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
-                }
-
-                //adds any tags found in csv that aren't in tagrelationships
-                var insertTagRelationsSql = string.Concat("insert into cmsTagRelationship (tagId,nodeId,propertyTypeId) ",
-                                                          "select NewTagsSet.Id, " + contentId + ", " + propertyTypeId + " from  ",
-                                                          "( ",
-                                                          "select NewTags.Id from  ",
-                                                          tagSetSql,
-                                                          " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.",
-                                                          SqlSyntax.GetQuotedColumnName("group"),
-                                                          " = NewTags.",
-                                                          SqlSyntax.GetQuotedColumnName("group"),
-                                                          ") ",
-                                                          ") as NewTagsSet ",
-                                                          "left outer join cmsTagRelationship ",
-                                                          "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.nodeId = ",
-                                                          contentId,
-                                                          " and cmsTagRelationship.propertyTypeId = ",
-                                                          propertyTypeId,
-                                                          ") ",
-                                                          "where cmsTagRelationship.tagId is null ");
-
-                //insert the tags relations that don't exist
-                Database.Execute(insertTagRelationsSql);
-
-                //GO!
-                trans.Complete();
+                //if we are replacing the tags then remove them first
+                Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
             }
+
+            //adds any tags found in csv that aren't in tagrelationships
+            var insertTagRelationsSql = string.Concat("insert into cmsTagRelationship (tagId,nodeId,propertyTypeId) ",
+                                                        "select NewTagsSet.Id, " + contentId + ", " + propertyTypeId + " from  ",
+                                                        "( ",
+                                                        "select NewTags.Id from  ",
+                                                        tagSetSql,
+                                                        " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.",
+                                                        SqlSyntax.GetQuotedColumnName("group"),
+                                                        " = NewTags.",
+                                                        SqlSyntax.GetQuotedColumnName("group"),
+                                                        ") ",
+                                                        ") as NewTagsSet ",
+                                                        "left outer join cmsTagRelationship ",
+                                                        "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.nodeId = ",
+                                                        contentId,
+                                                        " and cmsTagRelationship.propertyTypeId = ",
+                                                        propertyTypeId,
+                                                        ") ",
+                                                        "where cmsTagRelationship.tagId is null ");
+
+            //insert the tags relations that don't exist
+            Database.Execute(insertTagRelationsSql);
         }
 
         /// <summary>

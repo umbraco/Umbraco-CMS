@@ -25,34 +25,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DeleteUserLogins(int memberId)
         {
-            using (var t = Database.GetTransaction())
-            {
-                Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
-
-                t.Complete();
-            }
+            Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
         }
 
         public void SaveUserLogins(int memberId, IEnumerable<UserLoginInfo> logins)
         {
-            using (var t = Database.GetTransaction())
+            //clear out logins for member
+            Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });
+
+            //add them all
+            foreach (var l in logins)
             {
-                //clear out logins for member
-                Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });
-
-                //add them all
-                foreach (var l in logins)
+                Database.Insert(new ExternalLoginDto
                 {
-                    Database.Insert(new ExternalLoginDto
-                    {
-                        LoginProvider = l.LoginProvider,
-                        ProviderKey = l.ProviderKey,
-                        UserId = memberId,
-                        CreateDate = DateTime.Now
-                    });
-                }
-
-                t.Complete();
+                    LoginProvider = l.LoginProvider,
+                    ProviderKey = l.ProviderKey,
+                    UserId = memberId,
+                    CreateDate = DateTime.Now
+                });
             }
         }
 

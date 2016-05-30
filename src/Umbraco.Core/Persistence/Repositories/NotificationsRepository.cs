@@ -37,14 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
         {
-            var notifications = new List<Notification>();
-            using (var t = _unitOfWork.Database.GetTransaction())
-            {
-                DeleteNotifications(user, entity);
-                notifications.AddRange(actions.Select(action => CreateNotification(user, entity, action)));
-                t.Complete();
-            }
-            return notifications;
+            DeleteNotifications(user, entity);
+            return actions.Select(action => CreateNotification(user, entity, action)).ToList();
         }
 
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
