@@ -463,6 +463,10 @@ module.exports = function (grunt) {
                     expand: true,
                     ignorePackages: ['bootstrap'],
                     packageSpecific: {
+                        'moment': {
+                            keepExpandedHierarchy: false,
+                            files: ['min/moment-with-locales.js']
+                        },
                         'typeahead.js': {
                             keepExpandedHierarchy: false,
                             files: ['dist/typeahead.bundle.min.js']
