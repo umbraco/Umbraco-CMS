@@ -7,10 +7,16 @@ namespace Umbraco.Core.Security
 {
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
+        public virtual string ActiveDirectoryDomain {
+            get {
+                return ConfigurationManager.AppSettings["ActiveDirectoryDomain"];
+            }
+        }
+
         public Task<BackOfficeUserPasswordCheckerResult> CheckPasswordAsync(BackOfficeIdentityUser user, string password)
         {
             bool isValid;
-            using (var pc = new PrincipalContext(ContextType.Domain, ConfigurationManager.AppSettings["ActiveDirectoryDomain"]))
+            using (var pc = new PrincipalContext(ContextType.Domain, ActiveDirectoryDomain))
             {
                 isValid = pc.ValidateCredentials(user.UserName, password);
             }
