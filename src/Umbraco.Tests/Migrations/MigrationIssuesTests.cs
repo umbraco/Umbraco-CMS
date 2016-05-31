@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Migrations
             };
             DatabaseContext.Database.Insert(data);
 
-            var migration = new UpdateRelatedLinksData(SqlSyntax, Logger);
+            var migration = new UpdateRelatedLinksData(Logger);
             migration.UpdateRelatedLinksDataDo(DatabaseContext.Database);
 
             data = DatabaseContext.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();

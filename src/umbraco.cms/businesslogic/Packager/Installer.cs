@@ -299,18 +299,7 @@ namespace umbraco.cms.businesslogic.packager
                 // Get current user, with a fallback
                 var currentUser = ApplicationContext.Current.Services.UserService.GetUserById(0);
 
-                //if there's a context, try to resolve the user - this will return null if there is a context but no
-                // user found when there are old/invalid cookies lying around most likely during installation.
-                // in that case we'll keep using the admin user
-                if (string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID) == false)
-                {
-                    if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
-                    {
-                        var userById = //User.GetCurrent();
-                        if (userById != null)
-                            currentUser = userById;
-                    }
-                }
+                //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
                 
 
                 //Xml as XElement which is used with the new PackagingService

@@ -72,7 +72,7 @@ namespace Umbraco.Web.Routing
                     s = "/" + string.Join("/", l) + " (id=" + id + ")";
 
                 }
-                urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
+                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/routeError", s));
             }
             else
             {

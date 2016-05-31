@@ -121,7 +121,6 @@ namespace umbraco
         private static readonly object DbReadSyncLock = new object();
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
-        private const string XmlContextClonedContentItemKey = "UmbracoXmlContextContent.cloned";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
 
@@ -215,6 +214,7 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
+            var childNodesXPath = "./* [@id]";
             using (var safeXml = GetSafeXmlWriter(false))
             {
                 var parentNode = parentId == -1
@@ -543,7 +543,6 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             get { return XmlFileEnabled && UmbracoConfig.For.UmbracoSettings().Content.XmlContentCheckForDiskChanges; }
         }
         
-        }        
 
         #endregion
 
@@ -747,7 +746,6 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                 _releaser.Dispose();
                 _releaser = null;
             }
-            
         }
                 
         private static string ChildNodesXPath
@@ -813,7 +811,8 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                 // save
                 using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
                 {
-                    SaveXmlToStream(xml, fs);
+                    var bytes = Encoding.UTF8.GetBytes(SaveXmlToString(xml));
+                    fs.Write(bytes, 0, bytes.Length);
                 }
 
                 LogHelper.Info<content>("Saved Xml to file.");
@@ -827,7 +826,47 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             }
         }
 
-        private void SaveXmlToStream(XmlDocument xml, Stream writeStream)
+        // invoked by XmlCacheFilePersister ONLY and that one manages the MainDom, ie it
+        // will NOT try to save once the current app domain is not the main domain anymore
+        // (no need to test _released)
+        internal async Task SaveXmlToFileAsync()
+        {
+            LogHelper.Info<content>("Save Xml to file...");
+
+            try
+            {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
+                // delete existing file, if any
+                DeleteXmlFile();
+
+                // ensure cache directory exists
+                var directoryName = Path.GetDirectoryName(_xmlFileName);
+                if (directoryName == null)
+                    throw new Exception(string.Format("Invalid XmlFileName \"{0}\".", _xmlFileName));
+                if (File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
+                    Directory.CreateDirectory(directoryName);
+
+                // save
+                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+                {
+                    var bytes = Encoding.UTF8.GetBytes(SaveXmlToString(xml));
+                    await fs.WriteAsync(bytes, 0, bytes.Length);
+                }
+
+                LogHelper.Info<content>("Saved Xml to file.");
+            }
+            catch (Exception e)
+            {
+                // if something goes wrong remove the file
+                DeleteXmlFile();
+
+                LogHelper.Error<content>("Failed to save Xml to file.", e);
+            }
+        }
+
+        private string SaveXmlToString(XmlDocument xml)
         {
             // using that one method because we want to have proper indent
             // and in addition, writing async is never fully async because
@@ -841,12 +880,8 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
 
             // so ImportContent must also make sure of ignoring whitespaces!
 
-            if (writeStream.CanSeek)
-            {
-                writeStream.Position = 0;
-            }
-
-            using (var xmlWriter = XmlWriter.Create(writeStream, new XmlWriterSettings
+            var sb = new StringBuilder();
+            using (var xmlWriter = XmlWriter.Create(sb, new XmlWriterSettings
             {
                 Indent = true,
                 Encoding = Encoding.UTF8,
@@ -856,6 +891,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                 //xmlWriter.WriteProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
                 xml.WriteTo(xmlWriter); // already contains the xml declaration
             }
+            return sb.ToString();
         }
 
         private XmlDocument LoadXmlFromFile()
@@ -1113,6 +1149,8 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         }
 
 
+        public class DocumentCacheEventArgs : System.ComponentModel.CancelEventArgs { }
+        public class RefreshContentEventArgs : System.ComponentModel.CancelEventArgs { }
 
         #endregion
     }

@@ -98,26 +98,106 @@ namespace umbraco.presentation.dialogs
             int languageId;
             if (int.TryParse(language.SelectedValue, out languageId))
             {
-                cms.businesslogic.translation.Translation.MakeNew(
+                // testing translate
+                MakeNew(
                     _currentPage,
-                    getUser(),
-                    BusinessLogic.User.GetUser(int.Parse(translator.SelectedValue)),
-                    new cms.businesslogic.language.Language(languageId),
+                    Security.CurrentUser,
+                    Services.UserService.GetUserById(int.Parse(translator.SelectedValue)),
+                    new Language(int.Parse(language.SelectedValue)),
                     comment.Text, includeSubpages.Checked,
                     true);
 
                 pane_form.Visible = false;
                 pl_buttons.Visible = false;
 
-                feedback.Text = ui.Text("translation", "pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) +
+                feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", _currentPage.Text) +
                     "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" +
-                    ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
-                feedback.type = uicontrols.Feedback.feedbacktype.success;
+                    Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
+                feedback.type = Feedback.feedbacktype.success;
             }
             else
             {
-                feedback.Text = ui.Text("translation", "noLanguageSelected");
-                feedback.type = uicontrols.Feedback.feedbacktype.error;
+                feedback.Text = Services.TextService.Localize("translation/noLanguageSelected");
+                feedback.type = Feedback.feedbacktype.error;
+            }
+        }
+        
+        public void MakeNew(CMSNode Node, IUser User, IUser Translator, Language Language, string Comment,
+            bool IncludeSubpages, bool SendEmail)
+        {
+            // Get translation taskType for obsolete task constructor
+            var taskType = Services.TaskService.GetTaskTypeByAlias("toTranslate");
+
+            // Create pending task
+            var t = new cms.businesslogic.task.Task(new Task(taskType));
+            t.Comment = Comment;
+            t.Node = Node;
+            t.ParentUser = User;
+            t.User = Translator;
+            t.Save();
+
+            Services.AuditService.Add(AuditType.SendToTranslate,
+                "Translator: " + Translator.Name + ", Language: " + Language.FriendlyName,
+                User.Id, Node.Id);
+
+            // send it
+            if (SendEmail)
+            {
+                string serverName = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
+                int port = HttpContext.Current.Request.Url.Port;
+
+                if (port != 80)
+                    serverName += ":" + port;
+
+                serverName += IOHelper.ResolveUrl(SystemDirectories.Umbraco);
+
+                // Send mail
+                string[] subjectVars = { serverName, Node.Text };
+                string[] bodyVars = {
+                    Translator.Name, Node.Text, User.Name,
+                    serverName, t.Id.ToString(),
+                    Language.FriendlyName
+                };
+
+                if (User.Email != "" && User.Email.Contains("@") && Translator.Email != "" &&
+                    Translator.Email.Contains("@"))
+                {
+                    // create the mail message 
+                    using (MailMessage mail = new MailMessage(User.Email, Translator.Email))
+                    {
+                        // populate the message
+                        mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService), subjectVars);
+                        mail.IsBodyHtml = false;
+                        mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService), bodyVars);
+                        try
+                        {
+                            using (SmtpClient sender = new SmtpClient())
+                            {
+                                sender.Send(mail);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<sendToTranslation>("Error sending translation e-mail", ex);
+                        }
+                    }
+                        
+                }
+                else
+                {
+                    LogHelper.Warn<sendToTranslation>("Could not send translation e-mail because either user or translator lacks e-mail in settings");
+                }
+
+            }
+
+            if (IncludeSubpages)
+            {
+                //store children array here because iterating over an Array property object is very inneficient.
+                var c = Node.Children;
+                foreach (CMSNode n in c)
+                {
+                    MakeNew(n, User, Translator, Language, Comment, true, false);
+                }
             }
         }
     }

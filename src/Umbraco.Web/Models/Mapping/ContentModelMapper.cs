@@ -15,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping
 {

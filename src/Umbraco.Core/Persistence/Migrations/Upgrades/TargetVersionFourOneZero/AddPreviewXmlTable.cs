@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourOneZero
     [Migration("4.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddPreviewXmlTable : MigrationBase
     {
-        public AddPreviewXmlTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddPreviewXmlTable(ILogger logger)
+            : base(logger)
         {
         }
 
