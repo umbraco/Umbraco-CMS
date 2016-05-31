@@ -1,47 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Logging;
 using Examine;
 using Lucene.Net.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using UmbracoExamine;
 
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
-    public class GridPropertyEditor : PropertyEditor
+    public class GridPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
-        /// <summary>
-        /// We're going to bind to the Examine events so we can ensure grid data is index nicely
-        /// </summary>
-        /// <remarks>
-        /// I think this kind of logic belongs on this property editor, putting this inside of the indexer certainly doesn't seem right
-        /// </remarks>
-        static GridPropertyEditor()
-        {
-            foreach (var i in ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>())
-            {
-                i.DocumentWriting += DocumentWriting;
-            }
-        }
+        private readonly IExamineIndexCollectionAccessor _indexCollection;
 
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
-        /// </summary>
-        public GridPropertyEditor(ILogger logger) : base(logger)
+        /// Constructor
+        /// </summary>        
+        public GridPropertyEditor(ILogger logger, IExamineIndexCollectionAccessor indexCollection) : base(logger)
         {
+            _indexCollection = indexCollection;
         }
-        
+
         private static void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
             var indexer = (BaseUmbracoIndexer)sender;
@@ -147,6 +130,27 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
         }
+
+        #region Application event handler, used to bind to events on startup
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        /// <summary>
+        /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
+        /// </summary>        
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            foreach (var i in _indexCollection.Indexes.Values.OfType<BaseUmbracoIndexer>())
+            {
+                i.DocumentWriting += DocumentWriting;
+            }
+        }
+        #endregion
     }
 
 

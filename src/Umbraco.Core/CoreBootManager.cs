@@ -179,6 +179,7 @@ namespace Umbraco.Core
             //ModelMappers
             container.RegisterFrom<CoreModelMappersCompositionRoot>();
 
+            //TODO: Don't think we'll need this when the resolvers are all container resolvers
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
             container.RegisterSingleton<PluginManager>(factory => PluginManager);
 

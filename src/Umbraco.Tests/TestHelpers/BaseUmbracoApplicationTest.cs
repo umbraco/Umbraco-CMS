@@ -200,16 +200,16 @@ namespace Umbraco.Tests.TestHelpers
         {
             return CacheHelper.CreateDisabledCacheHelper();
         }
-
-        /// <summary>
-        /// Inheritors can override this if they wish to create a custom application context
-        /// </summary>
-        protected virtual void SetupApplicationContext()
+        
+        private void SetupApplicationContext()
         {
             var applicationContext = CreateApplicationContext();
             ApplicationContext.Current = applicationContext;
         }
 
+        /// <summary>
+        /// Inheritors can override this if they wish to create a custom application context
+        /// </summary>
         protected virtual ApplicationContext CreateApplicationContext()
         {
             var evtMsgs = new TransientEventMessagesFactory();

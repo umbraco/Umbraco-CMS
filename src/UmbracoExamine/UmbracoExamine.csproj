@@ -163,6 +163,8 @@
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
     <Compile Include="DeletePolicyTracker.cs" />
+    <Compile Include="ExamineIndexCollectionAccessor.cs" />
+    <Compile Include="IExamineIndexCollectionAccessor.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyExtensions.cs" />
     <Compile Include="LegacyLibrary.cs" />
