@@ -206,8 +206,13 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            var evtMsgs = new TransientEventMessagesFactory();
-            ApplicationContext.Current = new ApplicationContext(
+            var applicationContext = CreateApplicationContext();
+            ApplicationContext.Current = applicationContext;
+        }
+
+        protected virtual ApplicationContext CreateApplicationContext()
+        {
+            var applicationContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(
                     Core.Configuration.GlobalSettings.UmbracoConnectionName, 
@@ -228,6 +233,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 IsReady = true
             };
+            return applicationContext;
         }
 
         /// <summary>

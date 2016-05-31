@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public PropertyValueEditor()
         {
-            ValueType = "string";
+            ValueType = PropertyEditorValueTypes.String;
             //set a default for validators
             Validators = new List<IPropertyValidator>();
         }
@@ -123,30 +123,35 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Returns the true DataTypeDatabaseType from the string representation ValueType
+        /// Returns the true DataTypeDatabaseType from the string representation ValueType.
         /// </summary>
         /// <returns></returns>
         public DataTypeDatabaseType GetDatabaseType()
         {
-            switch (ValueType.ToUpper(CultureInfo.InvariantCulture))
+            return GetDatabaseType(ValueType);
+        }
+
+        public static DataTypeDatabaseType GetDatabaseType(string valueType)
+        {
+            switch (valueType.ToUpperInvariant())
             {
-                case "INT":
-                case "INTEGER":
+                case PropertyEditorValueTypes.Integer:
+                case PropertyEditorValueTypes.IntegerAlternative:
                     return DataTypeDatabaseType.Integer;
-                case "DECIMAL":
+                case PropertyEditorValueTypes.Decimal:
                     return DataTypeDatabaseType.Decimal;
-                case "STRING":
+                case PropertyEditorValueTypes.String:
                     return DataTypeDatabaseType.Nvarchar;
-                case "TEXT":
-                case "JSON":
-                case "XML":
+                case PropertyEditorValueTypes.Text:
+                case PropertyEditorValueTypes.Json:
+                case PropertyEditorValueTypes.Xml:
                     return DataTypeDatabaseType.Ntext;
-                case "DATETIME":
-                case "DATE":
-                case "TIME":
+                case PropertyEditorValueTypes.DateTime:
+                case PropertyEditorValueTypes.Date:
+                case PropertyEditorValueTypes.Time:
                     return DataTypeDatabaseType.Date;
                 default:
-                    throw new FormatException("The ValueType does not match a known value type");
+                    throw new ArgumentException("Not a valid value type.", "valueType");
             }
         }
 
@@ -238,7 +243,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
             //if it's json but it's empty json, then return null
-            if (ValueType.InvariantEquals("JSON") && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
+            if (ValueType.InvariantEquals(PropertyEditorValueTypes.Json) && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
             {
                 return null;
             }

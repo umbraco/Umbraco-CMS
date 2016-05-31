@@ -46,12 +46,21 @@ namespace Umbraco.Web.Routing
             // will not use cache if previewing
             var route = umbracoContext.ContentCache.GetRouteById(id);
 
+
             if (string.IsNullOrWhiteSpace(route))
             {
                 LogHelper.Debug<DefaultUrlProvider>(
                     "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
                     () => id);
                 return null;
+            }
+
+            if (route.StartsWith("err/"))
+            {
+                LogHelper.Debug<DefaultUrlProvider>(
+                    "Page with nodeId={0} has a colliding url with page with nodeId={1}.",
+                    () => id, () => route.Substring(4));
+                return "#err-" + route.Substring(4);
             }
 
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
@@ -95,6 +104,9 @@ namespace Umbraco.Web.Routing
                     () => id);
                 return null;
             }
+
+            if (route.StartsWith("err/"))
+                return null;
 
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 

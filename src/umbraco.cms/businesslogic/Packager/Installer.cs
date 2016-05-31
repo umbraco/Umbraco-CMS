@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
+using System.Security;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -298,15 +299,19 @@ namespace umbraco.cms.businesslogic.packager
                 // Get current user, with a fallback
                 var currentUser = ApplicationContext.Current.Services.UserService.GetUserById(0);
 
-                //TODO: Need to migrate this class/code/logic so that we can replicate this functionality, until then everything will be installed by ADMIN
-
-                //if (string.IsNullOrEmpty(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID) == false)
-                //{
-                //    if (Umbraco.Web.UI.Pages.UmbracoEnsuredPage.ValidateUserContextID(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID))
-                //    {
-                //        currentUser = User.GetCurrent();
-                //    }
-                //}
+                //if there's a context, try to resolve the user - this will return null if there is a context but no
+                // user found when there are old/invalid cookies lying around most likely during installation.
+                // in that case we'll keep using the admin user
+                if (string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID) == false)
+                {
+                    if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
+                    {
+                        var userById = //User.GetCurrent();
+                        if (userById != null)
+                            currentUser = userById;
+                    }
+                }
+                
 
                 //Xml as XElement which is used with the new PackagingService
                 var rootElement = Config.DocumentElement.GetXElement();

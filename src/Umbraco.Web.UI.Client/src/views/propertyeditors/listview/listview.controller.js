@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -357,7 +357,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       $scope.actionInProgress = true;
       $scope.bulkStatus = getStatusMsg(0, selected.length);
 
-      serial(selected, fn, getStatusMsg, 0).then(function (result) {
+      return serial(selected, fn, getStatusMsg, 0).then(function (result) {
          // executes once the whole selection has been processed
          // in case of an error (caught by serial), result will be the error
          if (!(result.data && angular.isArray(result.data.notifications)))
@@ -366,11 +366,24 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    }
 
    $scope.delete = function () {
-      applySelected(
-             function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-             function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
-             "Sure you want to delete?");
+
+       var attempt =
+           applySelected(
+               function(selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+               function(count, total) {
+                   return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
+               },
+               function(total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
+               "Sure you want to delete?");
+       if (attempt) {
+           attempt.then(function () {
+               //executes if all is successful, let's sync the tree
+               var activeNode = appState.getTreeState("selectedNode");
+               if (activeNode) {
+                   navigationService.reloadNode(activeNode);
+               }
+           });
+       }
    };
 
    $scope.publish = function () {
@@ -412,12 +425,37 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    };
 
+
    function performMove(target) {
 
-      applySelected(
-             function (selected, index) { return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) }); },
-             function (count, total) { return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Moved " + total + " item" + (total > 1 ? "s" : ""); });
+       //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return 
+       // a specific value from one of the methods, so we'll have to try this way. Even though the first method
+       // will fire once per every node moved, the destination path will be the same and we need to use that to sync.
+       var newPath = null;
+       applySelected(
+               function(selected, index) {
+                   return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) }).then(function(path) {
+                       newPath = path;
+                       return path;
+                   });
+               },
+               function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : "");},
+               function(total) { return "Moved " + total + " item" + (total > 1 ? "s" : ""); })
+           .then(function() {  
+               //executes if all is successful, let's sync the tree
+               if (newPath) {
+
+                   //we need to do a double sync here: first refresh the node where the content was moved,
+                   // then refresh the node where the content was moved from
+                   navigationService.syncTree({ tree: target.nodeType, path: newPath, forceReload: true, activate: false }).then(function (args) {
+                        //get the currently edited node (if any)
+                        var activeNode = appState.getTreeState("selectedNode");
+                        if (activeNode) {                                                        
+                            navigationService.reloadNode(activeNode);
+                        }
+                   });
+               }
+           });
    }
 
    $scope.copy = function () {

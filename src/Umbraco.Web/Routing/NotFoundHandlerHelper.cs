@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -32,41 +33,23 @@ namespace Umbraco.Web.Routing
             ITypedPublishedContentQuery publishedContentQuery,
             IDomainService domainService)
         {
+            throw new NotImplementedException();
+        }
+
+        internal static int? GetCurrentNotFoundPageId(
+            IContentErrorPage[] error404Collection, 
+            IEntityService entityService,
+            ITypedPublishedContentQuery publishedContentQuery,
+            CultureInfo errorCulture)
+        {
             if (error404Collection.Length > 1)
             {
-                // try to get the 404 based on current culture (via domain)
-                IContentErrorPage cultureErr;
-
-                var d = domainService.GetByName(requestServerName);
-
-                if (d != null && d.LanguageId.HasValue)
-                {
-                    // test if a 404 page exists with current culture
-                    cultureErr = error404Collection
-                        .FirstOrDefault(x => x.Culture == d.LanguageIsoCode);
-
-                    if (cultureErr != null)
-                    {
-                        return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
-                    }
-                }
-
                 // test if a 404 page exists with current culture thread
-                cultureErr = error404Collection
-                    .FirstOrDefault(x => x.Culture == System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
-                if (cultureErr != null)
-                {
-                    return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
-                }
-
-                // there should be a default one!
-                cultureErr = error404Collection
-                    .FirstOrDefault(x => x.Culture == "default");
+                var cultureErr = error404Collection.FirstOrDefault(x => x.Culture == errorCulture.Name)
+                    ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)
-                {
                     return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
-                }
             }
             else
             {

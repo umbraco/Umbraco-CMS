@@ -184,7 +184,10 @@ namespace umbraco.presentation.webservices
                 //content.Instance.SortNodes(parentId);
 
                 //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
-                ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
+                if (parentId > 0)
+                {
+                    ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
+                }
 
             }
             catch (Exception ex)
