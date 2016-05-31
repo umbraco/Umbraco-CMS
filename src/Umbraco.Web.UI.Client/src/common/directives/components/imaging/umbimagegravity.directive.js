@@ -109,7 +109,8 @@ angular.module("umbraco.directives")
 						$timeout(function(){
 							setDimensions();
 							scope.loaded = true;
-							scope.onImageLoaded();
+							if (scope.onImageLoaded)
+							    scope.onImageLoaded();
 						});
 					});
 

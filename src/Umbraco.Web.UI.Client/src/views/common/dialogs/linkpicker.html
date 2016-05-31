@@ -11,12 +11,13 @@
 					 />
 			</umb-control-group>
 
-			<umb-control-group label="@content_nodeName">
+			<umb-control-group label="@content_nodeNameOptional">
 				<input type="text"
 					localize="placeholder" 
 					placeholder="@placeholders_entername" 
 					class="umb-editor umb-textstring" 
 					ng-model="target.name" />
+                <i class="icon icon-delete red hover-show pull-right" style="position:absolute;padding-top:6px;right:33px;" ng-click="target.name=''"></i>
 			</umb-control-group>
 
 			<umb-control-group label="@content_target">
@@ -27,6 +28,14 @@
 					<option value="_parent">Opens the linked document in the parent frame</option>
 				</select>
 			</umb-control-group>
+
+            <umb-control-group label="@content_classOptional">
+                <input type="text"
+                       localize="placeholder"
+                       placeholder="@placeholders_enterClass"
+                       class="umb-editor umb-textstring"
+                       ng-model="target.class" />
+            </umb-control-group>
 		</umb-pane>
 
         <umb-tree-search-box hide-search-callback="hideSearch"

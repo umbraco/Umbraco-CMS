@@ -153,6 +153,13 @@ angular.module("umbraco")
                         $scope.target = image;
                         $scope.target.url = mediaHelper.resolveFile(image);
                         $scope.openDetailsDialog();
+                        // restore original size
+                        _.each($scope.target.properties, function (prop) {
+                            if (prop.alias == "umbracoWidth")
+                                $scope.target.width = prop.value;
+                            if (prop.alias == "umbracoHeight")
+                                $scope.target.height = prop.value;
+                        });
                     } else {
                         selectImage(image);
                     }
@@ -208,6 +215,28 @@ angular.module("umbraco")
                 $scope.activeDrag = false;
             };
 
+            $scope.openDetailsDialog = function () {
+
+                $scope.mediaPickerDetailsOverlay = {};
+                $scope.mediaPickerDetailsOverlay.show = true;
+
+                $scope.mediaPickerDetailsOverlay.submit = function (model) {
+
+                    $scope.model.selectedImages.push($scope.target);
+                    $scope.model.submit($scope.model);
+
+                    $scope.mediaPickerDetailsOverlay.show = false;
+                    $scope.mediaPickerDetailsOverlay = null;
+
+                };
+
+                $scope.mediaPickerDetailsOverlay.close = function (oldModel) {
+                    $scope.mediaPickerDetailsOverlay.show = false;
+                    $scope.mediaPickerDetailsOverlay = null;
+                };
+
+            };
+
             //default root item
             if (!$scope.target) {
 
@@ -235,29 +264,8 @@ angular.module("umbraco")
 
                }
 
+            } else {
+                $scope.openDetailsDialog();
             }
-
-            $scope.openDetailsDialog = function() {
-
-               $scope.mediaPickerDetailsOverlay = {};
-               $scope.mediaPickerDetailsOverlay.show = true;
-
-               $scope.mediaPickerDetailsOverlay.submit = function(model) {
-
-                  $scope.model.selectedImages.push($scope.target);
-                  $scope.model.submit($scope.model);
-
-                  $scope.mediaPickerDetailsOverlay.show = false;
-                  $scope.mediaPickerDetailsOverlay = null;
-
-               };
-
-               $scope.mediaPickerDetailsOverlay.close = function(oldModel) {
-                  $scope.mediaPickerDetailsOverlay.show = false;
-                  $scope.mediaPickerDetailsOverlay = null;
-               };
-
-            };
-
 
         });

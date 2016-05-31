@@ -98,7 +98,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         currentTarget = {
                             altText: img.attr("alt"),
                             url: img.attr("src"),
-                            id: img.attr("rel")
+                            id: img.attr("rel"),
+                            'class': img.attr("class"),
+                            width: img.attr("width"),
+                            height: img.attr("height")
                         };
                     }
 
@@ -120,6 +123,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                    src: (img.url) ? img.url : "nothing.jpg",
                    rel: img.id,
                    'data-id': img.id,
+                   'class': img.class,
                    id: '__mcenew'
                };
 
@@ -130,16 +134,25 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                    var size = editor.dom.getSize(imgElm);
 
                    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, img.width, img.height);
 
-                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                        editor.dom.setAttrib(imgElm, 'style', s);
+                        //var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                        //editor.dom.setAttrib(imgElm, 'style', s);
+                        editor.dom.setAttrib(imgElm, 'width', newSize.width);
+                        editor.dom.setAttrib(imgElm, 'height', newSize.height);
                         editor.dom.setAttrib(imgElm, 'id', null);
 
                         if (img.url) {
                             var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
                             editor.dom.setAttrib(imgElm, 'data-mce-src', src);
                         }
+
+                   } else {
+                        //var s = "width: " + size.w + "px; height:" + size.h + "px;";
+                        //editor.dom.setAttrib(imgElm, 'style', s);
+                        editor.dom.setAttrib(imgElm, 'width', img.width);
+                        editor.dom.setAttrib(imgElm, 'height', img.height);
+                        editor.dom.setAttrib(imgElm, 'id', null);
                    }
                }, 500);
             }
@@ -625,6 +638,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
                 data.target = anchorElm ? dom.getAttrib(anchorElm, 'target') : '';
                 data.rel = anchorElm ? dom.getAttrib(anchorElm, 'rel') : '';
+                data.class = anchorElm ? dom.getAttrib(anchorElm, 'class') : '';
 
                 if (selectedElm.nodeName === "IMG") {
                     data.text = initialText = " ";
@@ -667,7 +681,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     currentTarget = {
                         name: anchor.attr("title"),
                         url: anchor.attr("href"),
-                        target: anchor.attr("target")
+                        target: anchor.attr("target"),
+                        'class': anchor.attr("class")
                     };
 
                     //locallink detection, we do this here, to avoid poluting the dialogservice
@@ -724,7 +739,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         title: target.name,
                         target: target.target ? target.target : null,
                         rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
+                        'data-id': target.id ? target.id : null,
+                        'class': data.class ? data.class : null
                     });
 
                     editor.selection.select(anchorElm);
@@ -735,7 +751,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         title: target.name,
                         target: target.target ? target.target : null,
                         rel: target.rel ? target.rel : null,
-                        'data-id': target.id ? target.id : null
+                        'data-id': target.id ? target.id : null,
+                        'class': data.class ? data.class : null
                     });
                 }
             }

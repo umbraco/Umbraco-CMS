@@ -40,6 +40,29 @@
                            class="umb-editor umb-textstring"
                            ng-model="target.altText" />
                 </umb-control-group>
+
+
+                <umb-control-group label="@general_dimensions">
+                    <input type="text"
+                           localize="placeholder"
+                           placeholder="@general_width"
+                           class="umb-editor umb-textstring small"
+                           ng-model="target.width" />
+                    <localize key="general_by">by</localize>
+                    <input type="text"
+                           localize="placeholder"
+                           placeholder="@general_height"
+                           class="umb-editor umb-textstring small"
+                           ng-model="target.height" />
+                </umb-control-group>
+
+                <umb-control-group label="@content_classOptional">
+                    <input type="text"
+                           localize="placeholder"
+                           placeholder="@placeholders_enterClass"
+                           class="umb-editor umb-textstring"
+                           ng-model="target.class" />
+                </umb-control-group>
             </umb-pane>
         </div>
 

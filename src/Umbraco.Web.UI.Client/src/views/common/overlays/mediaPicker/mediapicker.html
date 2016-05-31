@@ -119,21 +119,56 @@
       </div>
 
       <div class="umb-control-group">
-         <label><localize key="@general_url"></localize></label>
-         <input
-            type="text"
-            localize="placeholder"
-            placeholder="@general_url"
-            class="umb-editor umb-textstring"
-            ng-model="target.url"
-            ng-disabled="target.id" />
+         <label class="control-label"><localize key="@general_url"></localize></label>
+          <div class="controls controls-row">
+             <input
+                type="text"
+                localize="placeholder"
+                placeholder="@general_url"
+                class="umb-editor umb-textstring"
+                ng-model="target.url"
+                ng-disabled="target.id" />
+          </div>
       </div>
 
       <div class="umb-control-group">
-         <label><localize key="@content_altTextOptional"></localize></label>
-         <input type="text" class="umb-editor umb-textstring" ng-model="target.altText" />
+         <label class="control-label"><localize key="@content_altTextOptional"></localize></label>
+          <div class="controls controls-row">
+            <input type="text" 
+				localize="placeholder" 
+				placeholder="@placeholders_entername" 
+                class="umb-editor umb-textstring" 
+                ng-model="target.altText" />
+          </div>
+      </div>
+       
+       <div class="umb-control-group">
+           <label class="control-label"><localize key="@general_dimensions"></localize></label>
+           <div class="controls controls-row">
+               <input type="text"
+                      localize="placeholder"
+                      placeholder="@general_width"
+                      class="umb-editor umb-textstring small"
+                      ng-model="target.width" />
+               <localize key="general_by" style="vertical-align: bottom;vertical-align: -webkit-baseline-middle;">by</localize>
+               <input type="text"
+                      localize="placeholder"
+                      placeholder="@general_height"
+                      class="umb-editor umb-textstring small"
+                      ng-model="target.height" />
+          </div>
       </div>
 
+       <div class="umb-control-group">
+           <label class="control-label"><localize key="@content_classOptional"></localize></label>
+           <div class="controls controls-row">
+               <input type="text"
+                      localize="placeholder"
+                      placeholder="@placeholders_enterClass"
+                      class="umb-editor umb-textstring"
+                      ng-model="target.class" />
+           </div>
+       </div>
 
 	</umb-overlay>
 

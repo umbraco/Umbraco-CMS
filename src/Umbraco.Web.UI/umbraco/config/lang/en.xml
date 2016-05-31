@@ -144,6 +144,8 @@
     <key alias="membertype">Member Type</key>
     <key alias="noDate">No date chosen</key>
     <key alias="nodeName">Page Title</key>
+    <key alias="nodeNameOptional">Page Title (Optional)</key>
+    <key alias="classOptional">Css Class (Optional)</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
@@ -297,6 +299,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
+    <key alias="enterClass">Enter class selectors...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
