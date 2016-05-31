@@ -1,33 +1,20 @@
-<div class="" ng-controller="Umbraco.Editors.Packages.RepoController as vm">
-
-    <umb-editor-sub-header>
-        <umb-editor-sub-header-content-left>
-
-            <umb-editor-sub-header-section>
-                <div class="umb-packages-categories -collapsed">
-                    <a href="" class="umb-packages-category" ng-class="{'-active': category.active === true}" ng-click="vm.selectCategory(category)" ng-repeat="category in vm.categories">
-                        <i class="umb-packages-category-icon" ng-class="category.icon"></i>
-                        <div>{{ category.name }}</div>
-                    </a>
-                </div>
-            </umb-editor-sub-header-section>
-
-        </umb-editor-sub-header-content-left>
-    </umb-editor-sub-header>
+<div class="umb-packages-view-wrapper" ng-controller="Umbraco.Editors.Packages.RepoController as vm">
 
 
     <div class="umb-packages-search">
         <input class="-full-width-input" type="text" name="name" value="" placeholder="Search for packages">
     </div>
 
-
-    <!-- <div class="umb-packages-categories">
-        <a href="" class="umb-packages-category" ng-click="vm.selectCategory(category)" ng-repeat="category in vm.categories">
-            <i class="umb-packages-category-icon" ng-class="category.icon"></i>
+    <div class="umb-packages-categories">
+        <a
+            href=""
+            class="umb-packages-category"
+            ng-click="vm.selectCategory(category)"
+            ng-repeat="category in vm.categories"
+            ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
             <div>{{ category.name }}</div>
         </a>
-    </div> -->
-
+    </div>
 
     <h4><strong>Popular</strong></h4>
     <div class="umb-packages clearfix">

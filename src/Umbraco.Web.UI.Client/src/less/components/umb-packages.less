@@ -11,8 +11,6 @@
 
 .umb-packages-search {
     width: 100%;
-
-    margin-top: 40px;
     margin-bottom: 40px;
     background: @grayLighter;
     border-radius: 3px;
@@ -38,11 +36,10 @@
 
 
 .umb-packages {
-    // margin: 0 -10px;
+    margin: 0 -10px;
 }
 
-
-// List
+// Cards
 .umb-package {
     float: left;
     padding: 10px;
@@ -50,8 +47,6 @@
     width: 20%;
 }
 
-
-// Link (Wrapper)
 .umb-package-link {
     display: flex;
     flex-wrap: wrap;
@@ -64,7 +59,7 @@
     height: 100%;
     width: 100%;
 
-    border: 2px solid #ececec;
+    border: 1px solid #ececec;
     border-radius: 3px;
 
     text-decoration: none !important;
@@ -93,7 +88,7 @@
     text-align: center;
     background-color: white;
 
-    min-height: 80px;
+    min-height: 60px;
 }
 
 .umb-package-icon img {
@@ -107,13 +102,16 @@
     padding-right: 15px;
     padding-bottom: 15px;
     padding-left: 15px;
+    padding-top: 15px;
     text-align: center;
+    background: @grayLighter;
+    border-top: 1px solid #ececec;
 }
 
 
 // Name
 .umb-package-name {
-    font-size: 15px;
+    font-size: 14px;
     max-width: 250px;
     margin-bottom: 5px;
 
@@ -263,59 +261,37 @@
     margin-bottom: 30px;
 }
 
-
-
 .umb-packages-category {
     display: flex;
     align-items: center;
     flex: 1 0 auto;
     justify-content: center;
-
-    opacity: .6;
-
     max-width: 25%;
-
     font-size: 14px;
     font-weight: bold;
     color: @black;
-
     box-sizing: border-box;
-
     justify-content: center;
+    border-top: 1px solid @grayLight;
+    border-bottom: 1px solid @grayLight;
+    border-right: 1px solid @grayLight;
+    padding: 5px;
 }
-
 
 .umb-packages-category:hover,
-.umb-packages-category:focus {
+.umb-packages-category.-active {
     text-decoration: none;
-    opacity: 1;
+    color: @blue;
 }
 
-.umb-packages-category-icon {
-    font-size: 20px;
-    margin-right: 5px;
-
-    display: none;
+.umb-packages-category.-first {
+    border-left: 1px solid @grayLight;
+    border-radius: 3px 0 0 3px;
 }
 
-// Collapsed
-.umb-packages-categories.-collapsed {
-    margin-bottom: 0;
-}
-
-.umb-packages-categories.-collapsed .umb-packages-category {
-    margin-right: 15px;
-    margin-left: 15px;
-}
-
-.-ma0 {
-    margin: 0 !important;
-}
-
-.-collapsed .umb-packages-category.-active {
-    color: @black;
-    opacity: 1;
-    border-bottom: 2px solid @black;
+.umb-packages-category.-last {
+    border-right: 1px solid @grayLight;
+    border-radius: 0 3px 3px 0;
 }
 
 /* PACKAGE DETAILS */
@@ -603,3 +579,4 @@
 
 .umb-info-local-item {
     margin: 10px 0;
+}
