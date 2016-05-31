@@ -68,7 +68,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             var elementData = $element.find("div:first").data().DateTimePicker;
             if ($scope.model.config.pickTime) {
                 //check if we are supposed to offset the time
-                if ($scope.model.value && $scope.model.config.offsetTime === "1" && Umbraco.Sys.ServerVariables.application.serverTimeOffset) {
+                if ($scope.model.value && $scope.model.config.offsetTime === "1" && Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
                     $scope.model.value = dateHelper.convertToServerStringTime(elementData.getDate(), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
                     $scope.serverTime = dateHelper.convertToServerStringTime(elementData.getDate(), Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
                 }
