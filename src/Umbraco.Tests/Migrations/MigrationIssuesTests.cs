@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Tests.TestHelpers;
 
@@ -80,8 +81,9 @@ namespace Umbraco.Tests.Migrations
                 Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>"
             };
             DatabaseContext.Database.Insert(data);
+            var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
 
-            var migration = new UpdateRelatedLinksData(Logger);
+            var migration = new UpdateRelatedLinksData(migrationContext);
             migration.UpdateRelatedLinksDataDo(DatabaseContext.Database);
 
             data = DatabaseContext.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();

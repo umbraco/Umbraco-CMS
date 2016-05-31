@@ -36,13 +36,11 @@ namespace Umbraco.Core
     /// </remarks>
     public class CoreBootManager : IBootManager
     {
-
-        private ServiceContainer _appStartupEvtContainer;
         protected ProfilingLogger ProfilingLogger { get; private set; }
         private DisposableTimer _timer;
         protected PluginManager PluginManager { get; private set; }
 
-
+        private Scope _appStartupScope;
         private bool _isInitialized = false;
         private bool _isStarted = false;
         private bool _isComplete = false;
@@ -111,13 +109,8 @@ namespace Umbraco.Core
             //TODO: Remove these for v8!
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
             LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
-
-            //Create a 'child'container which is a copy of all of the current registrations and begin a sub scope for it
-            // this child container will be used to manage the application event handler instances and the scope will be
-            // completed at the end of the boot process to allow garbage collection
-            _appStartupEvtContainer = Container.CreateChildContainer();
-            _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
+            
+            Container.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
 
             //build up standard IoC services
             ConfigureApplicationServices(Container);
@@ -125,8 +118,11 @@ namespace Umbraco.Core
             InitializeResolvers();
             InitializeModelMappers();
 
+            //Begin the app startup handlers scope
+            _appStartupScope = Container.BeginScope();
+
             //now we need to call the initialize methods
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            Parallel.ForEach(Container.GetAllInstances<IApplicationEventHandler>(), x =>
             {
                 try
                 {
@@ -263,7 +259,7 @@ namespace Umbraco.Core
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
             //call OnApplicationStarting of each application events handler
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            Parallel.ForEach(Container.GetAllInstances<IApplicationEventHandler>(), x =>
             {
                 try
                 {
@@ -316,7 +312,7 @@ namespace Umbraco.Core
 
 
             //call OnApplicationStarting of each application events handler
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            Parallel.ForEach(Container.GetAllInstances<IApplicationEventHandler>(), x =>
             {
                 try
                 {
@@ -336,8 +332,8 @@ namespace Umbraco.Core
                 }
             });
 
-            //end the current scope which was created to intantiate all of the startup handlers
-            _appStartupEvtContainer.EndCurrentScope();
+            //End the app startup handlers scope
+            _appStartupScope.Dispose();
 
             if (afterComplete != null)
             {
@@ -479,6 +475,20 @@ namespace Umbraco.Core
             // by default, no factory is activated
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
         }
+
+        //private class ApplicationStartupLifetime : ILifetime
+        //{
+        //    /// <summary>
+        //    /// Returns a service instance according to the specific lifetime characteristics.
+        //    /// </summary>
+        //    /// <param name="createInstance">The function delegate used to create a new service instance.</param>
+        //    /// <param name="scope">The <see cref="T:LightInject.Scope" /> of the current service request.</param>
+        //    /// <returns>The requested services instance.</returns>
+        //    public object GetInstance(Func<object> createInstance, Scope scope)
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+        //}
 
     }
 }

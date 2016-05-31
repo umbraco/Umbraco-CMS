@@ -7,8 +7,8 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("4.11.0", 0, "Test")]
     public class FourElevenMigration : MigrationBase
     {
-        public FourElevenMigration(ILogger logger) 
-            : base(logger)
+        public FourElevenMigration(IMigrationContext context) 
+            : base(context)
         { }
 
 

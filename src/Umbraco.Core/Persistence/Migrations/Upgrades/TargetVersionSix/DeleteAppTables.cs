@@ -9,8 +9,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
-        public DeleteAppTables(ILogger logger) 
-            : base(logger)
+        public DeleteAppTables(IMigrationContext context) 
+            : base(context)
         { }
 
 

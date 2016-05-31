@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             var logger = Mock.Of<ILogger>();
-            var sqlSyntax = db.SqlSyntax;
+            var context = new MigrationContext(db, logger);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
@@ -67,20 +67,20 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 targetVersion,
                 GlobalSettings.UmbracoMigrationName,
                 //pass in explicit migrations
-                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(logger),
-                new DeleteAppTables(logger),
-                new EnsureAppsTreesUpdated(logger),
-                new MoveMasterContentTypeData(logger),
-                new NewCmsContentType2ContentTypeTable(logger),
-                new RemoveMasterContentTypeColumn(logger),
-                new RenameCmsTabTable(logger),
-                new RenameTabIdColumn(logger),
-                new UpdateCmsContentTypeAllowedContentTypeTable(logger),
-                new UpdateCmsContentTypeTable(logger),
-                new UpdateCmsContentVersionTable(logger),
-                new UpdateCmsPropertyTypeGroupTable(logger));
+                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(context),
+                new DeleteAppTables(context),
+                new EnsureAppsTreesUpdated(context),
+                new MoveMasterContentTypeData(context),
+                new NewCmsContentType2ContentTypeTable(context),
+                new RemoveMasterContentTypeColumn(context),
+                new RenameCmsTabTable(context),
+                new RenameTabIdColumn(context),
+                new UpdateCmsContentTypeAllowedContentTypeTable(context),
+                new UpdateCmsContentTypeTable(context),
+                new UpdateCmsContentVersionTable(context),
+                new UpdateCmsPropertyTypeGroupTable(context));
 
-            var upgraded = migrationRunner.Execute(db /*, true*/);
+            var upgraded = migrationRunner.Execute(context /*, true*/);
 
             Assert.That(upgraded, Is.True);
 

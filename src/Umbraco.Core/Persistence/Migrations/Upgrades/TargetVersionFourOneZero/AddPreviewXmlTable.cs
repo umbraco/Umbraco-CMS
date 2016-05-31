@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourOneZero
@@ -8,8 +7,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourOneZero
     [Migration("4.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddPreviewXmlTable : MigrationBase
     {
-        public AddPreviewXmlTable(ILogger logger)
-            : base(logger)
+        public AddPreviewXmlTable(IMigrationContext context)
+            : base(context)
         {
         }
 

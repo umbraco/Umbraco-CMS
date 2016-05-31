@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 
@@ -12,8 +11,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class UpdateControlIdToPropertyEditorAlias : MigrationBase
     {
-        public UpdateControlIdToPropertyEditorAlias(ILogger logger) 
-            : base(logger)
+        public UpdateControlIdToPropertyEditorAlias(IMigrationContext context) 
+            : base(context)
         { }
 
 

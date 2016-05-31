@@ -227,6 +227,7 @@
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
+    <Compile Include="TestHelpers\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="TestHelpers\TestScopeContextAdapter.cs" />

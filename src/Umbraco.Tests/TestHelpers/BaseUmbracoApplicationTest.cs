@@ -25,6 +25,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -115,6 +116,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
             //replace some stuff
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");

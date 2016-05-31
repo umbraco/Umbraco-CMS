@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
@@ -9,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
     [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
-        public RemoveUmbracoAppConstraints(ILogger logger) 
-            : base(logger)
+        public RemoveUmbracoAppConstraints(IMigrationContext context) 
+            : base(context)
         { }
 
 

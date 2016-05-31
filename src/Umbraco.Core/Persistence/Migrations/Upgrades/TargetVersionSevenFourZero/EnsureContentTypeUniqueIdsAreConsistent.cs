@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -16,8 +15,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class EnsureContentTypeUniqueIdsAreConsistent : MigrationBase
     {
-        public EnsureContentTypeUniqueIdsAreConsistent(ILogger logger)
-            : base(logger)
+        public EnsureContentTypeUniqueIdsAreConsistent(IMigrationContext context)
+            : base(context)
         { }
         
         public override void Up()

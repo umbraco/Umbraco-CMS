@@ -74,14 +74,6 @@ namespace Umbraco.Tests.BootManagers
                     factory.GetInstance<ILogger>()), new PerContainerLifetime());
                 container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
             }
-
-            public class TestIndexCollectionAccessor : IExamineIndexCollectionAccessor
-            {
-                public IReadOnlyDictionary<string, IExamineIndexer> Indexes
-                {
-                    get { return new Dictionary<string, IExamineIndexer>(); }
-                }
-            }
         }
         
         /// <summary>

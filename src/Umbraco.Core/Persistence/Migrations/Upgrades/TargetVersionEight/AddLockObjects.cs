@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
@@ -9,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
     [Migration("8.0.0", 101, GlobalSettings.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
-        public AddLockObjects(ILogger logger)
-            : base(logger)
+        public AddLockObjects(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()

@@ -7,8 +7,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class MoveMasterContentTypeData : MigrationBase
     {
-        public MoveMasterContentTypeData(ILogger logger) 
-            : base(logger)
+        public MoveMasterContentTypeData(IMigrationContext context) 
+            : base(context)
         { }
 
 

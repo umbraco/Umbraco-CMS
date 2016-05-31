@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using Examine;
 using Moq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -75,8 +78,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new MockDbConnection();
         }
-
+        
         #region Inner classes
+
+        
 
         private class MockDbConnection : DbConnection
         {

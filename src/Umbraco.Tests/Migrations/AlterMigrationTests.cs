@@ -35,10 +35,10 @@ namespace Umbraco.Tests.Migrations
         {
             // Arrange
             var context = new MigrationContext(_database, _logger);
-            var stub = new DropForeignKeyMigrationStub(_logger);
+            var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
-            stub.GetUpExpressions(context);
+            stub.Up();
 
             // Assert
             Assert.That(context.Expressions.Count, Is.EqualTo(1));
@@ -52,10 +52,10 @@ namespace Umbraco.Tests.Migrations
         {
             // Arrange
             var context = new MigrationContext(_database, _logger);
-            var stub = new AlterUserTableMigrationStub(_logger);
+            var stub = new AlterUserTableMigrationStub(context);
 
             // Act
-            stub.GetUpExpressions(context);
+            stub.Up();
 
             // Assert
             Assert.That(context.Expressions.Any(), Is.True);
