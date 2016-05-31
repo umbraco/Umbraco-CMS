@@ -32,6 +32,7 @@
 
                     <div class="umb-package-info">
                         <div class="umb-package-name">{{ package.name }}</div>
+                        <div class="umb-package-description">{{ package.description | limitTo: 40 }}<span ng-if="package.description > (package.description | limitTo: 40)">...</span></div>
 
                         <div class="umb-package-numbers">
                             <small class="umb-package-downloads">
@@ -61,9 +62,8 @@
                     </div>
 
                     <div class="umb-package-info">
-                        <h4 class="umb-package-name">
-                            {{ package.name }}
-                        </h4>
+                        <div class="umb-package-name">{{ package.name }}</div>
+                        <div class="umb-package-description">{{ package.description | limitTo: 40 }}<span ng-if="package.description > (package.description | limitTo: 40)">...</span></div>
 
                         <div class="umb-package-numbers">
                             <small class="umb-package-downloads">
