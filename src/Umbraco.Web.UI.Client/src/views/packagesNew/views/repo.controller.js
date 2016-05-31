@@ -129,11 +129,12 @@
             }
         ];
 
-        function selectCategory(category) {
-            var section = $route.current.params.section;
-            var tree = $route.current.params.tree;
-            var path = "/" + section + "/" + tree + "/category/" + category.id;
-            $location.path(path);
+        function selectCategory(selectedCategory, categories) {
+            for (var i = 0; i < categories.length; i++) {
+                var category = categories[i];
+                category.active = false;
+            }
+            selectedCategory.active = true;
         }
 
         function showPackageDetails(selectedPackage) {
