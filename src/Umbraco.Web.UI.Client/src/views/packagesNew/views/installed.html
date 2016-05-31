@@ -1,1 +1,26 @@
-Installed
+<div class="umb-packages-view-wrapper" ng-controller="Umbraco.Editors.Packages.InstalledController as vm">
+
+    <div class="umb-packages-view-title">Installed packages</div>
+
+    <div class="umb-package-list">
+
+        <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
+
+            <div class="umb-package-list__item-icon">
+                <img ng-src="{{installedPackage.icon}}" />
+            </div>
+
+            <div class="umb-package-list__item-content">
+                <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
+                <div class="umb-package-list__item-description">{{ installedPackage.description }}</div>
+            </div>
+
+            <div class="umb-package-list__item-actions">
+                <button type="button" class="umb-era-button" ng-click="vm.uninstallPackage(installedPackage)">Uninstall</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

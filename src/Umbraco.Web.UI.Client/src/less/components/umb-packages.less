@@ -1,3 +1,14 @@
+.umb-packages-view-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: @black;
+    margin-bottom: 30px;
+}
+
+.umb-packages-view-wrapper {
+    padding: 20px 60px;
+}
+
 .umb-packages-search {
     width: 100%;
 
@@ -213,6 +224,11 @@
 
 .umb-era-button.-blue:hover {
 	background-color: @blueDark;
+}
+
+.umb-era-button.-red-orange {
+    background-color: #FF3F34;
+    color: white;
 }
 
 .umb-era-button.-full-width {
@@ -437,4 +453,49 @@
     bottom: 0;
     width: 100%;
     border-radius: 10px;
+}
+
+/* PACKAGE LIST */
+
+.umb-package-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.umb-package-list__item {
+    display: flex;
+    flex-direction: row;
+    background: @grayLighter;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    padding: 20px;
+    align-items: center;
+}
+
+.umb-package-list__item-icon {
+    flex: 0 0 50px;
+    margin-right: 20px;
+}
+
+.umb-package-list__item-content {
+    flex: 1 1 auto;
+    margin-right: 20px;
+}
+
+.umb-package-list__item-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: @black;
+    font-weight: bold;
+}
+
+.umb-package-list__item-description {
+    font-size: 14px;
+    color: @grayMed;
+}
+
+.umb-package-list__item-actions {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-end;
 }
