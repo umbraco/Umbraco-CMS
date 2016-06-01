@@ -22,13 +22,18 @@ build_script:
 
     ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet  
+
+    DIR %nuGetFolder%
     
     SET nuGetFolder=%CD%\..\src\packages\
     
     ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Tests\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
+    
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
-
+    DIR %nuGetFolder%
+    
     ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
 
     SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
@@ -37,7 +42,6 @@ build_script:
 
 
     build.bat %release% build%APPVEYOR_BUILD_NUMBER%
-
 
     ECHO %PATH%
 test:
