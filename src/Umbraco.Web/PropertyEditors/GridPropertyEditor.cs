@@ -14,15 +14,13 @@ namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor, IApplicationEventHandler
-    {
-        private readonly IExamineIndexCollectionAccessor _indexCollection;
-
+    {   
         /// <summary>
         /// Constructor
         /// </summary>        
         public GridPropertyEditor(ILogger logger, IExamineIndexCollectionAccessor indexCollection) : base(logger)
-        {
-            _indexCollection = indexCollection;
+        {            
+            _applicationStartup = new GridPropertyEditorApplicationStartup(indexCollection);
         }
 
         private static void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
@@ -132,23 +130,47 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         #region Application event handler, used to bind to events on startup
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
 
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
+        private readonly GridPropertyEditorApplicationStartup _applicationStartup;
 
         /// <summary>
-        /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
-        /// </summary>        
+        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
+        /// </summary>
+        private class GridPropertyEditorApplicationStartup : ApplicationEventHandler
+        {
+            private readonly IExamineIndexCollectionAccessor _indexCollection;
+
+            public GridPropertyEditorApplicationStartup(IExamineIndexCollectionAccessor indexCollection)
+            {
+                this._indexCollection = indexCollection;
+            }
+
+            /// <summary>
+            /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
+            /// </summary>        
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            {
+                foreach (var i in _indexCollection.Indexes.Values.OfType<BaseUmbracoIndexer>())
+                {
+                    i.DocumentWriting += DocumentWriting;
+                }
+            }
+        }
+
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+        }
         public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            foreach (var i in _indexCollection.Indexes.Values.OfType<BaseUmbracoIndexer>())
-            {
-                i.DocumentWriting += DocumentWriting;
-            }
+            //wrap
+            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);            
         }
         #endregion
     }
