@@ -17,21 +17,8 @@ using UmbracoExamine;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
-    public class GridPropertyEditor : PropertyEditor
-    {
-        /// <summary>
-        /// We're going to bind to the Examine events so we can ensure grid data is index nicely
-        /// </summary>
-        /// <remarks>
-        /// I think this kind of logic belongs on this property editor, putting this inside of the indexer certainly doesn't seem right
-        /// </remarks>
-        static GridPropertyEditor()
-        {
-            foreach (var i in ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>())
-            {
-                i.DocumentWriting += DocumentWriting;
-            }
-        }
+    public class GridPropertyEditor : PropertyEditor, IApplicationEventHandler
+    {        
 
         private static void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
@@ -138,6 +125,44 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
         }
+
+        #region Application event handler, used to bind to events on startup
+
+        private readonly GridPropertyEditorApplicationStartup _applicationStartup = new GridPropertyEditorApplicationStartup();
+
+        /// <summary>
+        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
+        /// </summary>
+        private class GridPropertyEditorApplicationStartup : ApplicationEventHandler
+        {
+            /// <summary>
+            /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
+            /// </summary>        
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            {
+                foreach (var i in ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>())
+                {
+                    i.DocumentWriting += DocumentWriting;
+                }
+            }
+        }
+
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);            
+        }
+        #endregion
     }
 
 

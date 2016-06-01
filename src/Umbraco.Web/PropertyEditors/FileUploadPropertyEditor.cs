@@ -21,32 +21,8 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
-    public class FileUploadPropertyEditor : PropertyEditor
+    public class FileUploadPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
-        /// <summary>
-        /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-        /// if we find any attached to the current media item.
-        /// </summary>
-        /// <remarks>
-        /// I think this kind of logic belongs on this property editor, I guess it could exist elsewhere but it all has to do with the upload field.
-        /// </remarks>
-        static FileUploadPropertyEditor()
-        {
-            MediaService.Saving += MediaServiceSaving;
-            MediaService.Created += MediaServiceCreating;
-            ContentService.Copied += ContentServiceCopied;
-            
-            MediaService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
-            ContentService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
-            MemberService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-        }
 
         /// <summary>
         /// Creates our custom value editor
@@ -274,6 +250,55 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
         }
+
+        #region Application event handler, used to bind to events on startup
+
+        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup = new FileUploadPropertyEditorApplicationStartup();
+
+        /// <summary>
+        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
+        /// </summary>
+        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
+        {
+            /// <summary>
+            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
+            /// if we find any attached to the current media item.
+            /// </summary>
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            {
+                MediaService.Saving += MediaServiceSaving;
+                MediaService.Created += MediaServiceCreating;
+                ContentService.Copied += ContentServiceCopied;
+
+                MediaService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                MediaService.EmptiedRecycleBin += (sender, args) =>
+                    args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+                ContentService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                ContentService.EmptiedRecycleBin += (sender, args) =>
+                    args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+                MemberService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            }
+        }
+
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
+        }
+        #endregion
 
     }
 }
