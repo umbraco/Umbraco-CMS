@@ -1215,6 +1215,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IContentRepository>();
+            ((ContentRepository) repository).SetNoCachePolicy();
             var query = repository.Query;
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
@@ -1284,6 +1285,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMediaRepository>();
+            ((MediaRepository)repository).SetNoCachePolicy();
             var query = repository.Query;
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
@@ -1343,6 +1345,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMemberRepository>();
+            ((MemberRepository)repository).SetNoCachePolicy();
             var query = repository.Query;
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)

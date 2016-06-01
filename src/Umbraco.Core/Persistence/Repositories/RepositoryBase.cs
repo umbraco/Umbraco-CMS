@@ -100,6 +100,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 return _cachePolicy;
             }
+            set
+            {
+                _cachePolicy = value; // ok to set to null, reverts to default
+            }
         }
 
         /// <summary>

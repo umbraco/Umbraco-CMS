@@ -39,6 +39,13 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberGroupRepository = memberGroupRepository;
         }
 
+        public void SetNoCachePolicy()
+        {
+            // using NoCache here means that we are NOT updating the cache
+            // so this should be OK for reads but NOT for writes!
+            CachePolicy = new NoCacheRepositoryCachePolicy<IMember, int>();
+        }
+
         protected override MemberRepository Instance => this;
 
         #region Overrides of RepositoryBase<int, IMembershipUser>

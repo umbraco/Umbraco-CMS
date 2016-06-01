@@ -45,6 +45,13 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureUniqueNaming = true;
         }
 
+        public void SetNoCachePolicy()
+        {
+            // using NoCache here means that we are NOT updating the cache
+            // so this should be OK for reads but NOT for writes!
+            CachePolicy = new NoCacheRepositoryCachePolicy<IContent, int>();
+        }
+
         protected override ContentRepository Instance => this;
 
         public bool EnsureUniqueNaming { get; set; }

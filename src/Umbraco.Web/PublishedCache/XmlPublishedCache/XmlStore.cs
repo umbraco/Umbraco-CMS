@@ -1807,6 +1807,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
+                ((ContentRepository)repository).SetNoCachePolicy();
                 RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 uow.Complete();
