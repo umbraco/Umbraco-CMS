@@ -20,7 +20,7 @@ build_script:
 
     ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
 
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% 
 
     ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
