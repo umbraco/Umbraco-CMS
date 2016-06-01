@@ -1,9 +1,5 @@
 version: '{build}'
 shallow_clone: true
-before_build:
-  - CD src
-  - nuget restore
-  - CD ..
 build_script:
 - cmd: >-
     cd build
