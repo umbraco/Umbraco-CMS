@@ -20,13 +20,13 @@ build_script:
 
     ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
 
-    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
-    IF EXIST ..\src\umbraco.businesslogic\packages.config ..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 
-    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
 
     SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 
