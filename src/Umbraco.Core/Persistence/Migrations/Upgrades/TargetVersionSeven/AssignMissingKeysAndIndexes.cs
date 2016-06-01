@@ -1,7 +1,6 @@
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -15,8 +14,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingKeysAndIndexes : MigrationBase
     {
-        public AssignMissingKeysAndIndexes(ILogger logger) 
-            : base(logger)
+        public AssignMissingKeysAndIndexes(IMigrationContext context) 
+            : base(context)
         { }
 
 

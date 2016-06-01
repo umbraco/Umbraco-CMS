@@ -26,6 +26,9 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("onlyImages", "Pick only images", "boolean", Description = "Only let the editor choose images from media.")]
             public bool OnlyImages { get; set; }
 
+            [PreValueField("disableFolderSelect", "Disable folder select", "boolean", Description = "Do not allow folders to be picked.")]
+            public bool DisableFolderSelect { get; set; }
+
             [PreValueField("startNodeId", "Start node", "mediapicker")]
  			public int StartNodeId { get; set; }
         }

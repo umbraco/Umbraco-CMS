@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -9,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AddPropertyEditorAliasColumn : MigrationBase
     {
-        public AddPropertyEditorAliasColumn(ILogger logger) 
-            : base(logger)
+        public AddPropertyEditorAliasColumn(IMigrationContext context) 
+            : base(context)
         { }
 
 

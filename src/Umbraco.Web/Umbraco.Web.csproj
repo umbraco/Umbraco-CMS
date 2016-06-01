@@ -168,6 +168,7 @@
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Editors\GravatarController.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />

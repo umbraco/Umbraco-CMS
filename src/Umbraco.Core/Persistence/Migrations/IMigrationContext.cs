@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -7,5 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations
         UmbracoDatabase Database { get; }
 
         ICollection<IMigrationExpression> Expressions { get; set; }
+
+        ILogger Logger { get; }
     }
 }

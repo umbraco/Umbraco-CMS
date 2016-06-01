@@ -7,6 +7,6 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <summary>
         /// Gets the migrations
         /// </summary>
-        IEnumerable<IMigration> Migrations { get; }
+        IEnumerable<IMigration> GetMigrations(IMigrationContext migrationContext);
     }
 }

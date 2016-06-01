@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
-        public AlterTagRelationsTable(ILogger logger) 
-            : base(logger)
+        public AlterTagRelationsTable(IMigrationContext context) 
+            : base(context)
         { }
 
 

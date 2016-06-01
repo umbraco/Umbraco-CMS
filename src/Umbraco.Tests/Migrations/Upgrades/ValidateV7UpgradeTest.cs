@@ -32,9 +32,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroTable()
         {
-            var migration = new AddIndexToCmsMacroTable(true, _logger);
             var migrationContext = new MigrationContext(_database, _logger);
-            migration.GetUpExpressions(migrationContext);
+            var migration = new AddIndexToCmsMacroTable(true, migrationContext);            
+            migration.Up();
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);
 
@@ -46,9 +46,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroPropertyTable()
         {
-            var migration = new AddIndexToCmsMacroPropertyTable(true, _logger);
             var migrationContext = new MigrationContext(_database, _logger);
-            migration.GetUpExpressions(migrationContext);
+            var migration = new AddIndexToCmsMacroPropertyTable(true, migrationContext);
+            migration.Up();
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);
 

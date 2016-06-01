@@ -50,6 +50,30 @@ namespace Umbraco.Web.Routing
                 else
                     urls.Add(umbracoContext.Application.Services.TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
+            else if (url.StartsWith("#err-"))
+            {
+                // route error, report
+                var id = int.Parse(url.Substring(5));
+                var o = umbracoContext.ContentCache.GetById(id);
+                string s;
+                if (o == null)
+                {
+                    s = "(unknown)";
+                }
+                else
+                {
+                    var l = new List<string>();
+                    while (o != null)
+                    {
+                        l.Add(o.Name);
+                        o = o.Parent;
+                    }
+                    l.Reverse();
+                    s = "/" + string.Join("/", l) + " (id=" + id + ")";
+
+                }
+                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/routeError", s));
+            }
             else
             {
                 urls.Add(url);

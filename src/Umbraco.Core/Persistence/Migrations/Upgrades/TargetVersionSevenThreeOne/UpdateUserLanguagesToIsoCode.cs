@@ -1,7 +1,6 @@
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -13,8 +12,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeOn
     [Migration("7.3.1", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUserLanguagesToIsoCode : MigrationBase
     {
-        public UpdateUserLanguagesToIsoCode(ILogger logger) 
-            : base(logger)
+        public UpdateUserLanguagesToIsoCode(IMigrationContext context) 
+            : base(context)
         { }
 
         public override void Up()

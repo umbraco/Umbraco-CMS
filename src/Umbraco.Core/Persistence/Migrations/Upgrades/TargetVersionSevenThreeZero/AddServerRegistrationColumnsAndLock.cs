@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,8 +9,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 17, GlobalSettings.UmbracoMigrationName)]
     public class AddServerRegistrationColumnsAndLock : MigrationBase
     {
-        public AddServerRegistrationColumnsAndLock(ILogger logger)
-            : base(logger)
+        public AddServerRegistrationColumnsAndLock(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()

@@ -16,7 +16,7 @@ namespace Umbraco.Core.ObjectResolution
         where TResolved : class
         where TResolver : ResolverBase
     {
-        private IServiceContainer _container;
+        protected IServiceContainer Container;
         private object _locker = new object();
         private bool _isInitialized = false;
 
@@ -24,10 +24,36 @@ namespace Umbraco.Core.ObjectResolution
             : base(logger, typeListProducerList, scope)
         {
             if (container == null) throw new ArgumentNullException("container");
-            _container = container;
+            Container = container;
 
             //Register ourselves in the case that a resolver instance should be injected someplace
-            _container.Register<TResolver>(factory => (TResolver)(object)this);
+            Container.Register<TResolver>(factory => (TResolver)(object)this);
+        }
+
+        /// <summary>
+        /// Ensures that the types are registered in the container before the values can be resolved
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="afterRegistered">
+        /// A callback that executes after the types are registered, this allows for custom registrations for inheritors
+        /// </param>
+        protected void EnsureTypesRegisterred(ObjectLifetimeScope scope, Action<IServiceContainer> afterRegistered = null)
+        {
+            //Before we can do anything, the first time this happens we need to setup the container with the resolved types
+            LazyInitializer.EnsureInitialized(ref Container, ref _isInitialized, ref _locker, () =>
+            {
+                foreach (var type in InstanceTypes)
+                {
+                    Container.Register(type, GetLifetime(LifetimeScope));
+                }
+
+                if (afterRegistered != null)
+                {
+                    afterRegistered(Container);
+                }
+
+                return Container;
+            });
         }
 
         /// <summary>
@@ -36,19 +62,11 @@ namespace Umbraco.Core.ObjectResolution
         /// <returns>A list of objects of type <typeparamref name="TResolved"/>.</returns>
         protected override IEnumerable<TResolved> CreateValues(ObjectLifetimeScope scope)
         {
-            //Before we can do anything, the first time this happens we need to setup the container with the resolved types
-            LazyInitializer.EnsureInitialized(ref _container, ref _isInitialized, ref _locker, () =>
-            {
-                foreach (var type in InstanceTypes)
-                {
-                    _container.Register(type, GetLifetime(LifetimeScope));
-                }
-                return _container;
-            });
+            EnsureTypesRegisterred(scope);
 
             //NOTE: we ignore scope because objects are registered under this scope and not build based on the scope.
 
-            return _container.GetAllInstances<TResolved>();
+            return Container.GetAllInstances<TResolved>();
         }
 
         /// <summary>
@@ -56,7 +74,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        private static ILifetime GetLifetime(ObjectLifetimeScope scope)
+        protected static ILifetime GetLifetime(ObjectLifetimeScope scope)
         {
             switch (scope)
             {

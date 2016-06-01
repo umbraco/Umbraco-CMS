@@ -19,29 +19,17 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
 
-        public ILogger Logger { get; private set; }
+        public ILogger Logger { get; }
+        protected IMigrationContext Context { get; }
 
-        protected MigrationBase(ILogger logger)
+        protected MigrationBase(IMigrationContext context)
         {
-            Logger = logger;
+            Logger = context.Logger;
+            Context = context;
         }
-
-        internal IMigrationContext Context;
 
         public abstract void Up();
-        public abstract void Down();
-
-        public virtual void GetUpExpressions(IMigrationContext context)
-        {
-            Context = context;
-            Up();
-        }
-
-        public virtual void GetDownExpressions(IMigrationContext context)
-        {
-            Context = context;
-            Down();
-        }
+        public abstract void Down();        
 
         public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(Context);
 

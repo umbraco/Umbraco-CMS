@@ -134,4 +134,11 @@ src/.vs/
 src/Umbraco.Web.UI/umbraco/js/install.loader.js
 src/Umbraco.Web.UI/js/*
 src/Umbraco.Tests/media
+tools/docfx/*
+apidocs/_site/*
 src/*/project.lock.json
+
+apidocs/api/*
+build/docs.zip
+build/ui-docs.zip
+build/csharp-docs.zip

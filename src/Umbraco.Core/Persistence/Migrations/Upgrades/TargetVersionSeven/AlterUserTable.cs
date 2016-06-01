@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -8,8 +7,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AlterUserTable : MigrationBase
     {
-        public AlterUserTable(ILogger logger)
-            : base(logger)
+        public AlterUserTable(IMigrationContext context)
+            : base(context)
         { }
 
 

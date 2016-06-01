@@ -79,7 +79,7 @@ namespace Umbraco.Tests.TestHelpers
             get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
         }
 
-        protected override void SetupApplicationContext()
+        protected override ApplicationContext CreateApplicationContext()
         {
             var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
 
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.TestHelpers
             // application is ready
             _appContext.IsReady = true;
 
-            ApplicationContext.Current = _appContext;
+            return _appContext;
         }
 
         /// <summary>

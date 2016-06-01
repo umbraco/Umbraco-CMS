@@ -7,8 +7,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class NewCmsContentType2ContentTypeTable : MigrationBase
     {
-        public NewCmsContentType2ContentTypeTable(ILogger logger) 
-            : base(logger)
+        public NewCmsContentType2ContentTypeTable(IMigrationContext context) 
+            : base(context)
         { }
 
 

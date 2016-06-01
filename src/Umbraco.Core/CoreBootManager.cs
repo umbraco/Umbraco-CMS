@@ -36,13 +36,11 @@ namespace Umbraco.Core
     /// </remarks>
     public class CoreBootManager : IBootManager
     {
-
-        private ServiceContainer _appStartupEvtContainer;
         protected ProfilingLogger ProfilingLogger { get; private set; }
         private DisposableTimer _timer;
         protected PluginManager PluginManager { get; private set; }
 
-
+        private IServiceContainer _appStartupEvtContainer;
         private bool _isInitialized = false;
         private bool _isStarted = false;
         private bool _isComplete = false;
@@ -115,9 +113,9 @@ namespace Umbraco.Core
             //Create a 'child'container which is a copy of all of the current registrations and begin a sub scope for it
             // this child container will be used to manage the application event handler instances and the scope will be
             // completed at the end of the boot process to allow garbage collection
-            _appStartupEvtContainer = Container.CreateChildContainer();
+            _appStartupEvtContainer = Container.Clone();
             _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
+            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());            
 
             //build up standard IoC services
             ConfigureApplicationServices(Container);
@@ -179,6 +177,7 @@ namespace Umbraco.Core
             //ModelMappers
             container.RegisterFrom<CoreModelMappersCompositionRoot>();
 
+            //TODO: Don't think we'll need this when the resolvers are all container resolvers
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
             container.RegisterSingleton<PluginManager>(factory => PluginManager);
 
@@ -335,8 +334,12 @@ namespace Umbraco.Core
                 }
             });
 
-            //end the current scope which was created to intantiate all of the startup handlers
+            //end the current scope which was created to intantiate all of the startup handlers,
+            //this will dispose them if they're IDisposable
             _appStartupEvtContainer.EndCurrentScope();
+            //NOTE: DO NOT Dispose this cloned container since it will also dispose of any instances 
+            // resolved from the parent container    
+            _appStartupEvtContainer = null;
 
             if (afterComplete != null)
             {
@@ -478,6 +481,6 @@ namespace Umbraco.Core
             // by default, no factory is activated
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
         }
-
+        
     }
 }

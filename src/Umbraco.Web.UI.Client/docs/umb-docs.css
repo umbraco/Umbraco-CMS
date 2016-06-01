@@ -1,0 +1,78 @@
+
+html {
+    font-family: 'Segoe UI', Tahoma, Helvetica, sans-serif;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Helvetica, sans-serif;
+    
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 1.1;
+    color: inherit;
+}
+
+.content code {
+    font-family: inherit;
+}
+
+.navbar .brand {
+    display: block;
+    float: left;
+    padding: 10px 20px 10px;
+    margin-left: -20px;
+    font-size: 20px;
+    font-weight: 200;
+    color: rgba(0,0,0,.8);
+    text-shadow: none;
+}
+
+.navbar-fixed-top .navbar-inner {
+    min-height: 50px;
+    background: #a3db78;
+}
+
+.form-search .well {
+    background-color: #f5fbf1;
+}
+
+.form-search > ul.nav > li.module {
+    background-color: #daf0c9;
+}
+
+.breadcrumb {    
+    background-color: #f5fbf1;
+}
+
+a {
+    color: #f36f21;
+}
+a:hover {
+    text-decoration: none;
+    color: rgba(0,0,0,.8);
+}
+.nav-list > .active > a, .nav-list > .active > a:hover, .nav-list > .active > a:focus,
+.form-search > .nav-list > .active > a, .form-search > .nav-list > .active > a:hover, .form-search > .nav-list > .active > a:focus {
+    color: #f36f21;
+    text-shadow: none;
+    background-color: inherit;
+}
+
+.form-search > ul.nav > li > a {
+    color: rgba(0,0,0,.8);
+    text-shadow: none;
+}
+
+.form-search > ul.nav > li > a:hover {
+    text-decoration: none;
+    background-color: inherit;
+    text-shadow: none;
+    color: #000;
+}
+
+.header img {
+    width: 50px;
+    margin-top: 5px;
+}

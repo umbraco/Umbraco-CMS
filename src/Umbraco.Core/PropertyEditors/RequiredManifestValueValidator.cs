@@ -22,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 var asString = value.ToString();
 
-                if (editor.ValueEditor.ValueType.InvariantEquals("JSON"))
+                if (editor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json))
                 {
                     if (asString.DetectIsEmptyJson())
                     {

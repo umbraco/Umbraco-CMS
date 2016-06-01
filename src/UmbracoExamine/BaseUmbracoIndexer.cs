@@ -25,7 +25,6 @@ using Directory = Lucene.Net.Store.Directory;
 
 namespace UmbracoExamine
 {
-
     /// <summary>
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.

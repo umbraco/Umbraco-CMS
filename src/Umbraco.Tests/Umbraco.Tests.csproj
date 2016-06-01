@@ -138,8 +138,8 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NPoco, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.3.0-beta3\lib\net45\NPoco.dll</HintPath>
+    <Reference Include="NPoco, Version=3.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.3.3\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
@@ -224,8 +224,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
+    <Compile Include="TestHelpers\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="TestHelpers\TestScopeContextAdapter.cs" />

@@ -49,7 +49,7 @@ namespace Umbraco.Core.Events
         /// <param name="productName"></param>
         /// <param name="canCancel"></param>
         /// <param name="configuredVersion"></param>
-        internal MigrationEventArgs(IList<IMigration> eventObject, MigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
+        internal MigrationEventArgs(IList<IMigration> eventObject, IMigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
             : base(eventObject, canCancel)
         {
             MigrationContext = migrationContext;
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Events
         /// <param name="configuredVersion"></param>
         [Obsolete("Use constructor accepting a product name instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        internal MigrationEventArgs(IList<IMigration> eventObject, MigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, bool canCancel)
+        internal MigrationEventArgs(IList<IMigration> eventObject, IMigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, bool canCancel)
             : base(eventObject, canCancel)
         {
             MigrationContext = migrationContext;
@@ -134,6 +134,6 @@ namespace Umbraco.Core.Events
 
         public string ProductName { get; private set; }
 
-        internal MigrationContext MigrationContext { get; private set; }
+        internal IMigrationContext MigrationContext { get; private set; }
     }
 }

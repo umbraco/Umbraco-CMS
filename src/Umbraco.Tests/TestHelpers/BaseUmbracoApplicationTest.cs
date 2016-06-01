@@ -25,6 +25,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -115,6 +116,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
             //replace some stuff
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
@@ -200,14 +202,20 @@ namespace Umbraco.Tests.TestHelpers
         {
             return CacheHelper.CreateDisabledCacheHelper();
         }
+        
+        private void SetupApplicationContext()
+        {
+            var applicationContext = CreateApplicationContext();
+            ApplicationContext.Current = applicationContext;
+        }
 
         /// <summary>
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
-        protected virtual void SetupApplicationContext()
+        protected virtual ApplicationContext CreateApplicationContext()
         {
             var evtMsgs = new TransientEventMessagesFactory();
-            ApplicationContext.Current = new ApplicationContext(
+            var applicationContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(
                     Core.Configuration.GlobalSettings.UmbracoConnectionName, 
@@ -228,6 +236,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 IsReady = true
             };
+            return applicationContext;
         }
 
         /// <summary>

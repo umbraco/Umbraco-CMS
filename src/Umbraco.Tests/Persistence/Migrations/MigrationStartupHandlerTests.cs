@@ -36,10 +36,10 @@ namespace Umbraco.Tests.Persistence.Migrations
             testHandler1.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(logger, Mock.Of<IProfiler>())));
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
-
+            var migrationContext = new MigrationContext(db, logger);
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), logger, new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>() });
-            var result1 = runner1.Execute(db /*, false*/);
+            var result1 = runner1.Execute(migrationContext /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);            
         }
 
@@ -57,16 +57,16 @@ namespace Umbraco.Tests.Persistence.Migrations
             testHandler2.OnApplicationStarting(Mock.Of<UmbracoApplicationBase>(), new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(), new ProfilingLogger(logger, Mock.Of<IProfiler>())));
 
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
-
+            var migrationContext = new MigrationContext(db, logger);
             var runner1 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), logger, new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>()});
-            var result1 = runner1.Execute(db /*, false*/);
+            var result1 = runner1.Execute(migrationContext /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(0, changed2.CountExecuted);
 
             var runner2 = new MigrationRunner(Mock.Of<IMigrationResolver>(), Mock.Of<IMigrationEntryService>(), logger, new SemVersion(1), new SemVersion(2), "Test2",
                 new IMigration[] { Mock.Of<IMigration>() });            
-            var result2 = runner2.Execute(db /*, false*/);
+            var result2 = runner2.Execute(migrationContext /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(1, changed2.CountExecuted);
         }

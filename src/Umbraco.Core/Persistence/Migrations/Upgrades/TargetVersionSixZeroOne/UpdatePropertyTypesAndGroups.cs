@@ -11,8 +11,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
     [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
-        public UpdatePropertyTypesAndGroups(ILogger logger) 
-            : base(logger)
+        public UpdatePropertyTypesAndGroups(IMigrationContext context) 
+            : base(context)
         { }
 
 
