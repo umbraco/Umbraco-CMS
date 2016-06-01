@@ -1,7 +1,9 @@
 <div ng-controller="Umbraco.Editors.Packages.RepoController as vm" class="clearfix">
 
+    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
     <!-- LIST -->
-    <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageList'">
+    <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageList' && vm.loading === false">
 
         <div class="umb-packages-section">
             <div class="umb-packages-search">
@@ -100,7 +102,7 @@
 
 
     <!-- DETAILS --->
-    <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageDetails'">
+    <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageDetails' && vm.loading === false">
 
         <div class="umb-packages-section">
             <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList')">

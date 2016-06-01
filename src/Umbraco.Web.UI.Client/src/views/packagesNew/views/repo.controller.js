@@ -1,11 +1,12 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location) {
+    function PackagesRepoController($scope, $route, $location, $timeout) {
 
         var vm = this;
 
         vm.packageViewState = "packageList";
+        vm.loading = false;
         vm.pagination = {
             pageNumber: 1,
             totalPages: 10
@@ -17,6 +18,7 @@
         vm.nextPage = nextPage;
         vm.prevPage = prevPage;
         vm.goToPage = goToPage;
+
 
         vm.categories = [
             {
@@ -225,6 +227,16 @@
             ]
         };
 
+        function init() {
+
+            vm.loading = true;
+
+            $timeout(function () {
+                vm.loading = false;
+            }, 500);
+
+        }
+
         function selectCategory(selectedCategory, categories) {
             for (var i = 0; i < categories.length; i++) {
                 var category = categories[i];
@@ -254,6 +266,8 @@
         function goToPage(pageNumber) {
             console.log(pageNumber);
         }
+
+        init();
 
     }
 
