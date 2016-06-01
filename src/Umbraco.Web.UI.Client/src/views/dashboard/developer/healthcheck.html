@@ -1,12 +1,12 @@
-<div id="umbracoHealthCheck" ng-controller="Umbraco.Dashboard.HealthCheckController">
-    <div ng-repeat="group in groups">
+<div id="umbracoHealthCheck" ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
+    <div ng-repeat="group in vm.groups">
         <div class="table">
             <table>
                 <thead>
                     <tr>
                         <th>
                             <h4><strong>{{group.name}}</strong></h4>
-                            <button class="btn check-all" type="button" ng-click="checkAllInGroup(group.checks);">Check all in {{group.name}}</button>
+                            <button class="btn check-all" type="button" ng-click="vm.checkAllInGroup(group.checks);">Check all in {{group.name}}</button>
                         </th>
                     </tr>
                 </thead>
@@ -14,13 +14,13 @@
                 <tr ng-repeat="check in group.checks">
                     <td>
                         <div>
-                            <button prevent-default class="btn check" ng-click="getStatus(check);">Check</button>
+                            <button prevent-default class="btn check" ng-click="vm.getStatus(check);">Check</button>
                             <strong>{{check.name}}</strong><br/>
                             {{check.description}}
                         </div>
 
                         <span ng-if="check.loading">Loading status...</span>
-                        
+
                         <div ng-if="check.status">
                             <div ng-repeat="status in check.status" class="check-status">
                                 <i class="icon icon-check color-green" ng-if="status.resultType == 0"></i>
@@ -30,7 +30,7 @@
                                 <span ng-bind-html="status.message"></span><br/>
                                 <span ng-if="status.description" ng-bind-html="status.description"></span>
                                 <div ng-repeat="action in status.actions">
-                                    <button type="button" class="btn" ng-click="executeAction(check, status, action);">{{action.name}}</button><br/>
+                                    <button type="button" class="btn" ng-click="vm.executeAction(check, status, action);">{{action.name}}</button><br/>
                                     <p ng-bind-html="action.description"></p>
                                 </div>
                             </div>
