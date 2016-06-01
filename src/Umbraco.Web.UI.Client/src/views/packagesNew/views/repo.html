@@ -84,6 +84,18 @@
             </div> <!-- end packages -->
         </div>
 
+        <div class="umb-packages__pagination">
+
+            <umb-pagination
+                page-number="vm.pagination.pageNumber"
+                total-pages="vm.pagination.totalPages"
+                on-next="vm.nextPage"
+                on-prev="vm.prevPage"
+                on-go-to-page="vm.goToPage">
+            </umb-pagination>
+
+        </div>
+
     </div>
 
 

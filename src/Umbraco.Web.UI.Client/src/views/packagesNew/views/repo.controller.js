@@ -6,10 +6,17 @@
         var vm = this;
 
         vm.packageViewState = "packageList";
+        vm.pagination = {
+            pageNumber: 1,
+            totalPages: 10
+        };
 
         vm.selectCategory = selectCategory;
         vm.showPackageDetails = showPackageDetails;
         vm.setPackageViewState = setPackageViewState;
+        vm.nextPage = nextPage;
+        vm.prevPage = prevPage;
+        vm.goToPage = goToPage;
 
         vm.categories = [
             {
@@ -234,6 +241,18 @@
             if(state) {
                 vm.packageViewState = state;
             }
+        }
+
+        function nextPage(pageNumber) {
+            console.log(pageNumber);
+        }
+
+        function prevPage(pageNumber) {
+            console.log(pageNumber);
+        }
+
+        function goToPage(pageNumber) {
+            console.log(pageNumber);
         }
 
     }
