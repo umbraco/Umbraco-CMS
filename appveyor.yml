@@ -31,6 +31,8 @@ build_script:
     ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Tests\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
     
     ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.controls\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
     DIR %nuGetFolder%
     
