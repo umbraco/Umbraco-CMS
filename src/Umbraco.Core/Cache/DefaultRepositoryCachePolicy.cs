@@ -40,158 +40,155 @@ namespace Umbraco.Core.Cache
             return $"uRepo_{typeof (TEntity).Name}_";
         }
 
-        /// <summary>
-        /// Sets the action to execute on disposal for a single entity
-        /// </summary>
-        /// <param name="cacheKey"></param>
-        /// <param name="entity"></param>
-        protected virtual void SetCacheActionToInsertEntity(string cacheKey, TEntity entity)
+        protected virtual void InsertEntity(string cacheKey, TEntity entity)
         {
-            SetCacheAction(() =>
-            {
-                Cache.InsertCacheItem(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-            });
+            Cache.InsertCacheItem(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
         }
 
-        /// <summary>
-        /// Sets the action to execute on disposal for an entity collection
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="entities"></param>
-        protected virtual void SetCacheActionToInsertEntities(TId[] ids, TEntity[] entities)
+        protected virtual void InsertEntities(TId[] ids, TEntity[] entities)
         {
-            SetCacheAction(() =>
+            if (ids.Length == 0 && entities.Length == 0 && _options.GetAllCacheAllowZeroCount)
             {
-                if (ids.Length == 0 && entities.Length == 0 && _options.GetAllCacheAllowZeroCount)
+                // getting all of them, and finding nothing.
+                // if we can cache a zero count, cache an empty array,
+                // for as long as the cache is not cleared (no expiration)
+                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => EmptyEntities);
+            }
+            else
+            {
+                // individually cache each item
+                foreach (var entity in entities)
                 {
-                    // getting all of them, and finding nothing.
-                    // if we can cache a zero count, cache an empty array,
-                    // for as long as the cache is not cleared (no expiration)
-                    Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => EmptyEntities);
+                    var capture = entity;
+                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
                 }
-                else
-                {
-                    // individually cache each item
-                    foreach (var entity in entities)
-                    {
-                        var capture = entity;
-                        Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
-                    }
-                }
-            });
+            }
         }
 
         /// <inheritdoc />
-        public override void CreateOrUpdate(TEntity entity, Action<TEntity> repoCreateOrUpdate)
+        public override void Create(TEntity entity, Action<TEntity> persistNew)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (repoCreateOrUpdate == null) throw new ArgumentNullException(nameof(repoCreateOrUpdate));
 
             try
             {
-                repoCreateOrUpdate(entity);
+                persistNew(entity);
 
-                SetCacheAction(() =>
+                // just to be safe, we cannot cache an item without an identity
+                if (entity.HasIdentity)
                 {
-                    // just to be safe, we cannot cache an item without an identity
-                    if (entity.HasIdentity)
-                    {
-                        Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
-                    }
+                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                }
 
-                    // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                    Cache.ClearCacheItem(GetEntityTypeCacheKey());
-                });
-
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetEntityTypeCacheKey());
             }
             catch
             {
-                SetCacheAction(() =>
-                {
-                    // if an exception is thrown we need to remove the entry from cache,
-                    // this is ONLY a work around because of the way
-                    // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                    Cache.ClearCacheItem(GetEntityCacheKey(entity.Id));
+                // if an exception is thrown we need to remove the entry from cache,
+                // this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                Cache.ClearCacheItem(GetEntityCacheKey(entity.Id));
 
-                    // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                    Cache.ClearCacheItem(GetEntityTypeCacheKey());
-                });
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetEntityTypeCacheKey());
 
                 throw;
             }
         }
 
         /// <inheritdoc />
-        public override void Remove(TEntity entity, Action<TEntity> repoRemove)
+        public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (repoRemove == null) throw new ArgumentNullException(nameof(repoRemove));
 
             try
             {
-                repoRemove(entity);
+                persistUpdated(entity);
+
+                // just to be safe, we cannot cache an item without an identity
+                if (entity.HasIdentity)
+                {
+                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                }
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetEntityTypeCacheKey());
+            }
+            catch
+            {
+                // if an exception is thrown we need to remove the entry from cache,
+                // this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                Cache.ClearCacheItem(GetEntityCacheKey(entity.Id));
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetEntityTypeCacheKey());
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                persistDeleted(entity);
             }
             finally
             {
                 // whatever happens, clear the cache
                 var cacheKey = GetEntityCacheKey(entity.Id);
-                SetCacheAction(() =>
-                {
-                    Cache.ClearCacheItem(cacheKey);
-
-                    // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                    Cache.ClearCacheItem(GetEntityTypeCacheKey());
-                });
+                Cache.ClearCacheItem(cacheKey);
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetEntityTypeCacheKey());
             }
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id, Func<TId, TEntity> repoGet)
+        public override TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
-            if (repoGet == null) throw new ArgumentNullException(nameof(repoGet));
-
             var cacheKey = GetEntityCacheKey(id);
             var fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
 
             // if found in cache then return else fetch and cache
             if (fromCache != null)
                 return fromCache;
-            var entity = repoGet(id);
+            var entity = performGet(id);
 
             if (entity != null && entity.HasIdentity)
-                SetCacheActionToInsertEntity(cacheKey, entity);
+                InsertEntity(cacheKey, entity);
 
             return entity;
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id)
+        public override TEntity GetCached(TId id)
         {
             var cacheKey = GetEntityCacheKey(id);
             return Cache.GetCacheItem<TEntity>(cacheKey);
         }
 
         /// <inheritdoc />
-        public override bool Exists(TId id, Func<TId, bool> repoExists)
+        public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
-            if (repoExists == null) throw new ArgumentNullException(nameof(repoExists));
-
             // if found in cache the return else check
             var cacheKey = GetEntityCacheKey(id);
             var fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
-            return fromCache != null || repoExists(id);
+            return fromCache != null || performExists(id);
         }
 
         /// <inheritdoc />
-        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> repoGet)
+        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
-            if (repoGet == null) throw new ArgumentNullException(nameof(repoGet));
-
             if (ids.Length > 0)
             {
                 // try to get each entity from the cache
                 // if we can find all of them, return
-                var entities = ids.Select(Get).ToArray();
+                var entities = ids.Select(GetCached).WhereNotNull().ToArray();
                 if (ids.Length.Equals(entities.Length))
                     return entities; // no need for null checks, we are not caching nulls
             }
@@ -227,15 +224,21 @@ namespace Umbraco.Core.Cache
             }
 
             // cache failed, get from repo and cache
-            var repoEntities = repoGet(ids)
+            var repoEntities = performGetAll(ids)
                 .WhereNotNull() // exclude nulls!
                 .Where(x => x.HasIdentity) // be safe, though would be weird...
                 .ToArray();
 
             // note: if empty & allow zero count, will cache a special (empty) entry
-            SetCacheActionToInsertEntities(ids, repoEntities);
+            InsertEntities(ids, repoEntities);
 
             return repoEntities;
+        }
+
+        /// <inheritdoc />
+        public override void ClearAll()
+        {
+            Cache.ClearCacheByKeySearch(GetEntityTypeCacheKey());
         }
     }
 }

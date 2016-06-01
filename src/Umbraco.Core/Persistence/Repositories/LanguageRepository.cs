@@ -21,19 +21,22 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
+        private IRepositoryCachePolicy<ILanguage, int> _cachePolicy;
+
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
             : base(work, cache, logger, mappingResolver)
         {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<ILanguage, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<ILanguage, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<ILanguage, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ILanguage, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<ILanguage, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
+
+                return _cachePolicy;
             }
         }
 

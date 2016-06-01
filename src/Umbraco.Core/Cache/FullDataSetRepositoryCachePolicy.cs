@@ -21,120 +21,129 @@ namespace Umbraco.Core.Cache
         where TEntity : class, IAggregateRoot
     {
         private readonly Func<TEntity, TId> _entityGetId;
-        private readonly Func<IEnumerable<TEntity>> _repoGetAll;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> entityGetId, Func<IEnumerable<TEntity>> repoGetAll, bool expires)
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache,
+            Func<TEntity, TId> entityGetId,
+            bool expires)
             : base(cache)
         {
             _entityGetId = entityGetId;
-            _repoGetAll = repoGetAll;
             _expires = expires;
         }
+
+        protected static readonly TId[] EmptyIds = new TId[0];
 
         protected string GetEntityTypeCacheKey()
         {
             return $"uRepo_{typeof (TEntity).Name}_";
         }
 
-        private void SetCacheActionToClearAll()
+        protected void InsertEntities(TEntity[] entities)
         {
-            SetCacheAction(() =>
-            {
-                // clear all, force reload
-                Cache.ClearCacheItem(GetEntityTypeCacheKey());
-            });
-        }
+            // cache is expected to be a deep-cloning cache ie it deep-clones whatever is
+            // IDeepCloneable when it goes in, and out. it also resets dirty properties,
+            // making sure that no 'dirty' entity is cached.
+            //
+            // this policy is caching the entire list of entities. to ensure that entities
+            // are properly deep-clones when cached, it uses a DeepCloneableList. however,
+            // we don't want to deep-clone *each* entity in the list when fetching it from
+            // cache as that would not be efficient for Get(id). so the DeepCloneableList is
+            // set to ListCloneBehavior.CloneOnce ie it will clone *once* when inserting,
+            // and then will *not* clone when retrieving.
 
-        protected void SetCacheActionToInsertEntities(TEntity[] entities)
-        {
-            SetCacheAction(() =>
+            if (_expires)
             {
-                // cache is expected to be a deep-cloning cache ie it deep-clones whatever is
-                // IDeepCloneable when it goes in, and out. it also resets dirty properties,
-                // making sure that no 'dirty' entity is cached.
-                //
-                // this policy is caching the entire list of entities. to ensure that entities
-                // are properly deep-clones when cached, it uses a DeepCloneableList. however,
-                // we don't want to deep-clone *each* entity in the list when fetching it from
-                // cache as that would not be efficient for Get(id). so the DeepCloneableList is
-                // set to ListCloneBehavior.CloneOnce ie it will clone *once* when inserting,
-                // and then will *not* clone when retrieving.
-
-                if (_expires)
-                {
-                    Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
-                }
-                else
-                {
-                    Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities));
-                }
-            });
+                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
+            }
+            else
+            {
+                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities));
+            }
         }
 
         /// <inheritdoc />
-        public override void CreateOrUpdate(TEntity entity, Action<TEntity> repoCreateOrUpdate)
+        public override void Create(TEntity entity, Action<TEntity> persistNew)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (repoCreateOrUpdate == null) throw new ArgumentNullException(nameof(repoCreateOrUpdate));
 
             try
             {
-                repoCreateOrUpdate(entity);
+                persistNew(entity);
             }
             finally
             {
-                SetCacheActionToClearAll();
+                ClearAll();
             }
         }
 
         /// <inheritdoc />
-        public override void Remove(TEntity entity, Action<TEntity> repoRemove)
+        public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (repoRemove == null) throw new ArgumentNullException(nameof(repoRemove));
 
             try
             {
-                repoRemove(entity);
+                persistUpdated(entity);
             }
             finally
             {
-                SetCacheActionToClearAll();
+                ClearAll();
             }
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id, Func<TId, TEntity> repoGet)
+        public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
-            return Get(id);
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                persistDeleted(entity);
+            }
+            finally
+            {
+                ClearAll();
+            }
         }
 
         /// <inheritdoc />
-        public override TEntity Get(TId id)
+        public override TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
-            // get all from the cache, the look for the entity
-            var all = GetAllCached();
+            // get all from the cache, then look for the entity
+            var all = GetAllCached(performGetAll);
             var entity = all.FirstOrDefault(x => _entityGetId(x).Equals(id));
 
-            // see note in SetCacheActionToInsertEntities - what we get here is the original
+            // see note in InsertEntities - what we get here is the original
+            // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
+            return (TEntity)entity?.DeepClone();
+        }
+
+        /// <inheritdoc />
+        public override TEntity GetCached(TId id)
+        {
+            // get all from the cache -- and only the cache, then look for the entity
+            var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
+            var entity = all?.FirstOrDefault(x => _entityGetId(x).Equals(id));
+
+            // see note in InsertEntities - what we get here is the original
             // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
             return (TEntity) entity?.DeepClone();
         }
 
         /// <inheritdoc />
-        public override bool Exists(TId id, Func<TId, bool> repoExists)
+        public override bool Exists(TId id, Func<TId, bool> performExits, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // get all as one set, then look for the entity
-            var all = GetAllCached();
+            var all = GetAllCached(performGetAll);
             return all.Any(x => _entityGetId(x).Equals(id));
         }
 
         /// <inheritdoc />
-        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> repoGet)
+        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // get all as one set, from cache if possible, else repo
-            var all = GetAllCached();
+            var all = GetAllCached(performGetAll);
 
             // if ids have been specified, filter
             if (ids.Length > 0) all = all.Where(x => ids.Contains(_entityGetId(x)));
@@ -146,16 +155,22 @@ namespace Umbraco.Core.Cache
         }
 
         // does NOT clone anything, so be nice with the returned values
-        private IEnumerable<TEntity> GetAllCached()
+        private IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // try the cache first
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
             if (all != null) return all.ToArray();
 
             // else get from repo and cache
-            var entities = _repoGetAll().WhereNotNull().ToArray();
-            SetCacheActionToInsertEntities(entities); // may be an empty array...
+            var entities = performGetAll(EmptyIds).WhereNotNull().ToArray();
+            InsertEntities(entities); // may be an empty array...
             return entities;
+        }
+
+        /// <inheritdoc />
+        public override void ClearAll()
+        {
+            Cache.ClearCacheItem(GetEntityTypeCacheKey());
         }
     }
 }

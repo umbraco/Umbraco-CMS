@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
@@ -19,7 +21,7 @@ namespace Umbraco.Core.Cache
             : base(cache, options)
         { }
 
-        protected override void SetCacheActionToInsertEntities(TId[] ids, TEntity[] entities)
+        protected override void InsertEntities(TId[] ids, TEntity[] entities)
         {
             // nop
         }

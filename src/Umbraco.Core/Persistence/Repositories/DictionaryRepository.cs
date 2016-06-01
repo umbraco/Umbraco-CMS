@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DictionaryRepository : NPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
+        private IRepositoryCachePolicy<IDictionaryItem, int> _cachePolicy;
         private readonly IMappingResolver _mappingResolver;
 
         public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
@@ -28,16 +29,23 @@ namespace Umbraco.Core.Persistence.Repositories
             _mappingResolver = mappingResolver;
         }
 
-        private IRepositoryCachePolicyFactory<IDictionaryItem, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IDictionaryItem, int> CachePolicyFactory => _cachePolicyFactory ??
-            // custom cache policy which will not cache any results for GetAll
-            (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, int>(
-                RuntimeCache,
-                new RepositoryCachePolicyOptions
+        protected override IRepositoryCachePolicy<IDictionaryItem, int> CachePolicy
+        {
+            get
+            {
+                if (_cachePolicy != null) return _cachePolicy;
+
+                var options = new RepositoryCachePolicyOptions
                 {
                     //allow zero to be cached
                     GetAllCacheAllowZeroCount = true
-                }));
+                };
+
+                _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(RuntimeCache, options);
+
+                return _cachePolicy;
+            }
+        }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
 
@@ -286,6 +294,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
         {
+            private IRepositoryCachePolicy<IDictionaryItem, Guid> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
             public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
@@ -325,20 +334,28 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
             }
 
-            private IRepositoryCachePolicyFactory<IDictionaryItem, Guid> _cachePolicyFactory;
-            protected override IRepositoryCachePolicyFactory<IDictionaryItem, Guid> CachePolicyFactory => _cachePolicyFactory ??
-                // custom cache policy which will not cache any results for GetAll
-                (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, Guid>(
-                    RuntimeCache,
-                    new RepositoryCachePolicyOptions
+            protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CachePolicy
+            {
+                get
+                {
+                    if (_cachePolicy != null) return _cachePolicy;
+
+                    var options = new RepositoryCachePolicyOptions
                     {
                         //allow zero to be cached
                         GetAllCacheAllowZeroCount = true
-                    }));
+                    };
+
+                    _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(RuntimeCache, options);
+
+                    return _cachePolicy;
+                }
+            }
         }
 
         private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
         {
+            private IRepositoryCachePolicy<IDictionaryItem, string> _cachePolicy;
             private readonly DictionaryRepository _dictionaryRepository;
 
             public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
@@ -378,16 +395,23 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
 
-            private IRepositoryCachePolicyFactory<IDictionaryItem, string> _cachePolicyFactory;
-            protected override IRepositoryCachePolicyFactory<IDictionaryItem, string> CachePolicyFactory => _cachePolicyFactory ??
-                // custom cache policy which will not cache any results for GetAll
-                (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, string>(
-                    RuntimeCache,
-                    new RepositoryCachePolicyOptions
+            protected override IRepositoryCachePolicy<IDictionaryItem, string> CachePolicy
+            {
+                get
+                {
+                    if (_cachePolicy != null) return _cachePolicy;
+
+                    var options = new RepositoryCachePolicyOptions
                     {
                         //allow zero to be cached
                         GetAllCacheAllowZeroCount = true
-                    }));
+                    };
+
+                    _cachePolicy = new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(RuntimeCache, options);
+
+                    return _cachePolicy;
+                }
+            }
         }
     }
 }
