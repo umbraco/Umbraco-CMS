@@ -1,7 +1,7 @@
 version: '{build}'
 shallow_clone: true
 before_build:
-  - nuget restore src\umbraco.sln
+  - nuget restore %APPVEYOR_BUILD_FOLDER%\src\umbraco.sln
 build_script:
 - cmd: >-
     cd build
