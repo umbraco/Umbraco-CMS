@@ -22,7 +22,7 @@ echo Removing bin files
 del ..\src\Umbraco.Web.UI\bin\*.*
 
 echo Building solution
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
+"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe ..\src\umbraco.sln /t:Clean,Build
 
 echo Resetting installedPackages.config
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<packages^>^</packages^> >..\src\Umbraco.Web.UI\App_Data\packages\installed\installedPackages.config
@@ -86,7 +86,7 @@ echo Removing bin files
  FOR %%A IN (..\src\Umbraco.Web.UI\bin\*.*) DO DEL %%A
 
 echo Building solution
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
+"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe ..\src\umbraco.sln /t:Clean,Build
 
 echo Resetting installedPackages.config
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<packages^>^</packages^> >..\src\Umbraco.Web.UI\App_Data\packages\installed\installedPackages.config
