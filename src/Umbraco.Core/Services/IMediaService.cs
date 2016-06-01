@@ -67,9 +67,9 @@ namespace Umbraco.Core.Services
         /// </param>
         void RebuildXmlStructures(params int[] contentTypeIds);
 
-        int Count(string contentTypeAlias = null);
-        int CountChildren(int parentId, string contentTypeAlias = null);
-        int CountDescendants(int parentId, string contentTypeAlias = null);
+        int Count(string mediaTypeAlias = null);
+        int CountChildren(int parentId, string mediaTypeAlias = null);
+        int CountDescendants(int parentId, string mediaTypeAlias = null);
 
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
 

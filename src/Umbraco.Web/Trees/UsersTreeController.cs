@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            int totalusers;
+            long totalusers;
             var users = new List<IUser>(Services.UserService.GetAll(0, int.MaxValue, out totalusers));
 
             var currentUser = UmbracoContext.Current.Security.CurrentUser;

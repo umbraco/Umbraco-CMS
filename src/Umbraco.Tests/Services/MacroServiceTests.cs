@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Services
         {
             base.CreateTestData();
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);

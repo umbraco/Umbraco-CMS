@@ -181,27 +181,27 @@ namespace Umbraco.Core.Persistence.Repositories
                 umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
             }
 
-            Func<string, Sql> createSql = url => Sql().SelectAll()
-                                                  .From<PropertyDataDto>()
-                                                  .InnerJoin<PropertyTypeDto>()
-                                                  .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                                                  .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                                                  .Where<PropertyDataDto>(x => x.VarChar == url);
-
-            var sql = createSql(umbracoFileValue);
-
-            var propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
-
             // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
-            if (propertyDataDto == null)
-            {
-                sql = createSql(mediaPath);
-                propertyDataDto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
-            }
+            var nodeId = GetMediaNodeIdByPath(umbracoFileValue);
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(mediaPath);
 
-            return propertyDataDto == null ? null : Get(propertyDataDto.NodeId);
+            return nodeId < 0 ? null : Get(nodeId);
         }
+
+        private int GetMediaNodeIdByPath(string url)
+        {
+            var sql = Sql().SelectAll()
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                .Where<PropertyDataDto>(x => x.VarChar == url);
+
+            var dto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
+            return dto?.NodeId ?? -1;
+        }
+
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
             Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });

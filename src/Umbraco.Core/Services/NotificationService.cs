@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
             //we'll lazily get these if we need to send notifications
             IEnumerable<IContent> allVersions = null;
 
-            int totalUsers;
+            long totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
             foreach (var u in allUsers)
             {

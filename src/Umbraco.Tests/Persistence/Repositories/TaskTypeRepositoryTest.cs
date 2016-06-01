@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var taskType = new TaskType("asdfasdf");

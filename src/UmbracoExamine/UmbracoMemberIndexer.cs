@@ -152,7 +152,7 @@ namespace UmbracoExamine
                 //no node types specified, do all members
                 do
                 {
-                    int total;
+                    long total;
                     members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
 
                     IndexItems(GetValueSets(members));

@@ -30,12 +30,14 @@ namespace Umbraco.Core.Security
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
+        private readonly IMemberTypeService _memberTypeService;
         private readonly IExternalLoginService _externalLoginService;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
         {
             _userService = userService;
+            _memberTypeService = memberTypeService;
             _externalLoginService = externalLoginService;
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
@@ -69,7 +71,7 @@ namespace Umbraco.Core.Security
             if (user == null) throw new ArgumentNullException("user");
 
             var userType = _userService.GetUserTypeByAlias(
-                user.UserTypeAlias.IsNullOrWhiteSpace() ? _userService.GetDefaultMemberType() : user.UserTypeAlias);
+                user.UserTypeAlias.IsNullOrWhiteSpace() ? _memberTypeService.GetDefault() : user.UserTypeAlias);
 
             var member = new User(userType)
             {

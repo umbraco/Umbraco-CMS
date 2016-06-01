@@ -446,7 +446,7 @@ namespace Umbraco.Tests.Services
             var members = MockedMember.CreateSimpleMember(memberType, 10);
             ServiceContext.MemberService.Save(members);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs);
 
             Assert.AreEqual(2, found.Count());
@@ -466,7 +466,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindMembersByDisplayName("B", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(1, found.Count());
@@ -483,7 +483,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello","hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
@@ -500,7 +500,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
@@ -517,7 +517,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
@@ -534,7 +534,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
@@ -551,7 +551,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
@@ -568,7 +568,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(1, found.Count());
@@ -585,7 +585,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hellotest");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
@@ -602,7 +602,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            int totalRecs;
+            long totalRecs;
             var found = ServiceContext.MemberService.FindByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
@@ -1057,7 +1057,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
 
             using (var uow = provider.CreateUnitOfWork())
             {

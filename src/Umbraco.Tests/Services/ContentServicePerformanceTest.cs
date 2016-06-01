@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);

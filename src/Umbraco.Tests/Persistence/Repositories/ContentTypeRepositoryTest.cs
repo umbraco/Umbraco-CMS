@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Maps_Templates_Correctly()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Move()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Media_Types()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Media_Types()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
@@ -246,7 +246,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -277,7 +277,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ContentTypeRepository_After_Model_Mapping()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -326,7 +326,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -402,7 +402,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -465,7 +465,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -489,7 +489,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -519,7 +519,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Query_On_ContentTypeRepository_Sort_By_Name()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -548,7 +548,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -566,7 +566,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -588,7 +588,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -604,7 +604,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -626,7 +626,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -649,7 +649,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -666,7 +666,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_ContentType_With_PropertyType_Removed()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -690,7 +690,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_SimpleTextpage()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -708,7 +708,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_Textpage()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -726,7 +726,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyType_With_No_Group()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -760,7 +760,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_AllowedChildContentTypes_On_ContentType()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -794,7 +794,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository repository;
@@ -821,7 +821,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository repository;
@@ -849,7 +849,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Usage_Of_New_PropertyType_On_Content()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository repository;
@@ -883,7 +883,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentTypeRepository repository;

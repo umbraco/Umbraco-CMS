@@ -322,7 +322,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, string>> orderBy)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 

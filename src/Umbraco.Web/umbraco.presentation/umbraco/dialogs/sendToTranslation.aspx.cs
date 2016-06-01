@@ -70,7 +70,7 @@ namespace umbraco.presentation.dialogs
                     includeSubpages.Enabled = false;
 
                 // Translators
-                int totalUsers;
+                long totalUsers;
                 foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
                     if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));

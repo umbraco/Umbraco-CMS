@@ -35,7 +35,7 @@ namespace umbraco.cms.presentation.Trees
 
         public override void Render(ref XmlTree tree)
         {
-            int totalusers;
+            long totalusers;
             foreach (var user in Services.UserService.GetAll(0, int.MaxValue, out totalusers))
             {
                 if (user.Id > 0 && user.IsApproved)

@@ -32,25 +32,29 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
+        /// <param name="memberTypeService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
+            IMemberTypeService memberTypeService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
+            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, memberTypeService, externalLoginService, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, options);
             return manager;
         }

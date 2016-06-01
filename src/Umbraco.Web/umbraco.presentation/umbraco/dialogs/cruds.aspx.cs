@@ -63,7 +63,7 @@ namespace umbraco.dialogs
 
             ht.Rows.Add(names);
 
-            int totalUsers;
+            long totalUsers;
             foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
             {
                 // Not disabled users and not system account
@@ -117,7 +117,7 @@ namespace umbraco.dialogs
         {
             //get non disabled, non admin users and project to a dictionary, 
             // the string (value) portion will store the array of chars = their permissions
-            int totalUsers;
+            long totalUsers;
             var usersPermissions = Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
                 .Where(user => user.IsApproved && user.Id > 0)
                 .ToDictionary(user => user, user => "");

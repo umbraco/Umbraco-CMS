@@ -218,14 +218,14 @@ namespace Umbraco.Tests.TestHelpers
             var applicationContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(
-                    Core.Configuration.GlobalSettings.UmbracoConnectionName, 
-                    TestObjects.GetDefaultSqlSyntaxProviders(Logger), 
+                    Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                    TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                     Logger, new TestScopeContextAdapter(),
                     Mock.Of<IMappingResolver>()), Logger),
                 //assign the service context
                 TestObjects.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(),
-                    new NPocoUnitOfWorkProvider(Logger, Mock.Of<IMappingResolver>()),
+                    TestObjects.GetDatabaseUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
                     CacheHelper,
                     Logger,

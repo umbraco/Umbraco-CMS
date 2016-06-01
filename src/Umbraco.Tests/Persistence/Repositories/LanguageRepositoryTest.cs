@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 unitOfWork.Database.EnableSqlTrace = true;
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
         {
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_WhenIdDoesntExist_ReturnsNull()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
         { 
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -254,7 +254,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange
-            var provider = CreateUowProvider();
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
