@@ -1,10 +1,8 @@
 <div ng-controller="Umbraco.Editors.Packages.OverviewController as vm" class="clearfix">
 
-    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
-
     <form name="packagesForm" ng-submit="save()" novalidate val-form-manager>
 
-        <umb-editor-view footer="false" ng-if="!page.loading">
+        <umb-editor-view footer="false">
 
             <umb-editor-header
                 name="vm.page.name"
@@ -18,7 +16,6 @@
             <umb-editor-container>
 
                 <umb-editor-sub-views
-                    ng-if="!vm.page.loading"
                     sub-views="vm.page.navigation">
                 </umb-editor-sub-views>
 
