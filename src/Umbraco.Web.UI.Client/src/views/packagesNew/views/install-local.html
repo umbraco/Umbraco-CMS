@@ -1,82 +1,82 @@
-<div class="clearfix" ng-controller="Umbraco.Editors.Packages.InstallLocalController as vm">
-
+<div class="umb-packages-view-wrapper" ng-controller="Umbraco.Editors.Packages.InstallLocalController as vm">
 
     <!-- Upload -->
     <div class="umb-upload-local" ng-if="vm.state === 'upload'">
-        <form novalidate name="localPackageForm" class="umb-center-allthings">
-            <h3><strong>Install local package</strong></h3>
-            <p>Browse for local packages, they usally have a ".zip" extension. You can find trusted packages on our.umbraco.com or in the package tab in Umbraco</p>
+        <form novalidate name="localPackageForm">
 
 
-            <div class="umb-upload-local">
-                <label for="body_file1">
-
-                    <div class="umb-era-button -blue upload">
-                        <i class="icon-cloud-upload large"></i>
-                        <span class="uploaded-file-name">Choose file</span>
-                    </div>
-
-                    <input class="input-file" name="ctl00$body$file1" type="file" id="body_file1" onchange="enableButton();">
-
-                </label>
+            <div class="umb-upload-field">
+                    <i class="icon-box"></i>
+                    <small class="faded"><strong>Drop to upload</strong></small>
             </div>
 
+            <h3><strong>Upload package</strong></h3>
+            <p class="faded">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+            </p>
 
-            <label for="accept-terms" class="umb-accept-terms umb-package-installer-label">
-                <input type="checkbox" id="accept-terms" ng-model="vm.localPackage.riskAccept" required>
-                <strong class="label-text">I understand the security risks associated with installing a local package</strong>
-            </label>
 
             <button type="button"
-                    class="umb-era-button -blue loaded"
-                    ng-class="{'-inactive' : localPackageForm.$invalid}"
-                    ng-disabled="localPackageForm.$invalid"
-                    ng-click="vm.loadPackage()">Load package and proceed
+                    class="umb-era-button -blue"
+                    ng-click="vm.loadPackage()">Next
             </button>
         </form>
     </div>
 
 
     <!-- Package details -->
-    <div class="umb-info-local umb-center-allthings" ng-if="vm.state === 'packageDetails'">
-        <h3 class="umb-info-local-item"><strong>{{ vm.localPackage.packageName }}</strong></h3>
+    <div class="umb-info-local" ng-if="vm.state === 'packageDetails'">
+        <div class="umb-info-local-items">
 
-        <div class="umb-info-local-item">
-            <strong>Author</strong>
-            <a href="{{ vm.localPackage.packageAuthorLink }}" target="_blank">{{ vm.localPackage.packageAuthor }}</a>
+            <form novalidate name="localPackageForm">
+                <div class="umb-package-icon">
+                    <img ng-src="{{vm.localPackage.icon}}" alt="" />
+                </div>
+
+
+                <div class="umb-package-info">
+                    <h4 class="umb-info-local-item"><strong>{{ vm.localPackage.name }}</strong></h4>
+
+                    <div class="umb-info-local-item">
+                        <strong>Author</strong>
+                        <a href="{{ vm.localPackage.authorLink }}" target="_blank">{{ vm.localPackage.author }}</a>
+                    </div>
+
+                    <div class="umb-info-local-item">
+                        <strong>Repository</strong>
+                        <a href="{{ vm.localPackage.info }}" target="_blank">{{ vm.localPackage.info }}</a>
+                    </div>
+
+                    <div class="umb-info-local-item">
+                        <strong>License</strong>
+                        <a href="{{ vm.localPackage.licensLink }}">{{ vm.localPackage.licens }}</a>
+                    </div>
+
+                    <div class="umb-info-local-item">
+                        <strong>Read me</strong>
+                        <br>
+                        <small> {{ vm.localPackage.readme }} </small>
+                    </div>
+
+                    <div class="umb-info-local-item mt-3">
+                        <button type="button"
+                                ng-class="{'-inactive' : localPackageForm.$invalid}"
+                                ng-disabled="localPackageForm.$invalid"
+                                class="umb-era-button -blue inline-flex">
+                                Install package
+                        </button>
+                        <label for="licens-accept" class="umb-package-installer-label">
+                            <input type="checkbox" id="licens-accept" ng-model="vm.localPackage.packageLicensAccept" required>
+                            <strong class="label-text">I accept <a href="#">terms of use</a></strong>
+                        </label>
+
+                    </div>
+
+                </div>
+            </form>
+
         </div>
-
-        <div class="umb-info-local-item">
-            <strong>Repository</strong>
-            <a href="{{ vm.localPackage.packageInfo }}" target="_blank">{{ vm.localPackage.packageInfo }}</a>
-        </div>
-
-        <div class="umb-info-local-item">
-            <strong>License</strong>
-            <a href="{{ vm.localPackage.packageLicensLink }}">{{ vm.localPackage.packageLicens }}</a>
-        </div>
-
-        <div class="umb-info-local-item">
-            <strong>Accept license</strong>
-            <label for="licens-accept" class="umb-package-installer-label">
-                <input type="checkbox" id="licens-accept" ng-model="vm.localPackage.packageLicensAccept" required>
-                <strong class="label-text">I accept License</strong>
-            </label>
-        </div>
-
-        <div class="umb-info-local-item">
-            <strong>Read me</strong>
-        </div>
-
-        <button type="button"
-                class="umb-era-button -blue">
-                Install package
-        </button>
     </div>
-
-    <pre>
-        {{ vm.localPackage | json }}
-    </pre>
 
 
 </div>

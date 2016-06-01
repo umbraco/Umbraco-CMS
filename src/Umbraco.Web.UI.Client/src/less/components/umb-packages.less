@@ -194,7 +194,7 @@
     font-weight: bold;
 
     height: 38px;
-    line-height: 38px;
+    line-height: 1;
 
     max-width: 100%;
     padding: 0 18px;
@@ -210,6 +210,7 @@
 
     border-radius: 3px;
     border: 0 none;
+    box-sizing: border-box;
 
     cursor: pointer;
 
@@ -251,13 +252,13 @@
 
 .umb-era-button.-inactive {
 	cursor: not-allowed;
-    background: whitesmoke;
-	color: @grayMed;
+    color: #BBB;
+    background: #EAE7E7;
 }
 
 .umb-era-button.-inactive:hover {
-    background: whitesmoke;
-	color: @grayMed;
+    color: #BBB;
+    background: #EAE7E7;
 }
 
 
@@ -514,93 +515,4 @@
     flex: 1 1 auto;
     display: flex;
     justify-content: flex-end;
-}
-
-
-
-// Install local package
-
-// Accept terms
-.umb-accept-terms {
-    margin-bottom: 40px;
-    display: flex;
-    align-items: center;
-
-    font-size: 13px;
-}
-
-.umb-package-installer-label .label-text {
-    margin-left: 5px;
-}
-
-.umb-package-installer-label input[type="radio"],
-.umb-package-installer-label input[type="checkbox"] {
-    margin-top: 0px;
-}
-
-.umb-package-installer-label {
-    display: flex;
-    align-items: center;
-
-    font-size: 13px;
-    user-select: none;
-}
-
-// Install local package
-.umb-center-allthings {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    max-width: 640px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-
-// Upload state
-.umb-upload-local input[type="file"] {
-    display: none;
-}
-
-.umb-upload-local {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-
-    margin: 40px auto;
-}
-
-.umb-upload-local .loaded {
-    margin-left: 10px;
-}
-
-.umb-upload-local .upload i {
-    font-size: 20px;
-    line-height: 1;
-}
-
-.umb-upload-local .-large {
-    font-size: 18px;
-}
-
-.uploaded-file-name {
-    margin-left: 10px;
-}
-
-
-// Info state
-.umb-info-local {
-
-}
-
-.umb-info-local-item {
-    margin: 10px 0;
 }
