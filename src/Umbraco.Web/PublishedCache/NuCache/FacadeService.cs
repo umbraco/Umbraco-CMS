@@ -1088,9 +1088,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
         {
-            // handling a transaction event that does not play well with cache...
-            //RepositoryBase.SetCacheEnabledForCurrentRequest(false); // fixme !!
-
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
@@ -1100,9 +1097,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
         {
-            // handling a transaction event that does not play well with cache...
-            //RepositoryBase.SetCacheEnabledForCurrentRequest(false); // fixme !!
-
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
@@ -1112,9 +1106,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
         {
-            // handling a transaction event that does not play well with cache...
-            //RepositoryBase.SetCacheEnabledForCurrentRequest(false); // fixme !!
-
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
