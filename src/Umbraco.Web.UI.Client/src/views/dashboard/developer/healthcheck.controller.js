@@ -5,11 +5,15 @@
 
         var vm = this;
 
+        vm.viewState = "list";
 		vm.groups = [];
+        vm.selectedGroup = {};
 
 		vm.getStatus = getStatus;
 		vm.executeAction = executeAction;
 		vm.checkAllInGroup = checkAllInGroup;
+        vm.openGroup = openGroup;
+        vm.closeGroup = closeGroup;
 
 		// Get a (grouped) list of all health checks
 		healthCheckService.getAllChecks().then(
@@ -114,6 +118,16 @@
 			});
 
 		}
+
+        function openGroup(group) {
+            vm.selectedGroup = group;
+            vm.viewState = "details";
+        }
+
+        function closeGroup() {
+            vm.selectedGroup = {};
+            vm.viewState = "list";
+        }
 
     }
 

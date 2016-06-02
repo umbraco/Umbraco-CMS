@@ -1,30 +1,42 @@
-<div class="umb-healthcheck" ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
+<div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
 
-    <div class="umb-air" ng-repeat="group in vm.groups">
-        <div class="umb-healthcheck-group">
-            <div class="umb-healthcheck-title">
-                <h4><strong>{{group.name}}</strong></h4>
+    <div class="umb-healthcheck" ng-if="vm.viewState === 'list'">
+
+        <div class="umb-air" ng-repeat="group in vm.groups">
+            <div class="umb-healthcheck-group">
+                <div class="umb-healthcheck-title">
+                    <h4><strong>{{group.name}}</strong></h4>
+                </div>
+
+                <div class="umb-healthcheck-messages">
+
+                    <div>Checks:</div>
+                    <div>{{ group.checkCounter }} / {{ group.checks.length }}</div>
+
+                    <div ng-if="group.resultType === 0">Success!</div>
+                    <div ng-if="group.resultType === 1">Warning!</div>
+                    <div ng-if="group.resultType === 2">Error!</div>
+                    <div ng-if="group.resultType === 3">Info!</div>
+
+                </div>
+
+                <button class="umb-era-button align-self-center" ng-if="group.resultType && group.resultType !== 0" type="button" ng-click="vm.openGroup(group);">Open group</button>
+
+                <button class="umb-era-button align-self-center" ng-if="!group.resultType || group.resultType === 0" type="button" ng-click="vm.checkAllInGroup(group, group.checks);">Check all</button>
             </div>
-
-            <div class="umb-healthcheck-messages">
-
-                <div>Checks:</div>
-                <div>{{ group.checkCounter }} / {{ group.checks.length }}</div>
-
-                <div ng-if="group.resultType === 0">Success!</div>
-                <div ng-if="group.resultType === 1">Warning!</div>
-                <div ng-if="group.resultType === 2">Error!</div>
-                <div ng-if="group.resultType === 3">Info!</div>
-
-            </div>
-
-            <button class="umb-era-button align-self-center" ng-if="group.resultType && group.resultType !== 0" type="button" ng-click="vm.openGroup(group);">Open group</button>
-
-            <button class="umb-era-button align-self-center" ng-if="!group.resultType || group.resultType === 0" type="button" ng-click="vm.checkAllInGroup(group, group.checks);">Check all</button>
         </div>
+
+    </div>
+
+    <div ng-if="vm.viewState === 'details'">
+
+        <a href="" ng-click="vm.closeGroup();">Tak me back</a>
+        <pre>{{ vm.selectedGroup | json }}</pre>
+
     </div>
 
 </div>
+
 
 
 <!-- <div class="umb-healthcheck-groupinfo" ng-repeat="check in group.checks">
