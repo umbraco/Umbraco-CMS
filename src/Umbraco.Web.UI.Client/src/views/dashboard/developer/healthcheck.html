@@ -1,15 +1,19 @@
 <div class="umb-healthcheck" ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
-    <a href="#" class="umb-healthcheck-group" ng-repeat="group in vm.groups">
 
-        <div class="umb-healthcheck-card">
+    <div class="umb-healthcheck-group" ng-repeat="group in vm.groups">
+
+        <div class="umb-healthcheck-title">
             <h4><strong>{{group.name}}</strong></h4>
-
-            <p>flax</p>
-
-            <button class="umb-era-button" type="button" ng-click="vm.checkAllInGroup(group.checks);">Check all in {{group.name}}</button>
         </div>
 
-    </a>
+        <div class="umb-healthcheck-messages">
+            <p>flax</p>
+        </div>
+
+        <button class="umb-era-button" type="button" ng-click="vm.checkAllInGroup(group.checks);">Check all in {{group.name}}</button>
+
+    </div>
+
 </div>
 
 
