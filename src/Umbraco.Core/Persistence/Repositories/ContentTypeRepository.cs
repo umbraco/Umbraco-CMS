@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
         private readonly ITemplateRepository _templateRepository;
+        private IRepositoryCachePolicy<IContentType, int> _cachePolicy;
 
         public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository, IMappingResolver mappingResolver)
             : base(work, cache, logger, mappingResolver)
@@ -27,16 +28,15 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IContentType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IContentType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IContentType, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(),
-                    //allow this cache to expire
-                    expires:true));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<IContentType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
+
+                return _cachePolicy;
             }
         }
 
