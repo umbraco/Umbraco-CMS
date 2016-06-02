@@ -32,11 +32,9 @@ namespace Umbraco.Tests.Cache
                     isCached = true;
                 });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.Get(1, o => new AuditItem(1, "blah", AuditType.Copy, 123));
-            }
+            var policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
+
+            var found = policy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), ids => getAll);
             Assert.IsTrue(isCached);
         }
 
@@ -52,12 +50,10 @@ namespace Umbraco.Tests.Cache
             var cache = new Mock<IRuntimeCacheProvider>();
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem(1, "blah", AuditType.Copy, 123));
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.Get(1, o => (AuditItem)null);
-                Assert.IsNotNull(found);
-            }
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
+
+            var found = defaultPolicy.Get(1, id => null, ids => getAll);
+            Assert.IsNotNull(found);
         }
 
         [Test]
@@ -84,21 +80,17 @@ namespace Umbraco.Tests.Cache
                 return cached.Any() ? new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce) : null;
             });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] {}, o => getAll);
-            }
+            var policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
+
+            var found = policy.GetAll(new object[] {}, ids => getAll);
 
             Assert.AreEqual(1, cached.Count);
             Assert.IsNotNull(list);
 
             //Do it again, ensure that its coming from the cache!
-            defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] { }, o => getAll);
-            }
+            policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
+
+            found = policy.GetAll(new object[] { }, ids => getAll);
 
             Assert.AreEqual(1, cached.Count);
             Assert.IsNotNull(list);
@@ -127,11 +119,9 @@ namespace Umbraco.Tests.Cache
                 });
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem[] { });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] { }, o => getAll);
-            }
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
+
+            var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
 
             Assert.AreEqual(1, cached.Count);
             Assert.IsNotNull(list);
@@ -150,12 +140,10 @@ namespace Umbraco.Tests.Cache
                 new AuditItem(2, "blah2", AuditType.Copy, 123)
             });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] { }, o => getAll);
-                Assert.AreEqual(2, found.Length);
-            }
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object,item => item.Id, false);
+
+            var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
+            Assert.AreEqual(2, found.Length);
         }
 
         [Test]
@@ -175,16 +163,10 @@ namespace Umbraco.Tests.Cache
                     cacheCleared = true;
                 });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
             try
             {
-                using (defaultPolicy)
-                {
-                    defaultPolicy.CreateOrUpdate(new AuditItem(1, "blah", AuditType.Copy, 123), item =>
-                    {
-                        throw new Exception("blah!");
-                    });
-                }
+                defaultPolicy.Update(new AuditItem(1, "blah", AuditType.Copy, 123), item => { throw new Exception("blah!"); });
             }
             catch
             {
@@ -213,16 +195,10 @@ namespace Umbraco.Tests.Cache
                     cacheCleared = true;
                 });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
             try
             {
-                using (defaultPolicy)
-                {
-                    defaultPolicy.Remove(new AuditItem(1, "blah", AuditType.Copy, 123), item =>
-                    {
-                        throw new Exception("blah!");
-                    });
-                }
+                defaultPolicy.Delete(new AuditItem(1, "blah", AuditType.Copy, 123), item => { throw new Exception("blah!"); });
             }
             catch
             {

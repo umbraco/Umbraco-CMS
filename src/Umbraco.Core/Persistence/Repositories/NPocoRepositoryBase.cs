@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -107,7 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual new TId GetEntityId(TEntity entity)
         {
-            return (TId)(object)entity.Id;
+            return (TId)(object) entity.Id;
         }
     }
 }

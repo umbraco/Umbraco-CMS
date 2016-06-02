@@ -16,19 +16,22 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
+        private IRepositoryCachePolicy<PublicAccessEntry, Guid> _cachePolicy;
+
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
             : base(work, cache, logger, mappingResolver)
         {            
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<PublicAccessEntry, Guid> CachePolicyFactory
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(RuntimeCache, GetEntityId, /*expires:*/ false);
+
+                return _cachePolicy;
             }
         }
 
