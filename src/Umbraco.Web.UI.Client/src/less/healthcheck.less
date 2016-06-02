@@ -1,21 +1,84 @@
+/* Vars */
+	@red-orange: #FF3F34;
+	@sunrise: #F5D226;
+	@emerald: #50C878;
+
+
 .umb-healthcheck {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-.umb-healthcheck-group {
-	border: 2px solid @grayLighter;
 
+/* Group and states */
+.umb-healthcheck-group {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	justify-content: center;
+
+	background: @grayLighter;
 	border-radius: 3px;
 
 	padding: 20px;
-	margin: 10px;
+	box-sizing: border-box;
 
-	text-decoration: none !important;
+	text-align: center;
+}
 
-	&:hover {
-		border-color: @blue;
-	}
+.umb-healthcheck-group.-warning {
+	border-color: @sunrise;
+}
+
+.umb-healthcheck-group.-error {
+	border-color: @red-orange;
+}
+
+.umb-healthcheck-group.-success {
+	border-color: @emerald;
+}
+
+.umb-healthcheck-group.-info {
+	border-color: @blue;
+}
+
+
+/* Title */
+.umb-healthcheck-title {
+
+}
+
+.umb-healthcheck-group.-warning .umb-healthcheck-title {
+	color: @sunrise;
+}
+
+.umb-healthcheck-group.-error .umb-healthcheck-title {
+	color: @red-orange;
+}
+
+.umb-healthcheck-group.-success .umb-healthcheck-title {
+	color: @emerald;
+}
+
+.umb-healthcheck-group.-info .umb-healthcheck-title {
+	color: @blue;
+}
+
+
+/* Messages */
+.umb-healthcheck-messages {
+	display: block;
+	margin-bottom: 15px;
+
+	font-size: 13px;
+
+	color: @grayMed;
+}
+
+
+/* Helpers */
+.align-self-center {
+	align-self: center;
 }
 
 
@@ -100,4 +163,25 @@
 .umb-era-button.-full-width {
     display: block;
     width: 100%;
+}
+
+
+/* Spacing for boxes */
+.umb-air {
+	flex: 0 0 auto;
+	flex-basis: 100%;
+    max-width: 100%;
+
+	padding: 10px;
+	box-sizing: border-box;
+
+	@media (min-width: 1024px) {
+		flex-basis: 50%;
+	    max-width: 50%;
+	}
+
+	@media (min-width: 1400px) {
+		flex-basis: 25%;
+	    max-width: 25%;
+	}
 }
