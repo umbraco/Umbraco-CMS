@@ -856,7 +856,7 @@ namespace Umbraco.Core.Services
                 var c = stack.Peek();
                 IMedia[] cc;
                 if (c.Level == level)
-                    while ((cc = c.Children().ToArray()).Length > 0)
+                    while ((cc = c.Children(this).ToArray()).Length > 0)
                     {
                         foreach (var ci in cc)
                             stack.Push(ci);

@@ -30,12 +30,13 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var fix = new PublishAfterUpgradeToVersionSixth();
 
             //Setup the MigrationRunner
+            var migrationContext = new MigrationContext(db, Mock.Of<ILogger>());
             var migrationRunner = new MigrationRunner(
                 Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
 
-            bool upgraded = migrationRunner.Execute(db /*, true*/);
+            bool upgraded = migrationRunner.Execute(migrationContext /*, true*/);
 
             Assert.That(upgraded, Is.True);
 

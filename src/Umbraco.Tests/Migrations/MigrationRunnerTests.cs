@@ -21,6 +21,7 @@ namespace Umbraco.Tests.Migrations
         private ILogger _logger;
         private ISqlSyntaxProvider _sqlSyntax;
         private UmbracoDatabase _database;
+        private MigrationContext _migrationContext;
 
         [SetUp]
         public void Setup()
@@ -30,6 +31,7 @@ namespace Umbraco.Tests.Migrations
 
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
             _database = new UmbracoDatabase("cstr", _sqlSyntax, DatabaseType.SQLCe, dbProviderFactory, _logger);
+            _migrationContext = new MigrationContext(_database, _logger);
         }
 
         [Test]
@@ -40,8 +42,9 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(6 /*, 0, 0*/), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(_logger) });
-            var context = runner.InitializeMigrations(migrations.ToList(), _database /*, true*/);
+            var context = new MigrationContext(_database, _logger);
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
+            runner.InitializeMigrations(migrations.ToList() /*, true*/);
 
             Assert.AreEqual(1, context.Expressions.Count);
         }
@@ -54,8 +57,9 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(5 /*, 0, 0*/), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(_logger) });
-            var context = runner.InitializeMigrations(migrations.ToList(), _database /*, true*/);
+            var context = new MigrationContext(_database, _logger);
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
+            runner.InitializeMigrations(migrations.ToList() /*, true*/);
 
             Assert.AreEqual(1, context.Expressions.Count);
         }
@@ -68,8 +72,9 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(5, 0, 1), new SemVersion(6 /*, 0, 0*/), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(_logger) });
-            var context = runner.InitializeMigrations(migrations.ToList(), _database /*, true*/);
+            var context = new MigrationContext(_database, _logger);
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
+            runner.InitializeMigrations(migrations.ToList() /*, true*/);
 
             Assert.AreEqual(1, context.Expressions.Count);
         }
@@ -78,8 +83,8 @@ namespace Umbraco.Tests.Migrations
         [Migration("5.0.0", 1, "Test")]
         private class MultiMigration : MigrationBase
         {
-            public MultiMigration(ILogger logger) 
-                : base(logger)
+            public MultiMigration(IMigrationContext context) 
+                : base(context)
             { }
 
             public override void Up()

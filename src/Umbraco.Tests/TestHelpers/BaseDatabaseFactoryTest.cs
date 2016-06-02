@@ -85,7 +85,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected IDatabaseUnitOfWorkProvider UowProvider => _uowProvider;
 
-        protected override void SetupApplicationContext()
+        protected override ApplicationContext CreateApplicationContext()
         {
             var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
 
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers
             // application is ready
             _appContext.IsReady = true;
 
-            ApplicationContext.Current = _appContext;
+            return _appContext;
         }
 
         /// <summary>

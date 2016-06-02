@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
 
-        public MigrateAndRemoveTemplateMasterColumn(ILogger logger)
-            : base(logger)
+        public MigrateAndRemoveTemplateMasterColumn(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()

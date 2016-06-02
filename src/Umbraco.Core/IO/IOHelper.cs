@@ -36,6 +36,7 @@ namespace Umbraco.Core.IO
 	        string tempDir = unPackDirectory;
 	        Directory.CreateDirectory(tempDir);
 
+            //TODO: Get rid of SharpZipLib library
 	        using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
 	        {
                 ZipEntry theEntry;

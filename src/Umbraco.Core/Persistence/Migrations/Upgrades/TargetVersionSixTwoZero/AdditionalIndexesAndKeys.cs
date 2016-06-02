@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
-        public AdditionalIndexesAndKeys(ILogger logger) 
-            : base(logger)
+        public AdditionalIndexesAndKeys(IMigrationContext context) 
+            : base(context)
         { }
 
 

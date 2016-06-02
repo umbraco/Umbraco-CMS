@@ -7,8 +7,8 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("6.0.0", 2, "Test")]
     public class SixZeroMigration2 : MigrationBase
     {
-        public SixZeroMigration2(ILogger logger) 
-            : base(logger)
+        public SixZeroMigration2(IMigrationContext context) 
+            : base(context)
         { }
 
 

@@ -65,6 +65,7 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Clear selection</key>
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
@@ -147,6 +148,7 @@
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="routeError">Oops: this document is published but its url would collide with content %0%</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>
@@ -171,7 +173,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
-	<key alias="urls">Link to media</key>
+	  <key alias="urls">Link to media</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
     <key alias="maxFileSize">Max file size is</key>
@@ -197,6 +199,12 @@
     <key alias="restart">Restart</key>
     <key alias="visit">Visit</key>
     <key alias="welcome">Welcome</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Name</key>
@@ -482,8 +490,8 @@
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
     <key alias="current">current</key>
-    <key alias="move">Move</key>
     <key alias="embed">Embed</key>
+    <key alias="selected">selected</key>
   </area>
 
   <area alias="colors">
@@ -813,14 +821,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
     ]]></key>
-    <key alias="includeUnpublished">Include unpublished child pages</key>
+    <key alias="includeUnpublished">Include unpublished subpages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="nodePublish">%0% has been published</key>
     <key alias="nodePublishAll">%0% and subpages have been published</key>
     <key alias="publishAll">Publish %0% and all its subpages</key>
-    <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
-      You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
+    <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
+      You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
       ]]></key>
   </area>
   <area alias="colorpicker">
@@ -1161,6 +1169,7 @@ To manage your website, simply open the Umbraco back office and start adding con
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]></key>
     <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
+    <key alias="noLanguageSelected">Please select the language that the content should be translated into</key>
     <key alias="sendToTranslate">Send the page '%0%' to translation</key>
     <key alias="taskAssignedBy">Assigned by</key>
     <key alias="taskOpened">Task opened</key>

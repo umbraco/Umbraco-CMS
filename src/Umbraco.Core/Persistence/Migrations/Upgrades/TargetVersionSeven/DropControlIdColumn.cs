@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -8,8 +7,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class DropControlIdColumn : MigrationBase
     {
-        public DropControlIdColumn(ILogger logger) 
-            : base(logger)
+        public DropControlIdColumn(IMigrationContext context) 
+            : base(context)
         { }
 
 

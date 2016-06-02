@@ -17,14 +17,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     {
         private readonly bool _forTesting;
 
-        internal AddIndexToCmsMacroTable(bool forTesting, ILogger logger)
-            : base(logger)
+        internal AddIndexToCmsMacroTable(bool forTesting, IMigrationContext context)
+            : base(context)
         {
             _forTesting = forTesting;
         }
 
-        public AddIndexToCmsMacroTable(ILogger logger) 
-            : base(logger)
+        public AddIndexToCmsMacroTable(IMigrationContext context) 
+            : base(context)
         { }
 
         public override void Up()

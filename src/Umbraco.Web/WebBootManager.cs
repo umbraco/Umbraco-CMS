@@ -43,6 +43,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
 using Umbraco.Web._Legacy.Actions;
+using UmbracoExamine;
 using Action = System.Action;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
@@ -347,6 +348,8 @@ namespace Umbraco.Web
             container.Register<IEventMessagesFactory, ScopeContextEventMessagesFactory>();
             container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             container.RegisterSingleton<ISectionService, SectionService>();
+
+            container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
         }
 
         /// <summary>

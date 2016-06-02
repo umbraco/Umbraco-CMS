@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -11,8 +10,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
-        public UpdateUniqueIdToHaveCorrectIndexType(ILogger logger)
-            : base(logger)
+        public UpdateUniqueIdToHaveCorrectIndexType(IMigrationContext context)
+            : base(context)
         { }
 
 

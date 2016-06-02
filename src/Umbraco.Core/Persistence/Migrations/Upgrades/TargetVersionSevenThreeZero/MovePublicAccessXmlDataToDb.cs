@@ -14,8 +14,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class MovePublicAccessXmlDataToDb : MigrationBase
     {
-        public MovePublicAccessXmlDataToDb(ILogger logger)
-            : base(logger)
+        public MovePublicAccessXmlDataToDb(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()

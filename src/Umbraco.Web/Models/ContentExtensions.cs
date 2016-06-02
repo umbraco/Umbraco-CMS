@@ -49,6 +49,8 @@ namespace Umbraco.Web.Models
                 ? null // for tests only
                 : umbracoContext.ContentCache.GetRouteById(contentId); // cached
 
+            if (route != null && route.StartsWith("err/")) route = null;
+
             var domainCache = umbracoContext == null
                 ? new PublishedCache.XmlPublishedCache.DomainCache(domainService) // for tests only
                 : umbracoContext.Facade.DomainCache; // default

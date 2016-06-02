@@ -305,7 +305,9 @@ namespace Umbraco.Web.Scheduling
 
             // tasks in the queue will be executed...
             if (wait == false) return;
-            _runningTask.Wait(); // wait for whatever is running to end...
+
+            if (_runningTask != null)
+                _runningTask.Wait(); // wait for whatever is running to end...
         }
 
         /// <summary>

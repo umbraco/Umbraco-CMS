@@ -1,0 +1,51 @@
+version: '{build}'
+shallow_clone: true
+build_script:
+- cmd: >-
+    cd build
+
+    SET "release="
+
+    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+
+    SET nuGetFolder=C:\Users\appveyor\.nuget\packages
+    
+    ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet  
+    
+    SET nuGetFolder=%CD%\..\src\packages\
+    
+    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Tests\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
+    
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    
+    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.controls\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    
+    ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
+
+    SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+
+    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /verbosity:minimal
+
+    build.bat %release% build%APPVEYOR_BUILD_NUMBER%
+
+    ECHO %PATH%
+test:
+  assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
+artifacts:
+- path: build\UmbracoCms.*
+notifications:
+- provider: Slack
+  auth_token:
+    secure: v2csJi2V5ghR0rPdODK8GJdOGNCA+XaK84iQ9MdPOClqB+VU+40ybdKp6gPirGSH
+  channel: '#build-umbraco-core'
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false

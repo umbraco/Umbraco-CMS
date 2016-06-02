@@ -152,32 +152,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override async Task RunAsync(CancellationToken token)
+        public override Task RunAsync(CancellationToken token)
         {
-            lock (_locko)
-            {
-                _logger.Debug<XmlStoreFilePersister>("Run now (async).");
-                // just make sure - in case the runner is running the task on shutdown
-                _released = true;
-            }
-
-            // http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
-            // http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
-            // do we really need that ConfigureAwait here?
-
-            // - In theory, no, because we are already executing on a background thread because we know it is there and
-            // there won't be any SynchronizationContext to resume to, however this is 'library' code and 
-            // who are we to say that this will never be executed in a sync context... this is best practice to be sure 
-            // it won't cause problems.
-            // .... so yes we want it.
-
-            using (await _runLock.LockAsync())
-            {
-                await _store.SaveXmlToFileAsync().ConfigureAwait(false);
-            }
+            throw new NotImplementedException();
         }
 
-        public override bool IsAsync => true;
+        public override bool IsAsync => false;
 
         public override void Run()
         {

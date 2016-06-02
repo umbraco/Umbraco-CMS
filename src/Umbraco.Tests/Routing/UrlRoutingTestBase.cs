@@ -57,11 +57,11 @@ namespace Umbraco.Tests.Routing
         public const int LangNlId = 337;
         public const int LangDkId = 338;
 
-        protected override void SetupApplicationContext()
+        protected override ApplicationContext CreateApplicationContext()
         {
             var settings = SettingsForTests.GetDefault();
             var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
-            ApplicationContext.Current = new ApplicationContext(
+            return new ApplicationContext(
                 new DatabaseContext(databaseFactory, Logger),
                 GetServiceContext(settings, Logger),
                 CacheHelper,

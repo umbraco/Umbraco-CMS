@@ -159,7 +159,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMemberGroup TO MemberGroupDisplay
             config.CreateMap<IMemberGroup, MemberGroupDisplay>()
-                .ForMember(x => x.Path, expression => expression.MapFrom(group => "-1," + group.Id));
+                .ForMember(x => x.Path, expression => expression.MapFrom(group => "-1," + group.Id))
+                .ForMember(x => x.Notifications, expression => expression.Ignore())
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.ParentId, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Path, expression => expression.Ignore());
         }
 
         /// <summary>

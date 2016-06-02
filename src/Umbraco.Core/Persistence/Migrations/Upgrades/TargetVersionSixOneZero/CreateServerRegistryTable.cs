@@ -13,8 +13,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixOneZero
     [Migration("6.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class CreateServerRegistryTable : MigrationBase
     {
-        public CreateServerRegistryTable(ILogger logger) 
-            : base(logger)
+        public CreateServerRegistryTable(IMigrationContext context) 
+            : base(context)
         { }
 
 

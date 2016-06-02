@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 9, GlobalSettings.UmbracoMigrationName)]
     public class EnsureAppsTreesUpdated : MigrationBase
     {
-        public EnsureAppsTreesUpdated(ILogger logger)
-            : base(logger)
+        public EnsureAppsTreesUpdated(IMigrationContext context)
+            : base(context)
         { }
 
 
