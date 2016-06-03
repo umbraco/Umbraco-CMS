@@ -346,6 +346,7 @@ namespace Umbraco.Core
             /// Alias for the True/False (Ja/Nej) datatype.
             /// </summary>
             public const string TrueFalseAlias = "Umbraco.TrueFalse";
+            public const string BooleanAlias = TrueFalseAlias;
 
             /// <summary>
             /// Guid for the Ultimate Picker datatype.

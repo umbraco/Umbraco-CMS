@@ -132,14 +132,14 @@ namespace Umbraco.Web.Models.Mapping
             switch (entityType)
             {
                 case "content":
-                    dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultContentListView;
                     
                     break;
                 case "media":
-                    dtdId = Constants.System.DefaultMediaListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultMediaListView;
                     break;
                 case "member":
-                    dtdId = Constants.System.DefaultMembersListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultMembersListView;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("entityType does not match a required value");

@@ -63,16 +63,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //.ToDictionary(x => x.Key, x => x.Value);
                 .ToDictionary(x => x.Alias, x => x.Value, StringComparer.OrdinalIgnoreCase);
 
+            // see also PublishedContentType
             AddIf(contentType, properties, "Email", member.Email);
             AddIf(contentType, properties, "Username", member.Username);
-            //AddIf(contentType, properties, "PasswordQuestion", member.PasswordQuestion);
-            //AddIf(contentType, properties, "Comments", member.Comments);
-            //AddIf(contentType, properties, "IsApproved", member.IsApproved);
-            //AddIf(contentType, properties, "IsLockedOut", member.IsLockedOut);
-            //AddIf(contentType, properties, "LastLockoutDate", member.LastLockoutDate);
-            //AddIf(contentType, properties, "CreateDate", member.CreateDate);
-            //AddIf(contentType, properties, "LastLoginDate", member.LastLoginDate);
-            //AddIf(contentType, properties, "LastPasswordChangeDate", member.LastPasswordChangeDate);
+            AddIf(contentType, properties, "PasswordQuestion", member.PasswordQuestion);
+            AddIf(contentType, properties, "Comments", member.Comments);
+            AddIf(contentType, properties, "IsApproved", member.IsApproved);
+            AddIf(contentType, properties, "IsLockedOut", member.IsLockedOut);
+            AddIf(contentType, properties, "LastLockoutDate", member.LastLockoutDate);
+            AddIf(contentType, properties, "CreateDate", member.CreateDate);
+            AddIf(contentType, properties, "LastLoginDate", member.LastLoginDate);
+            AddIf(contentType, properties, "LastPasswordChangeDate", member.LastPasswordChangeDate);
 
             return properties;
         }

@@ -28,9 +28,9 @@ namespace Umbraco.Web.Models.Mapping
 
             var systemIds = new[]
             {
-                Constants.System.DefaultContentListViewDataTypeId, 
-                Constants.System.DefaultMediaListViewDataTypeId, 
-                Constants.System.DefaultMembersListViewDataTypeId
+                Constants.DataTypes.DefaultContentListView, 
+                Constants.DataTypes.DefaultMediaListView, 
+                Constants.DataTypes.DefaultMembersListView
             };
 
             config.CreateMap<PropertyEditor, DataTypeBasic>()

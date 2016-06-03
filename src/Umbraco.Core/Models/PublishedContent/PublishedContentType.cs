@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models.PublishedContent
     public class PublishedContentType
     {
         private readonly PublishedPropertyType[] _propertyTypes;
-        private readonly HashSet<string> _compositionAliases;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -37,7 +36,7 @@ namespace Umbraco.Core.Models.PublishedContent
             Id = contentType.Id;
             Alias = contentType.Alias;
             ItemType = itemType;
-            _compositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
+            CompositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
             var propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => new PublishedPropertyType(this, x));
             if (itemType == PublishedItemType.Member)
@@ -62,7 +61,7 @@ namespace Umbraco.Core.Models.PublishedContent
             Id = id;
             Alias = alias;
             ItemType = itemType;
-            _compositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
+            CompositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
             if (itemType == PublishedItemType.Member)
                 propertyTypes = WithMemberProperties(propertyTypes);
             _propertyTypes = propertyTypes.ToArray();
@@ -88,25 +87,20 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // NOTE: code below defines and add custom, built-in, Umbraco properties for members
         //  unless they are already user-defined in the content type, then they are skipped
-
-        // fixme should have constants for these
-        private const int TextboxDataTypeDefinitionId = -88;
-        //private const int BooleanDataTypeDefinitionId = -49;
-        //private const int DatetimeDataTypeDefinitionId = -36;
-
-        static readonly Dictionary<string, Tuple<int, string>> BuiltinProperties = new Dictionary<string, Tuple<int, string>>
+        // not sure it's needed really - this is here for safety purposes
+        static readonly Dictionary<string, Tuple<int, string>> BuiltinMemberProperties = new Dictionary<string, Tuple<int, string>>
         {
-            // fixme is this ok?
-            { "Email", Tuple.Create(TextboxDataTypeDefinitionId, Constants.PropertyEditors.TextboxAlias) },
-            { "Username", Tuple.Create(TextboxDataTypeDefinitionId, Constants.PropertyEditors.TextboxAlias) },
-            //{ "PasswordQuestion", Tuple.Create(TextboxDataTypeDefinitionId, Constants.PropertyEditors.TextboxAlias) },
-            //{ "Comments", Tuple.Create(TextboxDataTypeDefinitionId, Constants.PropertyEditors.TextboxAlias) },
-            //{ "IsApproved", Tuple.Create(BooleanDataTypeDefinitionId, Constants.PropertyEditors.BooleanEditorAlias) },
-            //{ "IsLockedOut", Tuple.Create(BooleanDataTypeDefinitionId, Constants.PropertyEditors.BooleanEditorAlias) },
-            //{ "LastLockoutDate", Tuple.Create(DatetimeDataTypeDefinitionId, Constants.PropertyEditors.DatetimeEditorAlias) },
-            //{ "CreateDate", Tuple.Create(DatetimeDataTypeDefinitionId, Constants.PropertyEditors.DatetimeEditorAlias) },
-            //{ "LastLoginDate", Tuple.Create(DatetimeDataTypeDefinitionId, Constants.PropertyEditors.DatetimeEditorAlias) },
-            //{ "LastPasswordChangeDate", Tuple.Create(DatetimeDataTypeDefinitionId, Constants.PropertyEditors.DatetimeEditorAlias) },
+            // see also PublishedMember class - exposing special properties as properties
+            { "Email", Tuple.Create(Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
+            { "Username", Tuple.Create(Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
+            { "PasswordQuestion", Tuple.Create(Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
+            { "Comments", Tuple.Create(Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
+            { "IsApproved", Tuple.Create(Constants.DataTypes.Boolean, Constants.PropertyEditors.BooleanAlias) },
+            { "IsLockedOut", Tuple.Create(Constants.DataTypes.Boolean, Constants.PropertyEditors.BooleanAlias) },
+            { "LastLockoutDate", Tuple.Create(Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
+            { "CreateDate", Tuple.Create(Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
+            { "LastLoginDate", Tuple.Create(Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
+            { "LastPasswordChangeDate", Tuple.Create(Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
         };
 
         private static IEnumerable<PublishedPropertyType> WithMemberProperties(IEnumerable<PublishedPropertyType> propertyTypes,
@@ -119,9 +113,10 @@ namespace Umbraco.Core.Models.PublishedContent
                 yield return propertyType;
             }
 
-            foreach (var kvp in BuiltinProperties.Where(kvp => aliases.Contains(kvp.Key) == false))
+            foreach (var propertyType in BuiltinMemberProperties
+                .Where(kvp => aliases.Contains(kvp.Key) == false)
+                .Select(kvp => new PublishedPropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, true)))
             {
-                var propertyType = new PublishedPropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, true);
                 if (contentType != null) propertyType.ContentType = contentType;
                 yield return propertyType;
             }
@@ -129,13 +124,13 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Content type
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
-        public string Alias { get; private set; }
+        public string Alias { get; }
 
-        public PublishedItemType ItemType { get; private set; }
+        public PublishedItemType ItemType { get; }
 
-        public HashSet<string> CompositionAliases => _compositionAliases;
+        public HashSet<string> CompositionAliases { get; }
 
         #endregion
 

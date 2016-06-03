@@ -34,79 +34,43 @@ namespace Umbraco.Web.PublishedCache
                 .ToArray();
         }
 
-
         #region Membership provider member properties
-        public string Email
-        {
-            get { return _membershipUser.Email; }
-        }
-        public string UserName
-        {
-            get { return _membershipUser.Username; }
-        }
-        public string PasswordQuestion
-        {
-            get { return _membershipUser.PasswordQuestion; }
-        }
-        public string Comments
-        {
-            get { return _membershipUser.Comments; }
-        }
-        public bool IsApproved
-        {
-            get { return _membershipUser.IsApproved; }
-        }
-        public bool IsLockedOut
-        {
-            get { return _membershipUser.IsLockedOut; }
-        }
-        public DateTime LastLockoutDate
-        {
-            get { return _membershipUser.LastLockoutDate; }
-        }
-        public DateTime CreationDate
-        {
-            get { return _membershipUser.CreateDate; }
-        }
-        public DateTime LastLoginDate
-        {
-            get { return _membershipUser.LastLoginDate; }
-        }
-        public DateTime LastActivityDate
-        {
-            get { return _membershipUser.LastLoginDate; }
-        }
-        public DateTime LastPasswordChangedDate
-        {
-            get { return _membershipUser.LastPasswordChangeDate; }
-        }
+
+        public string Email => _membershipUser.Email;
+
+        public string UserName => _membershipUser.Username;
+
+        public string PasswordQuestion => _membershipUser.PasswordQuestion;
+
+        public string Comments => _membershipUser.Comments;
+
+        public bool IsApproved => _membershipUser.IsApproved;
+
+        public bool IsLockedOut => _membershipUser.IsLockedOut;
+
+        public DateTime LastLockoutDate => _membershipUser.LastLockoutDate;
+
+        public DateTime CreationDate => _membershipUser.CreateDate;
+
+        public DateTime LastLoginDate => _membershipUser.LastLoginDate;
+
+        public DateTime LastActivityDate => _membershipUser.LastLoginDate;
+
+        public DateTime LastPasswordChangeDate => _membershipUser.LastPasswordChangeDate;
+
         #endregion
 
         #region IPublishedContent
-        public override PublishedItemType ItemType
-        {
-            get { return PublishedItemType.Member; }
-        }
 
-        public override bool IsDraft
-        {
-            get { return false; }
-        }
+        public override PublishedItemType ItemType => PublishedItemType.Member;
 
-        public override IPublishedContent Parent
-        {
-            get { return null; }
-        }
+        public override bool IsDraft => false;
 
-        public override IEnumerable<IPublishedContent> Children
-        {
-            get { return Enumerable.Empty<IPublishedContent>(); }
-        }
+        public override IPublishedContent Parent => null;
 
-        public override ICollection<IPublishedProperty> Properties
-        {
-            get { return _properties; }
-        }
+        public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
+
+        public override ICollection<IPublishedProperty> Properties => _properties;
 
         public override IPublishedProperty GetProperty(string alias, bool recurse)
         {
@@ -119,114 +83,77 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
-            switch (alias)
+            switch (alias.ToLowerInvariant())
             {
                 case "Email":
                     return new PropertyResult("Email", Email, PropertyResultType.CustomProperty);
                 case "UserName":
                     return new PropertyResult("UserName", UserName, PropertyResultType.CustomProperty);
+                case "PasswordQuestion":
+                    return new PropertyResult("PasswordQuestion", PasswordQuestion, PropertyResultType.CustomProperty);
+                case "Comments":
+                    return new PropertyResult("Comments", Email, PropertyResultType.CustomProperty);
+                case "IsApproved":
+                    return new PropertyResult("IsApproved", IsApproved, PropertyResultType.CustomProperty);
+                case "IsLockedOut":
+                    return new PropertyResult("IsLockedOut", IsLockedOut, PropertyResultType.CustomProperty);
+                case "LastLockoutDate":
+                    return new PropertyResult("LastLockoutDate", LastLockoutDate, PropertyResultType.CustomProperty);
+                case "CreateDate":
+                    return new PropertyResult("CreateDate", CreateDate, PropertyResultType.CustomProperty);
+                case "LastLoginDate":
+                    return new PropertyResult("LastLoginDate", LastLoginDate, PropertyResultType.CustomProperty);
+                case "LastPasswordChangeDate":
+                    return new PropertyResult("LastPasswordChangeDate", LastPasswordChangeDate, PropertyResultType.CustomProperty);
             }
 
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
         }
 
-        public override PublishedContentType ContentType
-        {
-            get { return _publishedMemberType; }
-        }
+        public override PublishedContentType ContentType => _publishedMemberType;
 
-        public override int Id
-        {
-            get { return _member.Id; }
-        }
+        public override int Id => _member.Id;
 
-        public override Guid Key
-        {
-            get { return _member.Key; }
-        }
+        public override Guid Key => _member.Key;
 
         public override int TemplateId
         {
             get { throw new NotSupportedException(); }
         }
 
-        public override int SortOrder
-        {
-            get { return 0; }
-        }
+        public override int SortOrder => 0;
 
-        public override string Name
-        {
-            get { return _member.Name; }
-        }
+        public override string Name => _member.Name;
 
         public override string UrlName
         {
             get { throw new NotSupportedException(); }
         }
 
-        public override string DocumentTypeAlias
-        {
-            get { return _member.ContentTypeAlias; }
-        }
+        public override string DocumentTypeAlias => _member.ContentTypeAlias;
 
-        public override int DocumentTypeId
-        {
-            get { return _member.ContentType.Id; }
-        }
+        public override int DocumentTypeId => _member.ContentType.Id;
 
-        public override string WriterName
-        {
-            get
-            {
-                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-                return _member.GetCreatorProfile().Name;
-            }
-        }
+        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        public override string WriterName => _member.GetCreatorProfile().Name;
 
-        public override string CreatorName
-        {
-            get
-            {
-                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-                return _member.GetCreatorProfile().Name;
-            }
-        }
+        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        public override string CreatorName => _member.GetCreatorProfile().Name;
 
-        public override int WriterId
-        {
-            get { return _member.CreatorId; }
-        }
+        public override int WriterId => _member.CreatorId;
 
-        public override int CreatorId
-        {
-            get { return _member.CreatorId; }
-        }
+        public override int CreatorId => _member.CreatorId;
 
-        public override string Path
-        {
-            get { return _member.Path; }
-        }
+        public override string Path => _member.Path;
 
-        public override DateTime CreateDate
-        {
-            get { return _member.CreateDate; }
-        }
+        public override DateTime CreateDate => _member.CreateDate;
 
-        public override DateTime UpdateDate
-        {
-            get { return _member.UpdateDate; }
-        }
+        public override DateTime UpdateDate => _member.UpdateDate;
 
-        public override Guid Version
-        {
-            get { return _member.Version; }
-        }
+        public override Guid Version => _member.Version;
 
-        public override int Level
-        {
-            get { return _member.Level; }
-        }
+        public override int Level => _member.Level;
+
         #endregion
     }
 }
