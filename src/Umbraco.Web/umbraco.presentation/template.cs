@@ -58,7 +58,7 @@ namespace umbraco
             get { return _masterTemplate; }
         }
 
-        //added fallback to the default template to avoid nasty .net errors. 
+        //added fallback to the default template to avoid nasty .net errors.
         //This is referenced in /default.aspx.cs during page rendering.
         public string MasterPageFile
         {
@@ -386,7 +386,7 @@ namespace umbraco
 
         /// <summary>
         /// Parses the content of the templateOutput stringbuilder, and matches any tags given in the
-        /// XML-file /umbraco/config/umbracoTemplateTags.xml. 
+        /// XML-file /umbraco/config/umbracoTemplateTags.xml.
         /// Replaces the found tags in the StringBuilder object, with "real content"
         /// </summary>
         /// <param name="umbPage"></param>
@@ -406,13 +406,9 @@ namespace umbraco
 
                 if (tag.ToString().ToLower().IndexOf("umbraco_macro") > -1)
                 {
-                    String macroID = helper.FindAttribute(attributes, "macroid");
-                    if (macroID != "")
-                    {
-                        // fixme - wtf? in 7.4 *nothing* ever writes to macro.MacroContent!
-                        //macro tempMacro = GetMacro(macroID);
-                        _templateOutput.Replace(tag.Value.ToString(), "" /*tempMacro.MacroContent.ToString()*/);
-                    }
+                    var macroId = helper.FindAttribute(attributes, "macroid");
+                    if (macroId != "")
+                        _templateOutput.Replace(tag.Value, string.Empty);
                 }
                 else
                 {
@@ -420,22 +416,17 @@ namespace umbraco
                     {
                         try
                         {
-                            String tempElementContent = umbPage.Elements[helper.FindAttribute(attributes, "field")].ToString();
-                            MatchCollection tempMacros = Regex.Matches(tempElementContent, "<\\?UMBRACO_MACRO(?<attributes>[^>]*)><img[^>]*><\\/\\?UMBRACO_MACRO>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                            var tempElementContent = umbPage.Elements[helper.FindAttribute(attributes, "field")].ToString();
+                            var tempMacros = Regex.Matches(tempElementContent, "<\\?UMBRACO_MACRO(?<attributes>[^>]*)><img[^>]*><\\/\\?UMBRACO_MACRO>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                             foreach (Match tempMacro in tempMacros)
                             {
-                                Hashtable tempAttributes = new Hashtable(XmlHelper.GetAttributesFromElement(tempMacro.Groups["attributes"].Value));
-                                String macroID = helper.FindAttribute(tempAttributes, "macroid");
-                                if (Convert.ToInt32(macroID) > 0)
-                                {
-                                    // fixme - wtf? in 7.4 *nothing* ever writes to macro.MacroContent!
-                                    //macro tempContentMacro = GetMacro(macroID);
-                                    _templateOutput.Replace(tag.Value.ToString(), "" /*tempContentMacro.MacroContent.ToString()*/);
-                                }
-
+                                var tempAttributes = new Hashtable(XmlHelper.GetAttributesFromElement(tempMacro.Groups["attributes"].Value));
+                                var macroId = helper.FindAttribute(tempAttributes, "macroid");
+                                if (Convert.ToInt32(macroId) > 0)
+                                    _templateOutput.Replace(tag.Value, string.Empty);
                             }
 
-                            _templateOutput.Replace(tag.Value.ToString(), tempElementContent);
+                            _templateOutput.Replace(tag.Value, tempElementContent);
                         }
                         catch (Exception e)
                         {
@@ -463,7 +454,7 @@ namespace umbraco
 
         #endregion
 
-    
+
         #region constructors
 
         public static string GetMasterPageName(int templateID)
@@ -474,9 +465,9 @@ namespace umbraco
         public static string GetMasterPageName(int templateID, string templateFolder)
         {
             var t = new template(templateID);
-            
-            return !string.IsNullOrEmpty(templateFolder) 
-                ? t.AlternateMasterPageFile(templateFolder) 
+
+            return !string.IsNullOrEmpty(templateFolder)
+                ? t.AlternateMasterPageFile(templateFolder)
                 : t.MasterPageFile;
         }
 
@@ -505,7 +496,7 @@ where nodeId = @templateID",
                        if (templateData.design != null)
                            _templateDesign = templateData.design;
                    }
-                   
+
                    return this;
                });
 
@@ -523,7 +514,7 @@ where nodeId = @templateID",
             {
                 checkForMaster(tId);
             }
-                
+
         }
 
         private void checkForMaster(int templateID) {
@@ -565,6 +556,6 @@ where nodeId = @templateID",
         #endregion
     }
 
-    
+
 
 }
