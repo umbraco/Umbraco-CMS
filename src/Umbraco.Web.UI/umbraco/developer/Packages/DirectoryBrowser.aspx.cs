@@ -89,6 +89,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 //Output directorys
                 var oDirInfo = new DirectoryInfo(IOHelper.MapPath("~/" + sSubDir));
                 var oDirs = oDirInfo.GetDirectories();
+
+                Array.Sort(oDirs, delegate(DirectoryInfo dir1, DirectoryInfo dir2)
+                {
+                    return dir1.Name.CompareTo(dir2.Name);
+                });
+
                 foreach (var oDir in oDirs)
                 {
                     try
