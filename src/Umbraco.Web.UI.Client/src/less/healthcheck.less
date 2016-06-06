@@ -112,7 +112,7 @@
 
     cursor: pointer;
 
-    transition: background-color 80ms ease, color 80ms ease;
+    transition: background-color 80ms ease, color 80ms ease, opacity 80ms ease;
 }
 
 
@@ -167,6 +167,10 @@
 
 .umb-era-button.-white {
 	background-color: @white;
+
+	&:hover {
+		opacity: .9;
+	}
 }
 
 .umb-era-button.-text-blue {
@@ -244,9 +248,9 @@
 }
 
 .umb-healthcheck-group__details-status {
-	padding: 15px 0;
+	padding: 25px 0;
 	display: flex;
-	border-bottom: 1px dashed @grayLight;
+	border-bottom: 2px solid @grayLighter;
 }
 
 .umb-healthcheck-group__details-status:last-child {
