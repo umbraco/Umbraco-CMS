@@ -60,13 +60,19 @@
                         </div>
 
                         <div class="umb-healthcheck-group__details-status-content">
-                            <span ng-bind-html="status.message"></span><br/>
-                            <span ng-if="status.description" ng-bind-html="status.description"></span>
-                        </div>
 
-                        <div ng-repeat="action in status.actions">
-                            <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, status, action);">{{action.name}}</button><br/>
-                            <p ng-bind-html="action.description"></p>
+                            <div class="umb-healthcheck-group__details-status-text">
+                                <div ng-bind-html="status.message"></div>
+                                <div ng-if="status.description" ng-bind-html="status.description"></div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status-actions">
+                                <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
+                                    <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, status, action);">{{action.name}}</button>
+                                    <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>

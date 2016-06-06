@@ -246,7 +246,6 @@
 .umb-healthcheck-group__details-status {
 	padding: 15px 0;
 	display: flex;
-	align-items: center;
 	border-bottom: 1px dashed @grayLight;
 }
 
@@ -258,7 +257,6 @@
 	flex: 0 0 50px;
 	display: flex;
 	justify-content: center;
-	align-items: center;
 	padding: 0 20px;
 }
 
@@ -275,4 +273,27 @@
 
 .umb-healthcheck-group__details-status-content {
 	padding: 0 20px;
+	flex: 1 1 auto;
+}
+
+.umb-healthcheck-group__details-status-text {
+	line-height: 1.6em;
+	margin-bottom: 10px;
+}
+
+.umb-healthcheck-group__details-status-actions {
+	display: flex;
+	flex-direction: column;
+}
+
+.umb-healthcheck-group__details-status-action {
+	background-color: @grayLighter;
+	padding: 15px;
+	margin-bottom: 10px;
+	border-radius: 3px;
+}
+
+.umb-healthcheck-group__details-status-action-description {
+	margin-top: 10px;
+	font-size: 13px;
 }
