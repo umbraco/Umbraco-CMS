@@ -94,7 +94,10 @@ function openMedia(id) {
                 // to call so that is fine.
 
                 var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Media).ToArray();
-                
+
+                var args = new TreeEventArgs(tree);
+                OnBeforeTreeRenderOptimizedMode(entities, args);
+
                 foreach (UmbracoEntity entity in entities)
                 {
                     var e = entity;
@@ -107,6 +110,8 @@ function openMedia(id) {
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
                 }
+
+                OnAfterTreeRenderOptimizedMode(entities, args);
             }            
         }
 
