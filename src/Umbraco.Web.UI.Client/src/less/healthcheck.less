@@ -24,55 +24,36 @@
 	box-sizing: border-box;
 
 	text-align: center;
+	border: 2px solid transparent;
 }
 
-.umb-healthcheck-group.-warning {
-	border-color: @sunrise;
-}
-
-.umb-healthcheck-group.-error {
-	border-color: @red-orange;
-}
-
-.umb-healthcheck-group.-success {
-	border-color: @emerald;
-}
-
-.umb-healthcheck-group.-info {
-	border-color: @blue;
+.umb-healthcheck-group:hover {
+	border: 2px solid @blue;
+	cursor: pointer;
 }
 
 
 /* Title */
 .umb-healthcheck-title {
-
-}
-
-.umb-healthcheck-group.-warning .umb-healthcheck-title {
-	color: @sunrise;
-}
-
-.umb-healthcheck-group.-error .umb-healthcheck-title {
-	color: @red-orange;
-}
-
-.umb-healthcheck-group.-success .umb-healthcheck-title {
-	color: @emerald;
-}
-
-.umb-healthcheck-group.-info .umb-healthcheck-title {
-	color: @blue;
+	margin-bottom: 15px;
 }
 
 
 /* Messages */
 .umb-healthcheck-messages {
-	display: block;
-	margin-bottom: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 20px;
+}
 
-	font-size: 13px;
+.umb-healthcheck-details-link {
+	color: @blue;
+}
 
-	color: @grayMed;
+.umb-healthcheck-details-link:hover {
+	text-decoration: none;
+	color: @blue;
 }
 
 
@@ -173,8 +154,8 @@
 	}
 }
 
-.umb-era-button.-text-blue {
-	color: @blue;
+.umb-era-button.-text-black {
+	color: @black;
 }
 
 
@@ -264,7 +245,7 @@
 	padding: 0 20px;
 }
 
-.umb-healthcheck-group__details-status-icon {
+.umb-healthcheck-status-icon {
 	background: @grayLighter;
 	width: 35px;
 	height: 35px;
@@ -273,6 +254,13 @@
 	justify-content: center;
 	align-items: center;
 	font-size: 20px;
+}
+
+.umb-healthcheck-status-icon.-large {
+	width: 70px;
+	height: 70px;
+	font-size: 30px;
+	background-color: @white;
 }
 
 .umb-healthcheck-group__details-status-content {

@@ -23,9 +23,11 @@
                 for(var i = 0; i < response.length; i++) {
                     var group = response[i];
                     group.checkCounter = 0;
+                    checkAllInGroup(group, group.checks);
                 }
 
 				vm.groups = response;
+
 			}
 		);
 

@@ -9,20 +9,14 @@
                 </div>
 
                 <div class="umb-healthcheck-messages">
-
-                    <div>Checks:</div>
-                    <div>{{ group.checkCounter }} / {{ group.checks.length }}</div>
-
-                    <div ng-if="group.resultType === 0">Success!</div>
-                    <div ng-if="group.resultType === 1">Warning!</div>
-                    <div ng-if="group.resultType === 2">Error!</div>
-                    <div ng-if="group.resultType === 3">Info!</div>
-
+                    <div class="umb-healthcheck-status-icon -large icon-check color-green" ng-if="group.resultType === 0"></div>
+                    <div class="umb-healthcheck-status-icon -large icon-alert icon-alert color-yellow" ng-if="group.resultType === 1"></div>
+                    <div class="umb-healthcheck-status-icon -large icon-delete icon-delete color-red" ng-if="group.resultType === 2"></div>
+                    <div class="umb-healthcheck-status-icon -large icon-info icon-info" ng-if="group.resultType === 3"></div>
                 </div>
 
-                <button class="umb-era-button align-self-center" ng-if="group.resultType && group.resultType !== 0" type="button" ng-click="vm.openGroup(group);">Open group</button>
+                <a class="umb-healthcheck-details-link" ng-click="vm.openGroup(group)" href="">See details</a>
 
-                <button class="umb-era-button align-self-center" ng-if="!group.resultType || group.resultType === 0" type="button" ng-click="vm.checkAllInGroup(group, group.checks);">Check all</button>
             </div>
         </div>
 
@@ -38,7 +32,7 @@
 
             <div class="umb-healthcheck-group__details-group-title">
                 <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedGroup.name }}</div>
-                <button class="umb-era-button -white" type="button" ng-click="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks);">Check all</button>
+                <button class="umb-era-button -white -text-black" type="button" ng-click="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks);">Check all</button>
             </div>
 
             <div class="umb-healthcheck-group__details-checks">
@@ -53,10 +47,10 @@
                     <div class="umb-healthcheck-group__details-status" ng-repeat="status in check.status">
 
                         <div class="umb-healthcheck-group__details-status-icon-container">
-                            <i class="umb-healthcheck-group__details-status-icon icon-check color-green" ng-if="status.resultType == 0"></i>
-                            <i class="umb-healthcheck-group__details-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType == 1"></i>
-                            <i class="umb-healthcheck-group__details-status-icon icon-delete icon-delete color-red" ng-if="status.resultType == 2"></i>
-                            <i class="umb-healthcheck-group__details-status-icon icon-info icon-info" ng-if="status.resultType == 3"></i>
+                            <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType == 0"></i>
+                            <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType == 1"></i>
+                            <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType == 2"></i>
+                            <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType == 3"></i>
                         </div>
 
                         <div class="umb-healthcheck-group__details-status-content">
