@@ -16,6 +16,7 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
+            $scope.constrain = { proportions: true }; // Can't be a primtive
             if($scope.onlyImages){
                 $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
             }
@@ -25,6 +26,15 @@ angular.module("umbraco")
             $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
+
+            $scope.changeDimensions = function (type) {
+                if ($scope.constrain.proportions) {
+                    if (type == 'width')
+                        $scope.target.height = (parseInt($scope.target.width) / $scope.target.aspectRatio).toFixed(0);
+                    else if (type == 'height')
+                        $scope.target.width = (parseInt($scope.target.height) * $scope.target.aspectRatio).toFixed(0);
+                }
+            }
 
             //preload selected item
             $scope.target = undefined;
@@ -265,6 +275,9 @@ angular.module("umbraco")
                }
 
             } else {
+                if (!$scope.target.aspectRatio && $scope.target.width && $scope.target.height)
+                    $scope.target.aspectRatio = parseInt($scope.target.width) / parseInt($scope.target.height);
+
                 $scope.openDetailsDialog();
             }
 

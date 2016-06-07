@@ -149,13 +149,15 @@
                       localize="placeholder"
                       placeholder="@general_width"
                       class="umb-editor umb-textstring small"
-                      ng-model="target.width" />
+                      ng-model="target.width" ng-change="changeDimensions('width')" />
                <localize key="general_by" style="vertical-align: bottom;vertical-align: -webkit-baseline-middle;">by</localize>
                <input type="text"
                       localize="placeholder"
                       placeholder="@general_height"
                       class="umb-editor umb-textstring small"
-                      ng-model="target.height" />
+                      ng-model="target.height" ng-change="changeDimensions('height')" />
+               <input type="checkbox" ng-model="constrain.proportions" style="vertical-align:middle;margin-left:.5em;" id="constrainProportions">
+               <label style="vertical-align:bottom;vertical-align:-webkit-baseline-middle; padding-left: 2px;" for="constrainProportions"><localize key="general_constrainProportions">Constrain proportions</localize></label>
           </div>
       </div>
 
