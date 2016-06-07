@@ -175,7 +175,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (testing)
                 return;
             InitializeOtherEvents();
-            InitializeContent();
+
+            // not so soon! if eg installing we may not be able to load content yet
+            // so replace this by LazyInitializeContent() called in Xml ppty getter
+            //InitializeContent();
         }
 
         private void InitializeRepositoryEvents()
@@ -231,11 +234,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _withOtherEvents = false;
         }
 
-        private void InitializeContent()
+        private void LazyInitializeContent()
         {
+            if (_xml != null) return;
+
             // and populate the cache
             using (var safeXml = GetSafeXmlWriter(false))
             {
+                if (_xml != null) return; // double-check
+
                 bool registerXmlChange;
                 LoadXmlLocked(safeXml, out registerXmlChange);
                 safeXml.Commit(registerXmlChange);
@@ -321,6 +328,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 if (GetXmlDocument != null)
                     return GetXmlDocument();
 
+                LazyInitializeContent();
                 ReloadXmlFromFileIfChanged();
                 return _xml;
             }
@@ -1143,6 +1151,9 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
+            draftChanged = publishedChanged = false;
+            if (_xml == null) return; // not initialized yet!
+
             draftChanged = true; // by default - we don't track drafts
             publishedChanged = false;
 
@@ -1307,6 +1318,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
+            if (_xml == null) return; // not initialized yet!
+            
             // see ContentTypeServiceBase
             // in all cases we just want to clear the content type cache
             // the type will be reloaded if/when needed
@@ -1334,6 +1347,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
+            if (_xml == null) return; // not initialized yet!
+
             // see above
             // in all cases we just want to clear the content type cache
             // the types will be reloaded if/when needed
