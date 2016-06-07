@@ -24,9 +24,12 @@
 
     <div ng-if="vm.viewState === 'details'">
 
-        <div>
-            <a href="" ng-click="vm.closeGroup();">Tak me back</a>
-        </div>
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-healthcheck-back-link" href="" ng-click="vm.closeGroup();">&larr; Take me back</a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
 
         <div class="umb-healthcheck-group__details">
 
