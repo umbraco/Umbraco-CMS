@@ -9,6 +9,7 @@
                 </div>
 
                 <div class="umb-healthcheck-messages">
+                    <div class="umb-healthcheck-status-icon -large" ng-if="group.loading"><umb-load-indicator></umb-load-indicator></div>
                     <div class="umb-healthcheck-status-icon -large icon-check color-green" ng-if="group.resultType === 0"></div>
                     <div class="umb-healthcheck-status-icon -large icon-alert icon-alert color-yellow" ng-if="group.resultType === 1"></div>
                     <div class="umb-healthcheck-status-icon -large icon-delete icon-delete color-red" ng-if="group.resultType === 2"></div>

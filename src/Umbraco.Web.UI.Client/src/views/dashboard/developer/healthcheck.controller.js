@@ -104,6 +104,7 @@
 		function checkAllInGroup(group, checks) {
 
             group.checkCounter = 0;
+            group.loading = true;
 
 			angular.forEach(checks, function(check) {
 
@@ -117,6 +118,7 @@
                     // when all checks are done, set global group result
                     if(group.checkCounter === checks.length) {
                         setGroupGlobalResultType(group);
+                        group.loading = false;
                     }
 
 				});
