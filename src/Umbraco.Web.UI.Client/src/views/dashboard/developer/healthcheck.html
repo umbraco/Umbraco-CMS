@@ -49,6 +49,9 @@
 
                     <div class="umb-healthcheck-group__details-status" ng-repeat="status in check.status">
 
+                        <div ng-show="check.loading" class="umb-healthcheck-group__details-status-overlay"></div>
+                        <umb-load-indicator ng-show="check.loading"></umb-load-indicator>
+
                         <div class="umb-healthcheck-group__details-status-icon-container">
                             <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType == 0"></i>
                             <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType == 1"></i>

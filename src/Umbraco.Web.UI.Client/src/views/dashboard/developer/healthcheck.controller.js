@@ -106,6 +106,9 @@
             group.checkCounter = 0;
 
 			angular.forEach(checks, function(check) {
+
+                check.loading = true;
+
 				healthCheckService.getStatus(check.id).then(function(response) {
 					check.status = response;
                     group.checkCounter = group.checkCounter + 1;
