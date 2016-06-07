@@ -114,7 +114,8 @@ namespace Umbraco.Core.Persistence.Factories
                         ValidationRegExp = typeDto.ValidationRegExp,
                         PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id.Value),
                         CreateDate = memberType.CreateDate,
-                        UpdateDate = memberType.UpdateDate
+                        UpdateDate = memberType.UpdateDate,
+                        Key = typeDto.UniqueId
                     };
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946
@@ -166,7 +167,8 @@ namespace Umbraco.Core.Persistence.Factories
                     ValidationRegExp = typeDto.ValidationRegExp,
                     PropertyGroupId = null,
                     CreateDate = dto.CreateDate,
-                    UpdateDate = dto.CreateDate
+                    UpdateDate = dto.CreateDate,
+                    Key = typeDto.UniqueId
                 };
                 
                 propertyTypes.Add(propertyType);

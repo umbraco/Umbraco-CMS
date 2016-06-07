@@ -94,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
-                "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory",
+                "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory", "cmsPropertyType.UniqueID",
                 "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
                 "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
