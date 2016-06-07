@@ -11,14 +11,29 @@ angular.module("umbraco")
             $scope.mediaPickerOverlay.onlyImages = true;
             $scope.mediaPickerOverlay.show = true;
 
+            if ($scope.control.value)
+                $scope.mediaPickerOverlay.currentTarget = {
+                    altText: $scope.control.value.altText,
+                    url: $scope.control.value.image,
+                    id: $scope.control.value.id,
+                    'class': $scope.control.value.class,
+                    width: $scope.control.value.width,
+                    height: $scope.control.value.height,
+                    focalPoint: $scope.control.value.focalPoint
+                }
+
+
             $scope.mediaPickerOverlay.submit = function(model) {
                 var selectedImage = model.selectedImages[0];
 
                 $scope.control.value = {
                     focalPoint: selectedImage.focalPoint,
                     id: selectedImage.id,
-                    image: selectedImage.image,
-                    altText: selectedImage.altText
+                    image: selectedImage.image ? selectedImage.image : selectedImage.url,
+                    altText: selectedImage.altText,
+                    'class': selectedImage.class,
+                    width: selectedImage.width,
+                    height: selectedImage.height
                 };
 
                 $scope.setUrl();
