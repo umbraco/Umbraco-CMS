@@ -1,14 +1,16 @@
 /**
  * @ngdoc service
- * @name umbraco.services.healthCheckService
+ * @name umbraco.resources.healthCheckResource
  * @function
  *
  * @description
  * Used by the health check dashboard to get checks and send requests to fix checks.
  */
-angular.module("umbraco.services").factory("healthCheckService", function ($http, umbRequestHelper) {
-    return {
-        
+(function () {
+    'use strict';
+
+    function healthCheckResource($http, umbRequestHelper) {
+
         /**
          * @ngdoc function
          * @name umbraco.services.healthCheckService#getAllChecks
@@ -18,12 +20,12 @@ angular.module("umbraco.services").factory("healthCheckService", function ($http
          * @description
          * Called to get all available health checks
          */
-        getAllChecks: function() {
+        function getAllChecks() {
             return umbRequestHelper.resourcePromise(
                 $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + "GetAllHealthChecks"),
                 "Failed to retrieve health checks"
             );
-        },
+        }
 
         /**
          * @ngdoc function
@@ -34,12 +36,12 @@ angular.module("umbraco.services").factory("healthCheckService", function ($http
          * @description
          * Called to get execute a health check and return the check status
          */
-        getStatus: function(id) {
+        function getStatus(id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'GetStatus?id=' + id),
                 'Failed to retrieve status for health check with ID ' + id
             );
-        },
+        }
 
         /**
          * @ngdoc function
@@ -50,11 +52,25 @@ angular.module("umbraco.services").factory("healthCheckService", function ($http
          * @description
          * Called to execute a health check action (rectifying an issue)
          */
-        executeAction: function (action) {
+        function executeAction(action) {
             return umbRequestHelper.resourcePromise(
                 $http.post(Umbraco.Sys.ServerVariables.umbracoUrls.healthCheckBaseUrl + 'ExecuteAction', action),
                 'Failed to execute action with alias ' + action.alias + ' and healthCheckId + ' + action.healthCheckId
             );
         }
-	};
-});
+
+        var resource = {
+            getAllChecks: getAllChecks,
+            getStatus: getStatus,
+            executeAction: executeAction
+        };
+
+        return resource;
+
+    }
+
+
+    angular.module('umbraco.resources').factory('healthCheckResource', healthCheckResource);
+
+
+})();

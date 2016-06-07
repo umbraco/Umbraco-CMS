@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HealthCheckController($scope, healthCheckService) {
+    function HealthCheckController($scope, healthCheckResource) {
 
         var vm = this;
 
@@ -16,7 +16,7 @@
         vm.closeGroup = closeGroup;
 
 		// Get a (grouped) list of all health checks
-		healthCheckService.getAllChecks().then(
+		healthCheckResource.getAllChecks().then(
 			function(response) {
 
                 // set number of checks which has been executed
@@ -87,7 +87,7 @@
 		function getStatus(check) {
 			check.loading = true;
 			check.status = null;
-			healthCheckService.getStatus(check.id).then(function(response) {
+			healthCheckResource.getStatus(check.id).then(function(response) {
 				check.loading = false;
 				check.status = response;
 			});
@@ -96,7 +96,7 @@
 		function executeAction(check, status, action) {
 			check.status = null;
 			check.rectify = "Loading result of '" + action.name + "'...";
-			healthCheckService.executeAction(action).then(function (response) {
+			healthCheckResource.executeAction(action).then(function (response) {
 				check.rectify = response.message;
 			});
 		}
@@ -110,7 +110,7 @@
 
                 check.loading = true;
 
-				healthCheckService.getStatus(check.id).then(function(response) {
+				healthCheckResource.getStatus(check.id).then(function(response) {
 					check.status = response;
                     group.checkCounter = group.checkCounter + 1;
                     check.loading = false;
