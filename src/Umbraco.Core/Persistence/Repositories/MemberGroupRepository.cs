@@ -5,14 +5,10 @@ using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -24,8 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
             : base(work, cache, logger, mappingResolver)
-        {
-        }
+        { }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();
 
@@ -96,10 +91,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.MemberGroup); }
-        }
+        protected override Guid NodeObjectTypeId => new Guid(Constants.ObjectTypes.MemberGroup);
 
         protected override void PersistNewItem(IMemberGroup entity)
         {
@@ -107,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var group = (MemberGroup)entity;
             group.AddingEntity();
             var dto = _modelFactory.BuildDto(group);
-            var o = Database.IsNew<NodeDto>(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
+            var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
             group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
             
             //Update with new correct path and id            
@@ -130,7 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IMemberGroup GetByName(string name)
         {
             return RuntimeCache.GetCacheItem<IMemberGroup>(
-                string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
+                typeof (IMemberGroup).FullName + "." + name,
                 () =>
                 {
                     var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(name));
@@ -161,7 +153,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
             }
 
-            // fixme - in a repository?!
             SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
 
             return grp;
@@ -284,11 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get the groups that are currently assigned to any of these members
 
             var assignedSql = Sql()
-                .Select(string.Format(
-                    "{0},{1},{2}",
-                    SqlSyntax.GetQuotedColumnName("text"),
-                    SqlSyntax.GetQuotedColumnName("Member"),
-                    SqlSyntax.GetQuotedColumnName("MemberGroup")))
+                .Select($"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
@@ -344,6 +331,8 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("MemberGroup")]
             public int MemberGroupId { get; set; }
         }
+
+        // todo - understand why we need these two repository-level events, move them back to service
 
         /// <summary>
         /// Occurs before Save

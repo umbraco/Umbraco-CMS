@@ -39,17 +39,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
             var entityIdKey = string.Join(",", entityIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
             return _runtimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
                 string.Format("{0}{1}{2}", CacheKeys.UserPermissionsCacheKey, userId, entityIdKey),
                 () =>
-        {            
+        {
 
                     var whereBuilder = new StringBuilder();
-            
+
                     //where userId = @userId AND
                     whereBuilder.Append(SqlSyntax.GetQuotedColumnName("userId"));
                     whereBuilder.Append("=");
@@ -85,13 +85,13 @@ namespace Umbraco.Core.Persistence.Repositories
                     return ConvertToPermissionList(result);
 
                 },
-                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes,
                 // then it will refresh from the database.
                 new TimeSpan(0, 20, 0),
                 //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
                 priority: CacheItemPriority.BelowNormal);
 
-        } 
+        }
 
         /// <summary>
         /// Returns permissions for all users for a given entity
@@ -148,7 +148,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(SqlSyntax, toInsert);
 
             //Raise the event
-            // fixme - in the repository?
             AssignedPermissions.RaiseEvent(
                 new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this);
         }
@@ -181,10 +180,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
 
             //Raise the event
-            // fixme - in the repo?
             AssignedPermissions.RaiseEvent(
                 new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
-        } 
+        }
 
         /// <summary>
         /// Assigns one permission to an entity for multiple users
@@ -199,7 +197,7 @@ namespace Umbraco.Core.Persistence.Repositories
             db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId AND permission=@permission AND userId in (@userIds)",
                 new
                 {
-                    nodeId = entity.Id, 
+                    nodeId = entity.Id,
                     permission = permission.ToString(CultureInfo.InvariantCulture),
                     userIds = userIds
                 });
@@ -214,7 +212,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
 
             //Raise the event
-            // fixme - in the repo?!
             AssignedPermissions.RaiseEvent(
                 new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
         }
@@ -243,7 +240,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _unitOfWork.Database.BulkInsertRecords(SqlSyntax, actions);
 
             //Raise the event
-            // fixme - in the repo?
             AssignedPermissions.RaiseEvent(
                 new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
         }
@@ -263,6 +259,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             return permissions;
         }
+
+        // todo - understand why we need this repository-level event, move it back to service
 
         public static event TypedEventHandler<PermissionRepository<TEntity>, SaveEventArgs<EntityPermission>> AssignedPermissions;
     }
