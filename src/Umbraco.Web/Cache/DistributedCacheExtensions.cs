@@ -242,15 +242,6 @@ namespace Umbraco.Web.Cache
 
         #region MacroCache
 
-        // fixme!
-        /*
-        public static void ClearAllMacroCacheOnCurrentServer(this DistributedCache dc)
-        {
-            var macroRefresher = CacheRefreshersResolver.Current.GetById(MacroCacheRefresher.UniqueId);
-            macroRefresher.RefreshAll();
-        }
-        */
-
         public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
         {
             if (macro == null) return;
@@ -316,31 +307,22 @@ namespace Umbraco.Web.Cache
         public static void RefreshDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain == null) return;
-            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainCacheRefresher.ChangeTypes.Refresh) };
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Refresh) };
             dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
 
         public static void RemoveDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain == null) return;
-            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainCacheRefresher.ChangeTypes.Remove) };
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Remove) };
             dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
 
         public static void RefreshAllDomainCache(this DistributedCache dc)
         {
-            var payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainCacheRefresher.ChangeTypes.RefreshAll) };
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) };
             dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
-
-        // fixme?
-        /*
-        public static void ClearDomainCacheOnCurrentServer(this DistributedCache dc)
-        {
-            var domainRefresher = CacheRefreshersResolver.Current.GetById(DomainCacheRefresher.UniqueId);
-            domainRefresher.RefreshAll();
-        }
-        */
 
         #endregion
 
@@ -368,17 +350,6 @@ namespace Umbraco.Web.Cache
         {
             if (language == null) return;
             dc.Remove(LanguageCacheRefresher.UniqueId, language.id);
-        }
-
-        #endregion
-
-        #region Xslt Cache
-
-        // fixme?
-        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc, CacheHelper cacheHelper)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            cacheHelper.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
         }
 
         #endregion

@@ -448,6 +448,7 @@
     <Compile Include="Services\Changes\TreeChange.cs" />
     <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
     <Compile Include="Services\Changes\TreeChangeTypes.cs" />
+    <Compile Include="Services\Changes\DomainChangeTypes.cs" />
     <Compile Include="Services\UnPublishedStatusType.cs" />
     <Compile Include="Services\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />

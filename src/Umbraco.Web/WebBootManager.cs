@@ -447,7 +447,7 @@ namespace Umbraco.Web
                                 // note: refresh all content & media caches does refresh content types too
     					        IFacadeService svc = FacadeServiceResolver.Current.Service;
                                 bool ignored1, ignored2;
-                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainCacheRefresher.ChangeTypes.RefreshAll) });
+                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
                                 svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
                                 svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1);
                             },

@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void DomainCacheRefresherCanDeserializeJsonPayload()
         {
-            var source = new[] { new DomainCacheRefresher.JsonPayload(1234, DomainCacheRefresher.ChangeTypes.None) };
+            var source = new[] { new DomainCacheRefresher.JsonPayload(1234, DomainChangeTypes.None) };
             var json = JsonConvert.SerializeObject(source);
             var payload = JsonConvert.DeserializeObject<DomainCacheRefresher.JsonPayload[]>(json);
             Assert.AreEqual(source[0].Id, payload[0].Id);

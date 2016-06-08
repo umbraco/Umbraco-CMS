@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
-            public JsonPayload(int id, ChangeTypes changeType)
+            public JsonPayload(int id, DomainChangeTypes changeType)
             {
                 Id = id;
                 ChangeType = changeType;
@@ -80,15 +81,7 @@ namespace Umbraco.Web.Cache
 
             public int Id { get; }
 
-            public ChangeTypes ChangeType { get; }
-        }
-
-        public enum ChangeTypes : byte // fixme should NOT be here !?
-        {
-            None = 0,
-            RefreshAll = 1,
-            Refresh = 2,
-            Remove = 3
+            public DomainChangeTypes ChangeType { get; }
         }
 
         #endregion

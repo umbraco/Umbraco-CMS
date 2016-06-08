@@ -130,9 +130,6 @@ namespace Umbraco.Web.Cache
             MacroCacheRefresher.ClearMacroContentCache(cacheHelper); // just the content
             ClearXsltCache();
 
-            // fixme which?
-            cacheHelper.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
-            cacheHelper.RuntimeCache.ClearCacheObjectTypes<IContent>();
             cacheHelper.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
             cacheHelper.IsolatedRuntimeCache.ClearCache<IContent>();
         }

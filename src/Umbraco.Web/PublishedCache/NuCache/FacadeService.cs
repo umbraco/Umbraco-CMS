@@ -753,7 +753,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     switch (payload.ChangeType)
                     {
-                        case DomainCacheRefresher.ChangeTypes.RefreshAll:
+                        case DomainChangeTypes.RefreshAll:
                             var domainService = _serviceContext.DomainService as DomainService;
                             if (domainService == null) throw new Exception("oops");
                             using (var uow = _uowProvider.CreateUnitOfWork())
@@ -763,10 +763,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                                 uow.Complete();
                             }
                             break;
-                        case DomainCacheRefresher.ChangeTypes.Remove:
+                        case DomainChangeTypes.Remove:
                             _domainStore.Clear(payload.Id);
                             break;
-                        case DomainCacheRefresher.ChangeTypes.Refresh:
+                        case DomainChangeTypes.Refresh:
                             var domain = _serviceContext.DomainService.GetById(payload.Id);
                             if (domain == null) continue;
                             if (domain.RootContentId.HasValue == false) continue; // anomaly
