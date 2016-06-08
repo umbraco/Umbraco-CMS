@@ -237,7 +237,7 @@ namespace Umbraco.Web.Editors
             }
 
             //if the current item is in the recycle bin
-            if (foundMedia.IsInRecycleBin() == false)
+            if (foundMedia.Trashed == false)
             {
                 var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
                 if (moveResult == false)

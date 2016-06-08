@@ -37,50 +37,6 @@ namespace Umbraco.Tests.Models
 
         }
 
-        [TestCase("-1,-20,12,34,56", false)]
-        [TestCase("-1,-21,12,34,56", true)]
-        [TestCase("-1,12,34,56", false)]
-        public void Is_Media_In_Recycle_Bin(string path, bool isInBin)
-        {
-            var mediaType = MockedContentTypes.CreateImageMediaType();
-            var media = MockedMedia.CreateMediaFile(mediaType, -1);
-
-            // this is NOT how we should do it, we should "move to recycle bin"
-            // as it causes various things to change... IsInRecycleBin looks for
-            // the path but Trashed looks for the flag!
-            // fixme .Trashed is weird anyways, should be refactored
-            media.Path = path;
-            ((Media)media).Trashed = isInBin;
-
-            media.Id = 34;
-
-            Assert.AreEqual(isInBin, media.IsInRecycleBin());
-            if (isInBin)
-                Assert.IsTrue(media.Trashed);
-        }
-
-        [TestCase("-1,-20,12,34,56", true)]
-        [TestCase("-1,-21,12,34,56", false)]
-        [TestCase("-1,12,34,56", false)]
-        public void Is_Content_In_Recycle_Bin(string path, bool isInBin)
-        {
-            var contentType = MockedContentTypes.CreateSimpleContentType();
-            var content = MockedContent.CreateSimpleContent(contentType);
-
-            // this is NOT how we should do it, we should "move to recycle bin"
-            // as it causes various things to change... IsInRecycleBin looks for
-            // the path but Trashed looks for the flag!
-            // fixme .Trashed is weird anyways, should be refactored
-            content.Path = path;
-            content.Trashed = isInBin;
-
-            content.Id = 34;
-
-            Assert.AreEqual(isInBin, content.IsInRecycleBin());
-            if (isInBin)
-                Assert.IsTrue(content.Trashed);
-        }
-
         [Test]
         public void Get_Non_Grouped_Properties()
         {

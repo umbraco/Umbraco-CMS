@@ -366,22 +366,6 @@ namespace Umbraco.Core.Models
         }
         #endregion
 
-        internal static bool IsInRecycleBin(this IContent content)
-        {
-            return IsInRecycleBin(content, Constants.System.RecycleBinContent);
-        }
-
-        internal static bool IsInRecycleBin(this IMedia media)
-        {
-            return IsInRecycleBin(media, Constants.System.RecycleBinMedia);
-        }
-
-        internal static bool IsInRecycleBin(this IContentBase content, int recycleBinId)
-        {
-            return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                          .Contains(recycleBinId.ToInvariantString());
-        }
-
         /// <summary>
         /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
