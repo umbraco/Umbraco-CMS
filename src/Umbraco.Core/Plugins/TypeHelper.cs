@@ -12,10 +12,9 @@ namespace Umbraco.Core.Plugins
 	/// </summary>
 	internal static class TypeHelper
 	{
-		
-		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
-		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-       
+	    private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
+        private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
+
         /// <summary>
         /// Find all assembly references that are referencing the assignTypeFrom Type's assembly found in the assemblyList
         /// </summary>
@@ -32,16 +31,15 @@ namespace Umbraco.Core.Plugins
             //check if it is App_global.asax assembly
             if (assignTypeFrom.Assembly.IsAppCodeAssembly() || assignTypeFrom.Assembly.IsGlobalAsaxAssembly())
             {
-                return Enumerable.Empty<Assembly>().ToArray();
+                return EmptyAssemblies;
             }
-            
-            //find all assembly references that are referencing the current type's assembly since we 
+
+            //find all assembly references that are referencing the current type's assembly since we
             //should only be scanning those assemblies because any other assembly will definitely not
             //contain sub type's of the one we're currently looking for
             return assemblies
-                .Where(assembly =>
-                       assembly == assignTypeFrom.Assembly 
-                        || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
+                .Where(assembly => assembly == assignTypeFrom.Assembly
+                                    || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
                 .ToArray();
         }
 
@@ -52,9 +50,9 @@ namespace Umbraco.Core.Plugins
 	    /// <param name="expectedAssemblyName"></param>
 	    /// <returns></returns>
         private static bool HasReferenceToAssemblyWithName(Assembly assembly, string expectedAssemblyName)
-        {           
+        {
             return assembly
-                .GetReferencedAssemblies()                
+                .GetReferencedAssemblies()
                 .Select(a => a.Name)
                 .Contains(expectedAssemblyName, StringComparer.Ordinal);
         }
@@ -95,13 +93,10 @@ namespace Umbraco.Core.Plugins
         public static Attempt<Type> GetLowestBaseType(params Type[] types)
 	    {
 	        if (types.Length == 0)
-	        {
 	            return Attempt<Type>.Fail();
-	        }
-	        if (types.Length == 1)
-	        {
+
+            if (types.Length == 1)
                 return Attempt.Succeed(types[0]);
-	        }
 
 	        foreach (var curr in types)
 	        {
@@ -153,10 +148,9 @@ namespace Umbraco.Core.Plugins
         /// <param name="implementation">The implementation.</param>
         public static bool IsTypeAssignableFrom<TContract>(object implementation)
         {
-            if (implementation == null) throw new ArgumentNullException("implementation");
+            if (implementation == null) throw new ArgumentNullException(nameof(implementation));
             return IsTypeAssignableFrom<TContract>(implementation.GetType());
         }
-	
 
 		/// <summary>
 		/// Returns (and caches) a PropertyInfo from a type
@@ -168,20 +162,15 @@ namespace Umbraco.Core.Plugins
 		/// <param name="includeIndexed"></param>
 		/// <param name="caseSensitive"> </param>
 		/// <returns></returns>
-		public static PropertyInfo GetProperty(Type type, string name, 
-			bool mustRead = true, 
-			bool mustWrite = true, 
+		public static PropertyInfo GetProperty(Type type, string name,
+			bool mustRead = true,
+			bool mustWrite = true,
 			bool includeIndexed = false,
 			bool caseSensitive = true)
 		{
-			return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
-				.FirstOrDefault(x =>
-					{
-						if (caseSensitive)
-							return x.Name == name;
-						return x.Name.InvariantEquals(name);
-					});
-		}        
+		    return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
+		        .FirstOrDefault(x => caseSensitive ? (x.Name == name) : x.Name.InvariantEquals(name));
+		}
 
 		/// <summary>
 		/// Gets (and caches) <see cref="PropertyInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
@@ -197,12 +186,11 @@ namespace Umbraco.Core.Plugins
 				new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
 				x => type
 				     	.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => (!mustRead || y.CanRead)
-				     	            && (!mustWrite || y.CanWrite)
-				     	            && (includeIndexed || !y.GetIndexParameters().Any()))
+				     	.Where(y => (mustRead == false || y.CanRead)
+				     	            && (mustWrite == false || y.CanWrite)
+				     	            && (includeIndexed || y.GetIndexParameters().Any() == false))
 				     	.ToArray());
 		}
-
 
         #region Match Type
 
@@ -294,9 +282,9 @@ namespace Umbraco.Core.Plugins
 
             // not a generic type, not a generic parameter
             // so normal class or interface
-            // fixme structs? enums? array types?
             // about primitive types, value types, etc:
             // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+            // if it's a primitive type... it needs to be ==
 
             if (implementation == contract) return true;
             if (contract.IsClass && implementation.IsClass && implementation.IsSubclassOf(contract)) return true;
