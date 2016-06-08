@@ -124,10 +124,54 @@ namespace Umbraco.Core.Models
                 bool typeValidation = _propertyType.IsPropertyTypeValid(value);
 
                 if (typeValidation == false)
-                    throw new Exception(
-                        string.Format(
-                            "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
-                            value == null ? "null" : value.GetType().Name, Alias));
+                {
+                    // Normally we'll throw an exception here.  However if the property is of a type that can have it's data field (dataInt, dataVarchar etc.)
+                    // changed, we might have a value of the now "wrong" type.  As of May 2016 Label is the only built-in property editor that supports this.
+                    // In that case we should try to parse the value and return null if that's not possible rather than throwing an exception.
+                    if (value != null && _propertyType.CanHaveDataValueTypeChanged())
+                    {
+                        var stringValue = value.ToString();
+                        switch (_propertyType.DataTypeDatabaseType)
+                        {
+                            case DataTypeDatabaseType.Nvarchar:
+                            case DataTypeDatabaseType.Ntext:
+                                value = stringValue;
+                                break;
+                            case DataTypeDatabaseType.Integer:
+                                int integerValue;
+                                if (int.TryParse(stringValue, out integerValue) == false)
+                                {
+                                    // Edge case, but if changed from decimal --> integer, the above tryparse will fail.  So we'll try going
+                                    // via decimal too to return the integer value rather than zero.
+                                    decimal decimalForIntegerValue;
+                                    if (decimal.TryParse(stringValue, out decimalForIntegerValue))
+                                    {
+                                        integerValue = (int)decimalForIntegerValue;
+                                    }
+                                }
+
+                                value = integerValue;
+                                break;
+                            case DataTypeDatabaseType.Decimal:
+                                decimal decimalValue;
+                                decimal.TryParse(stringValue, out decimalValue);
+                                value = decimalValue;
+                                break;
+                            case DataTypeDatabaseType.Date:
+                                DateTime dateValue;
+                                DateTime.TryParse(stringValue, out dateValue);
+                                value = dateValue;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception(
+                            string.Format(
+                                "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
+                                value == null ? "null" : value.GetType().Name, Alias));
+                    }
+                }
 
                 SetPropertyValueAndDetectChanges(o =>
                 {

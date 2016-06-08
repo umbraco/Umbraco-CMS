@@ -201,6 +201,15 @@ ul.color-picker li a  {
     margin: 5px;
     background: white;
     border: 1px solid #f8f8f8;
+
+    max-width: 100%;
+}
+
+
+.umb-mediapicker .umb-sortable-thumbnails li {
+    flex-direction: column;
+    margin: 0;
+    padding: 5px;
 }
 
 
@@ -289,7 +298,7 @@ ul.color-picker li a  {
  }
 
  .umb-cropper img {
-     max-width: initial;
+     max-width: none;
  }
 
  .umb-cropper .overlay, .umb-cropper-gravity .overlay {
@@ -384,6 +393,7 @@ ul.color-picker li a  {
 }
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
+        max-width: 100%;
     }
 
     .umb-cropper-imageholder {

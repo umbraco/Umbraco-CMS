@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors
             EditorView = editorView;
 
             //defaults
-            ValueType = "string";
+            ValueType = PropertyEditorValueTypes.String;
             Icon = Constants.Icons.PropertyEditor;
             Group = "common";
         }
@@ -33,7 +33,7 @@ namespace Umbraco.Core.PropertyEditors
             Name = name;
 
             //defaults
-            ValueType = "string";
+            ValueType = PropertyEditorValueTypes.String;
             Icon = Constants.Icons.PropertyEditor;
             Group = "common";
         }

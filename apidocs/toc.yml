@@ -1,0 +1,5 @@
+
+- name: Umbraco.Core Documentation
+  href: https://our.umbraco.org/apidocs/csharp/api/Umbraco.Core.html
+- name: Umbraco.Web Documentation
+  href: https://our.umbraco.org/apidocs/csharp/api/Umbraco.Web.html
