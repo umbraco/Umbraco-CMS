@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml.Linq;
 using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -30,6 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
         private readonly CacheHelper _cacheHelper;
+        private PermissionRepository<IContent> _permissionRepository;
 
         public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
             : base(work, cacheHelper, logger, contentSection, mappingResolver)
@@ -55,6 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override ContentRepository Instance => this;
 
         public bool EnsureUniqueNaming { get; set; }
+
+        // note: is ok to 'new' the repo here as it's a sub-repo really
+        private PermissionRepository<IContent> PermissionRepository => _permissionRepository
+            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper));
 
         #region Overrides of RepositoryBase<IContent>
 
@@ -305,10 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161
-            // fixme STOP new-ing repos everywhere!
-            // var prepo = UnitOfWork.CreateRepository<IPermissionRepository<IContent>>();
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
+            var parentPermissions = PermissionRepository.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
             if (parentPermissions.Any())
@@ -318,7 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     from p in perm.AssignedPermissions
                     select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
 
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
+                PermissionRepository.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content)entity).PermissionsChanged = true;
@@ -630,8 +631,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.ReplaceEntityPermissions(permissionSet);
+            PermissionRepository.ReplaceEntityPermissions(permissionSet);
         }
 
         public void ClearPublishedFlag(IContent content)
@@ -664,14 +664,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userIds"></param>
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.AssignEntityPermission(entity, permission, userIds);
+            PermissionRepository.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            return repo.GetPermissionsForEntity(entityId);
+            return PermissionRepository.GetPermissionsForEntity(entityId);
         }
 
         /// <summary>

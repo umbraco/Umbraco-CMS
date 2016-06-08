@@ -26,6 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
+        private PermissionRepository<IContent> _permissionRepository;
 
         public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMappingResolver mappingResolver)
             : base(work, cacheHelper, logger, mappingResolver)
@@ -33,6 +34,10 @@ namespace Umbraco.Core.Persistence.Repositories
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
         }
+
+        // note: is ok to 'new' the repo here as it's a sub-repo really
+        private PermissionRepository<IContent> PermissionRepository => _permissionRepository
+            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper));
 
         #region Overrides of RepositoryBase<int,IUser>
 
@@ -378,8 +383,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            return repo.GetUserPermissionsForEntities(userId, entityIds);
+            return PermissionRepository.GetUserPermissionsForEntities(userId, entityIds);
         }
 
         /// <summary>
@@ -390,8 +394,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.ReplaceUserPermissions(userId, permissions, entityIds);
+            PermissionRepository.ReplaceUserPermissions(userId, permissions, entityIds);
         }
 
         /// <summary>
@@ -402,8 +405,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void AssignUserPermission(int userId, char permission, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.AssignUserPermission(userId, permission, entityIds);
+            PermissionRepository.AssignUserPermission(userId, permission, entityIds);
         }
 
         #endregion

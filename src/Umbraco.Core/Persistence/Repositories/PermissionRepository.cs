@@ -1,27 +1,22 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Web.Caching;
-using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using CacheKeys = Umbraco.Core.Cache.CacheKeys;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// A repository that exposes functionality to modify assigned permissions to a node
+    /// A (sub) repository that exposes functionality to modify assigned permissions to a node
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     internal class PermissionRepository<TEntity>
