@@ -925,6 +925,10 @@ namespace Umbraco.Core.Services
                 UpdateContentXmlStructure(contentType);
             }
 
+            // Raise the saved event for both content types (as they have changed, and also to trigger cache refreshes)
+            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
+            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(compositionType, false), this);
+
             Audit(AuditType.Custom, "Extract content type composition performed by user", userId, -1);
             return compositionType;
         }
@@ -974,6 +978,10 @@ namespace Umbraco.Core.Services
 
                 UpdateContentXmlStructure(mediaType);
             }
+
+            // Raise the saved event for both content types (as they have changed, and also to trigger cache refreshes)
+            SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
+            SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(compositionType, false), this);
 
             Audit(AuditType.Custom, "Extract media type composition performed by user", userId, -1);
             return compositionType;

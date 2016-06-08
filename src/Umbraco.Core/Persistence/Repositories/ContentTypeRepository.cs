@@ -316,11 +316,6 @@ namespace Umbraco.Core.Persistence.Repositories
         public void ExtractComposition(IContentType contentType, IContentType compositionContentType, string[] propertyAliases)
         {
             ExtractContentTypeComposition(contentType, compositionContentType, propertyAliases);
-
-            // Clear the cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two content types provided and update the related content)
-            RuntimeCache.ClearAllCache();
-            var contentRuntimeCache = RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
-            contentRuntimeCache.ClearAllCache();
         }
     }
 }
