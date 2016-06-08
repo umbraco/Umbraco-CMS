@@ -16,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// if multiple threads are performing publishing tasks that the file will be persisted in accordance with the final resulting
     /// xml structure since the file writes are queued.
     /// </remarks>
-    internal class XmlStoreFilePersister : LatchedBackgroundTaskBase // FIXME compare to the one we have already
+    internal class XmlStoreFilePersister : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<XmlStoreFilePersister> _runner;
         private readonly ILogger _logger;
