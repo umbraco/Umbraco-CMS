@@ -81,6 +81,8 @@ namespace umbraco.uicontrols
                     ClientDependencyLoader.Instance.RegisterDependency(1, "CodeMirror/js/mode/javascript/javascript.js", "UmbracoClient", ClientDependencyType.Javascript);
                     ClientDependencyLoader.Instance.RegisterDependency(1, "CodeMirror/js/mode/css/css.js", "UmbracoClient", ClientDependencyType.Javascript);
                 }
+                
+                ClientDependencyLoader.Instance.RegisterDependency(1, "CodeMirror/addon/edit/matchbrackets.js", "UmbracoClient", ClientDependencyType.Javascript);
 
 
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
