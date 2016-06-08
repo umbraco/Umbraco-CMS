@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using umbraco.cms.businesslogic.macro;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Macro = Umbraco.Core.Models.Macro;
 
 namespace Umbraco.Web.Macros
 {
@@ -74,32 +68,5 @@ namespace Umbraco.Web.Macros
             // can convert enums
             MacroType = Core.Services.MacroService.GetMacroType(macro);
         }
-
-        // fixme what's the point? used only in tests!
-        internal static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType /*, string scriptAssembly*/)
-        {
-            if (string.IsNullOrEmpty(xslt) == false)
-                return MacroTypes.Xslt;
-
-            if (string.IsNullOrEmpty(scriptFile) == false)
-            {
-                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
-                //a partial view macro, not a script macro
-                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
-                return (scriptFile.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-                        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
-                           ? MacroTypes.PartialView
-                           : MacroTypes.Script;
-            }
-
-            if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))
-                return MacroTypes.UserControl;
-
-            //if (string.IsNullOrEmpty(scriptType) == false && !string.IsNullOrEmpty(scriptAssembly))
-            //    return MacroTypes.CustomControl;
-
-            return MacroTypes.Unknown;
-        }
-
     }
 }

@@ -87,9 +87,10 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var macro = MacroRenderer.GetMacroModel(macroAlias);
-            if (macro == null)
+            var m = Services.MacroService.GetByAlias(macroAlias);
+            if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+            var macro = new MacroModel(m);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             if (macro.RenderInEditor == false)

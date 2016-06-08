@@ -342,7 +342,6 @@ namespace umbraco.cms.businesslogic.macro
         {           
         }
 
-
 		#region STATICS
 
 		/// <summary>
@@ -407,28 +406,6 @@ namespace umbraco.cms.businesslogic.macro
                     });
         }
 
-        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType)
-        {
-            if (string.IsNullOrEmpty(xslt) == false)
-                return MacroTypes.Xslt;
-	        
-			if (string.IsNullOrEmpty(scriptFile) == false)
-			{
-                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
-                //a partial view macro, not a script macro
-                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
-                return (scriptFile.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-                        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
-                           ? MacroTypes.PartialView
-                           : MacroTypes.Script;
-            }
-
-	        if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))
-		        return MacroTypes.UserControl;
-
-	        return MacroTypes.Unknown;
-        }
-
         #region Macro Refactor
         
         private static string GetCacheKey(string alias)
@@ -438,8 +415,6 @@ namespace umbraco.cms.businesslogic.macro
 
         #endregion
 
-
-       
 		#endregion
 	}
 }

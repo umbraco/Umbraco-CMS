@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Collections;
-using umbraco.cms.businesslogic.macro;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -21,23 +20,7 @@ namespace umbraco.presentation.templateControls
     [ParseChildren(true, "Text")]
     public class Macro : WebControl, ITextControl
     {
-
-        private Hashtable m_Attributes = new Hashtable();
-        private string m_Code = String.Empty;
-
-        public Hashtable MacroAttributes
-        {
-            get
-            {
-                //                Hashtable attributes = (Hashtable)ViewState["Attributes"];
-                return m_Attributes;
-            }
-            set
-            {
-                m_Attributes = value;
-            }
-        }
-
+        public Hashtable MacroAttributes { get; set; } = new Hashtable();
 
         [Bindable(true)]
         [Category("Umbraco")]
@@ -47,8 +30,8 @@ namespace umbraco.presentation.templateControls
         {
             get
             {
-                String s = (String)ViewState["Alias"];
-                return ((s == null) ? String.Empty : s);
+                var s = (string)ViewState["Alias"];
+                return s ?? string.Empty;
             }
 
             set
@@ -63,8 +46,8 @@ namespace umbraco.presentation.templateControls
         [Localizable(true)]
         public string Language {
             get {
-                var s = (String)ViewState["Language"];
-                return (s ?? String.Empty);
+                var s = (string)ViewState["Language"];
+                return s ?? string.Empty;
             }
             set {
                 ViewState["Language"] = value.ToLower();
@@ -77,8 +60,8 @@ namespace umbraco.presentation.templateControls
         [Localizable(true)]
         public string FileLocation {
             get {
-                var s = (String)ViewState["FileLocation"];
-                return (s ?? String.Empty);
+                var s = (string)ViewState["FileLocation"];
+                return s ?? string.Empty;
             }
             set {
                 ViewState["FileLocation"] = value.ToLower();
@@ -92,7 +75,7 @@ namespace umbraco.presentation.templateControls
 		{
 			get
 			{
-				RenderEvents renderEvent = RenderEvents.Init;
+				var renderEvent = RenderEvents.Init;
 				if (ViewState["RenderEvent"] != null)
 					renderEvent = (RenderEvents)ViewState["RenderEvent"];
 				return renderEvent;
@@ -121,7 +104,7 @@ namespace umbraco.presentation.templateControls
             base.OnInit(e);
 
             // Create child controls when told to - this is the default
-			if (this.RenderEvent == RenderEvents.Init)
+			if (RenderEvent == RenderEvents.Init)
 	            EnsureChildControls();
         }
 
@@ -130,7 +113,7 @@ namespace umbraco.presentation.templateControls
 		{
 			base.OnPreRender(e);
 
-			if (this.RenderEvent == RenderEvents.PreRender)
+			if (RenderEvent == RenderEvents.PreRender)
 				EnsureChildControls();
 		}
 
@@ -143,32 +126,41 @@ namespace umbraco.presentation.templateControls
             foreach (string key in keys)
                 MacroAttributes.Add(key.ToLower(), HttpUtility.HtmlDecode(Attributes[key]));
 
-            if (!MacroAttributes.ContainsKey("macroalias") && !MacroAttributes.ContainsKey("macroAlias"))
+            if (MacroAttributes.ContainsKey("macroalias") == false && MacroAttributes.ContainsKey("macroAlias") == false)
                 MacroAttributes.Add("macroalias", Alias);
 
             // set pageId to int.MinValue if no pageID was found,
             // e.g. if the macro was rendered on a custom (non-Umbraco) page
-            int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
+            var pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
 
-            if ((!String.IsNullOrEmpty(Language) && Text != "") || !string.IsNullOrEmpty(FileLocation)) {
+            if ((string.IsNullOrEmpty(Language) == false && Text != "") || string.IsNullOrEmpty(FileLocation) == false) {
                 var tempMacro = new MacroModel();
                 MacroRenderer.GenerateMacroModelPropertiesFromAttributes(tempMacro, MacroAttributes);
-                if (string.IsNullOrEmpty(FileLocation)) {
-                    tempMacro.ScriptCode = Text;
-                    tempMacro.ScriptLanguage = Language;
-                } else {
-                    tempMacro.ScriptName = FileLocation;
-                }
-                
-                tempMacro.MacroType = MacroTypes.PartialView;
 
-                if (!String.IsNullOrEmpty(Attributes["Cache"])) {
-                    var cacheDuration = 0;
+                // executing an inline macro?
+                // ie the code of the macro is in the control's text body
+                // ok, this is not supported in v8 anymore
+                if (string.IsNullOrEmpty(FileLocation))
+                    throw new NotSupportedException("Inline macros are not supported anymore.");
+
+                // executing an on-disk macro
+                // it has to be a partial (cshtml or vbhtml) macro in v8
+                var extension = System.IO.Path.GetExtension(FileLocation);
+                if (extension.InvariantEndsWith(".cshtml") == false && extension.InvariantEndsWith(".vbhtml") == false)
+                    throw new NotSupportedException("");
+
+                tempMacro.ScriptName = FileLocation;
+                tempMacro.MacroType = MacroTypes.PartialView;               
+
+                if (string.IsNullOrEmpty(Attributes["Cache"]) == false)
+                {
+                    int cacheDuration;
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))
                         tempMacro.CacheDuration = cacheDuration;
                     else
                         Context.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
+
                 var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
                 var c = renderer.Render(tempMacro, (Hashtable) Context.Items["pageElements"], pageId).GetAsControl();
                 if (c != null)
@@ -177,22 +169,29 @@ namespace umbraco.presentation.templateControls
                     Controls.Add(c);
                 }
                 else
+                {
                     Context.Trace.Warn("Template", "Result of inline macro scripting is null");
-            
-            } else {
-                var tempMacro = MacroRenderer.GetMacroModel(Alias);
-                if (tempMacro != null) {
-                    try {
-                        var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
-                        var c = renderer.Render(tempMacro, (Hashtable)Context.Items["pageElements"], pageId, MacroAttributes).GetAsControl();
-                        if (c != null)
-                            Controls.Add(c);
-                        else
-                            Context.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
-                    } catch (Exception ee) {
-                        Context.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
-                        throw;
-                    }
+                }            
+            }
+            else
+            {
+                var m = ApplicationContext.Current.Services.MacroService.GetByAlias(Alias);
+                if (m == null) return;
+
+                var tempMacro = new MacroModel(m);
+                try
+                {
+                    var renderer = new MacroRenderer(ApplicationContext.Current.ProfilingLogger);
+                    var c = renderer.Render(tempMacro, (Hashtable)Context.Items["pageElements"], pageId, MacroAttributes).GetAsControl();
+                    if (c != null)
+                        Controls.Add(c);
+                    else
+                        Context.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
+                }
+                catch (Exception ee)
+                {
+                    Context.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
+                    throw;
                 }
             }
         }
@@ -206,23 +205,18 @@ namespace umbraco.presentation.templateControls
 			// Create child controls when told to - do it here anyway as it has to be done
             EnsureChildControls();
 
-            bool isDebug = GlobalSettings.DebugMode && (Context.Request.GetItemAsString("umbdebugshowtrace") != "" || Context.Request.GetItemAsString("umbdebug") != "");
+            var isDebug = GlobalSettings.DebugMode && (Context.Request.GetItemAsString("umbdebugshowtrace") != "" || Context.Request.GetItemAsString("umbdebug") != "");
             if (isDebug)
             {
                 writer.Write("<div title=\"Macro Tag: '{0}'\" style=\"border: 1px solid #009;\">", Alias);
             }
-            base.RenderChildren(writer);
+            RenderChildren(writer);
             if (isDebug)
             {
                 writer.Write("</div>");
             }
         }
 
-
-        public string Text
-        {
-            get { return m_Code; }
-            set { m_Code = value; }
-        }
+        public string Text { get; set; } = string.Empty;
     }
 }

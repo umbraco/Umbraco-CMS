@@ -279,13 +279,9 @@ namespace umbraco
                         }
                         else
                         {
-                            MacroModel tempMacro;
-                            String macroID = helper.FindAttribute(attributes, "macroid");
-                            if (macroID != String.Empty)
-                                tempMacro = GetMacro(macroID);
-                            else
-                                tempMacro = MacroRenderer.GetMacroModel(helper.FindAttribute(attributes, "macroalias"));
-
+                            var macroId = helper.FindAttribute(attributes, "macroid");
+                            if (macroId == string.Empty) macroId = helper.FindAttribute(attributes, "macroalias");
+                            var tempMacro = GetMacro(macroId);
                             if (tempMacro != null)
                             {
 
@@ -448,8 +444,9 @@ namespace umbraco
         private static MacroModel GetMacro(string macroId)
         {
             HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroId + ")");
-            var id = int.Parse(macroId);
-            return MacroRenderer.GetMacroModel(id);
+            // it's all obsolete anyways...
+            var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(macroId);
+            return macro == null ? null : new MacroModel(macro);
         }
 
         #endregion

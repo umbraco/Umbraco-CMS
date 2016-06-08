@@ -3,7 +3,6 @@ using System.IO;
 using System.Web;
 using System.Web.UI;
 using umbraco;
-using umbraco.cms.businesslogic.macro;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -28,34 +27,14 @@ namespace Umbraco.Web.Macros
                 : model.MacroControlIdentifier;
 
             // initialize the control
+            // note: we are not setting the 'CurrentNode' property on the control anymore,
+            // as that was an INode which is gone in v8. Use UmbracoContext to access the
+            // current content.
             LogHelper.Info<UserControlMacroEngine>($"Loaded control \"{filename}\" with ID \"{control.ID}\".");
-            //SetControlCurrentNode(control); // fixme what are the consequences?
             UpdateControlProperties(control, model);
 
             return new MacroContent { Control = control };
         }
-
-        // no more INode in v8
-        /*
-        // sets the control CurrentNode|currentNode property
-        private static void SetControlCurrentNode(Control control)
-        {
-            var node = GetCurrentNode(); // get the current INode
-            SetControlCurrentNode(control, "CurrentNode", node);
-            SetControlCurrentNode(control, "currentNode", node);
-        }
-
-        // sets the control 'propertyName' property, of type INode
-        private static void SetControlCurrentNode(Control control, string propertyName, INode node)
-        {
-            var currentNodeProperty = control.GetType().GetProperty(propertyName);
-            if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(INode)))
-            {
-                currentNodeProperty.SetValue(control, node, null);
-            }
-        }
-        */
 
         private static string GetControlUniqueId(string filename)
         {

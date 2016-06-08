@@ -2,29 +2,14 @@ using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using HtmlAgilityPack;
 using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using Umbraco.Core.Cache;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web
@@ -118,13 +103,11 @@ namespace Umbraco.Web
             if (alias == null) throw new ArgumentNullException("alias");
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
 
-            var m = MacroRenderer.GetMacroModel(alias);
+            var m = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
             if (m == null)
-            {
                 throw new KeyNotFoundException("Could not find macro with alias " + alias);
-            }
 
-            return RenderMacro(m, parameters, umbracoPage);
+            return RenderMacro(new MacroModel(m), parameters, umbracoPage);
         }
 
         /// <summary>

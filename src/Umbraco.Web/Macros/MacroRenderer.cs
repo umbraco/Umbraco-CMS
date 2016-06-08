@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -29,6 +28,8 @@ namespace Umbraco.Web.Macros
     {
         private readonly ProfilingLogger _plogger;
 
+        // todo: there are many more things that would need to be injected in here
+
         public MacroRenderer(ProfilingLogger plogger)
         {
             _plogger = plogger;
@@ -36,22 +37,6 @@ namespace Umbraco.Web.Macros
 
         // probably can do better - just porting from v7
         public IList<Exception> Exceptions { get; } = new List<Exception>();
-
-        #region Static getters - MOVE!
-
-        public static MacroModel GetMacroModel(int id)
-        {
-            var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
-            return macro == null ? null : new MacroModel(macro);
-        }
-
-        public static MacroModel GetMacroModel(string alias)
-        {
-            var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
-            return macro == null ? null : new MacroModel(macro);
-        }
-
-        #endregion
 
         #region MacroContent cache
 
@@ -118,7 +103,7 @@ namespace Umbraco.Web.Macros
             LogHelper.Debug<MacroRenderer>("Macro content loaded from cache \"{0}\".", () => model.CacheIdentifier);
 
             // ensure that the source has not changed
-            // fixme - does not handle dependencies (never has)
+            // note: does not handle dependencies, and never has
             var macroSource = GetMacroFile(model); // null if macro is not file-based
             if (macroSource != null)
             {
@@ -135,7 +120,7 @@ namespace Umbraco.Web.Macros
                 }
             }
 
-            // fixme - legacy - what's the point? (let's keep it for now)
+            // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.Control.ID = macroContent.ControlId;
 
@@ -165,7 +150,7 @@ namespace Umbraco.Web.Macros
             // controls is a bad idea, it can lead to plenty of issues ?!
             // eg with IDs...
 
-            // fixme - legacy - what's the point? (let's keep it for now)
+            // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.ControlId = macroContent.Control.ID;
 
@@ -272,12 +257,7 @@ namespace Umbraco.Web.Macros
             // trigger MacroRendering event so that the model can be manipulated before rendering
             OnMacroRendering(new MacroRenderingEventArgs(pageElements, pageId));
 
-            // fixme - meaning INLINE macros are SCRIPTs - are we still supporting this?
-
-            var macroInfo = (macro.MacroType == MacroTypes.Script && macro.Name.IsNullOrWhiteSpace())
-                ? $"Render Inline Macro, cache: {macro.CacheDuration}"
-                : $"Render Macro: {macro.Name}, type: {macro.MacroType}, cache: {macro.CacheDuration}";
-
+            var macroInfo = $"Render Macro: {macro.Name}, type: {macro.MacroType}, cache: {macro.CacheDuration}";
             using (_plogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
             {
                 // parse macro parameters ie replace the special [#key], [$key], etc. syntaxes
@@ -304,7 +284,7 @@ namespace Umbraco.Web.Macros
                 // just check to avoid internal errors
                 macroContent = attempt.Result;
                 if (macroContent == null)
-                    throw new Exception("Internal error, ExecuteMacroByType returned no content.");
+                    throw new Exception("Internal error, ExecuteMacroOfType returned no content.");
 
                 // add to cache if render is successful
                 // content may be empty but that's not an issue
@@ -563,13 +543,10 @@ namespace Umbraco.Web.Macros
 
         private static string ParseAttributeOnParents(IDictionary pageElements, string name)
         {
-            // fixme - this was an ugly piece of nonsense
-            // getting better but we should inject the content cache
-            // and we should skip that "splitpath" thing entirely and use the
-            // recursive GetPropertyValue!
+            // this was, and still is, an ugly piece of nonsense
 
             var value = string.Empty;
-            var cache = UmbracoContext.Current.ContentCache; // fixme inject?
+            var cache = UmbracoContext.Current.ContentCache; // should be injected
 
             var splitpath = (string[])pageElements["splitpath"];
             for (var i = splitpath.Length - 1; i > 0; i--) // at 0 we have root (-1)
@@ -625,15 +602,15 @@ namespace Umbraco.Web.Macros
         private static readonly Regex HrefRegex = new Regex("href=\"([^\"]*)\"",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        // fixme - ONLY reference to an old DLL!
-        public static string GetRenderedMacro(int macroId, global::umbraco.page umbPage, Hashtable attributes, int pageId, ProfilingLogger plogger)
+        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, ProfilingLogger plogger)
         {
-            var macro = GetMacroModel(macroId);
-            if (macro == null) return string.Empty;
+            var m = macroService.GetById(macroId);
+            if (m == null) return string.Empty;
+            var model = new MacroModel(m);
 
             // get as text, will render the control if any
             var renderer = new MacroRenderer(plogger);
-            var macroContent = renderer.Render(macro, umbPage.Elements, pageId);
+            var macroContent = renderer.Render(model, elements, pageId);
             var text = macroContent.GetAsText();
 
             // remove hrefs
@@ -642,7 +619,7 @@ namespace Umbraco.Web.Macros
             return text;
         }
 
-        public static string MacroContentByHttp(int pageId, Guid pageVersion, Hashtable attributes)
+        public static string MacroContentByHttp(int pageId, Guid pageVersion, Hashtable attributes, IMacroService macroService)
         {
             // though... we only support FullTrust now?
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted)
@@ -650,7 +627,9 @@ namespace Umbraco.Web.Macros
 
             var tempAlias = attributes["macroalias"]?.ToString() ?? attributes["macroAlias"].ToString();
 
-            var macro = GetMacroModel(tempAlias);
+            var m = macroService.GetByAlias(tempAlias);
+            if (m == null) return string.Empty;
+            var macro = new MacroModel(m);
             if (macro.RenderInEditor == false)
                 return ShowNoMacroContent(macro);
 
@@ -733,8 +712,8 @@ namespace Umbraco.Web.Macros
 
         private static string ShowNoMacroContent(MacroModel model)
         {
-            // fixme should we html-escape the name?
-            return $"<span style=\"color: green\"><strong>{model.Name}</strong><br />No macro content available for WYSIWYG editing</span>";
+            var name = HttpUtility.HtmlEncode(model.Name); // safe
+            return $"<span style=\"color: green\"><strong>{name}</strong><br />No macro content available for WYSIWYG editing</span>";
         }
 
         private static bool ValidateRemoteCertificate(
