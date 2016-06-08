@@ -75,6 +75,7 @@ namespace Umbraco.Core.Persistence.Factories
                     group.Id = groupDto.Id.Value;
                 }
 
+                group.Key = groupDto.UniqueId;
                 group.Name = groupDto.Text;
                 group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();

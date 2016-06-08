@@ -74,11 +74,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 var propertyKeys = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
+                var groupKeys = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
 
                 memberType = repository.Get(memberType.Id);
                 var propertyKeys2 = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
+                var groupKeys2 = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
 
                 Assert.IsTrue(propertyKeys.SequenceEqual(propertyKeys2));
+                Assert.IsTrue(groupKeys.SequenceEqual(groupKeys2));
 
             }
         }
