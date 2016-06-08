@@ -43,16 +43,6 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Constructor
         /// </summary>
-        public ContentController()
-            : this(UmbracoContext.Current, null)
-        {
-            // fixme wtf?
-            throw new NotSupportedException("Why are we even calling that ctor?");
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="facadeService"></param>
         public ContentController(UmbracoContext umbracoContext, IFacadeService facadeService)
