@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services.Changes;
@@ -54,8 +52,8 @@ namespace Umbraco.Web.Cache
             DataTypeService.Saved += DataTypeServiceSaved;
 
             // bind to stylesheet events
-            FileService.SavedStylesheet += FileServiceSavedStylesheet;
-            FileService.DeletedStylesheet += FileServiceDeletedStylesheet;
+            //FileService.SavedStylesheet += FileServiceSavedStylesheet;
+            //FileService.DeletedStylesheet += FileServiceDeletedStylesheet;
 
             // bind to domain events
             DomainService.Saved += DomainServiceSaved;
@@ -127,8 +125,8 @@ namespace Umbraco.Web.Cache
             DataTypeService.Saved -= DataTypeServiceSaved;
 
             // bind to stylesheet events
-            FileService.SavedStylesheet -= FileServiceSavedStylesheet;
-            FileService.DeletedStylesheet -= FileServiceDeletedStylesheet;
+            //FileService.SavedStylesheet -= FileServiceSavedStylesheet;
+            //FileService.DeletedStylesheet -= FileServiceDeletedStylesheet;
 
             // bind to domain events
             DomainService.Saved -= DomainServiceSaved;
@@ -322,20 +320,6 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region FileService / StyleSheets
-
-        static void FileServiceDeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e)
-        {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveStylesheetCache(x));
-        }
-
-        static void FileServiceSavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e)
-        {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshStylesheetCache(x));
-        }
-
-        #endregion
-
         #region DomainService
 
         static void DomainServiceSaved(IDomainService sender, SaveEventArgs<IDomain> e)
@@ -408,22 +392,6 @@ namespace Umbraco.Web.Cache
         static void UserServiceDeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
-        }
-
-        private static void InvalidateCacheForPermissionsChange(UserPermission sender)
-        {
-            if (sender.User != null)
-            {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.User.Id);
-            }
-            else if (sender.UserId > -1)
-            {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.UserId);
-            }
-            else if (sender.NodeIds.Any())
-            {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
-            }
         }
 
         #endregion

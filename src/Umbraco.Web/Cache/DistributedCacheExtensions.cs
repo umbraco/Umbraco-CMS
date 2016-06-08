@@ -311,46 +311,6 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region Stylesheet Cache
-
-        public static void RefreshStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
-        {
-            if (styleSheetProperty == null) return;
-            dc.Refresh(DistributedCache.StylesheetPropertyCacheRefresherGuid, styleSheetProperty.Id);
-        }
-
-        public static void RemoveStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
-        {
-            if (styleSheetProperty == null) return;
-            dc.Remove(DistributedCache.StylesheetPropertyCacheRefresherGuid, styleSheetProperty.Id);
-        }
-
-        public static void RefreshStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Refresh(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RemoveStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Remove(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RefreshStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Refresh(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RemoveStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Remove(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        #endregion
-
         #region Domain Cache
 
         public static void RefreshDomainCache(this DistributedCache dc, IDomain domain)

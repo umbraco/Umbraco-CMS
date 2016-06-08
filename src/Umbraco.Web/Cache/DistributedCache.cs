@@ -21,14 +21,6 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class DistributedCache
     {
-        #region Public constants/Ids
-
-        // fixme ALL THIS MUST MOVE TO THE REFRESHERS
-        public static readonly Guid StylesheetCacheRefresherGuid = new Guid("E0633648-0DEB-44AE-9A48-75C3A55CB670");
-        public static readonly Guid StylesheetPropertyCacheRefresherGuid = new Guid("2BC7A3A4-6EB1-4FBC-BAA3-C9E7B6D36D38");
-
-        #endregion
-
         #region Constructor & Singleton
 
         // note - should inject into the application instead of using a singleton
