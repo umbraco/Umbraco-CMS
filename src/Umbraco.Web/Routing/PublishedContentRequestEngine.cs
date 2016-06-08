@@ -243,7 +243,6 @@ namespace Umbraco.Web.Routing
 
                 _pcr.Domain = domainAndUri;
                 _pcr.Culture = domainAndUri.Culture;
-                _pcr.DomainUri = domainAndUri.Uri; // fixme wtf?!
 
                 // canonical? not implemented at the moment
                 // if (...)

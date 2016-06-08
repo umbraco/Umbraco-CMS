@@ -179,7 +179,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <remarks>Setting the requested content clears <c>Template</c>.</remarks>
 		public IPublishedContent PublishedContent
-		{			
+		{
 			get { return _publishedContent; }
 			set
 			{
@@ -202,7 +202,7 @@ namespace Umbraco.Web.Routing
 		    EnsureWriteable();
 
             // unless a template has been set already by the finder,
-            // template should be null at that point. 
+            // template should be null at that point.
 
             // IsInternalRedirect if IsInitial, or already IsInternalRedirect
             var isInternalRedirect = IsInitialPublishedContent || IsInternalRedirectPublishedContent;
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets value indicating whether the current published content is the initial one.
 		/// </summary>
-		public bool IsInitialPublishedContent 
+		public bool IsInitialPublishedContent
 		{
 			get
 			{
@@ -292,7 +292,7 @@ namespace Umbraco.Web.Routing
 	    /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
-        internal ITemplate TemplateModel 
+        internal ITemplate TemplateModel
         {
             get
             {
@@ -314,9 +314,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public string TemplateAlias
         {
-            get 
-            { 
-                return _template == null ? null : _template.Alias; 
+            get
+            {
+                return _template == null ? null : _template.Alias;
             }
         }
 
@@ -346,7 +346,7 @@ namespace Umbraco.Web.Routing
             if (model == null)
                 return false;
 
-            TemplateModel = model;                    
+            TemplateModel = model;
             return true;
         }
 
@@ -379,29 +379,22 @@ namespace Umbraco.Web.Routing
             get { return _template != null; }
         }
 
-		#endregion
+        #endregion
 
-		#region Domain and Culture
+        #region Domain and Culture
 
         //TODO: Should we publicize the setter now that we are using a non-legacy entity??
         /// <summary>
         /// Gets or sets the content request's domain.
         /// </summary>
+        /// <remarks>Is a DomainAndUri object ie a standard Domain plus the fully qualified uri. For example,
+        /// the <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
         public DomainAndUri Domain { get; internal set; }
-
-		/// <summary>
-		/// Gets or sets the content request's domain Uri.
-		/// </summary>
-		/// <remarks>The <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
-		public Uri DomainUri { get; internal set; }
 
 		/// <summary>
 		/// Gets a value indicating whether the content request has a domain.
 		/// </summary>
-		public bool HasDomain
-		{
-            get { return Domain != null; }
-		}
+		public bool HasDomain => Domain != null;
 
 	    private CultureInfo _culture;
 
@@ -573,7 +566,7 @@ namespace Umbraco.Web.Routing
             ResponseStatusCode = code;
             ResponseStatusDescription = description;
         }
-		
-        #endregion		
+
+        #endregion
     }
 }
