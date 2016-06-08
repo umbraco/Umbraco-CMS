@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -13,7 +12,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -1123,7 +1121,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         Attempt<UnPublishStatus> IContentServiceOperations.UnPublish(IContent content, int userId)
         {
-            return UnPublishDo(content, false, userId);
+            return UnPublishDo(content, userId);
         }
 
         /// <summary>
@@ -1632,7 +1630,11 @@ namespace Umbraco.Core.Services
             if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
                 return null;
 
-            // fixme - relateToOriginal is ignored?!
+            // note - relateToOriginal is not managed here,
+            // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
+            // meaning that the event has to trigger for every copied content including descendants
+
+            var copies = new List<Tuple<IContent, IContent>>();
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -1640,43 +1642,50 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // a copy is .Saving and will be .Unpublished
+                // update the create author and last edit author
                 if (copy.Published)
                     copy.ChangePublishedState(PublishedState.Saving);
-
-                // update the create author and last edit author
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
-                // save
+                // save and flush because we need the ID for the recursive Copying events
                 repository.AddOrUpdate(copy);
+                uow.Flush();
 
-                uow.Flush(); // ensure copy has an ID - fixme why?
+                // keep track of copies
+                copies.Add(Tuple.Create(content, copy));
+                var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
 
-                if (recursive)
+                if (recursive) // process descendants
                 {
-                    // process descendants
-                    var copyIds = new Dictionary<int, IContent>();
-                    copyIds[content.Id] = copy;
                     foreach (var descendant in GetDescendants(content))
                     {
-                        var dcopy = descendant.DeepCloneWithResetIdentities();
-                        //dcopy.ParentId = copyIds[descendant.ParentId];
-                        var descendantParentId = descendant.ParentId;
-                        ((Content) dcopy).SetLazyParentId(new Lazy<int>(() => copyIds[descendantParentId].Id));
+                        // if parent has not been copied, skip, else gets its copy id
+                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
 
-                        if (dcopy.Published)
-                            dcopy.ChangePublishedState(PublishedState.Saving);
-                        dcopy.CreatorId = userId;
-                        dcopy.WriterId = userId;
+                        copy = descendant.DeepCloneWithResetIdentities();
+                        copy.ParentId = parentId;
 
-                        repository.AddOrUpdate(dcopy);
+                        if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(descendant, copy, parentId), this))
+                            continue;
 
-                        copyIds[descendant.Id] = dcopy;
+                        // a copy is .Saving and will be .Unpublished
+                        // update the create author and last edit author
+                        if (copy.Published)
+                            copy.ChangePublishedState(PublishedState.Saving);
+                        copy.CreatorId = userId;
+                        copy.WriterId = userId;
+
+                        // save and flush (see above)
+                        repository.AddOrUpdate(copy);
+                        uow.Flush();
+
+                        copies.Add(Tuple.Create(descendant, copy));
+                        idmap[descendant.Id] = copy.Id;
                     }
                 }
 
-                // fixme tag & tree issue
-                // tags code handling has been removed here
+                // not handling tags here, because
                 // - tags should be handled by the content repository
                 // - a copy is unpublished and therefore has no impact on tags in DB
 
@@ -1684,7 +1693,8 @@ namespace Umbraco.Core.Services
             }
 
             TreeChanged.RaiseEvent(new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs(), this);
-            Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this);
+            foreach (var x in copies)
+                Copied.RaiseEvent(new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal), this);
             Audit(AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
             return copy;
         }
@@ -1909,9 +1919,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // fail fast + use in alreadyChecked below to avoid duplicate checks
-                var attempt = EnsurePublishable(content, evtMsgs);
-                if (attempt.Success)
-                    attempt = StrategyCanPublish(content, userId, evtMsgs);
+                var attempt = StrategyCanPublish(content, userId, /*checkPath:*/ true, evtMsgs);
                 if (attempt.Success == false)
                     return new[] { attempt }; // causes rollback
 
@@ -1949,13 +1957,10 @@ namespace Umbraco.Core.Services
         /// UnPublishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        private Attempt<UnPublishStatus> UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
+        private Attempt<UnPublishStatus> UnPublishDo(IContent content, int userId = 0)
         {
-            // fixme kill omitCacheRefresh!
-
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -2014,18 +2019,12 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                // fixme - EnsurePublishable vs StrategyCanPublish?
-                // EnsurePublishable ensures that path published is ok
-                // StrategyCanPublish ensures other things including valid properties
-                // should we merge or?!
-
-                // ensure content is publishable, and try to publish
-                status = EnsurePublishable(content, evtMsgs);
+                status = StrategyCanPublish(content, userId, /*checkPath:*/ true, evtMsgs);
                 if (status.Success)
                 {
                     // strategy handles events, and various business rules eg release & expire
                     // dates, trashed status...
-                    status = StrategyPublish(content, false, userId, evtMsgs);
+                    status = StrategyPublish(content, true, userId, evtMsgs);
                 }
 
                 // save - always, even if not publishing (this is SaveAndPublish)
@@ -2038,9 +2037,11 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
+            if (raiseEvents) // always
+                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
+
             if (status.Success == false)
             {
-                // fixme what about the saved event?
                 TreeChanged.RaiseEvent(new TreeChange<IContent>(content, changeType).ToEventArgs(), this);
                 return status;
             }
@@ -2065,50 +2066,6 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
             return status;
-        }
-
-        private Attempt<PublishStatus> EnsurePublishable(IContent content, EventMessages evtMsgs)
-        {
-            // root content can be published
-            var checkParents = content.ParentId == Constants.System.Root;
-
-            // trashed content cannot be published
-            if (checkParents == false && content.ParentId != Constants.System.RecycleBinContent)
-            {
-                // ensure all ancestors are published
-                // because content may be new its Path may be null - start with parent
-                var path = content.Path ?? content.Parent(this).Path;
-                if (path != null) // if parent is also null, give up
-                {
-                    var ancestorIds = path.Split(',')
-                        .Skip(1) // remove leading "-1"
-                        .Reverse()
-                        .Select(int.Parse);
-                    if (content.Path != null)
-                        ancestorIds = ancestorIds.Skip(1); // remove trailing content.Id
-
-                    if (ancestorIds.All(HasPublishedVersion))
-                        checkParents = true;
-                }
-            }
-
-            if (checkParents == false)
-            {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because its parent is not published.");
-                return Attempt.Fail(new PublishStatus(PublishStatusType.FailedPathNotPublished, evtMsgs, content));
-            }
-
-            // fixme - should we do it - are we doing it for descendants too?
-            if (content.IsValid() == false)
-            {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because of invalid properties.");
-                return Attempt.Fail(new PublishStatus(PublishStatusType.FailedContentInvalid, evtMsgs, content)
-                {
-                    InvalidProperties = ((ContentBase)content).LastInvalidProperties
-                });
-            }
-
-            return Attempt.Succeed(new PublishStatus(PublishStatusType.Success, evtMsgs, content));
         }
 
         #endregion
@@ -2251,7 +2208,7 @@ namespace Umbraco.Core.Services
 
         // prob. want to find nicer names?
 
-        internal Attempt<PublishStatus> StrategyCanPublish(IContent content, int userId, EventMessages evtMsgs)
+        internal Attempt<PublishStatus> StrategyCanPublish(IContent content, int userId, bool checkPath, EventMessages evtMsgs)
         {
             if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content, evtMsgs), this))
             {
@@ -2290,14 +2247,51 @@ namespace Umbraco.Core.Services
                 return Attempt.Fail(new PublishStatus(PublishStatusType.FailedIsTrashed, evtMsgs, content));
             }
 
+            // check if the content can be path-published
+            if (checkPath)
+            {
+                // root content can be published
+                var pathIsOk = content.ParentId == Constants.System.Root;
+
+                // else check ancestors - we know we are not trashed
+                if (pathIsOk == false)
+                {
+                    // ensure all ancestors are published
+                    // because content may be new its Path may be null - start with parent
+                    var path = content.Path ?? content.Parent(this).Path;
+                    if (path != null) // if parent is also null, give up
+                    {
+                        var ancestorIds = path.Split(',')
+                            .Skip(1) // remove leading "-1"
+                            .Reverse()
+                            .Select(int.Parse);
+                        if (content.Path != null)
+                            ancestorIds = ancestorIds.Skip(1); // remove trailing content.Id
+
+                        if (ancestorIds.All(HasPublishedVersion))
+                            pathIsOk = true;
+                    }
+                }
+
+                if (pathIsOk == false)
+                {
+                    Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because its parent is not published.");
+                    return Attempt.Fail(new PublishStatus(PublishStatusType.FailedPathNotPublished, evtMsgs, content));
+                }
+            }
+
             return Attempt.Succeed(new PublishStatus(content, evtMsgs));
         }
 
         internal Attempt<PublishStatus> StrategyPublish(IContent content, bool alreadyCheckedCanPublish, int userId, EventMessages evtMsgs)
         {
+            // note: when used at top-level, StrategyCanPublish with checkPath=true should have run already
+            // and alreadyCheckedCanPublish should be true, so not checking again. when used at nested level,
+            // there is no need to check the path again. so, checkPath=false in StrategyCanPublish below is ok
+
             var attempt = alreadyCheckedCanPublish
                 ? Attempt.Succeed(new PublishStatus(content, evtMsgs)) // already know we can
-                : StrategyCanPublish(content, userId, evtMsgs); // else check
+                : StrategyCanPublish(content, userId, /*checkPath:*/ false, evtMsgs); // else check
             if (attempt.Success == false)
                 return attempt;
 
@@ -2459,7 +2453,11 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
         /// </summary>
-        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <remarks>
+        /// <para>This needs extra care and attention as its potentially a dangerous and extensive operation.</para>
+        /// <para>Deletes content items of the specified type, and only that type. Does *not* handle content types
+        /// inheritance and compositions, which need to be managed outside of this method.</para>
+        /// </remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
@@ -2479,7 +2477,6 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                // fixme what about content that has the contenttype as part of its composition?
                 var query = repository.Query.Where(x => x.ContentTypeId == contentTypeId);
                 var contents = repository.GetByQuery(query).ToArray();
 

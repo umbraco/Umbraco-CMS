@@ -815,11 +815,6 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
-        /// <remarks>
-        /// Please note that this method will completely remove the Media from the database,
-        /// but current not from the file system.
-        /// FIXME uh?
-        /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
         Attempt<OperationStatus> IMediaServiceOperations.Delete(IMedia media, int userId)
@@ -1281,7 +1276,11 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.
         /// </summary>
-        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <remarks>
+        /// <para>This needs extra care and attention as its potentially a dangerous and extensive operation.</para>
+        /// <para>Deletes media items of the specified type, and only that type. Does *not* handle content types
+        /// inheritance and compositions, which need to be managed outside of this method.</para>
+        /// </remarks>
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
@@ -1301,7 +1300,6 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
 
-                // fixme what about media that has the contenttype as part of its composition?
                 var query = repository.Query.Where(x => x.ContentTypeId == mediaTypeId);
                 var medias = repository.GetByQuery(query).ToArray();
 
