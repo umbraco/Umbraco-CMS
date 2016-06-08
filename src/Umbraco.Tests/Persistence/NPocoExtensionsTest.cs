@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence
 
             // Act
             string[] sql;
-            db.GenerateBulkInsertCommand(servers, db.Connection, out sql);
+            db.GenerateBulkInsertCommand(servers.ToArray(), db.Connection, out sql);
             db.CloseSharedConnection();
 
             // Assert
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence
 
             // Act
             string[] sql;
-            db.GenerateBulkInsertCommand(servers, db.Connection, out sql);
+            db.GenerateBulkInsertCommand(servers.ToArray(), db.Connection, out sql);
             db.CloseSharedConnection();
 
             // Assert
