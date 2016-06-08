@@ -283,8 +283,6 @@ namespace Umbraco.Core.Persistence.Repositories
             // get the database field eg "[table].[column]"
             var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
 
-            // fixme - ContentTypeAlias is not properly managed because it's not part of the query to begin with!
-
             // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
             // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
             // to be "NodeDto__Text" and NOT "umbracoNode.text".
@@ -294,6 +292,8 @@ namespace Umbraco.Core.Persistence.Repositories
             // thought about maintaining a map of columns-to-aliases in the sql context but that would
             // be expensive and most of the time, useless. so instead we parse the SQL looking for the
             // alias. somewhat expensive too but nothing's free.
+
+            // note: ContentTypeAlias is not properly managed because it's not part of the query to begin with!
 
             var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
             var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
@@ -309,15 +309,15 @@ namespace Umbraco.Core.Persistence.Repositories
             // from most recent content version for the given order by field
             var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
             var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
-            var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar"); // fixme SqlSyntax!
+            var sortedString = $"COALESCE({"dataNvarchar"},'')"; // assuming COALESCE is ok for all syntaxes
             var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
-            var innerJoinTempTable = string.Format(@"INNER JOIN (
+            var innerJoinTempTable = $@"INNER JOIN (
  	                SELECT CASE
- 		                WHEN dataInt Is Not Null THEN {0}
-                        WHEN dataDecimal Is Not Null THEN {1}
-                        WHEN dataDate Is Not Null THEN {2}
-                        ELSE {3}
+ 		                WHEN dataInt Is Not Null THEN {sortedInt}
+                        WHEN dataDecimal Is Not Null THEN {sortedDecimal}
+                        WHEN dataDate Is Not Null THEN {sortedDate}
+                        ELSE {sortedString}
  	                END AS CustomPropVal,
                     cd.nodeId AS CustomPropValContentId
  	                FROM cmsDocument cd
@@ -325,11 +325,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
 			        WHERE cpt.Alias = @2 AND cd.newest = 1) AS CustomPropData
                     ON CustomPropData.CustomPropValContentId = umbracoNode.id
-", sortedInt, sortedDecimal, sortedDate, sortedString);
+";
 
             // insert the SQL fragment just above the LEFT OUTER JOIN [cmsDocument] [cmsDocument2] ...
             // ensure it's there, 'cos, someone's going to edit the query, eventually!
-            var pos = sql.SQL.IndexOf("LEFT OUTER JOIN");
+            var pos = sql.SQL.InvariantIndexOf("LEFT OUTER JOIN");
             if (pos < 0) throw new Exception("Oops, LEFT OUTER JOIN not found.");
             var newSql = sql.SQL.Insert(pos, innerJoinTempTable);
             var newArgs = sql.Arguments.ToList();
@@ -582,51 +582,5 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// 
-        /// Deletes all media files passed in.
-        /// </summary>
-        /// <param name="files"></param>
-        /// <returns></returns>
-        public virtual bool DeleteMediaFiles(IEnumerable<string> files) // fixme kill eventually
-        {
-            //ensure duplicates are removed
-            files = files.Distinct();
-
-            var allsuccess = true;
-
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            Parallel.ForEach(files, file =>
-            {
-                try
-                {
-                    if (file.IsNullOrWhiteSpace()) return;
-
-                    var relativeFilePath = fs.GetRelativePath(file);
-                    if (fs.FileExists(relativeFilePath) == false) return;
-
-                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (_contentSection.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        fs.DeleteFile(file, true);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error<VersionableRepositoryBase<TId, TEntity, TRepository>>("An error occurred while deleting file attached to nodes: " + file, e);
-                    allsuccess = false;
-                }
-            });
-
-            return allsuccess;
-        }
     }
 }
