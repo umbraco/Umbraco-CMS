@@ -166,6 +166,11 @@ namespace Umbraco.Core.Services
                 var container = repo.Get(containerId);
                 if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
 
+                var erepo = uow.CreateRepository<IEntityRepository>();
+                var entity = erepo.Get(container.Id);
+                if (entity.HasChildren()) // because container.HasChildren() does not work?
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCannot, evtMsgs)); // causes rollback
+
                 if (DeletingContainer.IsRaisedEventCancelled(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this))
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs)); // causes rollback
 

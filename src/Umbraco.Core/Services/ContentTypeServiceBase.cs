@@ -829,9 +829,9 @@ namespace Umbraco.Core.Services
                 }
             }
 
-
-            // FIXME should raise Changed events for the content type that is MOVED and ALL ITS CHILDREN IF ANY
-            // FIXME at the moment we don't have no MoveContainer don't we?!
+            // note: not raising any Changed event here because moving a content type under another container
+            // has no impact on the published content types - would be entirely different if we were to support
+            // moving a content type under another content type.
 
             OnMoved(new MoveEventArgs<TItem>(false, evtMsgs, moveInfo.ToArray()));
 
@@ -983,7 +983,6 @@ namespace Umbraco.Core.Services
             }
         }
 
-        // fixme - what happens if deleting a non-empty container?
         public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -994,6 +993,11 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
                 var container = repo.Get(containerId);
                 if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
+
+                var erepo = uow.CreateRepository<IEntityRepository>();
+                var entity = erepo.Get(container.Id);
+                if (entity.HasChildren()) // because container.HasChildren() does not work?
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCannot, evtMsgs)); // causes rollback
 
                 if (OnDeletingContainerCancelled(new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs)); // causes rollback
