@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Security;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -1031,8 +1030,6 @@ namespace Umbraco.Core.Services
             }
         }
 
-        // FIXME CURRENT WIP
-
         public bool DeleteRole(string roleName, bool throwIfBeingUsed)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -1053,7 +1050,7 @@ namespace Umbraco.Core.Services
                 var found = repository.GetByQuery(query).ToArray();
 
                 foreach (var memberGroup in found)
-                    _memberGroupService.Delete(memberGroup); // FIXME BAD BAD BAD!
+                    _memberGroupService.Delete(memberGroup);
 
                 uow.Complete();
                 return found.Length > 0;
@@ -1183,27 +1180,29 @@ namespace Umbraco.Core.Services
         /// <param name="password">The password to encrypt and save</param>
         public void SavePassword(IMember member, string password)
         {
-            if (member == null) throw new ArgumentNullException("member");
+            if (member == null) throw new ArgumentNullException(nameof(member));
 
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
-                provider.ChangePassword(member.Username, "", password);
+                provider.ChangePassword(member.Username, "", password); // this is actually updating the password
             else
                 throw new NotSupportedException("When using a non-Umbraco membership provider you must change the member password by using the MembershipProvider.ChangePassword method");
 
-            //go re-fetch the member and update the properties that may have changed
-            var result = GetByUsername(member.Username);
+            // go re-fetch the member to update the properties that may have changed
+            // check that it still exists (optimistic concurrency somehow)
 
-            //should never be null but it could have been deleted by another thread.
-            // fixme - should LOCK! instead
-            if (result == null)
-                return;
+            // re-fetch and ensure it exists
+            var m = GetByUsername(member.Username);
+            if (m == null) return; // gone
 
-            member.RawPasswordValue = result.RawPasswordValue;
-            member.LastPasswordChangeDate = result.LastPasswordChangeDate;
-            member.UpdateDate = result.UpdateDate;
+            // update properties that have changed
+            member.RawPasswordValue = m.RawPasswordValue;
+            member.LastPasswordChangeDate = m.LastPasswordChangeDate;
+            member.UpdateDate = m.UpdateDate;
 
-            // fixme - not saving?
+            // no need to save anything - provider.ChangePassword has done the updates,
+            // and then all we do is re-fetch to get the updated values, and update the
+            // in-memory member accordingly
         }
 
         /// <summary>
