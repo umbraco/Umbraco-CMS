@@ -56,7 +56,6 @@ namespace Umbraco.Web.Search
 		    ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated;
 
 			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
 			if (contentIndexer != null)
@@ -69,19 +68,6 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
-
-        // see: http://issues.umbraco.org/issue/U4-4798
-	    static void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs e)
-        {
-            // fixme wtf?
-
-            //var indexersToUpdate = ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>();
-            //foreach (var provider in indexersToUpdate)
-            //{
-            //    // fixme - but are we re-indexing? what if a property is removed?
-            //    provider.RefreshIndexerDataFromDataService();
-            //}
-        }
 
 	    static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
 	    {
