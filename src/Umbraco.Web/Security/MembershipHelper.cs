@@ -8,7 +8,6 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -18,7 +17,6 @@ using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace Umbraco.Web.Security
 {
-
     /// <summary>
     /// A helper class for handling Members
     /// </summary>
@@ -31,29 +29,27 @@ namespace Umbraco.Web.Security
         private readonly IPublishedMemberCache _memberCache;
 
         #region Constructors
-        public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
-            : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService))
-        {            
-        }
 
-        public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
+        // used here and there for IMember operations (not front-end stuff, no need for _memberCache)
+        public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
         {
             if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
-            if (roleProvider == null) throw new ArgumentNullException(nameof(roleProvider));
             _applicationContext = applicationContext;
             _httpContext = httpContext;
-            _membershipProvider = membershipProvider;
-            _roleProvider = roleProvider;
-            _memberCache = UmbracoContext.Current?.Facade?.MemberCache; // fixme
-        }   
+            _membershipProvider = MPE.GetMembersMembershipProvider();
+            _roleProvider = Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService);
 
-        public MembershipHelper(UmbracoContext umbracoContext)
-            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider: new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
-        {            
+            // _memberCache remains null - not supposed to use it
+            // alternatively we'd need to get if from the 'current' UmbracoContext?
         }
 
+        // used everywhere
+        public MembershipHelper(UmbracoContext umbracoContext)
+            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider: new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
+        { }
+
+        // used in tests and (this)
         public MembershipHelper(UmbracoContext umbracoContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
@@ -65,7 +61,18 @@ namespace Umbraco.Web.Security
             _roleProvider = roleProvider;
             _memberCache = umbracoContext.Facade.MemberCache;
         }
+
         #endregion
+
+        protected IPublishedMemberCache MemberCache
+        {
+            get
+            {
+                if (_memberCache == null)
+                    throw new InvalidOperationException("No MemberCache.");
+                return _memberCache;
+            }
+        }
 
         /// <summary>
         /// Returns true if the current membership provider is the Umbraco built-in one.
@@ -115,8 +122,8 @@ namespace Umbraco.Web.Security
 
             var member = GetCurrentPersistedMember();
 
-            //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do 
-            // not support changing a username! 
+            //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do
+            // not support changing a username!
             if (model.Name != null && member.Name != model.Name)
             {
                 member.Name = model.Name;
@@ -158,7 +165,7 @@ namespace Umbraco.Web.Security
 
             MembershipUser membershipUser;
             var provider = _membershipProvider;
-            //update their real name 
+            //update their real name
             if (provider.IsUmbracoMembershipProvider())
             {
                 membershipUser = ((UmbracoMembershipProviderBase)provider).CreateUser(
@@ -198,7 +205,7 @@ namespace Umbraco.Web.Security
             {
                 //Set member online
                 provider.GetUser(model.Username, true);
-    
+
                 //Log them in
                 FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
             }
@@ -225,7 +232,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);                
+                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
                 return false;
             }
             //Log them in
@@ -245,22 +252,22 @@ namespace Umbraco.Web.Security
 
         public virtual IPublishedContent GetByProviderKey(object key)
         {
-            return _memberCache.GetByProviderKey(key);
+            return MemberCache.GetByProviderKey(key);
         }
 
         public virtual IPublishedContent GetById(int memberId)
         {
-            return _memberCache.GetById(memberId);
+            return MemberCache.GetById(memberId);
         }
 
         public virtual IPublishedContent GetByUsername(string username)
         {
-            return _memberCache.GetByUsername(username);
+            return MemberCache.GetByUsername(username);
         }
 
         public virtual IPublishedContent GetByEmail(string email)
         {
-            return _memberCache.GetByEmail(email);
+            return MemberCache.GetByEmail(email);
         }
 
         /// <summary>
@@ -274,7 +281,7 @@ namespace Umbraco.Web.Security
                 return null;
             }
             var result = GetCurrentPersistedMember();
-            return result == null ? null : _memberCache.GetByMember(result);
+            return result == null ? null : MemberCache.GetByMember(result);
         }
 
         /// <summary>
@@ -288,9 +295,9 @@ namespace Umbraco.Web.Security
                 return -1;
             }
             var result = GetCurrentMember();
-            return result == null ? -1 : result.Id;
+            return result?.Id ?? -1;
         }
-        
+
         #endregion
 
         #region Model Creation methods for member data editing on the front-end
@@ -309,7 +316,7 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
 
             if (provider.IsUmbracoMembershipProvider())
-            {                
+            {
                 var membershipUser = provider.GetCurrentUserOnline();
                 var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
@@ -396,7 +403,7 @@ namespace Umbraco.Web.Security
                     if (propValue != null && propValue.Value != null)
                     {
                         value = propValue.Value.ToString();
-                    }    
+                    }
                 }
 
                 var viewProperty = new UmbracoProperty
@@ -406,11 +413,11 @@ namespace Umbraco.Web.Security
                     Value = value
                 };
 
-                //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers 
+                //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
                 // can just render their own.
 
                 ////This is a rudimentary check to see what data template we should render
-                //// if developers want to change the template they can do so dynamically in their views or controllers 
+                //// if developers want to change the template they can do so dynamically in their views or controllers
                 //// for a given property.
                 ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “Html”, “Object”, “String”, “Text”, and “Url”
                 //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
@@ -419,7 +426,7 @@ namespace Umbraco.Web.Security
                 //    viewProperty.EditorTemplate = "UmbracoBoolean";
                 //}
                 //else
-                //{                    
+                //{
                 //    switch (prop.DataTypeDatabaseType)
                 //    {
                 //        case DataTypeDatabaseType.Integer:
@@ -505,10 +512,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Returns the currently logged in username
         /// </summary>
-        public string CurrentUserName
-        {
-            get { return _httpContext.User.Identity.Name; }
-        }
+        public string CurrentUserName => _httpContext.User.Identity.Name;
 
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
@@ -536,7 +540,7 @@ namespace Umbraco.Web.Security
 
             // Allow by default
             var allowAction = true;
-            
+
             if (IsLoggedIn() == false)
             {
                 // If not logged on, not allowed
@@ -571,7 +575,7 @@ namespace Umbraco.Web.Security
                     var member = provider.GetCurrentUser();
                     username = member.UserName;
                 }
-                
+
                 // If groups defined, check member is of one of those groups
                 var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
                 if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
@@ -580,8 +584,6 @@ namespace Umbraco.Web.Security
                     var groups = _roleProvider.GetRolesForUser(username);
                     allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
                 }
-
-                
             }
 
             return allowAction;
@@ -610,13 +612,13 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="passwordModel"></param>
         /// <param name="membershipProvider"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
+            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
-            if (passwordModel == null) throw new ArgumentNullException("passwordModel");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
+            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
@@ -735,7 +737,7 @@ namespace Umbraco.Web.Security
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }
-        
+
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>
@@ -756,45 +758,41 @@ namespace Umbraco.Web.Security
             DateTime? lastActivityDate = null,
             string comment = null)
         {
-            var needsUpdating = new List<bool>();
+            var update = false;
 
-            //set the writable properties
             if (email != null)
             {
-                needsUpdating.Add(member.Email != email);
+                if (member.Email != email) update = true;
                 member.Email = email;
             }
             if (isApproved.HasValue)
             {
-                needsUpdating.Add(member.IsApproved != isApproved.Value);
+                if (member.IsApproved != isApproved.Value) update = true;
                 member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
-                needsUpdating.Add(member.LastLoginDate != lastLoginDate.Value);
+                if (member.LastLoginDate != lastLoginDate.Value) update = true;
                 member.LastLoginDate = lastLoginDate.Value;
             }
             if (lastActivityDate.HasValue)
             {
-                needsUpdating.Add(member.LastActivityDate != lastActivityDate.Value);
+                if (member.LastActivityDate != lastActivityDate.Value) update = true;
                 member.LastActivityDate = lastActivityDate.Value;
             }
             if (comment != null)
             {
-                needsUpdating.Add(member.Comment != comment);
+                if (member.Comment != comment) update = true;
                 member.Comment = comment;
             }
 
-            //Don't persist anything if nothing has changed
-            if (needsUpdating.Any(x => x == true))
-            {
-                provider.UpdateUser(member);
-                return Attempt<MembershipUser>.Succeed(member);
-            }
+            if (update == false)
+                return Attempt<MembershipUser>.Fail(member);
 
-            return Attempt<MembershipUser>.Fail(member);
+            provider.UpdateUser(member);
+            return Attempt<MembershipUser>.Succeed(member);
         }
-        
+
         /// <summary>
         /// Returns the currently logged in IMember object - this should never be exposed to the front-end since it's returning a business logic entity!
         /// </summary>
@@ -816,9 +814,12 @@ namespace Umbraco.Web.Security
                 });
         }
 
-        private string GetCacheKey(string key, params object[] additional)
+        private static string GetCacheKey(string key, params object[] additional)
         {
-            var sb = new StringBuilder(string.Format("{0}-{1}", typeof (MembershipHelper).Name, key));
+            var sb = new StringBuilder();
+            sb.Append(typeof (MembershipHelper).Name);
+            sb.Append("-");
+            sb.Append(key);
             foreach (var s in additional)
             {
                 sb.Append("-");

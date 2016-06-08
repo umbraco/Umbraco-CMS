@@ -24,10 +24,10 @@ namespace umbraco.cms.businesslogic.member
 {
     /// <summary>
     /// The Member class represents a member of the public website (not to be confused with umbraco users)
-    /// 
-    /// Members are used when creating communities and collaborative applications using umbraco, or if there are a 
+    ///
+    /// Members are used when creating communities and collaborative applications using umbraco, or if there are a
     /// need for identifying or authentifying the visitor. (extranets, protected/private areas of the public website)
-    /// 
+    ///
     /// Inherits generic datafields from it's baseclass content.
     /// </summary>
     [Obsolete("Use the MemberService and the Umbraco.Core.Models.Member models instead")]
@@ -40,16 +40,16 @@ namespace umbraco.cms.businesslogic.member
 
         // zb-00004 #29956 : refactor cookies names & handling
 
-        private const string _sQLOptimizedMany = @"	
-			select 
-	            umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, 
-	            umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, 
-	            umbracoNode.nodeUser, umbracoNode.text, 
+        private const string _sQLOptimizedMany = @"
+			select
+	            umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level,
+	            umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate,
+	            umbracoNode.nodeUser, umbracoNode.text,
 	            cmsMember.Email, cmsMember.LoginName, cmsMember.Password
-            from umbracoNode 
+            from umbracoNode
             inner join cmsContent on cmsContent.nodeId = umbracoNode.id
             inner join cmsMember on  cmsMember.nodeId = cmsContent.nodeId
-			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}			
+			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
 			order by {1}";
 
         #endregion
@@ -82,7 +82,7 @@ namespace umbraco.cms.businesslogic.member
         public Member(Guid id) : base(id) { }
 
         /// <summary>
-        /// Initializes a new instance of the Member class, with an option to only initialize 
+        /// Initializes a new instance of the Member class, with an option to only initialize
         /// the data used by the tree in the umbraco console.
         /// </summary>
         /// <param name="id">Identifier</param>
@@ -96,7 +96,7 @@ namespace umbraco.cms.businesslogic.member
         #region Static methods
         /// <summary>
         /// A list of all members in the current umbraco install
-        /// 
+        ///
         /// Note: is ressource intensive, use with care.
         /// </summary>
         public static Member[] GetAll
@@ -122,7 +122,7 @@ namespace umbraco.cms.businesslogic.member
         public static Member[] getAllOtherMembers()
         {
 
-            //NOTE: This hasn't been ported to the new service layer because it is an edge case, it is only used to render the tree nodes but in v7 we plan on 
+            //NOTE: This hasn't been ported to the new service layer because it is an edge case, it is only used to render the tree nodes but in v7 we plan on
             // changing how the members are shown and not having to worry about letters.
 
             var ids = new List<int>();
@@ -130,10 +130,10 @@ namespace umbraco.cms.businesslogic.member
                                         string.Format(_sQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
-                
+
                 while (dr.Read())
                 {
-                    ids.Add(dr.GetInt("id"));                    
+                    ids.Add(dr.GetInt("id"));
                 }
             }
 
@@ -215,7 +215,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The new member</returns>
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, IUser u)
         {
-            if (mbt == null) throw new ArgumentNullException("mbt");            
+            if (mbt == null) throw new ArgumentNullException("mbt");
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
 
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -236,7 +236,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             var legacy = new Member(model);
-            
+
             legacy.Save();
 
             return legacy;
@@ -244,7 +244,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Retrieve a member given the loginname
-        /// 
+        ///
         /// Used when authentifying the Member
         /// </summary>
         /// <param name="loginName">The unique Loginname</param>
@@ -261,7 +261,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Retrieve a Member given an email, the first if there multiple members with same email
-        /// 
+        ///
         /// Used when authentifying the Member
         /// </summary>
         /// <param name="email">The email of the member</param>
@@ -279,7 +279,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Retrieve Members given an email
-        /// 
+        ///
         /// Used when authentifying a Member
         /// </summary>
         /// <param name="email">The email of the member(s)</param>
@@ -298,7 +298,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Retrieve a Member given the credentials
-        /// 
+        ///
         /// Used when authentifying the member
         /// </summary>
         /// <param name="loginName">Member login</param>
@@ -373,9 +373,9 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Deletes all members of the membertype specified
-        /// 
+        ///
         /// Used when a membertype is deleted
-        /// 
+        ///
         /// Use with care
         /// </summary>
         /// <param name="dt">The membertype which are being deleted</param>
@@ -581,16 +581,16 @@ namespace umbraco.cms.businesslogic.member
             var x = base.ToXml(xd, Deep);
             if (x.Attributes != null && x.Attributes["loginName"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));                
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));
             }
             if (x.Attributes != null && x.Attributes["email"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));    
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));
             }
             if (x.Attributes != null && x.Attributes["key"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));   
-            }                       
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));
+            }
             return x;
         }
 
@@ -616,13 +616,13 @@ namespace umbraco.cms.businesslogic.member
         }
 
         /// <summary>
-        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider - you must 
+        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider - you must
         /// call Save() after using this method
         /// </summary>
         /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
-            MemberItem.RawPasswordValue = newPassword;            
+            MemberItem.RawPasswordValue = newPassword;
         }
 
         /// <summary>
@@ -649,7 +649,7 @@ namespace umbraco.cms.businesslogic.member
                 SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
                     parameters);
             PopulateGroups();
-            
+
         }
 
         /// <summary>
@@ -664,8 +664,6 @@ namespace umbraco.cms.businesslogic.member
             PopulateGroups();
         }
         #endregion
-
-     
 
         #region Private methods
 
@@ -682,9 +680,9 @@ namespace umbraco.cms.businesslogic.member
                     if (group != null)
                     {
                         temp.Add(dr.GetInt("memberGroup"), group);
-                    }                    
+                    }
                 }
-                    
+
             }
             _groups = temp;
         }
@@ -700,11 +698,11 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Method is used when logging a member in.
-        /// 
+        ///
         /// Adds the member to the cache of logged in members
-        /// 
+        ///
         /// Uses cookiebased recognition
-        /// 
+        ///
         /// Can be used in the runtime
         /// </summary>
         /// <param name="m">The member to log in</param>
@@ -741,11 +739,11 @@ namespace umbraco.cms.businesslogic.member
         // zb-00035 #29931 : remove old cookie code
         /// <summary>
         /// Method is used when logging a member in.
-        /// 
+        ///
         /// Adds the member to the cache of logged in members
-        /// 
+        ///
         /// Uses cookie or session based recognition
-        /// 
+        ///
         /// Can be used in the runtime
         /// </summary>
         /// <param name="m">The member to log in</param>
@@ -781,7 +779,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Removes the member from the cache
-        /// 
+        ///
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member to remove</param>
@@ -793,7 +791,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Removes the member from the cache
-        /// 
+        ///
         /// Can be used in the public website
         /// </summary>
         /// <param name="NodeId">Node Id of the member to remove</param>
@@ -801,11 +799,11 @@ namespace umbraco.cms.businesslogic.member
         public static void RemoveMemberFromCache(int NodeId)
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(NodeId));
-        }        
+        }
 
         /// <summary>
         /// Retrieve a collection of members in the cache
-        /// 
+        ///
         /// Can be used from the public website
         /// </summary>
         /// <returns>A collection of cached members</returns>
@@ -824,7 +822,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// Retrieve a member from the cache
-        /// 
+        ///
         /// Can be used from the public website
         /// </summary>
         /// <param name="id">Id of the member</param>
@@ -840,7 +838,7 @@ namespace umbraco.cms.businesslogic.member
 
         /// <summary>
         /// An indication if the current visitor is logged in
-        /// 
+        ///
         /// Can be used from the public website
         /// </summary>
         /// <returns>True if the the current visitor is logged in</returns>
@@ -907,16 +905,15 @@ namespace umbraco.cms.businesslogic.member
 
         #endregion
 
-
         #region Membership helper class used for encryption methods
         /// <summary>
         /// ONLY FOR INTERNAL USE.
-        /// This is needed due to a design flaw where the Umbraco membership provider is located 
+        /// This is needed due to a design flaw where the Umbraco membership provider is located
         /// in a separate project referencing this project, which means we can't call special methods
         /// directly on the UmbracoMemberShipMember class.
-        /// This is a helper implementation only to be able to use the encryption functionality 
+        /// This is a helper implementation only to be able to use the encryption functionality
         /// of the membership provides (which are protected).
-        /// 
+        ///
         /// ... which means this class should have been marked internal with a Friend reference to the other assembly right??
         /// </summary>
         internal class MemberShipHelper : MembershipProvider
@@ -1085,8 +1082,5 @@ namespace umbraco.cms.businesslogic.member
             }
         }
         #endregion
-
     }
-
-
 }
