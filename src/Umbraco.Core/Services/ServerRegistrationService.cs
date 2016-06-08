@@ -5,7 +5,6 @@ using System.Web;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Sync;
@@ -45,7 +44,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.Servers);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
 
-                ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
+                ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
 
                 var regs = repo.GetAll().ToArray();
                 var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
@@ -88,17 +87,6 @@ namespace Umbraco.Core.Services
         /// <param name="serverIdentity">The server unique identity.</param>
         public void DeactiveServer(string serverIdentity)
         {
-            //_lrepo.WithWriteLocked(xr =>
-            //{
-            //    var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
-            //    var server = xr.Repository.GetByQuery(query).FirstOrDefault();
-            //    if (server == null) return;
-
-            //    server.IsActive = false;
-            //    server.IsMaster = false;
-            //    xr.Repository.AddOrUpdate(server);
-            //});
-
             // because the repository caches "all" and has queries disabled...
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -106,7 +94,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.Servers);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
 
-                ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
+                ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
 
                 var server = repo.GetAll().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
@@ -135,38 +123,19 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Return all active servers.
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<IServerRegistration> GetActiveServers()
+        /// <param name="refresh">A value indicating whether to force-refresh the cache.</param>
+        /// <returns>All active servers.</returns>
+        /// <remarks>By default this method will rely on the repository's cache, which is updated each
+        /// time the current server is touched, and the period depends on the configuration. Use the
+        /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
+        /// from the database.</remarks>
+        public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false)
         {
-            // fixme - this needs to be refactored entirely now that we have repeatable read everywhere
-
-            //return _lrepo.WithReadLocked(xr =>
-            //{
-            //    var query = Query<IServerRegistration>.Builder.Where(x => x.IsActive);
-            //    return xr.Repository.GetByQuery(query).ToArray();
-            //});
-
-            // because the repository caches "all" we should use the following code
-            // in order to ensure we use the cache and not hit the database each time
-
-            //return _lrepo.WithReadLocked(xr => xr.Repository.GetAll().Where(x => x.IsActive).ToArray());
-
-            // however, WithReadLocked (as any other LockingRepository methods) will attempt
-            // to properly lock the repository using a database-level lock, which wants
-            // the transaction isolation level to be RepeatableRead, which it is not by default,
-            // and then, see U4-7046.
-            //
-            // in addition, LockingRepository methods need to hit the database in order to
-            // ensure proper locking, and so if we know that the repository might not need the
-            // database, we cannot use these methods - and then what?
-            //
-            // this raises a good number of questions, including whether caching anything in
-            // repositories works at all in a LB environment - TODO: figure it out
-
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.Servers);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
+                if (refresh) ((ServerRegistrationRepository) repo).ClearCache();
                 var servers = repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
                 uow.Complete();
                 return servers;

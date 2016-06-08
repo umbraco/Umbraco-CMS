@@ -10,19 +10,24 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        private readonly ICacheProvider _staticCache;
+        private IRepositoryCachePolicy<IServerRegistration, int> _cachePolicy;
 
         public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMappingResolver mappingResolver)
             : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver)
+        { }
+
+        protected override IRepositoryCachePolicy<IServerRegistration, int> CachePolicy => _cachePolicy
+            ?? (_cachePolicy = new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(RuntimeCache, GetEntityId, /*expires:*/ false));
+
+        public void ClearCache()
         {
-            _staticCache = cacheHelper.StaticCache;
+            CachePolicy.ClearAll();
         }
 
         protected override int PerformCount(IQuery<IServerRegistration> query)
@@ -44,15 +49,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IServerRegistration> PerformGetAll(params int[] ids)
         {
-            // we do NOT want to populate the cache on-demand, because then it might happen
-            // during a ReadCommited transaction, and reading the registrations under ReadCommited
-            // is NOT safe because they could be updated in the middle of the read.
-            //
-            // the cache is populated by ReloadCache which should only be called from methods
-            // that ensure proper locking (at least, read-lock in ReadCommited) of the repo.
-
-            var all = _staticCache.GetCacheItem<IEnumerable<IServerRegistration>>(CacheKey, Enumerable.Empty<IServerRegistration>);
-            return ids.Length == 0 ? all : all.Where(x => ids.Contains(x.Id));
+            var factory = new ServerRegistrationFactory();
+            return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
+                .Select(x => factory.BuildEntity(x));
         }
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
@@ -104,7 +103,6 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Id = id;
 
             entity.ResetDirtyProperties();
-            ReloadCache();
         }
 
         protected override void PersistUpdatedItem(IServerRegistration entity)
@@ -117,26 +115,6 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
-            ReloadCache();
-        }
-
-        public override void PersistDeletedItem(IEntity entity)
-        {
-            base.PersistDeletedItem(entity);
-            ReloadCache();
-        }
-
-        private static readonly string CacheKey = GetCacheTypeKey<IServerRegistration>() + "all";
-
-        public void ReloadCache()
-        {
-            var factory = new ServerRegistrationFactory();
-            var all = Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
-                .Select(x => factory.BuildEntity(x))
-                .Cast<IServerRegistration>()
-                .ToArray();
-            _staticCache.ClearCacheItem(CacheKey);
-            _staticCache.GetCacheItem(CacheKey, () => all);
         }
 
         public void DeactiveStaleServers(TimeSpan staleTimeout)
@@ -144,7 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var timeoutDate = DateTime.Now.Subtract(staleTimeout);
 
             Database.Update<ServerRegistrationDto>("SET isActive=0, isMaster=0 WHERE lastNotifiedDate < @timeoutDate", new { /*timeoutDate =*/ timeoutDate });
-            ReloadCache();
+            ClearCache();
         }
     }
 }
