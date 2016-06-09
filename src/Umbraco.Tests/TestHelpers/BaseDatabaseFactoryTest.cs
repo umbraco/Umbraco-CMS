@@ -457,7 +457,7 @@ namespace Umbraco.Tests.TestHelpers
 
             if (setSingleton)
             {
-                UmbracoContext.Current = ctx;
+                Umbraco.Web.Current.SetUmbracoContext(ctx, true);
             }
 
             return ctx;

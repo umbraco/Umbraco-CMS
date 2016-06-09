@@ -77,7 +77,6 @@ namespace Umbraco.Tests.TestHelpers
 
             // reset settings
             SettingsForTests.Reset();
-            UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
 

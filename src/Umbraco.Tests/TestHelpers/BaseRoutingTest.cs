@@ -43,9 +43,9 @@ namespace Umbraco.Tests.TestHelpers
 			umbracoContext.RoutingContext = routingContext;
 
 	        if (setUmbracoContextCurrent)
-	            UmbracoContext.Current = umbracoContext;
+                Umbraco.Web.Current.SetUmbracoContext(umbracoContext, true);
 
-			return routingContext;
+            return routingContext;
 		}
 
 		/// <summary>

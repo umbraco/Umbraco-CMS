@@ -101,6 +101,7 @@ namespace Umbraco.Web.WebApi.Binders
             var request = actionContext.Request;
 
             // IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
+            // FIXME but doesn't it flow? doesn't http context flow in async threads?
             var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
 
             UmbracoContext.EnsureContext(

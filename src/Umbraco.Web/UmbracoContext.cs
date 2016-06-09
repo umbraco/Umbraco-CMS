@@ -15,18 +15,8 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
-        internal const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
-        private static readonly object Locker = new object();
-
-        private bool _replacing;
         private bool? _previewing;
         private readonly Lazy<IFacade> _facade;
-
-        /// <summary>
-        /// Used if not running in a web application (no real HttpContext)
-        /// </summary>
-        [ThreadStatic]
-        private static UmbracoContext _umbracoContext; // fixme KILL whould use accessor! but accessor uses .Current! catch-22!
 
         #region Ensure Context
 
@@ -70,18 +60,15 @@ namespace Umbraco.Web
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
 
-            // if there is already a current context,
-            // return if not replacing
-            // else mark as replacing
-            if (Current != null)
-            {
-                if (replaceContext == false)
-                    return Current;
-                Current._replacing = true;
-            }
+            // if there is already a current context, return if not replacing
+            var umbracoContext = Web.Current.UmbracoContext;
+            if (umbracoContext != null && replaceContext == false)
+                return umbracoContext;
 
             // create, assign the singleton, and return
-            return Current = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders, preview);
+            umbracoContext = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders, preview);
+            Web.Current.SetUmbracoContext(umbracoContext, replaceContext);
+            return umbracoContext;
         }
 
         /// <summary>
@@ -97,7 +84,7 @@ namespace Umbraco.Web
         /// <returns>
         /// A new instance of UmbracoContext
         /// </returns>
-        public static UmbracoContext CreateContext(
+        internal static UmbracoContext CreateContext(
             HttpContextBase httpContext,
             ApplicationContext applicationContext,
             IFacadeService facadeService,
@@ -187,44 +174,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current Umbraco Context.
         /// </summary>
-		public static UmbracoContext Current
-        {
-            get
-            {
-                //if we have a real context then return the request based object
-                if (System.Web.HttpContext.Current != null)
-                {
-                    return (UmbracoContext)System.Web.HttpContext.Current.Items[HttpContextItemName];
-                }
+        // note: obsolete, use Current.UmbracoContext... then obsolete Current too, and inject!
+        public static UmbracoContext Current => Web.Current.UmbracoContext;
 
-                //return the object if not running in a real HttpContext
-                return _umbracoContext;
-            }
-
-            internal set
-            {
-                lock (Locker)
-                {
-                    //if running in a real HttpContext, this can only be set once
-                    if (System.Web.HttpContext.Current != null && Current != null && Current._replacing == false)
-                    {
-                        throw new ApplicationException("The current UmbracoContext can only be set once during a request.");
-                    }
-
-                    //if there is an HttpContext, return the item
-                    if (System.Web.HttpContext.Current != null)
-                    {
-                        System.Web.HttpContext.Current.Items[HttpContextItemName] = value;
-                    }
-                    else
-                    {
-                        _umbracoContext = value;
-                    }
-                }
-            }
-        }
-
-		/// <summary>
+        /// <summary>
 		/// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
 		/// object is instantiated which in the web site is created during the BeginRequest phase.
 		/// We can then determine complete rendering time from that.
@@ -397,7 +350,7 @@ namespace Umbraco.Web
             Security.DisposeIfDisposable();
 
             //If not running in a web ctx, ensure the thread based instance is nulled
-            _umbracoContext = null;
+            Web.Current.SetUmbracoContext(null, true);
 
             // help caches release resources
             // (but don't create caches just to dispose them)

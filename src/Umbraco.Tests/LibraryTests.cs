@@ -47,7 +47,7 @@ namespace Umbraco.Tests
                     .PropertyTypes.Count());
             
             var routingContext = GetRoutingContext("/test", 1234);
-			UmbracoContext.Current = routingContext.UmbracoContext;
+            Umbraco.Web.Current.SetUmbracoContext(routingContext.UmbracoContext, true);
 		}
 
 	    /// <summary>
@@ -62,13 +62,6 @@ namespace Umbraco.Tests
 
 	        base.FreezeResolution();
 	    }
-
-	    public override void TearDown()
-		{
-			base.TearDown();
-			UmbracoContext.Current = null;
-		}
-
 
 	    [Test]
 	    public void Json_To_Xml_Object()

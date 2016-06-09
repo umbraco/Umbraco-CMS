@@ -73,7 +73,7 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        internal void DeleteLegacyInstaller()
+        internal static void DeleteLegacyInstaller()
         {
             if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Install)))
             {

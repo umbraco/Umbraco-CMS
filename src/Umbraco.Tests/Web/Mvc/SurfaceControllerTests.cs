@@ -28,6 +28,18 @@ namespace Umbraco.Tests.Web.Mvc
     [TestFixture]
     public class SurfaceControllerTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = null;
+        }
+
         [Test]
         public void Can_Construct_And_Get_Result()
         {

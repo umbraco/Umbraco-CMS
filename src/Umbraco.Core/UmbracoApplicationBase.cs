@@ -35,6 +35,15 @@ namespace Umbraco.Core
             // create the container for the application, the boot managers are responsible for registrations
             Container = new ServiceContainer();
             Container.EnableAnnotatedConstructorInjection();
+
+            // from the docs: "LightInject considers all read/write properties a dependency, but implements
+            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
+            // in the case of an unresolved property dependency."
+            //
+            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
+            // from the docs, the following line will cause the container to "now only try to inject
+            // dependencies for properties that is annotated with the InjectAttribute."
+            Container.EnableAnnotatedPropertyInjection();
         }
 
         public event EventHandler ApplicationStarting;

@@ -59,16 +59,15 @@ namespace Umbraco.Tests.PublishedContent
 				};
 			var routingContext = GetRoutingContext("/test");
 
-			//set the UmbracoContext.Current since the extension methods rely on it
-			UmbracoContext.Current = routingContext.UmbracoContext;
-		}
+            //set the UmbracoContext.Current since the extension methods rely on it
+            Umbraco.Web.Current.SetUmbracoContext(routingContext.UmbracoContext, true);
+        }
 
 		public override void TearDown()
 		{
 			base.TearDown();
 			Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = null;
-			UmbracoContext.Current = null;
-		}		
+        }		
 
 		[Test]
 		public void To_DataTable()

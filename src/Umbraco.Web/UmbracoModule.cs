@@ -1,31 +1,19 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Mvc;
 using System.Web.Routing;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using umbraco;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Sync;
 using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using ObjectExtensions = Umbraco.Core.ObjectExtensions;
-using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web
 {
@@ -108,16 +96,12 @@ namespace Umbraco.Web
                 return;
             }
 
-		
+
 			// do not process if this request is not a front-end routable page
 		    var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
             //raise event here
             OnRouteAttempt(new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
-            if (!isRoutableAttempt.Success)
-			{
-                return;
-			}
-
+		    if (isRoutableAttempt.Success == false) return;
 
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
 
@@ -138,7 +122,7 @@ namespace Umbraco.Web
             if (HandleHttpResponseStatus(httpContext, pcr))
 		        return;
 
-            if (!pcr.HasPublishedContent)
+            if (pcr.HasPublishedContent == false)
 				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 			else
 				RewriteToUmbracoHandler(httpContext, pcr);
@@ -161,22 +145,22 @@ namespace Umbraco.Web
 		    var reason = EnsureRoutableOutcome.IsRoutable;
 
 			// ensure this is a document request
-			if (!EnsureDocumentRequest(httpContext, uri))
+			if (EnsureDocumentRequest(httpContext, uri) == false)
 			{
 			    reason = EnsureRoutableOutcome.NotDocumentRequest;
 			}
 			// ensure Umbraco is ready to serve documents
-			else if (!EnsureIsReady(httpContext, uri))
+			else if (EnsureIsReady(httpContext, uri) == false)
 			{
 			    reason = EnsureRoutableOutcome.NotReady;
 			}
 			// ensure Umbraco is properly configured to serve documents
-			else if (!EnsureIsConfigured(httpContext, uri))
+			else if (EnsureIsConfigured(httpContext, uri) == false)
             {
                 reason = EnsureRoutableOutcome.NotConfigured;
             }
             // ensure Umbraco has documents to serve
-            else if (!EnsureHasContent(context, httpContext))
+            else if (EnsureHasContent(context, httpContext) == false)
             {
                 reason = EnsureRoutableOutcome.NoContent;
             }
@@ -199,7 +183,7 @@ namespace Umbraco.Web
 			// legacy - what's the point really?
 			if (/*maybeDoc &&*/ GlobalSettings.UseDirectoryUrls)
 			{
-				int asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
+				var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
 				if (asmxPos >= 0)
 				{
 					// use uri.AbsolutePath, not path, 'cos path has been lowercased
@@ -245,29 +229,22 @@ namespace Umbraco.Web
 			var ready = ApplicationContext.Current.IsReady;
 
 			// ensure we are ready
-			if (!ready)
-			{
-				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
+	        if (ready) return true;
+	        LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
 
-                if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false)
-				{
-					// let requests pile up and wait for 10s then show the splash anyway
-					ready = ApplicationContext.Current.WaitForReady(10 * 1000);
-				}
+	        if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false)
+	        {
+	            // let requests pile up and wait for 10s then show the splash anyway
+	            ready = ApplicationContext.Current.WaitForReady(10 * 1000);
+	        }
 
-				if (!ready)
-				{
-					httpContext.Response.StatusCode = 503;
+	        if (ready) return true;
 
-                    var bootUrl = "~/config/splashes/booting.aspx";
+	        httpContext.Response.StatusCode = 503;
+	        const string bootUrl = "~/config/splashes/booting.aspx";
+	        httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
 
-					httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
-
-					return false;
-				}
-			}
-
-			return true;
+	        return false;
 		}
 
 		// ensures Umbraco has at least one published node
@@ -305,7 +282,7 @@ namespace Umbraco.Web
             }
 
 			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
-			var installUrl = string.Format("{0}/?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
+			var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
 			httpContext.Response.Redirect(installUrl, true);
 			return false;
 		}
@@ -348,15 +325,14 @@ namespace Umbraco.Web
             //if (pcr.IsRedirect)
             //    response.End(); // end response -- kills the thread and does not return!
 
-            if (pcr.IsRedirect)
-            {
-                response.Flush();
-                // bypass everything and directly execute EndRequest event -- but returns
-                context.ApplicationInstance.CompleteRequest();
-                // though some say that .CompleteRequest() does not properly shutdown the response
-                // and the request will hang until the whole code has run... would need to test?
-                LogHelper.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
-            }
+            if (pcr.IsRedirect == false) return end;
+
+            response.Flush();
+            // bypass everything and directly execute EndRequest event -- but returns
+            context.ApplicationInstance.CompleteRequest();
+            // though some say that .CompleteRequest() does not properly shutdown the response
+            // and the request will hang until the whole code has run... would need to test?
+            LogHelper.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
 
             return end;
         }
@@ -368,7 +344,7 @@ namespace Umbraco.Web
         private static void RewriteToBackOfficeHandler(HttpContextBase context)
         {
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/Default";
+            var rewritePath = GlobalSettings.Path.TrimEnd('/') + "/Default";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", "", false);
 
@@ -398,10 +374,10 @@ namespace Umbraco.Web
             // rewritten url, but this is not what we want!
             // read: http://forums.iis.net/t/1146511.aspx
 
-			var query = pcr.Uri.Query.TrimStart(new[] { '?' });
+			var query = pcr.Uri.Query.TrimStart('?');
 
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/RenderMvc";
+            var rewritePath = GlobalSettings.Path.TrimEnd('/') + "/RenderMvc";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", query, false);
 
@@ -492,7 +468,7 @@ namespace Umbraco.Web
                     httpContext.Response.Headers.Remove("X-AspNet-Version");
                     httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
                 }
-                catch (PlatformNotSupportedException ex)
+                catch (PlatformNotSupportedException)
                 {
                     // can't remove headers this way on IIS6 or cassini.
                 }
@@ -517,32 +493,30 @@ namespace Umbraco.Web
 
 					DisposeHttpContextItems(httpContext);
 				};
-
 		}
 
 		public void Dispose()
-		{
-
-		}
+		{ }
 
 		#endregion
 
         #region Events
+
         internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+
         private void OnRouteAttempt(RoutableAttemptEventArgs args)
         {
-            if (RouteAttempt != null)
-                RouteAttempt(this, args);
+            RouteAttempt?.Invoke(this, args);
         }
 
         internal static event EventHandler<EventArgs> EndRequest;
+
         private void OnEndRequest(EventArgs args)
         {
-            if (EndRequest != null)
-                EndRequest(this, args);
+            EndRequest?.Invoke(this, args);
         }
-        #endregion
 
+        #endregion
 
         /// <summary>
         /// This is used to be passed into the GlobalSettings.IsReservedPathOrUrl and will include some 'fake' routes

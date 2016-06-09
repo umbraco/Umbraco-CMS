@@ -5,6 +5,6 @@ namespace Umbraco.Web
     /// </summary>
     public interface IUmbracoContextAccessor
     {
-        UmbracoContext UmbracoContext { get; }
+        UmbracoContext UmbracoContext { get; set;  }
     }
 }

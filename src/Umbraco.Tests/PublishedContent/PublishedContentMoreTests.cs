@@ -75,7 +75,7 @@ namespace Umbraco.Tests.PublishedContent
                 Enumerable.Empty<IUrlProvider>(),
                 null);
 
-            UmbracoContext.Current = ctx;
+            Umbraco.Web.Current.SetUmbracoContext(ctx, true);
         }
         
         public override void TearDown()

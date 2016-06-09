@@ -158,9 +158,11 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Current.cs" />
-    <Compile Include="DefaultUmbracoContextAccessor.cs" />
+    <Compile Include="HttpContextUmbracoContextAccessor.cs" />
+    <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="IDynamicPublishedContentQuery.cs" />
@@ -352,7 +354,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="Redirects\RedirectTrackingEventHandler.cs" />
     <Compile Include="ScopeContextEventMessagesFactory.cs" />
-    <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
@@ -625,7 +626,6 @@
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
-    <Compile Include="SingletonUmbracoContextAccessor.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />

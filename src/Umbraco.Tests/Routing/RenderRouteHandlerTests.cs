@@ -55,8 +55,7 @@ namespace Umbraco.Tests.Routing
 		public override void TearDown()
 		{
 			base.TearDown();
-		    UmbracoContext.Current = null;
-			RouteTable.Routes.Clear();			
+            RouteTable.Routes.Clear();			
 		}
 
         Template CreateTemplate(string alias)

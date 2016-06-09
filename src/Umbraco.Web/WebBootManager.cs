@@ -117,8 +117,7 @@ namespace Umbraco.Web
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
 
-            InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
-            insHelper.DeleteLegacyInstaller();
+            InstallHelper.DeleteLegacyInstaller();
 
             return this;
         }
@@ -130,8 +129,6 @@ namespace Umbraco.Web
         protected override void FreezeResolution()
         {
             base.FreezeResolution();
-
-            IFacadeService facadeService;
 
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
@@ -328,34 +325,49 @@ namespace Umbraco.Web
             // configure the temp. Current
             Current.Container = container;
 
-            //ModelMappers
+            // register model mappers
             container.RegisterFrom<WebModelMappersCompositionRoot>();
 
+            // support web request scope
+            // note: everything that is PerRequestLifeTime will be disposed by LightInject at the end of the request
             container.EnablePerWebRequestScope();
 
-            // no need to declare as per request, it's lifetime is already managed as a singleton
-            container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
-            container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
+            // register the http context and umbraco context accessors
+            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // replaces HttpContext.Current
+            container.RegisterSingleton<IUmbracoContextAccessor, HttpContextUmbracoContextAccessor>(); // the "current" context is in the http context
 
-            // register the facade service
-            //container.RegisterSingleton<IFacadeService>(factory => new FacadeService(
+            // register a per-request HttpContextBase object
+            // is per-request so only one wrapper is created per request
+            container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), new PerRequestLifeTime());
+
+            // register the facade accessor - the "current" facade is in the umbraco context
+            container.RegisterSingleton<IFacadeAccessor, UmbracoContextFacadeAccessor>();
+
+            // register the XML facade service
+            //container.RegisterSingleton<IFacadeService>(factory => new PublishedCache.XmlPublishedCache.FacadeService(
             //    factory.GetInstance<ServiceContext>(),
             //    factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
             //    factory.GetInstance<CacheHelper>().RequestCache,
-            //    factory.GetAllInstances<IUrlSegmentProvider>()));
+            //    factory.GetAllInstances<IUrlSegmentProvider>(),
+            //    factory.GetInstance<IFacadeAccessor>()));
+
+            // register the NuCache facade service
             container.RegisterSingleton<IFacadeService>(factory => new PublishedCache.NuCache.FacadeService(
                 new PublishedCache.NuCache.FacadeService.Options { FacadeCacheIsApplicationRequestCache = true },
                 factory.GetInstance<ApplicationContext>().MainDom,
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-                new UmbracoContextFacadeAccessor(new SingletonUmbracoContextAccessor()),  // fixme inject!
+                factory.GetInstance<IFacadeAccessor>(),
                 factory.GetInstance<ILogger>()));
 
-            //no need to declare as per request, currently we manage it's lifetime as the singleton
-            container.Register(factory => UmbracoContext.Current);
+            // register a per-request UmbracoContext object
+            // no real need to be per request but assuming it is faster
+            container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
+
+            // register the umbraco helper
             container.RegisterSingleton<UmbracoHelper>();
 
-            //Replace services:
+            // replace some services
             container.Register<IEventMessagesFactory, ScopeContextEventMessagesFactory>();
             container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             container.RegisterSingleton<ISectionService, SectionService>();
@@ -370,10 +382,10 @@ namespace Umbraco.Web
         internal override void ConfigureApplicationServices(ServiceContainer container)
         {
             base.ConfigureApplicationServices(container);
-            
-            //IoC setup for LightInject for mvc/webapi
+
+            // IoC setup for LightInject for MVC/WebApi
             Container.EnableMvc();
-            Container.RegisterMvcControllers(PluginManager);            
+            Container.RegisterMvcControllers(PluginManager);
             container.EnableWebApi(GlobalConfiguration.Configuration);
             container.RegisterApiControllers(PluginManager);
         }

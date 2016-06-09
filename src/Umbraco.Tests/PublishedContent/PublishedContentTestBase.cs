@@ -26,8 +26,7 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
 
             var rCtx = GetRoutingContext("/test", 1234);
-            UmbracoContext.Current = rCtx.UmbracoContext;
-            
+            Umbraco.Web.Current.SetUmbracoContext(rCtx.UmbracoContext, true);            
         }
 
         protected override void FreezeResolution()
@@ -46,13 +45,6 @@ namespace Umbraco.Tests.PublishedContent
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
             base.FreezeResolution();
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-            
-            UmbracoContext.Current = null;
         }
     }
 }

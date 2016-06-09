@@ -28,6 +28,17 @@ namespace Umbraco.Tests
     [TestFixture]
     public class MockTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = null;
+        }
 
         [Test]
         public void Can_Create_Empty_App_Context()
@@ -100,7 +111,7 @@ namespace Umbraco.Tests
             var appCtx = new ApplicationContext(
                CacheHelper.CreateDisabledCacheHelper(),
                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            
+
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(), appCtx,
                 Mock.Of<IFacadeService>(),

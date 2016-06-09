@@ -13,7 +13,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Allows for Model Binding any IPublishedContent or IRenderModel
     /// </summary>
-	public class RenderModelBinder : DefaultModelBinder, IModelBinder, IModelBinderProvider
+	public class RenderModelBinder : DefaultModelBinder, IModelBinderProvider
     {
 		/// <summary>
 		/// Binds the model to a value by using the specified controller context and binding context.
@@ -43,16 +43,11 @@ namespace Umbraco.Web.Mvc
             // types this binder is dealing with.
 		    if ((model is IRenderModel) == false && (model is IPublishedContent) == false) return null;
 
-		    //default culture
+		    // default culture, unless we have an UmbracoContext and a PublishedContentRequest with a culture
 		    var culture = CultureInfo.CurrentCulture;
-
-		    var umbracoContext = controllerContext.GetUmbracoContext()
-		                         ?? UmbracoContext.Current;
-
-		    if (umbracoContext != null && umbracoContext.PublishedContentRequest != null)
-		    {
+		    var umbracoContext = controllerContext.GetUmbracoContext();
+		    if (umbracoContext?.PublishedContentRequest != null)
 		        culture = umbracoContext.PublishedContentRequest.Culture;
-		    }
 
 		    return BindModel(model, bindingContext.ModelType, culture);
 		}

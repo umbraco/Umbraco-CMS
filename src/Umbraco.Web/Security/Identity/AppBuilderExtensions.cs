@@ -31,10 +31,10 @@ namespace Umbraco.Web.Security.Identity
         /// <remarks>
         /// This could be used for something else in the future - maybe to inform Umbraco that middleware is done/ready, but for
         /// now this is used to raise the custom event
-        /// 
+        ///
         /// This is an extension method in case developer entirely replace the UmbracoDefaultOwinStartup class, in which case they will
         /// need to ensure they call this extension method in their startup class.
-        /// 
+        ///
         /// TODO: Move this method in v8, it doesn't belong in this namespace/extension class
         /// </remarks>
         public static void FinalizeMiddlewareConfiguration(this IAppBuilder app)
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Security.Identity
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
         }
-        
+
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
@@ -159,9 +159,9 @@ namespace Umbraco.Web.Security.Identity
 
             authOptions.Provider = new BackOfficeCookieAuthenticationProvider
             {
-                // Enables the application to validate the security stamp when the user 
-                // logs in. This is a security feature which is used when you 
-                // change a password or add an external login to your account.  
+                // Enables the application to validate the security stamp when the user
+                // logs in. This is a security feature which is used when you
+                // change a password or add an external login to your account.
                 OnValidateIdentity = SecurityStampValidator
                     .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
                         TimeSpan.FromMinutes(30),
@@ -224,8 +224,8 @@ namespace Umbraco.Web.Security.Identity
             if (appContext.IsUpgrading || appContext.IsConfigured)
             {
                 //Then our custom middlewares
-                app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, new SingletonUmbracoContextAccessor());
-                app.Use(typeof(FixWindowsAuthMiddlware));                
+                app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, Current.UmbracoContextAccessor);
+                app.Use(typeof(FixWindowsAuthMiddlware));
             }
 
             //Marks all of the above middlewares to execute on Authenticate
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Security.Identity
                 CookieName = Constants.Security.BackOfficeExternalCookieName,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
                 //Custom cookie manager so we can filter requests
-                CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor()),
+                CookieManager = new BackOfficeCookieManager(Current.UmbracoContextAccessor),
                 CookiePath = "/",
                 CookieSecure = GlobalSettings.UseSSL ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
@@ -315,8 +315,8 @@ namespace Umbraco.Web.Security.Identity
                 var authOptions = app.CreateUmbracoCookieAuthOptions();                
                 app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
 
-                //This middleware must execute at least on PostAuthentication, by default it is on Authorize
-                // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate, 
+                // This middleware must execute at least on PostAuthentication, by default it is on Authorize
+                // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate,
                 // currently I've had 100% success with ensuring this fires after RoleManagerModule even if this is set
                 // to PostAuthenticate though not sure if that's always a guarantee so by default it's Authorize.
                 if (stage < PipelineStage.PostAuthenticate)
@@ -324,7 +324,7 @@ namespace Umbraco.Web.Security.Identity
                     throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
                 }
 
-                
+
                 app.UseStageMarker(stage);
             }
 

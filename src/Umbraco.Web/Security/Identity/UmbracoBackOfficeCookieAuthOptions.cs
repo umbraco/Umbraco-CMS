@@ -47,7 +47,7 @@ namespace Umbraco.Web.Security.Identity
             CookiePath = "/";            
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor(), explicitPaths);
+            CookieManager = new BackOfficeCookieManager(Current.UmbracoContextAccessor, explicitPaths);
         }
 
         public UmbracoBackOfficeCookieAuthOptions(

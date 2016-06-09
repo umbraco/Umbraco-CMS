@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -16,15 +14,14 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             SettingsForTests.Reset();
-            
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            //reset settings
-            SettingsForTests.Reset();            
-            
+            SettingsForTests.Reset();
+            Umbraco.Web.Current.UmbracoContextAccessor = null;
         }
     }
 }

@@ -24,6 +24,18 @@ namespace Umbraco.Tests.Web.Mvc
     [TestFixture]
     public class RenderIndexActionSelectorAttributeTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Umbraco.Web.Current.UmbracoContextAccessor = null;
+        }
+
         private MethodInfo GetRenderMvcControllerIndexMethodFromCurrentType(Type currType)
         {
             return currType.GetMethods().Single(x =>
