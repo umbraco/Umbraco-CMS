@@ -10,7 +10,7 @@ using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class PublishedContent : PublishedContentWithKeyBase
+    internal class PublishedContent : PublishedContentBase
     {
         private readonly IFacadeAccessor _facadeAccessor;
         private readonly ContentNode _contentNode;

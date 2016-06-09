@@ -363,7 +363,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 				updateDateVal = DateTime.Parse("2012-01-02");
 
 			Assert.AreEqual(idVal, doc.Id);
-            Assert.AreEqual(keyVal, doc.GetKey());
+            Assert.AreEqual(keyVal, doc.Key);
 			Assert.AreEqual(templateIdVal, doc.TemplateId);
 			Assert.AreEqual(sortOrderVal, doc.SortOrder);
 			Assert.AreEqual(urlNameVal, doc.UrlName);

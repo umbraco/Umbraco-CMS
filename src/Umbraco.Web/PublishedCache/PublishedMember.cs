@@ -13,7 +13,7 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    public sealed class PublishedMember : PublishedContentWithKeyBase
+    public sealed class PublishedMember : PublishedContentBase
     {
         private readonly IMember _member;
         private readonly IMembershipUser _membershipUser;

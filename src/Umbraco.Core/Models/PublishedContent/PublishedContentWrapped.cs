@@ -50,115 +50,57 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region ContentSet
 
-        public virtual IEnumerable<IPublishedContent> ContentSet
-        {
-            get { return Content.ContentSet; }
-        }
+        public virtual IEnumerable<IPublishedContent> ContentSet => Content.ContentSet;
 
         #endregion
 
         #region ContentType
 
-        public virtual PublishedContentType ContentType { get { return Content.ContentType; } }
+        public virtual PublishedContentType ContentType => Content.ContentType;
 
         #endregion
 
         #region Content
 
-        public virtual int Id
-        {
-            get { return Content.Id; }
-        }
+        public virtual int Id => Content.Id;
 
-        public virtual int TemplateId
-        {
-            get { return Content.TemplateId; }
-        }
+        public Guid Key => Content.Key;
 
-        public virtual int SortOrder
-        {
-            get { return Content.SortOrder; }
-        }
+        public virtual int TemplateId => Content.TemplateId;
 
-        public virtual string Name
-        {
-            get { return Content.Name; }
-        }
+        public virtual int SortOrder => Content.SortOrder;
 
-        public virtual string UrlName
-        {
-            get { return Content.UrlName; }
-        }
+        public virtual string Name => Content.Name;
 
-        public virtual string DocumentTypeAlias
-        {
-            get { return Content.DocumentTypeAlias; }
-        }
+        public virtual string UrlName => Content.UrlName;
 
-        public virtual int DocumentTypeId
-        {
-            get { return Content.DocumentTypeId; }
-        }
+        public virtual string DocumentTypeAlias => Content.DocumentTypeAlias;
 
-        public virtual string WriterName
-        {
-            get { return Content.WriterName; }
-        }
+        public virtual int DocumentTypeId => Content.DocumentTypeId;
 
-        public virtual string CreatorName
-        {
-            get { return Content.CreatorName; }
-        }
+        public virtual string WriterName => Content.WriterName;
 
-        public virtual int WriterId
-        {
-            get { return Content.WriterId; }
-        }
+        public virtual string CreatorName => Content.CreatorName;
 
-        public virtual int CreatorId
-        {
-            get { return Content.CreatorId; }
-        }
+        public virtual int WriterId => Content.WriterId;
 
-        public virtual string Path
-        {
-            get { return Content.Path; }
-        }
+        public virtual int CreatorId => Content.CreatorId;
 
-        public virtual DateTime CreateDate
-        {
-            get { return Content.CreateDate; }
-        }
+        public virtual string Path => Content.Path;
 
-        public virtual DateTime UpdateDate
-        {
-            get { return Content.UpdateDate; }
-        }
+        public virtual DateTime CreateDate => Content.CreateDate;
 
-        public virtual Guid Version
-        {
-            get { return Content.Version; }
-        }
+        public virtual DateTime UpdateDate => Content.UpdateDate;
 
-        public virtual int Level
-        {
-            get { return Content.Level; }
-        }
+        public virtual Guid Version => Content.Version;
 
-        public virtual string Url
-        {
-            get { return Content.Url; }
-        }
+        public virtual int Level => Content.Level;
 
-        public virtual PublishedItemType ItemType
-        {
-            get { return Content.ItemType; }
-        }
+        public virtual string Url => Content.Url;
 
-        public virtual bool IsDraft
-        {
-            get { return Content.IsDraft; }
-        }
+        public virtual PublishedItemType ItemType => Content.ItemType;
+
+        public virtual bool IsDraft => Content.IsDraft;
 
         public virtual int GetIndex()
         {
@@ -169,29 +111,17 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Tree
 
-        public virtual IPublishedContent Parent
-        {
-            get { return Content.Parent; }
-        }
+        public virtual IPublishedContent Parent => Content.Parent;
 
-        public virtual IEnumerable<IPublishedContent> Children
-        {
-            get { return Content.Children; }
-        }
+        public virtual IEnumerable<IPublishedContent> Children => Content.Children;
 
         #endregion
 
         #region Properties
 
-        public virtual ICollection<IPublishedProperty> Properties
-        {
-            get { return Content.Properties; }
-        }
+        public virtual ICollection<IPublishedProperty> Properties => Content.Properties;
 
-        public virtual object this[string alias]
-        {
-            get { return Content[alias]; }
-        }
+        public virtual object this[string alias] => Content[alias];
 
         public virtual IPublishedProperty GetProperty(string alias)
         {

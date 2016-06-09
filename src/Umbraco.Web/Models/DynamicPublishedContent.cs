@@ -519,6 +519,11 @@ namespace Umbraco.Web.Models
 			get { return PublishedContent.Id; }
 		}
 
+	    public Guid Key
+	    {
+	        get { return PublishedContent.Key; }
+	    }
+
 		public DateTime UpdateDate
 		{
 			get { return PublishedContent.UpdateDate; }

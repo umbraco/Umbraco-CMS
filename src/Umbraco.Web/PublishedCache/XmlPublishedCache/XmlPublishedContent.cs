@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	/// </summary>
 	[Serializable]
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	internal class XmlPublishedContent : PublishedContentWithKeyBase
+	internal class XmlPublishedContent : PublishedContentBase
 	{
 	    /// <summary>
 	    /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node.

@@ -178,6 +178,7 @@ namespace Umbraco.Tests.PublishedContent
         #region Content
 
         public int Id { get; set; }
+        public Guid Key { get; set; }
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }

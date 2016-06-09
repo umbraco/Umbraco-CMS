@@ -43,7 +43,8 @@ namespace Umbraco.Core.Models
         #region Content
 
         int Id { get; }
-		int TemplateId { get; }
+        Guid Key { get; }
+        int TemplateId { get; }
 		int SortOrder { get; }
 		string Name { get; }
 		string UrlName { get; }

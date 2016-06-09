@@ -66,10 +66,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (model == content) // == means the factory did not create a model
             {
                 // so we have to extend
-                var contentWithKey = content as IPublishedContentWithKey;
-                extended = contentWithKey == null
-                    ? new PublishedContentExtended(content)
-                    : new PublishedContentWithKeyExtended(contentWithKey);
+                extended = new PublishedContentExtended(content);
             }
             else
             {

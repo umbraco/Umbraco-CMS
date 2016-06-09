@@ -494,6 +494,7 @@ namespace umbraco
         {
             private readonly IContent _inner;
             private readonly int _id;
+            private readonly Guid _key;
             private readonly string _creatorName;
             private readonly string _writerName;
             private readonly PublishedContentType _contentType;
@@ -512,6 +513,7 @@ namespace umbraco
 
                 _inner = inner;
                 _id = _inner.Id;
+                _key = _inner.Key;
 
                 //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 _creatorName = _inner.GetCreatorProfile().Name;
@@ -544,6 +546,11 @@ namespace umbraco
             public int Id
             {
                 get { return _id; }
+            }
+
+            public Guid Key
+            {
+                get { return _key; }
             }
 
             public int TemplateId

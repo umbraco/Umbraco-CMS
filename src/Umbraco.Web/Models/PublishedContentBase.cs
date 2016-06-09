@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models
 		/// Gets the url of the content.
 		/// </summary>
 		/// <remarks>
-		/// If this content is Content, the url that is returned is the one computed by the NiceUrlProvider, otherwise if 
+		/// If this content is Content, the url that is returned is the one computed by the NiceUrlProvider, otherwise if
 		/// this content is Media, the url returned is the value found in the 'umbracoFile' property.
 		/// </remarks>
 		public virtual string Url
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Models
                                     _url = json.ToObject<ImageCropDataSet>(new JsonSerializer { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal }).Src;
 	                                break;
 	                            }
-                                
+
 	                            _url = prop.Value.ToString();
 	                            break;
 	                    }
@@ -96,7 +96,8 @@ namespace Umbraco.Web.Models
 
 		public abstract PublishedItemType ItemType { get; }
 		public abstract int Id { get; }
-		public abstract int TemplateId { get; }
+        public abstract Guid Key { get; }
+        public abstract int TemplateId { get; }
 		public abstract int SortOrder { get; }
 		public abstract string Name { get; }
 		public abstract string UrlName { get; }
@@ -113,7 +114,7 @@ namespace Umbraco.Web.Models
 		public abstract int Level { get; }
 
         public abstract bool IsDraft { get; }
-        
+
         public int GetIndex()
         {
             var index = this.Siblings().FindIndex(x => x.Id == Id);
@@ -179,7 +180,7 @@ namespace Umbraco.Web.Models
 		{
 			get
 			{
-                // no cache here: GetProperty should be fast, and .Value cache should be managed by the property.              
+                // no cache here: GetProperty should be fast, and .Value cache should be managed by the property.
                 var property = GetProperty(alias);
 			    return property == null ? null : property.Value;
 			}

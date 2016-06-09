@@ -580,7 +580,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// This is a helper class and definitely not intended for public use, it expects that all of the values required
 		/// to create an IPublishedContent exist in the dictionary by specific aliases.
 		/// </remarks>
-		internal class DictionaryPublishedContent : PublishedContentWithKeyBase
+		internal class DictionaryPublishedContent : PublishedContentBase
 		{
             // note: I'm not sure this class fully complies with IPublishedContent rules especially
             // I'm not sure that _properties contains all properties including those without a value,
