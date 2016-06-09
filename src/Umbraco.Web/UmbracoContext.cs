@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -15,8 +16,9 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
-        private bool? _previewing;
         private readonly Lazy<IFacade> _facade;
+        private string _previewToken;
+        private bool? _previewing;
 
         #region Ensure Context
 
@@ -34,7 +36,6 @@ namespace Umbraco.Web
         /// during application startup the base url domain will not be available so after app startup we'll replace the current
         /// context with a new one in which we can access the httpcontext.Request object.
         /// </param>
-        /// <param name="preview"></param>
         /// <returns>
         /// The Singleton context object
         /// </returns>
@@ -51,8 +52,7 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            bool replaceContext,
-            bool? preview = null)
+            bool replaceContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
@@ -66,7 +66,7 @@ namespace Umbraco.Web
                 return umbracoContext;
 
             // create, assign the singleton, and return
-            umbracoContext = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders, preview);
+            umbracoContext = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders);
             Web.Current.SetUmbracoContext(umbracoContext, replaceContext);
             return umbracoContext;
         }
@@ -80,7 +80,6 @@ namespace Umbraco.Web
         /// <param name="webSecurity"></param>
         /// <param name="umbracoSettings"></param>
         /// <param name="urlProviders"></param>
-        /// <param name="preview"></param>
         /// <returns>
         /// A new instance of UmbracoContext
         /// </returns>
@@ -90,8 +89,7 @@ namespace Umbraco.Web
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
-            bool? preview = null)
+            IEnumerable<IUrlProvider> urlProviders)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
@@ -104,8 +102,7 @@ namespace Umbraco.Web
                 httpContext,
                 applicationContext,
                 facadeService,
-                webSecurity,
-                preview);
+                webSecurity);
 
             // create and assign the RoutingContext,
             // note the circular dependency here
@@ -132,13 +129,11 @@ namespace Umbraco.Web
         /// <param name="applicationContext">An Umbraco application context.</param>
         /// <param name="facadeService">A facade service.</param>
         /// <param name="webSecurity">A web security.</param>
-        /// <param name="preview">An optional value overriding detection of preview mode.</param>
         private UmbracoContext(
 			HttpContextBase httpContext,
 			ApplicationContext applicationContext,
             IFacadeService facadeService,
-            WebSecurity webSecurity,
-            bool? preview = null)
+            WebSecurity webSecurity)
         {
             // ensure that this instance is disposed when the request terminates,
             // though we *also* ensure this happens in the Umbraco module since the
@@ -155,8 +150,8 @@ namespace Umbraco.Web
             Application = applicationContext;
             Security = webSecurity;
 
+            // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _facade = new Lazy<IFacade>(() => facadeService.CreateFacade(PreviewToken));
-            _previewing = preview; // fixme are we ignoring this entirely?!
 
             // set the urls...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -308,28 +303,46 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        /// <remarks>Can be internally set by the RTE macro rendering to render macros in the appropriate mode.</remarks>
-        // fixme - that's bad, RTE macros should then create their own facade?! they don't have a preview token!
         public bool InPreviewMode
         {
-            get { return _previewing ?? (_previewing = (PreviewToken.IsNullOrWhiteSpace() == false)).Value; }
-            set { _previewing = value; }
+            get
+            {
+                if (_previewing.HasValue == false) DetectPreviewMode();
+                return _previewing.Value;
+            }
+            private set { _previewing = value; }
         }
 
         private string PreviewToken
         {
             get
             {
-                var request = GetRequestFromContext();
-                if (request?.Url == null)
-                    return null;
-
-                if (request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)) return null;
-                if (Security.CurrentUser == null) return null;
-
-                var previewToken = request.GetPreviewCookieValue(); // may be null or empty
-                return previewToken.IsNullOrWhiteSpace() ? null : previewToken;
+                if (_previewing.HasValue == false) DetectPreviewMode();
+                return _previewToken;
             }
+        }
+
+        private void DetectPreviewMode()
+        {
+            var request = GetRequestFromContext();
+            if (request?.Url != null
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false
+                && Security.CurrentUser != null)
+            {
+                var previewToken = request.GetPreviewCookieValue(); // may be null or empty
+                _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
+            }
+
+            _previewing = _previewToken.IsNullOrWhiteSpace() == false;
+        }
+
+        // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
+        // then due to the way it all works at the moment, the 'current' facade need to be in the proper
+        // default 'preview' mode - somehow we have to force it. and that could be recursive.
+        internal IDisposable ForcedPreview(bool preview)
+        {
+            InPreviewMode = preview;
+            return Facade.ForcedPreview(preview, orig => InPreviewMode = orig);
         }
 
         private HttpRequestBase GetRequestFromContext()

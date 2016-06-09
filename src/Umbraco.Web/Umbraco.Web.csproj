@@ -161,6 +161,7 @@
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Current.cs" />
+    <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />

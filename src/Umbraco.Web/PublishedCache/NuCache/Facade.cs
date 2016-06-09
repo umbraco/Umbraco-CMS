@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -7,7 +8,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     class Facade : IFacade, IDisposable
     {
         private readonly FacadeService _service;
-        private readonly bool _defaultPreview;
+        private bool _defaultPreview;
         private FacadeElements _elements;
 
         #region Constructors
@@ -63,6 +64,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public IPublishedMemberCache MemberCache => Elements.MemberCache;
 
         public IDomainCache DomainCache => Elements.DomainCache;
+
+        public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
+        {
+            return new ForcedPreviewObject(this, preview, callback);
+        }
+
+        private class ForcedPreviewObject : DisposableObject
+        {
+            private readonly Facade _facade;
+            private readonly bool _origPreview;
+            private readonly Action<bool> _callback;
+
+            public ForcedPreviewObject(Facade facade, bool preview, Action<bool> callback)
+            {
+                _facade = facade;
+                _callback = callback;
+
+                // save and force
+                _origPreview = facade._defaultPreview;
+                facade._defaultPreview = preview;
+            }
+
+            protected override void DisposeResources()
+            {
+                // restore
+                _facade._defaultPreview = _origPreview;
+                _callback?.Invoke(_origPreview);
+            }
+        }
 
         #endregion
 

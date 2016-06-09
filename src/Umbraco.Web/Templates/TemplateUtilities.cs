@@ -17,19 +17,10 @@ namespace Umbraco.Web.Templates
 	{
         //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
         internal static string ParseInternalLinks(string text, bool preview)
-	    {
-            // save and set for url provider
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-            UmbracoContext.Current.InPreviewMode = preview;
-
-            try
+	    {            
+            using (UmbracoContext.Current.ForcedPreview(preview)) // force for url provider
             {
                 text = ParseInternalLinks(text);
-            }
-            finally
-            {
-                // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;
             }
 
             return text;

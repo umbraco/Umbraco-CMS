@@ -34,15 +34,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
         string RenderMacros(string source, bool preview)
-        {
-            // save and set for macro rendering
-            var inPreviewMode = _umbracoContext.InPreviewMode;
-            _umbracoContext.InPreviewMode = preview;
-
-            var sb = new StringBuilder();
-
-            try
+        {            
+            using (_umbracoContext.ForcedPreview(preview)) // force for macro rendering
             {
+                var sb = new StringBuilder();
+
                 var umbracoHelper = new UmbracoHelper(_umbracoContext);
                 MacroTagParser.ParseMacros(
                     source,
@@ -53,15 +49,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         macroAlias,
                         //needs to be explicitly casted to Dictionary<string, object>
                         macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
-            }
-            finally
-            {
-                // restore
-                _umbracoContext.InPreviewMode = inPreviewMode;
-            }
 
-            return sb.ToString();
-        }
+                return sb.ToString();
+            }
+         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {

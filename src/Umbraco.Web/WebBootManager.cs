@@ -333,8 +333,11 @@ namespace Umbraco.Web
             container.EnablePerWebRequestScope();
 
             // register the http context and umbraco context accessors
+            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
+            // we have no http context, eg when booting Umbraco or in background threads, so instead
+            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // replaces HttpContext.Current
-            container.RegisterSingleton<IUmbracoContextAccessor, HttpContextUmbracoContextAccessor>(); // the "current" context is in the http context
+            container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request

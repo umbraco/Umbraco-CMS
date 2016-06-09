@@ -39,33 +39,24 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
 	    string RenderRteMacros(string source, bool preview)
-        {
-            // save and set for macro rendering
-            var inPreviewMode = _umbracoContext.InPreviewMode;
-            _umbracoContext.InPreviewMode = preview;
+        {            
+	        using (_umbracoContext.ForcedPreview(preview)) // force for macro rendering
+            {
+                var sb = new StringBuilder();
 
-            var sb = new StringBuilder();
-            
-            try
-	        {
                 var umbracoHelper = new UmbracoHelper(_umbracoContext);
-	            MacroTagParser.ParseMacros(
-	                source,
-	                //callback for when text block is found
-	                textBlock => sb.Append(textBlock),
-	                //callback for when macro syntax is found
-	                (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
-	                    macroAlias,
-	                    //needs to be explicitly casted to Dictionary<string, object>
-	                    macroAttributes.ConvertTo(x => (string) x, x => x)).ToString()));
-	        }
-	        finally
-	        {
-                // restore
-                _umbracoContext.InPreviewMode = inPreviewMode;	            
-	        }
+                MacroTagParser.ParseMacros(
+                    source,
+                    //callback for when text block is found
+                    textBlock => sb.Append(textBlock),
+                    //callback for when macro syntax is found
+                    (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+                        macroAlias,
+                        //needs to be explicitly casted to Dictionary<string, object>
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
 
-            return sb.ToString();
+                return sb.ToString();
+            }
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

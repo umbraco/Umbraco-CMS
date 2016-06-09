@@ -396,7 +396,11 @@ namespace Umbraco.Web.Routing
                     throw new InvalidOperationException("There is no finder collection.");
 
                 //iterate but return on first one that finds it
-			    var found = _routingContext.PublishedContentFinders.Any(finder => finder.TryFindContent(_pcr));
+			    var found = _routingContext.PublishedContentFinders.Any(finder =>
+			    {
+                    LogHelper.Debug<PublishedContentRequestEngine>("Finder " + finder.GetType().FullName);
+			        return finder.TryFindContent(_pcr);
+			    });
 			}
 
 		    // indicate that the published content (if any) we have at the moment is the

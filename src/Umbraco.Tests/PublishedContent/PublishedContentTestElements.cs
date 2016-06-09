@@ -36,6 +36,11 @@ namespace Umbraco.Tests.PublishedContent
             get { return null; }
         }
 
+        public IDisposable ForcedPreview(bool forcedPreview, Action<bool> callback = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Resync()
         { }
     }
