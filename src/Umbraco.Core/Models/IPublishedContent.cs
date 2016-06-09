@@ -16,21 +16,6 @@ namespace Umbraco.Core.Models
 	/// </remarks>	
     public interface IPublishedContent
     {
-        #region ContentSet
-
-        // Because of http://issues.umbraco.org/issue/U4-1797 and in order to implement
-        // Index() and methods that derive from it such as IsFirst(), IsLast(), etc... all
-        // content items must know about their containing content set.
-
-        /// <summary>
-        /// Gets the content set to which the content belongs.
-        /// </summary>
-        /// <remarks>The default set consists in the siblings of the content (including the content 
-        /// itself) ordered by <c>sortOrder</c>.</remarks>
-        IEnumerable<IPublishedContent> ContentSet { get; }
-
-        #endregion
-
         #region ContentType
 
         /// <summary>
@@ -72,12 +57,6 @@ namespace Umbraco.Core.Models
         /// <remarks>A content is draft when it is the unpublished version of a content, which may
         /// have a published version, or not.</remarks>
         bool IsDraft { get; }
-
-        /// <summary>
-        /// Gets the index of the published content within its current owning content set.
-        /// </summary>
-        /// <returns>The index of the published content within its current owning content set.</returns>
-	    int GetIndex();
 
         #endregion
 

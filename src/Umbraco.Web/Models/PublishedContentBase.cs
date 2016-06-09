@@ -115,14 +115,6 @@ namespace Umbraco.Web.Models
 
         public abstract bool IsDraft { get; }
 
-        public int GetIndex()
-        {
-            var index = this.Siblings().FindIndex(x => x.Id == Id);
-            if (index < 0)
-                throw new IndexOutOfRangeException("Could not find content in the content set.");
-            return index;
-        }
-
         #endregion
 
         #region Tree
@@ -137,16 +129,6 @@ namespace Umbraco.Web.Models
         /// </summary>
         /// <remarks>Children are sorted by their sortOrder.</remarks>
         public abstract IEnumerable<IPublishedContent> Children { get; }
-
-        #endregion
-
-        #region ContentSet
-
-        public virtual IEnumerable<IPublishedContent> ContentSet
-        {
-            // the default content set of a content is its siblings
-            get { return this.Siblings(); }
-        }
 
         #endregion
 

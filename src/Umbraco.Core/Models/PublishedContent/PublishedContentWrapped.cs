@@ -48,12 +48,6 @@ namespace Umbraco.Core.Models.PublishedContent
             return Content;
         }
 
-        #region ContentSet
-
-        public virtual IEnumerable<IPublishedContent> ContentSet => Content.ContentSet;
-
-        #endregion
-
         #region ContentType
 
         public virtual PublishedContentType ContentType => Content.ContentType;
@@ -101,11 +95,6 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual PublishedItemType ItemType => Content.ItemType;
 
         public virtual bool IsDraft => Content.IsDraft;
-
-        public virtual int GetIndex()
-        {
-            return Content.GetIndex();
-        }
 
         #endregion
 

@@ -119,48 +119,15 @@ namespace Umbraco.Tests.PublishedContent
 		}
 
         [Test]
-        [Ignore("IPublishedContent currently (6.1 as of april 25, 2013) has bugs")]
-        public void Fails()
-        {
-            var content = GetNode(1173);
-
-            var c1 = content.Children.First(x => x.Id == 1177);
-            Assert.IsFalse(c1.IsFirst());
-
-            var c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument").First(x => x.Id == 1177);
-            Assert.IsTrue(c2.IsFirst());
-
-            // First is not implemented
-            var c2a = content.Children.First(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177);
-            Assert.IsTrue(c2a.IsFirst()); // so here it's luck
-
-            c1 = content.Children.First(x => x.Id == 1177);
-            Assert.IsFalse(c1.IsFirst()); // and here it fails
-
-            // but even using supported (where) method...
-            // do not replace by First(x => ...) here since it's not supported at the moment
-            c1 = content.Children.Where(x => x.Id == 1177).First();
-            c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177).First();
-
-            Assert.IsFalse(c1.IsFirst()); // here it fails because c2 has corrupted it
-
-            // so there's only 1 IPublishedContent instance
-            // which keeps changing collection, ie being modified
-            // which is *bad* from a cache point of vue
-            // and from a consistency point of vue...
-            // => we want clones!
-        }
-
-        [Test]
         public void Is_Last_From_Where_Filter_Dynamic_Linq()
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Where("Visible").ToContentSet();
+            var items = doc.Children.Where("Visible").ToIndexedArray();
 
             foreach (var item in items)
             {
-                if (item.Id != 1178)
+                if (item.Content.Id != 1178)
                 {
                     Assert.IsFalse(item.IsLast());
                 }
@@ -179,13 +146,13 @@ namespace Umbraco.Tests.PublishedContent
             var items = doc
                 .Children
                 .Where(x => x.IsVisible())
-                .ToContentSet();
+                .ToIndexedArray();
 
-            Assert.AreEqual(3, items.Count());
+            Assert.AreEqual(3, items.Length);
 
             foreach (var d in items)
             {
-                switch (d.Id)
+                switch (d.Content.Id)
                 {
                     case 1174:
                         Assert.IsTrue(d.IsFirst());
@@ -228,14 +195,13 @@ namespace Umbraco.Tests.PublishedContent
 
                 .OfType<Home>() // ours, return IEnumerable<Home> (actually a PublishedContentSet<Home>)
                 .Where(x => x.IsVisible()) // so, here it's linq again :-(
-                .ToContentSet() // so, we need that one for the test to pass
-                .ToArray();
+                .ToIndexedArray(); // so, we need that one for the test to pass
 
             Assert.AreEqual(1, items.Count());
 
             foreach (var d in items)
             {
-                switch (d.Id)
+                switch (d.Content.Id)
                 {
                     case 1174:
                         Assert.IsTrue(d.IsFirst());
@@ -253,11 +219,11 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Take(3).ToContentSet();
+            var items = doc.Children.Take(3).ToIndexedArray();
 
             foreach (var item in items)
             {
-                if (item.Id != 1178)
+                if (item.Content.Id != 1178)
                 {
                     Assert.IsFalse(item.IsLast());
                 }
@@ -273,9 +239,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            foreach (var d in doc.Children.Skip(1))
+            foreach (var d in doc.Children.Skip(1).ToIndexedArray())
             {
-                if (d.Id != 1176)
+                if (d.Content.Id != 1176)
                 {
                     Assert.IsFalse(d.IsLast());
                 }
@@ -293,11 +259,11 @@ namespace Umbraco.Tests.PublishedContent
 
             var items = doc.Children
                 .Concat(new[] { GetNode(1175), GetNode(4444) })
-                .ToContentSet();
+                .ToIndexedArray();
 
             foreach (var item in items)
             {
-                if (item.Id != 4444)
+                if (item.Content.Id != 4444)
                 {
                     Assert.IsFalse(item.IsLast());
                 }
@@ -360,58 +326,6 @@ namespace Umbraco.Tests.PublishedContent
 				.FirstOrDefault(x => x.GetPropertyValue<string>("selectedNodes", "").Split(',').Contains("1173"));
 
 			Assert.IsNotNull(result);
-		}
-
-		[Test]
-		public void Index()
-		{
-			var doc = GetNode(1173);
-			Assert.AreEqual(0, doc.Index());
-			doc = GetNode(1176);
-			Assert.AreEqual(3, doc.Index());
-			doc = GetNode(1177);
-			Assert.AreEqual(1, doc.Index());
-			doc = GetNode(1178);
-			Assert.AreEqual(2, doc.Index());
-		}
-
-		[Test]
-		public void Is_First()
-		{
-			var doc = GetNode(1046); //test root nodes
-			Assert.IsTrue(doc.IsFirst());
-			doc = GetNode(1172);
-			Assert.IsFalse(doc.IsFirst());
-			doc = GetNode(1173); //test normal nodes
-			Assert.IsTrue(doc.IsFirst());
-			doc = GetNode(1175);
-			Assert.IsFalse(doc.IsFirst());
-		}
-
-		[Test]
-		public void Is_Not_First()
-		{
-			var doc = GetNode(1046); //test root nodes
-			Assert.IsFalse(doc.IsNotFirst());
-			doc = GetNode(1172);
-			Assert.IsTrue(doc.IsNotFirst());
-			doc = GetNode(1173); //test normal nodes
-			Assert.IsFalse(doc.IsNotFirst());
-			doc = GetNode(1175);
-			Assert.IsTrue(doc.IsNotFirst());
-		}
-
-		[Test]
-		public void Is_Position()
-		{
-			var doc = GetNode(1046); //test root nodes
-			Assert.IsTrue(doc.IsPosition(0));
-			doc = GetNode(1172);
-			Assert.IsTrue(doc.IsPosition(1));
-			doc = GetNode(1173); //test normal nodes
-			Assert.IsTrue(doc.IsPosition(0));
-			doc = GetNode(1175);
-			Assert.IsTrue(doc.IsPosition(1));
 		}
 
 		[Test]
@@ -615,46 +529,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsNotNull(result);
 
 			Assert.AreEqual((int)1174, (int)result.Id);
-		}
-
-		[Test]
-		public void Next()
-		{
-			var doc = GetNode(1173);
-
-			var result = doc.Next();
-
-			Assert.IsNotNull(result);
-
-			Assert.AreEqual((int)1175, (int)result.Id);
-		}
-
-		[Test]
-		public void Next_Without_Sibling()
-		{
-            var doc = GetNode(1176);
-
-			Assert.IsNull(doc.Next());
-		}
-
-		[Test]
-		public void Previous_Without_Sibling()
-		{
-			var doc = GetNode(1173);
-
-			Assert.IsNull(doc.Previous());
-		}
-
-		[Test]
-		public void Previous()
-		{
-			var doc = GetNode(1176);
-
-			var result = doc.Previous();
-
-			Assert.IsNotNull(result);
-
-			Assert.AreEqual((int)1178, (int)result.Id);
 		}
 
         [Test]

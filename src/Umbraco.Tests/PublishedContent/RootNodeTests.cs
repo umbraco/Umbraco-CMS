@@ -22,10 +22,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(1, content.Level);
             Assert.IsNull(content.Parent);
 
-            // and yet is has siblings, etc.
-            var siblings = content.Siblings();
-            Assert.AreEqual(2, siblings.Count());
-
             // non-existing content is null
             content = ctx.ContentCache.GetById(666);
             Assert.IsNull(content);

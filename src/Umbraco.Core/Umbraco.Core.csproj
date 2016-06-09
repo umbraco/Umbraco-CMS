@@ -627,8 +627,7 @@
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentOrderedSet.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentSet.cs" />
+    <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Strings\Css\StylesheetRule.cs" />
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />

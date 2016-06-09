@@ -14,14 +14,13 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class ExamineExtensions
 	{
-        internal static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
+        internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
 		{
 			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent,
 			// however this is currently not the case:
 			// http://examine.codeplex.com/workitem/10350
 
 		    var list = new List<IPublishedContent>();
-            var set = new PublishedContentSet<IPublishedContent>(list);
 
 			foreach (var result in results.OrderByDescending(x => x.Score))
 			{
@@ -36,16 +35,17 @@ namespace Umbraco.Web
                 // returned by the cache, in case the cache can create real types.
                 // so we have to ask it to please extend itself.
 
-                list.Add(content);
-			    var extend = set.MapContent(content);
+			    //var extend = set.MapContent(content);
+			    var extend = PublishedContentExtended.Extend(content);
+                list.Add(extend);
 
-			    var property = new PropertyResult("examineScore",
+                var property = new PropertyResult("examineScore",
                     result.Score,
 			        PropertyResultType.CustomProperty);
                 extend.AddProperty(property);
 			}
 
-            return set;
+            return list;
 		}
 	}
 }

@@ -17,31 +17,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #endregion
 
-        #region Index
-
-        private int? _index;
-
-        public override int GetIndex()
-        {
-            // fast
-            if (_index.HasValue) return _index.Value;
-
-            // slow -- and don't cache, not in a set
-            if (_contentSet == null) return Content.GetIndex();
-
-            // slow -- but cache for next time
-            var index = _contentSet.FindIndex(x => x.Id == Id);
-            if (index < 0)
-                throw new IndexOutOfRangeException("Could not find content in the content set.");
-            _index = index;
-            return index;
-        }
-
-        #endregion
-
         #region Extend
 
-        internal static IPublishedContentExtended Extend(IPublishedContent content, IEnumerable<IPublishedContent> contentSet)
+        internal static IPublishedContentExtended Extend(IPublishedContent content)
         {
             // first unwrap content down to the lowest possible level, ie either the deepest inner
             // IPublishedContent or the first extended that has added properties. this is to avoid
@@ -95,7 +73,6 @@ namespace Umbraco.Core.Models.PublishedContent
             var extended2 = extended as IPublishedContentExtended;
             if (extended2 == null)
                 throw new Exception("Extended does not implement IPublishedContentExtended.");
-            extended2.SetContentSet(contentSet);
             return extended2;
         }
 
@@ -113,37 +90,6 @@ namespace Umbraco.Core.Models.PublishedContent
         bool IPublishedContentExtended.HasAddedProperties
         {
             get { return _properties != null; }
-        }
-
-        void IPublishedContentExtended.SetContentSet(IEnumerable<IPublishedContent> contentSet)
-        {
-            _contentSet = contentSet;
-        }
-
-        void IPublishedContentExtended.ClearContentSet()
-        {
-            _contentSet = null;
-        }
-
-        void IPublishedContentExtended.SetIndex(int value)
-        {
-            _index = value;
-        }
-
-        void IPublishedContentExtended.ClearIndex()
-        {
-            _index = null;
-        }
-
-        #endregion
-
-        #region Content set
-
-        private IEnumerable<IPublishedContent> _contentSet;
-
-        public override IEnumerable<IPublishedContent> ContentSet
-        {
-            get { return _contentSet ?? Content.ContentSet; }
         }
 
         #endregion

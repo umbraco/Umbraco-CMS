@@ -28,13 +28,6 @@ namespace Umbraco.Web.Models
 		protected internal IPublishedContent PublishedContent { get; private set; }
 	    private DynamicPublishedContentList _contentList;
 
-        // must implement that one if we implement IPublishedContent
-	    public IEnumerable<IPublishedContent> ContentSet
-	    {
-            // that is a definitively non-efficient way of doing it, though it should work
-	        get { return _contentList ?? (_contentList = new DynamicPublishedContentList(PublishedContent.ContentSet)); }
-	    }
-
         public PublishedContentType ContentType { get { return PublishedContent.ContentType; } }
 
 		#region Constructors
@@ -435,11 +428,6 @@ namespace Umbraco.Web.Models
             get { return PublishedContent.IsDraft; }
 	    }
 
-        int IPublishedContent.GetIndex()
-        {
-            return PublishedContent.GetIndex();
-        }
-
         ICollection<IPublishedProperty> IPublishedContent.Properties
         {
             get { return PublishedContent.Properties; }
@@ -775,20 +763,6 @@ namespace Umbraco.Web.Models
         
         #endregion
 
-        #region IPublishedContente extension methods - ContentSet
-
-        public int Position()
-        {
-            return Index();
-        }
-
-        public int Index()
-        {
-            return PublishedContent.GetIndex();
-        }
-
-        #endregion
-
         #region IPublishedContent extension methods - IsSomething: misc
 
         public bool Visible
@@ -817,160 +791,6 @@ namespace Umbraco.Web.Models
 		}
 
         #endregion 
-
-        #region IPublishedContent extension methods - IsSomething: position in set
-
-        public bool IsFirst()
-		{
-			return PublishedContent.IsFirst();
-		}
-
-		public HtmlString IsFirst(string valueIfTrue)
-		{
-			return PublishedContent.IsFirst(valueIfTrue);
-		}
-
-		public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsFirst(valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsNotFirst()
-		{
-			return PublishedContent.IsNotFirst();
-		}
-
-		public HtmlString IsNotFirst(string valueIfTrue)
-		{
-			return PublishedContent.IsNotFirst(valueIfTrue);
-		}
-
-		public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsNotFirst(valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsPosition(int index)
-		{
-			return PublishedContent.IsPosition(index);
-		}
-
-		public HtmlString IsPosition(int index, string valueIfTrue)
-		{
-			return PublishedContent.IsPosition(index, valueIfTrue);
-		}
-
-		public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsPosition(index, valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsModZero(int modulus)
-		{
-			return PublishedContent.IsModZero(modulus);
-		}
-
-		public HtmlString IsModZero(int modulus, string valueIfTrue)
-		{
-			return PublishedContent.IsModZero(modulus, valueIfTrue);
-		}
-
-		public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsModZero(modulus, valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsNotModZero(int modulus)
-		{
-			return PublishedContent.IsNotModZero(modulus);
-		}
-
-		public HtmlString IsNotModZero(int modulus, string valueIfTrue)
-		{
-			return PublishedContent.IsNotModZero(modulus, valueIfTrue);
-		}
-
-		public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsNotModZero(modulus, valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsNotPosition(int index)
-		{
-			return PublishedContent.IsNotPosition(index);
-		}
-
-		public HtmlString IsNotPosition(int index, string valueIfTrue)
-		{
-			return PublishedContent.IsNotPosition(index, valueIfTrue);
-		}
-
-		public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsNotPosition(index, valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsLast()
-		{
-			return PublishedContent.IsLast();
-		}
-
-		public HtmlString IsLast(string valueIfTrue)
-		{
-			return PublishedContent.IsLast(valueIfTrue);
-		}
-
-		public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsLast(valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsNotLast()
-		{
-			return PublishedContent.IsNotLast();
-		}
-
-		public HtmlString IsNotLast(string valueIfTrue)
-		{
-			return PublishedContent.IsNotLast(valueIfTrue);
-		}
-
-		public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsNotLast(valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsEven()
-		{
-			return PublishedContent.IsEven();
-		}
-
-		public HtmlString IsEven(string valueIfTrue)
-		{
-			return PublishedContent.IsEven(valueIfTrue);
-		}
-
-		public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsEven(valueIfTrue, valueIfFalse);
-		}
-
-		public bool IsOdd()
-		{
-			return PublishedContent.IsOdd();
-		}
-
-		public HtmlString IsOdd(string valueIfTrue)
-		{
-			return PublishedContent.IsOdd(valueIfTrue);
-		}
-
-		public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
-		{
-			return PublishedContent.IsOdd(valueIfTrue, valueIfFalse);
-		}
-
-        #endregion
 
         #region IPublishedContent extension methods - IsSomething: equality
 
@@ -1208,46 +1028,6 @@ namespace Umbraco.Web.Models
 		{
             return PublishedContent.Down(contentTypeAlias).AsDynamicOrNull();
 		}
-
-		public DynamicPublishedContent Next()
-		{
-            return PublishedContent.Next().AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Next(int number)
-		{
-            return PublishedContent.Next(number).AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Next(string contentTypeAlias)
-		{
-            return PublishedContent.Next(contentTypeAlias).AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Previous()
-		{
-            return PublishedContent.Previous().AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Previous(int number)
-		{
-            return PublishedContent.Previous(number).AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Previous(string contentTypeAlias)
-		{
-            return PublishedContent.Previous(contentTypeAlias).AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Sibling(int number)
-		{
-            return PublishedContent.Previous(number).AsDynamicOrNull();
-		}
-
-		public DynamicPublishedContent Sibling(string contentTypeAlias)
-		{
-			return PublishedContent.Previous(contentTypeAlias).AsDynamicOrNull();
-		} 
 
 		#endregion
 

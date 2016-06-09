@@ -92,74 +92,38 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        public void DefaultContentSetIsSiblings()
-        {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            Assert.AreEqual(0, content.Index());
-            Assert.IsTrue(content.IsFirst());
-        }
-
-        [Test]
-        public void RunOnLatestContentSet()
-        {
-            // get first content
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var id = content.Id;
-            Assert.IsTrue(content.IsFirst());
-
-            // reverse => should be last, but set has not changed => still first
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().First(x => x.Id == id);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
-
-            // reverse + new set => now it's last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
-
-            // reverse that set => should be first, but no new set => still last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().Reverse().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
-        }
-
-        [Test]
         public void Distinct()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .Distinct()
                 .Distinct()
-                .ToContentSet()
-                .First();
+                .ToIndexedArray();
 
-            Assert.AreEqual("Content 1", content.Name);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            var item = items[0];
+            Assert.AreEqual("Content 1", item.Content.Name);
+            Assert.IsTrue(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            item = items[1];
+            Assert.AreEqual("Content 2", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2Sub", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
+            item = items[2];
+            Assert.AreEqual("Content 2Sub", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsTrue(item.IsLast());
         }
 
         [Test]
         public void OfType1()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .OfType<ContentType2>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(2, content.Count());
-            Assert.IsInstanceOf<ContentType2>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2>(set.First());
-            Assert.AreSame(set, set.First().ContentSet);
-            Assert.IsInstanceOf<ContentType2Sub>(set.First().Next());
+                .ToIndexedArray();
+            Assert.AreEqual(2, items.Length);
+            Assert.IsInstanceOf<ContentType2>(items.First().Content);
         }
 
         [Test]
@@ -168,11 +132,9 @@ namespace Umbraco.Tests.PublishedContent
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .OfType<ContentType2Sub>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(1, content.Count());
-            Assert.IsInstanceOf<ContentType2Sub>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2Sub>(set.First());
+                .ToIndexedArray();
+            Assert.AreEqual(1, content.Length);
+            Assert.IsInstanceOf<ContentType2Sub>(content.First().Content);
         }
 
         [Test]
@@ -188,17 +150,16 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Position()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .Where(x => x.GetPropertyValue<int>("prop1") == 1234)
-                .ToContentSet()
-                .ToArray();
+                .ToIndexedArray();
 
-            Assert.IsTrue(content.First().IsFirst());
-            Assert.IsFalse(content.First().IsLast());
-            Assert.IsFalse(content.First().Next().IsFirst());
-            Assert.IsFalse(content.First().Next().IsLast());
-            Assert.IsFalse(content.First().Next().Next().IsFirst());
-            Assert.IsTrue(content.First().Next().Next().IsLast());
+            Assert.IsTrue(items.First().IsFirst());
+            Assert.IsFalse(items.First().IsLast());
+            Assert.IsFalse(items.Skip(1).First().IsFirst());
+            Assert.IsFalse(items.Skip(1).First().IsLast());
+            Assert.IsFalse(items.Skip(2).First().IsFirst());
+            Assert.IsTrue(items.Skip(2).First().IsLast());
         }
 
         [Test]

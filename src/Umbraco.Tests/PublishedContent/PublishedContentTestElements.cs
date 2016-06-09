@@ -199,14 +199,6 @@ namespace Umbraco.Tests.PublishedContent
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft { get; set; }
 
-        public int GetIndex()
-        {
-            var index = this.Siblings().FindIndex(x => x.Id == Id);
-            if (index < 0)
-                throw new IndexOutOfRangeException("Failed to find content in its siblings collection?!");
-            return index;
-        }
-
         #endregion
 
         #region Tree
@@ -216,12 +208,6 @@ namespace Umbraco.Tests.PublishedContent
 
         public IPublishedContent Parent { get; set; }
         public IEnumerable<IPublishedContent> Children { get; set; }
-
-        #endregion
-
-        #region ContentSet
-
-        public IEnumerable<IPublishedContent> ContentSet { get { return this.Siblings(); } }
 
         #endregion
 

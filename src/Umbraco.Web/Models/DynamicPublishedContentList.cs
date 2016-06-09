@@ -19,7 +19,6 @@ namespace Umbraco.Web.Models
     public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>
     {
         private readonly List<IPublishedContent> _content;
-        private readonly PublishedContentSet<IPublishedContent> _contentSet;
         internal readonly List<DynamicPublishedContent> Items;
 
         #region Constructor
@@ -27,22 +26,19 @@ namespace Umbraco.Web.Models
         public DynamicPublishedContentList()
         {
             _content = new List<IPublishedContent>();
-            _contentSet = new PublishedContentSet<IPublishedContent>(_content);
             Items = new List<DynamicPublishedContent>();
         }
 
         public DynamicPublishedContentList(IEnumerable<IPublishedContent> items)
         {
             _content = items.ToList();
-            _contentSet = new PublishedContentSet<IPublishedContent>(_content);
-            Items = _contentSet.Select(x => new DynamicPublishedContent(x, this)).ToList();
+            Items = _content.Select(x => new DynamicPublishedContent(x, this)).ToList();
         }
 
         public DynamicPublishedContentList(IEnumerable<DynamicPublishedContent> items)
         {
             _content = items.Select(x => x.PublishedContent).ToList();
-            _contentSet = new PublishedContentSet<IPublishedContent>(_content);
-            Items = _contentSet.Select(x => new DynamicPublishedContent(x, this)).ToList();
+            Items = _content.Select(x => new DynamicPublishedContent(x, this)).ToList();
         }
 
         #endregion
@@ -67,10 +63,7 @@ namespace Umbraco.Web.Models
         {
             var content = dynamicContent.PublishedContent;
             _content.Add(content);
-            _contentSet.SourceChanged();
-
-            var setContent = _contentSet.MapContent(content);
-            Items.Add(new DynamicPublishedContent(setContent, this));
+            Items.Add(new DynamicPublishedContent(content, this));
         }
 
         /// <summary>
@@ -82,7 +75,6 @@ namespace Umbraco.Web.Models
             if (Items.Contains(dynamicContent) == false) return;
             Items.Remove(dynamicContent);
             _content.Remove(dynamicContent.PublishedContent);
-            _contentSet.SourceChanged();
         }
 
         #endregion
