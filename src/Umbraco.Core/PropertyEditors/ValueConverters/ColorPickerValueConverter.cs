@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             // make sure it's a string
-            return source.ToString();
+            return source?.ToString() ?? string.Empty;
         }
     }
 }

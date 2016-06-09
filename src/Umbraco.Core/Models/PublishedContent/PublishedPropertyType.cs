@@ -30,6 +30,7 @@ namespace Umbraco.Core.Models.PublishedContent
             _objectCacheLevel = orig._objectCacheLevel;
             _xpathCacheLevel = orig._xpathCacheLevel;
             _clrType = orig._clrType;
+            _initialized = true;
 
             // do NOT copy the reduced cache levels
             // as we should NOT clone a nested / detached type
@@ -51,8 +52,6 @@ namespace Umbraco.Core.Models.PublishedContent
 
             DataTypeId = propertyType.DataTypeDefinitionId;
             PropertyEditorAlias = propertyType.PropertyEditorAlias;
-
-            InitializeConverters();
         }
 
         /// <summary>
@@ -123,8 +122,6 @@ namespace Umbraco.Core.Models.PublishedContent
             DataTypeId = dataTypeDefinitionId;
             PropertyEditorAlias = propertyEditorAlias;
             IsUmbraco = umbraco;
-
-            InitializeConverters();
         }
 
         #endregion
@@ -161,6 +158,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Converters
 
+        private readonly object _locker = new object();
+        private volatile bool _initialized;
         private IPropertyValueConverter _converter;
 
         private PropertyCacheLevel _sourceCacheLevel;
@@ -168,6 +167,17 @@ namespace Umbraco.Core.Models.PublishedContent
         private PropertyCacheLevel _xpathCacheLevel;
 
         private Type _clrType = typeof (object);
+
+        private void EnsureInitialized()
+        {
+            if (_initialized) return;
+            lock (_locker)
+            {
+                if (_initialized) return;
+                InitializeConverters();
+                _initialized = true;
+            }
+        }
 
         private void InitializeConverters()
         {
@@ -283,6 +293,8 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertDataToSource(object source, bool preview)
         {
+            EnsureInitialized();
+
             // use the converter else use dark (& performance-wise expensive) magic
             return _converter != null
                 ? _converter.ConvertDataToSource(this, source, preview)
@@ -290,7 +302,14 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // gets the source cache level
-        public PropertyCacheLevel SourceCacheLevel => _sourceCacheLevel;
+        public PropertyCacheLevel SourceCacheLevel
+        {
+            get
+            {
+                EnsureInitialized();
+                return _sourceCacheLevel;
+            }
+        }
 
         // converts the source value into the clr value
         // uses converters, else returns the source value
@@ -298,6 +317,8 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertSourceToObject(object source, bool preview)
         {
+            EnsureInitialized();
+
             // use the converter if any
             // else just return the source value
             return _converter != null
@@ -306,7 +327,14 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // gets the value cache level
-        public PropertyCacheLevel ObjectCacheLevel => _objectCacheLevel;
+        public PropertyCacheLevel ObjectCacheLevel
+        {
+            get
+            {
+                EnsureInitialized();
+                return _objectCacheLevel;
+            }
+        }
 
         // converts the source value into the xpath value
         // uses the converter else returns the source value as a string
@@ -315,6 +343,8 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertSourceToXPath(object source, bool preview)
         {
+            EnsureInitialized();
+
             // use the converter if any
             if (_converter != null)
                 return _converter.ConvertSourceToXPath(this, source, preview);
@@ -328,7 +358,14 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // gets the xpath cache level
-        public PropertyCacheLevel XPathCacheLevel => _xpathCacheLevel;
+        public PropertyCacheLevel XPathCacheLevel
+        {
+            get
+            {
+                EnsureInitialized();
+                return _xpathCacheLevel;
+            }
+        }
 
         internal static object ConvertUsingDarkMagic(object source)
         {
@@ -362,7 +399,14 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // gets the property CLR type
-        public Type ClrType => _clrType;
+        public Type ClrType
+        {
+            get
+            {
+                EnsureInitialized();
+                return _clrType;
+            }
+        }
 
         #endregion
 
