@@ -197,11 +197,6 @@ namespace Umbraco.Core.Persistence.Repositories
         public void ExtractComposition(IMediaType mediaType, IMediaType compositionMediaType, string[] propertyAliases)
         {
             ExtractContentTypeComposition(mediaType, compositionMediaType, propertyAliases);
-
-            // Clear the cache (TODO: need less of a sledgehammer here - really want to clear cache for just the two media types provided and update the related media)
-            RuntimeCache.ClearAllCache();
-            var mediaRuntimeCache = RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<IMedia>();
-            mediaRuntimeCache.ClearAllCache();
         }
     }
 }
