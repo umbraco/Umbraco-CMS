@@ -42,8 +42,7 @@ namespace Umbraco.Tests.Web
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
-                new List<IUrlProvider>(),
-                false);
+                new List<IUrlProvider>());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -62,8 +61,7 @@ namespace Umbraco.Tests.Web
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
-                new List<IUrlProvider>(),
-                false);
+                new List<IUrlProvider>());
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -92,8 +90,7 @@ namespace Umbraco.Tests.Web
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
-                new List<IUrlProvider>(),
-                false);
+                new List<IUrlProvider>());
 
             var httpContext = Mock.Of<HttpContextBase>();
 

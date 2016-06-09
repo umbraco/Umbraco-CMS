@@ -72,8 +72,7 @@ namespace Umbraco.Tests.PublishedContent
                 facadeService.Object,
                 new WebSecurity(httpContext, ApplicationContext),
                 Mock.Of<IUmbracoSettingsSection>(),
-                Enumerable.Empty<IUrlProvider>(),
-                null);
+                Enumerable.Empty<IUrlProvider>());
 
             Umbraco.Web.Current.SetUmbracoContext(ctx, true);
         }

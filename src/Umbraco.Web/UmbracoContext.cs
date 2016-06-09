@@ -67,7 +67,7 @@ namespace Umbraco.Web
 
             // create, assign the singleton, and return
             umbracoContext = CreateContext(httpContext, applicationContext, facadeService, webSecurity, umbracoSettings, urlProviders);
-            Web.Current.SetUmbracoContext(umbracoContext, replaceContext);
+            Web.Current.SetUmbracoContext(umbracoContext, replaceContext); // will dispose the one that is being replaced
             return umbracoContext;
         }
 
@@ -135,9 +135,14 @@ namespace Umbraco.Web
             IFacadeService facadeService,
             WebSecurity webSecurity)
         {
-            // ensure that this instance is disposed when the request terminates,
-            // though we *also* ensure this happens in the Umbraco module since the
-            // UmbracoCOntext is added to the HttpContext items.
+            // ensure that this instance is disposed when the request terminates, though we *also* ensure
+            // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
+            //
+            // also, it *can* be returned by the container with a PerRequest lifetime, meaning that the
+            // container *could* also try to dispose it.
+            //
+            // all in all, this context may be disposed more than once, but DisposableObject ensures that
+            // it is ok and it will be actually disposed only once.
             httpContext.DisposeOnPipelineCompleted(this);
 
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
@@ -357,12 +362,13 @@ namespace Umbraco.Web
             }
         }
 
-
         protected override void DisposeResources()
         {
+            // DisposableObject ensures that this runs only once
+
             Security.DisposeIfDisposable();
 
-            //If not running in a web ctx, ensure the thread based instance is nulled
+            // reset - important when running outside of http context
             Web.Current.SetUmbracoContext(null, true);
 
             // help caches release resources

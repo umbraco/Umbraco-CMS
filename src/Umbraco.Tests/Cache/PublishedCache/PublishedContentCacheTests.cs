@@ -75,8 +75,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		        facadeService.Object,
 		        new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext),
 		        settings,
-		        Enumerable.Empty<IUrlProvider>(),
-		        null);
+		        Enumerable.Empty<IUrlProvider>());
 
 		    _cache = _umbracoContext.ContentCache;
         }

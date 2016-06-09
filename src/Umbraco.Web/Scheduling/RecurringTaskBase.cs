@@ -67,7 +67,7 @@ namespace Umbraco.Web.Scheduling
             if (_runner.TryAdd(this))
                 _timer.Change(_periodMilliseconds, 0);
             else
-                Dispose(true);
+                Dispose();
         }
 
         /// <summary>

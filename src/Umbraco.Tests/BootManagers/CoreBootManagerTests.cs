@@ -33,7 +33,7 @@ namespace Umbraco.Tests.BootManagers
             TestApplicationEventHandler.Reset();
         }
 
-     
+
         /// <summary>
         /// test application using a CoreBootManager instance to boot
         /// </summary>
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.BootManagers
                 container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
             }
         }
-        
+
         /// <summary>
         /// test event handler
         /// </summary>
@@ -86,13 +86,13 @@ namespace Umbraco.Tests.BootManagers
                 Initialized = false;
                 Starting = false;
                 Started = false;
-                Disposed = false;
+                HasBeenDisposed = false;
             }
 
-            public static bool Initialized = false;
-            public static bool Starting = false;
-            public static bool Started = false;
-            public static bool Disposed = false;
+            public static bool Initialized;
+            public static bool Starting;
+            public static bool Started;
+            public static bool HasBeenDisposed;
 
             public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
             {
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.BootManagers
 
             protected override void DisposeResources()
             {
-                Disposed = true;
+                HasBeenDisposed = true;
             }
         }
 
@@ -121,8 +121,8 @@ namespace Umbraco.Tests.BootManagers
             using (var app = new TestApp())
             {
                 app.StartApplication(app, new EventArgs());
-                
-                Assert.IsTrue(TestApplicationEventHandler.Disposed);
+
+                Assert.IsTrue(TestApplicationEventHandler.HasBeenDisposed);
             }
         }
 

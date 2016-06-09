@@ -55,6 +55,7 @@ namespace Umbraco.Web
             {
                 if (UmbracoContextAccessor.UmbracoContext != null && canReplace == false)
                     throw new InvalidOperationException("Current UmbracoContext can be set only once per request.");
+                UmbracoContextAccessor.UmbracoContext?.Dispose(); // dispose the one that is being replaced, if any
                 UmbracoContextAccessor.UmbracoContext = value;
             }
         }
@@ -62,7 +63,11 @@ namespace Umbraco.Web
         // this is because of the weird mixed accessor we're using that can store things in thread-static var
         public static void ClearUmbracoContext()
         {
-            UmbracoContextAccessor.UmbracoContext = null;
+            lock (Locker)
+            {
+                UmbracoContextAccessor.UmbracoContext?.Dispose(); // dispose the one that is being cleared, if any
+                UmbracoContextAccessor.UmbracoContext = null;
+            }
         }
 
         // cannot set - it's set by whatever creates the facade, which should have the accessor injected

@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<HttpContextBase>(), appCtx,
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
-                Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
+                Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>());
 
             var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx));
 
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<HttpContextBase>(), appCtx,
                 Mock.Of<IFacadeService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
-                Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
+                Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>());
 
             var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx));
 
