@@ -1663,25 +1663,25 @@ namespace Umbraco.Core.Services
                         // if parent has not been copied, skip, else gets its copy id
                         if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
 
-                        copy = descendant.DeepCloneWithResetIdentities();
-                        copy.ParentId = parentId;
+                        var descendantCopy = descendant.DeepCloneWithResetIdentities();
+                        descendantCopy.ParentId = parentId;
 
-                        if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(descendant, copy, parentId), this))
+                        if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(descendant, descendantCopy, parentId), this))
                             continue;
 
                         // a copy is .Saving and will be .Unpublished
                         // update the create author and last edit author
-                        if (copy.Published)
-                            copy.ChangePublishedState(PublishedState.Saving);
-                        copy.CreatorId = userId;
-                        copy.WriterId = userId;
+                        if (descendantCopy.Published)
+                            descendantCopy.ChangePublishedState(PublishedState.Saving);
+                        descendantCopy.CreatorId = userId;
+                        descendantCopy.WriterId = userId;
 
                         // save and flush (see above)
-                        repository.AddOrUpdate(copy);
+                        repository.AddOrUpdate(descendantCopy);
                         uow.Flush();
 
-                        copies.Add(Tuple.Create(descendant, copy));
-                        idmap[descendant.Id] = copy.Id;
+                        copies.Add(Tuple.Create(descendant, descendantCopy));
+                        idmap[descendant.Id] = descendantCopy.Id;
                     }
                 }
 

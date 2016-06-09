@@ -212,10 +212,9 @@ namespace Umbraco.Core.Persistence
 
         private static bool IncludeColumn(PocoData pocoData, string columnKey, PocoColumn column)
         {
-            return
-                column.ResultColumn == false
-                && pocoData.TableInfo.AutoIncrement == false
-                && columnKey != pocoData.TableInfo.PrimaryKey;
+            // exclude result columns,
+            // exclude primary key column if auto-increment
+            return column.ResultColumn == false && (pocoData.TableInfo.AutoIncrement == false || columnKey != pocoData.TableInfo.PrimaryKey);
         }
 
         /// <summary>
@@ -256,7 +255,7 @@ namespace Umbraco.Core.Persistence
             // 4168 / 262 = 15.908... = there will be 16 trans in total
 
             // if we have disabled db parameters, then all items will be included, in only one transaction
-            var rowsPerCommand = Convert.ToInt32(Math.Floor(2000.00 / paramsPerRow));
+            var rowsPerCommand = paramsPerRow == 0 ? int.MaxValue : Convert.ToInt32(Math.Floor(2000.00 / paramsPerRow));
             var commandsCount = Convert.ToInt32(Math.Ceiling((double) records.Length / rowsPerCommand));
 
             sql = new string[commandsCount];

@@ -24,7 +24,7 @@ namespace Umbraco.Core.PropertyEditors
 
         public virtual object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
-            return source.ToString();
+            return source?.ToString() ?? string.Empty;
         }
     }
 }

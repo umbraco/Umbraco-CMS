@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(date.AddMinutes(1), d.LastActivityDate);
             Assert.AreEqual(date.AddMinutes(2), d.LastLockoutDate);
             Assert.AreEqual(date.AddMinutes(1), d.LastLoginDate);
-            Assert.AreEqual(date.AddMinutes(4), d.LastPasswordChangedDate);
+            Assert.AreEqual(date.AddMinutes(4), d.LastPasswordChangeDate);
             Assert.AreEqual("test name", d.Name);
             Assert.AreEqual("test question", d.PasswordQuestion);
             Assert.AreEqual("test username", d.UserName);
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(date.AddMinutes(1), d.lastActivityDate);
             Assert.AreEqual(date.AddMinutes(2), d.lastLockoutDate);
             Assert.AreEqual(date.AddMinutes(1), d.lastLoginDate);
-            Assert.AreEqual(date.AddMinutes(4), d.lastPasswordChangedDate);
+            Assert.AreEqual(date.AddMinutes(4), d.lastPasswordChangeDate);
             Assert.AreEqual("test name", d.name);
             Assert.AreEqual("test question", d.passwordQuestion);
             Assert.AreEqual("test username", d.userName);
