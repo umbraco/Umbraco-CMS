@@ -367,8 +367,27 @@ namespace Umbraco.Core.Models
         /// <param name="value">Value to set for the Property</param>
         public virtual void SetPropertyValue(string propertyTypeAlias, long value)
         {
-            string val = value.ToString();
-            SetValueOnProperty(propertyTypeAlias, val);
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Decimal"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, decimal value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Double"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, double value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>

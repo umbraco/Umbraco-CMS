@@ -161,7 +161,7 @@
 
 
 // Mixin for form field states
-//SD: I've had to modify this slightly to work nicely with angular validation , note the 
+//SD: I've had to modify this slightly to work nicely with angular validation , note the
 // additional targetting of the ng-invalid class.
 .formFieldState(@textColor: #555, @borderColor: #ccc, @backgroundColor: #f5f5f5) {
   // Set the text color
@@ -182,12 +182,6 @@
   select.ng-invalid,
   textarea.ng-invalid {
     border-color: @borderColor;
-    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work
-    &:focus {
-      border-color: darken(@borderColor, 10%);
-      @shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten(@borderColor, 20%);
-      .box-shadow(@shadow);
-    }
   }
   // Give a small background color for input-prepend/-append
   .input-prepend .add-on,
@@ -196,6 +190,18 @@
     background-color: @backgroundColor;
     border-color: @textColor;
   }
+  //SD: We could do this but need to get the colors right
+  /*input.ng-invalid {
+    &:-moz-placeholder {
+        color: lighten(@textColor, 50%) !important;
+    }
+    &:-ms-input-placeholder {
+        color: lighten(@textColor, 50%) !important;
+    }
+    &::-webkit-input-placeholder {
+        color: lighten(@textColor, 50%) !important;
+    }
+  }*/
 }
 
 // CSS3 PROPERTIES
@@ -516,10 +522,14 @@
   *background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
   .reset-filter();
 
+  // button states
+  &:hover, &:focus, &:active {
+      background-color: darken(@startColor, 2%);
+  }
+
   // in these cases the gradient won't cover the background, so we override
   &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
     color: @textColor;
-    background-color: @endColor;
     *background-color: darken(@endColor, 5%);
   }
 

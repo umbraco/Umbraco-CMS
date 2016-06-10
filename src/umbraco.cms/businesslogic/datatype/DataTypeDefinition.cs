@@ -145,8 +145,8 @@ namespace umbraco.cms.businesslogic.datatype
             var serializer = new EntityXmlSerializer();
             var xml = serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, DataTypeItem);
             return (XmlElement)xml.GetXmlNode(xd);
-
         }
+        
         #endregion
 
         #region Static methods

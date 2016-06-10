@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 
@@ -12,9 +13,9 @@ namespace Umbraco.Core.Persistence
     /// Represents the Umbraco implementation of the PetaPoco Database object
     /// </summary>
     /// <remarks>
-    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we 
+    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we
     /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
-    /// this object instead of the base PetaPoco database object.	
+    /// this object instead of the base PetaPoco database object.
     /// </remarks>
     public class UmbracoDatabase : Database, IDisposeOnRequestEnd
     {
@@ -111,22 +112,42 @@ namespace Umbraco.Core.Persistence
 
         public override IDbConnection OnConnectionOpened(IDbConnection connection)
         {
-            // wrap the connection with a profiling connection that tracks timings 
+            // propagate timeout if none yet
+
+            // wrap the connection with a profiling connection that tracks timings
             return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
         }
 
         public override void OnException(Exception x)
         {
-            _logger.Info<UmbracoDatabase>(x.StackTrace);
+            _logger.Error<UmbracoDatabase>("Database exception occurred", x);
             base.OnException(x);
+        }
+
+        public override void OnExecutingCommand(IDbCommand cmd)
+        {
+            // if no timeout is specified, and the connection has a longer timeout, use it
+            if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)
+                cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
+
+            if (EnableSqlTrace)
+            {
+                var sb = new StringBuilder();
+                sb.Append(cmd.CommandText);
+                foreach (DbParameter p in cmd.Parameters)
+                {
+                    sb.Append(" - ");
+                    sb.Append(p.Value);
+                }
+                
+                _logger.Debug<UmbracoDatabase>(sb.ToString());
+            }
+
+            base.OnExecutingCommand(cmd);
         }
 
         public override void OnExecutedCommand(IDbCommand cmd)
         {
-            if (EnableSqlTrace)
-            {
-                _logger.Debug<UmbracoDatabase>(cmd.CommandText);
-            }
             if (_enableCount)
             {
                 SqlCount++;

@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(27, foundTypes1.Count());
+            Assert.AreEqual(28, foundTypes1.Count());
         }
 
         [Test]
@@ -282,7 +282,8 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Attributed_Trees()
         {
             var trees = _manager.ResolveAttributedTrees();
-            Assert.AreEqual(17, trees.Count());
+            // commit 6c5e35ec2cbfa31be6790d1228e0c2faf5f55bc8 brings the count down to 14
+            Assert.AreEqual(14, trees.Count());
         }
 
         [Test]

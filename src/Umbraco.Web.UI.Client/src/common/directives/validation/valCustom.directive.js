@@ -57,7 +57,7 @@ angular.module('umbraco.directives.validation')
           }
         };
         validators[key] = validateFn;
-        ctrl.$formatters.push(validateFn);
+        
         ctrl.$parsers.push(validateFn);
       });
 

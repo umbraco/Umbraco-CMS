@@ -116,6 +116,14 @@ namespace umbraco.cms.businesslogic
         #region Public Properties
 
         /// <summary>
+        /// Get the newParent id of the node
+        /// </summary>
+        public override int ParentId
+        {
+            get { return ContentBase == null ? base.ParentId : ContentBase.ParentId; }
+        }
+
+        /// <summary>
         /// The current Content objects ContentType, which defines the Properties of the Content (data)
         /// </summary>
         public ContentType ContentType
@@ -411,7 +419,7 @@ namespace umbraco.cms.businesslogic
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "version", this.Version.ToString()));
             if (this.Level > 1)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.Parent.Id.ToString()));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.ParentId.ToString()));
             else
                 x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", "-1"));
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "level", this.Level.ToString()));

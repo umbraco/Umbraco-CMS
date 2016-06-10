@@ -1,0 +1,23 @@
+<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.TemplatesController as vm">
+
+    <div class="sub-view-column-left">
+        <h5><localize key="contentTypeEditor_allowedTemplatesHeading" /></h5>
+        <small><localize key="contentTypeEditor_allowedTemplatesDescription" /></small>
+    </div>
+
+    <div class="sub-view-column-right">
+
+        <umb-grid-selector
+                ng-if="vm.availableTemplates"
+                selected-items="model.allowedTemplates"
+                available-items="vm.availableTemplates"
+                default-item="model.defaultTemplate"
+                item-name="template"
+                name="model.name"
+                alias="model.alias"
+                update-placeholder="vm.updateTemplatePlaceholder">
+        </umb-grid-selector>
+
+    </div>
+
+</div>

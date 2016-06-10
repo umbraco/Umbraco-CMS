@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -22,11 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-
-            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
-            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
-            // changes entities are reset.
-            _cache = new CacheHelper(new DeepCloneRuntimeCacheProvider(cache.RuntimeCache), cache.StaticCache, cache.RequestCache);            
+            _cache = cache;
         }
 
         /// <summary>
@@ -84,9 +82,41 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        private readonly RepositoryCacheOptions _cacheOptions = new RepositoryCacheOptions();
 
-        #region IRepository<TEntity> Members
+        protected virtual TId GetEntityId(TEntity entity)
+        {
+            return (TId)(object)entity.Id;
+        }
+
+        /// <summary>
+        /// The runtime cache used for this repo by default is the isolated cache for this type
+        /// </summary>
+        protected override IRuntimeCacheProvider RuntimeCache
+        {
+            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
+        }
+
+        private IRepositoryCachePolicyFactory<TEntity, TId> _cachePolicyFactory;
+        /// <summary>
+        /// Returns the Cache Policy for the repository
+        /// </summary>
+        /// <remarks>
+        /// The Cache Policy determines how each entity or entity collection is cached
+        /// </remarks>
+        protected virtual IRepositoryCachePolicyFactory<TEntity, TId> CachePolicyFactory
+        {
+            get
+            {
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new DefaultRepositoryCachePolicyFactory<TEntity, TId>(
+                    RuntimeCache,
+                    new RepositoryCachePolicyOptions(() =>
+                    {
+                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                        var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
+                        return PerformCount(query);
+                    })));
+            }
+        }
 
         /// <summary>
         /// Adds or Updates an entity of type TEntity
@@ -119,23 +149,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected abstract TEntity PerformGet(TId id);
         /// <summary>
-        /// Gets an entity by the passed in Id utilizing the repository's runtime cache
+        /// Gets an entity by the passed in Id utilizing the repository's cache policy
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            var cacheKey = GetCacheIdKey<TEntity>(id);
-            var fromCache = RuntimeCache.GetCacheItem<TEntity>(cacheKey);
-
-            if (fromCache != null) return fromCache;
-
-            var entity = PerformGet(id);
-            if (entity == null) return null;
-            
-            RuntimeCache.InsertCacheItem(cacheKey, () => entity);
-
-            return entity;
+            using (var p = CachePolicyFactory.CreatePolicy())
+            {
+                return p.Get(id, PerformGet);
+            }
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -158,88 +181,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
             }
 
-            if (ids.Any())
+            using (var p = CachePolicyFactory.CreatePolicy())
             {
-                var entities = ids.Select(x => RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
-
-                if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
-                    return entities;
-            }
-            else
-            {
-                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>())
-                    .WhereNotNull()
-                    .ToArray();
-
-                if (allEntities.Any())
-                {
-
-                    if (RepositoryCacheOptions.GetAllCacheValidateCount)
-                    {
-                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                        var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
-                        int totalCount = PerformCount(query);
-
-                        if (allEntities.Count() == totalCount)
-                            return allEntities;
-                    }
-                    else
-                    {
-                        return allEntities;
-                    }
-                }
-                else if (RepositoryCacheOptions.GetAllCacheAllowZeroCount)
-                {
-                    //if the repository allows caching a zero count, then check the zero count cache
-                    var zeroCount = RuntimeCache.GetCacheItem<TEntity[]>(GetCacheTypeKey<TEntity>());
-                    if (zeroCount != null && zeroCount.Any() == false)
-                    {
-                        //there is a zero count cache so return an empty list
-                        return Enumerable.Empty<TEntity>();
-                    }
-                }
-
-            }
-
-            var entityCollection = PerformGetAll(ids)
-                //ensure we don't include any null refs in the returned collection!
-                .WhereNotNull()
-                .ToArray();
-
-            //We need to put a threshold here! IF there's an insane amount of items
-            // coming back here we don't want to chuck it all into memory, this added cache here
-            // is more for convenience when paging stuff temporarily
-
-            if (entityCollection.Length > RepositoryCacheOptions.GetAllCacheThresholdLimit) 
-                return entityCollection;
-
-            if (entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
-            {
-                //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
-                // to signify that there is a zero count cache
-                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new TEntity[] {});
-            }
-
-            foreach (var entity in entityCollection)
-            {
-                if (entity != null)
-                {
-                    var localCopy = entity;
-                    RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => localCopy);
-                }
-            }
-
-            return entityCollection;
+                var result = p.GetAll(ids, PerformGetAll);
+                return result;
+            }          
         }
-
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected virtual RepositoryCacheOptions RepositoryCacheOptions
-        {
-            get { return _cacheOptions; }
-        }
-
+        
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
         /// <summary>
         /// Gets a list of entities by the passed in query
@@ -261,12 +209,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            var fromCache = RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(id));
-            if (fromCache != null)
+            using (var p = CachePolicyFactory.CreatePolicy())
             {
-                return true;
+                return p.Exists(id, PerformExists);
             }
-            return PerformExists(id);
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);
@@ -279,34 +225,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return PerformCount(query);
         }
-
-        #endregion
-
-        #region IUnitOfWorkRepository Members
-
+        
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
         /// <param name="entity"></param>
         public virtual void PersistNewItem(IEntity entity)
         {
-            try
-            {
-                PersistNewItem((TEntity)entity);
-                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
-                //If there's a GetAll zero count cache, ensure it is cleared
-                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
-            }
-            catch (Exception)
-            {
-                //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
-                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
-                //If there's a GetAll zero count cache, ensure it is cleared
-                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
-                throw;
-            }
+            var casted = (TEntity)entity;
 
+            using (var p = CachePolicyFactory.CreatePolicy())
+            {
+                p.CreateOrUpdate(casted, PersistNewItem);
+            }
         }
 
         /// <summary>
@@ -315,23 +246,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistUpdatedItem(IEntity entity)
         {
-            try
-            {
-                PersistUpdatedItem((TEntity)entity);
-                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
-                //If there's a GetAll zero count cache, ensure it is cleared
-                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
-            }
-            catch (Exception)
-            {
-                //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
-                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
-                //If there's a GetAll zero count cache, ensure it is cleared
-                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
-                throw;
-            }
+            var casted = (TEntity)entity;
 
+            using (var p = CachePolicyFactory.CreatePolicy())
+            {
+                p.CreateOrUpdate(casted, PersistUpdatedItem);
+            }
         }
 
         /// <summary>
@@ -340,21 +260,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistDeletedItem(IEntity entity)
         {
-            PersistDeletedItem((TEntity)entity);
-            RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
-            //If there's a GetAll zero count cache, ensure it is cleared
-            RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
+            var casted = (TEntity)entity;
+
+            using (var p = CachePolicyFactory.CreatePolicy())
+            {
+                p.Remove(casted, PersistDeletedItem);
+            }            
         }
-
-        #endregion
-
-        #region Abstract IUnitOfWorkRepository Methods
+        
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
 
-        #endregion
 
         /// <summary>
         /// Dispose disposable properties

@@ -3,4 +3,33 @@
     <textarea ng-style="{ visibility :  isLoading ? 'hidden' : 'visible'}"
               ng-model="model.value" rows="10"
               id="{{textAreaHtmlId}}"></textarea>
+
+    <umb-overlay
+        ng-if="linkPickerOverlay.show"
+        model="linkPickerOverlay"
+        view="linkPickerOverlay.view"
+        position="right">
+    </umb-overlay>
+
+   <umb-overlay
+      ng-if="mediaPickerOverlay.show"
+      model="mediaPickerOverlay"
+      position="right"
+      view="mediaPickerOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+      ng-if="embedOverlay.show"
+      model="embedOverlay"
+      position="right"
+      view="embedOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="macroPickerOverlay.show"
+       model="macroPickerOverlay"
+       view="macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
+
 </div>

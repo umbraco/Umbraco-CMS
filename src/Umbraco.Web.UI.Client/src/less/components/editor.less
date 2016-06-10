@@ -1,0 +1,63 @@
+/*
+	contains styling for all main editor directives
+*/
+
+.umb-editor-wrapper{
+	background: white;
+	position: absolute;
+	top: 0px; bottom: 0px; left: 0px; right: 0px;
+}
+
+
+.umb-editor-header{
+	background: @grayLighter;
+	border-bottom: 1px solid @grayLight;
+	position: absolute;
+	height: 99px;
+	top: 0px;
+	right: 0px;
+	left: 0px;
+}
+
+
+.umb-editor-container {
+	top: 101px;
+	left: 0px;
+	right: 0px;
+	bottom: 52px;
+	position: absolute;
+	clear: both;
+	overflow: auto;
+}
+
+.umb-editor-wrapper.-no-footer .umb-editor-container {
+	bottom: 0;
+}
+
+.umb-editor-container.-stop-scrolling {
+	overflow: hidden;
+}
+
+.umb-editor-drawer{
+	margin: 0;
+	padding: 10px 20px;
+	z-index: 999;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 31px;
+
+	background: @grayLighter;
+	border-top: 1px solid @grayLight;
+}
+
+
+.umb-editor-actions{
+	list-style: none;
+	margin: 0; padding: 0;
+}
+
+.umb-editor-actions li{
+	display: inline-block;
+}

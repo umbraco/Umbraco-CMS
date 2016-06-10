@@ -17,7 +17,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Languages)]
     [LegacyBaseTree(typeof(loadLanguages))]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, "Languages", sortOrder: 4)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, null, sortOrder: 4)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class LanguageTreeController : TreeController
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
                             language.Id.ToString(CultureInfo.InvariantCulture), "-1", queryStrings, language.CultureInfo.DisplayName, "icon-flag-alt", false,
                             //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
                             "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                            Uri.EscapeDataString("/umbraco/settings/editLanguage.aspx?id=" + language.Id)));
+                            Uri.EscapeDataString("settings/editLanguage.aspx?id=" + language.Id)));
                 }
             }
 

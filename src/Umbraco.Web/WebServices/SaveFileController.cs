@@ -26,6 +26,7 @@ namespace Umbraco.Web.WebServices
     /// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
     /// over to this controller.
     /// </remarks>
+    [ValidateMvcAngularAntiForgeryToken]
     public class SaveFileController : UmbracoAuthorizedController
     {
         /// <summary>
@@ -97,22 +98,28 @@ namespace Umbraco.Web.WebServices
                     oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var view = get(svce, oldname);
-            if (view == null)
-                view = new PartialView(filename);
+            var currentView = oldname.IsNullOrWhiteSpace() 
+                ? get(svce, filename)
+                : get(svce, oldname);
+
+            if (currentView == null)
+                currentView = new PartialView(filename);
             else
-                view.Path = filename;
-            view.Content = contents;
+                currentView.Path = filename;
+            currentView.Content = contents;
+
+            
+
 
             Attempt<IPartialView> attempt;
             try
             {
-                var partialView = view as PartialView;
+                var partialView = currentView as PartialView;
                 if (partialView != null && validate != null && validate(svce, partialView) == false)
                     return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                                    new FileSecurityException("File '" + view.Path + "' is not a valid partial view file."));
+                                    new FileSecurityException("File '" + currentView.Path + "' is not a valid partial view file."));
 
-                attempt = save(svce, view);
+                attempt = save(svce, currentView);
             }
             catch (Exception e)
             {
@@ -125,7 +132,8 @@ namespace Umbraco.Web.WebServices
                                 attempt.Exception);
             }
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
         /// <summary>
@@ -148,8 +156,8 @@ namespace Umbraco.Web.WebServices
             {
                 t = new Template(templateId)
                 {
-                    Text = templateName,
-                    Alias = templateAlias,
+                    Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
+                    Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
                     Design = templateContents
                 };
 
@@ -184,7 +192,8 @@ namespace Umbraco.Web.WebServices
                     new
                     {
                         path = syncPath,
-                        contents = t.Design
+                        contents = t.Design,
+                        alias = t.Alias // might have been updated!
                     });
             }
             catch (Exception ex)

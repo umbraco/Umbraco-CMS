@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -9,8 +10,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
-    
-
     /// <summary>
     /// Default back office user manager
     /// </summary>
@@ -21,6 +20,18 @@ namespace Umbraco.Core.Security
         {
         }
 
+        public BackOfficeUserManager(
+            IUserStore<BackOfficeIdentityUser, int> store,
+            IdentityFactoryOptions<BackOfficeUserManager> options,
+            MembershipProviderBase membershipProvider)
+            : base(store)
+        {
+            if (options == null) throw new ArgumentNullException("options");
+            var manager = new BackOfficeUserManager(store);
+            InitUserManager(manager, membershipProvider, options);
+        }
+
+        #region Static Create methods
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
@@ -40,8 +51,8 @@ namespace Umbraco.Core.Security
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
-
-            return InitUserManager(manager, membershipProvider, options);
+            manager.InitUserManager(manager, membershipProvider, options);
+            return manager;
         }
 
         /// <summary>
@@ -56,13 +67,10 @@ namespace Umbraco.Core.Security
            BackOfficeUserStore customUserStore,
            MembershipProviderBase membershipProvider)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            if (customUserStore == null) throw new ArgumentNullException("customUserStore");
-
-            var manager = new BackOfficeUserManager(customUserStore);
-
-            return InitUserManager(manager, membershipProvider, options);
-        }
+            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
+            return manager;
+        } 
+        #endregion
 
         /// <summary>
         /// Initializes the user manager with the correct options
@@ -71,7 +79,7 @@ namespace Umbraco.Core.Security
         /// <param name="membershipProvider"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private static BackOfficeUserManager InitUserManager(BackOfficeUserManager manager, MembershipProviderBase membershipProvider, IdentityFactoryOptions<BackOfficeUserManager> options)
+        protected void InitUserManager(BackOfficeUserManager manager, MembershipProviderBase membershipProvider, IdentityFactoryOptions<BackOfficeUserManager> options)
         {
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<BackOfficeIdentityUser, int>(manager)
@@ -110,6 +118,8 @@ namespace Umbraco.Core.Security
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
 
+            manager.EmailService = new EmailService();
+
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
@@ -124,11 +134,10 @@ namespace Umbraco.Core.Security
             //    BodyFormat = "Your security code is: {0}"
             //});
 
-            //manager.EmailService = new EmailService();
-            //manager.SmsService = new SmsService();
-
-            return manager;
+            //manager.SmsService = new SmsService();            
         }
+
+        
     }
 
     /// <summary>
@@ -171,5 +180,44 @@ namespace Umbraco.Core.Security
         }
         #endregion
 
+        /// <summary>
+        /// Logic used to validate a username and password
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this uses the standard ASP.Net Identity approach which is:
+        /// * Get password store
+        /// * Call VerifyPasswordAsync with the password store + user + password
+        /// * Uses the PasswordHasher.VerifyHashedPassword to compare the stored password
+        /// 
+        /// In some cases people want simple custom control over the username/password check, for simplicity
+        /// sake, developers would like the users to simply validate against an LDAP directory but the user
+        /// data remains stored inside of Umbraco. 
+        /// See: http://issues.umbraco.org/issue/U4-7032 for the use cases.
+        /// 
+        /// We've allowed this check to be overridden with a simple callback so that developers don't actually
+        /// have to implement/override this class.
+        /// </remarks>
+        public async override Task<bool> CheckPasswordAsync(T user, string password)
+        {
+            if (BackOfficeUserPasswordChecker != null)
+            {
+                var result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+                //if the result indicates to not fallback to the default, then return true if the credentials are valid
+                if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
+                {
+                    return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
+                }
+            }
+            //use the default behavior
+            return await base.CheckPasswordAsync(user, password);
+        }
+
+        /// <summary>
+        /// Gets/sets the default back office user password checker
+        /// </summary>
+        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
     }
 }

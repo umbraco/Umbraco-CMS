@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -11,10 +11,12 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using umbraco;
-using umbraco.cms.businesslogic.member;
+using Constants = Umbraco.Core.Constants;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {
@@ -194,12 +196,78 @@ namespace Umbraco.Web
             return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
         }
 
-		#region BeginUmbracoForm
+        #region GetCropUrl
 
-		/// <summary>
-		/// Used for rendering out the Form for BeginUmbracoForm
-		/// </summary>
-		internal class UmbracoForm : MvcForm
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string cropAlias)
+        {
+            return new HtmlString(mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true));
+        }
+
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias)
+        {
+            return new HtmlString(mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true));
+        }
+
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
+            IPublishedContent mediaItem,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true)
+        {
+            return
+                new HtmlString(mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
+                    imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
+                    upScale));
+        }
+
+        [Obsolete("Use the UrlHelper.GetCropUrl extension instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
+            string imageUrl,
+            int? width = null,
+            int? height = null,
+            string imageCropperValue = null,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            string cacheBusterValue = null,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true)
+        {
+            return
+                new HtmlString(imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
+                    imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
+                    upScale));
+        }
+
+        #endregion
+
+        #region BeginUmbracoForm
+
+        /// <summary>
+        /// Used for rendering out the Form for BeginUmbracoForm
+        /// </summary>
+        internal class UmbracoForm : MvcForm
 		{
 		    /// <summary>
 		    /// Creates an UmbracoForm
@@ -756,8 +824,7 @@ namespace Umbraco.Web
 		}
 
 		#endregion
-
-
+        
 		#region Wrap
 
 		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
@@ -823,7 +890,71 @@ namespace Umbraco.Web
 			return item;
 		}
 
-		#endregion
+        #endregion
 
-	}
+        #region canvasdesigner
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html, 
+            UrlHelper url,
+            UmbracoContext umbCtx)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, string.Empty, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, canvasdesignerConfigPath, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
+        {
+            
+            var umbracoPath = url.Content(SystemDirectories.Umbraco);
+
+            string previewLink = @"<script src=""{0}/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{2}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{3}'</script>" +
+                                 @"<script src=""{0}/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
+
+            string noPreviewLinks = @"<link href=""{1}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
+
+            // Get page value
+            int pageId = umbCtx.PublishedContentRequest.UmbracoPage.PageID;
+            string[] path = umbCtx.PublishedContentRequest.UmbracoPage.SplitPath;
+            string result = string.Empty;
+            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
+
+            if (umbCtx.InPreviewMode)
+            {
+                canvasdesignerConfigPath = string.IsNullOrEmpty(canvasdesignerConfigPath) == false 
+                    ? canvasdesignerConfigPath 
+                    : string.Format("{0}/js/canvasdesigner.config.js", umbracoPath);
+                canvasdesignerPalettesPath = string.IsNullOrEmpty(canvasdesignerPalettesPath) == false 
+                    ? canvasdesignerPalettesPath 
+                    : string.Format("{0}/js/canvasdesigner.palettes.js", umbracoPath);
+
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, umbracoPath, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
+            }
+            else
+            {
+                // Get css path for current page
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath);
+            }
+
+            return new HtmlString(result);
+
+        }
+
+        #endregion
+
+    }
 }

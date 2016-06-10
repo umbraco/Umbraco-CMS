@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using umbraco.BasePages;
 using System.Web.UI;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -47,7 +48,12 @@ namespace Umbraco.Web.UI.Pages
 			public static string ChangeContentFrameUrl(string url) {
 				return string.Format(ClientMgrScript + ".contentFrame('{0}');", url);
 			}
-			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
+            public static string ReloadContentFrameUrlIfPathLoaded(string url)
+            {
+                return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
+            }
+            public static string ReloadLocation { get { return string.Format(ClientMgrScript + ".reloadLocation();"); } }
+            public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
 			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
 			public static string CopyNode { get { return GetMainTree + ".copyNode('{0}', '{1}');"; } }
@@ -146,23 +152,57 @@ namespace Umbraco.Web.UI.Pages
             //don't load if there is no url
 			if (string.IsNullOrEmpty(url)) return this;
 
-            if (url.StartsWith("/") && !url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
-                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/" + url;
-
-            if (url.Trim().StartsWith("~"))
-                url = IOHelper.ResolveUrl(url);
+            url = EnsureUmbracoUrl(url);
 
             RegisterClientScript(Scripts.ChangeContentFrameUrl(url));
 			
             return this;
 		}
 
-		/// <summary>
-		/// Shows the dashboard for the given application
-		/// </summary>
-		/// <param name="app"></param>
-		/// <returns></returns>
-		public ClientTools ShowDashboard(string app)
+        /// <summary>
+        /// Reloads the content in the content frame if the specified URL is currently loaded
+        /// </summary>
+        /// <param name="url"></param>
+        public ClientTools ReloadContentFrameUrlIfPathLoaded(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return this;
+
+            url = EnsureUmbracoUrl(url);
+
+            RegisterClientScript(Scripts.ReloadContentFrameUrlIfPathLoaded(url));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Reloads location, refreshing what is in the content frame
+        /// </summary>
+        public ClientTools ReloadLocation()
+        {
+            RegisterClientScript(Scripts.ReloadLocation);
+
+            return this;
+        }
+
+        private string EnsureUmbracoUrl(string url)
+        {
+            if (url.StartsWith("/") && url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+            {
+                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco).EnsureEndsWith('/') + url;
+            }
+
+            if (url.Trim().StartsWith("~"))
+                url = IOHelper.ResolveUrl(url);
+
+            return url;
+        }
+
+        /// <summary>
+        /// Shows the dashboard for the given application
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public ClientTools ShowDashboard(string app)
 		{
             return ChangeContentFrameUrl(SystemDirectories.Umbraco + string.Format("/dashboard.aspx?app={0}", app));
 		}

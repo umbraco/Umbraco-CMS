@@ -10,8 +10,6 @@
 
 Don't forget to build!
 
-When upgrading your website using NuGet you should answer "No" to the questions to overwrite the Web.config 
-file (and config files in the config folder). 
 
 We've done our best to transform your configuration files but in case something is not quite right: remember we
 backed up your files in App_Data\NuGetBackup so you can find the original files before they were transformed.

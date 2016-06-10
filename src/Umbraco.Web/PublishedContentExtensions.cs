@@ -116,6 +116,21 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region IsComposedOf
+
+        /// <summary>
+        /// Gets a value indicating whether the content is of a content type composed of the given alias
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
+        public static bool IsComposedOf(this IPublishedContent content, string alias)
+        {
+            return content.ContentType.CompositionAliases.Contains(alias);
+        }
+
+        #endregion
+
         #region HasProperty
 
         /// <summary>
@@ -1186,6 +1201,7 @@ namespace Umbraco.Web
         /// <returns>Enumerates bottom-up ie walking up the tree (parent, grand-parent, etc).</returns>
         internal static IEnumerable<IPublishedContent> EnumerateAncestors(this IPublishedContent content, bool orSelf)
         {
+            if (content == null) throw new ArgumentNullException("content");
             if (orSelf) yield return content;
             while ((content = content.Parent) != null)
                 yield return content;
@@ -1358,6 +1374,7 @@ namespace Umbraco.Web
 
         internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf)
         {
+            if (content == null) throw new ArgumentNullException("content");
             if (orSelf) yield return content;
 
             foreach (var child in content.Children)
@@ -1692,6 +1709,7 @@ namespace Umbraco.Web
         public static T Parent<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
+            if (content == null) throw new ArgumentNullException("content");
             return content.Parent as T;
         }
 
@@ -1709,9 +1727,10 @@ namespace Umbraco.Web
         /// <para>This method exists for consistency, it is the same as calling content.Children as a property.</para>
 		/// </remarks>
 		public static IEnumerable<IPublishedContent> Children(this IPublishedContent content)
-		{
-		    return content.Children;
-		}
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            return content.Children;
+        }
 
         /// <summary>
         /// Gets the children of the content, filtered by a predicate.

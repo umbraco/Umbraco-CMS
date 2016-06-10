@@ -70,7 +70,7 @@ namespace umbraco
 			var docParentId = -1;
 			try
 			{
-				docParentId = document.Parent.Id;
+				docParentId = document.ParentId;
 			}
 			catch (ArgumentException)
 			{

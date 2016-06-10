@@ -22,11 +22,11 @@
                     s = s.replace(/\-/g, "/");
                     //all of these basically transform the string into year-month-day since that
                     //is what JS understands when creating a Date object
-                    if (c.dateFormat.indexOf("dd/MM/yyyy") == 0 || c.dateFormat.indexOf("dd-MM-yyyy") == 0) {
-                        s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3-$2-$1");
+                    if (c.dateFormat.indexOf("dd/MM/yyyy") == 0 || c.dateFormat.indexOf("dd-MM-yyyy") == 0 || c.dateFormat.indexOf("dd.MM.yyyy") == 0) {
+                        s = s.replace(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/, "$3-$2-$1");
                     }
-                    else if (c.dateFormat.indexOf("dd/MM/yy") == 0 || c.dateFormat.indexOf("dd-MM-yy") == 0) {
-                        s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, "$3-$2-$1");
+                    else if (c.dateFormat.indexOf("dd/MM/yy") == 0 || c.dateFormat.indexOf("dd-MM-yy") == 0 || c.dateFormat.indexOf("dd.MM.yy") == 0) {
+                        s = s.replace(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2})/, "$3-$2-$1");
                     }
                     else if (c.dateFormat.indexOf("MM/dd/yyyy") == 0 || c.dateFormat.indexOf("MM-dd-yyyy") == 0) {
                         s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3-$1-$2");

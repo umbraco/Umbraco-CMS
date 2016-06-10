@@ -152,6 +152,9 @@ namespace Umbraco.Core.Services
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
+            var parent = GetById(content.ParentId);
+            content.Path = string.Concat(parent.IfNotNull(x => x.Path, content.ParentId.ToString()), ",", content.Id);
+
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
             {
@@ -190,8 +193,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
+            if (parent == null) throw new ArgumentNullException("parent");
+
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
+            content.Path = string.Concat(parent.Path, ",", content.Id);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
             {
@@ -276,6 +282,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
+            if (parent == null) throw new ArgumentNullException("parent");
+
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
 
@@ -445,6 +453,9 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetAncestors(IContent content)
         {
+            //null check otherwise we get exceptions
+            if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
+
             var ids = content.Path.Split(',').Where(x => x != Constants.System.Root.ToInvariantString() && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
                 return new List<IContent>();
@@ -476,22 +487,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-
-                var query = Query<IContent>.Builder;
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    query.Where(x => x.ParentId == id);
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
+            long total;
+            var result = GetPagedChildren(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -508,6 +507,24 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page index (zero based)</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
+        {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
@@ -519,7 +536,7 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.ParentId == id);
                 }
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return contents;
             }
@@ -529,22 +546,10 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
-            Mandate.ParameterCondition(pageSize > 0, "pageSize");
-            using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
-            {
-
-                var query = Query<IContent>.Builder;
-                //if the id is System Root, then just get all
-                if (id != Constants.System.Root)
-                {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
-                }
-                long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
-                totalChildren = Convert.ToInt32(total);
-                return contents;
-            }
+            long total;
+            var result = GetPagedDescendants(id, Convert.ToInt64(pageIndex), pageSize, out total, orderBy, orderDirection, true, filter);
+            totalChildren = Convert.ToInt32(total);
+            return result;
         }
 
         /// <summary>
@@ -557,8 +562,25 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns> 
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filter);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>        
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
@@ -571,7 +593,7 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return contents;
             }
@@ -895,11 +917,11 @@ namespace Umbraco.Core.Services
             {
                 var originalPath = content.Path;
 
-                if (Trashing.IsRaisedEventCancelled(                  
+                if (Trashing.IsRaisedEventCancelled(
                   new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 var moveInfo = new List<MoveEventInfo<IContent>>
@@ -946,7 +968,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1011,7 +1033,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         public bool UnPublish(IContent content, int userId = 0)
         {
-            return ((IContentServiceOperations) this).UnPublish(content, userId).Success;
+            return ((IContentServiceOperations)this).UnPublish(content, userId).Success;
         }
 
         /// <summary>
@@ -1069,7 +1091,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IContent>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
             using (new WriteLock(Locker))
@@ -1113,7 +1135,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1132,11 +1154,11 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-                if (Deleting.IsRaisedEventCancelled(                  
+                if (Deleting.IsRaisedEventCancelled(
                   new DeleteEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 //Make sure that published content is unpublished before being deleted
@@ -1157,17 +1179,17 @@ namespace Umbraco.Core.Services
                 {
                     repository.Delete(content);
                     uow.Commit();
-                    
+
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
                     Deleted.RaiseEvent(args, this);
-                    
+
                     //remove any flagged media files
                     repository.DeleteMediaFiles(args.MediaFilesToDelete);
                 }
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1216,6 +1238,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
         {
+            //TODO: This currently this is called from the ContentTypeService but that needs to change, 
+            // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
+            // This method will recursively go lookup every content item, check if any of it's descendants are
+            // of a different type, move them to the recycle bin, then permanently delete the content items. 
+            // The main problem with this is that for every content item being deleted, events are raised...
+            // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -1332,7 +1361,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void MoveToRecycleBin(IContent content, int userId = 0)
         {
-            ((IContentServiceOperations) this).MoveToRecycleBin(content, userId);
+            ((IContentServiceOperations)this).MoveToRecycleBin(content, userId);
         }
 
         /// <summary>
@@ -1636,7 +1665,7 @@ namespace Umbraco.Core.Services
                 //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
                 _publishingStrategy.PublishingFinalized(shouldBePublished, false);
             }
-            
+
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1698,6 +1727,7 @@ namespace Umbraco.Core.Services
             }
         }
 
+        //TODO: All of this needs to be moved to the repository
         private void PerformMove(IContent content, int parentId, int userId, ICollection<MoveEventInfo<IContent>> moveInfo)
         {
             //add a tracking item to use in the Moved event
@@ -1883,13 +1913,13 @@ namespace Umbraco.Core.Services
                 content = newest;
 
             var evtMsgs = EventMessagesFactory.Get();
-               
+
             var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
             if (published == null)
             {
                 return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs)); // already unpublished
             }
-            
+
             var unpublished = _publishingStrategy.UnPublish(content, userId);
             if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
 
@@ -1966,6 +1996,10 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
+                    if (published == false)
+                    {
+                        content.ChangePublishedState(PublishedState.Saved);
+                    }
                     //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
                     if (content.HasIdentity == false)
                     {
@@ -2023,11 +2057,11 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(                  
+                if (Saving.IsRaisedEventCancelled(
                   new SaveEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
 
@@ -2059,7 +2093,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -2107,6 +2141,22 @@ namespace Umbraco.Core.Services
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
                 return PublishStatusType.FailedPathNotPublished;
+            }
+            else if (content.ExpireDate.HasValue && content.ExpireDate.Value > DateTime.MinValue && DateTime.Now > content.ExpireDate.Value)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' has expired and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedHasExpired;
+            }
+            else if (content.ReleaseDate.HasValue && content.ReleaseDate.Value > DateTime.MinValue && content.ReleaseDate.Value > DateTime.Now)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedAwaitingRelease;
             }
 
             return PublishStatusType.Success;

@@ -55,17 +55,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // cache if we have a content and not previewing
             if (content != null && preview == false)
-            {
-                var domainRootNodeId = route.StartsWith("/") ? -1 : int.Parse(route.Substring(0, route.IndexOf('/')));
-                var iscanon = 
-                    UnitTesting == false 
-                    && DomainHelper.ExistsDomainInPath(umbracoContext.Application.Services.DomainService.GetAll(false), content.Path, domainRootNodeId) == false;
-                // and only if this is the canonical url (the one GetUrl would return)
-                if (iscanon)
-                    _routesCache.Store(contentId, route);
-            }
+                AddToCacheIfDeepestRoute(umbracoContext, content, route);
 
             return content;
+        }
+
+        private void AddToCacheIfDeepestRoute(UmbracoContext umbracoContext, IPublishedContent content, string route)
+        {
+            var domainRootNodeId = route.StartsWith("/") ? -1 : int.Parse(route.Substring(0, route.IndexOf('/')));
+
+            // so we have a route that maps to a content... say "1234/path/to/content" - however, there could be a
+            // domain set on "to" and route "4567/content" would also map to the same content - and due to how
+            // urls computing work (by walking the tree up to the first domain we find) it is that second route
+            // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
+            // longer one - so make sure we don't cache the wrong route
+
+            var deepest = UnitTesting == false
+                && DomainHelper.ExistsDomainInPath(umbracoContext.Application.Services.DomainService.GetAll(false), content.Path, domainRootNodeId) == false;
+
+            if (deepest)
+                _routesCache.Store(content.Id, route);
         }
 
         public virtual string GetRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
@@ -80,11 +89,35 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // else actually determine the route
             route = DetermineRouteById(umbracoContext, preview, contentId);
 
-            // cache if we have a route and not previewing
-            if (route != null && preview == false)
+            // node not found
+            if (route == null)
+                return null;
+
+            // find the content back, detect routes collisions: we should find ourselves back,
+            // else it means that another content with "higher priority" is sharing the same route.
+            // perf impact:
+            // - non-colliding, adds one complete "by route" lookup, only on the first time a url is computed (then it's cached anyways)
+            // - colliding, adds one "by route" lookup, the first time the url is computed, then one dictionary looked each time it is computed again
+            // assuming no collisions, the impact is one complete "by route" lookup the first time each url is computed
+            var loopId = preview ? 0 : _routesCache.GetNodeId(route); // might be cached already in case of collision
+            if (loopId == 0)
+            {
+                var content = DetermineIdByRoute(umbracoContext, preview, route, GlobalSettings.HideTopLevelNodeFromPath);
+
+                // add the other route to cache so next time we have it already
+                if (content != null && preview == false)
+                    AddToCacheIfDeepestRoute(umbracoContext, content, route);
+
+                loopId = content == null ? 0 : content.Id; // though... 0 here would be quite weird?
+            }
+
+            // cache if we have a route and not previewing and it's not a colliding route
+            // (the result of DetermineRouteById is always the deepest route)
+            if (/*route != null &&*/ preview == false && loopId == contentId)
                 _routesCache.Store(contentId, route);
 
-            return route;
+            // return route if no collision, else report collision
+            return loopId == contentId ? route : ("err/" + loopId);
         }
 
         IPublishedContent DetermineIdByRoute(UmbracoContext umbracoContext, bool preview, string route, bool hideTopLevelNode)
@@ -159,7 +192,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // we add this check - we look for the document matching "/" and if it's not us, then
             // we do not hide the top level path
             // it has to be taken care of in GetByRoute too so if
-            // "/foo" fails (looking for "/*/foo") we try also "/foo". 
+            // "/foo" fails (looking for "/*/foo") we try also "/foo".
             // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (node.Parent == null)
@@ -244,8 +277,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private static IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
 		{
-		    return xmlNode == null 
-                ? null 
+		    return xmlNode == null
+                ? null
                 : (new XmlPublishedContent(xmlNode, isPreviewing)).CreateModel();
 		}
 
@@ -398,7 +431,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 if (startNodeId > 0)
                 {
 					// if in a domain then use the root node of the domain
-					xpath = string.Format(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);                    
+					xpath = string.Format(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);
                 }
                 else
                 {
@@ -409,7 +442,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					// umbraco does not consistently guarantee that sortOrder starts with 0
 					// so the one that we want is the one with the smallest sortOrder
 					// read http://stackoverflow.com/questions/1128745/how-can-i-use-xpath-to-find-the-minimum-value-of-an-attribute-in-a-set-of-elemen
-                    
+
 					// so that one does not work, because min(@sortOrder) maybe 1
 					// xpath = "/root/*[@isDoc and @sortOrder='0']";
 
@@ -453,7 +486,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     else
                     {
                         xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, part);
-                        
+
                     }
                 }
 

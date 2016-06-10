@@ -154,7 +154,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return IOHelper.ReturnPath("umbracoWebservicesPath", "~/umbraco/webservices");
+                return IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
             }
         }
 

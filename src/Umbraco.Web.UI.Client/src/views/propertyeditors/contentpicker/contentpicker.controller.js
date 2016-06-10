@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper) {
+function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper, navigationService, $location) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -49,7 +49,9 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //the default pre-values
     var defaultConfig = {
         multiPicker: false,
-        showEditButton: false,        
+        showOpenButton: false,
+        showEditButton: false,
+        showPathOnHover: false,
         startNode: {
             query: "",
             type: "content",
@@ -64,13 +66,17 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
     $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
+    $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
-
+    $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
+ 
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
         ? "Media"
         : "Document";
+    $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
+    $scope.allowEditButton = entityType === "Document";
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -87,6 +93,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
                 $scope.clear();
                 $scope.add(data);
             }
+        angularHelper.getCurrentForm($scope).$setDirty();
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type
@@ -132,17 +139,53 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         });
     } else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
-    }        
-    
+    }
+
     //dialog
-    $scope.openContentPicker = function () {                
-        var d = dialogService.treePicker(dialogOptions);
+    $scope.openContentPicker = function() {
+      $scope.contentPickerOverlay = dialogOptions;
+      $scope.contentPickerOverlay.view = "treepicker";
+      $scope.contentPickerOverlay.show = true;
+
+      $scope.contentPickerOverlay.submit = function(model) {
+
+          if (angular.isArray(model.selection)) {
+             _.each(model.selection, function (item, i) {
+                  $scope.add(item);
+             });
+          }
+
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
+
+      $scope.contentPickerOverlay.close = function(oldModel) {
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
+
     };
 
     $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
+        angularHelper.getCurrentForm($scope).$setDirty();
     };
-        
+
+    $scope.showNode = function (index) {
+        var item = $scope.renderModel[index];
+        var id = item.id;
+        var section = $scope.model.config.startNode.type.toLowerCase();
+
+        entityResource.getPath(id, entityType).then(function (path) {
+            navigationService.changeSection(section);
+            navigationService.showTree(section, {
+                tree: section, path: path, forceReload: false, activate: true
+            });
+            var routePath = section + "/" + section + "/edit/" + id.toString();
+            $location.path(routePath).search("");
+        });
+    }
+
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
             return i.id;
@@ -150,7 +193,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
         }
     };
 
@@ -182,7 +225,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
            
             if (entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
             }
             
            

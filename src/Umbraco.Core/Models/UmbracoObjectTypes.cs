@@ -15,49 +15,49 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Content Item Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.ContentItemType)]
+        [UmbracoObjectType(Constants.ObjectTypes.ContentItemType)]
         [FriendlyName("Content Item Type")]
         ContentItemType,
 
         /// <summary>
         /// Root
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.SystemRoot)]
+        [UmbracoObjectType(Constants.ObjectTypes.SystemRoot)]
         [FriendlyName("Root")]
         ROOT,
 
         /// <summary>
         /// Document
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Document, typeof(IContent))]
+        [UmbracoObjectType(Constants.ObjectTypes.Document, typeof(IContent))]
         [FriendlyName("Document")]
         Document,
 
         /// <summary>
         /// Media
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Media, typeof(IMedia))]
+        [UmbracoObjectType(Constants.ObjectTypes.Media, typeof(IMedia))]
         [FriendlyName("Media")]
         Media,
 
         /// <summary>
         /// Member Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.MemberType, typeof(IMemberType))]
+        [UmbracoObjectType(Constants.ObjectTypes.MemberType, typeof(IMemberType))]
         [FriendlyName("Member Type")]
         MemberType,
 
         /// <summary>
         /// Template
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Template, typeof(ITemplate))]
+        [UmbracoObjectType(Constants.ObjectTypes.Template, typeof(ITemplate))]
         [FriendlyName("Template")]
         Template,
 
         /// <summary>
         /// Member Group
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.MemberGroup)]
+        [UmbracoObjectType(Constants.ObjectTypes.MemberGroup)]
         [FriendlyName("Member Group")]
         MemberGroup,
 
@@ -65,50 +65,73 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Content Item
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.ContentItem)]
+        [UmbracoObjectType(Constants.ObjectTypes.ContentItem)]
         [FriendlyName("Content Item")]
         ContentItem,
 
         /// <summary>
         /// "Media Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.MediaType, typeof(IMediaType))]
+        [UmbracoObjectType(Constants.ObjectTypes.MediaType, typeof(IMediaType))]
         [FriendlyName("Media Type")]
         MediaType,
 
         /// <summary>
         /// Document Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.DocumentType, typeof(IContentType))]
+        [UmbracoObjectType(Constants.ObjectTypes.DocumentType, typeof(IContentType))]
         [FriendlyName("Document Type")]
         DocumentType,
 
         /// <summary>
         /// Recycle Bin
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.ContentRecycleBin)]
+        [UmbracoObjectType(Constants.ObjectTypes.ContentRecycleBin)]
         [FriendlyName("Recycle Bin")]
         RecycleBin,
 
         /// <summary>
         /// Stylesheet
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Stylesheet)]
+        [UmbracoObjectType(Constants.ObjectTypes.Stylesheet)]
         [FriendlyName("Stylesheet")]
         Stylesheet,
 
         /// <summary>
         /// Member
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Member, typeof(IMember))]
+        [UmbracoObjectType(Constants.ObjectTypes.Member, typeof(IMember))]
         [FriendlyName("Member")]
         Member,
 
         /// <summary>
         /// Data Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.DataType, typeof(IDataTypeDefinition))]
+        [UmbracoObjectType(Constants.ObjectTypes.DataType, typeof(IDataTypeDefinition))]
         [FriendlyName("Data Type")]
-        DataType
+        DataType,
+
+        /// <summary>
+        /// Document type container
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.DocumentTypeContainer)]
+        [FriendlyName("Document Type Container")]
+        DocumentTypeContainer,
+
+        /// <summary>
+        /// Media type container
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.MediaTypeContainer)]
+        [FriendlyName("Media Type Container")]
+        MediaTypeContainer,
+
+        /// <summary>
+        /// Media type container
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.DataTypeContainer)]
+        [FriendlyName("Data Type Container")]
+        DataTypeContainer
+
+
     }
 }

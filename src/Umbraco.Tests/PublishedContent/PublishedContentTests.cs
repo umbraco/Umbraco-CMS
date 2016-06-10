@@ -50,7 +50,8 @@ namespace Umbraco.Tests.PublishedContent
                     new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
                     new PublishedPropertyType("testRecursive", 0, "?"), 
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var compositionAliases = new[] {"MyCompositionAlias"};
+            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
         }
 
@@ -468,6 +469,16 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsNull(doc.FirstChild<IPublishedContent>());
 		}
 
+        [Test]
+        public void IsComposedOf()
+        {
+            var doc = GetNode(1173);
+
+            var isComposedOf = doc.IsComposedOf("MyCompositionAlias");
+
+            Assert.IsTrue(isComposedOf);
+        }
+
 		[Test]
 		public void HasProperty()
 		{
@@ -475,8 +486,7 @@ namespace Umbraco.Tests.PublishedContent
 
 			var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
 
-			Assert.AreEqual(true, (bool)hasProp);
-
+            Assert.IsTrue(hasProp);
 		}
 
 		[Test]

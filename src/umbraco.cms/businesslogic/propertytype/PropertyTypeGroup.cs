@@ -9,7 +9,6 @@ namespace umbraco.cms.businesslogic.propertytype
     public class PropertyTypeGroup
     {
         public int Id { get; set; }
-        public int ParentId { get; set; }
         public int ContentTypeId { get; set; }
         public string Name { get; set; }
         public int SortOrder { get; set; }
@@ -18,17 +17,15 @@ namespace umbraco.cms.businesslogic.propertytype
         {
         }
 
-        public PropertyTypeGroup(int parentId, int contentTypeId, string name, int sortOrder)
+        public PropertyTypeGroup(int contentTypeId, string name, int sortOrder)
         {
-            ParentId = parentId;
             ContentTypeId = contentTypeId;
             Name = name;
             SortOrder = sortOrder;
         }
 
-        public PropertyTypeGroup(int parentId, int contentTypeId, string name)
+        public PropertyTypeGroup(int contentTypeId, string name)
         {
-            ParentId = parentId;
             ContentTypeId = contentTypeId;
             Name = name;
             SortOrder = -1; // we set this to -1 so in the save method we can get the current highest sortorder in case it's not sat after init (ie. if you want to force a sortOrder)
@@ -44,19 +41,14 @@ namespace umbraco.cms.businesslogic.propertytype
             return PropertyType.GetPropertyTypesByGroup(Id);
         }
 
-        //TODO: Verify support for master doctypes / mixins!
+        // note: this is used to delete all groups that inherit from a group, when the group is deleted,
+        // see the Delete method in this class - but it is all done in an obsolete way which does not
+        // take compositions in account + we delete the group but do not re-allocate the properties, etc.
+        // ALL THIS should be either removed, or refactored to use the new APIs - so... returning nothing
+        // from now on, which is just another way of being broken.
         public IEnumerable<PropertyTypeGroup> GetPropertyTypeGroups()
         {
-            var ptgs = new List<PropertyTypeGroup>();
-            using (var dr = SqlHelper.ExecuteReader(@"SELECT id FROM cmsPropertyTypeGroup WHERE parentGroupId = @id", SqlHelper.CreateParameter("@id", Id)))
-            {
-                while (dr.Read())
-                {
-                    ptgs.Add(GetPropertyTypeGroup(dr.GetInt("id")));
-                }
-            }
-
-            return ptgs;
+            return Enumerable.Empty<PropertyTypeGroup>();
         }
 
         public void Save()
@@ -67,7 +59,6 @@ namespace umbraco.cms.businesslogic.propertytype
                     @"UPDATE 
                         cmsPropertyTypeGroup 
                     SET 
-                        parentGroupId = @parentGroupId,
                         contenttypeNodeId = @contentTypeId,
                         sortOrder = @sortOrder,                        
                         text = @name
@@ -75,7 +66,6 @@ namespace umbraco.cms.businesslogic.propertytype
                         id = @id
                 ",
                     SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
                     SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
                     SqlHelper.CreateParameter("@sortOrder", SortOrder),
                     SqlHelper.CreateParameter("@name", Name)
@@ -84,18 +74,17 @@ namespace umbraco.cms.businesslogic.propertytype
             else
             {
                 if (SortOrder == -1)
-                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where COALESCE(parentGroupId, 0) = 0 and contenttypeNodeId = @nodeId",
+                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where contenttypeNodeId = @nodeId",
                         SqlHelper.CreateParameter("@nodeId", ContentTypeId)) + 1;
 
                 SqlHelper.ExecuteNonQuery(
                     @"
                     INSERT INTO 
                         cmsPropertyTypeGroup
-                        (parentGroupId, contenttypeNodeId, sortOrder, text)
+                        (contenttypeNodeId, sortOrder, text)
                     VALUES 
-                        (@parentGroupId, @contentTypeId, @sortOrder, @name)
+                        (@contentTypeId, @sortOrder, @name)
                 ",
-                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
                     SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
                     SqlHelper.CreateParameter("@sortOrder", SortOrder),
                     SqlHelper.CreateParameter("@name", Name)
@@ -122,12 +111,10 @@ namespace umbraco.cms.businesslogic.propertytype
 
         internal void Load()
         {
-            using (var dr = SqlHelper.ExecuteReader(@" SELECT parentGroupId, contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id)))
+            using (var dr = SqlHelper.ExecuteReader(@" SELECT contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id)))
             {
                 if (dr.Read())
                 {
-                    // if no parent, the value should just be null. The GetInt helper method returns -1 if value is null so we need to check
-                    ParentId = dr.GetInt("parentGroupId") != -1 ? dr.GetInt("parentGroupId") : 0;
                     SortOrder = dr.GetInt("sortOrder");
                     ContentTypeId = dr.GetInt("contenttypeNodeId");
                     Name = dr.GetString("text");
@@ -156,14 +143,6 @@ namespace umbraco.cms.businesslogic.propertytype
             return ptgs;
         }
 
-        private object ConvertParentId(int parentId)
-        {
-            if (parentId == 0)
-                return DBNull.Value;
-
-            return parentId;
-        }
-        
         /// <summary>
         /// Gets the SQL helper.
         /// </summary>

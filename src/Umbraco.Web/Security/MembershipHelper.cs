@@ -13,6 +13,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
+using Umbraco.Web.Security.Providers;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace Umbraco.Web.Security
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Security
 
         #region Constructors
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
-            : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Provider)
+            : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService))
         {            
         }
 
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Security
         }   
 
         public MembershipHelper(UmbracoContext umbracoContext)
-            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Provider)
+            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider: new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
         {            
         }
 

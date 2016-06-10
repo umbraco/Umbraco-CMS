@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, dialogService, entityResource, $log, iconHelper){
+function memberPickerController($scope, dialogService, entityResource, $log, iconHelper, angularHelper){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -27,19 +27,39 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
                 $scope.clear();
                 $scope.add(data);
             }
+            angularHelper.getCurrentForm($scope).$setDirty();
         }
     };
 
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     if ($scope.model.config) {
         angular.extend(dialogOptions, $scope.model.config);
     }
-    
-    $scope.openMemberPicker =function() {
-        var d = dialogService.memberPicker(dialogOptions);
-    };
 
+    $scope.openMemberPicker = function() {
+       $scope.memberPickerOverlay = dialogOptions;
+       $scope.memberPickerOverlay.view = "memberPicker";
+       $scope.memberPickerOverlay.show = true;
+
+       $scope.memberPickerOverlay.submit = function(model) {
+
+          if (model.selection) {
+             _.each(model.selection, function(item, i) {
+                $scope.add(item);
+             });
+          }
+
+          $scope.memberPickerOverlay.show = false;
+          $scope.memberPickerOverlay = null;
+       };
+
+       $scope.memberPickerOverlay.close = function(oldModel) {
+          $scope.memberPickerOverlay.show = false;
+          $scope.memberPickerOverlay = null;
+       };
+
+    };
 
     $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);
@@ -52,14 +72,14 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});				
-        }	
+            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+        }
     };
 
     $scope.clear = function() {
         $scope.renderModel = [];
     };
-	
+
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
             return i.id;

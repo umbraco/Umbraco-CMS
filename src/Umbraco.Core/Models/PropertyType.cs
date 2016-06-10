@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Defines the type of a <see cref="Property"/> object
     /// </summary>
@@ -32,6 +34,8 @@ namespace Umbraco.Core.Models
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
+            if (dataTypeDefinition == null) throw new ArgumentNullException("dataTypeDefinition");
+
             if(dataTypeDefinition.HasIdentity)
                 _dataTypeDefinitionId = dataTypeDefinition.Id;
 
@@ -218,8 +222,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
+        /// Gets or sets the identifier of the PropertyGroup this PropertyType belongs to.
         /// </summary>
+        /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {
@@ -401,6 +406,9 @@ namespace Umbraco.Core.Models
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
                     return true;
 
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Decimal && type == typeof(decimal))
+                    return true;
+
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))
                     return true;
 
@@ -416,6 +424,19 @@ namespace Umbraco.Core.Models
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks the underlying property editor prevalues to see if the one that allows changing of the database field
+        /// to which data is saved (dataInt, dataVarchar etc.) is included.  If so that means the field could be changed when the data
+        /// type is saved.
+        /// </summary>
+        /// <returns></returns>
+        internal bool CanHaveDataValueTypeChanged()
+        {
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(_propertyEditorAlias);
+            return propertyEditor.PreValueEditor.Fields
+                .SingleOrDefault(x => x.Key == Constants.PropertyEditors.PreValueKeys.DataValueType) != null;
         }
 
         /// <summary>

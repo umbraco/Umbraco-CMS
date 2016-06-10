@@ -1,4 +1,20 @@
-<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid umb-editor umb-grid" id="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-editor clearfix" id="umb-grid">
+
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-right>
+            <umb-button
+                ng-if="showReorderButton()"
+                type="button"
+                icon="icon-navigation"
+                button-style="link"
+                label-key="{{reorderKey}}"
+                action="toggleSortMode()">
+            </umb-button>
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
 
     <div ng-if="contentReady">
 
@@ -7,6 +23,8 @@
         <div class="templates-preview"
              ng-show="!model.value || model.value == ''">
 
+             <p><strong><localize key="grid_chooseLayout" /></strong></p>
+
             <div class="preview-rows layout"
                  ng-repeat="template in model.config.items.templates"
                  ng-click="addTemplate(template)">
@@ -14,7 +32,6 @@
                 <div class="preview-row">
 
                     <div class="preview-col"
-                         ng-class="{last:$last}"
                          ng-repeat="section in template.sections"
                          ng-style="{width: percentage(section.grid) + '%'}">
 
@@ -28,187 +45,194 @@
                 <div class="preview-overlay">
                 </div>
 
-                <small>{{layout.name}}</small>
+                <small>{{template.name}}</small>
 
             </div> <!-- .templates-preview-rows -->
 
-            <p><span class="help-text"><localize key="grid_addRows"/></span></p>
-
-
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
+
         <!-- Grids -->
-        <div class="usky-grid-width">
+        <div class="umb-grid-width">
             <div class="tb">
 
                 <!-- for each column in model -->
-                <div class="usky-column td"
-                     ng-class="{last:$last}"
+                <div class="umb-column td"
                      ng-repeat="section in model.value.sections"
                      ng-init="initSection(section)"
                      ng-style="{width: section.$percentage + '%'}">
 
-                    <div ui-sortable="sortableOptions" ng-model="section.rows">
+                    <div ui-sortable="sortableOptionsRow" ng-model="section.rows">
 
                         <!-- for each row in template section -->
-                        <div ng-repeat="row in section.rows"
-                             class="usky-row"
-                             ng-mouseenter="setCurrentRow(row)"
-                             ng-mouseleave="disableCurrentRow()">
+                        <!-- ng-mouseenter="setCurrentRow(row)" -->
+                        <!-- ng-mouseleave="disableCurrentRow()"  -->
+                        <div class="umb-row"
+                             ng-repeat="row in section.rows"
+                             ng-click="clickRow($index, section.rows)"
+                             ng-class="{
+                                     '-has-config': row.hasConfig,
+                                     '-active': row.active,
+                                     '-active-child': row.hasActiveChild}"
+                             on-outside-click="clickOutsideRow($index, section.rows)"
+                             bind-click-on="{{row.active}}">
 
-                            <!-- Row tool -->
-                            <div class="row-tools" ng-animate="'fade'" 
-                                ng-if="currentRow === row && currentControl === null">
+                            <div class="umb-row-title-bar">
 
-                                <!-- delete row -->
-                                <div class="cell-tools-remove">
-                                    <div class="iconBox"
-                                         ng-click="showPrompt(row)"
-                                         ng-mouseover="setWarnighlightRow(row)"
-                                         ng-mouseleave="disableWarnhighlightRow(row)">
+                                <div class=".umb-grid-right">
+                                    <div class="umb-row-title">{{row.name}}</div>
 
-                                        <span class="prompt" ng-if="row.deletePrompt">
-                                            <localize key="general_areyousure" />
-                                            <a href ng-click="removeRow(section, $index)"><localize key="general_yes" /></a>
-                                            <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
-                                        </span>
-
-                                        <i ng-if="!row.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
+                                    <div class="umb-grid-has-config" ng-if="row.hasConfig && !sortMode">
+                                            <localize key="grid_settingsApplied" />
                                     </div>
                                 </div>
 
-                                <div class="cell-tools-move">
-                                    <a class="iconBox"
-                                       ng-mouseover="setInfohighlightRow(row)"
-                                       ng-mouseleave="disableInfohighlightRow(row)"
-                                       href>
-                                        <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                    </a>
-                                </div>
+                               <!-- Row tool -->
+                               <div class="umb-tools row-tools" ng-show="row.active && !sortMode">
 
-                                <div class="cell-tools-edit" ng-if="hasSettings">
-                                    <a class="iconBox"
-                                       ng-mouseover="setInfohighlightRow(row)"
-                                       ng-mouseleave="disableInfohighlightRow(row)"
-                                       ng-click="editGridItemSettings(row, 'row')"
-                                       href>
-                                        <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
-                                    </a>
-                                </div>
+                                   <div class="cell-tools-edit row-tool" ng-if="hasSettings">
+                                       <i class="icon icon-settings" title="@grid_settings" localize="title" ng-click="editGridItemSettings(row, 'row')"></i>
+                                   </div>
+
+                                    <div class="cell-tools-remove row-tool">
+                                        <i class="icon-trash" ng-click="togglePrompt(row)"></i>
+                                        <umb-confirm-action
+                                            ng-if="row.deletePrompt"
+                                            direction="left"
+                                            on-confirm="removeRow(section, $index)"
+                                            on-cancel="hidePrompt(row)">
+                                        </umb-confirm-action>
+                                    </div>
+
+                               </div>
+
 
                             </div>
 
                             <!-- row container -->
-                            <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                                 ng-class="{last:$last,
-                                            first:$first,
-                                            warnhighlight:currentWarnhighlightRow == row, 
-                                            infohighlight:currentInfohighlightRow == row,
-                                            selectedRow:currentRow == row && currentControl === null}">
+                            <div class="{{row.cssClass}} umb-row-inner">
 
-                                <ins class="item-label">{{row.name}}</ins>
-                                    
                                 <div class="mainTb">
                                     <div class="tb">
                                         <div class="tr">
 
                                             <!-- Areas in row -->
-                                            <div ng-style="{width: area.$percentage + '%'}"
-                                                 class="td mainTd usky-cell"
-                                                 ng-class="{last:$last,first:$first, infohighlight:currentInfohighlightArea == area,
-                                                            warnhighlight:currentWarnhighlightArea == area}"
-                                                 ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                            <div class="umb-cell td mainTd"
+                                                 ng-repeat="area in row.areas"
+                                                 ng-style="{width: area.$percentage + '%'}"
+                                                 ng-class="{
+                                                    '-has-config': area.hasConfig,
+                                                    '-active': area.active,
+                                                    '-active-child': area.hasActiveChild}"
+                                                 ng-model="area.controls"
+                                                 ng-click="clickCell($index, row.areas, row)"
+                                                 on-outside-click="clickOutsideCell($index, row.areas, row)"
+                                                 bind-click-on="{{area.active}}">
 
-                                                <!-- Controls in areas -->
-                                                <div ng-repeat="control in area.controls"
-                                                     ng-mouseover="setCurrentControl(control)"
-                                                     ng-mouseleave="disableCurrentControl(control)"
-                                                     ng-animate="'fade'"
-                                                     class="usky-control">
+                                                 <!-- Cell -->
+                                                 <div class="umb-cell-content"
+                                                      ng-class="
+                                                        {'-active': area.active,
+                                                        '-has-editors': area.controls.length > 0,
+                                                        '-collapsed': sortMode}">
 
-                                                    <!-- Filled cell tools -->
-                                                    <div class="cell-tools"
-                                                         ng-class="{'with-prompt': control.deletePrompt}"
-                                                         ng-animate="'fade'"
-                                                         ng-if="control && (currentControl == control)">
+                                                      <!-- disable drop overlay -->
+                                                      <div class="drop-overlay -disable" ng-if="area.dropNotAllowed">
+                                                          <i class="icon-delete drop-icon"></i>
+                                                          <localize key="grid_contentNotAllowed" />
+                                                      </div>
 
-                                                        <!-- delete control -->
-                                                        <div class="cell-tools-remove">
-                                                            <div class="iconBox"
-                                                                 ng-click="showPrompt(control)"
-                                                                 ng-mouseover="setWarnhighlightControl(control)"
-                                                                 ng-mouseleave="disableWarnhighlightControl(control)">
+                                                      <!-- allow drop overlay -->
+                                                      <div class="drop-overlay -allow" ng-if="area.dropOnEmpty">
+                                                          <i class="icon-download drop-icon"></i>
+                                                          <localize key="grid_contentAllowed" />
+                                                      </div>
 
-                                                                <span class="prompt" ng-if="control.deletePrompt">
-                                                                    <localize key="general_areyousure" />
-                                                                    <a href ng-click="removeControl(area, $index)"><localize key="general_yes" /></a>
-                                                                    <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
-                                                                </span>
+                                                      <div class="umb-grid-has-config" ng-if="area.hasConfig && !sortMode">
+                                                         <localize key="grid_settingsApplied" />
+                                                      </div>
 
-                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
-                                                            </div>
-                                                        </div>
+                                                      <div class="cell-tools" ng-if="area.active && !sortMode">
+                                                         <div class="cell-tool" ng-click="editGridItemSettings(area, 'cell')">
+                                                            <i class="icon-settings"></i>
+                                                         </div>
+                                                      </div>
 
-                                                        <!-- move control -->
-                                                        <div class="cell-tools-move">
-                                                            <a class="iconBox"
-                                                               ng-mouseover="setInfohighlightControl(control)"
-                                                               ng-mouseleave="disableInfohighlightControl(control)"
-                                                               href>
-                                                                <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                                            </a>
-                                                        </div>
+                                                      <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" ng-model="area.controls">
 
-                                                        <!-- setting area -->
-                                                        <div class="cell-tools-edit" ng-if="hasSettings && $first">
-                                                            <a class="iconBox"
-                                                               ng-mouseover="setInfohighlightArea(area)"
-                                                               ng-mouseleave="disableInfohighlightArea(area)"
-                                                               ng-click="editGridItemSettings(area, 'cell')"
-                                                               href>
-                                                                <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
-                                                            </a>
-                                                        </div>
+                                                          <!-- Control placeholder -->
+                                                          <div class="umb-cell-placeholder" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
+                                                               <div class="cell-tools-add -center">
+                                                                   <localize ng-if="!sortMode" key="grid_addElement" />
+                                                                   <localize ng-if="sortMode" key="grid_dropElement" />
+                                                               </div>
+                                                          </div>
 
-                                                    </div>
+                                                          <!-- for each control in areas -->
+                                                          <div class="umb-control"
+                                                              ng-repeat="control in area.controls"
+                                                              ng-click="clickControl($index, area.controls, area)"
+                                                              ng-class="{'-active': control.active}"
+                                                              on-outside-click="clickOutsideControl($index, area.controls, area)"
+                                                              bind-click-on="{{control.active}}"
+                                                              umb-set-dirty-on-change="{{control.value}}">
 
-                                                    <div class="usky-control-inner" ng-class="{last:$last,
-                                                               infohighlight:currentInfohighlightControl == control,
-                                                               warnhighlight:currentWarnhighlightControl == control,
-                                                               selectedControl:currentControl == control}">
-                                                        
-                                                        <ins class="item-label">{{control.editor.name}}</ins>
+                                                              <div class="umb-control-click-overlay" ng-show="!control.active && !sortMode"></div>
 
-                                                        <!-- Redering the editor for specific control -->
-                                                        <div ng-if="control && control.$editorPath"
-                                                             ng-include="control.$editorPath"
-                                                             class="usky-cell-{{control.editor.view}}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- Controls repeat end -->
-                                                <!-- if area is empty tools -->
-                                                <div class="usky-control usky-control-placeholder"
-                                                     ng-if="area.controls.length == 0">
-                                                    <div class="help-text" style="margin-bottom: 15px">
-                                                        <localize key="grid_addElement"/>
-                                                    </div><br />
-                                                </div>
+                                                              <div class="umb-control-collapsed umb-control-handle" ng-show="sortMode">
+                                                                  {{control.editor.name}}
+                                                              </div>
 
-                                                <div class="cell-tools-add"
-                                                     ng-class="{emptyArea:area.controls.length == 0}"
-                                                     ng-if="!currentToolsControl"
-                                                     ng-animate="'fade'">
+                                                              <div class="umb-control-inner" ng-hide="sortMode">
 
-                                                    <a class="iconBox" href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                        <i class=" icon icon-add" title="@general_add" localize="title"></i>
-                                                    </a>
+                                                                   <div class="umb-control-bar umb-control-handle">
 
-                                                    <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
-                                                </div>
+                                                                      <div class="umb-control-title" ng-if="control.active">
+                                                                         {{control.editor.name}}
+                                                                      </div>
+
+                                                                      <div class="umb-tools" ng-if="control.active">
+
+                                                                          <div class="umb-control-tool" ng-if="control.editor.config.settings">
+                                                                              <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
+                                                                          </div>
+
+                                                                        <div class="umb-control-tool">
+                                                                            <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
+                                                                            <umb-confirm-action
+                                                                                ng-if="control.deletePrompt"
+                                                                                direction="left"
+                                                                                on-confirm="removeControl(area, $index)"
+                                                                                on-cancel="hidePrompt(control)">
+                                                                            </umb-confirm-action>
+                                                                        </div>
+
+                                                                      </div>
+
+                                                                   </div>
+
+                                                                 <!-- Redering the editor for specific control -->
+                                                                 <div ng-if="control && control.$editorPath"
+                                                                       ng-include="control.$editorPath"
+                                                                       class="umb-cell-{{control.editor.view}}">
+                                                                 </div>
+
+                                                              </div>
+                                                          </div>
+
+                                                      </div>
+                                                      <!-- Controls repeat end -->
+
+                                                      <!-- if area is empty tools -->
+                                                      <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode">
+                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
+                                                      </div>
+
+                                                 </div>
 
                                             </div>
                                             <!-- cells repeat end -->
+
                                         </div>
                                     </div>
                                 </div>
@@ -222,7 +246,22 @@
                     <!-- row sortable end -->
                     <!-- column tools -->
 
-                    <div class="templates-preview">
+                    <div class="umb-add-row" ng-if="!sortMode">
+
+                       <a href=""
+                          class="iconBox"
+                          ng-click="toggleAddRow()"
+                          ng-if="!showRowConfigurations">
+
+                          <i class=" icon icon-add" title="@general_add" localize="title"></i>
+
+                       </a>
+
+                    </div>
+
+                    <div class="templates-preview" ng-if="showRowConfigurations">
+
+                        <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows" /></strong></p>
 
                         <div class="preview-rows columns"
                              ng-repeat="layout in  section.$allowedLayouts"
@@ -247,11 +286,6 @@
 
                         </div> <!-- .templates-preview-rows -->
 
-                        <p>
-                            <span class="help-text"><localize key="grid_addRows" /></span>
-                        </p>
-
-
                     </div> <!-- .templates-preview -->
                     <!-- column tools end -->
 
@@ -260,5 +294,19 @@
             </div>
         </div>
     </div>
+
+    <umb-overlay
+      ng-if="editorOverlay.show"
+      model="editorOverlay"
+      view="editorOverlay.view"
+      position="target">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="gridItemSettingsDialog.show"
+      model="gridItemSettingsDialog"
+      view="gridItemSettingsDialog.view"
+      position="right">
+    </umb-overlay>
 
 </div>

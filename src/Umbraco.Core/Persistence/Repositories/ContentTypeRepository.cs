@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -11,6 +14,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -27,46 +31,54 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
         }
 
-        #region Overrides of RepositoryBase<int,IContentType>
-        
+        private FullDataSetRepositoryCachePolicyFactory<IContentType, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<IContentType, int> CachePolicyFactory
+        {
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), 
+                    //allow this cache to expire
+                    expires:true));
+            }
+        }
+
         protected override IContentType PerformGet(int id)
         {
-            var contentTypes = ContentTypeQueryMapper.GetContentTypes(
-                new[] {id}, Database, SqlSyntax, this, _templateRepository);
-            
-            var contentType = contentTypes.SingleOrDefault();
-            return contentType;
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<IContentType> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+                //NOTE: This logic should never be executed according to our cache policy
+                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository)
+                    .Where(x => ids.Contains(x.Id));
             }
-            else
-            {
-                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
-            }
+
+            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository);
         }
 
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
-            var sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.Text);
+            var sql = translator.Translate();                
 
-            var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
-            return dtos.Any()
-                ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
-                : Enumerable.Empty<IContentType>();
+            var dtos = Database.Fetch<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql);
+
+            return
+                //This returns a lookup from the GetAll cached looup
+                (dtos.Any()
+                    ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
+                    : Enumerable.Empty<IContentType>())
+                    //order the result by name
+                    .OrderBy(x => x.Name);
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -89,18 +101,39 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
         }
 
-        #region Overrides of PetaPocoRepositoryBase<int,IContentType>
+        /// <summary>
+        /// Gets all content type aliases
+        /// </summary>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
+        {
+            var sql = new Sql().Select("cmsContentType.alias")
+                .From<ContentTypeDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
+
+            if (objectTypes.Any())
+            {
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+            }
+
+            return Database.Fetch<string>(sql);
+        }
 
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
 
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ContentTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-               .LeftJoin<DocumentTypeDto>()
-               .On<DocumentTypeDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+               .From<ContentTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+               .LeftJoin<ContentTypeTemplateDto>(SqlSyntax)
+               .On<ContentTypeTemplateDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
@@ -135,11 +168,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.DocumentType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         /// <summary>
         /// Deletes a content type
         /// </summary>
@@ -157,6 +186,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 // ensure the cache is updated.
                 PersistDeletedItem((IEntity)child);
             }
+
+            //Before we call the base class methods to run all delete clauses, we need to first 
+            // delete all of the property data associated with this document type. Normally this will
+            // be done in the ContentTypeService by deleting all associated content first, but in some cases
+            // like when we switch a document type, there is property data left over that is linked
+            // to the previous document type. So we need to ensure it's removed.
+            var sql = new Sql().Select("DISTINCT cmsPropertyData.propertytypeid")
+                .From<PropertyDataDto>(SqlSyntax)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
+                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+
+            //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
+            Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));
 
             base.PersistDeletedItem(entity);
         }
@@ -178,24 +223,37 @@ namespace Umbraco.Core.Persistence.Repositories
 
             ((ContentType)entity).AddingEntity();
 
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistNewBaseContentType(dto.ContentTypeDto, entity);
-            //Inserts data into the cmsDocumentType table if a template exists
-            if (dto.TemplateNodeId > 0)
-            {
-                dto.ContentTypeNodeId = entity.Id;
-                Database.Insert(dto);
-            }
-
-            //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
-            {
-                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
-            }
+            PersistNewBaseContentType(entity);
+            PersistTemplates(entity, false);
 
             entity.ResetDirtyProperties();
+        }
+
+        protected void PersistTemplates(IContentType entity, bool clearAll)
+        {
+            // remove and insert, if required
+            Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
+
+            // we could do it all in foreach if we assume that the default template is an allowed template??
+            var defaultTemplateId = ((ContentType) entity).DefaultTemplateId;
+            if (defaultTemplateId > 0)
+            {
+                Database.Insert(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = defaultTemplateId,
+                    IsDefault = true
+                });
+            }
+            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != defaultTemplateId))
+            {
+                Database.Insert(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = template.Id,
+                    IsDefault = false
+                });
+            }
         }
 
         protected override void PersistUpdatedItem(IContentType entity)
@@ -218,51 +276,41 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistUpdatedBaseContentType(dto.ContentTypeDto, entity);
-
-            //Look up DocumentType entries for updating - this could possibly be a "remove all, insert all"-approach
-            Database.Delete<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
-            //Insert the updated DocumentTypeDto if a template exists
-            if (dto.TemplateNodeId > 0)
-            {
-                Database.Insert(dto);
-            }
-
-            //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
-            {
-                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
-            }
+            PersistUpdatedBaseContentType(entity);
+            PersistTemplates(entity, true);
 
             entity.ResetDirtyProperties();
         }
-
-        #endregion
-
+        
         protected override IContentType PerformGet(Guid id)
         {
-            var contentTypes = ContentTypeQueryMapper.GetContentTypes(
-                new[] { id }, Database, SqlSyntax, this, _templateRepository);
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Key == id);
+        }
 
-            var contentType = contentTypes.SingleOrDefault();
-            return contentType;
+        protected override IContentType PerformGet(string alias)
+        {
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
         protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
         {
+            //use the underlying GetAll which will force cache all content types
+
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+                return GetAll().Where(x => ids.Contains(x.Key));
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
+                return GetAll();
             }
+        }
+
+        protected override bool PerformExists(Guid id)
+        {
+            return GetAll().FirstOrDefault(x => x.Key == id) != null;
         }
     }
 }

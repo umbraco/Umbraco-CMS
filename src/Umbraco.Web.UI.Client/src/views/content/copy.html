@@ -9,9 +9,9 @@
                 <div class="umb-loader"></div>
             </div>
 
-            <div class="alert alert-error" ng-show="error">
-                <h4>{{error.errorMsg}}</h4>
-                <p>{{error.data.Message}}</p>
+            <div ng-show="error">
+                <h5 class="text-error">{{error.errorMsg}}</h5>
+                <p class="text-error">{{error.data.message}}</p>
             </div>
 
             <div class="alert alert-success" ng-show="success">
@@ -53,6 +53,12 @@
                 <umb-pane>
                     <umb-control-group label="Relate to original">
                         <input type="checkbox" ng-model="$parent.$parent.relateToOriginal" />
+                    </umb-control-group>
+                </umb-pane>
+
+                <umb-pane>
+                    <umb-control-group label="Include descendants">
+                        <input type="checkbox" ng-model="$parent.$parent.recursive" />
                     </umb-control-group>
                 </umb-pane>
 

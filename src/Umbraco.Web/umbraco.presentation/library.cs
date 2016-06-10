@@ -493,11 +493,11 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
-                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        () => GetMediaDo(MediaId, Deep));
+                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem:   () => GetMediaDo(MediaId, Deep));
 
                     if (xml != null)
                     {                   
@@ -552,11 +552,11 @@ namespace umbraco
             {
                 if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
-                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
-                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        () => GetMemberDo(MemberId));
+                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem:   () => GetMemberDo(MemberId));
 
                     if (xml != null)
                     {
@@ -602,7 +602,7 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-                return xp.Select("/node");
+                return xp.Select("/node()");
             }
 
             XmlDocument xd = new XmlDocument();
@@ -1575,30 +1575,26 @@ namespace umbraco
         /// <summary>
         /// Sends an e-mail using the System.Net.Mail.MailMessage object
         /// </summary>
-        /// <param name="FromMail">The sender of the e-mail</param>
-        /// <param name="ToMail">The recipient of the e-mail</param>
-        /// <param name="Subject">E-mail subject</param>
-        /// <param name="Body">The complete content of the e-mail</param>
-        /// <param name="IsHtml">Set to true when using Html formatted mails</param>
-        public static void SendMail(string FromMail, string ToMail, string Subject, string Body, bool IsHtml)
+        /// <param name="fromMail">The sender of the e-mail</param>
+        /// <param name="toMail">The recipient(s) of the e-mail, add multiple email addresses by using a semicolon between them</param>
+        /// <param name="subject">E-mail subject</param>
+        /// <param name="body">The complete content of the e-mail</param>
+        /// <param name="isHtml">Set to true when using Html formatted mails</param>
+        public static void SendMail(string fromMail, string toMail, string subject, string body, bool isHtml)
         {
             try
             {
-                // create the mail message 
-                MailMessage mail = new MailMessage(FromMail.Trim(), ToMail.Trim());
-
-                // populate the message
-                mail.Subject = Subject;
-                if (IsHtml)
-                    mail.IsBodyHtml = true;
-                else
-                    mail.IsBodyHtml = false;
-
-                mail.Body = Body;
-
-                // send it
-                SmtpClient smtpClient = new SmtpClient();
-                smtpClient.Send(mail);
+                using (var mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(fromMail.Trim());
+                    foreach (var mailAddress in toMail.Split(';'))
+                        mail.To.Add(new MailAddress(mailAddress.Trim()));
+                    mail.Subject = subject;
+                    mail.IsBodyHtml = isHtml;
+                    mail.Body = body;
+                    using (var smtpClient = new SmtpClient())
+                        smtpClient.Send(mail);
+                }
             }
             catch (Exception ee)
             {

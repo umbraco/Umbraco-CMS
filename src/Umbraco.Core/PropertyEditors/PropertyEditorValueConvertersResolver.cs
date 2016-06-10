@@ -8,6 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
 	/// Manages the list of IPropertyEditorValueConverter's
     /// </summary>
+    [Obsolete("IPropertyEditorValueConverter is obsolete, but we need to support them until v8, to resolve the correct converter types use: PropertyValueConvertersResolver")]
     internal sealed class PropertyEditorValueConvertersResolver : ManyObjectsResolverBase<PropertyEditorValueConvertersResolver, IPropertyEditorValueConverter>
 	{
         /// <summary>

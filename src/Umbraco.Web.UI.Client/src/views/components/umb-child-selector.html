@@ -1,0 +1,37 @@
+<div class="umb-child-selector">
+
+    <div class="umb-child-selector__child -parent">
+        <div class="umb-child-selector__child-description">
+            <div class="umb-child-selector__child-icon-holder">
+                <i class="umb-child-selector__child-icon {{ parentIcon }}"></i>
+            </div>
+            <span class="umb-child-selector__child-name">
+                <strong>{{ parentName }}</strong>
+            </span>
+            <small>
+                (<localize key="general_current"></localize>)
+            </small>
+        </div>
+    </div>
+
+    <div class="umb-child-selector__children-container">
+
+        <div class="umb-child-selector__child" ng-repeat="selectedChild in selectedChildren">
+            <div class="umb-child-selector__child-description">
+                <div class="umb-child-selector__child-icon-holder">
+                    <i class="umb-child-selector__child-icon {{ selectedChild.icon }}"></i>
+                </div>
+                <span class="umb-child-selector__child-name"> {{ selectedChild.name }}</span>
+            </div>
+            <div class="umb-child-selector__child-actions">
+                <i class="umb-child-selector__child-remove icon-trash" ng-click="removeChild(selectedChild, $index)"></i>
+            </div>
+        </div>
+
+        <a href="" class="umb-child-selector__child -placeholder" ng-click="addChild($event)" hotkey="alt+shift+c">
+            <div class="umb-child-selector__child-name -blue"><strong><localize key="shortcuts_addChild">Add Child</localize></strong></div>
+        </a>
+
+    </div>
+
+</div>

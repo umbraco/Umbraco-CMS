@@ -1,0 +1,140 @@
+<form ng-controller="Umbraco.Overlays.MediaPickerController" id="fileupload"
+      method="POST"
+      enctype="multipart/form-data"
+      umb-image-upload="options">
+
+   <div
+      on-drag-leave="dragLeave()"
+      on-drag-end="dragLeave()"
+      on-drag-enter="dragEnter()">
+
+      <div class="umb-control-group umb-mediapicker-upload">
+
+         <div class="form-search">
+            <i class="icon-search"></i>
+            <input
+                class="umb-search-field search-query"
+                ng-model="searchTerm"
+                localize="placeholder"
+                placeholder="@placeholders_filter"
+                type="text">
+         </div>
+
+         <div class="upload-button">
+             <umb-button
+                type="button"
+                key="general_upload"
+                label="Upload"
+                action="upload()"
+                disabled="disabled">
+             </umb-button>
+         </div>
+
+      </div>
+
+      <div class="row umb-control-group">
+         <ul class="umb-breadcrumbs">
+            <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
+               <a href ng-click="gotoFolder()" prevent-default>Media</a>
+               <span class="umb-breadcrumbs__seperator">&#47;</span>
+            </li>
+
+            <li ng-repeat="item in path" class="umb-breadcrumbs__ancestor">
+               <a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a>
+               <span class="umb-breadcrumbs__seperator">&#47;</span>
+            </li>
+
+            <li class="umb-breadcrumbs__ancestor">
+               <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
+                  <i class="icon icon-add small"></i>
+               </a>
+
+               <input
+                  type="text"
+                  class="input-foldername input-mini inline"
+                  ng-show="showFolderInput"
+                  ng-model="newFolderName"
+                  ng-keydown="enterSubmitFolder($event)"
+                  on-blur="submitFolder()"
+                  focus-when="{{showFolderInput}}" />
+               </li>
+          </ul>
+
+      </div>
+
+      <umb-file-dropzone
+         parent-id="{{currentFolder.id}}"
+         files-uploaded="onUploadComplete"
+         files-queued="onFilesQueue"
+         accept="{{acceptedFileTypes}}"
+         max-file-size="{{maxFileSize}}"
+         hide-dropzone="{{!activeDrag && images.length > 0 }}"
+         compact="{{ images.length > 0 }}">
+      </umb-file-dropzone>
+
+      <umb-media-grid
+         items="images"
+         filter-by="searchTerm"
+         on-click="clickHandler"
+         on-click-name="clickItemName"
+         item-max-width="150"
+         item-max-height="150"
+         item-min-width="100"
+         item-min-height="100"
+         only-images={{onlyImages}}>
+      </umb-media-grid>
+
+   </div>
+
+   <umb-overlay
+		ng-if="mediaPickerDetailsOverlay.show"
+		model="mediaPickerDetailsOverlay"
+		position="right">
+
+      <div class="umb-control-group">
+
+         <div ng-if="target.url">
+            <umb-image-gravity
+               src="target.url"
+               center="target.focalPoint">
+            </umb-image-gravity>
+         </div>
+
+         <div ng-if="cropSize">
+
+            <h5>
+                <localize key="general_preview">Preview</localize>
+            </h5>
+
+            <umb-image-thumbnail
+               center="target.focalPoint"
+               src="target.url"
+               height="{{cropSize.height}}"
+               width="{{cropSize.width}}"
+               max-size="400">
+            </umb-image-thumbnail>
+
+         </div>
+
+      </div>
+
+      <div class="umb-control-group">
+         <label><localize key="@general_url"></localize></label>
+         <input
+            type="text"
+            localize="placeholder"
+            placeholder="@general_url"
+            class="umb-editor umb-textstring"
+            ng-model="target.url"
+            ng-disabled="target.id" />
+      </div>
+
+      <div class="umb-control-group">
+         <label><localize key="@content_altTextOptional"></localize></label>
+         <input type="text" class="umb-editor umb-textstring" ng-model="target.altText" />
+      </div>
+
+
+	</umb-overlay>
+
+</form>

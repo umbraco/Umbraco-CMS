@@ -1,0 +1,227 @@
+// Table Styles
+.umb-table {
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid @grayLight;
+
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    min-width: 640px;
+}
+
+.umb-table a {
+    text-decoration: none;
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+        text-decoration: none;
+    }
+}
+
+input.umb-table__input {
+    margin: 0 auto;
+}
+
+
+
+
+// Table Head Styles
+.umb-table-head {
+    text-transform: uppercase;
+
+    background-color: @grayLighter;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.umb-table-head__link {
+    position: relative;
+
+    cursor: default;
+    text-decoration: none;
+
+    color: fade(@gray, 75%);
+
+
+    &:hover {
+        text-decoration: none;
+        color: fade(@gray, 75%);
+    }
+}
+
+.umb-table-head__link .sortable {
+    &:hover {
+        text-decoration: none;
+        cursor: pointer;
+        color: @black;
+    }
+}
+
+.umb-table-thead__icon {
+    position: absolute;
+
+    padding-top: 1px;
+    padding-left: 3px;
+
+    font-size: 13px;
+
+    cursor: default;
+}
+
+.umb-table-thead .sortable:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+
+
+
+// Table Body Styles
+.umb-table-body .umb-table-row {
+    color: fade(@gray, 75%);
+    border-top: 1px solid @grayLight;
+    cursor: pointer;
+    font-size: 13px;
+
+    &:hover {
+        background-color: fade(@grayLighter, 90%);
+    }
+}
+
+.umb-table-body__link {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.umb-table-body__icon,
+.umb-table-body__icon[class^="icon-"],
+.umb-table-body__icon[class*=" icon-"] {
+    margin: 0 auto;
+    font-size: 22px;
+    line-height: 22px;
+    color: @blueDark;
+}
+
+.umb-table-body__checkicon,
+.umb-table-body__checkicon[class^="icon-"],
+.umb-table-body__checkicon[class*=" icon-"] {
+    display: none;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.umb-table-body .umb-table__name {
+    color: @black;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+// Styles of no items in the listview
+.umb-table-body__empty {
+    font-size: 16px;
+    text-align: center;
+
+    color: @gray;
+
+    padding: 20px 0;
+
+    height: 100%;
+}
+
+// Show checkmark when checked, hide file icon
+.-selected {
+    .umb-table-body__fileicon {
+        display: none;
+    }
+
+    .umb-table-body__checkicon {
+        display: inline-block;
+    }
+}
+
+
+// Styling for when item is published or not
+.-published {
+
+}
+
+.-content .-unpublished {
+    .umb-table__name > * {
+        opacity: .4;
+    }
+
+    .umb-table-body__icon {
+        opacity: .4;
+    }
+}
+
+.-selected.-unpublished {
+    .umb-table-body__icon {
+        opacity: 1;
+    }
+}
+
+
+
+
+
+
+// Table Row Styles
+.umb-table-row {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    user-select: none;
+}
+
+.umb-table-row.-selected,
+.umb-table-row.-selected:hover {
+    background-color: fade(@blueDark, 4%);
+}
+
+
+
+
+// Table Cell Styles
+.umb-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
+
+    position: relative;
+
+    margin: auto 14px;
+    padding: 6px 2px;
+
+    text-align: left;
+    overflow:hidden;
+}
+
+.umb-table-cell > * {
+    overflow: hidden;
+    white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
+    text-overflow: ellipsis;
+}
+
+.umb-table-cell:first-of-type {
+    flex: 0 0 25px;
+
+    margin: 0 0 0 15px;
+    padding: 15px 0;
+}
+
+
+// Increases the space for the name cell
+.umb-table__name {
+    flex: 1 1 25%;
+    max-width: 25%;
+}

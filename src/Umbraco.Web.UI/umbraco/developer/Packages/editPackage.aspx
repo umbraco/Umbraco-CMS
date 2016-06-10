@@ -75,7 +75,7 @@
             <asp:PlaceHolder ID="content" runat="server"></asp:PlaceHolder>
             <br />
             <asp:CheckBox ID="packageContentSubdirs" runat="server" />
-            Include all child nodes
+            <asp:Label ID="packageContentSubdirsLabel" Text="Include all child nodes" AssociatedControlID="packageContentSubdirs" runat="server" />
         </cc2:PropertyPanel>
     </cc2:Pane>
     <cc2:Pane ID="Pane2_1" runat="server">

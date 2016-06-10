@@ -20,13 +20,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        private readonly CacheHelper _cacheHelper;
-
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, CacheHelper cacheHelper)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _cacheHelper = cacheHelper;
         }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();
@@ -135,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup GetByName(string name)
         {
-            return _cacheHelper.RuntimeCache.GetCacheItem<IMemberGroup>(
+            return RuntimeCache.GetCacheItem<IMemberGroup>(
                 string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
                 () =>
                 {

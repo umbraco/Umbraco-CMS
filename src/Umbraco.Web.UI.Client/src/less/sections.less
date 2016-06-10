@@ -19,8 +19,11 @@ ul.sections li {
 }
 
 ul.sections li [class^="icon-"]:before, 
-ul.sections li [class*=" icon-"]:before{
+ul.sections li [class*=" icon-"]:before,
+ul.sections li img.icon-section {
 	font-size: 30px;
+    line-height: 20px; /* set line-height to ensure all icons use same line-height */
+    display: inline-block;
 	margin: 1px 0 0 0;
 	opacity: 0.4;
 	-webkit-transition: all .3s linear;
@@ -29,7 +32,8 @@ ul.sections li [class*=" icon-"]:before{
 }
 
 ul.sections:hover li [class^="icon-"]:before, 
-ul.sections:hover li [class*=" icon-"]:before {
+ul.sections:hover li [class*=" icon-"]:before,
+ul.sections:hover li img.icon-section {
 	opacity: 1
 }
 
@@ -65,8 +69,8 @@ ul.sections:hover a span {
 // -------------------------
 
 ul.sections li.avatar {
-	height: 67px;
-	padding: 30px 0 2px 0;
+	height: 75px;
+	padding: 22px 0 2px 0;
 	text-align: center;
 	margin: 0 0 0 -4px;
 	border-bottom: 1px solid @grayDark;
@@ -81,8 +85,8 @@ ul.sections li.avatar a {
 }
 
 ul.sections li.avatar a img {
-	border-radius: 16px;
-	width: 30px
+	border-radius: 50%;
+	width: 30px;
 }
 
 .faded ul.sections li {

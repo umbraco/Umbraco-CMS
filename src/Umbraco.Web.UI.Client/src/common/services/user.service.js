@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -211,7 +211,7 @@ angular.module('umbraco.services')
                         return result;
                     });
             },
-
+          
             /** Logs the user out 
              */
             logout: function () {
@@ -250,7 +250,7 @@ angular.module('umbraco.services')
                             }
 
                             setCurrentUser(data);
-                            currentUser.avatar = 'https://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+
                             deferred.resolve(currentUser);
                         });
 

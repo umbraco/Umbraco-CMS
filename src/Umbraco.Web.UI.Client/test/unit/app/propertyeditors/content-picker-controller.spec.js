@@ -5,7 +5,7 @@ describe('Content picker controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, entityMocks, mocksUtils) {
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, entityMocks, mocksUtils, localizationMocks) {
 
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
@@ -28,6 +28,7 @@ describe('Content picker controller tests', function () {
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         entityMocks.register();
+        localizationMocks.register();
 
         controller = $controller('Umbraco.PropertyEditors.ContentPickerController', {
             $scope: scope,

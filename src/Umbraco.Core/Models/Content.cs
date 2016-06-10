@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -155,6 +156,7 @@ namespace Umbraco.Core.Models
         /// Language of the data contained within this Content object.
         /// </summary>
         [Obsolete("This is not used and will be removed from the codebase in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public string Language
         {
             get { return _language; }
@@ -340,18 +342,6 @@ namespace Umbraco.Core.Models
             }
         }
         
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if(Key == Guid.Empty)
-                Key = Guid.NewGuid();
-        }
-
         /// <summary>
         /// Method to call when Entity is being updated
         /// </summary>

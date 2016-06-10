@@ -3,12 +3,15 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using umbraco.interfaces;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.webservices
 {
@@ -57,10 +60,31 @@ namespace umbraco.presentation.webservices
             return jsonRefresher;
         }
 
-        private static bool NotAutorized(string login, string rawPassword)
+        private bool Authorized(string login, string rawPassword)
         {
+            //TODO: This technique of passing the raw password in is a legacy idea and isn't really 
+            // a very happy way to secure this webservice. To prevent brute force attacks, we need 
+            // to ensure that the lockout policies are applied, though because we are not authenticating
+            // the user with their real password, we need to do this a bit manually.
+
+            var userMgr = Context.GetOwinContext().GetUserManager<BackOfficeUserManager>();
+            
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
-            return user == null || user.RawPasswordValue != rawPassword;
+            if (user == null) return false;
+
+            var u = userMgr.FindById(user.Id);
+            if (u == null) return false;
+
+            if (u.IsLockedOut) return false;
+
+            if (user.RawPasswordValue != rawPassword)
+            {
+                //this performs the lockout and/or increments the access failed count
+                userMgr.AccessFailed(u.Id);
+                return false;
+            }
+
+            return true;
         }
 
         #endregion
@@ -68,7 +92,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void BulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password)
         {
-            if (NotAutorized(login, password)) return;
+            if (Authorized(login, password) == false) return;
             if (SelfMessage(appId)) return; // do not process self-messages
 
             // only execute distinct instructions - no sense in running the same one more than once
@@ -107,29 +131,29 @@ namespace umbraco.presentation.webservices
 		[WebMethod]
 		public void RefreshAll(Guid uniqueIdentifier, string Login, string Password)
 		{
-		    if (NotAutorized(Login, Password)) return;
+		    if (Authorized(Login, Password) == false) return;
 			GetRefresher(uniqueIdentifier).RefreshAll();
 		}
 
 	    [WebMethod]
 		public void RefreshByGuid(Guid uniqueIdentifier, Guid Id, string Login, string Password)
 		{
-		    if (NotAutorized(Login, Password)) return;
+            if (Authorized(Login, Password) == false) return;
             GetRefresher(uniqueIdentifier).Refresh(Id);
 		}
 
 		[WebMethod]
 		public void RefreshById(Guid uniqueIdentifier, int Id, string Login, string Password)
 		{
-		    if (NotAutorized(Login, Password)) return;
+		    if (Authorized(Login, Password) == false) return;
 			GetRefresher(uniqueIdentifier).Refresh(Id);
 		}
 
         [WebMethod]
         public void RefreshByIds(Guid uniqueIdentifier, string jsonIds, string Login, string Password)
         {
-		    if (NotAutorized(Login, Password)) return;
-	        var refresher = GetRefresher(uniqueIdentifier);
+            if (Authorized(Login, Password) == false) return;
+            var refresher = GetRefresher(uniqueIdentifier);
 	        foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
 	            refresher.Refresh(id);
         }
@@ -137,21 +161,21 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void RefreshByJson(Guid uniqueIdentifier, string jsonPayload, string Login, string Password)
         {
-            if (NotAutorized(Login, Password)) return;
+            if (Authorized(Login, Password) == false) return;
             GetJsonRefresher(uniqueIdentifier).Refresh(jsonPayload);
         }
 
 	    [WebMethod]
         public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) 
         {
-            if (NotAutorized(Login, Password)) return;
+            if (Authorized(Login, Password) == false) return;
             GetRefresher(uniqueIdentifier).Remove(Id);
         }
 
 	    [WebMethod]
 		public XmlDocument GetRefreshers(string Login, string Password)
 	    {
-	        if (NotAutorized(Login, Password)) return null;
+	        if (Authorized(Login, Password) == false) return null;
 
 			var xd = new XmlDocument();
 			xd.LoadXml("<cacheRefreshers/>");

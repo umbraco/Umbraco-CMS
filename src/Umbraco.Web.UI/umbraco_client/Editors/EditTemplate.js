@@ -7,14 +7,14 @@
         _opts: null,
 
         _openMacroModal: function(alias) {
-            
+
             var self = this;
 
             UmbClientMgr.openAngularModalWindow({
                 template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "WebForms",
-                    selectedAlias: alias
+                    macroData: { macroAlias: alias }
                 },
                 callback: function(data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.editorClientId);
@@ -66,7 +66,7 @@
         constructor: function(opts) {
             // Merge options with default
             this._opts = $.extend({
-                
+
 
                 // Default options go here
             }, opts);
@@ -82,7 +82,7 @@
                 event.preventDefault();
                 self.doSubmit();
             });
-            
+
             $("#sb").click(function() {
                 self._insertCodeBlock();
             });
@@ -112,7 +112,7 @@
             });
         },
 
-        doSubmit: function() {            
+        doSubmit: function() {
             this.save(jQuery('#' + this._opts.templateNameClientId).val(), jQuery('#' + this._opts.templateAliasClientId).val(), UmbEditor.GetCode());
         },
 
@@ -134,7 +134,7 @@
                             self.submitFailure(e.message, e.header);
                         }
                     });
-            
+
         },
 
         submitSuccess: function (args) {
@@ -151,7 +151,10 @@
             if (args.contents) {
                 UmbEditor.SetCode(args.contents);
             }
-            
+
+            var alias = args.alias;
+            this._opts.aliasTxtBox.val(alias);
+
             top.UmbSpeechBubble.ShowMessage('save', header, msg);
             UmbClientMgr.mainTree().setActiveTreeType('templates');
             if (pathChanged) {
@@ -167,7 +170,7 @@
             top.UmbSpeechBubble.ShowMessage('error', header, err);
         }
     });
-    
+
     //Set defaults for jQuery ajax calls.
     $.ajaxSetup({
         dataType: 'json',

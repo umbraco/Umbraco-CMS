@@ -1,0 +1,14 @@
+<div class="umb-layout-selector" ng-show="showLayoutSelector">
+
+   <div class="umb-layout-selector__active-layout" ng-click="toggleLayoutDropdown()">
+      <i class="{{ activeLayout.icon }}"></i>
+   </div>
+
+   <div ng-if="layoutDropDownIsOpen" class="umb-layout-selector__dropdown shadow-depth-3 animated -half-second fadeIn" on-outside-click="closeLayoutDropdown()">
+       <div ng-repeat="layout in layouts | filter:{selected:true}" class="umb-layout-selector__dropdown-item" ng-click="pickLayout(layout)" ng-class="{'-active': layout.active }" ng-attr-title="{{layout.name}}">
+           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></i>
+       </div>
+
+   </div>
+
+</div>

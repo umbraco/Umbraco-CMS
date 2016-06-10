@@ -1,0 +1,101 @@
+<div class="umb-file-dropzone-directive">
+
+<ng-form name="uploadForm">
+
+<!-- Drag and drop files area -->
+    <div ngf-drop
+        ng-hide="hideDropzone"
+        ng-model="filesHolder"
+        ngf-change="handleFiles($files, $event)"
+        class="dropzone"
+        ngf-drag-over-class="drag-over"
+        ngf-multiple="true"
+        ngf-allow-dir="true"
+        ngf-pattern="{{ accept }}"
+        ngf-max-size="{{ maxFileSize }}"
+        ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
+
+
+        <div class="content" >
+
+            <!-- Drag and drop illustration -->
+            <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
+
+
+            <!-- Select files -->
+            <div class="file-select"
+                 ngf-select
+                 ng-model="filesHolder"
+                 ngf-change="handleFiles($files, $event)"
+                 ngf-multiple="true"
+                 ngf-pattern="{{ accept }}"
+                 ngf-max-size="{{ maxFileSize }}">
+                - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of uploading/uploaded files  -->
+    <ul class="file-list" ng-show="done.length > 0 || queue.length > 0 || rejected.length > 0">
+
+        <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
+        <li class="file" ng-repeat="file in done">
+
+            <!-- file name -->
+            <div class="file-description">{{ file.name }}</div>
+
+            <!-- upload success -->
+            <div class="file-icon" ng-if="file.uploadStatus == 'done'">
+                <i class="icon icon-check color-green"></i>
+            </div>
+
+        </li>
+
+        <li class="file" ng-if="currentFile">
+
+            <!-- file name -->
+            <div class="file-name">{{ currentFile.name }}</div>
+
+            <!-- upload progress bar -->
+            <div class="file-progress">
+                <span class="file-progress-indicator"
+                ng-style="{'width': currentFile.uploadProgress + '%'}"></span>
+            </div>
+        </li>
+
+        <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
+        <li class="file" ng-repeat="queued in queue">
+
+            <!-- file name -->
+            <div class="file-name">{{ queued.name }}</div>
+        </li>
+
+        <li class="file" ng-repeat="file in rejected">
+
+            <!-- file name -->
+            <div class="file-description">
+
+               <strong>{{ file.name }}</strong>
+
+               <span class="file-error" ng-if="file.$error">
+                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
+                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
+               </span>
+
+               <span class="file-error" ng-if="file.serverErrorMessage">
+                   <span class="errorMessage color-red">{{file.serverErrorMessage}}</span>
+               </span>
+
+            </div>
+
+            <!-- upload error -->
+            <div class="file-icon">
+               <i class="icon icon-delete color-red"></i>
+            </div>
+
+        </li>
+    </ul>
+
+</ng-form>
+
+</div>

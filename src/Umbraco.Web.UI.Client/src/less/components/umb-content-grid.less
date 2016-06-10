@@ -1,0 +1,114 @@
+.umb-content-grid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   justify-content: center;
+}
+
+.umb-content-grid__item {
+   background: @grayLighter;
+   flex: 0 1 200px;
+   cursor: pointer;
+   position: relative;
+   margin: 10px;
+   user-select: none;
+}
+
+.umb-content-grid__item.-selected {
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
+}
+
+.umb-content-grid__icon-container {
+   background: lighten(@grayLight, 7%);
+   height: 75px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.umb-content-grid__icon,
+.umb-content-grid__icon[class^="icon-"],
+.umb-content-grid__icon[class*=" icon-"] {
+   font-size: 40px;
+   color: lighten(@gray, 20%);
+}
+
+.umb-content-grid__icon.-light {
+   color: @grayLight;
+}
+
+
+.umb-content-grid__content {
+   box-sizing: border-box;
+   padding: 15px;
+}
+
+.umb-content-grid__item-name {
+   font-weight: bold;
+   margin-bottom: 10px;
+   color: black;
+   padding-bottom: 10px;
+   line-height: 1.4em;
+   border-bottom: 1px solid @grayLight;
+   display: inline-block;
+}
+
+.umb-content-grid__item-name:hover {
+    text-decoration: underline;
+}
+
+.umb-content-grid__item-name.-light {
+   color: @grayLight;
+}
+
+.umb-content-grid__details-list {
+   list-style: none;
+   margin-bottom: 0;
+   margin-left: 0;
+   font-size: 11px;
+}
+
+.umb-content-grid__details-list.-light {
+   color: @grayLight;
+}
+
+.umb-content-grid__details-label {
+   font-weight: bold;
+   display: inline-block;
+}
+
+.umb-content-grid__details-value {
+   display: inline-block;
+}
+
+.umb-content-grid__checkmark {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   border: 1px solid #ffffff;
+   width: 25px;
+   height: 25px;
+   background: @blue;
+   border-radius: 50px;
+   box-sizing: border-box;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   color: #ffffff;
+   cursor: pointer;
+}
+
+.umb-content-grid__item:hover .umb-content-grid__action:not(.-selected) {
+   opacity: 1;
+   animation: fadeIn;
+   animation-duration: 0.2s;
+   animation-timing-function: ease-in-out;
+}
+
+.umb-content-grid__no-items {
+   font-size: 16px;
+   font-weight: bold;
+   color: @grayLight;
+   padding-top: 50px;
+   padding-bottom: 50px;
+}

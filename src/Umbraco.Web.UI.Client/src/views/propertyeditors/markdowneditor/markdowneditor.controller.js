@@ -1,11 +1,34 @@
 //inject umbracos assetsServce and dialog service
-function MarkdownEditorController($scope, assetsService, dialogService, $timeout) {
+function MarkdownEditorController($scope, $element, assetsService, dialogService, angularHelper, $timeout) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
 
     if ($scope.model.value === null || $scope.model.value === "") {
         $scope.model.value = $scope.model.config.defaultValue;
+    }
+
+    function openMediaPicker(callback) {
+
+      $scope.mediaPickerOverlay = {};
+      $scope.mediaPickerOverlay.view = "mediaPicker";
+      $scope.mediaPickerOverlay.show = true;
+      $scope.mediaPickerOverlay.disableFolderSelect = true;
+
+      $scope.mediaPickerOverlay.submit = function(model) {
+
+          var selectedImagePath = model.selectedImages[0].image;
+          callback(selectedImagePath);
+
+          $scope.mediaPickerOverlay.show = false;
+          $scope.mediaPickerOverlay = null;
+      };
+
+      $scope.mediaPickerOverlay.close = function(model) {
+          $scope.mediaPickerOverlay.show = false;
+          $scope.mediaPickerOverlay = null;
+      };
+
     }
 
     assetsService
@@ -19,7 +42,7 @@ function MarkdownEditorController($scope, assetsService, dialogService, $timeout
             // we need a short delay to wait for the textbox to appear.
             setTimeout(function () {
                 //this function will execute when all dependencies have loaded
-                // but in the case that they've been previously loaded, we can only 
+                // but in the case that they've been previously loaded, we can only
                 // init the md editor after this digest because the DOM needs to be ready first
                 // so run the init on a timeout
                 $timeout(function () {
@@ -29,15 +52,16 @@ function MarkdownEditorController($scope, assetsService, dialogService, $timeout
 
                     //subscribe to the image dialog clicks
                     editor2.hooks.set("insertImageDialog", function (callback) {
-
-                        dialogService.mediaPicker({
-                            callback: function (data) {
-                                callback(data.image);
-                            }
-                        });
-
+                        openMediaPicker(callback);
                         return true; // tell the editor that we'll take care of getting the image url
                     });
+
+                    editor2.hooks.set("onPreviewRefresh", function () {
+                        angularHelper.getCurrentForm($scope).$setDirty();
+                        // We must manually update the model as there is no way to hook into the markdown editor events without editing that code.
+                        $scope.model.value = $("textarea", $element).val();
+                    });
+
                 }, 200);
             });
 

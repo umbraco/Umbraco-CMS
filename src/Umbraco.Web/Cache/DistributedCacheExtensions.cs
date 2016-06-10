@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
@@ -262,8 +263,8 @@ namespace Umbraco.Web.Cache
 
         public static void ClearAllMacroCacheOnCurrentServer(this DistributedCache dc)
         {
-            // NOTE: The 'false' ensure that it will only refresh on the current server, not post to all servers
-            dc.RefreshAll(DistributedCache.MacroCacheRefresherGuid, false);
+            var macroRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.MacroCacheRefresherGuid);
+            macroRefresher.RefreshAll();
         }
 
         public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
@@ -400,6 +401,12 @@ namespace Umbraco.Web.Cache
             dc.Remove(DistributedCache.DomainCacheRefresherGuid, domain.Id);
         }
 
+        public static void ClearDomainCacheOnCurrentServer(this DistributedCache dc)
+        {
+            var domainRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.DomainCacheRefresherGuid);
+            domainRefresher.RefreshAll();
+        }
+
         #endregion
 
         #region Language Cache
@@ -435,7 +442,7 @@ namespace Umbraco.Web.Cache
         public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
         }
 
         #endregion

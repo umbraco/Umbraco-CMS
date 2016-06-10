@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Web.Trees;
 
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.Tabs,
-                    expression => expression.ResolveUsing<MemberTabsAndPropertiesResolver>())
+                    expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.MemberProviderFieldMapping,
                     expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
                 .ForMember(display => display.MembershipScenario,
@@ -89,7 +90,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
-                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
+                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display, applicationContext.Services.TextService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
@@ -163,10 +164,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="memberService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
+        /// <param name="localizedText"></param>
         /// <remarks>
         /// If this is a new entity and there is an approved field then we'll set it to true by default.
         /// </remarks>
-        private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display)
+        private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
         {
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
@@ -177,47 +179,58 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
                 display.TreeNodeUrl = url;
             }
-
-            TabsAndPropertiesResolver.MapGenericProperties(
-                member, display,
-                GetLoginProperty(memberService, member, display),
+            
+            var genericProperties = new List<ContentPropertyDisplay>
+            {
                 new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/membertype"),
+                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                },
+                GetLoginProperty(memberService, member, display, localizedText),
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("general/email"),
+                    Value = display.Email,
+                    View = "email",
+                    Validation = {Mandatory = true}
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("password"),
+                    //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                    // only when creating a new member and we want to have a generated password pre-filled.
+                    Value = new Dictionary<string, object>
                     {
-                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("general", "email"),
-                        Value = display.Email,
-                        View = "email",
-                        Validation = { Mandatory = true }        
+                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
+                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
-                new ContentPropertyDisplay
+                    //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
+                    View = "changepassword",
+                    //initialize the dictionary with the configuration from the default membership provider
+                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
                     {
-                        Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("password"),
-                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
-                        // only when creating a new member and we want to have a generated password pre-filled.
-                        Value = new Dictionary<string, object>
-                            {
-                                {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null) },
-                                {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) },
-                            },
-                        //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
-                        View = "changepassword",
-                        //initialize the dictionary with the configuration from the default membership provider
-                        Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
-                            {
-                                //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                            }
-                    },
+                        //the password change toggle will only be displayed if there is already a password assigned.
+                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                    }
+                },
                 new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "membergroup"),
-                        Value = GetMemberGroupValue(display.Username),
-                        View = "membergroups",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
-                    });
+                {
+                    Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/membergroup"),
+                    Value = GetMemberGroupValue(display.Username),
+                    View = "membergroups",
+                    Config = new Dictionary<string, object> {{"IsRequired", true}}
+                }
+            };
 
+
+            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties);
+            
             //check if there's an approval field
             var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
             if (member.HasIdentity == false && provider != null)
@@ -244,12 +257,12 @@ namespace Umbraco.Web.Models.Mapping
         /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively 
         /// allow that.
         /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display)
+        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
         {
             var prop = new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = ui.Text("login"),
+                    Label = localizedText.Localize("login"),
                     Value = display.Username            
                 };
 
@@ -318,6 +331,20 @@ namespace Umbraco.Web.Models.Mapping
         /// </remarks>
         internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver
         {
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+                _localizedTextService = localizedTextService;
+            }
+
+            public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService,
+                IEnumerable<string> ignoreProperties) : base(localizedTextService, ignoreProperties)
+            {
+                _localizedTextService = localizedTextService;
+            }
+
             protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
             {
                 var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -336,7 +363,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
-                        isLockedOutProperty.Value = ui.Text("general", "no");
+                        isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
 
                     return result;    
@@ -352,7 +379,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
-                        isLockedOutProperty.Value = ui.Text("general", "no");
+                        isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
 
                     return result;    
