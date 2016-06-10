@@ -5,12 +5,12 @@ namespace Umbraco.Core
     /// <summary>
     /// Represents the result of an operation attempt.
     /// </summary>
-    /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+    /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
     [Serializable]
-	public struct Attempt<T>
+	public struct Attempt<TResult>
 	{
         /// <summary>
-        /// Gets a value indicating whether this <see cref="Attempt{T}"/> was successful.
+        /// Gets a value indicating whether this <see cref="Attempt{TResult}"/> was successful.
         /// </summary>
         public bool Success { get; }
 
@@ -22,13 +22,13 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the attempt result.
         /// </summary>
-        public T Result { get; }
+        public TResult Result { get; }
 
         // optimize, use a singleton failed attempt
-		private static readonly Attempt<T> Failed = new Attempt<T>(false, default(T), null);
+		private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);
 
         // private - use Succeed() or Fail() methods to create attempts
-        private Attempt(bool success, T result, Exception exception)
+        private Attempt(bool success, TResult result, Exception exception)
         {
             Success = success;
             Result = result;
@@ -39,9 +39,9 @@ namespace Umbraco.Core
         /// Creates a successful attempt.
         /// </summary>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<T> Succeed()
+        public static Attempt<TResult> Succeed()
         {
-            return new Attempt<T>(true, default(T), null);
+            return new Attempt<TResult>(true, default(TResult), null);
         }
 
         /// <summary>
@@ -49,16 +49,16 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<T> Succeed(T result)
+        public static Attempt<TResult> Succeed(TResult result)
         {
-            return new Attempt<T>(true, result, null);
+            return new Attempt<TResult>(true, result, null);
         }
 
         /// <summary>
         /// Creates a failed attempt.
         /// </summary>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<T> Fail()
+        public static Attempt<TResult> Fail()
         {
             return Failed;
         }
@@ -68,9 +68,9 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<T> Fail(Exception exception)
+        public static Attempt<TResult> Fail(Exception exception)
         {
-            return new Attempt<T>(false, default(T), exception);
+            return new Attempt<TResult>(false, default(TResult), exception);
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<T> Fail(T result)
+        public static Attempt<TResult> Fail(TResult result)
         {
-            return new Attempt<T>(false, result, null);
+            return new Attempt<TResult>(false, result, null);
         }
 
         /// <summary>
@@ -89,9 +89,9 @@ namespace Umbraco.Core
         /// <param name="result">The result of the attempt.</param>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<T> Fail(T result, Exception exception)
+        public static Attempt<TResult> Fail(TResult result, Exception exception)
         {
-            return new Attempt<T>(false, result, exception);
+            return new Attempt<TResult>(false, result, exception);
         }
 
         /// <summary>
@@ -99,9 +99,9 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="condition">A value indicating whether the attempt is successful.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<T> SucceedIf(bool condition)
+        public static Attempt<TResult> If(bool condition)
         {
-            return condition ? new Attempt<T>(true, default(T), null) : Failed;
+            return condition ? new Attempt<TResult>(true, default(TResult), null) : Failed;
         }
 
         /// <summary>
@@ -110,9 +110,9 @@ namespace Umbraco.Core
         /// <param name="condition">A value indicating whether the attempt is successful.</param>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<T> SucceedIf(bool condition, T result)
+        public static Attempt<TResult> If(bool condition, TResult result)
         {
-            return new Attempt<T>(condition, result, null);
+            return new Attempt<TResult>(condition, result, null);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static implicit operator bool(Attempt<T> a)
+        public static implicit operator bool(Attempt<TResult> a)
         {
             return a.Success;
         }

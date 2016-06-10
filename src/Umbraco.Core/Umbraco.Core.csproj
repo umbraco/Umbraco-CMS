@@ -69,7 +69,8 @@
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
-    <Compile Include="AttemptOfT.cs" />
+    <Compile Include="AttemptOfTResult.cs" />
+    <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />

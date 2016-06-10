@@ -198,7 +198,7 @@ namespace Umbraco.Web.Models
 			}
 
 		    var value = PublishedContent.GetPropertyValue(name, recurse);
-			return Attempt<object>.SucceedIf(value != null, value);
+			return Attempt<object>.If(value != null, value);
 		}
 
 		/// <summary>

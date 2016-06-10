@@ -127,20 +127,30 @@ namespace Umbraco.Web.Trees
 
                     var currentAction = t;
 
-                    //First try to get a URL/title from the legacy action,
-                    // if that doesn't work, try to get the legacy confirm view
-                    // if that doesn't work and there's no jsAction in there already then add the legacy js method call
-                    Attempt
-                        .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
-                             action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
-                        .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
-                                   view => menuItem.LaunchDialogView(
-                                       view,
-                                       ApplicationContext.Current.Services.TextService.Localize("defaultdialogs/confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
-                        .OnFailure(() => menuItem.AdditionalData.ContainsKey(MenuItem.JsActionKey)
-                                             ? Attempt.Fail(false)
-                                             : Attempt.Succeed(true),
-                                   b => menuItem.ExecuteLegacyJs(menuItem.Action.JsFunctionName));
+                    // try to get a URL/title from the legacy action
+                    var attempt = GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection);
+                    if (attempt)
+                    {
+                        var action = attempt.Result;
+                        menuItem.LaunchDialogUrl(action.Url, action.DialogTitle);
+                    }
+                    else
+                    {
+                        // if that doesn't work, try to get the legacy confirm view
+                        var attempt2 = GetLegacyConfirmView(currentAction, currentSection);
+                        if (attempt2)
+                        {
+                            var view = attempt2.Result;
+                            var textService = ApplicationContext.Current.Services.TextService;
+                            menuItem.LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + xmlTreeNode.Text + "' ?");
+                        }
+                        else
+                        {
+                            // if that doesn't work and there's no jsAction in there already then add the legacy js method call
+                            if (menuItem.AdditionalData.ContainsKey(MenuItem.JsActionKey) == false)
+                                menuItem.ExecuteLegacyJs(menuItem.Action.JsFunctionName);
+                        }
+                    }
                     
                     numAdded++;
                 }
