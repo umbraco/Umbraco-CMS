@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
-        // create detached content type - ie does not match anything in the DB
+        // create floating content type - ie does not match anything in the DB
         internal PublishedContentType(string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
             : this(0, alias, compositionAliases, propertyTypes)
         { }

@@ -18,6 +18,7 @@ using Examine.Session;
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
 

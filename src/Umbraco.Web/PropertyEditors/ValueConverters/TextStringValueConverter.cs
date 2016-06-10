@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(string))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
         private readonly static string[] PropertyTypeAliases =
@@ -25,7 +20,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (string);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Facade;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -37,16 +42,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return sourceString;
         }
 
-        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return source ?? string.Empty;
+            return inter ?? string.Empty;
         }
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return source;
+            return inter;
         }
     }
 }

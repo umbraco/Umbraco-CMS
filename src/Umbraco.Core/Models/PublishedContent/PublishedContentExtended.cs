@@ -87,10 +87,7 @@ namespace Umbraco.Core.Models.PublishedContent
             _properties.Add(property);
         }
 
-        bool IPublishedContentExtended.HasAddedProperties
-        {
-            get { return _properties != null; }
-        }
+        bool IPublishedContentExtended.HasAddedProperties => _properties != null;
 
         #endregion
 
@@ -98,28 +95,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         private ICollection<IPublishedProperty> _properties;
 
-        public override ICollection<IPublishedProperty> Properties
-        {
-            get
-            {
-                return _properties == null
-                    ? Content.Properties
-                    : Content.Properties.Union(_properties).ToList();
-            }
-        }
-
-        public override object this[string alias]
-        {
-            get
-            {
-                if (_properties != null)
-                {
-                    var property = _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias));
-                    if (property != null) return property.HasValue ? property.Value : null;
-                }
-                return Content[alias];
-            }
-        }
+        public override IEnumerable<IPublishedProperty> Properties => _properties == null
+            ? Content.Properties
+            : Content.Properties.Union(_properties).ToList();
 
         public override IPublishedProperty GetProperty(string alias)
         {

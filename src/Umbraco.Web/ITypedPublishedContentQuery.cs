@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Xml.XPath;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web

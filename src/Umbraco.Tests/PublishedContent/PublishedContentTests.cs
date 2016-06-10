@@ -3,7 +3,6 @@ using System.Linq;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Web;
@@ -50,7 +49,7 @@ namespace Umbraco.Tests.PublishedContent
                 };
             var compositionAliases = new[] {"MyCompositionAlias"};
             var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
-            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
         public override void TearDown()
@@ -197,7 +196,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Where(x => x.IsVisible()) // so, here it's linq again :-(
                 .ToIndexedArray(); // so, we need that one for the test to pass
 
-            Assert.AreEqual(1, items.Count());
+            Assert.AreEqual(1, items.Length);
 
             foreach (var d in items)
             {
@@ -287,17 +286,17 @@ namespace Umbraco.Tests.PublishedContent
                 Assert.AreEqual(expected[exindex++], d.Id);
 	    }
 
-	    [Test]
-		public void Test_Get_Recursive_Val()
-		{
-			var doc = GetNode(1174);
-			var rVal = doc.GetRecursiveValue("testRecursive");
-			var nullVal = doc.GetRecursiveValue("DoNotFindThis");
-			Assert.AreEqual("This is the recursive val", rVal);
-			Assert.AreEqual("", nullVal);
-		}
+        [Test]
+        public void GetPropertyValueRecursiveTest()
+        {
+            var doc = GetNode(1174);
+            var rVal = doc.GetPropertyValue("testRecursive", true);
+            var nullVal = doc.GetPropertyValue("DoNotFindThis", true);
+            Assert.AreEqual("This is the recursive val", rVal);
+            Assert.AreEqual("", nullVal);
+        }
 
-		[Test]
+        [Test]
 		public void Get_Property_Value_Uses_Converter()
 		{
 			var doc = GetNode(1173);
@@ -333,9 +332,9 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1046);
 
-			var found1 = doc.Children.GroupBy("DocumentTypeAlias");
+			var found1 = doc.Children.GroupBy("DocumentTypeAlias").ToArray();
 
-			Assert.AreEqual(2, found1.Count());
+			Assert.AreEqual(2, found1.Length);
 			Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
 			Assert.AreEqual(1, found1.Single(x => x.Key.ToString() == "CustomDocument").Count());
 		}
@@ -460,11 +459,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1174);
 
-			var result = doc.AncestorsOrSelf();
+			var result = doc.AncestorsOrSelf().ToArray();
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(3, result.Count());
+			Assert.AreEqual(3, result.Length);
 			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
 		}
 
@@ -473,11 +472,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1174);
 
-			var result = doc.Ancestors();
+			var result = doc.Ancestors().ToArray();
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(2, result.Count());
+			Assert.AreEqual(2, result.Length);
 			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
 		}
 
@@ -486,11 +485,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1046);
 
-			var result = doc.DescendantsOrSelf();
+			var result = doc.DescendantsOrSelf().ToArray();
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(8, result.Count());
+			Assert.AreEqual(8, result.Length);
 			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
 		}
 
@@ -499,11 +498,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1046);
 
-			var result = doc.Descendants();
+			var result = doc.Descendants().ToArray();
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(7, result.Count());
+			Assert.AreEqual(7, result.Length);
 			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
 		}
 
@@ -516,7 +515,7 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int)1046, (int)result.Id);
+			Assert.AreEqual(1046, result.Id);
 		}
 
 		[Test]
@@ -528,8 +527,14 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int)1174, (int)result.Id);
+			Assert.AreEqual(1174, result.Id);
 		}
+
+	    [Test]
+	    public void FragmentTest()
+	    {
+	        
+	    }
 
         [Test]
         public void DetachedProperty1()
@@ -574,8 +579,8 @@ namespace Umbraco.Tests.PublishedContent
 
 	    class ImageWithLegendModel
 	    {
-	        private IPublishedProperty _legendProperty;
-	        private IPublishedProperty _imageProperty;
+	        private readonly IPublishedProperty _legendProperty;
+	        private readonly IPublishedProperty _imageProperty;
 
 	        public ImageWithLegendModel(IPublishedProperty legendProperty, IPublishedProperty imageProperty)
 	        {
@@ -583,8 +588,8 @@ namespace Umbraco.Tests.PublishedContent
 	            _imageProperty = imageProperty;
 	        }
 
-            public string Legend { get { return _legendProperty.GetValue<string>(); } }
-            public IPublishedContent Image { get { return _imageProperty.GetValue<IPublishedContent>(); } }
-        }
+            public string Legend => _legendProperty.GetValue<string>();
+	        public IPublishedContent Image => _imageProperty.GetValue<IPublishedContent>();
+	    }
     }
 }

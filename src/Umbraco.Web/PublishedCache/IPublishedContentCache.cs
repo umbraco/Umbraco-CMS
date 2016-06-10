@@ -48,15 +48,5 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>The route.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
         string GetRouteById(int contentId);
-
-        /// <summary>
-        /// Creates a detached property.
-        /// </summary>
-        /// <param name="propertyType">The published property type.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="isPreviewing">A value indicating whether the property is created within a previewing context.</param>
-        /// <returns>A detached property.</returns>
-        /// <remarks>Implementations must check that propertyType.IsDetachedOrNested is true.</remarks>
-        IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing);
     }
 }

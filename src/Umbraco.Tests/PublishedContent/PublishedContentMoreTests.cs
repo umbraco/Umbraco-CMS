@@ -226,7 +226,7 @@ namespace Umbraco.Tests.PublishedContent
                                     PropertyTypeAlias = "prop1",
                                     HasValue = true,
                                     Value = 1234,
-                                    DataValue = "1234"
+                                    SourceValue = "1234"
                                 }
                         }
                 });
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.PublishedContent
                                         PropertyTypeAlias = "prop1",
                                         HasValue = true,
                                         Value = 1234,
-                                        DataValue = "1234"
+                                        SourceValue = "1234"
                                     }
                             }
                 });
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.PublishedContent
                                         PropertyTypeAlias = "prop1",
                                         HasValue = true,
                                         Value = 1234,
-                                        DataValue = "1234"
+                                        SourceValue = "1234"
                                     }
                             }
             });

@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
@@ -16,21 +17,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// Used to strongly type the value for the image cropper
     /// </summary>
     [DefaultPropertyValueConverter(typeof (JsonValueConverter))] //this shadows the JsonValueConverter
-    [PropertyValueType(typeof (ImageCropDataSet))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class ImageCropperValueConverter : Core.PropertyEditors.ValueConverters.ImageCropperValueConverter
     {
         public ImageCropperValueConverter()
-        {
-        }
+        { }
 
         public ImageCropperValueConverter(IDataTypeService dataTypeService) : base(dataTypeService)
+        { }
+
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
+            return typeof (ImageCropDataSet);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
-            var baseVal = base.ConvertDataToSource(propertyType, source, preview);
+            var baseVal = base.ConvertSourceToInter(propertyType, source, preview);
             var json = baseVal as JObject;
             if (json == null) return baseVal;
 

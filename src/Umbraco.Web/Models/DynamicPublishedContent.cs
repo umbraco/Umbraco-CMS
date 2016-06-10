@@ -46,15 +46,6 @@ namespace Umbraco.Web.Models
 		
 		#endregion
 
-        // these two here have leaked in v6 and so we cannot remove them anymore
-        // without breaking compatibility but... TODO: remove them in v7
-
-        [Obsolete("Will be removing in future versions")]
-        public DynamicPublishedContentList ChildrenAsList { get { return Children; } }
-        
-        [Obsolete("Will be removing in future versions")]
-        public int parentId { get { return PublishedContent.Parent.Id; } }
-
         #region DynamicObject
 
         private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
@@ -428,7 +419,7 @@ namespace Umbraco.Web.Models
             get { return PublishedContent.IsDraft; }
 	    }
 
-        ICollection<IPublishedProperty> IPublishedContent.Properties
+        IEnumerable<IPublishedProperty> IPublishedFragment.Properties
         {
             get { return PublishedContent.Properties; }
         }
@@ -438,7 +429,7 @@ namespace Umbraco.Web.Models
             get { return PublishedContent.Children; }
         }
 
-        IPublishedProperty IPublishedContent.GetProperty(string alias)
+        IPublishedProperty IPublishedFragment.GetProperty(string alias)
         {
             return PublishedContent.GetProperty(alias);
         }
@@ -546,11 +537,6 @@ namespace Umbraco.Web.Models
 		public IEnumerable<IPublishedProperty> Properties
 		{
 			get { return PublishedContent.Properties; }
-		}
-
-		public object this[string propertyAlias]
-		{
-			get { return PublishedContent[propertyAlias]; }
 		}
 
         #endregion

@@ -1,8 +1,8 @@
 using System;
 using System.Xml;
 using System.Xml.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
@@ -15,13 +15,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
 	internal class XmlPublishedProperty : PublishedPropertyBase
 	{
-		private readonly string _xmlValue; // the raw, xml node value
+		private readonly string _sourceValue; // the raw, xml node value
 
-        // in v7 we're not using XPath value so don't allocate that Lazy.
-        // as for the rest... we're single threaded here, keep it simple
-        //private readonly Lazy<object> _sourceValue;
-        //private readonly Lazy<object> _objectValue;
-        //private readonly Lazy<object> _xpathValue;
+        // Xml cache not using XPath value... and as for the rest...
+        // we're single threaded here, keep it simple
         private object _objectValue;
         private bool _objectValueComputed;
         private readonly bool _isPreviewing;
@@ -29,21 +26,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <summary>
         /// Gets the raw value of the property.
         /// </summary>
-        public override object DataValue { get { return _xmlValue; } }
+        public override object SourceValue => _sourceValue;
 
-        // in the Xml cache, everything is a string, and to have a value
+	    // in the Xml cache, everything is a string, and to have a value
         // you want to have a non-null, non-empty string.
-	    public override bool HasValue 
-        {
-	        get { return _xmlValue.Trim().Length > 0; }
-	    }
+	    public override bool HasValue => _sourceValue.Trim().Length > 0;
 
 	    public override object Value
 	    {
 	        get
 	        {
                 // NOT caching the source (intermediate) value since we'll never need it
-                // everything in Xml cache in v7 is per-request anyways
+                // everything in Xml cache is per-request anyways
                 // also, properties should not be shared between requests and therefore
                 // are single threaded, so the following code should be safe & fast
 
@@ -61,27 +55,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             : this(propertyType, isPreviewing)
 		{
 		    if (propertyXmlData == null)
-		        throw new ArgumentNullException("propertyXmlData", "Property xml source is null");
-		    _xmlValue = XmlHelper.GetNodeValue(propertyXmlData);
+		        throw new ArgumentNullException(nameof(propertyXmlData), "Property xml source is null");
+		    _sourceValue = XmlHelper.GetNodeValue(propertyXmlData);
         }
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, string propertyData)
             : this(propertyType, isPreviewing)
         {
             if (propertyData == null)
-                throw new ArgumentNullException("propertyData");
-            _xmlValue = propertyData;
+                throw new ArgumentNullException(nameof(propertyData));
+            _sourceValue = propertyData;
         }
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing)
-            : base(propertyType)
+            : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
-            _xmlValue = string.Empty;
+            _sourceValue = string.Empty;
             _isPreviewing = isPreviewing;
-
-            //_sourceValue = new Lazy<object>(() => PropertyType.ConvertDataToSource(_xmlValue, _isPreviewing));
-            //_objectValue = new Lazy<object>(() => PropertyType.ConvertSourceToObject(_sourceValue.Value, _isPreviewing));
-            //_xpathValue = new Lazy<object>(() => PropertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreviewing));
         }
 	}
 }

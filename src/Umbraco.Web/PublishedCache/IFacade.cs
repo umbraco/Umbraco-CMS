@@ -1,4 +1,8 @@
-﻿namespace Umbraco.Web.PublishedCache
+﻿using System;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+
+namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
     /// The Umbraco facade.
@@ -35,5 +39,17 @@
         /// otherwise the facade keeps previewing according to whatever settings it is using already.</para>
         /// <para>Stops forcing preview when disposed.</para></remarks>
         IDisposable ForcedPreview(bool preview, Action<bool> callback = null);
+
+        // fixme - document
+        /// <summary>
+        /// Creates a fragment property.
+        /// </summary>
+        /// <param name="propertyType"></param>
+        /// <param name="itemKey"></param>
+        /// <param name="previewing"></param>
+        /// <param name="referenceCacheLevel"></param>
+        /// <param name="sourceValue"></param>
+        /// <returns></returns>
+        IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
     }
 }

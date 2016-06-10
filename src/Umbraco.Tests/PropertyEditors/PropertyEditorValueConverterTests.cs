@@ -28,7 +28,7 @@ namespace Umbraco.Tests.PropertyEditors
 		{
 			var converter = new DatePickerValueConverter();
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var result = converter.ConvertDataToSource(null, date, false); // does not use type for conversion
+			var result = converter.ConvertSourceToInter(null, date, false); // does not use type for conversion
 
 		    if (expected)
 		        Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertYesNoPropertyEditor(object value, bool expected)
         {
             var converter = new YesNoValueConverter();
-            var result = converter.ConvertDataToSource(null, value, false); // does not use type for conversion
+            var result = converter.ConvertSourceToInter(null, value, false); // does not use type for conversion
 
             Assert.AreEqual(expected, result);
         }

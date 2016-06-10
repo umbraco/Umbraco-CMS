@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.PublishedContent;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing

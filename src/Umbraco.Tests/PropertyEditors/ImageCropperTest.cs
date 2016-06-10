@@ -149,7 +149,7 @@ namespace Umbraco.Tests.PropertyEditors
                 dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>())).Returns(new PreValueCollection(Enumerable.Empty<PreValue>()));
 
                 var converter = new Umbraco.Web.PropertyEditors.ValueConverters.ImageCropperValueConverter(dataTypeService.Object);
-                var result = converter.ConvertDataToSource(new PublishedPropertyType("test", 0, "test"), val1, false); // does not use type for conversion
+                var result = converter.ConvertSourceToInter(new PublishedPropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 
                 var resultShouldMatch = val2.SerializeToCropDataSet();
                 if (expected)

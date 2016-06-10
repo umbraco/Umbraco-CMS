@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,8 +11,6 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(JArray))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
@@ -31,7 +26,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return Constants.PropertyEditors.RelatedLinksAlias.Equals(propertyType.PropertyEditorAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (JArray);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -55,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                 a["link"] = link;
                             }
                         }
-                    }    
+                    }
                     return obj;
                 }
                 catch (Exception ex)
@@ -68,10 +73,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return sourceString;
         }
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            if (source == null) return null;
-            var sourceString = source.ToString();
+            if (inter == null) return null;
+            var sourceString = inter.ToString();
 
             if (sourceString.DetectIsJson())
             {
@@ -83,7 +88,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var e = d.CreateElement("links");
                     d.AppendChild(e);
 
-                    var values = (IEnumerable<string>)source;
+                    var values = (IEnumerable<string>)inter;
                     foreach (dynamic link in obj)
                     {
                         var ee = d.CreateElement("link");

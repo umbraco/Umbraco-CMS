@@ -108,9 +108,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Properties
 
-        public virtual ICollection<IPublishedProperty> Properties => Content.Properties;
-
-        public virtual object this[string alias] => Content[alias];
+        public virtual IEnumerable<IPublishedProperty> Properties => Content.Properties;
 
         public virtual IPublishedProperty GetProperty(string alias)
         {

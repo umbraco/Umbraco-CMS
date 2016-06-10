@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 

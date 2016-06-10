@@ -17,6 +17,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Moq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -12,15 +13,24 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// Example: http://issues.umbraco.org/issue/U4-7929
     /// </remarks>
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof (string))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class LabelValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return Constants.PropertyEditors.NoEditAlias.Equals(propertyType.PropertyEditorAlias);
         }
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (string);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             return source == null ? string.Empty : source.ToString();
         }

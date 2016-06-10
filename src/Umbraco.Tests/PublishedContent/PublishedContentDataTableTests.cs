@@ -159,11 +159,11 @@ namespace Umbraco.Tests.PublishedContent
 			if (!createChildren)
 			{
 				//create additional columns, used to test the different columns for child nodes
-				d.Properties.Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
+				((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
 			}
 			else
 			{
-				d.Properties.Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
+                ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
 			}
 			return d;
 		}
@@ -204,14 +204,8 @@ namespace Umbraco.Tests.PublishedContent
 	        public Guid Version { get; set; }
 	        public int Level { get; set; }
             public bool IsDraft { get; set; }
-            public int GetIndex() { throw new NotImplementedException();}
             
-            public ICollection<IPublishedProperty> Properties { get; set; }
-
-	        public object this[string propertyAlias]
-	        {
-                get { return GetProperty(propertyAlias).Value; }
-	        }
+            public IEnumerable<IPublishedProperty> Properties { get; set; }
 
 	        public IEnumerable<IPublishedContent> Children { get; set; }
 
@@ -233,11 +227,6 @@ namespace Umbraco.Tests.PublishedContent
 	            }
 
 	            return property;
-	        }
-
-	        public IEnumerable<IPublishedContent> ContentSet
-	        {
-	            get { throw new NotImplementedException(); }
 	        }
 
             public PublishedContentType ContentType 

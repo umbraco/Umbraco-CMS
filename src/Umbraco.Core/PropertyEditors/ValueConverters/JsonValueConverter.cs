@@ -13,8 +13,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// Since this is a default (umbraco) converter it will be ignored if another converter found conflicts with this one.
     /// </remarks>
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(JToken))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class JsonValueConverter : PropertyValueConverterBase
     {
         /// <summary>
@@ -29,7 +27,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return propertyEditor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (JToken);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

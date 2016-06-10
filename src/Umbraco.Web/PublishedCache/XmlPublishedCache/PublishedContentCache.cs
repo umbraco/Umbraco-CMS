@@ -509,17 +509,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #endregion
 
-        #region Detached
-
-        public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
-        {
-            if (propertyType.IsDetachedOrNested == false)
-                throw new ArgumentException("Property type is neither detached nor nested.", nameof(propertyType));
-            return new XmlPublishedProperty(propertyType, isPreviewing, value.ToString());
-        }
-
-        #endregion
-
         #region Content types
 
         public override PublishedContentType GetContentType(int id)

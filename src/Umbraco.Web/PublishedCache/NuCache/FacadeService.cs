@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
@@ -1477,6 +1478,15 @@ AND cmsContentNu.nodeId IS NULL
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
         }
 
+        #endregion
+
+        #region Fragments
+
+        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        {
+            return new PublishedFragmentProperty(_facadeAccessor, propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
+        }
+        
         #endregion
     }
 }

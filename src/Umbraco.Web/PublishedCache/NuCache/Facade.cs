@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -92,6 +94,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _facade._defaultPreview = _origPreview;
                 _callback?.Invoke(_origPreview);
             }
+        }
+
+        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        {
+            return _service.CreateFragmentProperty(propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
         }
 
         #endregion

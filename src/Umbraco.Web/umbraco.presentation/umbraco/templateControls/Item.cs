@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 using Umbraco.Web._Legacy.Actions;

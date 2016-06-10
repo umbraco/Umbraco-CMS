@@ -740,7 +740,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		    public override bool IsDraft => false;
 
-		    public override ICollection<IPublishedProperty> Properties => _properties;
+		    public override IEnumerable<IPublishedProperty> Properties => _properties;
 
 		    public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
 

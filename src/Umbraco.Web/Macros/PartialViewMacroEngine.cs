@@ -9,6 +9,7 @@ using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {

@@ -143,30 +143,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// Gets the properties of the content.
         /// </summary>
-        public abstract ICollection<IPublishedProperty> Properties { get; }
-
-        /// <summary>
-        /// Gets the value of a property identified by its alias.
-        /// </summary>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The value of the property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>If <c>GetProperty(alias)</c> is <c>null</c> then returns <c>null</c> else return <c>GetProperty(alias).Value</c>.</para>
-        /// <para>So if the property has no value, returns the default value for that property type.</para>
-        /// <para>This one is defined here really because we cannot define index extension methods, but all it should do is:
-        /// <code>var p = GetProperty(alias); return p == null ? null : p.Value;</code> and nothing else.</para>
-        /// <para>The recursive syntax (eg "_title") is _not_ supported here.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public virtual object this[string alias]
-		{
-			get
-			{
-                // no cache here: GetProperty should be fast, and .Value cache should be managed by the property.
-                var property = GetProperty(alias);
-			    return property == null ? null : property.Value;
-			}
-		}
+        public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <summary>
         /// Gets a property identified by its alias.

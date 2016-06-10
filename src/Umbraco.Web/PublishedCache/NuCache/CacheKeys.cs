@@ -41,9 +41,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return "NuCache.Property.Recurse[" + DraftOrPub(previewing) + contentUid + ":" + typeAlias + "]";
         }
 
-        public static string PropertyValueSet(Guid contentUid, string typeAlias, bool previewing)
+        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
         {
-            return "NuCache.Property.ValueSet[" + DraftOrPub(previewing) + contentUid + ":" + typeAlias + "]";
+            return "NuCache.Property.CacheValues[" + DraftOrPub(previewing) + contentUid + ":" + typeAlias + "]";
         }
 
         // routes still use int id and not Guid uid, because routable nodes must have

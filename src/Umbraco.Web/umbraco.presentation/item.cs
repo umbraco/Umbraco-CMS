@@ -6,6 +6,7 @@ using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;

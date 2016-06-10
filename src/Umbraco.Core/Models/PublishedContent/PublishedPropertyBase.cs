@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -8,23 +9,20 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     internal abstract class PublishedPropertyBase : IPublishedProperty
     {
-        public readonly PublishedPropertyType PropertyType;
-
-        protected PublishedPropertyBase(PublishedPropertyType propertyType)
+        protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
-            if (propertyType == null)
-                throw new ArgumentNullException("propertyType");
+            if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
             PropertyType = propertyType;
+            ReferenceCacheLevel = referenceCacheLevel;
         }
 
-        public string PropertyTypeAlias
-        {
-            get { return PropertyType.PropertyTypeAlias; }
-        }
+        public PublishedPropertyType PropertyType { get; }
+        public string PropertyTypeAlias => PropertyType.PropertyTypeAlias;
+        public PropertyCacheLevel ReferenceCacheLevel { get; }
 
         // these have to be provided by the actual implementation
         public abstract bool HasValue { get; }
-        public abstract object DataValue { get; }
+        public abstract object SourceValue { get; }
         public abstract object Value { get; }
         public abstract object XPathValue { get; }
     }

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -13,6 +14,20 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="propertyType">The property type.</param>
         /// <returns>A value indicating whether the converter supports a property type.</returns>
         bool IsConverter(PublishedPropertyType propertyType);
+
+        /// <summary>
+        /// Gets the type of values returned by the converter.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>The CLR type of values returned by the converter.</returns>
+        Type GetPropertyValueType(PublishedPropertyType propertyType);
+
+        /// <summary>
+        /// Gets the property cache level of a specified value.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>The property cache level of the specified value.</returns>
+        PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType);
 
         /// <summary>
         /// Converts a property Data value to a Source value.
@@ -32,25 +47,27 @@ namespace Umbraco.Core.PropertyEditors
         /// strings, and xml-whitespace strings appropriately, ie it should know whether to preserve
         /// whitespaces.</para>
         /// </remarks>
-        object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview);
+        object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview);
 
         /// <summary>
         /// Converts a property Source value to an Object value.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <param name="source">The source value.</param>
+        /// <param name="referenceCacheLevel">fixme</param>
+        /// <param name="inter">The source value.</param>
         /// <param name="preview">A value indicating whether conversion should take place in preview mode.</param>
         /// <returns>The result of the conversion.</returns>
         /// <remarks>The converter should know how to convert a <c>null</c> source value, or any source value
         /// indicating that no value has been assigned to the property. It is up to the converter to determine
         /// what to return in that case: either <c>null</c>, or the default value...</remarks>
-        object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview);
+        object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
 
         /// <summary>
         /// Converts a property Source value to an XPath value.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <param name="source">The source value.</param>
+        /// <param name="referenceCacheLevel">fixme</param>
+        /// <param name="inter">The source value.</param>
         /// <param name="preview">A value indicating whether conversion should take place in preview mode.</param>
         /// <returns>The result of the conversion.</returns>
         /// <remarks>
@@ -63,6 +80,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>The converter may want to return an XML fragment that represent a part of the content tree,
         /// but should pay attention not to create infinite loops that would kill XPath and XSLT.</para>
         /// </remarks>
-        object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview);
+        object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
     }
 }

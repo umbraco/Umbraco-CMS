@@ -1,13 +1,10 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(DateTime))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DatePickerValueConverter : PropertyValueConverterBase
 	{
 	    private static readonly string[] PropertyEditorAliases =
@@ -21,7 +18,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (DateTime);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return DateTime.MinValue;
 
@@ -38,17 +45,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             // in the database a DateTime is: DateTime
             // default value is: DateTime.MinValue
-            return (source is DateTime) 
-                ? source 
+            return (source is DateTime)
+                ? source
                 : DateTime.MinValue;
         }
 
         // default ConvertSourceToObject just returns source ie a DateTime value
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
-            return XmlConvert.ToString((DateTime)source, XmlDateTimeSerializationMode.Unspecified);
+            return XmlConvert.ToString((DateTime)inter, XmlDateTimeSerializationMode.Unspecified);
         }
     }
 }

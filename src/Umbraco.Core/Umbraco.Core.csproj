@@ -260,6 +260,7 @@
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
     <Compile Include="Models\DictionaryItemExtensions.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Plugins\HideFromTypeFinderAttribute.cs" />
@@ -540,7 +541,7 @@
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\IMemberGroup.cs" />
-    <Compile Include="Models\IPublishedProperty.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\EntityPermissionSet.cs" />
@@ -610,9 +611,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
-    <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
-    <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
-    <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
     <Compile Include="PropertyEditors\SupportTagsAttribute.cs" />
@@ -620,7 +618,6 @@
     <Compile Include="PropertyEditors\TagValueType.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
-    <Compile Include="PropertyEditors\IPropertyValueConverterMeta.cs" />
     <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
@@ -682,7 +679,7 @@
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
-    <Compile Include="Models\PublishedItemType.cs" />
+    <Compile Include="Models\PublishedContent\PublishedItemType.cs" />
     <Compile Include="Models\PublishedState.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
@@ -1124,7 +1121,7 @@
     <Compile Include="Dynamics\Res.cs" />
     <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
-    <Compile Include="Models\IPublishedContent.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
     <Compile Include="Cache\CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />

@@ -1,5 +1,6 @@
 ﻿using System.Web.Routing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Mvc
 {

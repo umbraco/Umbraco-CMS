@@ -18,24 +18,6 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         #region Constructors
 
-        // clone
-        private PublishedPropertyType(PublishedPropertyType orig)
-        {
-            ContentType = orig.ContentType;
-            PropertyTypeAlias = orig.PropertyTypeAlias;
-            DataTypeId = orig.DataTypeId;
-            PropertyEditorAlias = orig.PropertyEditorAlias;
-            _converter = orig._converter;
-            _sourceCacheLevel = orig._sourceCacheLevel;
-            _objectCacheLevel = orig._objectCacheLevel;
-            _xpathCacheLevel = orig._xpathCacheLevel;
-            _clrType = orig._clrType;
-            _initialized = true;
-
-            // do NOT copy the reduced cache levels
-            // as we should NOT clone a nested / detached type
-        }
-
         /// <summary>
         /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class within a <see cref="PublishedContentType"/>,
         /// with a <see cref="PropertyType"/>.
@@ -115,7 +97,6 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             // ContentType
             // - in unit tests, to be set by PublishedContentType when creating it
-            // - in detached types, remains null
 
             PropertyTypeAlias = propertyTypeAlias;
 
@@ -161,10 +142,7 @@ namespace Umbraco.Core.Models.PublishedContent
         private readonly object _locker = new object();
         private volatile bool _initialized;
         private IPropertyValueConverter _converter;
-
-        private PropertyCacheLevel _sourceCacheLevel;
-        private PropertyCacheLevel _objectCacheLevel;
-        private PropertyCacheLevel _xpathCacheLevel;
+        private PropertyCacheLevel _cacheLevel;
 
         private Type _clrType = typeof (object);
 
@@ -242,129 +220,68 @@ namespace Umbraco.Core.Models.PublishedContent
 
             }
 
-            var converterMeta = _converter as IPropertyValueConverterMeta;
-
-            // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)
-            if (converterMeta != null)
-            {
-                _sourceCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Source);
-                _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Object);
-                _xpathCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.XPath);
-            }
-            else
-            {
-                _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
-                _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
-                _xpathCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
-            }
-            if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
-            if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;
-
-            // get the CLR type of the converted value
-            if (_converter != null)
-            {
-                if (converterMeta != null)
-                {
-                    _clrType = converterMeta.GetPropertyValueType(this);
-                }
-                else
-                {
-                    var attr = _converter.GetType().GetCustomAttribute<PropertyValueTypeAttribute>(false);
-                    if (attr != null)
-                        _clrType = attr.Type;
-                }
-            }
+            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Facade;
+            _clrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
 
-        static PropertyCacheLevel GetCacheLevel(IPropertyValueConverter converter, PropertyCacheValue value)
+        // gets the cache level
+        public PropertyCacheLevel CacheLevel
         {
-            if (converter == null)
-                return PropertyCacheLevel.Request;
-
-            var attr = converter.GetType().GetCustomAttributes<PropertyValueCacheAttribute>(false)
-                .FirstOrDefault(x => x.Value == value || x.Value == PropertyCacheValue.All);
-
-            return attr?.Level ?? PropertyCacheLevel.Request;
+            get
+            {
+                EnsureInitialized();
+                return _cacheLevel;
+            }
         }
 
-        // converts the raw value into the source value
+        // converts the source value into the inter value
         // uses converters, else falls back to dark (& performance-wise expensive) magic
-        // source: the property raw value
+        // source: the property source value
         // preview: whether we are previewing or not
-        public object ConvertDataToSource(object source, bool preview)
+        public object ConvertSourceToInter(object source, bool preview)
         {
             EnsureInitialized();
 
             // use the converter else use dark (& performance-wise expensive) magic
             return _converter != null
-                ? _converter.ConvertDataToSource(this, source, preview)
+                ? _converter.ConvertSourceToInter(this, source, preview)
                 : ConvertUsingDarkMagic(source);
         }
 
-        // gets the source cache level
-        public PropertyCacheLevel SourceCacheLevel
-        {
-            get
-            {
-                EnsureInitialized();
-                return _sourceCacheLevel;
-            }
-        }
-
-        // converts the source value into the clr value
-        // uses converters, else returns the source value
-        // source: the property source value
+        // converts the inter value into the clr value
+        // uses converters, else returns the inter value
+        // inter: the property inter value
         // preview: whether we are previewing or not
-        public object ConvertSourceToObject(object source, bool preview)
+        public object ConvertInterToObject(PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             EnsureInitialized();
 
             // use the converter if any
-            // else just return the source value
+            // else just return the inter value
             return _converter != null
-                ? _converter.ConvertSourceToObject(this, source, preview)
-                : source;
+                ? _converter.ConvertInterToObject(this, referenceCacheLevel, inter, preview)
+                : inter;
         }
 
-        // gets the value cache level
-        public PropertyCacheLevel ObjectCacheLevel
-        {
-            get
-            {
-                EnsureInitialized();
-                return _objectCacheLevel;
-            }
-        }
-
-        // converts the source value into the xpath value
-        // uses the converter else returns the source value as a string
+        // converts the inter value into the xpath value
+        // uses the converter else returns the inter value as a string
         // if successful, returns either a string or an XPathNavigator
-        // source: the property source value
+        // inter: the property inter value
         // preview: whether we are previewing or not
-        public object ConvertSourceToXPath(object source, bool preview)
+        public object ConvertInterToXPath(PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             EnsureInitialized();
 
             // use the converter if any
             if (_converter != null)
-                return _converter.ConvertSourceToXPath(this, source, preview);
+                return _converter.ConvertInterToXPath(this, referenceCacheLevel, inter, preview);
 
-            // else just return the source value as a string or an XPathNavigator
-            if (source == null) return null;
-            var xElement = source as XElement;
+            // else just return the inter value as a string or an XPathNavigator
+            if (inter == null) return null;
+            var xElement = inter as XElement;
             if (xElement != null)
                 return xElement.CreateNavigator();
-            return source.ToString().Trim();
-        }
-
-        // gets the xpath cache level
-        public PropertyCacheLevel XPathCacheLevel
-        {
-            get
-            {
-                EnsureInitialized();
-                return _xpathCacheLevel;
-            }
+            return inter.ToString().Trim();
         }
 
         internal static object ConvertUsingDarkMagic(object source)
@@ -405,129 +322,6 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 EnsureInitialized();
                 return _clrType;
-            }
-        }
-
-        #endregion
-
-        #region Detached
-
-        private PropertyCacheLevel _sourceCacheLevelReduced = 0;
-        private PropertyCacheLevel _objectCacheLevelReduced = 0;
-        private PropertyCacheLevel _xpathCacheLevelReduced = 0;
-
-        internal bool IsDetachedOrNested => _sourceCacheLevelReduced != 0;
-
-        /// <summary>
-        /// Creates a detached clone of this published property type.
-        /// </summary>
-        /// <returns>A detached clone of this published property type.</returns>
-        /// <remarks>
-        /// <para>Only a published property type that has not already been detached or nested, can be detached.</para>
-        /// <para>Use detached published property type when creating detached properties outside of a published content.</para>
-        /// </remarks>
-        internal PublishedPropertyType Detached()
-        {
-            // verify
-            if (IsDetachedOrNested)
-                throw new Exception("PublishedPropertyType is already detached/nested.");
-
-            var detached = new PublishedPropertyType(this);
-            detached._sourceCacheLevel
-                = detached._objectCacheLevel
-                = detached._xpathCacheLevel
-                = PropertyCacheLevel.Content;
-            // set to none to a) indicate it's detached / nested and b) make sure any nested
-            // types switch all their cache to .Content
-            detached._sourceCacheLevelReduced
-                = detached._objectCacheLevelReduced
-                = detached._xpathCacheLevelReduced
-                = PropertyCacheLevel.None;
-
-            return detached;
-        }
-
-        /// <summary>
-        /// Creates a nested clone of this published property type within a specified container published property type.
-        /// </summary>
-        /// <param name="containerType">The container published property type.</param>
-        /// <returns>A nested clone of this published property type</returns>
-        /// <remarks>
-        /// <para>Only a published property type that has not already been detached or nested, can be nested.</para>
-        /// <para>Use nested published property type when creating detached properties within a published content.</para>
-        /// </remarks>
-        internal PublishedPropertyType Nested(PublishedPropertyType containerType)
-        {
-            // verify
-            if (IsDetachedOrNested)
-                throw new Exception("PublishedPropertyType is already detached/nested.");
-
-            var nested = new PublishedPropertyType(this);
-
-            // before we reduce, both xpath and object are >= source, and
-            // the way reduce works, the relative order of resulting xpath, object and source are preserved
-
-            // Reduce() will set _xxxCacheLevelReduced thus indicating that the type is detached / nested
-
-            Reduce(_sourceCacheLevel, _sourceCacheLevelReduced, ref nested._sourceCacheLevel, ref nested._sourceCacheLevelReduced);
-            Reduce(_objectCacheLevel, _objectCacheLevelReduced, ref nested._objectCacheLevel, ref nested._objectCacheLevelReduced);
-            Reduce(_xpathCacheLevel, _xpathCacheLevelReduced, ref nested._xpathCacheLevel, ref nested._xpathCacheLevelReduced);
-
-            return nested;
-        }
-
-        private static void Reduce(
-            PropertyCacheLevel containerCacheLevel, PropertyCacheLevel containerCacheLevelReduced,
-            ref PropertyCacheLevel nestedCacheLevel, ref PropertyCacheLevel nestedCacheLevelReduced)
-        {
-            // initialize if required
-            if (containerCacheLevelReduced == 0)
-                containerCacheLevelReduced = containerCacheLevel;
-
-            switch (containerCacheLevelReduced)
-            {
-                case PropertyCacheLevel.None:
-                    // once .None, force .Content for everything
-                    nestedCacheLevel = PropertyCacheLevel.Content;
-                    nestedCacheLevelReduced = PropertyCacheLevel.None; // and propagate
-                    break;
-
-                case PropertyCacheLevel.Request:
-                    // once .Request, force .Content for everything
-                    nestedCacheLevel = PropertyCacheLevel.Content;
-                    nestedCacheLevelReduced = PropertyCacheLevel.Request; // and propagate
-                    break;
-
-                case PropertyCacheLevel.Content:
-                    // as long as .Content, accept anything
-                    nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
-                    break;
-
-                case PropertyCacheLevel.ContentCache:
-                    // once .ContentCache, accept .Request and .Content but not .ContentCache
-                    switch (nestedCacheLevel)
-                    {
-                        case PropertyCacheLevel.Request:
-                        case PropertyCacheLevel.None:
-                            // accept
-                            nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
-                            break;
-                        case PropertyCacheLevel.Content:
-                            // accept
-                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
-                            break;
-                        case PropertyCacheLevel.ContentCache:
-                            // force .Content
-                            nestedCacheLevel = PropertyCacheLevel.Content;
-                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
-                            break;
-                        default:
-                            throw new Exception("Unsupported PropertyCacheLevel value.");
-                    }
-                    break;
-
-                default:
-                    throw new Exception("Unsupported PropertyCacheLevel value.");
             }
         }
 

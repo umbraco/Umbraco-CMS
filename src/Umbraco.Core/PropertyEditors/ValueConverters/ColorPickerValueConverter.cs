@@ -9,7 +9,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ColorPickerAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             // make sure it's a string
             return source?.ToString() ?? string.Empty;

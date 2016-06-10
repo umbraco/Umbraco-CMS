@@ -18,6 +18,7 @@ using System.IO;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
 {

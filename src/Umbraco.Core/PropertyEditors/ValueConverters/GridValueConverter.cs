@@ -16,8 +16,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// This ensures that the grid config is merged in with the front-end value
     /// </summary>
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
-    [PropertyValueType(typeof(JToken))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class GridValueConverter : JsonValueConverter
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -25,7 +23,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.GridAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (JToken);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

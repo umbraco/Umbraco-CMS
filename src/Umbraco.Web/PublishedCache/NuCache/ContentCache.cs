@@ -339,19 +339,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
-        #region Detached
-
-        // detached is something that needs to be refactored entirely eventually
-        // detached property should accept the "container content" guid
-        // etc
-
-        public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
         #region Content types
 
         public override PublishedContentType GetContentType(int id)

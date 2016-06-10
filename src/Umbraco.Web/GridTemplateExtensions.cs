@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Umbraco.Web.Templates;
 using System.IO;
 using System.Web.Routing;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web

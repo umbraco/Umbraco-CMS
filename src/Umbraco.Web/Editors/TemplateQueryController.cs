@@ -7,6 +7,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebApi;
 using System;
 using System.Diagnostics;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Dynamics;
 using Umbraco.Web.Models.TemplateQuery;
 

@@ -12,8 +12,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// Ensures macro syntax is parsed for the macro container which will work when getting the field
     /// values in any way (i.e. dynamically, using Field(), or IPublishedContent)
     /// </summary>
-    [PropertyValueType(typeof (IHtmlString))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     [DefaultPropertyValueConverter]
     public class MacroContainerValueConverter : PropertyValueConverterBase
     {
@@ -27,6 +25,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
+        }
+
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (IHtmlString);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Facade;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -54,7 +62,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
          }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

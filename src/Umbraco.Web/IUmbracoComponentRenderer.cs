@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
 {

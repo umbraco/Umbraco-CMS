@@ -1,33 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models
 {
     public static class PublishedProperty
     {
-        /// <summary>
-        /// Creates a detached published property.
-        /// </summary>
-        /// <param name="propertyType">A published property type.</param>
-        /// <param name="value">The property data raw value.</param>
-        /// <param name="isPreviewing">A value indicating whether to evaluate the property value in previewing context.</param>
-        /// <returns>A detached published property holding the value.</returns>
-        internal static IPublishedProperty GetDetached(PublishedPropertyType propertyType, object value, bool isPreviewing = false)
-        {
-            if (propertyType.IsDetachedOrNested == false)
-                throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
-            var property = UmbracoContext.Current.ContentCache.CreateDetachedProperty(propertyType, value, isPreviewing);
-            return property;
-        }
-
         /// <summary>
         /// Maps a collection of Property to a collection of IPublishedProperty for a specified collection of PublishedPropertyType.
         /// </summary>

@@ -10,6 +10,7 @@ using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
 using umbraco.presentation.templateControls;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web

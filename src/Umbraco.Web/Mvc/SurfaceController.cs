@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Web.Security;
 using System.Collections.Specialized;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Mvc
 {

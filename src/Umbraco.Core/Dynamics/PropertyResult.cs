@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Models;
 using System.Web;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Dynamics
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Dynamics
         internal PropertyResultType PropertyType { get { return _type; } }
 
         public string PropertyTypeAlias { get { return _source == null ? _alias : _source.PropertyTypeAlias; } }
-        public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
+        public object SourceValue { get { return _source == null ? _value : _source.SourceValue; } }
         public bool HasValue { get { return _source == null || _source.HasValue; } }
         public object Value { get { return _source == null ? _value : _source.Value; } }
         public object XPathValue { get { return Value == null ? null : Value.ToString(); } }

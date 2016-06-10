@@ -70,7 +70,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
 
-        public override ICollection<IPublishedProperty> Properties => _properties;
+        public override IEnumerable<IPublishedProperty> Properties => _properties;
 
         public override IPublishedProperty GetProperty(string alias, bool recurse)
         {

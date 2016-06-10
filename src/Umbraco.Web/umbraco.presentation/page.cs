@@ -14,6 +14,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 
 namespace umbraco
@@ -300,7 +301,7 @@ namespace umbraco
                     // to properly fix this, we'd need to turn the elements collection into some
                     // sort of collection of lazy values.
 
-					_elements[p.PropertyTypeAlias] = p.DataValue;
+					_elements[p.PropertyTypeAlias] = p.SourceValue;
 				}
 			}			
 		}
@@ -446,31 +447,31 @@ namespace umbraco
 
         private class PagePublishedProperty : PublishedPropertyBase
         {
-            private readonly object _dataValue;
+            private readonly object _sourceValue;
             private readonly IPublishedContent _content;
 
             public PagePublishedProperty(PublishedPropertyType propertyType, IPublishedContent content)
-                : base(propertyType)
+                : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
-                _dataValue = null;
+                _sourceValue = null;
                 _content = content;
             }
 
             public PagePublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, Umbraco.Core.Models.Property property)
-                : base(propertyType)
+                : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
-                _dataValue = property.Value;
+                _sourceValue = property.Value;
                 _content = content;
             }
 
             public override bool HasValue
             {
-                get { return _dataValue != null && ((_dataValue is string) == false || string.IsNullOrWhiteSpace((string)_dataValue) == false); }
+                get { return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false); }
             }
 
-            public override object DataValue
+            public override object SourceValue
             {
-                get { return _dataValue; }
+                get { return _sourceValue; }
             }
 
             public override object Value
@@ -479,8 +480,8 @@ namespace umbraco
                 {
                     // isPreviewing is true here since we want to preview anyway...
                     const bool isPreviewing = true;
-                    var source = PropertyType.ConvertDataToSource(_dataValue, isPreviewing);
-                    return PropertyType.ConvertSourceToObject(source, isPreviewing);
+                    var source = PropertyType.ConvertSourceToInter(_sourceValue, isPreviewing);
+                    return PropertyType.ConvertInterToObject(PropertyCacheLevel.Unknown, source, isPreviewing);
                 }
             }
 
@@ -531,11 +532,6 @@ namespace umbraco
                     .ToArray();
 
                 _parent = new PagePublishedContent(_inner.ParentId);
-            }
-
-            public IEnumerable<IPublishedContent> ContentSet
-            {
-                get { throw new NotImplementedException(); }
             }
 
             public PublishedContentType ContentType
@@ -658,7 +654,7 @@ namespace umbraco
                 get { throw new NotImplementedException(); }
             }
 
-            public ICollection<IPublishedProperty> Properties
+            public IEnumerable<IPublishedProperty> Properties
             {
                 get { return _properties; }
             }
@@ -671,11 +667,6 @@ namespace umbraco
             public IPublishedProperty GetProperty(string alias, bool recurse)
             {
                 throw new NotImplementedException();
-            }
-
-            public object this[string alias]
-            {
-                get { throw new NotImplementedException(); }
             }
         }
 

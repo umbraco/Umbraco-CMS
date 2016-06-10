@@ -12,6 +12,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Security.Providers;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 

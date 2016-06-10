@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels

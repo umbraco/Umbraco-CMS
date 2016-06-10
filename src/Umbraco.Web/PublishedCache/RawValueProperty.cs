@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Web.PublishedCache
         private readonly Lazy<object> _xpathValue;
         private readonly bool _isPreviewing;
 
-        public override object DataValue => _dbVal;
+        public override object SourceValue => _dbVal;
 
         public override bool HasValue => _dbVal != null && _dbVal.ToString().Trim().Length > 0;
 
@@ -35,14 +36,14 @@ namespace Umbraco.Web.PublishedCache
 
         // note: maintaining two ctors to make sure we understand what we do when calling them
         public RawValueProperty(PublishedPropertyType propertyType, bool isPreviewing = false)
-            : base(propertyType)
+            : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
             _dbVal = null;
             _isPreviewing = isPreviewing;
 
-            _sourceValue = new Lazy<object>(() => PropertyType.ConvertDataToSource(_dbVal, _isPreviewing));
-            _objectValue = new Lazy<object>(() => PropertyType.ConvertSourceToObject(_sourceValue.Value, _isPreviewing));
-            _xpathValue = new Lazy<object>(() => PropertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreviewing));
+            _sourceValue = new Lazy<object>(() => PropertyType.ConvertSourceToInter(_dbVal, _isPreviewing));
+            _objectValue = new Lazy<object>(() => PropertyType.ConvertInterToObject(PropertyCacheLevel.Unknown, _sourceValue.Value, _isPreviewing));
+            _xpathValue = new Lazy<object>(() => PropertyType.ConvertInterToXPath(PropertyCacheLevel.Unknown, _sourceValue.Value, _isPreviewing));
         }
     }
 }

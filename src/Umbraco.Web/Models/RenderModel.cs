@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Models

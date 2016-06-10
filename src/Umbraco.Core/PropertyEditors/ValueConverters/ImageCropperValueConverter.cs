@@ -13,11 +13,24 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// This ensures that the cropper config (pre-values/crops) are merged in with the front-end value.
     /// </summary>
     [DefaultPropertyValueConverter(typeof (JsonValueConverter))] //this shadows the JsonValueConverter
-    [PropertyValueType(typeof (JToken))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class ImageCropperValueConverter : JsonValueConverter
     {
         private readonly IDataTypeService _dataTypeService;
+
+        public override bool IsConverter(PublishedPropertyType propertyType)
+        {
+            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
+        }
+
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (JToken);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
 
         public ImageCropperValueConverter()
         {
@@ -28,11 +41,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _dataTypeService = dataTypeService;
-        }
-
-        public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
         }
 
         internal static void MergePreValues(JObject currentValue, IDataTypeService dataTypeService, int dataTypeId)
@@ -91,7 +99,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

@@ -3,8 +3,6 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(bool))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class YesNoValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -12,7 +10,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return propertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias;
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            return typeof (bool);
+        }
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        {
+            return PropertyCacheLevel.Content;
+        }
+
+        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a boolean is: string
             // in the database a boolean is: string "1" or "0" or empty
@@ -48,10 +56,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         // default ConvertSourceToObject just returns source ie a boolean value
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a boolean already
-            return (bool)source ? "1" : "0";
+            return (bool)inter ? "1" : "0";
         }
     }
 }

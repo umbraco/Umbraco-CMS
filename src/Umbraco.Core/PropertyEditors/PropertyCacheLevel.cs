@@ -11,22 +11,27 @@
         // xpath level >= source level
 
         /// <summary>
+        /// Default value.
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
         /// Indicates that the property value can be cached at the content level, ie it can be
         /// cached until the content itself is modified.
         /// </summary>
         Content = 1,
 
         /// <summary>
-        /// Indicates that the property value can be cached at the content cache level, ie it can
+        /// Indicates that the property value can be cached at the snapshot level, ie it can
         /// be cached until any content in the cache is modified.
         /// </summary>
-        ContentCache = 2,
+        Snapshot = 2,
 
         /// <summary>
-        /// Indicates that the property value can be cached at the request level, ie it can be
-        /// cached for the duration of the current request.
+        /// Indicates that the property value can be cached at the facade level, ie it can be
+        /// cached for the duration of the current facade (ie, in most cases, request).
         /// </summary>
-        Request = 3,
+        Facade = 3,
 
         /// <summary>
         /// Indicates that the property value cannot be cached and has to be converted any time

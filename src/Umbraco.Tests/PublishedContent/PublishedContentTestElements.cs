@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
@@ -16,27 +14,20 @@ namespace Umbraco.Tests.PublishedContent
         public readonly SolidPublishedContentCache InnerContentCache = new SolidPublishedContentCache();
         public readonly SolidPublishedContentCache InnerMediaCache = new SolidPublishedContentCache();
 
-        public IPublishedContentCache ContentCache
-        {
-            get { return InnerContentCache; }
-        }
+        public IPublishedContentCache ContentCache => InnerContentCache;
 
-        public IPublishedMediaCache MediaCache
-        {
-            get { return InnerMediaCache; }
-        }
+        public IPublishedMediaCache MediaCache => InnerMediaCache;
 
-        public IPublishedMemberCache MemberCache
-        {
-            get { return null; }
-        }
+        public IPublishedMemberCache MemberCache => null;
 
-        public IDomainCache DomainCache
-        {
-            get { return null; }
-        }
+        public IDomainCache DomainCache => null;
 
         public IDisposable ForcedPreview(bool forcedPreview, Action<bool> callback = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
             throw new NotImplementedException();
         }
@@ -133,11 +124,6 @@ namespace Umbraco.Tests.PublishedContent
             return _content.Count > 0;
         }
 
-        public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
-        {
-            throw new NotImplementedException();
-        }
-
         public override PublishedContentType GetContentType(int id)
         {
             throw new NotImplementedException();
@@ -219,7 +205,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Properties
 
-        public ICollection<IPublishedProperty> Properties { get; set; }
+        public IEnumerable<IPublishedProperty> Properties { get; set; }
 
         public IPublishedProperty GetProperty(string alias)
         {
@@ -261,7 +247,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         public string PropertyTypeAlias { get; set; }
-        public object DataValue { get; set; }
+        public object SourceValue { get; set; }
         public object Value { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
@@ -278,11 +264,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #endregion
 
-        // fast, if you know that the appropriate IPropertyEditorValueConverter is wired
-        public int Prop1 { get { return (int)this["prop1"]; } }
-
-        // almost as fast, not sure I like it as much, though
-        //public int Prop1 { get { return this.GetPropertyValue<int>("prop1"); } }
+        public int Prop1 => this.GetPropertyValue<int>("prop1");
     }
 
     [PublishedContentModel("ContentType2Sub")]
@@ -303,7 +285,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int StrongValue { get { return (int)this["strongValue"]; } }
+        public int StrongValue => this.GetPropertyValue<int>("strongValue");
     }
 
     class PublishedContentStrong1Sub : PublishedContentStrong1
@@ -312,7 +294,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int AnotherValue { get { return (int)this["anotherValue"]; } }
+        public int AnotherValue => this.GetPropertyValue<int>("anotherValue");
     }
 
     class PublishedContentStrong2 : PublishedContentExtended
@@ -321,7 +303,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int StrongValue { get { return (int)this["strongValue"]; } }
+        public int StrongValue => this.GetPropertyValue<int>("strongValue");
     }
 
     class AutoPublishedContentType : PublishedContentType

@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
 using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace Umbraco.Web.Mvc
