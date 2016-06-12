@@ -457,7 +457,9 @@ namespace UmbracoExamine
                     _contentService,
                     _dataTypeService,
                     _userService,
-                    c);
+                    c,
+                    deep:false,
+                    forExamine:true);
 
                 //add a custom 'icon' attribute
                 xml.Add(new XAttribute("icon", c.ContentType.Icon));

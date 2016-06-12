@@ -1276,4 +1276,68 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterCustomValidation">...or enter a custom validation</key>
     <key alias="fieldIsMandatory">Field is mandatory</key>
   </area>
+  <area alias="healthcheck">
+	<!-- The following keys get these tokens passed in:
+	     0: Current value
+		 1: Recommended value
+		 2: XPath
+		 3: Configuration file path
+	-->
+    <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
+	<key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>	
+	
+	<!-- The following keys get these tokens passed in:
+	     0: Current value
+		 1: Recommended value
+	-->	
+	<key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
+	<key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
+	<key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
+	
+	<key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
+	<key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+	<key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
+		
+	<!-- The following keys get these tokens passed in:
+	     0: Current value
+		 1: Recommended value
+		 2: Server version
+	-->		
+	<key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+	<key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
+	<key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+	
+	<!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+	<key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
+	<key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
+	<key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+	
+	<key alias="xmlDataIntegrityCheckMembers">Total XML: %0%, Total: %1%</key>
+	<key alias="xmlDataIntegrityCheckMedia">Total XML: %0%, Total: %1%</key>
+	<key alias="xmlDataIntegrityCheckContent">Total XML: %0%, Total published: %1%</key>
+	
+	<key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+	<key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+	<key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+	<key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+	<key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+
+	<!-- The following keys don't get tokens passed in -->
+	<key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
+	<key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
+	<key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+	
+	<key alias="rectifyButton">Rectify</key>
+	<key alias="cannotRectifyShouldNotEqual">Cannot rectify a check with a value comparison type of 'ShouldNotEqual'.</key>
+		
+	<key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
+	<key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+	<key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+
+	<key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
+	<key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
+	<key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
+  </area>
 </language>
