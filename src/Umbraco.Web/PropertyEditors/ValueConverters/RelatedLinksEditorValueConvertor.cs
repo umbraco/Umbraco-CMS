@@ -1,106 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RelatedLinksPropertyConverter.cs" company="Umbraco">
+//   Umbraco
+// </copyright>
+// <summary>
+//   Defines the RelatedLinksPropertyConverter type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(JArray))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
-    public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
+    /// <summary>
+    /// The related links property value converter.
+    /// </summary>
+    [PropertyValueType(typeof(RelatedLinks))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.ContentCache)]
+    public class RelatedLinksPropertyConverter : PropertyValueConverterBase
     {
+        /// <summary>
+        /// Checks if this converter can convert the property editor and registers if it can.
+        /// </summary>
+        /// <param name="propertyType">
+        /// The property type.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return Constants.PropertyEditors.RelatedLinksAlias.Equals(propertyType.PropertyEditorAlias);
+            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        /// <summary>
+        /// Convert the source nodeId into a RelatedLinks object
+        /// </summary>
+        /// <param name="propertyType">
+        /// The published property type.
+        /// </param>
+        /// <param name="source">
+        /// The value of the property
+        /// </param>
+        /// <param name="preview">
+        /// The preview.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
-            var sourceString = source.ToString();
-
-            if (sourceString.DetectIsJson())
+            if (source == null)
             {
-                try
-                {
-                    var obj = JsonConvert.DeserializeObject<JArray>(sourceString);
-                    //update the internal links if we have a context
-                    if (UmbracoContext.Current != null)
-                    {
-                        var helper = new UmbracoHelper(UmbracoContext.Current);
-                        foreach (var a in obj)
-                        {
-                            var type = a.Value<string>("type");
-                            if (type.IsNullOrWhiteSpace() == false)
-                            {
-                                if (type == "internal")
-                                {
-                                    var linkId = a.Value<int>("link");
-                                    var link = helper.NiceUrl(linkId);
-                                    a["link"] = link;
-                                }
-                            }
-                        }    
-                    }
-                    return obj;
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
-                }
+                return null;
             }
 
-            //it's not json, just return the string
-            return sourceString;
-        }
-
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            if (source == null) return null;
             var sourceString = source.ToString();
 
-            if (sourceString.DetectIsJson())
-            {
-                try
-                {
-                    var obj = JsonConvert.DeserializeObject<Array>(sourceString);
-
-                    var d = new XmlDocument();
-                    var e = d.CreateElement("links");
-                    d.AppendChild(e);
-
-                    var values = (IEnumerable<string>)source;
-                    foreach (dynamic link in obj)
-                    {
-                        var ee = d.CreateElement("link");
-                        ee.SetAttribute("title", link.title);
-                        ee.SetAttribute("link", link.link);
-                        ee.SetAttribute("type", link.type);
-                        ee.SetAttribute("newwindow", link.newWindow);
-
-                        e.AppendChild(ee);
-                    }
-
-                    return d.CreateNavigator();
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
-                }
-            }
-
-            //it's not json, just return the string
-            return sourceString;
+            return UmbracoContext.Current != null ? new RelatedLinks(sourceString) : null;
         }
     }
 }
