@@ -122,38 +122,41 @@ namespace Umbraco.Web.Install
 
         internal void InstallStatus(bool isCompleted, string errorMsg)
         {
-            var userAgent = _umbContext.HttpContext.Request.UserAgent;
-
-            // Check for current install Id
-            var installId = Guid.NewGuid();
-            var installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
-            if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+            try
             {
-                if (Guid.TryParse(installCookie.GetValue(), out installId))
-                {
-                    // check that it's a valid Guid
-                    if (installId == Guid.Empty)
-                        installId = Guid.NewGuid();
-                }
-            }
-            installCookie.SetValue(installId.ToString());
+                var userAgent = _umbContext.HttpContext.Request.UserAgent;
 
-            string dbProvider = String.Empty;
-            if (IsBrandNewInstall == false)
-                dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                // Check for current install Id
+                var installId = Guid.NewGuid();
+                var installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
+                if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+                {
+                    if (Guid.TryParse(installCookie.GetValue(), out installId))
+                    {
+                        // check that it's a valid Guid
+                        if (installId == Guid.Empty)
+                            installId = Guid.NewGuid();
+                    }
+                }
+                installCookie.SetValue(installId.ToString());
+                
+                bool brandNewInstall = IsBrandNewInstall;
+                string dbProvider = brandNewInstall
+                    ? ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString()
+                    : string.Empty;
 
                 org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
-                check.Install(installId,
-                    IsBrandNewInstall == false,
-                    isCompleted,
-                    DateTime.Now,
-                    UmbracoVersion.Current.Major,
-                    UmbracoVersion.Current.Minor,
-                    UmbracoVersion.Current.Build,
-                    UmbracoVersion.CurrentComment,
-                    errorMsg,
-                    userAgent,
-                    dbProvider);
+                    check.Install(installId,
+                        brandNewInstall == false,
+                        isCompleted,
+                        DateTime.Now,
+                        UmbracoVersion.Current.Major,
+                        UmbracoVersion.Current.Minor,
+                        UmbracoVersion.Current.Build,
+                        UmbracoVersion.CurrentComment,
+                        errorMsg,
+                        userAgent,
+                        dbProvider);
             }
             catch (Exception ex)
             {
