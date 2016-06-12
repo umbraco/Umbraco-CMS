@@ -21,7 +21,8 @@ Umbraco.Sys.ServerVariables = {
         "dashboardApiBaseUrl": "/umbraco/UmbracoApi/Dashboard/",
         "updateCheckApiBaseUrl": "/umbraco/Api/UpdateCheck/",
         "relationApiBaseUrl": "/umbraco/UmbracoApi/Relation/",
-        "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/"
+        "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/",
+        "nestedContentApiBaseUrl": "/umbraco/UmbracoApi/NestedContent/"
     },
     umbracoSettings: {
         "umbracoPath": "/umbraco",

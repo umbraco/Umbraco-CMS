@@ -420,6 +420,11 @@ namespace Umbraco.Core
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
 
+            /// <summary>
+            /// Alias for the Multiple Textstring datatype.
+            /// </summary>
+            public const string NestedContentAlias = "Umbraco.NestedContent";
+
             public static class PreValueKeys
             {
                 /// <summary>

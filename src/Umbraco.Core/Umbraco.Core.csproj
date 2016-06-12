@@ -527,6 +527,7 @@
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
     <Compile Include="Services\TaskService.cs" />
+    <Compile Include="Strategies\NestedContentCacheHandler.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />

@@ -350,6 +350,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
                                     controller => controller.CheckContentXmlTable())
+                            },
+                            {
+                                "nestedContentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<NestedContentController>(
+                                    controller => controller.GetContentTypes())
                             }
                         }
                     },
