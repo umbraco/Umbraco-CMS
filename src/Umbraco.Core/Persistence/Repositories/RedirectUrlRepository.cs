@@ -114,12 +114,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DeleteAll()
         {
-            Database.Execute("DELETE FROM umbracoContentUrl");
+            Database.Execute("DELETE FROM umbracoRedirectUrl");
         }
 
         public void DeleteContentUrls(int contentId)
         {
-            Database.Execute("DELETE FROM umbracoContentUrl WHERE contentId=@contentId", new { contentId });
+            Database.Execute("DELETE FROM umbracoRedirectUrl WHERE contentId=@contentId", new { contentId });
         }
 
         public void Delete(int id)
@@ -127,9 +127,9 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Delete<RedirectUrlDto>(id);
         }
 
-        public IRedirectUrl GetMostRecentRule(string url)
+        public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var dtos = Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE url=@url ORDER BY createDateUtc DESC;",
+            var dtos = Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoRedirectUrl WHERE url=@url ORDER BY createDateUtc DESC;",
                 new { url });
             var dto = dtos.FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<RedirectUrl> GetContentUrls(int contentId)
         {
-            var dtos = Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE contentId=@id ORDER BY createDateUtc DESC;",
+            var dtos = Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoRedirectUrl WHERE contentId=@id ORDER BY createDateUtc DESC;",
                 new { id = contentId });
             return dtos.Select(x => new RedirectUrl
             {

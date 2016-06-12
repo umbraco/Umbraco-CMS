@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -74,7 +72,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var rule = repo.GetMostRecentRule(url);
+                var rule = repo.GetMostRecentUrl(url);
                 uow.Commit();
                 return rule;
             }
