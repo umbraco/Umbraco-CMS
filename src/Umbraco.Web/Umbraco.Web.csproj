@@ -318,6 +318,7 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Editors\GravatarController.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />

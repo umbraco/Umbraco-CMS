@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\build\Build.bat = ..\build\Build.bat
 		..\build\Build.proj = ..\build\Build.proj
 		..\build\BuildBelle.bat = ..\build\BuildBelle.bat
+		..\build\BuildDocs.ps1 = ..\build\BuildDocs.ps1
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
 		SolutionInfo.cs = SolutionInfo.cs
@@ -19,8 +20,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
+		..\apidocs\docfx.filter.yml = ..\apidocs\docfx.filter.yml
+		..\apidocs\docfx.json = ..\apidocs\docfx.json
+		..\apidocs\index.md = ..\apidocs\index.md
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
+		..\apidocs\toc.yml = ..\apidocs\toc.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"

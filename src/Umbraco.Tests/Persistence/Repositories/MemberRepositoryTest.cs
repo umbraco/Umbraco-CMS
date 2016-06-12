@@ -220,7 +220,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
-                Assert.That(sut.Username, Is.EqualTo("hefty"));      
+                Assert.That(sut.Username, Is.EqualTo("hefty"));
+
+                TestHelper.AssertAllPropertyValuesAreEquals(sut, member, "yyyy-MM-dd HH:mm:ss");
             }
         }
 

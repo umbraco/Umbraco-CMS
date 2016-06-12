@@ -149,15 +149,19 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
+            var applicationContext = CreateApplicationContext();
+            ApplicationContext.Current = applicationContext;
+        }
 
+        protected virtual ApplicationContext CreateApplicationContext()
+        {
             var sqlSyntax = new SqlCeSyntaxProvider();
             var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
 
             var evtMsgs = new TransientMessagesFactory();
-            ApplicationContext.Current = new ApplicationContext(
+            var applicationContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
-                    Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
                 new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
@@ -165,6 +169,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 IsReady = true
             };
+            return applicationContext;
         }
 
         /// <summary>

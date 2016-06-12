@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -22,10 +23,12 @@ namespace Umbraco.Web.Install.InstallSteps
         "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
+        private readonly HttpContextBase _http;
         private readonly ApplicationContext _applicationContext;
 
-        public NewInstallStep(ApplicationContext applicationContext)
+        public NewInstallStep(HttpContextBase http, ApplicationContext applicationContext)
         {
+            _http = http;
             _applicationContext = applicationContext;
         }
 
@@ -111,7 +114,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 //the continue install UI
                 : "continueinstall"; }
         }
-
+        
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
@@ -136,6 +139,10 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else
             {
+                // In this one case when it's a brand new install and nothing has been configured, make sure the 
+                // back office cookie is cleared so there's no old cookies lying around causing problems
+                _http.ExpireCookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+
                 return true;
             }
         }

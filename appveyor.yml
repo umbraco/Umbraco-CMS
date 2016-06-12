@@ -1,0 +1,51 @@
+version: '{build}'
+shallow_clone: true
+build_script:
+- cmd: >-
+    cd build
+
+    SET "release="
+
+    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+
+    SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+
+    ECHO %PATH%
+
+
+    ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
+
+
+    SET nuGetFolder=%CD%\..\src\packages\
+
+    ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+
+    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+
+    IF EXIST ..\src\umbraco.businesslogic\packages.config ..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+
+
+    SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+
+    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /verbosity:minimal
+
+
+    build.bat %release% build%APPVEYOR_BUILD_NUMBER%
+
+
+    ECHO %PATH%
+test:
+  assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
+artifacts:
+- path: build\UmbracoCms.*
+notifications:
+- provider: Slack
+  auth_token:
+    secure: v2csJi2V5ghR0rPdODK8GJdOGNCA+XaK84iQ9MdPOClqB+VU+40ybdKp6gPirGSH
+  channel: '#build-umbraco-core'
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false

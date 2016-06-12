@@ -49,7 +49,7 @@
             <!-- TAB ACTIVE OR INACTIVE STATE -->
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
 
-                <div class="umb-group-builder__group-remove" ng-if="!sortingMode && tab.properties.length <= 1 && model.groups.length > 1">
+                <div class="umb-group-builder__group-remove" ng-if="!sortingMode && tab.properties.length <= 1">
                     <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
                     <umb-confirm-action
                         ng-if="tab.deletePrompt"
