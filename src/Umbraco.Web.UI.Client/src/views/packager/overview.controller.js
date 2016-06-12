@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesOverviewController($scope, $route, $location) {
+    function PackagesOverviewController($scope, $route, $location, navigationService, $timeout) {
 
         var vm = this;
 
@@ -25,6 +25,10 @@
 			    "view": "views/packagesNew/views/install-local.html"
 			}
         ];
+
+        $timeout(function() {
+            navigationService.syncTree({ tree: "packager", path: "-1" });
+        });
 
     }
 
