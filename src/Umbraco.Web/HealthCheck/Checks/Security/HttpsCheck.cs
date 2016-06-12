@@ -66,28 +66,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported 
             // and a valid certificate has been configured
-            using (var webClient = new WebClient())
+            var address = string.Format("https://{0}:{1}", url.Host.ToLower(), url.Port);
+            var request = (HttpWebRequest)WebRequest.Create(address);
+            request.Method = "HEAD";
+
+            try
             {
-                var address = string.Format("https://{0}:{1}", url.Host.ToLower(), url.Port);
-                try
+                var response = (HttpWebResponse)request.GetResponse();
+                success = response.StatusCode == HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                var exception = ex as WebException;
+                if (exception != null)
                 {
-                    webClient.DownloadString(address);
-                    // if we get here, all is well!
-                    success = true;
+                    message = exception.Status == WebExceptionStatus.TrustFailure
+                        ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
+                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
                 }
-                catch (Exception ex)
+                else
                 {
-                    var exception = ex as WebException;
-                    if (exception != null)
-                    {
-                        message = exception.Status == WebExceptionStatus.TrustFailure
-                            ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                            : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
-                    }
-                    else
-                    {
-                        message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-                    }
+                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
                 }
             }
 

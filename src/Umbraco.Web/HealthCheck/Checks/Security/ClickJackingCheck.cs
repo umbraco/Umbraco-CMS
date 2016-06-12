@@ -54,21 +54,21 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Access the site home page and check for the click-jack protection header
-            using (var webClient = new WebClient())
+            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var request = WebRequest.Create(address);
+            request.Method = "HEAD";
+
+            try
             {
-                var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
-                try
-                {
-                    webClient.DownloadString(address);
-                    success = webClient.ResponseHeaders.AllKeys.Contains("X-Frame-Options");
-                    message = success
-                        ? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
-                        : _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
-                }
-                catch (Exception ex)
-                {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-                }
+                var response = request.GetResponse();
+                success = response.Headers.AllKeys.Contains("X-Frame-Options");
+                message = success
+                    ? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
+                    : _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
+            }
+            catch (Exception ex)
+            {
+                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
