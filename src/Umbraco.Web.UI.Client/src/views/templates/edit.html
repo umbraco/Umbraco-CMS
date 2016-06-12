@@ -2,7 +2,11 @@
 
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
-    <form novalidate name="contentTypeForm" val-form-manager>
+   <form name="contentForm"
+      ng-submit="vm.save()"
+      novalidate
+      val-form-manager>
+
 
         <umb-editor-view ng-if="!vm.page.loading">
 
@@ -10,65 +14,63 @@
                 name="vm.template.name"
                 alias="vm.template.alias"
                 hideDescription="true"
-                hide-icon="true">
+                description="vm.template.virtualPath"
+                menu="vm.page.menu"
+                hide-icon="false">
             </umb-editor-header>
 
             <umb-editor-container>
 
-                <umb-editor-sub-header>
+                <div class="btn-group">
+                    <a href ng-click="vm.openMacroOverlay()" class="btn">
+                        <i class="icon-autofill"></i></a>
+                    <a href ng-click="vm.insert('@RenderDictionary()')"class="btn">
+                        <i class="icon-book-alt"></i></a>
+                    <a href ng-click="vm.openMacroOverlay()"class="btn">
+                        <i class="icon-settings-alt"></i></a>
+                </div>
 
-                    <umb-editor-sub-header-content-left>
-
-                        <umb-button
-                            type="button"
-                            button-style="link"
-                            label="Page field"
-                            icon="icon-merge"
-                            action="vm.openPageFieldOverlay()">
-                        </umb-button>
-
-                        <umb-button
-                            type="button"
-                            button-style="link"
-                            label="Dictionary item"
-                            icon="icon-merge"
-                            action="vm.openDictionaryItemOverlay()">
-                        </umb-button>
-
-                        <umb-button
-                            type="button"
-                            button-style="link"
-                            label="Query builder"
-                            icon="icon-merge"
-                            action="vm.openQueryBuilderOverlay()">
-                        </umb-button>
-
-                    </umb-editor-sub-header-content-left>
-
-                </umb-editor-sub-header>
+                <div class="btn-group">  
+                  <a href class="btn"><i class="icon-checkbox-empty"></i></a>
+                  <a href class="btn"><i class="icon-checkbox-dotted"></i></a>
+                </div> 
+            
 
                 <div
+                    auto-scale="85"
                     umb-ace-editor="vm.aceOption"
-                    ng-model="vm.aceModel">
+                    ng-model="vm.template.content">
                 </div>
+                    
 
             </umb-editor-container>
 
             <umb-editor-footer>
 
-                <umb-editor-footer-content-right>
+            <umb-editor-footer-content-right>
 
+               <umb-button
+                  type="submit"
+                  button-style="success"
+                  state="vm.page.saveButtonState"
+                  shortcut="ctrl+s"
+                  label="Save"
+                  label-key="buttons_save">
+               </umb-button>
 
+            </umb-editor-footer-content-right>
 
-
-                </umb-editor-footer-content-right>
-
-            </umb-editor-footer>
+         </umb-editor-footer>
 
         </umb-editor-view>
-
     </form>
 
+    <umb-overlay
+       ng-if="vm.macroPickerOverlay.show"
+       model="vm.macroPickerOverlay"
+       view="vm.macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
 
     <umb-overlay
         ng-if="vm.pageFieldOverlay.show"

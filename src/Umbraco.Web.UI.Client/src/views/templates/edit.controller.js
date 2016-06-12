@@ -1,47 +1,96 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope) {
+    function TemplatesEditController($scope, $routeParams, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService) {
 
         var vm = this;
-
         vm.page = {};
-        vm.page.loading = false;
+        vm.page.loading = true;
+        
+        //menu
+        vm.page.menu = {};
+        vm.page.menu.currentSection = appState.getSectionState("currentSection");
+        vm.page.menu.currentNode = null;
 
-        vm.mode = "css";
-
-        vm.aceOption = {
-            mode: vm.mode.toLowerCase(),
-            onLoad: function(ace) {
-
-                console.log(ace);
-
-                // HACK to have the ace instance in the scope...
-                /*
-                $scope.modeChanged = function() {
-                    _ace.getSession().setMode("ace/mode/" + $scope.mode.toLowerCase());
-                };
-                */
-
-            }
+        vm.insert = function(str){
+            vm.editor.insert(str);
+            vm.editor.focus();
         };
 
-        vm.aceModel = ';; Scheme code in here.\n' +
-            '(define (double x)\n\t(* x x))\n\n\n' +
-            '<!-- XML code in here. -->\n' +
-            '<root>\n\t<foo>\n\t</foo>\n\t<bar/>\n</root>\n\n\n' +
-            '// Javascript code in here.\n' +
-            'function foo(msg) {\n\tvar r = Math.random();\n\treturn "" + r + " : " + msg;\n}';
+        vm.save = function(){
+            vm.page.saveButtonState = "busy";
 
+            vm.template.content = vm.editor.getValue();
+
+            templateResource.save(vm.template).then(function(saved){
+                notificationsService.success("Template saved")
+                vm.page.saveButtonState = "success";
+                vm.template = saved;
+
+                //sync state
+                editorState.set(vm.template);
+                navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+
+
+            }, function(err){
+                notificationsService.error("Template save failed")
+                vm.page.saveButtonState = "error";
+            });
+        };
+
+        vm.init = function(){
+
+
+            //we need to load this somewhere, for now its here.
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            templateResource.getById($routeParams.id).then(function(template){
+                    
+                    vm.page.loading = false;
+                    vm.template = template;
+
+                    //sync state
+                    editorState.set(vm.template);
+                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
+
+                    vm.aceOption = {
+                        mode: "razor",
+                        theme: "chrome",
+
+                        onLoad: function(_editor) {
+                            vm.editor = _editor;
+                    }
+                };
+            });
+
+        };
+        
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
+        vm.openMacroOverlay = openMacroOverlay;
 
-        function init() {
+        function openMacroOverlay() {
+           
+            vm.macroPickerOverlay = {
+                view: "macropicker",
+                dialogData: {},
+                show: true,
+                submit: function(model) {
 
+                    var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
+                    vm.insert(macroObject.syntax);
+                    vm.macroPickerOverlay.show = false;
+                    vm.macroPickerOverlay = null;
+                }
+            };
 
         }
 
+ 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
                 view: "mediapicker",
@@ -84,7 +133,7 @@
             };
         }
 
-        init();
+        vm.init();
 
     }
 

@@ -16,10 +16,8 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
-    'lib/ace/ace-src-min-noconflict.js',
-    'lib/ace/mode-javascript.js',
-    'lib/ace/mode-razor.js',
-    'lib/ace/mode-css.js',
+    "lib/ace-builds/src-min-noconflict/ace.js",
+    "lib/ace-builds/src-min-noconflict/mode-razor.js",
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
