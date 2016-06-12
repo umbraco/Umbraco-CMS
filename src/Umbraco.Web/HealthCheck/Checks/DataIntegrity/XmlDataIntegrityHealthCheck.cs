@@ -15,10 +15,14 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         "D999EB2B-64C2-400F-B50C-334D41F8589A",
         "XML Data Integrity",
         Description = "Checks the integrity of the XML data in Umbraco",
-        Group = "DataIntegrity")]
+        Group = "Data Integrity")]
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+
+        private const string CheckContentXmlTableAction = "checkContentXmlTable";
+        private const string CheckMediaXmlTableAction = "checkMediaXmlTable";
+        private const string CheckMembersXmlTableAction = "checkMembersXmlTable";
 
         public XmlDataIntegrityHealthCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
@@ -51,13 +55,13 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         {
             switch (action.Alias)
             {
-                case "checkContentXmlTable":
+                case CheckContentXmlTableAction:
                     _services.ContentService.RebuildXmlStructures();
                     return CheckContent();
-                case "checkMediaXmlTable":
+                case CheckMediaXmlTableAction:
                     _services.MediaService.RebuildXmlStructures();
                     return CheckMedia();
-                case "checkMembersXmlTable":
+                case CheckMembersXmlTableAction:
                     _services.MemberService.RebuildXmlStructures();
                     return CheckMembers();
                 default:
@@ -79,7 +83,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
             var actions = new List<HealthCheckAction>();
             if (totalXml != total)
-                actions.Add(new HealthCheckAction("checkMembersXmlTable", Id));
+                actions.Add(new HealthCheckAction(CheckMembersXmlTableAction, Id));
             
             return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMembers", new[] { totalXml.ToString(), total.ToString() }))
             {
@@ -102,7 +106,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
             var actions = new List<HealthCheckAction>();
             if (totalXml != total)
-                actions.Add(new HealthCheckAction("checkMediaXmlTable", Id));
+                actions.Add(new HealthCheckAction(CheckMediaXmlTableAction, Id));
 
             return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMedia", new[] { totalXml.ToString(), total.ToString() }))
             {
@@ -123,7 +127,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
             var actions = new List<HealthCheckAction>();
             if (totalXml != total)
-                actions.Add(new HealthCheckAction("checkContentXmlTable", Id));
+                actions.Add(new HealthCheckAction(CheckContentXmlTableAction, Id));
 
             return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckContent", new[] { totalXml.ToString(), total.ToString() }))
             {

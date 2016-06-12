@@ -7,9 +7,6 @@ using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
 {
-    /// <summary>
-    /// Checks Umbraco backoffice users against the HaveIBeenPwned database to check if they've been breached
-    /// </summary>
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
         "HTTPS Configuration",
@@ -18,6 +15,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+
+        private const string CheckForValidCertificateAction = "checkForValidCertificate";
+        private const string CheckHttpsConfigurationSettingAction = "checkHttpsConfigurationSetting";
+        private const string CheckIfCurrentSchemeIsHttpsAction = "checkIfCurrentSchemeIsHttps";
+        private const string FixHttpsSettingAction = "fixHttpsSetting";
 
         public HttpsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
@@ -43,13 +45,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             switch (action.Alias)
             {
-                case "checkForValidCertificate":
+                case CheckForValidCertificateAction:
                     return CheckForValidCertificate();
-                case "checkHttpsConfigurationSetting":
+                case CheckHttpsConfigurationSettingAction:
                     return CheckHttpsConfigurationSetting();
-                case "checkIfCurrentSchemeIsHttps":
+                case CheckIfCurrentSchemeIsHttpsAction:
                     return CheckIfCurrentSchemeIsHttps();
-                case "fixHttpsSetting":
+                case FixHttpsSettingAction:
                     return FixHttpsSetting();
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -120,7 +122,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
             if (httpsSettingEnabled == false)
-                actions.Add(new HealthCheckAction("fixHttpsSetting", Id) {
+                actions.Add(new HealthCheckAction(FixHttpsSettingAction, Id) {
                     Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
                     Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
                 });
