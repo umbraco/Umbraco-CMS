@@ -77,14 +77,6 @@ namespace Umbraco.Core.IO
                 return "~/App_Code";
             }
         }
-        public static string AppData
-        {
-            get
-            {
-                //NOTE: this is not configurable and shouldn't need to be
-                return "~/App_Data";
-            }
-        }
 
         public static string AppPlugins
 		{

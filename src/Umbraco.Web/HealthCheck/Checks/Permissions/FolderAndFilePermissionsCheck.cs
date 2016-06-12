@@ -71,7 +71,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
             {
                 { SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
-                { SystemDirectories.AppData, PermissionCheckRequirement.Required },
+                { SystemDirectories.Data, PermissionCheckRequirement.Required },
+                { SystemDirectories.Packages, PermissionCheckRequirement.Optional },
+                { SystemDirectories.Preview, PermissionCheckRequirement.Optional },
                 { SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { SystemDirectories.Bin, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Config, PermissionCheckRequirement.Optional },
