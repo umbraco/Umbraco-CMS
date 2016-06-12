@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using umbraco.interfaces;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Services
 {
@@ -30,12 +31,12 @@ namespace Umbraco.Core.Services
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent content, bool deep = false)
+        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent content, bool deep = false, bool forExamine = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
-            var xml = Serialize(dataTypeService, content, nodeName);
+            var xml = Serialize(dataTypeService, content, nodeName, forExamine);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
             xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService).Name));
             xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService).Name));
@@ -131,6 +132,30 @@ namespace Umbraco.Core.Services
             }
 
             return xElement;
+        }
+
+        public IEnumerable<XElement> SerializeForExamine(IDataTypeService dataTypeService, Property property)
+        {
+            var propertyType = property.PropertyType;
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+
+            //Get the property editor for thsi property and let it convert it to the xml structure
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+            if (propertyEditor != null)
+            {
+                IEnumerable<XElement> xmlValues;
+                // TODO: Transform to XML here instead of from the valueeditor
+                xmlValues = propertyEditor.ValueEditor.ConvertDbToExamine(property, propertyType, dataTypeService);
+                if (!xmlValues.Any())
+                    xmlValues = new[] {new XElement(nodeName, propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService))};
+                foreach (var value in xmlValues)
+                    yield return value;
+            }
+            else
+            {
+                yield return new XElement(nodeName, new XText(property.Value as string));
+            }
+
         }
 
         /// <summary>
@@ -474,7 +499,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentBase">Base Content or Media to export</param>
         /// <param name="nodeName">Name of the node</param>
         /// <returns><see cref="XElement"/></returns>
-        private XElement Serialize(IDataTypeService dataTypeService, IContentBase contentBase, string nodeName)
+        private XElement Serialize(IDataTypeService dataTypeService, IContentBase contentBase, string nodeName, bool forExamine = false)
         {
             //NOTE: that one will take care of umbracoUrlName
             var url = contentBase.GetUrlSegment();
@@ -493,9 +518,16 @@ namespace Umbraco.Core.Services
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            var properties = contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false);
+            if (forExamine)
             {
-                xml.Add(Serialize(dataTypeService, property));
+                foreach (var property in properties)
+                    xml.Add(SerializeForExamine(dataTypeService, property));
+            }
+            else
+            {
+                foreach (var property in properties)
+                    xml.Add(Serialize(dataTypeService, property));
             }
 
             return xml;

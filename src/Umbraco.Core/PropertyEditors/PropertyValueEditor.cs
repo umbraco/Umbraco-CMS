@@ -390,5 +390,20 @@ namespace Umbraco.Core.PropertyEditors
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        /// <summary>
+        /// Converts the property db value to an XML fragment for use with UmbracoContentIndexer
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="dataTypeService"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will just return the value of ConvertDbToXml.
+        /// </remarks>
+        public virtual IEnumerable<XElement> ConvertDbToExamine(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        {
+            yield return new XElement(property.Alias, ConvertDbToXml(property, propertyType, dataTypeService));
+        }
     }
 }
