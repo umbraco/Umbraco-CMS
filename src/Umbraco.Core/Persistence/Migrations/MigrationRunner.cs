@@ -94,7 +94,6 @@ namespace Umbraco.Core.Persistence.Migrations
             var migrations = isUpgrade
                                  ? OrderedUpgradeMigrations(foundMigrations).ToList()
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
-
             
             if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, _productName, true), this))
             {
@@ -298,7 +297,6 @@ namespace Umbraco.Core.Persistence.Migrations
                 {
                     _migrationEntryService.CreateEntry(_productName, _targetVersion);    
                 }
-               
             }
         }
 

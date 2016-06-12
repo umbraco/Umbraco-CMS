@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Migrations
                 () => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
-					typeof(Dummy),
+					typeof (Dummy),
 					typeof (SixZeroMigration1),					
 					typeof (SixZeroMigration2),
 					typeof (FourElevenMigration),
@@ -51,7 +51,6 @@ namespace Umbraco.Tests.Migrations
             };
            
 			Resolution.Freeze();
-            
         }
 
         [Test]

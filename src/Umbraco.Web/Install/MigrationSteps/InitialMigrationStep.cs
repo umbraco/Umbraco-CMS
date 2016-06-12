@@ -28,7 +28,7 @@ namespace Umbraco.Web.Install.MigrationSteps
         /// </summary>
         public override object ViewModel
         {
-            get { return _applicationContext.PackageMigrationsContext.GetPendingPackageMigrations().Select(x => x.Key); }
+            get { return _applicationContext.PackageMigrationsContext.GetPendingPackageMigrationFriendlyNames(); }
         }
 
         public override InstallSetupResult Execute(object model)

@@ -1,5 +1,4 @@
-﻿using System;
-using Semver;
+﻿using Semver;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models

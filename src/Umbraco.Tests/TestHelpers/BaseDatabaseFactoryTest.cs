@@ -193,9 +193,7 @@ namespace Umbraco.Tests.TestHelpers
                         engine.CreateDatabase();
                     }
                 }
-
             }
-
         }
 
         /// <summary>
