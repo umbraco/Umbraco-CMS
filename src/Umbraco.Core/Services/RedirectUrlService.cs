@@ -9,13 +9,13 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    class ContentUrlRuleService : RepositoryService, IContentUrlRuleService
+    class RedirectUrlService : RepositoryService, IRedirectUrlService
     {
-        public ContentUrlRuleService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
+        public RedirectUrlService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
-        public void Save(ContentUrlRule rule)
+        public void Save(RedirectUrl redirectUrl)
         {
             // check if the url already exists
             // the url actually is a primary key?
@@ -23,24 +23,24 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var dto = new ContentUrlRuleDto
+                var dto = new RedirectUrlDto
                 {
-                    Id = rule.Id,
-                    ContentId = rule.ContentId,
-                    CreateDateUtc = rule.CreateDateUtc,
-                    Url = rule.Url
+                    Id = redirectUrl.Id,
+                    ContentId = redirectUrl.ContentId,
+                    CreateDateUtc = redirectUrl.CreateDateUtc,
+                    Url = redirectUrl.Url
                 };
                 uow.Database.InsertOrUpdate(dto);
                 uow.Commit();
-                rule.Id = dto.Id;
+                redirectUrl.Id = dto.Id;
             }
         }
 
-        public void Delete(int ruleId)
+        public void Delete(int id)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                uow.Database.Execute("DELETE FROM umbracoContentUrlRule WHERE id=@id", new { id = ruleId });
+                uow.Database.Execute("DELETE FROM umbracoContentUrlRule WHERE id=@id", new { id = id });
                 uow.Commit();
             }
         }
@@ -54,14 +54,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public ContentUrlRule GetMostRecentRule(string url)
+        public void DeleteAll()
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var ruleDtos = uow.Database.Fetch<ContentUrlRuleDto>("SELECT * FROM umbracoContentUrlRule WHERE url=@url ORDER BY createDateUtc DESC;",
+                uow.Database.Execute("DELETE FROM umbracoContentUrlRule;");
+                uow.Commit();
+            }
+        }
+
+        public RedirectUrl GetMostRecentRule(string url)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE url=@url ORDER BY createDateUtc DESC;",
                     new { url });
                 var ruleDto = ruleDtos.FirstOrDefault();
-                var rule = ruleDto == null ? null : new ContentUrlRule
+                var rule = ruleDto == null ? null : new RedirectUrl
                 {
                     Id = ruleDto.Id,
                     ContentId = ruleDto.ContentId,
@@ -73,13 +82,13 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<ContentUrlRule> GetRules(int contentId)
+        public IEnumerable<RedirectUrl> GetRules(int contentId)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var ruleDtos = uow.Database.Fetch<ContentUrlRuleDto>("SELECT * FROM umbracoContentUrlRule WHERE contentId=@id ORDER BY createDateUtc DESC;",
+                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE contentId=@id ORDER BY createDateUtc DESC;",
                     new { id = contentId });
-                var rules = ruleDtos.Select(x=> new ContentUrlRule
+                var rules = ruleDtos.Select(x=> new RedirectUrl
                 {
                     Id = x.Id,
                     ContentId = x.ContentId,
@@ -91,12 +100,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<ContentUrlRule> GetAllRules(long pageIndex, int pageSize, out long total)
+        public IEnumerable<RedirectUrl> GetAllRules(long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var ruleDtos = uow.Database.Fetch<ContentUrlRuleDto>("SELECT * FROM umbracoContentUrlRule ORDER BY createDateUtc DESC;");
-                var rules = ruleDtos.Select(x => new ContentUrlRule
+                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule ORDER BY createDateUtc DESC;");
+                var rules = ruleDtos.Select(x => new RedirectUrl
                 {
                     Id = x.Id,
                     ContentId = x.ContentId,
@@ -109,17 +118,17 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<ContentUrlRule> GetAllRules(int rootContentId, long pageIndex, int pageSize, out long total)
+        public IEnumerable<RedirectUrl> GetAllRules(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var path = "%," + rootContentId + ",%";
 
-                var ruleDtos = uow.Database.Fetch<ContentUrlRuleDto>(@"SELECT * FROM umbracoContentUrlRule
+                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>(@"SELECT * FROM umbracoContentUrlRule
 JOIN umbracoNode ON umbracoNode.id=umbracoContentUrlRule.contentId
 WHERE umbracoNode.path LIKE @path
 ORDER BY createDateUtc DESC;", new { path });
-                var rules = ruleDtos.Select(x => new ContentUrlRule
+                var rules = ruleDtos.Select(x => new RedirectUrl
                 {
                     Id = x.Id,
                     ContentId = x.ContentId,

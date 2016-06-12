@@ -373,6 +373,7 @@
     <Compile Include="Models\Identity\IIdentityUserLogin.cs" />
     <Compile Include="Models\IMigrationEntry.cs" />
     <Compile Include="Models\IPublishedContentWithKey.cs" />
+    <Compile Include="Models\IRedirectUrl.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
@@ -396,7 +397,7 @@
     <Compile Include="Media\Exif\ExifTag.cs" />
     <Compile Include="Media\Exif\ExifTagFactory.cs" />
     <Compile Include="Models\Rdbms\AccessRuleDto.cs" />
-    <Compile Include="Models\Rdbms\ContentUrlRuleDto.cs" />
+    <Compile Include="Models\Rdbms\RedirectUrlDto.cs" />
     <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\ExternalLoginDto.cs" />
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
@@ -418,7 +419,7 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\EnsureServersLockObject.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\CreateContentUrlRuleTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\AddRedirectUrlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\FixListViewMediaSortOrder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUmbracoDeployTables.cs" />
@@ -471,6 +472,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPublicAccessRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
@@ -510,12 +512,12 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
-    <Compile Include="Models\ContentUrlRule.cs" />
-    <Compile Include="Services\ContentUrlRuleService.cs" />
+    <Compile Include="Models\RedirectUrl.cs" />
+    <Compile Include="Services\RedirectUrlService.cs" />
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\ExternalLoginService.cs" />
     <Compile Include="Services\IAuditService.cs" />
-    <Compile Include="Services\IContentUrlRuleService.cs" />
+    <Compile Include="Services\IRedirectUrlService.cs" />
     <Compile Include="Services\IDomainService.cs" />
     <Compile Include="Services\IExternalLoginService.cs" />
     <Compile Include="Services\IMigrationEntryService.cs" />

@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public class ContentUrlRule
+    [Serializable]
+    [DataContract(IsReference = true)]
+    public class RedirectUrl : Entity, IRedirectUrl
     {
-        public ContentUrlRule()
+        public RedirectUrl()
         {
             CreateDateUtc = DateTime.UtcNow;
         }
-
-        public int Id { get; internal set; }
 
         public int ContentId { get; set; }
 

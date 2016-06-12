@@ -4,18 +4,18 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoContentUrlRule")]
+    [TableName("umbracoRedirectUrl")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    class ContentUrlRuleDto
+    class RedirectUrlDto
     {
-        public ContentUrlRuleDto()
+        public RedirectUrlDto()
         {
             CreateDateUtc = DateTime.UtcNow;
         }
 
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 1, Name = "PK_umbracoContentUrlRule")]
+        [PrimaryKeyColumn(IdentitySeed = 1, Name = "PK_umbracoRedirectUrl")]
         public int Id { get; set; }
 
         [Column("contentId")]
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("url")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoContentUrlRule", ForColumns = "url, createDateUtc")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "url, createDateUtc")]
         public string Url { get; set; }
     }
 }
