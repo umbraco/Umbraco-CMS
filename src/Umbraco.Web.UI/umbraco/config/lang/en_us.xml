@@ -1353,5 +1353,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   	-->
     <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+    
+    <key alias="clickJackingCheckHeaderFound">The header <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was found.</key>
+    <key alias="clickJackingCheckHeaderNotFound">The header <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was not found.</key>
   </area>
 </language>

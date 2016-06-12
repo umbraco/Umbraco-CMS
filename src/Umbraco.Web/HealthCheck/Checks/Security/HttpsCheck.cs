@@ -62,7 +62,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = HttpContext.Current.Request.Url;
+            var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported 
             // and a valid certificate has been configured
