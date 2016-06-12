@@ -1,0 +1,94 @@
+<div ng-controller="Umbraco.Editors.Templates.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+    <form novalidate name="contentTypeForm" val-form-manager>
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header
+                name="vm.template.name"
+                alias="vm.template.alias"
+                hideDescription="true"
+                hide-icon="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-editor-sub-header>
+
+                    <umb-editor-sub-header-content-left>
+
+                        <umb-button
+                            type="button"
+                            button-style="link"
+                            label="Page field"
+                            icon="icon-merge"
+                            action="vm.openPageFieldOverlay()">
+                        </umb-button>
+
+                        <umb-button
+                            type="button"
+                            button-style="link"
+                            label="Dictionary item"
+                            icon="icon-merge"
+                            action="vm.openDictionaryItemOverlay()">
+                        </umb-button>
+
+                        <umb-button
+                            type="button"
+                            button-style="link"
+                            label="Query builder"
+                            icon="icon-merge"
+                            action="vm.openQueryBuilderOverlay()">
+                        </umb-button>
+
+                    </umb-editor-sub-header-content-left>
+
+                </umb-editor-sub-header>
+
+                <div
+                    umb-ace-editor="vm.aceOption"
+                    ng-model="vm.aceModel">
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+
+
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+
+    <umb-overlay
+        ng-if="vm.pageFieldOverlay.show"
+        model="vm.pageFieldOverlay"
+        position="right"
+        view="vm.pageFieldOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.dictionaryItemOverlay.show"
+        model="vm.dictionaryItemOverlay"
+        position="right"
+        view="vm.dictionaryItemOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.queryBuilderOverlay.show"
+        model="vm.queryBuilderOverlay"
+        position="right"
+        view="vm.queryBuilderOverlay.view">
+    </umb-overlay>
+
+</div>
