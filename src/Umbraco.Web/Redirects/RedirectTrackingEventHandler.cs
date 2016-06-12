@@ -1,123 +1,188 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Events;
+using Umbraco.Web.Routing;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Cache;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.Redirects
 {
-    //when content is renamed or moved, we want to create a permanent 301 redirect from it's old url
+    // when content is renamed or moved, we want to create a permanent 301 redirect from it's old url
+    //
+    // not managing domains because we don't know how to do it
+    // changing domains => must create a higher level strategy using rewriting rules probably
+    //
+    // recycle bin = moving to and from does nothing
+    // to = the node is gone, where would we redirect? from = same
+    //
     public class RedirectTrackingEventHandler : ApplicationEventHandler
     {
-        protected override void ApplicationStarting
-              (UmbracoApplicationBase umbracoApplication,
-               ApplicationContext applicationContext)
+        private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
+        private const string ContextKey2 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.2";
+        private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
+
+        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            //create a redirect if the item is published
-            // on the publishing event the previous Url won't have been updated in the cache yet
+            // if any of these dlls are loaded we don't want to run our finder
+            var dlls = new[]
+            {
+                "InfoCaster.Umbraco.UrlTracker",
+                "SEOChecker",
+                "Simple301",
+                "Terabyte.Umbraco.Modules.PermanentRedirect",
+                "CMUmbracoTools",
+                "PWUrlRedirect"
+            };
+
+            // assuming all assemblies have been loaded already
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var name = assembly.FullName.Split(',')[0];
+                if (dlls.Contains(name))
+                {
+                    ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
+                    return;
+                }
+            }
+        }
+
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            // events are weird
+            // on 'published' we 'could' get the old or the new route depending on event handlers order
+            // so it is not reliable. getting the old route in 'publishing' to be sure and storing in http
+            // context. then for the same reason, we have to process these old items only when the cache
+            // is ready
+            // when moving, the moved node is also published, which is causing all sorts of troubles with
+            // descendants, so when moving, we lock events so that neither 'published' nor 'publishing'
+            // are processed more than once
+            //
+            // this is all verrrry weird but it seems to work
+
             ContentService.Publishing += ContentService_Publishing;
-
-            // create a redirect if the item is being moved
+            ContentService.Published += ContentService_Published;
             ContentService.Moving += ContentService_Moving;
+            ContentService.Moved += ContentService_Moved;
+            PageCacheRefresher.CacheUpdated += PageCacheRefresher_CacheUpdated;
 
-            //rolled back items have to be published, so publishing will take care of that
+            // kill all redirects once a content is deleted
+            //ContentService.Deleted += ContentService_Deleted;
+            // BUT, doing it here would prevent content deletion due to FK
+            // so the rows are actually deleted by the ContentRepository (see GetDeleteClauses)
 
-            // do we want to do anything if a content item is unpublished or deleted ?
-            // eg. remove any redirects to the node or associated redirects created by previous nodes
-            // for now it will just 404 which is correct I think
+            // rolled back items have to be published, so publishing will take care of that
         }
-        private void ContentService_Publishing(Core.Publishing.IPublishingStrategy sender, Core.Events.PublishEventArgs<IContent> e)
+
+        private static Dictionary<int, string> OldRoutes
         {
-            foreach (var publishedEntity in e.PublishedEntities)
+            get
             {
-                CreateRedirectsIfUrlHasChanged(publishedEntity);
+                var oldRoutes = (Dictionary<int, string>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
+                if (oldRoutes == null)
+                    UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<int, string>();
+                return oldRoutes;
             }
         }
-        private void ContentService_Moving(IContentService sender, Core.Events.MoveEventArgs<IContent> e)
+
+        private static bool LockedEvents
         {
-            var umbracoHelper = new Umbraco.Web.UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
-            var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
-
-            foreach (var moveEventInfo in e.MoveInfoCollection)
+            get { return Moving && UmbracoContext.Current.HttpContext.Items[ContextKey2] != null; }
+            set
             {
-                var entityBeingMoved = moveEventInfo.Entity;
-                //entity hasn't moved yet so current Url is ?
-                var currentUrl = umbracoHelper.Url(moveEventInfo.Entity.Id);
-                if (!String.IsNullOrWhiteSpace(currentUrl) && currentUrl != "/")
-                {
-                    //create redirectUrl
-                    var redirectUrl = new RedirectUrl()
-                    {
-                        ContentId = entityBeingMoved.Id,
-                        Url = currentUrl,
-                        CreateDateUtc = DateTime.UtcNow
-                    };
-                    redirectUrlService.Save(redirectUrl);
-
-                    // has the moved item got descendants ?
-                    CreateRedirectsForDescendants(entityBeingMoved);
-                }
-
-                // thoughts
-                // is the entity being moved from the recycle bin ?
+                if (Moving && value)
+                    UmbracoContext.Current.HttpContext.Items[ContextKey2] = true;
+                else
+                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey2);
             }
         }
-        private void CreateRedirectsIfUrlHasChanged(IContent entity)
+
+        private static bool Moving
         {
-            var umbracoHelper = new Umbraco.Web.UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
-            var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
-            //url won't have changed in the cache yet
-            var currentUrl = umbracoHelper.UrlAbsolute(entity.Id);
-            if (!String.IsNullOrWhiteSpace(currentUrl))
+            get { return UmbracoContext.Current.HttpContext.Items[ContextKey1] != null; }
+            set
             {
-                //get last segment of current url    
-                var currentUri = new Uri(currentUrl);
-                var currentLastSegment = (currentUri != null && currentUri.Segments.Any()) ? currentUri.Segments.LastOrDefault().Replace("/", "") : String.Empty;
-                // get segment of update entity
-                var updatedUrlSegment = entity.GetUrlSegment();
-                if (!String.IsNullOrWhiteSpace(currentLastSegment) && !currentLastSegment.InvariantEquals(updatedUrlSegment))
+                if (value)
+                    UmbracoContext.Current.HttpContext.Items[ContextKey1] = true;
+                else
                 {
-                    //url has changed...
-                    //create redirectUrl
-                    var redirectUrl = new RedirectUrl()
-                    {
-                        ContentId = entity.Id,
-                        Url = currentUrl,
-                        CreateDateUtc = DateTime.UtcNow
-                    };
-                    //create redirect for any descendants
-                    CreateRedirectsForDescendants(entity);
+                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey1);
+                    UmbracoContext.Current.HttpContext.Items.Remove(ContextKey2);
                 }
             }
         }
-        private void CreateRedirectsForDescendants(IContent entity)
-        {
-            var umbracoHelper = new Umbraco.Web.UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
-            var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
-            var descendants = entity.Descendants();
-            if (descendants.Any())
-            {
-                foreach (var descendant in descendants)
-                {
-                    // create redirect url for each descendant item
-                    var currentUrl = umbracoHelper.Url(descendant.Id);
-                    if (!String.IsNullOrWhiteSpace(currentUrl))
-                    {
-                        //create redirectUrl
-                        var redirectUrl = new RedirectUrl()
-                        {
-                            ContentId = descendant.Id,
-                            Url = currentUrl,
-                            CreateDateUtc = DateTime.UtcNow
-                        };
 
-                    }
+        private static void ContentService_Publishing(IPublishingStrategy sender, PublishEventArgs<IContent> args)
+        {
+            if (LockedEvents) return;
+
+            var contentCache = UmbracoContext.Current.ContentCache;
+            foreach (var entity in args.PublishedEntities)
+            {
+                var entityContent = contentCache.GetById(entity.Id);
+                if (entityContent == null) continue;
+                foreach (var x in entityContent.DescendantsOrSelf())
+                {
+                    var route = contentCache.GetRouteById(x.Id);
+                    if (IsNotRoute(route)) continue;
+                    OldRoutes[x.Id] = route;
                 }
             }
+
+            LockedEvents = true; // we only want to see the "first batch"
+        }
+
+        private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
+        {
+            var removeKeys = new List<int>();
+
+            foreach (var oldRoute in OldRoutes)
+            {
+                // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
+                // to set a flag in 'Published' to indicate which entities have been refreshed ok
+                CreateRedirect(oldRoute.Key, oldRoute.Value);
+                removeKeys.Add(oldRoute.Key);
+            }
+
+            foreach (var k in removeKeys)
+                OldRoutes.Remove(k);
+        }
+
+        private static void ContentService_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            // look note in CacheUpdated
+            // we might want to set a flag on the entities we are seeing here
+        }
+
+        private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> e)
+        {
+            Moving = true;
+        }
+
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
+        {
+            Moving = false;
+            LockedEvents = false;
+        }
+
+        private static void CreateRedirect(int contentId, string oldRoute)
+        {
+            var contentCache = UmbracoContext.Current.ContentCache;
+            var newRoute = contentCache.GetRouteById(contentId);
+            if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
+            var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
+            redirectUrlService.Register(oldRoute, contentId);
+        }
+
+        private static bool IsNotRoute(string route)
+        {
+            // null if content not found
+            // err/- if collision or anomaly or ...
+            return route == null || route.StartsWith("err/");
         }
     }
 }

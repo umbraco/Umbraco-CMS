@@ -514,7 +514,9 @@ namespace Umbraco.Web
                 //typeof (ContentFinderByProfile),
                 //typeof (ContentFinderByUrlAlias),
 
-                typeof(ContentFinderByRedirectUrl), // fixme - position?
+                // note: that one should run *after* NiceUrlAndTemplate, UrlAlias... but at the moment
+                // it cannot be done - just make sure to do it properly in v8!
+                typeof(ContentFinderByRedirectUrl),
 
                 // implement INotFoundHandler support... remove once we get rid of it
                 typeof(ContentFinderByNotFoundHandlers)

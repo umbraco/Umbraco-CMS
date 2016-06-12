@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IRedirectUrlRepository : IRepositoryQueryable<int, IRedirectUrl>
     {
+        IRedirectUrl Get(string url, int contentId);
         void Delete(int id);
         void DeleteAll();
         void DeleteContentUrls(int contentId);

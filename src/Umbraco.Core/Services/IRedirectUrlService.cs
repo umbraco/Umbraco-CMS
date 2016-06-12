@@ -5,7 +5,7 @@ namespace Umbraco.Core.Services
 {
     public interface IRedirectUrlService : IService
     {
-        void Save(IRedirectUrl redirectUrl);
+        void Register(string url, int contentId);
 
         void DeleteContentRedirectUrls(int contentId);
 

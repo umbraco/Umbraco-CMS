@@ -112,6 +112,13 @@ namespace Umbraco.Core.Persistence.Repositories
             };
         }
 
+        public IRedirectUrl Get(string url, int contentId)
+        {
+            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.ContentId == contentId);
+            var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+
         public void DeleteAll()
         {
             Database.Execute("DELETE FROM umbracoRedirectUrl");

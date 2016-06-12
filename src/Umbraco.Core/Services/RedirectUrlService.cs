@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -13,20 +16,21 @@ namespace Umbraco.Core.Services
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
-        public void Save(IRedirectUrl redirectUrl)
+        public void Register(string url, int contentId)
         {
-            // check if the url already exists
-            // the url actually is a primary key?
-            // though we might want to keep the history?
-
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                repo.AddOrUpdate(redirectUrl);
+                var redir = repo.Get(url, contentId);
+                if (redir != null)
+                    redir.CreateDateUtc = DateTime.UtcNow;
+                else
+                    redir = new RedirectUrl { Url = url, ContentId = contentId };
+                repo.AddOrUpdate(redir);
                 uow.Commit();
             }
         }
-
+        
         public void Delete(IRedirectUrl redirectUrl)
         {
             using (var uow = UowProvider.GetUnitOfWork())
