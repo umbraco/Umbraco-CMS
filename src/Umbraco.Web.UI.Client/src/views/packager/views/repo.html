@@ -104,11 +104,11 @@
     <!-- DETAILS --->
     <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageDetails' && vm.loading === false">
 
-        <div class="umb-packages-section">
-            <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList')">
-                &larr; Take me back
-            </a>
-        </div>
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList');">&larr; Take me back</a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
 
         <div class="umb-package-details">
 
