@@ -328,6 +328,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTags(null))
                             },
                             {
+                                "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                     controller => controller.GetNodes("-1", null))
                             },
