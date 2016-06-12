@@ -53,28 +53,26 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
             var url = HealthCheckContext.HttpContext.Request.Url;
 
-            // Access the site home page and check for the click-jack protection header
-            using (var webClient = new WebClient())
+            // Access the site home page and check for the headers
+            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var request = WebRequest.Create(address);
+            request.Method = "HEAD";
+            try
             {
-                var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
-                try
-                {
-                    webClient.DownloadString(address);
-
-                    var allHeaders = webClient.ResponseHeaders.AllKeys;
-                    var headersToCheckFor = new [] {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version"};
-                    var headersFound = allHeaders
-                        .Intersect(headersToCheckFor)
-                        .ToArray();
-                    success = headersFound.Any() == false;
-                    message = success
-                        ? _textService.Localize("healthcheck/excessiveHeadersNotFound")
-                        : _textService.Localize("healthcheck/excessiveHeadersFound", new [] { string.Join(", ", headersFound) });
-                }
-                catch (Exception ex)
-                {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-                }
+                var response = request.GetResponse();
+                var allHeaders = response.Headers.AllKeys;
+                var headersToCheckFor = new [] {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version"};
+                var headersFound = allHeaders
+                    .Intersect(headersToCheckFor)
+                    .ToArray();
+                success = headersFound.Any() == false;
+                message = success
+                    ? _textService.Localize("healthcheck/excessiveHeadersNotFound")
+                    : _textService.Localize("healthcheck/excessiveHeadersFound", new [] { string.Join(", ", headersFound) });
+            }
+            catch (Exception ex)
+            {
+                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
