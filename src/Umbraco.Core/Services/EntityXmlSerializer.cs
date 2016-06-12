@@ -144,6 +144,7 @@ namespace Umbraco.Core.Services
             if (propertyEditor != null)
             {
                 IEnumerable<XElement> xmlValues;
+                // TODO: Transform to XML here instead of from the valueeditor
                 xmlValues = propertyEditor.ValueEditor.ConvertDbToExamine(property, propertyType, dataTypeService);
                 if (!xmlValues.Any())
                     xmlValues = new[] {new XElement(nodeName, propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService))};

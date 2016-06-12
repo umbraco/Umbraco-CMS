@@ -120,13 +120,13 @@ namespace Umbraco.Tests.UmbracoExamine
             while (allTerms.Next())
                 Console.WriteLine(allTerms.Term().Field() + ": " + allTerms.Term().Text());
 
-            var rteDocs = reader.TermDocs(new Term("indexerTest.rte"));
+            var rteDocs = reader.Terms(new Term("indexerTest.rte"));
 
             var count = 0;
             while (rteDocs.Next())
                 count++;
 
-            Assert.AreEqual(2, count);
+            Assert.AreEqual(6, count);
         }
 
         private static UmbracoExamineSearcher _searcher;
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var contentService = Mock.Of<IContentService>();
             Mock.Get(dataService).Setup(s => s.ContentService).Returns(contentService);
             Mock.Get(dataService).Setup(s => s.LogService).Returns(Mock.Of<ILogService>());
-            Mock.Get(contentService).Setup(s => s.GetAllUserPropertyNames()).Returns(new[] { "aString", "indexerTest.headline", "indexerTest.rte" });
+            Mock.Get(contentService).Setup(s => s.GetAllUserPropertyNames()).Returns(new[] { "aString", "indexerTest" });
             _indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir,
                 dataService: dataService,
                 contentService: serviceContext.ContentService, mediaService: Mock.Of<Umbraco.Core.Services.IMediaService>());
