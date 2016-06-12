@@ -76,7 +76,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return _textService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
-                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
+                    new[] { Values.First(v => v.IsRecommended).Value });
             }
         }
     }
