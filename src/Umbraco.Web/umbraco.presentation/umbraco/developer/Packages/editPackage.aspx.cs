@@ -183,8 +183,8 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     ClientTools
-                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
-                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, true);
+                        .SetActiveTreeType(Constants.Trees.Packages)
+                        .SyncTree("-1,created," + createdPackage.Data.Id, true);
                 }
             }
         }

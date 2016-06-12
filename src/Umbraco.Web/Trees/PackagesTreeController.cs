@@ -16,6 +16,7 @@ using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -91,6 +92,17 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
+
+            // Root actions              
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
+
+            if (id == "created")
+            {
+                menu.Items.Add<RefreshNode, ActionRefresh>(
+                    Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            }
+
             return menu;
         }
     }

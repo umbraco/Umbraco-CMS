@@ -11,22 +11,22 @@
 			{
 			    "name": "Packages",
 			    "icon": "icon-cloud",
-			    "view": "views/packagesNew/views/repo.html",
+			    "view": "views/packager/views/repo.html",
 			    "active": true
 			},
 			{
 			    "name": "Installed",
 			    "icon": "icon-box",
-			    "view": "views/packagesNew/views/installed.html"
+			    "view": "views/packager/views/installed.html"
 			},
 			{
 			    "name": "Install local",
 			    "icon": "icon-add",
-			    "view": "views/packagesNew/views/install-local.html"
+			    "view": "views/packager/views/install-local.html"
 			}
         ];
 
-        $timeout(function() {
+        $timeout(function () {
             navigationService.syncTree({ tree: "packager", path: "-1" });
         });
 

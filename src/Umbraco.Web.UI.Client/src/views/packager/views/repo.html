@@ -4,7 +4,8 @@
 
     <!-- LIST -->
     <div class="umb-packages-view-wrapper" ng-if="vm.packageViewState === 'packageList' && vm.loading === false">
-
+        
+        <hr/>
         <div class="umb-packages-section">
             <div class="umb-packages-search">
                 <input class="-full-width-input" type="text" name="name" value="" placeholder="Search for packages" umb-auto-focus>
@@ -28,7 +29,7 @@
             <h4><strong>Popular</strong></h4>
             <div class="umb-packages clearfix">
 
-                <div class="umb-package" ng-repeat="package in vm.packages">
+                <div class="umb-package" ng-repeat="package in vm.popular">
                     <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                         <div class="umb-package-icon">
@@ -39,12 +40,12 @@
                             <div class="umb-package-name">{{ package.name }}</div>
                             <div class="umb-package-description">{{ package.description | limitTo: 40 }}<span ng-if="package.description > (package.description | limitTo: 40)">...</span></div>
 
-                            <div class="umb-package-numbers">
+                            <div class="umb-package-numbers"> 
                                 <small class="umb-package-downloads">
                                     <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
                                 </small>
                                 <small class="umb-package-karma">
-                                    <i class="icon-hearts"></i> <strong>{{ package.karma }}</strong>
+                                    <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
                                 </small>
                             </div>
 
@@ -75,7 +76,7 @@
                                     <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
                                 </small>
                                 <small class="umb-package-karma">
-                                    <i class="icon-hearts"></i> <strong>{{ package.karma }}</strong>
+                                    <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
                                 </small>
                             </div>
 
@@ -137,12 +138,12 @@
                 <div class="umb-package-details__section">
                     <div class="umb-package-details__owner-profile">
                         <div class="umb-package-details__owner-profile-avatar">
-                            <img class="umb-avatar" ng-src="{{vm.package.information.ownerAvatar}}" />
+                            <img class="umb-avatar" ng-src="{{vm.package.ownerInfo.ownerAvatar}}" />
                         </div>
                         <div>
-                            <div class="umb-package-details__owner-profile-name">{{ vm.package.information.owner }}</div>
+                            <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
                             <div class="umb-package-details__owner-profile-karma">
-                                {{ vm.package.information.owner }} has <strong>{{ vm.package.information.ownerKarma }}</strong> karma points
+                                {{ vm.package.ownerInfo.owner }} has <strong>{{ vm.package.ownerInfo.karma }}</strong> karma points
                             </div>
                         </div>
                     </div>
@@ -154,24 +155,24 @@
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Owner:</div>
-                            <div>{{vm.package.information.owner}}</div>
+                            <div>{{vm.package.ownerInfo.owner}}</div>
                         </div>
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Contributors:</div>
-                            <div ng-repeat="contributor in vm.package.information.contributors">
+                            <div ng-repeat="contributor in vm.package.ownerInfo.contributors">
                                 <a class="umb-package-details__link" href="{{ contributor.profileUrl }}" target="_blank">{{ contributor.name }}<span ng-if="!$last">,&nbsp;&nbsp;</span></a>
                             </div>
                         </div>
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Created:</div>
-                            <div>{{vm.package.information.created}}</div>
+                            <div>{{vm.package.created}}</div>
                         </div>
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Current version:</div>
-                            <div>{{vm.package.information.created}}</div>
+                            <div>{{vm.package.latestVersion}}</div>
                         </div>
 
                         <div class="umb-package-details__information-item">
@@ -181,17 +182,17 @@
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">License:</div>
-                            <div>{{vm.package.information.license}}</div>
+                            <div>{{vm.package.licenseName}}</div>
                         </div>
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Downloads:</div>
-                            <div>{{vm.package.information.downloads}}</div>
+                            <div>{{vm.package.downloads}}</div>
                         </div>
 
                         <div class="umb-package-details__information-item">
                             <div class="umb-package-details__information-item-label">Karma:</div>
-                            <div>{{vm.package.information.karma}}</div>
+                            <div>{{vm.package.ownerInfo.karma}}</div>
                         </div>
 
                     </div>
