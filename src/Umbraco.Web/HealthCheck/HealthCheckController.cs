@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Web.Http;
 using Umbraco.Web.Editors;
 
@@ -24,25 +23,24 @@ namespace Umbraco.Web.HealthCheck
             _healthCheckResolver = healthCheckResolver;
         }
 
-        //TODO: make this happen
-        // * Get all checks
-        // * Execute action
-        // * more?
-
         /// <summary>
         /// Gets a grouped list of health checks, but doesn't actively check the status of each health check.
         /// </summary>
         /// <returns>Returns a collection of anonymous objects representing each group.</returns>
         public object GetAllHealthChecks()
         {
-            var groups = _healthCheckResolver.HealthChecks.GroupBy(x => x.Group);
+            var groups = _healthCheckResolver.HealthChecks
+                .GroupBy(x => x.Group)
+                .OrderBy(x => x.Key);
             var healthCheckGroups = new List<HealthCheckGroup>();
             foreach (var healthCheckGroup in groups)
             {
                 var hcGroup = new HealthCheckGroup
                 {
                     Name = healthCheckGroup.Key,
-                    Checks = healthCheckGroup.ToList()
+                    Checks = healthCheckGroup
+                        .OrderBy(x => x.Name)
+                        .ToList()
                 };
                 healthCheckGroups.Add(hcGroup);
             }
