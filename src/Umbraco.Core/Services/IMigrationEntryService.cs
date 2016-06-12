@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Semver;
 using Umbraco.Core.Models;
@@ -23,8 +22,26 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         IMigrationEntry FindEntry(string migrationName, SemVersion version);
 
+        /// <summary>
+        /// Finds migration entries by name
+        /// </summary>
+        /// <param name="migrationName"></param>
+        /// <returns></returns>
         IEnumerable<IMigrationEntry> FindEntries(string migrationName);
+
+        /// <summary>
+        /// Finds migration entries by list of product names
+        /// </summary>
+        /// <param name="migrationNames"></param>
+        /// <returns></returns>
         IEnumerable<IMigrationEntry> FindEntries(IEnumerable<string> migrationNames);
+
+        /// <summary>
+        /// Finds migrations by version and list of product names
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="migrationNames"></param>
+        /// <returns></returns>
         IEnumerable<IMigrationEntry> FindEntries(SemVersion version, IEnumerable<string> migrationNames);
 
         /// <summary>

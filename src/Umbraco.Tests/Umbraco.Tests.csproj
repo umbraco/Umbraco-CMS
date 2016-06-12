@@ -176,6 +176,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
+    <Compile Include="Migrations\PackageMigrationsTests.cs" />
+    <Compile Include="Migrations\Stubs\PackageMigration1.cs" />
+    <Compile Include="Migrations\Stubs\PackageMigration2.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />

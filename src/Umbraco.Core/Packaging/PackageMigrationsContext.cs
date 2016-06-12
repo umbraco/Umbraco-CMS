@@ -16,7 +16,9 @@ namespace Umbraco.Core.Packaging
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
 
-        public PackageMigrationsContext(DatabaseContext dbContext, IMigrationEntryService migrationEntryService, ILogger logger)
+        public PackageMigrationsContext(DatabaseContext dbContext, 
+            IMigrationEntryService migrationEntryService, 
+            ILogger logger)
         {
             _dbContext = dbContext;
             _migrationEntryService = migrationEntryService;
@@ -77,7 +79,6 @@ namespace Umbraco.Core.Packaging
                                     maxVersion.ToSemanticString()));
                         }
                     }
-                    
                 }
 
                 return new ReadOnlyDictionary<string, SemVersion>(result);
@@ -98,6 +99,16 @@ namespace Umbraco.Core.Packaging
         internal ReadOnlyDictionary<string, SemVersion> GetPendingPackageMigrations()
         {
             return _packageVersionsConfigured.Value;
+        }
+
+        /// <summary>
+        /// Returns the list of package migration names and versions that need to be executed
+        /// with the following format: PackageProductName (2.0.0)
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<string> GetPendingPackageMigrationFriendlyNames()
+        {
+            return _packageVersionsConfigured.Value.Select(x => string.Format("{0} ({1})", x.Key, x.Value));
         }
     }
 }
