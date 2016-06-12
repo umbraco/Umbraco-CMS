@@ -3,6 +3,11 @@
 
     function HealthCheckController($scope, healthCheckResource) {
 
+        var SUCCESS = 0;
+        var INFO = 2;
+        var WARNING = 1;
+        var ERROR = 2;
+
         var vm = this;
 
         vm.viewState = "list";
@@ -20,7 +25,7 @@
 			function(response) {
 
                 // set number of checks which has been executed
-                for(var i = 0; i < response.length; i++) {
+                for (var i = 0; i < response.length; i++) {
                     var group = response[i];
                     group.checkCounter = 0;
                     checkAllInGroup(group, group.checks);
@@ -33,7 +38,7 @@
 
         function setGroupGlobalResultType(group) {
 
-            var totalSucces = 0;
+            var totalSuccess = 0;
             var totalError = 0;
             var totalWarning = 0;
             var totalInfo = 0;
@@ -42,16 +47,16 @@
             angular.forEach(group.checks, function(check){
                 angular.forEach(check.status, function(status){
                     switch(status.resultType) {
-                        case 0:
-                            totalSucces = totalSucces + 1;
+                        case SUCCESS:
+                            totalSuccess = totalSuccess + 1;
                             break;
-                        case 1:
+                        case WARNING:
                             totalWarning = totalWarning + 1;
                             break;
-                        case 2:
+                        case ERROR:
                             totalError = totalError + 1;
                             break;
-                        case 3:
+                        case INFO:
                             totalInfo = totalInfo + 1;
                             break;
                     }
@@ -59,25 +64,25 @@
             });
 
             // set global group result
-            if(totalError > 0) {
+            if (totalError > 0) {
 
                 // set group to error
-                group.resultType = 2;
+                group.resultType = ERROR;
 
             } else if ( totalWarning > 0 ) {
 
                 // set group to warning
-                group.resultType = 1;
+                group.resultType = WARNING;
 
             } else if ( totalInfo > 0 ) {
 
                 // set group to info
-                group.resultType = 3;
+                group.resultType = INFO;
 
-            } else if (totalSucces > 0) {
+            } else if (totalSuccess > 0) {
 
                 // set group to success
-                group.resultType = 0;
+                group.resultType = SUCCESS;
 
             }
 
@@ -116,7 +121,7 @@
                     check.loading = false;
 
                     // when all checks are done, set global group result
-                    if(group.checkCounter === checks.length) {
+                    if (group.checkCounter === checks.length) {
                         setGroupGlobalResultType(group);
                         group.loading = false;
                     }
