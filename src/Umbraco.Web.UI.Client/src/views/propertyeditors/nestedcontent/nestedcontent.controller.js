@@ -3,15 +3,11 @@
     "$scope",
     "$interpolate",
     "$filter",
+    "$timeout",
     "contentResource",
     "localizationService",
 
-    function ($scope, $interpolate, $filter, contentResource, localizationService) {
-
-        //$scope.model.config.contentTypes;
-        //$scope.model.config.minItems;
-        //$scope.model.config.maxItems;
-        //console.log($scope);
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService) {
 
         var inited = false;
 
@@ -21,22 +17,15 @@
                 : undefined;
         });
 
-        $scope.editIconTitle = '';
-        $scope.moveIconTitle = '';
         $scope.deleteIconTitle = '';
-
-        // localize the edit icon title
-        localizationService.localize('general_edit').then(function (value) {
-            $scope.editIconTitle = value;
-        });
+        $scope.moveIconTitle = '';
 
         // localize the delete icon title
         localizationService.localize('general_delete').then(function (value) {
             $scope.deleteIconTitle = value;
         });
 
-        // localize the move icon title
-        localizationService.localize('actions_move').then(function (value) {
+        localizationService.localize('general_move').then(function (value) {
             $scope.moveIconTitle = value;
         });
 
@@ -45,6 +34,7 @@
         $scope.realCurrentNode = undefined;
         $scope.scaffolds = undefined;
         $scope.sorting = false;
+        $scope.deletePromptIndex = undefined;
 
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;
@@ -53,72 +43,65 @@
             $scope.maxItems = 1000;
 
         $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
-        $scope.showIcons = $scope.model.config.showIcons || true;
         $scope.wideMode = $scope.model.config.hideLabel == "1";
-
-        $scope.overlayMenu = {
-            show: false,
-            style: {}
-        };
 
         $scope.addNode = function (alias) {
             var scaffold = $scope.getScaffold(alias);
-
             var newNode = initNode(scaffold, null);
-
             $scope.currentNode = newNode;
-
-            $scope.closeNodeTypePicker();
+            $scope.closeNodeTypePickerOverlay();
         };
 
-        $scope.openNodeTypePicker = function (event) {
+        $scope.openNodeTypePickerOverlay = function (event) {
             if ($scope.nodes.length >= $scope.maxItems) {
                 return;
             }
 
             // this could be used for future limiting on node types
-            $scope.overlayMenu.scaffolds = [];
+            var scaffolds = [];
             _.each($scope.scaffolds, function (scaffold) {
                 var icon = scaffold.icon;
                 // workaround for when no icon is chosen for a doctype
-                if (icon == ".sprTreeFolder") {
+                if (icon === ".sprTreeFolder") {
                     icon = "icon-folder";
                 }
-                $scope.overlayMenu.scaffolds.push({
+                scaffolds.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
                     icon: icon
                 });
             });
 
-            if ($scope.overlayMenu.scaffolds.length == 0) {
+            if (scaffolds.length == 0) {
                 return;
             }
 
-            if ($scope.overlayMenu.scaffolds.length == 1) {
+            if (scaffolds.length == 1) {
                 // only one scaffold type - no need to display the picker
-                $scope.addNode($scope.scaffolds[0].contentTypeAlias);
+                $scope.addNode(scaffolds[0].alias);
                 return;
             }
 
-            // calculate overlay position
-            // - yeah... it's jQuery (ungh!) but that's how the Grid does it.
-            var offset = $(event.target).offset();
-            var scrollTop = $(event.target).closest(".umb-panel-body").scrollTop();
-            if (offset.top < 400) {
-                $scope.overlayMenu.style.top = 300 + scrollTop;
-            }
-            else {
-                $scope.overlayMenu.style.top = offset.top - 150 + scrollTop;
-            }
-            $scope.overlayMenu.show = true;
+            $scope.nodeTypePickerOverlay = {
+                view: "itempicker",
+                filter: false,
+                title: localizationService.localize("grid_insertControl"), // Should probably use a NC specific string, but for now re-using the grid title
+                availableItems: scaffolds,
+                event: event,
+                show: true,
+                submit: function (model) {
+                    $scope.addNode(model.selectedItem.alias);
+                }
+            };
         };
 
-        $scope.closeNodeTypePicker = function () {
-            $scope.overlayMenu.show = false;
+        $scope.closeNodeTypePickerOverlay = function () {
+            $scope.nodeTypePickerOverlay.show = false;
+            $scope.nodeTypePickerOverlay = null;
         };
 
         $scope.editNode = function (idx) {
+            if ($scope.sorting) return;
             if ($scope.currentNode && $scope.currentNode.id == $scope.nodes[idx].id) {
                 $scope.currentNode = undefined;
             } else {
@@ -126,19 +109,21 @@
             }
         };
 
-        $scope.deleteNode = function (idx) {
+        $scope.showDeletePrompt = function (idx) {
+            $scope.deletePromptIndex = idx;
+        }
+
+        $scope.confirmDelete = function () {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
-                    if (confirm("Are you sure you want to delete this item?")) {
-                        $scope.nodes.splice(idx, 1);
-                        updateModel();
-                    }
-                } else {
-                    $scope.nodes.splice(idx, 1);
-                    updateModel();
-                }
+                $scope.nodes.splice($scope.deletePromptIndex, 1);
+                updateModel();
             }
-        };
+            $scope.deletePromptIndex = undefined;
+        }
+
+        $scope.hideDeletePrompt = function () {
+            $scope.deletePromptIndex = undefined;
+        }
 
         $scope.getName = function (idx) {
 
@@ -168,13 +153,14 @@
 
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
-            return scaffold && scaffold.icon && scaffold.icon !== ".sprTreeFolder" ? scaffold.icon : "icon-folder";
+            return scaffold && scaffold.icon && scaffold.icon != ".sprTreeFolder" ? scaffold.icon : "icon-folder";
         }
 
         $scope.sortableOptions = {
             axis: 'y',
             cursor: "move",
             handle: ".nested-content__icon--move",
+            forceHelperSize: true,
             start: function (ev, ui) {
                 // Yea, yea, we shouldn't modify the dom, sue me
                 $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
@@ -191,9 +177,11 @@
                     $(this).css("visibility", "visible");
                 });
                 $scope.$apply(function () {
-                    $scope.sorting = false;
                     updateModel();
                 });
+                $timeout(function () {
+                    $scope.sorting = false;
+                }, 250);
             }
         };
 
@@ -236,7 +224,7 @@
 
         var initIfAllScaffoldsHaveLoaded = function () {
             // Initialize when all scaffolds have loaded
-            if ($scope.model.config.contentTypes.length == scaffoldsLoaded) {
+            if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to 
                 // sort them explicitly according to the sort order defined by the data type.
                 var contentTypeAliases = [];

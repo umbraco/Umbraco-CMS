@@ -31,9 +31,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 {NestedContentPreValueEditor.ContentTypesPreValueKey, ""},
                 {"minItems", 0},
-                {"maxItems", 0},
-                {"confirmDeletes", "1"},
-                {"showIcons", "1"}
+                {"maxItems", 0}
             };
         }
 
@@ -56,12 +54,6 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
             public string MaxItems { get; set; }
-
-            [PreValueField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
-            public string ConfirmDeletes { get; set; }
-
-            [PreValueField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
-            public string ShowIcons { get; set; }
 
             [PreValueField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
             public string HideLabel { get; set; }

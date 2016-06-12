@@ -9,18 +9,26 @@
 
                 <div class="nested-content__header-bar" ng-click="$parent.editNode($index)" ng-hide="$parent.singleMode">
 
-                    <div class="nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span ng-bind="$parent.getName($index)"></span></div>
+                    <div class="nested-content__heading">
+                        <i class="icon icon-navigation nested-content__icon--move nested-content__header-icon" title="{{moveIconTitle}}"></i>
+                        <i class="icon nested-content__header-icon" ng-class="$parent.getIcon($index)"></i>
+                        <span ng-bind="$parent.getName($index)"></span>
+                    </div>
 
-                    <div class="nested-content__icons">
-                        <a class="nested-content__icon nested-content__icon--edit" title="{{editIconTitle}}" ng-class="{ 'nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode($index); $event.stopPropagation();" prevent-default>
-                            <i class="icon icon-edit"></i>
-                        </a>
-                        <a class="nested-content__icon nested-content__icon--move" title="{{moveIconTitle}}" ng-click="$event.stopPropagation();" prevent-default>
-                            <i class="icon icon-navigation"></i>
-                        </a>
-                        <a class="nested-content__icon nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
+                    <div class="nested-content__icons" ng-click="$event.stopPropagation();">
+                        
+                        <div class="delete-action" style="position: relative;display: inline-block;" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }">
+                            <i class="icon-trash nested-content__header-icon" ng-click="$parent.showDeletePrompt($index);"></i>
+                            <umb-confirm-action ng-if="$parent.deletePromptIndex == $index"
+                                direction="left"
+                                on-confirm="$parent.confirmDelete($index)"
+                                on-cancel="$parent.hideDeletePrompt()">
+                            </umb-confirm-action>
+                        </div>
+
+                        <!--<a class="nested-content__icon nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
-                        </a>
+                        </a>-->
                     </div>
 
                 </div>
@@ -37,26 +45,16 @@
         </div>
 
         <div class="nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
-            <a class="nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
+            <a class="nested-content__icon" ng-click="openNodeTypePickerOverlay($event)" prevent-default>
                 <i class=" icon icon-add"></i>
             </a>
         </div>
 
-        <div class="usky-grid" ng-if="overlayMenu.show">
-            <div class="cell-tools-menu" ng-style="overlayMenu.style" delayed-mouseleave="closeNodeTypePicker()" on-delayed-mouseleave="closeNodeTypePicker()">
-                <h5>
-                    <localize key="grid_insertControl" />
-                </h5>
-                <ul class="elements">
-                    <li ng-repeat="scaffold in overlayMenu.scaffolds">
-                        <a ng-click="addNode(scaffold.alias)" href>
-                            <i class="icon {{scaffold.icon}}"></i>
-                            {{scaffold.name}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <umb-overlay ng-if="nodeTypePickerOverlay.show"
+            model="nodeTypePickerOverlay"
+            view="nodeTypePickerOverlay.view"
+            position="target">
+        </umb-overlay>
 
     </ng-form>
 </div>

@@ -7,23 +7,25 @@
 {
     position: relative;
     text-align: left;
-    border-top: solid 1px transparent;
     background: white;
 
-
+    padding: 0;
+    border-bottom: 4px solid @grayLighter;
 }
 
 .nested-content__item--active:not(.nested-content__item--single)
 {
     background: #f8f8f8;
+    padding: 0;
+    border: 0;
 }
 
 .nested-content__item.ui-sortable-placeholder 
 {
     background: #f8f8f8;
-    border: 1px dashed #d9d9d9;
+    border: 1px solid #D9D9D9;
     visibility: visible !important;
-    height: 55px;
+    height: 50px;
     margin-top: -1px;
 }
 
@@ -37,18 +39,38 @@
     margin: 0;
 }
 
+.nested-content__content {
+    border: 4px solid @grayLight;
+    border-top: 0;
+    border-radius: 0 0 3px 3px;
+}
+
 .nested-content__header-bar 
 {
-    padding: 15px 20px; 
-    border-bottom: 1px dashed #e0e0e0;
+    padding: 8px 10px; 
     text-align: right;
     cursor: pointer;
     background-color: white;
+    overflow-x: hidden;
 
-    -moz-user-select: none; 
+    -moz-user-select: none;  
     -khtml-user-select: none; 
     -webkit-user-select: none; 
     -o-user-select: none; 
+}
+
+.nested-content__item--active > .nested-content__header-bar
+{
+    border-radius: 3px 3px 0 0;
+    background-color: @blue;
+    color: white;
+    border-bottom: 2px solid @blueDark;
+}
+
+.nested-content__item--active > .nested-content__header-bar .nested-content__header-icon,
+.nested-content__item--active > .nested-content__header-bar .nested-content__header-icon *
+{
+    color: white;
 }
 
 .nested-content__heading
@@ -61,13 +83,14 @@
 {
     vertical-align: text-top;
     color: #999; /* same icon color as the icons in the item type picker */
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 .nested-content__icons 
 {
-    margin: -6px 0;
+    margin: 0;
     opacity: 0;
+    display: inline-block;
 
     transition: opacity .15s ease-in-out;
    -moz-transition: opacity .15s ease-in-out;
@@ -83,6 +106,43 @@
 .nested-content__icon,
 .nested-content__icon.nested-content__icon--disabled:hover
 {
+    color: rgba(0, 0, 0, 0.23);
+    display: inline-block;
+    margin: 2px;
+    cursor: pointer;
+    text-decoration: none !important;
+}
+
+.nested-content__item--active > .nested-content__header-bar .nested-content__icon .icon
+{
+    color: white;
+}
+
+.nested-content__icon .icon,
+.nested-content__icon.nested-content__icon--disabled:hover .icon
+{
+    display: block;
+    font-size: 16px !important;
+}
+
+.nested-content__icon:hover .icon
+{
+    color: #2e8aea;
+}
+
+.nested-content__icon--disabled 
+{
+    opacity: 0.3;
+}
+
+.nested-content__footer-bar 
+{
+    text-align: center;
+    padding-top: 20px;
+}
+
+.nested-content__footer-bar .nested-content__icon
+{
     display: inline-block;
     padding: 4px 6px;
     margin: 2px;
@@ -93,8 +153,11 @@
     text-decoration: none !important;
 }
 
-.nested-content__icon:hover,
-.nested-content__icon--active
+.nested-content__footer-bar .nested-content__icon .icon {
+    color: #5F5F5F;
+}
+
+.nested-content__footer-bar .nested-content__icon:hover
 {
     color: white;
     background: #2e8aea;
@@ -102,40 +165,24 @@
     text-decoration: none;
 }
 
-.nested-content__icon .icon,
-.nested-content__icon.nested-content__icon--disabled:hover .icon
-{
-    display: block;
-    font-size: 16px !important;
-    color: #5f5f5f;
-}
-
-.nested-content__icon:hover .icon,
-.nested-content__icon--active .icon
-{
+.nested-content__footer-bar .nested-content__icon:hover .icon {
     color: white;
 }
 
-.nested-content__icon--disabled 
+.nested-content__content > .umb-pane
 {
-    opacity: 0.3;
-}
-
-
-.nested-content__footer-bar 
-{
-    text-align: center;
+    margin: 0 20px 20px;
     padding-top: 20px;
-}
-
-.nested-content__content 
-{
-    border-bottom: 1px dashed #e0e0e0;
 }
 
 .nested-content__content .umb-control-group {
     padding-bottom: 0;
 }
+
+/*.nested-content__item.ui-sortable-helper
+{
+    height: 40px !important; 
+}*/
 
 .nested-content__item.ui-sortable-helper .nested-content__content
 {
@@ -144,13 +191,13 @@
 
 .nested-content__help-text 
 {
-    display: inline-block;
-    padding: 10px 20px 10px 20px;
+    display: block;
+    padding: 20px;
     clear: both;
     font-size: 14px;
-    color: #555;
+    color: #2E8AEA;
     background: #f8f8f8;
-    border-radius: 15px;
+    border: 2px dashed #D9D9D9;
 }
 
 .nested-content__doctypepicker table input, .nested-content__doctypepicker table select {
@@ -189,4 +236,8 @@
 
 .form-horizontal .nested-content--narrow .controls-row .umb-dropdown {
     width: 99%;
+}
+
+.nested-content__icon--move {
+    cursor: move;
 }
