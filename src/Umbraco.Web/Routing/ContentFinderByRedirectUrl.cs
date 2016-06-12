@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Web.Routing
-{
-    using Umbraco.Core;
-    using Umbraco.Core.Logging;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 
+namespace Umbraco.Web.Routing
+{
     /// <summary>
     /// Provides an implementation of <see cref="IContentFinder"/> that handles page url rewrites
     /// that are stored when moving, saving, or deleting a node.
@@ -20,48 +20,32 @@
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
         public bool TryFindContent(PublishedContentRequest contentRequest)
         {
-            string route;
-            if (contentRequest.HasDomain)
-            {
-                route = contentRequest.UmbracoDomain.RootContentId + DomainHelper.PathRelativeToDomain(contentRequest.DomainUri, contentRequest.Uri.GetAbsolutePathDecoded());
-            }
-            else
-            {
-                route = contentRequest.Uri.GetAbsolutePathDecoded();
-            }
+            var route = contentRequest.HasDomain
+                ? contentRequest.UmbracoDomain.RootContentId + DomainHelper.PathRelativeToDomain(contentRequest.DomainUri, contentRequest.Uri.GetAbsolutePathDecoded())
+                : contentRequest.Uri.GetAbsolutePathDecoded();
 
-            return this.FindContent(contentRequest, route);
-        }
+            var service = contentRequest.RoutingContext.UmbracoContext.Application.Services.RedirectUrlService;
+            var redirectUrl = service.GetMostRecentRedirectUrl(route);
 
-        /// <summary>
-        /// Tries to find an Umbraco document for a <c>PublishedContentRequest</c> and a route.
-        /// </summary>
-        /// <param name="contentRequest">The document request.</param>
-        /// <param name="route">The route.</param>
-        /// <returns>True if a redirect is to take place, otherwise; false.</returns>
-        protected bool FindContent(PublishedContentRequest contentRequest, string route)
-        {
-            var rule = contentRequest.RoutingContext
-                                     .UmbracoContext.Application.Services
-                                     .RedirectUrlService.GetMostRecentRule(route); 
-
-            if (rule != null)
+            if (redirectUrl == null)
             {
-                var content = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(rule.ContentId);
-                if (content != null)
-                {
-                    var url = content.Url;
-                    if (url != "#")
-                    {
-                        contentRequest.SetRedirectPermanent(url);
-                        LogHelper.Debug<ContentFinderByRedirectUrl>("Got content, id={0}", () => content.Id);
-                        return true;
-                    }
-                }
+                LogHelper.Debug<ContentFinderByRedirectUrl>("No match for route: \"{0}\".", () => route);
+                return false;
             }
 
-            LogHelper.Debug<ContentFinderByRedirectUrl>("No match for the url: {0}.", () => route);
-            return false;
+            var content = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
+            var url = content == null ? "#" : content.Url;
+            if (url.StartsWith("#"))
+            {
+                LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} which has no url.",
+                    () => route, () => redirectUrl.ContentId);
+                return false;
+            }
+
+            LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
+                () => route, () => content.Id, () => url);
+            contentRequest.SetRedirectPermanent(url);
+            return true;
         }
     }
 }

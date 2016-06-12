@@ -514,6 +514,8 @@ namespace Umbraco.Web
                 //typeof (ContentFinderByProfile),
                 //typeof (ContentFinderByUrlAlias),
 
+                typeof(ContentFinderByRedirectUrl), // fixme - position?
+
                 // implement INotFoundHandler support... remove once we get rid of it
                 typeof(ContentFinderByNotFoundHandlers)
             );

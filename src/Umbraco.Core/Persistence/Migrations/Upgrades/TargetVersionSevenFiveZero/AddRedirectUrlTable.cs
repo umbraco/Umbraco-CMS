@@ -24,13 +24,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()
                 .WithColumn("url").AsString(2048).NotNullable();
 
-            Create.PrimaryKey("PK_umbracoRedirectUrl").OnTable("umbracoRedirectUrl").Columns(new[] { "id" });
+            //Create.PrimaryKey("PK_umbracoRedirectUrl").OnTable("umbracoRedirectUrl").Columns(new[] { "id" });
 
             Create.Index("IX_umbracoRedirectUrl").OnTable("umbracoRedirectUrl")
                   .OnColumn("url")
                   .Ascending()
                   .OnColumn("createDateUtc")
-                  .Ascending();
+                  .Ascending()
+                  .WithOptions().NonClustered();
         }
 
         public override void Down()

@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentUrls(int contentId)
+        public void DeleteContentRedirectUrls(int contentId)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IRedirectUrl GetMostRecentRule(string url)
+        public IRedirectUrl GetMostRecentRedirectUrl(string url)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IRedirectUrl> GetContentUrls(int contentId)
+        public IEnumerable<IRedirectUrl> GetContentRedirectUrls(int contentId)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total)
+        public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
+        public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
