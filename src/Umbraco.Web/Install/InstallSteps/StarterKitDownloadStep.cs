@@ -8,7 +8,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall,
+    [CoreInstallSetupStep(CoreInstallationType.NewInstall,
         "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started")]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {

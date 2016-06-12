@@ -1,0 +1,17 @@
+﻿<div>
+    <h1>Package migrations installation</h1>
+    
+    <p>
+        The following packages have migrations that need to be executed:
+    </p>
+    
+    <ul>
+        <li ng-repeat="item in installer.current.model">
+            {{item}}
+        </li>
+    </ul>
+    
+    <p>
+        <button class="btn btn-success" ng-click="forward()">Continue</button>
+   </p>
+</div>

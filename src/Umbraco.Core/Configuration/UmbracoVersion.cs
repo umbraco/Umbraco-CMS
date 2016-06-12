@@ -32,12 +32,7 @@ namespace Umbraco.Core.Configuration
 
         public static SemVersion GetSemanticVersion()
         {
-            return new SemVersion(
-                Current.Major, 
-                Current.Minor,
-                Current.Build, 
-                CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
-                Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
+            return Current.GetSemanticVersion();
         }
     }
 }

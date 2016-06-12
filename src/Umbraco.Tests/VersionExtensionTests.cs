@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Semver;
 using Umbraco.Core;
 
 namespace Umbraco.Tests
@@ -26,5 +27,6 @@ namespace Umbraco.Tests
 
             Assert.AreEqual(new Version(outcome), result);
         }
+        
     }
 }

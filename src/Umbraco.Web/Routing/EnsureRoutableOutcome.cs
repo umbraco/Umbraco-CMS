@@ -39,6 +39,11 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// There was no content at all.
         /// </summary>
-        NoContent = 13
+        NoContent = 13,
+
+        /// <summary>
+        /// Umbraco was not configured.
+        /// </summary>
+        PendingPackageMigrations = 14,
     }
 }

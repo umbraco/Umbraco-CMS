@@ -33,6 +33,11 @@ namespace Umbraco.Core.Persistence.Migrations
 			get { return Values; }
 		}
 
+	    public IEnumerable<MigrationAttribute> MigrationMetaData
+	    {
+	        get { return Values.SelectMany(x => x.GetType().GetCustomAttributes<MigrationAttribute>(false)).WhereNotNull(); }
+	    } 
+
 
         /// <summary>
         /// This will ctor the IMigration instances

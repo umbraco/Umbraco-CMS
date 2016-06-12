@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
     /// the Umbraco Application context
     /// </summary>
     /// <remarks>
@@ -183,6 +187,7 @@ namespace Umbraco.Core
 		readonly ManualResetEventSlim _isReadyEvent = new ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
+        private PackageMigrationsContext _packageMigrationsContext;
 
 		public bool IsReady
         {
@@ -212,17 +217,19 @@ namespace Umbraco.Core
         
         public bool IsConfigured
         {
-            get { return _configured.Value; }
+            get { return _umbracoVersionConfigured.Value; }
         }
+        
 
         /// <summary>
-        /// If the db is configured, there is a database context and there is an umbraco schema, but we are not 'configured' , then it means we are upgrading
+        /// If the db is configured, there is a database context and there is an umbraco schema, 
+        /// but we are: (not 'configured' OR there's pending migrations), then it means we are upgrading
         /// </summary>
 	    public bool IsUpgrading
 	    {
             get
             {
-                if (IsConfigured == false 
+                if ((IsConfigured == false || PackageMigrationsContext.HasPendingPackageMigrations)
                     && DatabaseContext != null 
                     && DatabaseContext.IsDatabaseConfigured)
                 {
@@ -268,7 +275,8 @@ namespace Umbraco.Core
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
 
-        private Lazy<bool> _configured;
+        private Lazy<bool> _umbracoVersionConfigured;
+        
         internal MainDom MainDom { get; private set; }
        
 	    private void Init()
@@ -277,7 +285,7 @@ namespace Umbraco.Core
             MainDom.Acquire();
             
             //Create the lazy value to resolve whether or not the application is 'configured'
-            _configured = new Lazy<bool>(() =>
+            _umbracoVersionConfigured = new Lazy<bool>(() =>
             {
                 try
                 {
@@ -318,9 +326,10 @@ namespace Umbraco.Core
                     LogHelper.Error<ApplicationContext>("Error determining if application is configured, returning false", ex);
                     return false;
                 }
+            });
 
-            }); 
-		}
+            _packageMigrationsContext = new PackageMigrationsContext(DatabaseContext, Services.MigrationEntryService, ProfilingLogger.Logger);
+        }
 
 		private string ConfigurationStatus
 		{
@@ -341,6 +350,11 @@ namespace Umbraco.Core
         {
             if (this.IsReady)
                 throw new Exception("ApplicationContext has already been initialized.");
+        }
+
+        internal PackageMigrationsContext PackageMigrationsContext
+        {
+            get { return _packageMigrationsContext; }
         }
 
 		/// <summary>

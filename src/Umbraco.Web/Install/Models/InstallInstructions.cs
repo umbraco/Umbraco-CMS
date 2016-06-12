@@ -13,5 +13,8 @@ namespace Umbraco.Web.Install.Models
 
         [DataMember(Name = "installId")]
         public Guid InstallId { get; set; }
+
+        [DataMember(Name = "installType")]
+        public InstallerType InstallType { get; set; }
     }
 }

@@ -5,9 +5,25 @@ using Semver;
 
 namespace Umbraco.Core
 {
-    internal static class VersionExtensions
+    public static class VersionExtensions
     {
-        public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
+
+        public static string ToSemanticString(this SemVersion semVersion)
+        {
+            return semVersion.ToString().Replace("--", "-").Replace("-+", "+");
+        }
+
+        internal static SemVersion GetSemanticVersion(this Version version)
+        {
+            return new SemVersion(
+                version.Major,
+                version.Minor,
+                version.Build,
+                null,
+                version.Revision > 0 ? version.Revision.ToInvariantString() : null);
+        }
+
+        internal static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
         {
             int build = 0;
             int.TryParse(semVersion.Build, out build);
@@ -24,7 +40,7 @@ namespace Umbraco.Core
             return new Version(semVersion.Major, semVersion.Minor);
         }
 
-        public static Version SubtractRevision(this Version version)
+        internal static Version SubtractRevision(this Version version)
         {
             var parts = new List<int>(new[] {version.Major, version.Minor, version.Build, version.Revision});
             

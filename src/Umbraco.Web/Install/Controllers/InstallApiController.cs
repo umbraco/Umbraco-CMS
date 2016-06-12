@@ -63,7 +63,7 @@ namespace Umbraco.Web.Install.Controllers
         /// Gets the install setup
         /// </summary>
         /// <returns></returns>
-        public InstallSetup GetSetup()
+        public InstallSetup GetSetup([FromUri]InstallerType installType)
         {
             var setup = new InstallSetup();
 
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Install.Controllers
 
             var steps = new List<InstallSetupStep>();
 
-            var installSteps = InstallHelper.GetStepsForCurrentInstallType().ToArray();
+            var installSteps = InstallHelper.GetStepsForCurrentInstallType(installType).ToArray();
 
             //only get the steps that are targetting the current install type
             steps.AddRange(installSteps);
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Install.Controllers
             {
                 var stepStatus = queue.Dequeue();
                 
-                var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
+                var step = InstallHelper.GetAllSteps(installModel.InstallType).Single(x => x.Name == stepStatus.Name);
 
                 JToken instruction = null;
                 //If this step has any instructions then extract them
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Install.Controllers
             if (queue.Count > 0)
             {
                 var next = queue.Peek();
-                var step = InstallHelper.GetAllSteps().Single(x => x.Name == next.Name);
+                var step = InstallHelper.GetAllSteps(installModel.InstallType).Single(x => x.Name == next.Name);
 
                 //If the current step restarts the app pool then we must simply return the next one in the queue, 
                 // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution 

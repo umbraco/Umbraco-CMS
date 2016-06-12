@@ -97,7 +97,9 @@ namespace Umbraco.Web
             //re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
             {
-                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl))
+                //only continue to process the back office if the app is configured and there are no pending migrations
+                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl) 
+                    && EnsurePackageMigrationsHaveExecuted(httpContext, umbracoContext.OriginalRequestUrl))
                 {
                     RewriteToBackOfficeHandler(httpContext);
                 }
@@ -176,6 +178,11 @@ namespace Umbraco.Web
 			else if (!EnsureIsConfigured(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotConfigured;
+            }
+            // ensure Umbraco is properly configured to serve documents
+            else if (!EnsurePackageMigrationsHaveExecuted(httpContext, uri))
+            {
+                reason = EnsureRoutableOutcome.PendingPackageMigrations;
             }
             // ensure Umbraco has documents to serve
             else if (!EnsureHasContent(context, httpContext))
@@ -311,6 +318,25 @@ namespace Umbraco.Web
 			httpContext.Response.Redirect(installUrl, true);
 			return false;
 		}
+
+        private bool EnsurePackageMigrationsHaveExecuted(HttpContextBase httpContext, Uri uri)
+        {
+            if (ApplicationContext.Current.PackageMigrationsContext.HasPendingPackageMigrations == false)
+                return true;
+
+            if (_notConfiguredReported)
+            {
+                // remember it's been reported so we don't flood the log
+                // no thread-safety so there may be a few log entries, doesn't matter
+                _notConfiguredReported = true;
+                LogHelper.Warn<UmbracoModule>("Umbraco is not configured - package migrations are pending");
+            }
+
+            var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);            
+            var installUrl = string.Format("{0}/PackageMigrations?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
+            httpContext.Response.Redirect(installUrl, true);
+            return false;
+        }
 
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate

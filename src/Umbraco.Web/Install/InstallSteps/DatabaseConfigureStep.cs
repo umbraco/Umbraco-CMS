@@ -13,7 +13,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall,
+    [CoreInstallSetupStep(CoreInstallationType.NewInstall,
         "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",
         PerformsAppRestart = true)]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>

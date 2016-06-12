@@ -33,6 +33,18 @@ namespace Umbraco.Web.Install.Controllers
 			_umbracoContext = umbracoContext;
 		}
 
+        [HttpGet]
+        public ActionResult PackageMigrations()
+        {
+            if (ApplicationContext.Current.PackageMigrationsContext.HasPendingPackageMigrations == false)
+            {
+                return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));
+            }
+
+            ViewBag.InstallType = "Migrations";
+
+            return CheckUpgradingAndReturnInstallerView();
+        }
 
         [HttpGet]
         public ActionResult Index()
@@ -42,6 +54,13 @@ namespace Umbraco.Web.Install.Controllers
                 return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));   
             }
 
+            ViewBag.InstallType = "Core";
+
+            return CheckUpgradingAndReturnInstallerView();
+        }
+
+        private ActionResult CheckUpgradingAndReturnInstallerView()
+        {
             if (ApplicationContext.Current.IsUpgrading)
             {
                 var result = _umbracoContext.Security.ValidateCurrentUser(false);
@@ -53,15 +72,15 @@ namespace Umbraco.Web.Install.Controllers
                         return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
                 }
             }
-       
+
 
             //gen the install base url
             ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup");
-            
+
             //get the base umbraco folder
             ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            InstallHelper ih = new InstallHelper(_umbracoContext);
+            var ih = new InstallHelper(_umbracoContext);
             ih.InstallStatus(false, "");
 
             //always ensure full path (see NOTE in the class remarks)

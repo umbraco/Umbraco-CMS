@@ -47,7 +47,11 @@ namespace Umbraco.Web.Install.Models
             View = att.View;
             ServerOrder = att.ServerOrder;
             Description = att.Description;
-            InstallTypeTarget = att.InstallTypeTarget;
+            var coreSetupAtt = att as CoreInstallSetupStepAttribute;
+            if (coreSetupAtt != null)
+            {
+                InstallTypeTarget = coreSetupAtt.InstallTypeTarget;
+            }
             PerformsAppRestart = att.PerformsAppRestart;
         }
 
@@ -67,7 +71,7 @@ namespace Umbraco.Web.Install.Models
         public string Description { get; private set; }
 
         [IgnoreDataMember]
-        public InstallationType InstallTypeTarget { get; private set; }
+        public CoreInstallationType InstallTypeTarget { get; private set; }
 
         [IgnoreDataMember]
         public bool PerformsAppRestart { get; private set; }
