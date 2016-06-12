@@ -119,19 +119,35 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
             var httpsSettingEnabled = Core.Configuration.GlobalSettings.UseSSL;
-
+            var uri = HttpContext.Current.Request.Url;
             var actions = new List<HealthCheckAction>();
-            if (httpsSettingEnabled == false)
-                actions.Add(new HealthCheckAction(FixHttpsSettingAction, Id) {
-                    Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
-                    Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
-                });
 
+
+            string resultMessage;
+            StatusResultType resultType;
+            if (uri.Scheme != "https")
+            {
+                resultMessage = _textService.Localize("healthcheck/httpsCheckConfigurationRectifyNotPossible");
+                resultType = StatusResultType.Info;
+            }
+            else
+            {
+                if (httpsSettingEnabled == false)
+                    actions.Add(new HealthCheckAction(FixHttpsSettingAction, Id)
+                    {
+                        Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
+                        Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
+                    });
+
+                resultMessage = _textService.Localize("healthcheck/httpsCheckConfigurationCheckResult",
+                    new[] {httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not"});
+                resultType = httpsSettingEnabled ? StatusResultType.Success: StatusResultType.Error;
+            }
+            
             return
-                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckConfigurationCheckResult", new [] {
-                        httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" }))
+                new HealthCheckStatus(resultMessage)
                 {
-                    ResultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error,
+                    ResultType = resultType,
                     Actions = actions
                 };
         }
