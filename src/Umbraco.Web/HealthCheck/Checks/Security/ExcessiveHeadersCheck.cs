@@ -8,15 +8,15 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     [HealthCheck(
-        "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
-        "Click-Jacking Protection",
-        Description = "Checks if your site is allowed to be IFRAMed by another site and thus would be susceptible to click-jacking.",
+        "92ABBAA2-0586-4089-8AE2-9A843439D577",
+        "Excessive Headers",
+        Description = "Checks to see if your site is revealing information in it's headers that gives away unnecessary details about the technology used to build and host it.",
         Group = "Security")]
-    public class ClickJackingCheck : HealthCheck
+    public class ExcessiveHeadersCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
 
-        public ClickJackingCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public ExcessiveHeadersCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
         }
@@ -28,7 +28,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
             //return the statuses
-            return new[] { CheckForFrameOptionsHeader() };
+            return new[] { CheckForHeaders() };
         }
 
         /// <summary>
@@ -40,14 +40,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             switch (action.Alias)
             {
-                case "checkForFrameOptionsHeader":
-                    return CheckForFrameOptionsHeader();
+                case "checkForHeaders":
+                    return CheckForHeaders();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private HealthCheckStatus CheckForFrameOptionsHeader()
+        private HealthCheckStatus CheckForHeaders()
         {
             var message = string.Empty;
             var success = false;
@@ -60,10 +60,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 try
                 {
                     webClient.DownloadString(address);
-                    success = webClient.ResponseHeaders.AllKeys.Contains("X-Frame-Options");
+
+                    var allHeaders = webClient.ResponseHeaders.AllKeys;
+                    var headersToCheckFor = new [] {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version"};
+                    var headersFound = allHeaders
+                        .Intersect(headersToCheckFor)
+                        .ToArray();
+                    success = headersFound.Any() == false;
                     message = success
-                        ? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
-                        : _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
+                        ? _textService.Localize("healthcheck/excessiveHeadersNotFound")
+                        : _textService.Localize("healthcheck/excessiveHeadersFound", new [] { string.Join(", ", headersFound) });
                 }
                 catch (Exception ex)
                 {
@@ -72,11 +78,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
 
             var actions = new List<HealthCheckAction>();
-
             return
                 new HealthCheckStatus(message)
                 {
-                    ResultType = success ? StatusResultType.Success : StatusResultType.Error,
+                    ResultType = success ? StatusResultType.Success : StatusResultType.Warning,
                     Actions = actions
                 };
         }
