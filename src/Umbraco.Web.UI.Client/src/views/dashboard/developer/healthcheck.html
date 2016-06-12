@@ -66,7 +66,7 @@
 
                             <div class="umb-healthcheck-group__details-status-actions">
                                 <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
-                                    <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, status, action);">{{action.name}}</button>
+                                    <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, $index, action);">{{action.name}}</button>
                                     <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                 </div>
                             </div>

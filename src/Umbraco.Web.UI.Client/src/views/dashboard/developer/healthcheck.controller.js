@@ -93,11 +93,9 @@
 			});
 		}
 
-		function executeAction(check, status, action) {
-			check.status = null;
-			check.rectify = "Loading result of '" + action.name + "'...";
+		function executeAction(check, index, action) {
 			healthCheckResource.executeAction(action).then(function (response) {
-				check.rectify = response.message;
+                check.status[index] = response;
 			});
 		}
 
