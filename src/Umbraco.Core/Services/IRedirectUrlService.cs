@@ -5,20 +5,22 @@ namespace Umbraco.Core.Services
 {
     public interface IRedirectUrlService : IService
     {
-        void Save(RedirectUrl redirectUrl);
+        void Save(IRedirectUrl redirectUrl);
+
+        void DeleteContentUrls(int contentId);
+
+        void Delete(IRedirectUrl redirectUrl);
 
         void Delete(int id);
 
-        void DeleteContentRules(int contentId);
-
         void DeleteAll();
 
-        RedirectUrl GetMostRecentRule(string url);
+        IRedirectUrl GetMostRecentRule(string url);
 
-        IEnumerable<RedirectUrl> GetRules(int contentId);
+        IEnumerable<IRedirectUrl> GetContentUrls(int contentId);
 
-        IEnumerable<RedirectUrl> GetAllRules(long pageIndex, int pageSize, out long total);
+        IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total);
 
-        IEnumerable<RedirectUrl> GetAllRules(int rootContentId, long pageIndex, int pageSize, out long total);
+        IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total);
     }
 }

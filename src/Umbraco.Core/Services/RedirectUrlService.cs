@@ -15,41 +15,46 @@ namespace Umbraco.Core.Services
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
-        public void Save(RedirectUrl redirectUrl)
+        public void Save(IRedirectUrl redirectUrl)
         {
             // check if the url already exists
             // the url actually is a primary key?
             // though we might want to keep the history?
 
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var dto = new RedirectUrlDto
-                {
-                    Id = redirectUrl.Id,
-                    ContentId = redirectUrl.ContentId,
-                    CreateDateUtc = redirectUrl.CreateDateUtc,
-                    Url = redirectUrl.Url
-                };
-                uow.Database.InsertOrUpdate(dto);
+                repo.AddOrUpdate(redirectUrl);
                 uow.Commit();
-                redirectUrl.Id = dto.Id;
+            }
+        }
+
+        public void Delete(IRedirectUrl redirectUrl)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
+            {
+                repo.Delete(redirectUrl);
+                uow.Commit();
             }
         }
 
         public void Delete(int id)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                uow.Database.Execute("DELETE FROM umbracoContentUrlRule WHERE id=@id", new { id = id });
+                repo.Delete(id);
                 uow.Commit();
             }
         }
 
-        public void DeleteContentRules(int contentId)
+        public void DeleteContentUrls(int contentId)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                uow.Database.Execute("DELETE FROM umbracoContentUrlRule WHERE contenId=@id", new { id = contentId });
+                repo.DeleteContentUrls(contentId);
                 uow.Commit();
             }
         }
@@ -57,85 +62,52 @@ namespace Umbraco.Core.Services
         public void DeleteAll()
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                uow.Database.Execute("DELETE FROM umbracoContentUrlRule;");
+                repo.DeleteAll();
                 uow.Commit();
             }
         }
 
-        public RedirectUrl GetMostRecentRule(string url)
+        public IRedirectUrl GetMostRecentRule(string url)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE url=@url ORDER BY createDateUtc DESC;",
-                    new { url });
-                var ruleDto = ruleDtos.FirstOrDefault();
-                var rule = ruleDto == null ? null : new RedirectUrl
-                {
-                    Id = ruleDto.Id,
-                    ContentId = ruleDto.ContentId,
-                    CreateDateUtc = ruleDto.CreateDateUtc,
-                    Url = ruleDto.Url
-                };
+                var rule = repo.GetMostRecentRule(url);
                 uow.Commit();
                 return rule;
             }
         }
 
-        public IEnumerable<RedirectUrl> GetRules(int contentId)
+        public IEnumerable<IRedirectUrl> GetContentUrls(int contentId)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule WHERE contentId=@id ORDER BY createDateUtc DESC;",
-                    new { id = contentId });
-                var rules = ruleDtos.Select(x=> new RedirectUrl
-                {
-                    Id = x.Id,
-                    ContentId = x.ContentId,
-                    CreateDateUtc = x.CreateDateUtc,
-                    Url = x.Url
-                });
+                var rules = repo.GetContentUrls(contentId);
                 uow.Commit();
                 return rules;
             }
         }
 
-        public IEnumerable<RedirectUrl> GetAllRules(long pageIndex, int pageSize, out long total)
+        public IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>("SELECT * FROM umbracoContentUrlRule ORDER BY createDateUtc DESC;");
-                var rules = ruleDtos.Select(x => new RedirectUrl
-                {
-                    Id = x.Id,
-                    ContentId = x.ContentId,
-                    CreateDateUtc = x.CreateDateUtc,
-                    Url = x.Url
-                }).ToArray();
-                total = rules.Length;
+                var rules = repo.GetAllUrls(pageIndex, pageSize, out total);
                 uow.Commit();
                 return rules;
             }
         }
 
-        public IEnumerable<RedirectUrl> GetAllRules(int rootContentId, long pageIndex, int pageSize, out long total)
+        public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var path = "%," + rootContentId + ",%";
-
-                var ruleDtos = uow.Database.Fetch<RedirectUrlDto>(@"SELECT * FROM umbracoContentUrlRule
-JOIN umbracoNode ON umbracoNode.id=umbracoContentUrlRule.contentId
-WHERE umbracoNode.path LIKE @path
-ORDER BY createDateUtc DESC;", new { path });
-                var rules = ruleDtos.Select(x => new RedirectUrl
-                {
-                    Id = x.Id,
-                    ContentId = x.ContentId,
-                    CreateDateUtc = x.CreateDateUtc,
-                    Url = x.Url
-                }).ToArray();
-                total = rules.Length;
+                var rules = repo.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
                 uow.Commit();
                 return rules;
             }
