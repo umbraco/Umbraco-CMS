@@ -23,7 +23,7 @@
             vm.template.content = vm.editor.getValue();
 
             templateResource.save(vm.template).then(function(saved){
-                notificationsService.success("Template saved")
+                notificationsService.success("Template saved");
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
 
@@ -35,7 +35,7 @@
 
 
             }, function(err){
-                notificationsService.error("Template save failed")
+                notificationsService.error("Template save failed");
                 vm.page.saveButtonState = "error";
             });
         };
@@ -75,7 +75,7 @@
             var newValue = path;
             var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
 
-            if (newValue != undefined && newValue != "") {
+            if (newValue !== undefined && newValue !== "") {
                 if (layoutDefRegex.test(templateCode)) {
                     // Declaration exists, so just update it
                     templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
@@ -101,6 +101,41 @@
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
+        vm.openInsertOverlay = openInsertOverlay;
+
+        function openInsertOverlay() {
+
+            vm.insertOverlay = {
+                view: "insert",
+                hideSubmitButton: true,
+                show: true,
+                submit: function(model) {
+
+                    switch(model.insert.type) {
+                        case "macro":
+
+                            var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
+                            vm.insert(macroObject.syntax);
+                            break;
+
+                        case "dictionary":
+                            //crappy hack due to dictionary items not in umbracoNode table
+                        	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
+                        	vm.insert(code);
+                            break;
+                    }
+
+                    vm.insertOverlay.show = false;
+                    vm.insertOverlay = null;
+
+                },
+                close: function(oldModel) {
+                    vm.insertOverlay.show = false;
+                    vm.insertOverlay = null;
+                }
+            };
+
+        }
 
 
         function openMacroOverlay() {

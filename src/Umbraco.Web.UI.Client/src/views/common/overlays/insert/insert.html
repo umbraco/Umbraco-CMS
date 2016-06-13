@@ -1,0 +1,41 @@
+<div ng-controller="Umbraco.Overlays.InsertOverlay as vm">
+
+    <div class="umb-insert-code-boxes">
+
+        <div class="umb-insert-code-box" ng-click="vm.openMacroPicker()">
+            <div class="umb-insert-code-box__title">Macro</div>
+            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
+        </div>
+
+        <div class="umb-insert-code-box">
+            <div class="umb-insert-code-box__title">Value</div>
+            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
+        </div>
+
+        <div class="umb-insert-code-box" ng-click="vm.openDictionaryItemOverlay()">
+            <div class="umb-insert-code-box__title">Dictionary</div>
+            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
+        </div>
+
+        <div class="umb-insert-code-box">
+            <div class="umb-insert-code-box__title">Partial</div>
+            <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
+        </div>
+
+    </div>
+
+    <umb-overlay
+       ng-if="vm.macroPickerOverlay.show"
+       model="vm.macroPickerOverlay"
+       view="vm.macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="vm.dictionaryItemOverlay.show"
+       model="vm.dictionaryItemOverlay"
+       position="right"
+       view="vm.dictionaryItemOverlay.view">
+   </umb-overlay>
+
+</div>
