@@ -12,32 +12,48 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
         getDetails: function (packageId) {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "/getdetails/" + packageId),
+               $http.get(baseurl + "/" + packageId),
                'Failed to get package details');
         },
 
         getCategories: function () {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "/getcategories"),
+               $http.get(baseurl),
                'Failed to query packages');
         },
 
-        getPopular: function (maxResults) {
+        getPopular: function (maxResults, category) {
 
             if (maxResults === undefined) {
                 maxResults = 10;
             }
+            if (category === undefined) {
+                category = "";
+            }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "/GetPopular?maxResults=" + maxResults),
+               $http.get(baseurl + "?pageIndex=0&pageSize=" + maxResults + "&category=" + category + "&order=Popular"),
                'Failed to query packages');
         },
+       
+        search: function (pageIndex, pageSize, category, query, canceler) {
 
-        getLatest: function (pageIndex, pageSize, category) {
+            var httpConfig = {};
+            if (canceler) {
+                httpConfig["timeout"] = canceler;
+            }
+
+            if (category === undefined) {
+                category = "";
+            }
+            if (query === undefined) {
+                query = "";
+            }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "/GetLatest?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category),
+               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query),
+               httpConfig,
                'Failed to query packages');
         }
         
