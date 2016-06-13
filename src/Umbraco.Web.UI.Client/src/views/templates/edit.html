@@ -44,6 +44,7 @@
                                 <li><a href="" ng-click="vm.openPageFieldOverlay()">Value</a></li>
                                 <li><a href="" ng-click="vm.openDictionaryItemOverlay()">Dictionary</a></li>
                                 <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
+                                <li><a href="" ng-click="vm.openPartialOverlay()">Partial view</a></li>
                             </ul>
 
                         </div>
@@ -56,12 +57,13 @@
                             action="vm.openQueryBuilderOverlay()">
                         </umb-button>
 
+
                         <umb-button
                             type="button"
                             button-style="link"
                             label="Organise"
                             icon="icon-layout"
-                            action="vm.openQueryBuilderOverlay()">
+                            action="vm.openOrganizeOverlay()">
                         </umb-button>
 
                     </umb-editor-sub-header-content-left>
@@ -124,5 +126,20 @@
         position="right"
         view="vm.queryBuilderOverlay.view">
     </umb-overlay>
+
+    <umb-overlay
+       ng-if="vm.organizeOverlay.show"
+       model="vm.organizeOverlay"
+       view="vm.organizeOverlay.view"
+       position="right">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="vm.partialOverlay.show"
+       model="vm.partialOverlay"
+       view="vm.partialOverlay.view"
+       position="right">
+   </umb-overlay>
+
 
 </div>

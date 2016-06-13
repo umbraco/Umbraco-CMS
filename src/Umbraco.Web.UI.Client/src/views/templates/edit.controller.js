@@ -124,6 +124,7 @@
         vm.openMacroOverlay = openMacroOverlay;
         vm.openInsertOverlay = openInsertOverlay;
         vm.openOrganizeOverlay = openOrganizeOverlay;
+        vm.openPartialOverlay = openPartialOverlay;
 
         function openInsertOverlay() {
 
@@ -166,6 +167,8 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
+                title: "Insert macro",
+
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -181,6 +184,7 @@
             vm.pageFieldOverlay = {
                 view: "mediapicker",
                 show: true,
+
                 submit: function (model) {
 
                 },
@@ -200,6 +204,7 @@
                 entityType: "dictionary",
                 multiPicker: false,
                 show: true,
+                title: "Insert dictionary item",
 
                 select: function(node){
                 	//crappy hack due to dictionary items not in umbracoNode table
@@ -217,6 +222,38 @@
                 close: function (model) {
                     vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
+                }
+            };
+        }
+
+        function openPartialOverlay() {
+            vm.partialItemOverlay = {
+                view: "treepicker",
+                section: "settings", 
+                treeAlias: "partialViews",
+                entityType: "partialView",
+                multiPicker: false,
+                show: true,
+                title: "Insert Partial view",
+
+                select: function(node){
+                    //crappy hack due to dictionary items not in umbracoNode table
+                    var code = "@Html.Partial(\"" + node.name + "\")";
+                    vm.insert(code);
+
+                    vm.partialItemOverlay.show = false;
+                    vm.partialItemOverlay = null;
+                },
+
+                submit: function (model) {
+                    console.log(model);
+                    vm.partialItemOverlay.show = false;
+                    vm.partialItemOverlay = null;
+                },
+
+                close: function (model) {
+                    vm.partialItemOverlay.show = false;
+                    vm.partialItemOverlay = null;
                 }
             };
         }
@@ -248,11 +285,15 @@
             };
         }
 
+
         function openOrganizeOverlay() {
             vm.organizeOverlay = {
+
                 view: "organize",
                 show: true,
                 template: vm.template,
+                title: "Organise template",
+
                 submit: function (model) {
                     if (model.masterPage && model.masterPage.alias) {
                         vm.template.masterPageAlias = model.masterPage.alias;
@@ -281,10 +322,12 @@
                     vm.organizeOverlay.show = false;
                     vm.organizeOverlay = null;
                 },
+
                 close: function (model) {
                     vm.organizeOverlay.show = false;
                     vm.organizeOverlay = null;
                 }
+
             }
         }
 
