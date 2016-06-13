@@ -6,23 +6,27 @@
         var vm = this;
         vm.page = {};
         vm.page.loading = true;
-        
+
         //menu
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
 
-        vm.insert = function(str){
+        vm.insert = function (str) {
+            vm.editor.moveCursorToPosition(vm.currentPosition);
             vm.editor.insert(str);
             vm.editor.focus();
         };
 
-        vm.save = function(){
+        vm.currentPosition = { col: 0, row: 0 };
+
+        vm.save = function () {
             vm.page.saveButtonState = "busy";
 
             vm.template.content = vm.editor.getValue();
 
-            templateResource.save(vm.template).then(function(saved){
+            templateResource.save(vm.template).then(function (saved) {
+
                 notificationsService.success("Template saved");
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
@@ -33,18 +37,21 @@
                     vm.page.menu.currentNode = syncArgs.node;
                 });
 
-
-            }, function(err){
+            }, function (err) {
                 notificationsService.error("Template save failed");
                 vm.page.saveButtonState = "error";
             });
         };
 
-        vm.init = function(){
+        function persistCurrentLocation() {
+            vm.currentPosition = vm.editor.getCursorPosition();
+        }
 
+        vm.init = function () {
 
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+
             if($routeParams.create){
 
             	templateResource.getScaffold().then(function(template){
@@ -60,6 +67,7 @@
             }
 
         };
+
         
         vm.ready = function(template){
         	vm.page.loading = false;
@@ -115,6 +123,7 @@
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
         vm.openInsertOverlay = openInsertOverlay;
+        vm.openOrganizeOverlay = openOrganizeOverlay;
 
         function openInsertOverlay() {
 
@@ -152,12 +161,12 @@
 
 
         function openMacroOverlay() {
-           
+
             vm.macroPickerOverlay = {
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                submit: function(model) {
+                submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
                     vm.insert(macroObject.syntax);
@@ -167,15 +176,15 @@
             };
         }
 
- 
+
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
                 view: "mediapicker",
                 show: true,
-                submit: function(model) {
+                submit: function (model) {
 
                 },
-                close: function(model) {
+                close: function (model) {
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
                 }
@@ -190,12 +199,7 @@
                 treeAlias: "dictionary",
                 entityType: "dictionary",
                 multiPicker: false,
-
                 show: true,
-
-                submit: function(model) {
-                    
-                },
 
                 select: function(node){
                 	//crappy hack due to dictionary items not in umbracoNode table
@@ -206,21 +210,24 @@
                     vm.dictionaryItemOverlay = null;
                 },
 
-                close: function(model) {
+                submit: function (model) {
+                    console.log(model);
+                },
+
+                close: function (model) {
                     vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
                 }
             };
         }
 
-
         function openQueryBuilderOverlay() {
             vm.queryBuilderOverlay = {
                 view: "querybuilder",
                 show: true,
                 title: "Query for content",
-               
-                submit: function(model) {
+
+                submit: function (model) {
 
                     var code = "\n@{\n" + "\tvar selection = " + model.result.queryExpression + ";\n}\n";
                     code += "<ul>\n" +
@@ -234,11 +241,51 @@
                     vm.insert(code);
                 },
 
-                close: function(model) {
+                close: function (model) {
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
                 }
             };
+        }
+
+        function openOrganizeOverlay() {
+            vm.organizeOverlay = {
+                view: "organize",
+                show: true,
+                template: vm.template,
+                submit: function (model) {
+                    if (model.masterPage && model.masterPage.alias) {
+                        vm.template.masterPageAlias = model.masterPage.alias;
+                        vm.setLayout(model.masterPage.alias + ".cshtml");
+                    } else {
+                        vm.template.masterPageAlias = null;
+                        vm.setLayout(null);
+                    }
+
+                    if (model.addRenderBody) {
+                        vm.insert("@RenderBody()");
+                    }
+
+                    if (model.addRenderSection) {
+                        vm.insert("@RenderSection(\"" +
+                            model.renderSectionName +
+                            "\", " +
+                            model.mandatoryRenderSection +
+                            ")");
+                    }
+
+                    if (model.addSection) {
+                        vm.insert("@section " + model.sectionName + "\r\n{\r\n\r\n}\r\n");
+                    }
+
+                    vm.organizeOverlay.show = false;
+                    vm.organizeOverlay = null;
+                },
+                close: function (model) {
+                    vm.organizeOverlay.show = false;
+                    vm.organizeOverlay = null;
+                }
+            }
         }
 
         vm.init();
