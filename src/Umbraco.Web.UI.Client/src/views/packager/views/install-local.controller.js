@@ -7,7 +7,6 @@
         vm.state = "upload";
 
         vm.localPackage = {};
-        vm.loadPackage = loadPackage;
         vm.installPackage = installPackage;
         vm.installState = {
             status: ""
@@ -57,6 +56,7 @@
 
                     // set done status on file
                     vm.zipFile.uploadStatus = "done";
+                    loadPackage();
 
                     vm.localPackage = data;
                 }
@@ -102,7 +102,7 @@
             packageResource
                 .installFiles(vm.localPackage)
                 .then(function(pack) {
-                        vm.installState.status = "Restarting, please hold...";
+                        vm.installState.status = "Restarting, please wait...";
                         return packageResource.installData(pack);
                     },
                     installError)

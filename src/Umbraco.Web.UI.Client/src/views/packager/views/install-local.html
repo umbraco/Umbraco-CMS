@@ -47,14 +47,7 @@
             <p class="faded">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
             </p>
-
-
-            <button type="button"
-                    class="umb-era-button -blue"
-                    ng-disabled="vm.zipFile.uploadStatus !== 'done'"
-                    ng-class="{'-inactive' : vm.zipFile.uploadStatus !== 'done'}"
-                    ng-click="vm.loadPackage()">Next
-            </button>
+            
         </form>
     </div>
 
@@ -78,13 +71,13 @@
                     </div>
 
                     <div class="umb-info-local-item">
-                        <strong>Repository</strong>
-                        <a href="{{ vm.localPackage.info }}" target="_blank">{{ vm.localPackage.info }}</a>
+                        <strong>Version</strong>
+                        {{ vm.package.version }}
                     </div>
 
                     <div class="umb-info-local-item">
                         <strong>License</strong>
-                        <a href="{{ vm.localPackage.licenseLink }}">{{ vm.localPackage.license }}</a>
+                        <a href="{{ vm.localPackage.licenseUrl }}">{{ vm.localPackage.license }}</a>
                     </div>
 
                     <div class="umb-info-local-item">
@@ -103,7 +96,7 @@
                         </button>
                         <label for="license-accept" class="umb-package-installer-label">
                             <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required>
-                            <strong class="label-text">I accept <a href="#">terms of use</a></strong>
+                            <strong class="label-text">I accept <a href="{{ vm.package.licenseUrl }}">terms of use</a></strong>
                         </label>
                     </div>
                     <div class="umb-info-local-item">

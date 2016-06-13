@@ -5,7 +5,13 @@
 
         var vm = this;
 
+        vm.confirmUninstall = confirmUninstall;
         vm.uninstallPackage = uninstallPackage;
+        vm.state = "list";
+        vm.installState = {
+            status: ""
+        };
+        vm.package = {};
 
         function init() {
             packageResource.getInstalled()
@@ -14,10 +20,17 @@
                 });
         }
 
+        function confirmUninstall(pck) {
+            vm.state = "packageDetails";
+            vm.package = pck;
+        }
+
         function uninstallPackage(installedPackage) {
+            vm.installState.status = "Uninstalling package...";
             packageResource.uninstall(installedPackage.id)
                 .then(function() {
-                    init();
+                    var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
+                    window.location.reload(true);
                 });
         }
 

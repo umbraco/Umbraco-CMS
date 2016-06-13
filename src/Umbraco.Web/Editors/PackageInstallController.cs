@@ -216,7 +216,9 @@ namespace Umbraco.Web.Editors
                     Id = pack.Id,
                     Author = pack.Author,
                     Version = pack.Version,
-                    Url = pack.Url
+                    Url = pack.Url,
+                    License = pack.License,
+                    LicenseUrl = pack.LicenseUrl
                 }).ToList();
         }
 
