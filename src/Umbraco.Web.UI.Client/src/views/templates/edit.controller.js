@@ -56,7 +56,7 @@
 
             	templateResource.getScaffold().then(function(template){
             		vm.ready(template);
-            	});	
+            	});
 
             }else{
 
@@ -68,7 +68,7 @@
 
         };
 
-        
+
         vm.ready = function(template){
         	vm.page.loading = false;
             vm.template = template;
@@ -89,7 +89,7 @@
             }
         };
 
-        
+
         vm.setLayout = function(path){
 
             var templateCode = vm.editor.getValue();
@@ -187,6 +187,8 @@
                 show: true,
                 submit: function(model) {
                   vm.insert(model.umbracoField);
+                  vm.pageFieldOverlay.show = false;
+                  vm.pageFieldOverlay = null;
                 },
                 close: function (model) {
                     vm.pageFieldOverlay.show = false;
@@ -199,7 +201,7 @@
         function openDictionaryItemOverlay() {
             vm.dictionaryItemOverlay = {
                 view: "treepicker",
-                section: "settings", 
+                section: "settings",
                 treeAlias: "dictionary",
                 entityType: "dictionary",
                 multiPicker: false,
