@@ -23,6 +23,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private const string SetFrameOptionsHeaderInConfigActiobn = "setFrameOptionsHeaderInConfig";
 
         private const string XFrameOptionsHeader = "X-Frame-Options";
+        private const string XFrameOptionsValue = "sameorigin"; // Note can't use "deny" as that would prevent Umbraco itself using IFRAMEs
 
         public ClickJackingCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
@@ -194,7 +195,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     addHeaderElement = new XElement("add");
                     addHeaderElement.Add(new XAttribute("name", XFrameOptionsHeader));
-                    addHeaderElement.Add(new XAttribute("value", "deny"));
+                    addHeaderElement.Add(new XAttribute("value", XFrameOptionsValue));
                     customHeadersElement.Add(addHeaderElement);
                 }
 
