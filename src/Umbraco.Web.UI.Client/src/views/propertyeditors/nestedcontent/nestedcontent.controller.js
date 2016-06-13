@@ -96,8 +96,10 @@
         };
 
         $scope.closeNodeTypePickerOverlay = function () {
-            $scope.nodeTypePickerOverlay.show = false;
-            $scope.nodeTypePickerOverlay = null;
+            if ($scope.nodeTypePickerOverlay) {
+                $scope.nodeTypePickerOverlay.show = false;
+                $scope.nodeTypePickerOverlay = null;
+            }
         };
 
         $scope.editNode = function (idx) {
