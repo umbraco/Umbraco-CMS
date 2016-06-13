@@ -7,8 +7,9 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models
 {
-    internal class NestedPublishedContent : PublishedContentBase
+    internal class NestedPublishedContent : PublishedContentWithKeyBase
     {
+        private readonly Guid key;
         private readonly string name;
         private readonly PublishedContentType contentType;
         private readonly IEnumerable<IPublishedProperty> properties;
@@ -16,13 +17,15 @@ namespace Umbraco.Web.Models
         private readonly bool isPreviewing;
         private readonly IPublishedContent owner;
 
-        public NestedPublishedContent(string name,
+        public NestedPublishedContent(Guid key,
+            string name,
             PublishedContentType contentType,
             IEnumerable<IPublishedProperty> properties,
             IPublishedContent owner = null,
             int sortOrder = 0,
             bool isPreviewing = false)
         {
+            this.key = key;
             this.name = name;
             this.contentType = contentType;
             this.properties = properties;
@@ -34,6 +37,11 @@ namespace Umbraco.Web.Models
         public override int Id
         {
             get { return 0; }
+        }
+
+        public override Guid Key
+        {
+            get { return this.key; }
         }
 
         public override string Name

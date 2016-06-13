@@ -8,7 +8,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    [PropertyValueType(typeof(IEnumerable<IPublishedContent>))]
+    [PropertyValueType(typeof(IEnumerable<IPublishedContentWithKey>))] 
     public class NestedContentValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)

@@ -19,7 +19,7 @@
             $scope.tab = tab;
 
             var unsubscribe = $scope.$on("ncSyncVal", function(ev, args) {
-                if (args.id === $scope.model.id) {
+                if (args.key === $scope.model.key) {
                     $scope.$broadcast("formSubmitting", { scope: $scope });
                 }
             });

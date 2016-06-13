@@ -362,7 +362,7 @@ namespace Umbraco.Web.PropertyEditors
 
         private static bool IsSystemPropertyKey(string propKey)
         {
-            return propKey == "name" || propKey == ContentTypeAliasPropertyKey;
+            return propKey == "name" || propKey == "key" || propKey == ContentTypeAliasPropertyKey;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -70,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (source != null && !source.ToString().IsNullOrWhiteSpace())
                 {
                     var rawValue = JsonConvert.DeserializeObject<List<object>>(source.ToString());
-                    var processedValue = new List<IPublishedContent>();
+                    var processedValue = new List<IPublishedContentWithKey>();
 
                     for (var i = 0; i < rawValue.Count; i++)
                     {
@@ -100,6 +101,13 @@ namespace Umbraco.Web.PropertyEditors
                             }
                         }
 
+                        // Parse out the key manually
+                        object keyObj = null;
+                        if (propValues.TryGetValue("key", out keyObj))
+                        {
+                            // Do nothing, we just want to parse out the name if we can
+                        }
+
                         // Parse out the name manually
                         object nameObj = null;
                         if (propValues.TryGetValue("name", out nameObj))
@@ -112,6 +120,7 @@ namespace Umbraco.Web.PropertyEditors
                         var containerNode = pcr != null && pcr.HasPublishedContent ? pcr.PublishedContent : null;
 
                         processedValue.Add(new NestedPublishedContent(
+                            keyObj == null ? Guid.Empty : Guid.Parse(keyObj.ToString()),
                             nameObj == null ? null : nameObj.ToString(),
                             publishedContentType,
                             properties.ToArray(),

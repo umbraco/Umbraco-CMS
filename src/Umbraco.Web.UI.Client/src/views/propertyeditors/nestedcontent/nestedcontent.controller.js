@@ -102,7 +102,7 @@
 
         $scope.editNode = function (idx) {
             if ($scope.sorting) return;
-            if ($scope.currentNode && $scope.currentNode.id == $scope.nodes[idx].id) {
+            if ($scope.currentNode && $scope.currentNode.key == $scope.nodes[idx].key) {
                 $scope.currentNode = undefined;
             } else {
                 $scope.currentNode = $scope.nodes[idx];
@@ -267,7 +267,7 @@
         var initNode = function (scaffold, item) {
             var node = angular.copy(scaffold);
 
-            node.id = guid();
+            node.key = guid();
             node.ncContentTypeAlias = scaffold.contentTypeAlias;
 
             for (var t = 0; t < node.tabs.length; t++) {
@@ -298,13 +298,14 @@
 
         var updateModel = function () {
             if ($scope.realCurrentNode) {
-                $scope.$broadcast("ncSyncVal", { id: $scope.realCurrentNode.id });
+                $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
             if (inited) {
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
                     var node = $scope.nodes[i];
                     var newValue = {
+                        key: node.key,
                         name: node.name,
                         ncContentTypeAlias: node.ncContentTypeAlias
                     };
