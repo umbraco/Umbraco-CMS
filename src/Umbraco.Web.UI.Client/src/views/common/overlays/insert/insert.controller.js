@@ -98,6 +98,36 @@
             };
         }
 
+        function openPartialOverlay() {
+            vm.partialItemOverlay = {
+                view: "treepicker",
+                section: "settings", 
+                treeAlias: "partialViews",
+                entityType: "partialView",
+                multiPicker: false,
+                show: true,
+                title: "Insert Partial view",
+
+                select: function(node){
+                    
+                    $scope.model.insert = {
+                        "type": "partial",
+                        "node": node
+                    };
+
+                    $scope.model.submit($scope.model);
+
+                    vm.partialItemOverlay.show = false;
+                    vm.partialItemOverlay = null;
+                },
+
+                close: function (model) {
+                    vm.partialItemOverlay.show = false;
+                    vm.partialItemOverlay = null;
+                }
+            };
+        }
+
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.InsertOverlay", InsertOverlayController);

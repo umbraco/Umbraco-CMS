@@ -18,7 +18,6 @@
             vm.editor.focus();
         };
 
-        vm.currentPosition = { col: 0, row: 0 };
 
         vm.save = function () {
             vm.page.saveButtonState = "busy";
@@ -85,6 +84,14 @@
 
                 onLoad: function(_editor) {
                     vm.editor = _editor;
+                    
+                    //initial cursor placement
+                    vm.editor.navigateFileEnd();
+                    persistCurrentLocation();
+
+                    //change on blur, focus
+                    vm.editor.on("blur", persistCurrentLocation);
+                    vm.editor.on("focus", persistCurrentLocation);
             	}
             }
         };
@@ -146,6 +153,13 @@
                         	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
                         	vm.insert(code);
                             break;
+
+                        case "partial":
+                            //crappy hack due to dictionary items not in umbracoNode table
+                            var code = "@Html.Partial(\"" + model.insert.node.name + "\")";
+                            vm.insert(code);
+                            break;
+                            
                         case "umbracoField":
                           vm.insert(model.insert.umbracoField);
                             break;
@@ -197,7 +211,7 @@
                   vm.pageFieldOverlay.show = false;
                   vm.pageFieldOverlay = null;
                 },
-                
+
                 close: function (model) {
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
@@ -286,6 +300,9 @@
                             "</ul>\n\n";
 
                     vm.insert(code);
+                    
+                    vm.queryBuilderOverlay.show = false;
+                    vm.queryBuilderOverlay = null;
                 },
 
                 close: function (model) {

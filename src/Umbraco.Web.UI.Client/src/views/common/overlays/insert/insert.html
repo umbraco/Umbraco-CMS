@@ -24,6 +24,7 @@
 
     </div>
 
+
     <umb-overlay
        ng-if="vm.macroPickerOverlay.show"
        model="vm.macroPickerOverlay"
@@ -43,6 +44,13 @@
        model="vm.dictionaryItemOverlay"
        position="right"
        view="vm.dictionaryItemOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="vm.partialItemOverlay.show"
+       model="vm.partialItemOverlay"
+       view="vm.partialItemOverlay.view"
+       position="right">
    </umb-overlay>
 
 </div>
