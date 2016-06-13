@@ -14,6 +14,7 @@
         }
 
         vm.openMacroPicker = openMacroPicker;
+        vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
 
 
@@ -39,6 +40,33 @@
                 }
             };
 
+        }
+
+        function openPageFieldOverlay() {
+            vm.pageFieldOverlay = {
+                title: "Insert page field",
+                description: "Insert data in template",
+                submitButtonLabel: "Insert",
+                closeButtonlabel: "Cancel",
+                view: "insertfield",
+                show: true,
+                submit: function(model) {
+
+                  $scope.model.insert = {
+                      "type": "umbracoField",
+                      "umbracoField": model.umbracoField
+                  };
+
+                  $scope.model.submit($scope.model);
+
+                  vm.pageFieldOverlay.show = false;
+                  vm.pageFieldOverlay = null;
+                },
+                close: function (model) {
+                    vm.pageFieldOverlay.show = false;
+                    vm.pageFieldOverlay = null;
+                }
+            };
         }
 
         function openDictionaryItemOverlay() {

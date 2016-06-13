@@ -145,6 +145,9 @@
                         	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
                         	vm.insert(code);
                             break;
+                        case "umbracoField":
+                          vm.insert(model.insert.umbracoField);
+                            break;
                     }
 
                     vm.insertOverlay.show = false;
