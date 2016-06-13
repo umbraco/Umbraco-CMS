@@ -9,14 +9,23 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Linq;
+using umbraco;
 using Umbraco.Core.Auditing;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.packager;
 using umbraco.cms.businesslogic.packager.repositories;
+using umbraco.cms.businesslogic.web;
+using umbraco.cms.presentation.Trees;
+using umbraco.presentation.developer.packages;
+using umbraco.webservices;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -25,6 +34,9 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using File = System.IO.File;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
+using Settings = umbraco.cms.businesslogic.packager.Settings;
 
 namespace Umbraco.Web.Editors
 {
@@ -32,6 +44,182 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        [HttpPost]
+        public IHttpActionResult Uninstall(int packageId)
+        {
+            var pack = InstalledPackage.GetById(packageId);
+            if (pack == null) return NotFound();
+
+            PerformUninstall(pack);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// SORRY :( I didn't have time to put this in a service somewhere - the old packager did this all manually too
+        /// </summary>
+        /// <param name="pack"></param>
+        protected void PerformUninstall(InstalledPackage pack)
+        {
+            if (pack == null) throw new ArgumentNullException("pack");
+
+            var refreshCache = false;
+            
+            //Uninstall templates
+            foreach (var item in pack.Data.Templates.ToArray())
+            {
+                int nId;
+                if (int.TryParse(item, out nId) == false) continue;
+                var found = Services.FileService.GetTemplate(nId);
+                if (found != null)
+                {
+                    ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
+                }
+                pack.Data.Templates.Remove(nId.ToString());
+            }
+
+            //Uninstall macros
+            foreach (var item in pack.Data.Macros.ToArray())
+            {
+                int nId;
+                if (int.TryParse(item, out nId) == false) continue;
+                var macro = Services.MacroService.GetById(nId);
+                if (macro != null)
+                {
+                    Services.MacroService.Delete(macro);
+                }                    
+                pack.Data.Macros.Remove(nId.ToString());
+            }
+
+            //Remove Document Types
+            var contentTypes = new List<IContentType>();
+            var contentTypeService = Services.ContentTypeService;
+            foreach (var item in pack.Data.Documenttypes.ToArray())
+            {
+                int nId;
+                if (int.TryParse(item, out nId) == false) continue;
+                var contentType = contentTypeService.GetContentType(nId);
+                if (contentType == null) continue;
+                contentTypes.Add(contentType);
+                pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
+                // refresh content cache when document types are removed
+                refreshCache = true;
+            }
+
+            //Order the DocumentTypes before removing them
+            if (contentTypes.Any())
+            {
+                var orderedTypes = from contentType in contentTypes
+                    orderby contentType.ParentId descending, contentType.Id descending
+                    select contentType;
+                foreach (var contentType in orderedTypes)
+                {
+                    contentTypeService.Delete(contentType);
+                }
+            }
+
+            //Remove Dictionary items
+            foreach (var item in pack.Data.DictionaryItems.ToArray())
+            {
+                int nId;
+                if (int.TryParse(item, out nId) == false) continue;
+                var di = Services.LocalizationService.GetDictionaryItemById(nId);
+                if (di != null)
+                {
+                    Services.LocalizationService.Delete(di);
+                }                    
+                pack.Data.DictionaryItems.Remove(nId.ToString());
+            }
+
+            //Remove Data types
+            foreach (var item in pack.Data.DataTypes.ToArray())
+            {
+                int nId;
+                if (int.TryParse(item, out nId) == false) continue;
+                var dtd = Services.DataTypeService.GetDataTypeDefinitionById(nId);
+                if (dtd != null)
+                {
+                    Services.DataTypeService.Delete(dtd);
+                }                    
+                pack.Data.DataTypes.Remove(nId.ToString());
+            }
+
+            pack.Save();
+
+            // uninstall actions
+            //TODO: We should probably report errors to the UI!! 
+            // This never happened before though, but we should do something now
+            if (pack.Data.Actions.IsNullOrWhiteSpace() == false)
+            {
+                try
+                {
+                    var actionsXml = new XmlDocument();
+                    actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
+
+                    LogHelper.Debug<installedPackage>("executing undo actions: {0}", () => actionsXml.OuterXml);
+
+                    foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
+                    {
+                        try
+                        {
+                            global::umbraco.cms.businesslogic.packager.PackageAction
+                                .UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<installedPackage>("An error occurred running undo actions", ex);
+                }
+            }
+
+            //moved remove of files here so custom package actions can still undo
+            //Remove files
+            foreach (var item in pack.Data.Files.ToArray())
+            {
+                //here we need to try to find the file in question as most packages does not support the tilde char
+                var file = IOHelper.FindFile(item);
+                if (file != null)
+                {
+                    var filePath = IOHelper.MapPath(file);
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                        
+                    }
+                }
+                pack.Data.Files.Remove(file);
+            }
+            pack.Save();
+            pack.Delete(Security.GetUserId());
+            
+            //TODO: Legacy - probably not needed
+            if (refreshCache)
+            {
+                library.RefreshContent();
+            }            
+            TreeDefinitionCollection.Instance.ReRegisterTrees();
+            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
+        }
+
+
+        public IEnumerable<InstalledPackageModel> GetInstalled()
+        {
+            return data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings))
+                .Select(pack => new InstalledPackageModel
+                {
+                    Name = pack.Name,
+                    Id = pack.Id,
+                    Author = pack.Author,
+                    Version = pack.Version,
+                    Url = pack.Url
+                }).ToList();
+        }
+
         [HttpPost]
         [FileUploadCleanupFilter(false)]
         public async Task<LocalPackageInstallModel> UploadLocalPackage()

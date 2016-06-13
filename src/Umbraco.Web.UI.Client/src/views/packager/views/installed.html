@@ -7,12 +7,15 @@
         <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
 
             <div class="umb-package-list__item-icon">
-                <img ng-src="{{installedPackage.icon}}" />
+                <i ng-if="!installedPackage.icon" class="icon-box"></i>
+                <img ng-if="installedPackage.icon" ng-src="{{installedPackage.icon}}" />
             </div>
 
             <div class="umb-package-list__item-content">
                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
-                <div class="umb-package-list__item-description">{{ installedPackage.description }}</div>
+                <div class="umb-package-list__item-description">
+                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                </div>
             </div>
 
             <div class="umb-package-list__item-actions">
