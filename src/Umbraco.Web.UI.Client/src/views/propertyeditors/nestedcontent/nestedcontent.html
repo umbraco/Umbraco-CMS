@@ -16,8 +16,8 @@
                     </div>
 
                     <div class="nested-content__icons" ng-click="$event.stopPropagation();">
-                        
-                        <div class="delete-action" style="position: relative;display: inline-block;" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }">
+
+                        <div class="delete-action" style="position: relative; display: inline-block;" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }">
                             <i class="icon-trash nested-content__header-icon" ng-click="$parent.showDeletePrompt($index);"></i>
                             <umb-confirm-action ng-if="$parent.deletePromptIndex == $index"
                                 direction="left"
@@ -26,14 +26,11 @@
                             </umb-confirm-action>
                         </div>
 
-                        <!--<a class="nested-content__icon nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
-                            <i class="icon icon-trash"></i>
-                        </a>-->
                     </div>
 
                 </div>
 
-                <div class="nested-content__content" ng-if="$parent.realCurrentNode.key == node.key && !$parent.sorting">
+                <div class="nested-content__content" ng-show="$parent.realCurrentNode.key == node.key && !$parent.sorting">
                     <nested-content-editor ng-model="node" tab-alias="ncTabAlias" />
                 </div>
             </div>
