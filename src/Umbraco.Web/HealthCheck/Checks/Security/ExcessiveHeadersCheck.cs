@@ -38,13 +38,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         /// <returns></returns>
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            switch (action.Alias)
-            {
-                case "checkForHeaders":
-                    return CheckForHeaders();
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            throw new InvalidOperationException("ExcessiveHeadersCheck has no executable actions");
         }
 
         private HealthCheckStatus CheckForHeaders()

@@ -38,13 +38,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         /// <returns></returns>
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            switch (action.Alias)
-            {
-                case "checkForFrameOptionsHeader":
-                    return CheckForFrameOptionsHeader();
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            throw new InvalidOperationException("ClickJackingCheck has no executable actions");
         }
 
         private HealthCheckStatus CheckForFrameOptionsHeader()

@@ -28,9 +28,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     {
         private readonly ILocalizedTextService _textService;
 
-        private const string CheckFolderPermissionsAction = "checkFolderPermissions";
-        private const string CheckFilePermissionsAction = "checkFilePermissions";
-
         public FolderAndFilePermissionsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
@@ -53,15 +50,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         /// <returns></returns>
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            switch (action.Alias)
-            {
-                case CheckFolderPermissionsAction:
-                    return CheckFolderPermissions();
-                case CheckFilePermissionsAction:
-                    return CheckFilePermissions();
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            throw new InvalidOperationException("FolderAndFilePermissionsCheck has no executable actions");
         }
 
         private HealthCheckStatus CheckFolderPermissions()

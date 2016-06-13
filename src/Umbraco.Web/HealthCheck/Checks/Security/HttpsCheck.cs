@@ -16,9 +16,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
 
-        private const string CheckForValidCertificateAction = "checkForValidCertificate";
-        private const string CheckHttpsConfigurationSettingAction = "checkHttpsConfigurationSetting";
-        private const string CheckIfCurrentSchemeIsHttpsAction = "checkIfCurrentSchemeIsHttps";
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
         public HttpsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
@@ -45,16 +42,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             switch (action.Alias)
             {
-                case CheckForValidCertificateAction:
-                    return CheckForValidCertificate();
-                case CheckHttpsConfigurationSettingAction:
-                    return CheckHttpsConfigurationSetting();
-                case CheckIfCurrentSchemeIsHttpsAction:
-                    return CheckIfCurrentSchemeIsHttps();
                 case FixHttpsSettingAction:
                     return FixHttpsSetting();
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidOperationException("HttpsCheck action requested is either not executable or does not exist");
             }
         }
 
