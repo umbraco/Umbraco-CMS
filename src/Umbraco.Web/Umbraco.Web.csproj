@@ -385,8 +385,10 @@
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="Redirects\RedirectTrackingEventHandler.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="RouteDataExtensions.cs" />
+    <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
