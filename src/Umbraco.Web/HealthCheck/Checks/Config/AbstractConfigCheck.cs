@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
+
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// </summary>
         private string AbsoluteFilePath
         {
-            get { return HttpContext.Current.Server.MapPath(FilePath); }
+            get { return IOHelper.MapPath(FilePath); }
         }
 
         /// <summary>

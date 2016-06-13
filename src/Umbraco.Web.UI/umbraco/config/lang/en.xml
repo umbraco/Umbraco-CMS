@@ -1358,5 +1358,10 @@ To manage your website, simply open the Umbraco back office and start adding con
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
+
+    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
   </area>  
 </language>
