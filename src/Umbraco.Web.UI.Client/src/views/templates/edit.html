@@ -28,6 +28,8 @@
                         <i class="icon-book-alt"></i></a>
                     <a href ng-click="vm.openMacroOverlay()"class="btn">
                         <i class="icon-settings-alt"></i></a>
+                    <a href ng-click="vm.openOrganizeOverlay()"class="btn">
+                        <i class="icon-settings-alt"></i></a>
                 </div>
 
                 <div class="btn-group">  
@@ -91,6 +93,13 @@
         model="vm.queryBuilderOverlay"
         position="right"
         view="vm.queryBuilderOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.organizeOverlay.show"
+        model="vm.organizeOverlay"
+        position="right"
+        view="vm.organizeOverlay.view">
     </umb-overlay>
 
 </div>

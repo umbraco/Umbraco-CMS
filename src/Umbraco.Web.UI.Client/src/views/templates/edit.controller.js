@@ -72,6 +72,7 @@
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
+        vm.openOrganizeOverlay = openOrganizeOverlay;
 
         function openMacroOverlay() {
            
@@ -131,6 +132,21 @@
                     vm.queryBuilderOverlay = null;
                 }
             };
+        }
+
+        function openOrganizeOverlay() {
+            vm.organizeOverlay = {
+                view: "/umbraco/views/common/dialogs/template/organize.html",
+                show: true,
+                template: vm.template,
+                submit: function(model) {
+                    vm.setLayout(model);
+                },
+                close: function(model) {
+                    vm.organizeOverlay.show = false;
+                    vm.organizeOverlay = null;
+                }
+            }
         }
 
         vm.init();
