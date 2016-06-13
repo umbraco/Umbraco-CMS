@@ -324,6 +324,7 @@
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationServiceResult.cs" />
     <Compile Include="HealthCheck\Checks\Config\MacroErrorsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\NotificationEmailCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\TrySkipIisCustomErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\CustomErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />

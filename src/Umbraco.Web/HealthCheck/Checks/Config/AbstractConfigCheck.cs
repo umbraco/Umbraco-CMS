@@ -119,7 +119,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             CurrentValue = configValue.Result;
 
             var valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
-            if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound)
+            if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
             {
                 var message = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
                 return new[] { new HealthCheckStatus(message) { ResultType = StatusResultType.Success } };

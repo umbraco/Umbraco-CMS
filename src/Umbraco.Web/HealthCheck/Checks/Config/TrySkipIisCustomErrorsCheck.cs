@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
     [HealthCheck("046A066C-4FB2-4937-B931-069964E16C66", "Try Skip IIS Custom Errors",
-        Description = "Starting with IIS 7.5, this must be set to true for Umbraco 404 pages to show. Else, IIS will takeover and render its built-in error page.",
+        Description = "Starting with IIS 7.5, this must be set to true for Umbraco 404 pages to show. Otherwise, IIS will takeover and render its built-in error page.",
         Group = "Configuration")]
     public class TrySkipIisCustomErrorsCheck : AbstractConfigCheck
     {
