@@ -45,29 +45,42 @@
 
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
-            templateResource.getById($routeParams.id).then(function(template){
-                    
-                    vm.page.loading = false;
-                    vm.template = template;
+            if($routeParams.create){
 
-                    //sync state
-                    editorState.set(vm.template);
-                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
-                        vm.page.menu.currentNode = syncArgs.node;
-                    });
+            	templateResource.getScaffold().then(function(template){
+            		vm.ready(template);
+            	});	
 
-                    vm.aceOption = {
-                        mode: "razor",
-                        theme: "chrome",
+            }else{
 
-                        onLoad: function(_editor) {
-                            vm.editor = _editor;
-                    }
-                };
-            });
+            	templateResource.getById($routeParams.id).then(function(template){
+                    vm.ready(template);
+                });
+
+            }
 
         };
         
+        vm.ready = function(template){
+        	vm.page.loading = false;
+            vm.template = template;
+
+            //sync state
+            editorState.set(vm.template);
+            navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                vm.page.menu.currentNode = syncArgs.node;
+            });
+
+            vm.aceOption = {
+                mode: "razor",
+                theme: "chrome",
+
+                onLoad: function(_editor) {
+                    vm.editor = _editor;
+            	}
+            }
+        };
+
         
         vm.setLayout = function(path){
 
@@ -188,7 +201,7 @@
                 	//crappy hack due to dictionary items not in umbracoNode table
                 	var code = "@Umbraco.GetDictionaryValue(\"" + node.name + "\")";
                 	vm.insert(code);
-                	
+
                 	vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
                 },
