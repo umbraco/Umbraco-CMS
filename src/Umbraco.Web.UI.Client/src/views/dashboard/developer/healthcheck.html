@@ -4,19 +4,35 @@
 
         <div class="umb-air" ng-repeat="group in vm.groups" ng-click="vm.openGroup(group);">
             <div class="umb-healthcheck-group">
-                <div class="umb-healthcheck-title">
-                    <h4><strong>{{group.name}}</strong></h4>
+                <div class="umb-healthcheck-title">{{group.name}}</div>
+
+                <div class="umb-healthcheck-group__load-container" ng-if="group.loading">
+                    <umb-load-indicator></umb-load-indicator>
                 </div>
 
-                <div class="umb-healthcheck-messages">
-                    <div class="umb-healthcheck-status-icon -large" ng-if="group.loading"><umb-load-indicator></umb-load-indicator></div>
-                    <div class="umb-healthcheck-status-icon -large icon-check color-green" ng-if="group.resultType === 0"></div>
-                    <div class="umb-healthcheck-status-icon -large icon-alert icon-alert color-yellow" ng-if="group.resultType === 1"></div>
-                    <div class="umb-healthcheck-status-icon -large icon-delete icon-delete color-red" ng-if="group.resultType === 2"></div>
-                    <div class="umb-healthcheck-status-icon -large icon-info icon-info" ng-if="group.resultType === 3"></div>
-                </div>
+                <div class="umb-healthcheck-messages" ng-if="!group.loading">
 
-                <a class="umb-healthcheck-details-link" ng-click="vm.openGroup(group)" href="">See details</a>
+                    <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
+                        <i class="icon-check color-green"></i>
+                        {{ group.totalSuccess }}
+                    </div>
+
+                    <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
+                        <i class="icon-alert color-yellow"></i>
+                        {{ group.totalWarning }}
+                    </div>
+
+                    <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
+                        <i class="icon-delete color-red"></i>
+                        {{ group.totalError }}
+                    </div>
+
+                    <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
+                        <i class="umb-healthcheck-status-icon icon-info"></i>
+                        {{ group.totalInfo }}
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -27,7 +43,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-healthcheck-back-link" href="" ng-click="vm.closeGroup();">&larr; Take me back</a>
+                <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Take me back</a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 

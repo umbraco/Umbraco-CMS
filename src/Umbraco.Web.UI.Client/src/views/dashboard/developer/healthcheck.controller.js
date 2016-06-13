@@ -4,9 +4,9 @@
     function HealthCheckController($scope, healthCheckResource) {
 
         var SUCCESS = 0;
-        var INFO = 2;
         var WARNING = 1;
         var ERROR = 2;
+        var INFO = 3;
 
         var vm = this;
 
@@ -18,7 +18,7 @@
 		vm.executeAction = executeAction;
 		vm.checkAllInGroup = checkAllInGroup;
         vm.openGroup = openGroup;
-        vm.closeGroup = closeGroup;
+        vm.setViewState = setViewState;
 
 		// Get a (grouped) list of all health checks
 		healthCheckResource.getAllChecks().then(
@@ -63,28 +63,10 @@
                 });
             });
 
-            // set global group result
-            if (totalError > 0) {
-
-                // set group to error
-                group.resultType = ERROR;
-
-            } else if ( totalWarning > 0 ) {
-
-                // set group to warning
-                group.resultType = WARNING;
-
-            } else if ( totalInfo > 0 ) {
-
-                // set group to info
-                group.resultType = INFO;
-
-            } else if (totalSuccess > 0) {
-
-                // set group to success
-                group.resultType = SUCCESS;
-
-            }
+            group.totalSuccess = totalSuccess;
+            group.totalError = totalError;
+            group.totalWarning = totalWarning;
+            group.totalInfo = totalInfo;
 
         }
 
@@ -134,9 +116,18 @@
             vm.viewState = "details";
         }
 
-        function closeGroup() {
-            vm.selectedGroup = {};
-            vm.viewState = "list";
+        function setViewState(state) {
+            vm.viewState = state;
+
+            if(state === 'list') {
+
+                for (var i = 0; i < vm.groups.length; i++) {
+                    var group = vm.groups[i];
+                    setGroupGlobalResultType(group);
+                }
+
+            }
+
         }
 
     }

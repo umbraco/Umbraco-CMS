@@ -15,16 +15,16 @@
 	display: flex;
 	flex-wrap: wrap;
 	flex-direction: column;
-	justify-content: center;
 
 	background: @grayLighter;
 	border-radius: 3px;
 
-	padding: 20px;
+	padding: 15px 10px;
 	box-sizing: border-box;
 
 	text-align: center;
 	border: 2px solid transparent;
+	height: 100%;
 }
 
 .umb-healthcheck-group:hover {
@@ -32,10 +32,19 @@
 	cursor: pointer;
 }
 
+.umb-healthcheck-group__load-container {
+	position: relative;
+	height: 30px;
+	margin-top: 15px;
+	margin-bottom: 16px;
+}
+
 
 /* Title */
 .umb-healthcheck-title {
 	margin-bottom: 15px;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 
@@ -44,7 +53,25 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 20px;
+	flex-direction: column;
+}
+
+.umb-healthcheck-message {
+	position: relative;
+	background: #fff;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    color: #000;
+    font-weight: bold;
+}
+
+.umb-healthcheck-message i {
+	font-size: 20px;
+	margin-right: 5px;
 }
 
 .umb-healthcheck-details-link {
@@ -168,14 +195,14 @@
 	padding: 10px;
 	box-sizing: border-box;
 
-	@media (min-width: 1024px) {
+	@media (min-width: 500px) {
 		flex-basis: 50%;
-	    max-width: 50%;
+		max-width: 50%;
 	}
 
-	@media (min-width: 1400px) {
-		flex-basis: 25%;
-	    max-width: 25%;
+	@media (min-width: 768px) {
+		flex-basis: 20%;
+		max-width: 20%;
 	}
 }
 
@@ -231,10 +258,11 @@
 	font-size: 12px;
 	color: @grayMed;
 	line-height: 1.6rem;
+	//margin-top: 10px;
 }
 
 .umb-healthcheck-group__details-status {
-	padding: 25px 0;
+	padding: 15px 0;
 	display: flex;
 	border-bottom: 2px solid @grayLighter;
 	position: relative;
@@ -262,15 +290,8 @@
 }
 
 .umb-healthcheck-status-icon {
-	position: relative;
-	background: @grayLighter;
-	width: 35px;
-	height: 35px;
-	border-radius: 50%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
 	font-size: 20px;
+	margin-top: 2px;
 }
 
 .umb-healthcheck-status-icon.-large {
@@ -287,19 +308,23 @@
 
 .umb-healthcheck-group__details-status-text {
 	line-height: 1.6em;
-	margin-bottom: 10px;
 }
 
 .umb-healthcheck-group__details-status-actions {
 	display: flex;
 	flex-direction: column;
+	margin-top: 10px;
 }
 
 .umb-healthcheck-group__details-status-action {
 	background-color: @grayLighter;
-	padding: 15px;
+	padding: 10px;
 	margin-bottom: 10px;
 	border-radius: 3px;
+}
+
+.umb-healthcheck-group__details-status-action:last-child {
+	margin-bottom: 0;
 }
 
 .umb-healthcheck-group__details-status-action-description {
