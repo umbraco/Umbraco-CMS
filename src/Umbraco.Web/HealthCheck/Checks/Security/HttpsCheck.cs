@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
 
@@ -112,7 +113,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var uri = HttpContext.Current.Request.Url;
             var actions = new List<HealthCheckAction>();
 
-
             string resultMessage;
             StatusResultType resultType;
             if (uri.Scheme != "https")
@@ -144,7 +144,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var configFile = HttpContext.Current.Server.MapPath("~/Web.config");
+            var configFile = IOHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='umbracoUseSSL']/@value";
             var configurationService = new ConfigurationService(configFile, xPath);
             var updateConfigFile = configurationService.UpdateConfigFile("true");
