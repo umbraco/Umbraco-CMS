@@ -7,7 +7,7 @@
             <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
         </div>
 
-        <div class="umb-insert-code-box">
+        <div class="umb-insert-code-box" ng-click="vm.openPageFieldOverlay()">
             <div class="umb-insert-code-box__title">Value</div>
             <div class="umb-insert-code-box__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque gravida hendrerit. Nunc lacinia ipsum sed urna volutpat finibus.</div>
         </div>
@@ -29,6 +29,13 @@
        model="vm.macroPickerOverlay"
        view="vm.macroPickerOverlay.view"
        position="right">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="vm.pageFieldOverlay.show"
+       model="vm.pageFieldOverlay"
+       position="right"
+       view="vm.pageFieldOverlay.view">
    </umb-overlay>
 
    <umb-overlay

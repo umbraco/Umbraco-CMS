@@ -56,7 +56,7 @@
 
             	templateResource.getScaffold().then(function(template){
             		vm.ready(template);
-            	});	
+            	});
 
             }else{
 
@@ -68,7 +68,7 @@
 
         };
 
-        
+
         vm.ready = function(template){
         	vm.page.loading = false;
             vm.template = template;
@@ -89,7 +89,7 @@
             }
         };
 
-        
+
         vm.setLayout = function(path){
 
             var templateCode = vm.editor.getValue();
@@ -146,6 +146,9 @@
                         	var code = "@Umbraco.GetDictionaryValue(\"" + model.insert.node.name + "\")";
                         	vm.insert(code);
                             break;
+                        case "umbracoField":
+                          vm.insert(model.insert.umbracoField);
+                            break;
                     }
 
                     vm.insertOverlay.show = false;
@@ -182,12 +185,19 @@
 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                view: "mediapicker",
+                title: "Insert page field",
+                description: "Insert data in template",
+                submitButtonLabel: "Insert",
+                closeButtonlabel: "Cancel",
+                view: "insertfield",
                 show: true,
 
                 submit: function (model) {
-
+                  vm.insert(model.umbracoField);
+                  vm.pageFieldOverlay.show = false;
+                  vm.pageFieldOverlay = null;
                 },
+                
                 close: function (model) {
                     vm.pageFieldOverlay.show = false;
                     vm.pageFieldOverlay = null;
@@ -199,7 +209,7 @@
         function openDictionaryItemOverlay() {
             vm.dictionaryItemOverlay = {
                 view: "treepicker",
-                section: "settings", 
+                section: "settings",
                 treeAlias: "dictionary",
                 entityType: "dictionary",
                 multiPicker: false,

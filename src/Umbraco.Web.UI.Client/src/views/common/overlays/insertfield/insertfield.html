@@ -1,0 +1,184 @@
+
+<div ng-controller="Umbraco.Overlays.InsertFieldController as vm">
+
+  <div class="control-group umb-control-group -no-border">
+     <div class="umb-el-wrap">
+
+        <label class="control-label" for="chooseField">
+            <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+            Choose field
+        </label>
+
+        <div class="controls">
+          <select name="chooseField" ng-model="vm.field">
+            <option value="{{property}}" ng-repeat="property in vm.properties">{{property}}</option>
+          </select>
+        </div>
+     </div>
+  </div>
+
+  <div class="advanced" style="position:relative">
+    <div class="hideAdvanced" style="position:absolute;height:100%;width:100%;background-color:white;opacity:.7;"  ng-hide="vm.field"></div>
+
+    <i class="icon icon-add blue" ng-hide="vm.showAltField"></i>
+    <a ng-click="vm.showAltField=true" ng-hide="vm.showAltField">Add alternative field<br></a>
+
+    <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltField">
+       <div class="umb-el-wrap">
+          <label class="control-label" for="altField">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Alternative Field
+          </label>
+
+          <div class="controls">
+            <select name="altField" ng-model="vm.altField">
+              <option value="{{property}}" ng-repeat="property in vm.properties">{{property}}</option>
+            </select>
+             <!-- <input type="text" class="umb-editor ng-pristine ng-valid ng-valid-required" umb-auto-focus="" focus-on-filled="true" required=""> -->
+          </div>
+       </div>
+    </div>
+
+    <i class="icon icon-add blue" ng-hide="vm.showAltText"></i>
+		<a ng-click="vm.showAltText=true" ng-hide="vm.showAltText">
+						<!-- <localize key="general_choose" class="ng-isolate-scope ng-scope">Choose</localize>... -->
+            Add default value
+		</a>
+
+    <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltText">
+
+       <div class="umb-el-wrap">
+
+         <label class="control-label" for="altText">
+             <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+             Alternative text
+         </label>
+          <div class="controls">
+            <input type="text" name="altText" ng-model="vm.altText">
+             <!-- <input type="text" class="umb-editor ng-pristine ng-valid ng-valid-required" umb-auto-focus="" focus-on-filled="true" required=""> -->
+          </div>
+       </div>
+
+    </div>
+
+
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+
+        <div class="controls"><br>
+          <label class="control-label" for="recursive">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Recursive?
+          </label>
+          <input type="checkbox" name="recursive" ng-model="vm.recursive">
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group umb-control-group -no-border ng-scope">
+
+       <div class="umb-el-wrap">
+
+         <label class="control-label" for="insertBefore">
+             <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+             Insert before field
+         </label>
+          <div class="controls">
+            <input type="text" name="insertBefore" ng-model="vm.insertBefore" on-focus="vm.showInsertPreview()" ng-change="vm.updateInsertPreview()" on-blur="vm.hideInsertPreview()">
+          </div>
+       </div>
+
+    </div>
+
+    <div class="control-group umb-control-group">
+
+       <div class="umb-el-wrap">
+
+         <label class="control-label" for="insertAfter">
+             <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+             Insert after field
+         </label>
+          <div class="controls">
+            <input type="text" name="insertAfter" ng-model="vm.insertAfter" on-focus="vm.showInsertPreview()" ng-change="vm.updateInsertPreview()" on-blur="vm.hideInsertPreview()">
+          </div>
+       </div>
+
+    </div>
+
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+
+        <div class="controls">
+          <label class="control-label" for="date">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Format as date
+          </label>
+          <a href ng-click="vm.updateDate()" class="btn">Date only</a>
+          <a href ng-click="vm.updateDateTime()" class="btn">Date and time</a>
+          <input type="text" ng-model="vm.dateTimeSeparator" ng-hide="!vm.dateTime" placeholder="separator">
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+
+        <div class="controls">
+          <label class="control-label" for="date">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Casing          </label>
+              <a href ng-click="vm.updateUpper()" class="btn">Upper</a>
+              <a href ng-click="vm.updateLower()" class="btn">lower</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+
+        <div class="controls">
+          <label class="control-label" for="date">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Encoding          </label>
+              <a href ng-click="vm.updateEncodeHtml()" class="btn">
+                  HTML</a>
+              <a href ng-click="vm.updateEncodeUrl()" class="btn">
+                  URL</a>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+
+        <div class="controls"><br>
+          <label class="control-label" for="recursive">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Convert line breaks?
+          </label>
+          <input type="checkbox" name="linebreaks" ng-model="vm.convertLinebreaks">
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group umb-control-group -no-border">
+      <div class="umb-el-wrap">
+
+        <div class="controls"><br>
+          <label class="control-label" for="recursive">
+              <!-- <localize key="name" class="ng-isolate-scope ng-scope">Name</localize> -->
+              Output sample
+          </label>
+          <p>{{updatePageField()}}</p>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+</div>
