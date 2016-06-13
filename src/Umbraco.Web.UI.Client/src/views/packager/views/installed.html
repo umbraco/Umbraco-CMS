@@ -35,7 +35,8 @@
 
             <form novalidate name="uninstallForm">
                 <div class="umb-package-icon">
-                    <img ng-src="{{vm.package.icon}}" alt="" />
+                    <i ng-if="!vm.package.icon" class="icon-box"></i>
+                    <img ng-if="vm.package.icon" ng-src="{{vm.package.icon}}" alt="" />
                 </div>
 
 
