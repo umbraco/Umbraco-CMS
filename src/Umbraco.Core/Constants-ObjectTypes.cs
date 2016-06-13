@@ -40,6 +40,16 @@ namespace Umbraco.Core
             public static readonly Guid MediaTypeContainerGuid = new Guid(MediaTypeContainer);
 
             /// <summary>
+            /// Guid for a schema type container
+            /// </summary>
+            public const string SchemaTypeContainer = "7065F072-6A85-4403-BD82-1A5341C93DFF";
+
+            /// <summary>
+            /// Guid for a schema type container
+            /// </summary>
+            public static readonly Guid SchemaTypeContainerGuid = new Guid(SchemaTypeContainer);
+
+            /// <summary>
             /// Guid for a Content Item object.
             /// </summary>
             public const string ContentItem = "10E2B09F-C28B-476D-B77A-AA686435E44A";
@@ -98,6 +108,16 @@ namespace Umbraco.Core
             /// Guid for a Media Type object.
             /// </summary>
             public static readonly Guid MediaTypeGuid = new Guid(MediaType);
+
+            /// <summary>
+            /// Guid for a Schema Type object.
+            /// </summary>
+            public const string SchemaType = "64908714-5EDF-4E02-BA7F-E9B636D6A471";
+
+            /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid SchemaTypeGuid = new Guid(SchemaType);
 
             /// <summary>
             /// Guid for a Member object.

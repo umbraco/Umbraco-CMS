@@ -260,6 +260,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllowedChildren(0))
                             },
                             {
+                                "schemaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<SchemaTypeController>(
+                                    controller => controller.GetAll())
+                            },
+                            {
                                 "macroApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MacroController>(
                                     controller => controller.GetMacroParameters(0))
                             },

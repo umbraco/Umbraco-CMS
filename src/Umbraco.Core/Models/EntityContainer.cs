@@ -15,7 +15,8 @@ namespace Umbraco.Core.Models
         {
             { Constants.ObjectTypes.DataTypeGuid, Constants.ObjectTypes.DataTypeContainerGuid },
             { Constants.ObjectTypes.DocumentTypeGuid, Constants.ObjectTypes.DocumentTypeContainerGuid },
-            { Constants.ObjectTypes.MediaTypeGuid, Constants.ObjectTypes.MediaTypeContainerGuid }
+            { Constants.ObjectTypes.MediaTypeGuid, Constants.ObjectTypes.MediaTypeContainerGuid },
+            { Constants.ObjectTypes.SchemaTypeGuid, Constants.ObjectTypes.SchemaTypeContainerGuid }
         };
 
         /// <summary>

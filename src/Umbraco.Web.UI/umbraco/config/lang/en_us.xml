@@ -140,6 +140,7 @@
     <key alias="noItemsToShow">There are no items to show</key>
     <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
     <key alias="mediatype">Media Type</key>
+    <key alias="schematype">Schema Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
@@ -950,6 +951,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fileSavedText">File saved without any errors</key>
     <key alias="languageSaved">Language saved</key>
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
+    <key alias="schemaTypeSavedHeader">Schema Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
     <key alias="pythonErrorHeader">Python script not saved</key>
     <key alias="pythonErrorText">Python script could not be saved due to error</key>
@@ -1198,6 +1200,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="localPackage">Install local package</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Media Types</key>
+    <key alias="schemaTypes">Schema Types</key>
     <key alias="member">Members</key>
     <key alias="memberGroups">Member Groups</key>
     <key alias="memberRoles">Member Roles</key>

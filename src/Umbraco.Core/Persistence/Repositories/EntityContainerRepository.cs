@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
             : base(work, cache, logger, sqlSyntax)
         {
-            var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
+            var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.SchemaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
             _containerObjectType = containerObjectType;
             if (allowedContainers.Contains(_containerObjectType) == false)
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);

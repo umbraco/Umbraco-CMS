@@ -77,6 +77,13 @@ namespace Umbraco.Core.Models
         MediaType,
 
         /// <summary>
+        /// "Media Type
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.SchemaType, typeof(ISchemaType))]
+        [FriendlyName("Schema Type")]
+        SchemaType,
+
+        /// <summary>
         /// Document Type
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.DocumentType, typeof(IContentType))]
@@ -124,6 +131,13 @@ namespace Umbraco.Core.Models
         [UmbracoObjectType(Constants.ObjectTypes.MediaTypeContainer)]
         [FriendlyName("Media Type Container")]
         MediaTypeContainer,
+
+        /// <summary>
+        /// Media type container
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.SchemaTypeContainer)]
+        [FriendlyName("Schema Type Container")]
+        SchemaTypeContainer,
 
         /// <summary>
         /// Media type container

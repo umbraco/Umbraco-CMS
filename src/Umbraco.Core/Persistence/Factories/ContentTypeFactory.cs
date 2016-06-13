@@ -48,6 +48,22 @@ namespace Umbraco.Core.Persistence.Factories
 
         #endregion
 
+        #region ISchemaType
+
+        public ISchemaType BuildSchemaTypeEntity(ContentTypeDto dto)
+        {
+            var contentType = new SchemaType(dto.NodeDto.ParentId);
+            BuildCommonEntity(contentType, dto);
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        #endregion
+
         #region IMemberType
 
         public IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
@@ -101,6 +117,8 @@ namespace Umbraco.Core.Persistence.Factories
                 nodeObjectType = Constants.ObjectTypes.DocumentTypeGuid;
             else if (entity is IMediaType)
                 nodeObjectType = Constants.ObjectTypes.MediaTypeGuid;
+            else if (entity is ISchemaType)
+                nodeObjectType = Constants.ObjectTypes.SchemaTypeGuid;
             else if (entity is IMemberType)
                 nodeObjectType = Constants.ObjectTypes.MemberTypeGuid;
             else

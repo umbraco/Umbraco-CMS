@@ -90,6 +90,11 @@
             /// </summary>
             public const string MediaTypes = "mediaTypes";
 
+            /// <summary>
+            /// alias for the schema type tree.
+            /// </summary>
+            public const string SchemaTypes = "schemaTypes";
+
 
             /// <summary>
             /// alias for the member type tree.

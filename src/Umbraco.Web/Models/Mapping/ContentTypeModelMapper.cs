@@ -78,6 +78,15 @@ namespace Umbraco.Web.Models.Mapping
                     ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
                 });
 
+            config.CreateMap<SchemaTypeSave, ISchemaType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity<SchemaTypeSave, PropertyTypeBasic, ISchemaType>(applicationContext)
+                .ConstructUsing((source) => new SchemaType(source.ParentId))
+                .AfterMap((source, dest) =>
+                {
+                    ContentTypeModelMapperExtensions.AfterMapSchemaTypeSaveToEntity(source, dest, applicationContext);
+                });
+
             config.CreateMap<MemberTypeSave, IMemberType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MemberTypeSave, MemberPropertyTypeBasic, IMemberType>(applicationContext)
@@ -135,6 +144,22 @@ namespace Umbraco.Web.Models.Mapping
                      }
                  });
 
+            config.CreateMap<ISchemaType, SchemaTypeDisplay>()
+                //map base logic
+                .MapBaseContentTypeEntityToDisplay<ISchemaType, SchemaTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .AfterMap((source, dest) =>
+                {
+                    //default listview
+                    dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Schema";
+
+                    if (string.IsNullOrEmpty(source.Name) == false)
+                    {
+                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
+                        if (applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
+                            dest.ListViewEditorName = name;
+                    }
+                });
+
             config.CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
                 .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
@@ -163,6 +188,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IMemberType, ContentTypeBasic>();
             config.CreateMap<IMediaType, ContentTypeBasic>();
+            config.CreateMap<ISchemaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
@@ -202,6 +228,9 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MediaTypeSave, MediaTypeDisplay>()
                 .MapBaseContentTypeSaveToDisplay<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>();
             
+            config.CreateMap<SchemaTypeSave, SchemaTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<SchemaTypeSave, PropertyTypeBasic, SchemaTypeDisplay, PropertyTypeDisplay>();
+
             config.CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
                 .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())

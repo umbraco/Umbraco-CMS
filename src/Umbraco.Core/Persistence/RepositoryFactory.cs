@@ -193,6 +193,14 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
+        public virtual ISchemaTypeRepository CreateSchemaTypeRepository(IDatabaseUnitOfWork uow)
+        {
+            return new SchemaTypeRepository(
+                uow,
+                _cacheHelper,
+                _logger, _sqlSyntax);
+        }
+
         public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
         {
             return new RelationRepository(

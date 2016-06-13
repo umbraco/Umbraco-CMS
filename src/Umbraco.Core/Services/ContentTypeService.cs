@@ -661,6 +661,7 @@ namespace Umbraco.Core.Services
 
             var contentType = compositionContentType as IContentType;
             var mediaType = compositionContentType as IMediaType;
+            var schmeaType = compositionContentType as ISchemaType;
             var memberType = compositionContentType as IMemberType; // should NOT do it here but... v8!
 
             IContentTypeComposition[] allContentTypes;
@@ -668,6 +669,8 @@ namespace Umbraco.Core.Services
                 allContentTypes = GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
             else if (mediaType != null)
                 allContentTypes = GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+            else if (schmeaType != null)
+                allContentTypes = GetAllSchemaTypes().Cast<IContentTypeComposition>().ToArray();
             else if (memberType != null)
                 return; // no compositions on members, always validate
             else
@@ -1349,16 +1352,397 @@ namespace Umbraco.Core.Services
             }
         }
 
+        #region Schema Types
+        
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateSchemaTypeContainer(int parentId, string name, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.SchemaTypeContainerGuid))
+            {
+                try
+                {
+                    var container = new EntityContainer(Constants.ObjectTypes.SchemaTypeGuid)
+                    {
+                        Name = name,
+                        ParentId = parentId,
+                        CreatorId = userId
+                    };
+
+                    if (SavingSchemaTypeContainer.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                    {
+                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    }
+
+                    repo.AddOrUpdate(container);
+                    uow.Commit();
+
+                    SavedSchemaTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                }
+                catch (Exception ex)
+                {
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                }
+            }
+        }
+
+        public Attempt<OperationStatus> SaveSchemaTypeContainer(EntityContainer container, int userId = 0)
+        {
+            return SaveContainer(
+                SavingSchemaTypeContainer, SavedSchemaTypeContainer,
+                container, Constants.ObjectTypes.SchemaTypeContainerGuid, "schema type", userId);
+        }
+
+        public Attempt<OperationStatus> DeleteSchemaTypeContainer(int containerId, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.SchemaTypeContainerGuid))
+            {
+                var container = repo.Get(containerId);
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingSchemaTypeContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
+                repo.Delete(container);
+                uow.Commit();
+
+                DeletedSchemaTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
+                //TODO: Audit trail ?
+            }
+        }
+
+        public EntityContainer GetSchemaTypeContainer(int containerId)
+        {
+            return GetContainer(containerId, Constants.ObjectTypes.SchemaTypeContainerGuid);
+        }
+
+        public EntityContainer GetSchemaTypeContainer(Guid containerId)
+        {
+            return GetContainer(containerId, Constants.ObjectTypes.SchemaTypeContainerGuid);
+        }
+
+        public IEnumerable<EntityContainer> GetSchemaTypeContainers(int[] containerIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.SchemaTypeContainerGuid))
+            {
+                return repo.GetAll(containerIds);
+            }
+        }
+
+        public IEnumerable<EntityContainer> GetSchemaTypeContainers(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.SchemaTypeContainerGuid))
+            {
+                return repo.Get(name, level);
+            }
+        }
+
+        public IEnumerable<EntityContainer> GetSchemaTypeContainers(ISchemaType schemaType)
+        {
+            var ancestorIds = schemaType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+               .Select(x =>
+               {
+                   var asInt = x.TryConvertTo<int>();
+                   if (asInt) return asInt.Result;
+                   return int.MinValue;
+               })
+               .Where(x => x != int.MinValue && x != schemaType.Id)
+               .ToArray();
+
+            return GetSchemaTypeContainers(ancestorIds);
+        }
+
+        public Attempt<OperationStatus<MoveOperationStatusType>> MoveSchemaType(ISchemaType toMove, int containerId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            if (MovingSchemaType.IsRaisedEventCancelled(
+                  new MoveEventArgs<ISchemaType>(evtMsgs, new MoveEventInfo<ISchemaType>(toMove, toMove.Path, containerId)),
+                  this))
+            {
+                return Attempt.Fail(
+                    new OperationStatus<MoveOperationStatusType>(
+                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+            }
+
+            var moveInfo = new List<MoveEventInfo<ISchemaType>>();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.SchemaTypeContainerGuid))
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+            {
+                try
+                {
+                    EntityContainer container = null;
+                    if (containerId > 0)
+                    {
+                        container = containerRepository.Get(containerId);
+                        if (container == null)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    moveInfo.AddRange(repository.Move(toMove, container));
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(
+                        new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            MovedSchemaType.RaiseEvent(new MoveEventArgs<ISchemaType>(false, evtMsgs, moveInfo.ToArray()), this);
+
+            return Attempt.Succeed(
+                new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+        }
+
+        public Attempt<OperationStatus<ISchemaType, MoveOperationStatusType>> CopySchemaType(ISchemaType toCopy, int containerId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            ISchemaType copy;
+            var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+            {
+                try
+                {
+                    if (containerId > 0)
+                    {
+                        var container = containerRepository.Get(containerId);
+                        if (container == null)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    var alias = repository.GetUniqueAlias(toCopy.Alias);
+                    copy = toCopy.DeepCloneWithResetIdentities(alias);
+                    copy.Name = copy.Name + " (copy)"; // might not be unique
+
+                    // if it has a parent, and the parent is a content type, unplug composition
+                    // all other compositions remain in place in the copied content type
+                    if (copy.ParentId > 0)
+                    {
+                        var parent = repository.Get(copy.ParentId);
+                        if (parent != null)
+                            copy.RemoveContentType(parent.Alias);
+                    }
+
+                    copy.ParentId = containerId;
+                    repository.AddOrUpdate(copy);
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(new OperationStatus<ISchemaType, MoveOperationStatusType>(null, ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            return Attempt.Succeed(new OperationStatus<ISchemaType, MoveOperationStatusType>(copy, MoveOperationStatusType.Success, evtMsgs));
+        }
+
+        public ISchemaType GetSchemaType(int id)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        public ISchemaType GetSchemaType(string alias)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(alias);
+            }
+        }
+
+        public ISchemaType GetSchemaType(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        public IEnumerable<ISchemaType> GetAllSchemaTypes(params int[] ids)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
+        public IEnumerable<ISchemaType> GetAllSchemaTypes(IEnumerable<Guid> ids)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids.ToArray());
+            }
+        }
+
+        public IEnumerable<ISchemaType> GetSchemaTypeChildren(int id)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var query = Query<ISchemaType>.Builder.Where(x => x.ParentId == id);
+                var contentTypes = repository.GetByQuery(query);
+                return contentTypes;
+            }
+        }
+
+        public IEnumerable<ISchemaType> GetSchemaTypeChildren(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetSchemaType(id); 
+                if (found == null) return Enumerable.Empty<ISchemaType>();
+                var query = Query<ISchemaType>.Builder.Where(x => x.ParentId == found.Id);
+                var contentTypes = repository.GetByQuery(query);
+                return contentTypes;
+            }
+        }
+
+        public void Save(ISchemaType schemaType, int userId = 0)
+        {
+            if (SavingSchemaType.IsRaisedEventCancelled(new SaveEventArgs<ISchemaType>(schemaType), this))
+                return;
+
+            using (new WriteLock(Locker))
+            {
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+                {
+                    ValidateLocked(schemaType); // throws if invalid
+                    schemaType.CreatorId = userId;
+                    repository.AddOrUpdate(schemaType);
+                    uow.Commit();
+
+                }
+
+                UpdateContentXmlStructure(schemaType);
+            }
+
+            SavedSchemaType.RaiseEvent(new SaveEventArgs<ISchemaType>(schemaType, false), this);
+            Audit(AuditType.Save, string.Format("Save SchemaType performed by user"), userId, schemaType.Id);
+        }
+
+        public void Save(IEnumerable<ISchemaType> schemaTypes, int userId = 0)
+        {
+            var asArray = schemaTypes.ToArray();
+
+            if (SavingSchemaType.IsRaisedEventCancelled(new SaveEventArgs<ISchemaType>(asArray), this))
+                return;
+
+            using (new WriteLock(Locker))
+            {
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+                {
+                    // all-or-nothing, validate them all first
+                    foreach (var schemaType in asArray)
+                    {
+                        ValidateLocked(schemaType); // throws if invalid
+                    }
+                    foreach (var schemaType in asArray)
+                    {
+                        schemaType.CreatorId = userId;
+                        repository.AddOrUpdate(schemaType);
+                    }
+
+                    //save it all in one go
+                    uow.Commit();
+                }
+
+                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
+            }
+
+            SavedSchemaType.RaiseEvent(new SaveEventArgs<ISchemaType>(asArray, false), this);
+            Audit(AuditType.Save, string.Format("Save SchemaTypes performed by user"), userId, -1);
+        }
+
+        public void Delete(ISchemaType schemaType, int userId = 0)
+        {
+            if (DeletingSchemaType.IsRaisedEventCancelled(new DeleteEventArgs<ISchemaType>(schemaType), this))
+                return;
+            using (new WriteLock(Locker))
+            {
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+                {
+
+                    repository.Delete(schemaType);
+                    uow.Commit();
+
+                    DeletedSchemaType.RaiseEvent(new DeleteEventArgs<ISchemaType>(schemaType, false), this);
+                }
+
+                Audit(AuditType.Delete, string.Format("Delete SchemaType performed by user"), userId, schemaType.Id);
+            }
+        }
+
+        public void Delete(IEnumerable<ISchemaType> schemaTypes, int userId = 0)
+        {
+            var asArray = schemaTypes.ToArray();
+
+            if (DeletingSchemaType.IsRaisedEventCancelled(new DeleteEventArgs<ISchemaType>(asArray), this))
+                return;
+            using (new WriteLock(Locker))
+            {
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateSchemaTypeRepository(uow))
+                {
+                    foreach (var mediaType in asArray)
+                    {
+                        repository.Delete(mediaType);
+                    }
+                    uow.Commit();
+
+                    DeletedSchemaType.RaiseEvent(new DeleteEventArgs<ISchemaType>(asArray, false), this);
+                }
+
+                Audit(AuditType.Delete, string.Format("Delete SchemaTypes performed by user"), userId, -1);
+            }
+        }
+
+        public int CountSchemaTypes()
+        {
+            using (var repository = RepositoryFactory.CreateSchemaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Count(Query<ISchemaType>.Builder);
+            }
+        }
+
+        #endregion
+
         #region Event Handlers
 
         public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavingContentTypeContainer;
         public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavedContentTypeContainer;
         public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletingContentTypeContainer;
         public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletedContentTypeContainer;
+
         public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavingMediaTypeContainer;
         public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavedMediaTypeContainer;
         public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletingMediaTypeContainer;
         public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletedMediaTypeContainer;
+
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavingSchemaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavedSchemaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletingSchemaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletedSchemaTypeContainer;
 
 
         /// <summary>
@@ -1420,6 +1804,36 @@ namespace Umbraco.Core.Services
         /// Occurs after Move
         /// </summary>
         public static event TypedEventHandler<IContentTypeService, MoveEventArgs<IContentType>> MovedContentType;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<ISchemaType>> DeletingSchemaType;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<ISchemaType>> DeletedSchemaType;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<ISchemaType>> SavingSchemaType;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<ISchemaType>> SavedSchemaType;
+
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, MoveEventArgs<ISchemaType>> MovingSchemaType;
+
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, MoveEventArgs<ISchemaType>> MovedSchemaType;
 
         #endregion
     }

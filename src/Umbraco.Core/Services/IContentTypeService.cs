@@ -13,6 +13,7 @@ namespace Umbraco.Core.Services
     {
         int CountContentTypes();
         int CountMediaTypes();
+        int CountSchemaTypes();
 
         /// <summary>
         /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
@@ -23,8 +24,11 @@ namespace Umbraco.Core.Services
 
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateSchemaTypeContainer(int parentId, string name, int userId = 0);
+
         Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
         Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus> SaveSchemaTypeContainer(EntityContainer container, int userId = 0);
 
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
@@ -36,8 +40,15 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityContainer> GetMediaTypeContainers(int[] containerIds);
         IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType);
+        EntityContainer GetSchemaTypeContainer(int containerId);
+        EntityContainer GetSchemaTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetSchemaTypeContainers(int[] containerIds);
+        IEnumerable<EntityContainer> GetSchemaTypeContainers(string folderName, int level);
+        IEnumerable<EntityContainer> GetSchemaTypeContainers(ISchemaType schemaType);
+
         Attempt<OperationStatus> DeleteMediaTypeContainer(int folderId, int userId = 0);
         Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0);
+        Attempt<OperationStatus> DeleteSchemaTypeContainer(int containerId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.
@@ -250,6 +261,83 @@ namespace Umbraco.Core.Services
         void Delete(IEnumerable<IMediaType> mediaTypes, int userId = 0);
 
         /// <summary>
+        /// Gets an <see cref="ISchemaType"/> object by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="ISchemaType"/> to retrieve</param>
+        /// <returns><see cref="ISchemaType"/></returns>
+        ISchemaType GetSchemaType(int id);
+
+        /// <summary>
+        /// Gets an <see cref="ISchemaType"/> object by its Alias
+        /// </summary>
+        /// <param name="alias">Alias of the <see cref="ISchemaType"/> to retrieve</param>
+        /// <returns><see cref="ISchemaType"/></returns>
+        ISchemaType GetSchemaType(string alias);
+
+        /// <summary>
+        /// Gets an <see cref="ISchemaType"/> object by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="ISchemaType"/> to retrieve</param>
+        /// <returns><see cref="ISchemaType"/></returns>
+        ISchemaType GetSchemaType(Guid id);
+
+        /// <summary>
+        /// Gets a list of all available <see cref="ISchemaType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="ISchemaType"/> objects</returns>
+        IEnumerable<ISchemaType> GetAllSchemaTypes(params int[] ids);
+
+        /// <summary>
+        /// Gets a list of all available <see cref="ISchemaType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="ISchemaType"/> objects</returns>
+        IEnumerable<ISchemaType> GetAllSchemaTypes(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// Gets a list of children for a <see cref="ISchemaType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="ISchemaType"/> objects</returns>
+        IEnumerable<ISchemaType> GetSchemaTypeChildren(int id);
+
+        /// <summary>
+        /// Gets a list of children for a <see cref="ISchemaType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="ISchemaType"/> objects</returns>
+        IEnumerable<ISchemaType> GetSchemaTypeChildren(Guid id);
+
+        /// <summary>
+        /// Saves a single <see cref="ISchemaType"/> object
+        /// </summary>
+        /// <param name="schemaType"><see cref="ISchemaType"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the SchemaType</param>
+        void Save(ISchemaType schemaType, int userId = 0);
+
+        /// <summary>
+        /// Saves a collection of <see cref="ISchemaType"/> objects
+        /// </summary>
+        /// <param name="schemaTypes">Collection of <see cref="ISchemaType"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the SchemaTypes</param>
+        void Save(IEnumerable<ISchemaType> schemaTypes, int userId = 0);
+
+        /// <summary>
+        /// Deletes a single <see cref="ISchemaType"/> object
+        /// </summary>
+        /// <param name="schemaType"><see cref="ISchemaType"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the MediaType</param>
+        void Delete(ISchemaType schemaType, int userId = 0);
+
+        /// <summary>
+        /// Deletes a collection of <see cref="ISchemaType"/> objects
+        /// </summary>
+        /// <param name="schemaTypes">Collection of <see cref="ISchemaType"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the MediaTypes</param>
+        void Delete(IEnumerable<ISchemaType> schemaTypes, int userId = 0);
+
+        /// <summary>
         /// Generates the complete (simplified) XML DTD.
         /// </summary>
         /// <returns>The DTD as a string</returns>
@@ -289,8 +377,10 @@ namespace Umbraco.Core.Services
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(Guid id);
 
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveSchemaType(ISchemaType toMove, int containerId);
         Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId);
         Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
+        Attempt<OperationStatus<ISchemaType, MoveOperationStatusType>> CopySchemaType(ISchemaType toCopy, int containerId);
         Attempt<OperationStatus<IMediaType, MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId);
         Attempt<OperationStatus<IContentType, MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId);
     }

@@ -583,6 +583,20 @@ AND umbracoNode.id <> @id",
                 }
             }
 
+            public static IEnumerable<ISchemaType> GetSchemaTypes<TRepo>(
+                Database db, ISqlSyntaxProvider sqlSyntax,
+                TRepo contentTypeRepository)
+                where TRepo : IReadRepository<int, TEntity>
+            {
+                IDictionary<int, List<int>> allParentSchemaTypeIds;
+                var schemaTypes = MapSchemaTypes(db, sqlSyntax, out allParentSchemaTypeIds)
+                    .ToArray();
+
+                MapContentTypeChildren(schemaTypes, db, sqlSyntax, contentTypeRepository, allParentSchemaTypeIds);
+
+                return schemaTypes;
+            }
+
             public static IEnumerable<IMediaType> GetMediaTypes<TRepo>(
                 Database db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository)
@@ -792,7 +806,7 @@ AND umbracoNode.id <> @id",
                     if (queue.Count == 0 || queue.Peek().ctId != ct.ctId)
                     {
                         //it's the last in the queue or the content type is changing (moving to the next one)
-                        var mediaType = CreateForMapping(ct, currAllowedContentTypes);
+                        var mediaType = CreateMediaForMapping(ct, currAllowedContentTypes);
                         mappedMediaTypes.Add(mediaType);
 
                         //Here we need to reset the current variables, we're now collecting data for a different content type
@@ -803,7 +817,7 @@ AND umbracoNode.id <> @id",
                 return mappedMediaTypes;
             }
 
-            private static IMediaType CreateForMapping(dynamic currCt, List<ContentTypeSort> currAllowedContentTypes)
+            private static IMediaType CreateMediaForMapping(dynamic currCt, List<ContentTypeSort> currAllowedContentTypes)
             {
                 // * create the DTO object
                 // * create the content type object
@@ -841,6 +855,144 @@ AND umbracoNode.id <> @id",
 
                 var factory = new ContentTypeFactory();
                 var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
+
+                //map the allowed content types
+                mediaType.AllowedContentTypes = currAllowedContentTypes;
+
+                return mediaType;
+            }
+
+            internal static IEnumerable<ISchemaType> MapSchemaTypes(Database db, ISqlSyntaxProvider sqlSyntax,
+                out IDictionary<int, List<int>> parentSchemaTypeIds)
+            {
+                Mandate.ParameterNotNull(db, "db");
+
+                var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
+                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
+                                ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
+                                umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
+		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
+                                umbracoNode.uniqueID as nUniqueId
+                        FROM cmsContentType
+                        INNER JOIN umbracoNode
+                        ON cmsContentType.nodeId = umbracoNode.id
+                        LEFT JOIN (
+                            SELECT cmsContentTypeAllowedContentType.Id, cmsContentTypeAllowedContentType.AllowedId, cmsContentType.alias, cmsContentTypeAllowedContentType.SortOrder
+                            FROM cmsContentTypeAllowedContentType
+                            INNER JOIN cmsContentType
+                            ON cmsContentTypeAllowedContentType.AllowedId = cmsContentType.nodeId
+                        ) AllowedTypes
+                        ON AllowedTypes.Id = cmsContentType.nodeId
+                        LEFT JOIN (
+                            SELECT cmsContentType2ContentType.parentContentTypeId, umbracoNode.uniqueID AS parentContentTypeKey, cmsContentType2ContentType.childContentTypeId
+                            FROM cmsContentType2ContentType
+                            INNER JOIN umbracoNode
+                            ON cmsContentType2ContentType.parentContentTypeId = umbracoNode." + sqlSyntax.GetQuotedColumnName("id") + @"
+                        ) ParentTypes
+                        ON ParentTypes.childContentTypeId = cmsContentType.nodeId
+                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
+                        ORDER BY ctId";
+
+                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.SchemaType) });
+
+                if (result.Any() == false)
+                {
+                    parentSchemaTypeIds = null;
+                    return Enumerable.Empty<ISchemaType>();
+                }
+
+                parentSchemaTypeIds = new Dictionary<int, List<int>>();
+                var mappedSchemaTypes = new List<ISchemaType>();
+
+                //loop through each result and fill in our required values, each row will contain different requried data than the rest.
+                // it is much quicker to iterate each result and populate instead of looking up the values over and over in the result like
+                // we used to do.
+                var queue = new Queue<dynamic>(result);
+                var currAllowedContentTypes = new List<ContentTypeSort>();
+
+                while (queue.Count > 0)
+                {
+                    var ct = queue.Dequeue();
+
+                    //check for allowed content types
+                    int? allowedCtId = ct.ctaAllowedId;
+                    int? allowedCtSort = ct.ctaSortOrder;
+                    string allowedCtAlias = ct.ctaAlias;
+                    if (allowedCtId.HasValue && allowedCtSort.HasValue && allowedCtAlias != null)
+                    {
+                        var ctSort = new ContentTypeSort(new Lazy<int>(() => allowedCtId.Value), allowedCtSort.Value, allowedCtAlias);
+                        if (currAllowedContentTypes.Contains(ctSort) == false)
+                        {
+                            currAllowedContentTypes.Add(ctSort);
+                        }
+                    }
+
+                    //always ensure there's a list for this content type
+                    if (parentSchemaTypeIds.ContainsKey(ct.ctId) == false)
+                        parentSchemaTypeIds[ct.ctId] = new List<int>();
+
+                    //check for parent ids and assign to the outgoing collection
+                    int? parentId = ct.chtParentId;
+                    if (parentId.HasValue)
+                    {
+                        var associatedParentIds = parentSchemaTypeIds[ct.ctId];
+                        if (associatedParentIds.Contains(parentId.Value) == false)
+                            associatedParentIds.Add(parentId.Value);
+                    }
+
+                    if (queue.Count == 0 || queue.Peek().ctId != ct.ctId)
+                    {
+                        //it's the last in the queue or the content type is changing (moving to the next one)
+                        var schemaType = CreateSchemaForMapping(ct, currAllowedContentTypes);
+                        mappedSchemaTypes.Add(schemaType);
+
+                        //Here we need to reset the current variables, we're now collecting data for a different content type
+                        currAllowedContentTypes = new List<ContentTypeSort>();
+                    }
+                }
+
+                return mappedSchemaTypes;
+            }
+
+            private static ISchemaType CreateSchemaForMapping(dynamic currCt, List<ContentTypeSort> currAllowedContentTypes)
+            {
+                // * create the DTO object
+                // * create the content type object
+                // * map the allowed content types
+                // * add to the outgoing list
+
+                var contentTypeDto = new ContentTypeDto
+                {
+                    Alias = currCt.ctAlias,
+                    AllowAtRoot = currCt.ctAllowAtRoot,
+                    Description = currCt.ctDesc,
+                    Icon = currCt.ctIcon,
+                    IsContainer = currCt.ctIsContainer,
+                    NodeId = currCt.ctId,
+                    PrimaryKey = currCt.ctPk,
+                    Thumbnail = currCt.ctThumb,
+                    //map the underlying node dto
+                    NodeDto = new NodeDto
+                    {
+                        CreateDate = currCt.nCreateDate,
+                        Level = (short)currCt.nLevel,
+                        NodeId = currCt.ctId,
+                        NodeObjectType = currCt.nObjectType,
+                        ParentId = currCt.nParentId,
+                        Path = currCt.nPath,
+                        SortOrder = currCt.nSortOrder,
+                        Text = currCt.nName,
+                        Trashed = currCt.nTrashed,
+                        UniqueId = currCt.nUniqueId,
+                        UserId = currCt.nUser
+                    }
+                };
+
+                //now create the content type object
+
+                var factory = new ContentTypeFactory();
+                var mediaType = factory.BuildSchemaTypeEntity(contentTypeDto);
 
                 //map the allowed content types
                 mediaType.AllowedContentTypes = currAllowedContentTypes;

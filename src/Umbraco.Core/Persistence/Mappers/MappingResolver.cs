@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Mappers
                     {
                         return byAttribute.Result;
                     }
-                    throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type");
+                    throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type " + type.FullName);
                 });
         }
 
