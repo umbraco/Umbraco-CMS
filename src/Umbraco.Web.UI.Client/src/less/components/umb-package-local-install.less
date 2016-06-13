@@ -38,7 +38,8 @@
     max-width: 640px;
 }
 
-.umb-upload-field {
+.umb-upload-local__dropzone {
+    position: relative;
     width: 500px;
     height: 300px;
     border: 2px dashed @grayLight;
@@ -54,7 +55,8 @@
 
     transition: 100ms box-shadow ease, 100ms border ease;
 
-    &:hover {
+    &:hover,
+    &.drag-over {
         border-color: @blue;
         border-style: solid;
         box-shadow: 0 3px 8px rgba(0,0,0, .1);
@@ -62,10 +64,17 @@
     }
 }
 
-.umb-upload-field i {
+.umb-upload-local__dropzone i {
+    display: block;
     color: @grayLight;
     font-size: 110px;
     line-height: 1;
+}
+
+.umb-upload-local__select-file {
+    font-weight: bold;
+    color: @blue;
+    cursor: pointer;
 }
 
 
