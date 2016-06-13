@@ -1,0 +1,51 @@
+﻿<div ng-controller="Umbraco.Dialogs.Template.OrganizeController">
+    <div class="row">
+        <label>Select master page</label>
+        <div class="btn-group">
+            <a class="btn btn-link dropdown-toggle"
+               data-toggle="dropdown" href="#">
+                {{model.masterPage.name || 'No master selected'}}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li ng-repeat="page in masterPages">
+                    <a href ng-click="selectMasterPage(page)">
+                        {{page.name}}
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <h3>Master page</h3>
+        <div>
+            <label>
+                <input type="checkbox" ng-model="model.addRenderBody"/>
+                Add RenderBody
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" ng-model="model.addRenderSection" />
+                Add RenderSection
+            </label>
+            <input type="text" ng-model="model.renderSectionName"/>
+            <label>
+                Make section mandatory
+                <input type="checkbox" ng-model="model.mandatoryRenderSection"/>
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <h3>Child page</h3>
+        <div>
+            <label>
+                <input type="checkbox" ng-model="model.addSection" />
+                Add section
+            </label>
+            <input type="text" ng-model="model.sectionName" />
+        </div>
+
+    </div>
+</div>
