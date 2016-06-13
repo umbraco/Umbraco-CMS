@@ -17,9 +17,15 @@ namespace Umbraco.Web.Models
         }
         
         public List<ContentItemFile> UploadedFiles { get; private set; }
-
+        
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
+
+        /// <summary>
+        /// The minimum umbraco version that this package is pinned to
+        /// </summary>
+        [DataMember(Name = "umbracoVersion")]
+        public string UmbracoVersion { get; set; }
 
         [DataMember(Name = "name")]
         public string Name { get; set; }

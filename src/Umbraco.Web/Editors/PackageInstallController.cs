@@ -278,6 +278,17 @@ namespace Umbraco.Web.Editors
                         var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
                         //this will load in all the metadata too
                         var tempDir = ins.Import(packageTempFileName);
+
+                        //now we need to check for version comparison
+                        if (ins.RequirementsType == RequirementsType.Strict)
+                        {
+                            var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
+                            if (UmbracoVersion.Current < packageMinVersion)
+                            {
+                                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("This package cannot be installed, it requires a minimum Umbraco version of " + packageMinVersion));
+                            }
+                        }
+
                         model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempDir);
                         model.Id = ins.CreateManifest(
                             IOHelper.MapPath(model.TemporaryDirectoryPath),
@@ -300,9 +311,13 @@ namespace Umbraco.Web.Editors
                         model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
                         model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;
                         model.ContainsUnsecureFiles = ins.ContainsUnsecureFiles;
-
                         model.Url = ins.Url;
                         model.Version = ins.Version;
+
+                        model.UmbracoVersion = ins.RequirementsType == RequirementsType.Strict
+                            ? string.Format("{0}.{1}.{2}", ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch)
+                            : string.Empty;
+
                         //TODO: We need to add the 'strict' requirement to the installer
                     }
                     finally
@@ -405,7 +420,7 @@ namespace Umbraco.Web.Editors
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public PackageInstallModel CleanUp(PackageInstallModel model)
+        public PackageInstallResult CleanUp(PackageInstallModel model)
         {
             var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
@@ -420,7 +435,15 @@ namespace Umbraco.Web.Editors
             global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
 
 
-            return model;
+            return new PackageInstallResult
+            {
+                Id = model.Id,
+                ZipFilePath = model.ZipFilePath,
+                PackageGuid = model.PackageGuid,
+                RepositoryGuid = model.RepositoryGuid,
+                TemporaryDirectoryPath = model.TemporaryDirectoryPath,
+
+            };
         }
 
 

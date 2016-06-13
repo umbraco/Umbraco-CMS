@@ -87,7 +87,7 @@
                         <small> {{ vm.localPackage.readme }} </small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == ''">
+                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == '' && vm.localPackage.allowed">
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"

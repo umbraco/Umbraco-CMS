@@ -21,7 +21,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 3)]
+    [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [LegacyBaseTree(typeof(loadPackager))]

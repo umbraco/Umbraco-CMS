@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -21,6 +22,12 @@ using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.packager
 {
+    public enum RequirementsType
+    {
+        Strict,
+        Legacy
+    }
+
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     /// 
@@ -88,6 +95,10 @@ namespace umbraco.cms.businesslogic.packager
         public int RequirementsMinor { get; private set; }
         public int RequirementsPatch { get; private set; }
 
+        public RequirementsType RequirementsType { get; private set; }
+
+        public string IconUrl { get; private set; }
+
         /// <summary>
         /// The xmldocument, describing the contents of a package.
         /// </summary>
@@ -98,58 +109,68 @@ namespace umbraco.cms.businesslogic.packager
         /// </summary>
         public Installer()
         {
-            initialize();
+            Initialize();
         }
 
         public Installer(int currentUserId)
         {
-            initialize();
+            Initialize();
             _currentUserId = currentUserId;
         }
 
-        private void initialize()
+        private void Initialize()
         {
             ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
             ContainsUnsecureFiles = false;
             ContainsMacroConflict = false;
             ContainsStyleSheeConflicts = false;
+        }
+
+        [Obsolete("Use the ctor with all parameters")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Installer(string name, string version, string url, string license, string licenseUrl, string author, string authorUrl, int requirementsMajor, int requirementsMinor, int requirementsPatch, string readme, string control)
+        {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="Name">The name of the package</param>
-        /// <param name="Version">The version of the package</param>
-        /// <param name="Url">The url to a descriptionpage</param>
-        /// <param name="License">The license under which the package is released (preferably GPL ;))</param>
-        /// <param name="LicenseUrl">The url to a licensedescription</param>
-        /// <param name="Author">The original author of the package</param>
-        /// <param name="AuthorUrl">The url to the Authors website</param>
-        /// <param name="RequirementsMajor">Umbraco version major</param>
-        /// <param name="RequirementsMinor">Umbraco version minor</param>
-        /// <param name="RequirementsPatch">Umbraco version patch</param>
-        /// <param name="Readme">The readme text</param>
-        /// <param name="Control">The name of the usercontrol used to configure the package after install</param>
-        public Installer(string Name, string Version, string Url, string License, string LicenseUrl, string Author, string AuthorUrl, int RequirementsMajor, int RequirementsMinor, int RequirementsPatch, string Readme, string Control)
+        /// <param name="name">The name of the package</param>
+        /// <param name="version">The version of the package</param>
+        /// <param name="url">The url to a descriptionpage</param>
+        /// <param name="license">The license under which the package is released (preferably GPL ;))</param>
+        /// <param name="licenseUrl">The url to a licensedescription</param>
+        /// <param name="author">The original author of the package</param>
+        /// <param name="authorUrl">The url to the Authors website</param>
+        /// <param name="requirementsMajor">Umbraco version major</param>
+        /// <param name="requirementsMinor">Umbraco version minor</param>
+        /// <param name="requirementsPatch">Umbraco version patch</param>
+        /// <param name="readme">The readme text</param>
+        /// <param name="control">The name of the usercontrol used to configure the package after install</param>
+        /// <param name="requirementsType"></param>
+        /// <param name="iconUrl"></param>
+        public Installer(string name, string version, string url, string license, string licenseUrl, string author, string authorUrl, int requirementsMajor, int requirementsMinor, int requirementsPatch, string readme, string control, RequirementsType requirementsType, string iconUrl)
         {
             ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
             ContainsUnsecureFiles = false;
             ContainsMacroConflict = false;
             ContainsStyleSheeConflicts = false;
-            this.Name = Name;
-            this.Version = Version;
-            this.Url = Url;
-            this.License = License;
-            this.LicenseUrl = LicenseUrl;
-            this.RequirementsMajor = RequirementsMajor;
-            this.RequirementsMinor = RequirementsMinor;
-            this.RequirementsPatch = RequirementsPatch;
-            this.Author = Author;
-            this.AuthorUrl = AuthorUrl;
-            ReadMe = Readme;
-            this.Control = Control;
+            this.Name = name;
+            this.Version = version;
+            this.Url = url;
+            this.License = license;
+            this.LicenseUrl = licenseUrl;
+            this.RequirementsMajor = requirementsMajor;
+            this.RequirementsMinor = requirementsMinor;
+            this.RequirementsPatch = requirementsPatch;
+            this.RequirementsType = requirementsType;
+            this.Author = author;
+            this.AuthorUrl = authorUrl;
+            this.IconUrl = iconUrl;
+            ReadMe = readme;
+            this.Control = control;
         }
 
         #region Public Methods
@@ -485,9 +506,21 @@ namespace umbraco.cms.businesslogic.packager
             Url = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/url").FirstChild.Value;
             License = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").FirstChild.Value;
             LicenseUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").Attributes.GetNamedItem("url").Value;
+
             RequirementsMajor = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/major").FirstChild.Value);
             RequirementsMinor = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/minor").FirstChild.Value);
             RequirementsPatch = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/patch").FirstChild.Value);
+
+            var reqNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements");
+            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null 
+                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true) 
+                : RequirementsType.Legacy;
+            var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/iconUrl");
+            if (iconNode != null)
+            {
+                IconUrl = iconNode.FirstChild.Value;
+            }
+            
             Author = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
             AuthorUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
 
@@ -605,7 +638,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch { }
         }
-
+        
         /// <summary>
         /// This uses the old method of fetching and only supports the packages.umbraco.org repository.
         /// </summary>
