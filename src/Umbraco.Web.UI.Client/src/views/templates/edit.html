@@ -22,7 +22,7 @@
             <umb-editor-container>
 
                 <div class="btn-group">
-                    <a href ng-click="vm.openMacroOverlay()" class="btn">
+                    <a href ng-click="vm.openPageFieldOverlay()" class="btn">
                         <i class="icon-autofill"></i></a>
                     <a href ng-click="vm.insert('@RenderDictionary()')"class="btn">
                         <i class="icon-book-alt"></i></a>
@@ -30,18 +30,18 @@
                         <i class="icon-settings-alt"></i></a>
                 </div>
 
-                <div class="btn-group">  
+                <div class="btn-group">
                   <a href class="btn"><i class="icon-checkbox-empty"></i></a>
                   <a href class="btn"><i class="icon-checkbox-dotted"></i></a>
-                </div> 
-            
+                </div>
+
 
                 <div
                     auto-scale="85"
                     umb-ace-editor="vm.aceOption"
                     ng-model="vm.template.content">
                 </div>
-                    
+
 
             </umb-editor-container>
 

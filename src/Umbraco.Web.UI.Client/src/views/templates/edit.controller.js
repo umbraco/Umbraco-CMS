@@ -6,7 +6,7 @@
         var vm = this;
         vm.page = {};
         vm.page.loading = true;
-        
+
         //menu
         vm.page.menu = {};
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
@@ -46,7 +46,7 @@
             //we need to load this somewhere, for now its here.
             assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
             templateResource.getById($routeParams.id).then(function(template){
-                    
+
                     vm.page.loading = false;
                     vm.template = template;
 
@@ -67,14 +67,14 @@
             });
 
         };
-        
+
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
 
         function openMacroOverlay() {
-           
+
             vm.macroPickerOverlay = {
                 view: "macropicker",
                 dialogData: {},
@@ -90,13 +90,17 @@
 
         }
 
- 
+
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                view: "mediapicker",
+                title: "Insert page field",
+                description: "Insert data in template",
+                submitButtonLabel: "Insert",
+                closeButtonlabel: "Cancel",
+                view: "insertfield",
                 show: true,
                 submit: function(model) {
-
+                  vm.insert(model.umbracoField);
                 },
                 close: function(model) {
                     vm.pageFieldOverlay.show = false;
