@@ -85,6 +85,10 @@
 
                             <div class="umb-healthcheck-group__details-status-actions">
                                 <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
+                                    <span ng-show="action.valueRequired">
+                                        Set new value: 
+                                        <input type="text" ng-model="action.providedValue" required/>
+                                    </span>
                                     <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, $index, action);">{{action.name}}</button>
                                     <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                 </div>

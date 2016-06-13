@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
 
@@ -16,9 +17,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
 
-        private const string CheckForValidCertificateAction = "checkForValidCertificate";
-        private const string CheckHttpsConfigurationSettingAction = "checkHttpsConfigurationSetting";
-        private const string CheckIfCurrentSchemeIsHttpsAction = "checkIfCurrentSchemeIsHttps";
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
         public HttpsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
@@ -45,16 +43,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             switch (action.Alias)
             {
-                case CheckForValidCertificateAction:
-                    return CheckForValidCertificate();
-                case CheckHttpsConfigurationSettingAction:
-                    return CheckHttpsConfigurationSetting();
-                case CheckIfCurrentSchemeIsHttpsAction:
-                    return CheckIfCurrentSchemeIsHttps();
                 case FixHttpsSettingAction:
                     return FixHttpsSetting();
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidOperationException("HttpsCheck action requested is either not executable or does not exist");
             }
         }
 
@@ -121,7 +113,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var uri = HttpContext.Current.Request.Url;
             var actions = new List<HealthCheckAction>();
 
-
             string resultMessage;
             StatusResultType resultType;
             if (uri.Scheme != "https")
@@ -153,7 +144,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var configFile = HttpContext.Current.Server.MapPath("~/Web.config");
+            var configFile = IOHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='umbracoUseSSL']/@value";
             var configurationService = new ConfigurationService(configFile, xPath);
             var updateConfigFile = configurationService.UpdateConfigFile("true");

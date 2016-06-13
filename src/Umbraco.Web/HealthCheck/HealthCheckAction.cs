@@ -36,7 +36,7 @@ namespace Umbraco.Web.HealthCheck
         /// <remarks>
         /// This is used to find the Health Check instance to execute this action
         /// </remarks>
-        [DataMember(Name = "healtCheckId")]
+        [DataMember(Name = "healthCheckId")]
         public Guid HealthCheckId { get; set; }
 
         /// <summary>
@@ -63,5 +63,17 @@ namespace Umbraco.Web.HealthCheck
         /// </summary>
         [DataMember(Name = "description")]
         public string Description { get; set; }
+
+        /// <summary>
+        /// Indicates if a value is required to rectify the issue
+        /// </summary>
+        [DataMember(Name = "valueRequired")]
+        public bool ValueRequired { get; set; }
+
+        /// <summary>
+        /// Provides a value to rectify the issue
+        /// </summary>
+        [DataMember(Name = "providedValue")]
+        public string ProvidedValue { get; set; }
     }
 }
