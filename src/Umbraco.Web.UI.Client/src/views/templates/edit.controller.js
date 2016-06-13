@@ -68,10 +68,40 @@
 
         };
         
+        
+        vm.setLayout = function(path){
+
+            var templateCode = vm.editor.getValue();
+            var newValue = path;
+            var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
+
+            if (newValue != undefined && newValue != "") {
+                if (layoutDefRegex.test(templateCode)) {
+                    // Declaration exists, so just update it
+                    templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
+                } else {
+                    // Declaration doesn't exist, so prepend to start of doc
+                    //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
+                    templateCode = "@{\n\tLayout = \"" + newValue + "\";\n}\n" + templateCode;
+                }
+            } else {
+                if (layoutDefRegex.test(templateCode)) {
+                    // Declaration exists, so just update it
+                    templateCode = templateCode.replace(layoutDefRegex, "$1null$3");
+                }
+            }
+
+            vm.editor.setValue(templateCode);
+            vm.editor.clearSelection();
+            vm.editor.navigateFileStart();
+        };
+
+
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openQueryBuilderOverlay = openQueryBuilderOverlay;
         vm.openMacroOverlay = openMacroOverlay;
+
 
         function openMacroOverlay() {
            
@@ -87,7 +117,6 @@
                     vm.macroPickerOverlay = null;
                 }
             };
-
         }
 
  
@@ -105,13 +134,17 @@
             };
         }
 
+
         function openDictionaryItemOverlay() {
             vm.dictionaryItemOverlay = {
-                view: "mediapicker",
+                view: "treepicker",
+                dialogOptions: {section: "settings", treeAlias: "dictionary"},
                 show: true,
-                submit: function(model) {
 
+                submit: function(model) {
+                    console.log(model);
                 },
+
                 close: function(model) {
                     vm.dictionaryItemOverlay.show = false;
                     vm.dictionaryItemOverlay = null;
@@ -119,13 +152,27 @@
             };
         }
 
+
         function openQueryBuilderOverlay() {
             vm.queryBuilderOverlay = {
-                view: "mediapicker",
+                view: "querybuilder",
                 show: true,
+                title: "Query for content",
+               
                 submit: function(model) {
 
+                    var code = "\n@{\n" + "\tvar selection = " + model.result.queryExpression + ";\n}\n";
+                    code += "<ul>\n" +
+                                "\t@foreach(var item in selection){\n" +
+                                    "\t\t<li>\n" +
+                                        "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
+                                    "\t\t</li>\n" +
+                                "\t}\n" +
+                            "</ul>\n\n";
+
+                    vm.insert(code);
                 },
+
                 close: function(model) {
                     vm.queryBuilderOverlay.show = false;
                     vm.queryBuilderOverlay = null;
