@@ -126,7 +126,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private static Dictionary<string, string> ParseMetaTags(string html)
         {
-            var regex = new Regex("<meta http-equiv=\"(.+?)\" content=\"(.+?)\">");
+            var regex = new Regex("<meta http-equiv=\"(.+?)\" content=\"(.+?)\"", RegexOptions.IgnoreCase);
 
             return regex.Matches(html)
                 .Cast<Match>()
