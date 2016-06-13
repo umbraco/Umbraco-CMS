@@ -15,35 +15,67 @@
                 alias="vm.template.alias"
                 hideDescription="true"
                 description="vm.template.virtualPath"
+                description-locked="true"
                 menu="vm.page.menu"
                 hide-icon="false">
             </umb-editor-header>
 
             <umb-editor-container>
 
-                <div class="btn-group">
-                    <a href ng-click="vm.openMacroOverlay()" class="btn">
-                        <i class="icon-autofill"></i></a>
-                    <a href ng-click="vm.insert('@RenderDictionary()')"class="btn">
-                        <i class="icon-book-alt"></i></a>
-                    <a href ng-click="vm.openMacroOverlay()"class="btn">
-                        <i class="icon-settings-alt"></i></a>
-                    <a href ng-click="vm.openOrganizeOverlay()"class="btn">
-                        <i class="icon-settings-alt"></i></a>
-                </div>
+                <umb-editor-sub-header>
 
-                <div class="btn-group">  
-                  <a href class="btn"><i class="icon-checkbox-empty"></i></a>
-                  <a href class="btn"><i class="icon-checkbox-dotted"></i></a>
-                </div> 
-            
+                    <umb-editor-sub-header-content-left>
+
+                        <div class="btn-group umb-button-group dropdown">
+
+                            <umb-button
+                                type="button"
+                                button-style="link"
+                                label="Insert"
+                                icon="icon-add"
+                                action="vm.openDocumentation()">
+                            </umb-button>
+
+                            <a class="btn btn-link dropdown-toggle umb-button-group__toggle" style="margin-left: -13px;" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </a>
+
+                            <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
+                                <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
+                                <li><a href="" ng-click="">Value</a></li>
+                                <li><a href="" ng-click="vm.insert('@RenderDictionary()')">Dictionary</a></li>
+                                <li><a href="" ng-click="">Partial</a></li>
+                                <li><a href="" ng-click="vm.openOrganizeOverlay()">Organize</a></li>
+                            </ul>
+
+                        </div>
+
+                        <umb-button
+                            type="button"
+                            button-style="link"
+                            label="Query Builder"
+                            icon="icon-wand"
+                            action="vm.openDictionaryItemOverlay()">
+                        </umb-button>
+
+                        <umb-button
+                            type="button"
+                            button-style="link"
+                            label="Organise"
+                            icon="icon-layout"
+                            action="vm.openQueryBuilderOverlay()">
+                        </umb-button>
+
+                    </umb-editor-sub-header-content-left>
+
+                </umb-editor-sub-header>
 
                 <div
                     auto-scale="85"
                     umb-ace-editor="vm.aceOption"
                     ng-model="vm.template.content">
                 </div>
-                    
+
 
             </umb-editor-container>
 
