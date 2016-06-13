@@ -77,7 +77,17 @@ namespace Umbraco.Web.Editors
         public TemplateDisplay GetEmpty()
         {
             var dt = new Template("", "");
-            return Mapper.Map<ITemplate, TemplateDisplay>((ITemplate)dt);
+            var scaffold = Mapper.Map<ITemplate, TemplateDisplay>((ITemplate)dt);
+            scaffold.Path = "-1";
+            scaffold.Content = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+}
+
+@* The fun starts here *@
+
+";
+            return scaffold;
         }
 
         /// <summary>
