@@ -25,8 +25,8 @@
         public void Log<T>(string text, [CallerMemberName] string callerName = null, [CallerLineNumber] int lineNumber = 0)
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
-            var message = string.Format("{0} {1}:{2}", callerName, lineNumber, text);
-            LogHelper.Error<T>(message, new ImageProcessingException(message));
+            var message = string.Format("{0} {1} : {2}", callerName, lineNumber, text);
+            LogHelper.Error<T>(string.Empty, new ImageProcessingException(message));
         }
 
         /// <summary>
@@ -39,8 +39,8 @@
         public void Log(Type type, string text, [CallerMemberName] string callerName = null, [CallerLineNumber] int lineNumber = 0)
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
-            var message = string.Format("{0} {1}:{2}", callerName, lineNumber, text);
-            LogHelper.Error(type, message, new ImageProcessingException(message));
+            var message = string.Format("{0} {1} : {2}", callerName, lineNumber, text);
+            LogHelper.Error(type, string.Empty, new ImageProcessingException(message));
         }
     }
 }
