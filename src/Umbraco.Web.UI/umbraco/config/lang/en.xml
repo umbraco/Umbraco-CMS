@@ -1326,7 +1326,9 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
 	
 	  <key alias="rectifyButton">Fix</key>
-	  <key alias="cannotRectifyShouldNotEqual">Cannot rectify a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
+    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
 		
 	  <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
 	  <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
