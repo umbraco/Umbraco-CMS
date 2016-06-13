@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 using LightInject;
 using Umbraco.Core.ObjectResolution;
 
@@ -18,8 +17,7 @@ namespace Umbraco.Web.Routing
         /// <param name="implementationType"></param>
         internal ContentLastChanceFinderResolver(IServiceContainer container, Type implementationType)
             : base(container, implementationType)
-        {
-        }
+        { }
    
         /// <summary>
         /// Sets the last chance finder.
@@ -34,10 +32,6 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the last chance finder.
         /// </summary>
-        public IContentFinder Finder
-        {
-            get { return Value; }
-        }
-
+        public IContentFinder Finder => Value;
     }
 }

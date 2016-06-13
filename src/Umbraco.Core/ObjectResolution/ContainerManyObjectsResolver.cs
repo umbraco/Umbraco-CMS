@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using LightInject;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -44,7 +43,6 @@ namespace Umbraco.Core.ObjectResolution
         } 
         #endregion
 
-
         /// <summary>
         /// Constructor for use with IoC
         /// </summary>
@@ -55,14 +53,11 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerManyObjectsResolver(IServiceContainer container, ILogger logger, IEnumerable<Type> types, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(logger, types, scope)
         {
-            if (container == null) throw new ArgumentNullException("container");
+            if (container == null) throw new ArgumentNullException(nameof(container));
             _container = container;
             Resolution.Frozen += Resolution_Frozen;
-
         }
-     
-        
-
+             
         /// <summary>
         /// When resolution is frozen add all the types to the container
         /// </summary>
@@ -70,9 +65,12 @@ namespace Umbraco.Core.ObjectResolution
         /// <param name="e"></param>
         void Resolution_Frozen(object sender, EventArgs e)
         {
+            var prefix = GetType().FullName + "_";
+            var i = 0;
             foreach (var type in InstanceTypes)
             {
-                _container.Register(type, GetLifetime(LifetimeScope));
+                var name = prefix + i++;
+                _container.Register(typeof(TResolved), type, name, GetLifetime(LifetimeScope));
             }
         }
 
@@ -89,7 +87,7 @@ namespace Umbraco.Core.ObjectResolution
                     return new PerRequestLifeTime();
                 case ObjectLifetimeScope.Application:
                     return new PerContainerLifetime();
-                case ObjectLifetimeScope.Transient:
+                //case ObjectLifetimeScope.Transient:
                 default:
                     return null;
             }
@@ -103,8 +101,23 @@ namespace Umbraco.Core.ObjectResolution
         {
             //NOTE: we ignore scope because objects are registered under this scope and not build based on the scope.
 
-            return _container.GetAllInstances<TResolved>();
-        }
-    
+            var prefix = GetType().FullName + "_";
+            var services = _container.AvailableServices
+                .Where(x => x.ServiceName.StartsWith(prefix))
+                .OrderBy(x => x.ServiceName);
+            var allInstances = _container.GetAllInstances<TResolved>()
+                .ToDictionary(x => x.GetType(), x => x);
+
+            //foreach (var service in services)
+            //    LogHelper.Debug<object>("SERVICE " + service.ImplementingType.FullName + " " + service.ServiceName);
+            //foreach (var instance in allInstances)
+            //    LogHelper.Debug<object>("INSTANCE " + instance.Key.FullName);
+
+            // GetAllInstances could return more than what *this* resolver has registered,
+            // and there is no guarantee instances will be in the right order - have to do
+            // it differently
+            //return _container.GetAllInstances<TResolved>();
+            return services.Select(x => allInstances[x.ImplementingType]);
+        }    
     }
 }
