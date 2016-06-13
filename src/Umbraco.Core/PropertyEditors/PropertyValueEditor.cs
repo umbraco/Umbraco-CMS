@@ -401,9 +401,9 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>
         /// By default this will just return the value of ConvertDbToXml.
         /// </remarks>
-        public virtual IEnumerable<XElement> ConvertDbToExamine(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public virtual IEnumerable<SearchDataValue> ConvertDbToExamine(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            yield return new XElement(property.Alias, ConvertDbToXml(property, propertyType, dataTypeService));
+            yield return new SearchDataValue(property.Alias, ConvertDbToString(property, propertyType, dataTypeService));
         }
     }
 }

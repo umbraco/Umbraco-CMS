@@ -143,9 +143,10 @@ namespace Umbraco.Core.Services
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {
+                var searchDataValues = propertyEditor.ValueEditor.ConvertDbToExamine(property, propertyType, dataTypeService);
                 IEnumerable<XElement> xmlValues;
                 // TODO: Transform to XML here instead of from the valueeditor
-                xmlValues = propertyEditor.ValueEditor.ConvertDbToExamine(property, propertyType, dataTypeService);
+                xmlValues = searchDataValues.Select(v => v.ToXml());
                 if (!xmlValues.Any())
                     xmlValues = new[] {new XElement(nodeName, propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService))};
                 foreach (var value in xmlValues)

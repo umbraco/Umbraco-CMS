@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 using Examine;
+using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Index;
@@ -46,93 +47,50 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Delegates_To_Property_Value_Converters()
         {
-            var content = new Mock<IContent>();
-            long total;
-            Mock.Get(serviceContext.ContentService)
-                .Setup(c => c.GetPagedDescendants(-1, 0, 1000, out total, "Path", Direction.Ascending, ""))
-                .Returns(new List<IContent> { content.Object });
+            indexer.IndexAll(IndexTypes.Content);
 
-            content.Setup(c => c.ContentType).Returns(new ContentType(-1) { Alias = "someType" });
-            content.Setup(c => c.Id).Returns(1);
-            content.Setup(c => c.Name).Returns("Some doc");
-            content.Setup(c => c.Path).Returns("-1 1");
-            content.Setup(c => c.Properties).Returns(new PropertyCollection {
-                new Property(new PropertyType("textstring", DataTypeDatabaseType.Nvarchar) { Alias = "a-string"} )
-                {
-                    Value = "a string"
-                },
-                new Property(new PropertyType("indexer-test", DataTypeDatabaseType.Ntext) { Alias = "indexer-test" })
-                {
-                    Value = @"{
-  ""name"": ""1 column layout"",
-  ""sections"": [
-    {
-      ""grid"": 12,
-      ""rows"": [
-        {
-          ""name"": ""Headline"",
-          ""areas"": [
-            {
-              ""grid"": 12,
-              ""hasConfig"": false,
-              ""controls"": [
-                {
-                  ""value"": ""Hello world!"",
-                  ""editor"": {
-                    ""alias"": ""headline""
-                  },
-                  ""active"": false
-                },
-                {
-                ""value"": ""<p>Here's the first article</p>"",
-                  ""editor"": {
-                    ""alias"": ""rte""
-                  },
-                  ""active"": false
-                },
-                {
-                ""value"": ""<p>And here's some more RTE content</p>"",
-                  ""editor"": {
-                    ""alias"": ""rte""
-                  },
-                  ""active"": true
-                }
-              ],
-              ""active"": true,
-              ""hasActiveChild"": true
-            }
-          ],
-          ""hasConfig"": false,
-          ""id"": ""f49faed0-0df4-4ddc-0b41-c841d07b0889"",
-          ""hasActiveChild"": true,
-          ""active"": true
-        }
-      ]
-    }
-  ]
-}"
-            } });
-
-            _indexer.IndexAll(IndexTypes.Content);
-
-            var reader = _indexer.GetIndexWriter().GetReader();
+            var reader = indexer.GetIndexWriter().GetReader();
             var allTerms = reader.Terms();
             while (allTerms.Next())
                 Console.WriteLine(allTerms.Term().Field() + ": " + allTerms.Term().Text());
 
-            var rteDocs = reader.Terms(new Term("indexerTest.rte"));
+            var rteTerms = reader.Terms(new Term("indexerTest.rte"));
 
             var count = 0;
-            while (rteDocs.Next())
+            while (rteTerms.Next())
                 count++;
 
             Assert.AreEqual(6, count);
         }
 
-        private static UmbracoExamineSearcher _searcher;
-        private static UmbracoContentIndexer _indexer;
-        private RAMDirectory _luceneDir;
+        [Test]
+        public void Value_Editor_Specifies_Storage_Of_Fields()
+        {
+            indexer.IndexAll(IndexTypes.Content);
+
+            var reader = indexer.GetIndexWriter().GetReader();
+
+            var doc = reader.Document(0);
+
+            Assert.IsNull(doc.GetField("indexerTest.rte"));
+            Assert.IsNotNull(doc.GetField("indexerTest.headline").StringValue());
+        }
+
+        [Test]
+        public void Value_Editor_Specifies_Analyzing_Of_Fields()
+        {
+            indexer.IndexAll(IndexTypes.Content);
+
+            var reader = indexer.GetIndexWriter().GetReader();
+
+            var headlineTerms = reader.Terms(new Term("indexerTest.headline"));
+            Assert.AreEqual("Hello world!", headlineTerms.Term().Text());
+        }
+
+        private UmbracoContentIndexer indexer;
+        private RAMDirectory luceneDir;
         private ServiceContext serviceContext;
+        private Mock<IContent> contentMock;
 
         [SetUp]
         public override void Initialize()
@@ -145,29 +103,105 @@ namespace Umbraco.Tests.UmbracoExamine
 
             GetUmbracoContext("http://localhost", -1, null, true);
 
-            _luceneDir = new RAMDirectory();
+            luceneDir = new RAMDirectory();
             var dataService = Mock.Of<IDataService>();
             var contentService = Mock.Of<IContentService>();
             Mock.Get(dataService).Setup(s => s.ContentService).Returns(contentService);
             Mock.Get(dataService).Setup(s => s.LogService).Returns(Mock.Of<ILogService>());
             Mock.Get(contentService).Setup(s => s.GetAllUserPropertyNames()).Returns(new[] { "aString", "indexerTest" });
-            _indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir,
+            indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
                 dataService: dataService,
                 contentService: serviceContext.ContentService, mediaService: Mock.Of<Umbraco.Core.Services.IMediaService>());
-            _indexer.Initialize("indexer", new NameValueCollection { { "supportUnpublished", "true" }, { "runAsync", "false" } });
+            indexer.Initialize("indexer", new NameValueCollection { { "supportUnpublished", "true" }, { "runAsync", "false" } });
 
+            indexer.RebuildIndex();
 
-            _indexer.RebuildIndex();
-            _searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
+            contentMock = new Mock<IContent>();
+            StubContentService(contentMock);
+            StubContent(contentMock);
         }
 
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-            _luceneDir.Dispose();
+            luceneDir.Dispose();
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;
+        }
+
+        private void StubContentService(Mock<IContent> content)
+        {
+            long total;
+            Mock.Get(serviceContext.ContentService)
+                .Setup(c => c.GetPagedDescendants(-1, 0, 1000, out total, "Path", Direction.Ascending, ""))
+                .Returns(new List<IContent> { content.Object });
+        }
+
+        private static void StubContent(Mock<IContent> content)
+        {
+            content.Setup(c => c.ContentType).Returns(new ContentType(-1) { Alias = "someType" });
+            content.Setup(c => c.Id).Returns(1);
+            content.Setup(c => c.Name).Returns("Some doc");
+            content.Setup(c => c.Path).Returns("-1 1");
+            content.Setup(c => c.Properties).Returns(new PropertyCollection
+            {
+                new Property(new PropertyType("textstring", DataTypeDatabaseType.Nvarchar) {Alias = "a-string"})
+                {
+                    Value = "a string"
+                },
+                new Property(new PropertyType("indexer-test", DataTypeDatabaseType.Ntext) {Alias = "indexer-test"})
+                {
+                    Value = @"{
+                      ""name"": ""1 column layout"",
+                      ""sections"": [
+                        {
+                          ""grid"": 12,
+                          ""rows"": [
+                            {
+                              ""name"": ""Headline"",
+                              ""areas"": [
+                                {
+                                  ""grid"": 12,
+                                  ""hasConfig"": false,
+                                  ""controls"": [
+                                    {
+                                      ""value"": ""Hello world!"",
+                                      ""editor"": {
+                                        ""alias"": ""headline""
+                                      },
+                                      ""active"": false
+                                    },
+                                    {
+                                    ""value"": ""<p>Here's the first article</p>"",
+                                      ""editor"": {
+                                        ""alias"": ""rte""
+                                      },
+                                      ""active"": false
+                                    },
+                                    {
+                                    ""value"": ""<p>And here's some more RTE content</p>"",
+                                      ""editor"": {
+                                        ""alias"": ""rte""
+                                      },
+                                      ""active"": true
+                                    }
+                                  ],
+                                  ""active"": true,
+                                  ""hasActiveChild"": true
+                                }
+                              ],
+                              ""hasConfig"": false,
+                              ""id"": ""f49faed0-0df4-4ddc-0b41-c841d07b0889"",
+                              ""hasActiveChild"": true,
+                              ""active"": true
+                            }
+                          ]
+                        }
+                      ]
+                    }"
+                }
+            });
         }
 
         protected override ApplicationContext CreateApplicationContext()
@@ -199,7 +233,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
     public class TestGridPropertyValueEditor : PropertyValueEditor
     {
-        public override IEnumerable<XElement> ConvertDbToExamine(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override IEnumerable<SearchDataValue> ConvertDbToExamine(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
             var value = property.Value as string;
@@ -220,7 +254,14 @@ namespace Umbraco.Tests.UmbracoExamine
                                 var controlValue = control["value"].Value<string>();
                                 var editorName = control["editor"]["alias"].Value<string>();
                                 if (!String.IsNullOrWhiteSpace(controlValue))
-                                    yield return new XElement(nodeName + "." + editorName, controlValue.StripHtml());
+                                {
+                                    var dataValue = new SearchDataValue(nodeName + "." + editorName, controlValue.StripHtml());
+                                    if (editorName == "rte")
+                                        dataValue.Store = false;
+                                    if (editorName == "headline")
+                                        dataValue.Analyze = false;
+                                    yield return dataValue;
+                                }
                             }
                         }
                     }
