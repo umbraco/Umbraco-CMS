@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +14,16 @@ using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager.repositories;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.UI;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
@@ -26,7 +32,117 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        [HttpPost]
+        [FileUploadCleanupFilter(false)]
+        public async Task<LocalPackageInstallModel> UploadLocalPackage()
+        {
+            if (Request.Content.IsMimeMultipartContent() == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
 
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            //ensure it exists
+            Directory.CreateDirectory(root);
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            var result = await Request.Content.ReadAsMultipartAsync(provider);
+
+            //must have a file
+            if (result.FileData.Count == 0)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            //TODO: App/Tree Permissions?
+            var model = new LocalPackageInstallModel
+            {
+                PackageGuid = Guid.NewGuid()
+            };
+
+            //get the files
+            foreach (var file in result.FileData)
+            {
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
+                var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+
+                //TODO: Only allow .zip
+                if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))
+                {
+                    //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
+                    var packageTempDir = IOHelper.MapPath(SystemDirectories.Data);
+                    
+                    //ensure it's there
+                    Directory.CreateDirectory(packageTempDir);
+
+                    //copy it - must always be '.umb' for the installer thing to work
+                    //the file name must be a GUID - this is what the packager expects (strange yes)
+                    //because essentially this is creating a temporary package Id that will be used
+                    //for unpacking/installing/etc...
+                    var packageTempFileName = model.PackageGuid + ".umb";
+                    var packageTempFileLocation = Path.Combine(packageTempDir, packageTempFileName);
+                    File.Copy(file.LocalFileName, packageTempFileLocation, true);
+
+                    try
+                    {
+                        var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+                        //this will load in all the metadata too
+                        var tempDir = ins.Import(packageTempFileName);
+                        model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempDir);
+                        model.Id = ins.CreateManifest(
+                            IOHelper.MapPath(model.TemporaryDirectoryPath),
+                            model.PackageGuid.ToString(),
+                            //TODO: Does this matter? we're installing a local package
+                            string.Empty);
+
+                        model.Name = ins.Name;
+                        model.Author = ins.Author;
+                        model.AuthorUrl = ins.AuthorUrl;
+                        model.License = ins.License;
+                        model.LicenseUrl = ins.LicenseUrl;
+                        model.ReadMe = ins.ReadMe;
+                        model.ConflictingMacroAliases = ins.ConflictingMacroAliases;
+                        model.ConflictingStyleSheetNames = ins.ConflictingStyleSheetNames;
+                        model.ConflictingTemplateAliases = ins.ConflictingTemplateAliases;
+                        model.ContainsBinaryFileErrors = ins.ContainsBinaryFileErrors;
+                        model.ContainsLegacyPropertyEditors = ins.ContainsLegacyPropertyEditors;
+                        model.ContainsMacroConflict = ins.ContainsMacroConflict;
+                        model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
+                        model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;
+                        model.ContainsUnsecureFiles = ins.ContainsUnsecureFiles;
+
+                        model.Url = ins.Url;
+                        model.Version = ins.Version;
+                        //TODO: We need to add the 'strict' requirement to the installer
+                    }
+                    finally
+                    {
+                        //Cleanup file
+                        if (File.Exists(packageTempFileLocation))
+                        {
+                            File.Delete(packageTempFileLocation);
+                        }
+                    }
+                }
+                else
+                {
+                    model.Notifications.Add(new Notification(
+                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                        Services.TextService.Localize("media/disallowedFileType"),
+                        SpeechBubbleIcon.Warning));
+                }
+                
+            }
+
+            return model;
+
+        }
+
+        /// <summary>
+        /// Gets the package from Our to install
+        /// </summary>
+        /// <param name="packageGuid"></param>
+        /// <returns></returns>
         [HttpGet]
         public PackageInstallModel Fetch(string packageGuid)
         {
@@ -50,6 +166,11 @@ namespace Umbraco.Web.Editors
             return p;
         }
 
+        /// <summary>
+        /// Extracts the package zip and gets the packages information
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
@@ -60,6 +181,11 @@ namespace Umbraco.Web.Editors
             return model;
         }
 
+        /// <summary>
+        /// Installs the package files
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
@@ -69,7 +195,11 @@ namespace Umbraco.Web.Editors
             return model;
         }
 
-
+        /// <summary>
+        /// Installs the packages data/business logic
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
@@ -79,7 +209,11 @@ namespace Umbraco.Web.Editors
             return model;
         }
 
-
+        /// <summary>
+        /// Cleans up the package installation
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public PackageInstallModel CleanUp(PackageInstallModel model)
         {

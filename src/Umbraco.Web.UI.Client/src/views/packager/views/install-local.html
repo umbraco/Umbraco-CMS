@@ -6,10 +6,43 @@
 
 
             <div class="umb-upload-field">
-                    <i class="icon-box"></i>
-                    <small class="faded"><strong>Drop to upload</strong></small>
-            </div>
+                
+                
+                <!-- Drag and drop files area -->
+                <div ngf-drop
+                     ng-hide="hideDropzone"
+                     ng-model="filesHolder"
+                     ngf-change="handleFiles($files, $event)"
+                     class="dropzone"
+                     ngf-drag-over-class="drag-over"
+                     ngf-multiple="false"
+                     ngf-allow-dir="false"
+                     ngf-pattern="*.zip"
+                     ngf-max-size="{{ maxFileSize }}"
+                     ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
 
+
+                    <div class="content">
+
+                        <!-- Drag and drop illustration -->
+                        <i class="icon-box" draggable="false"></i>
+                        <small class="faded" draggable="false"><strong>Drop to upload</strong></small>
+
+                        <!-- Select files -->
+                        <div class="file-select"
+                             ngf-select
+                             ng-model="filesHolder"
+                             ngf-change="handleFiles($files, $event)"
+                             ngf-multiple="true"
+                             ngf-pattern="*.zip"
+                             ngf-max-size="{{ maxFileSize }}">
+                            - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
             <h3><strong>Upload package</strong></h3>
             <p class="faded">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
@@ -18,6 +51,8 @@
 
             <button type="button"
                     class="umb-era-button -blue"
+                    ng-disabled="vm.zipFile.uploadStatus !== 'done'"
+                    ng-class="{'-inactive' : vm.zipFile.uploadStatus !== 'done'}"
                     ng-click="vm.loadPackage()">Next
             </button>
         </form>
@@ -49,7 +84,7 @@
 
                     <div class="umb-info-local-item">
                         <strong>License</strong>
-                        <a href="{{ vm.localPackage.licensLink }}">{{ vm.localPackage.licens }}</a>
+                        <a href="{{ vm.localPackage.licenseLink }}">{{ vm.localPackage.license }}</a>
                     </div>
 
                     <div class="umb-info-local-item">
@@ -58,18 +93,21 @@
                         <small> {{ vm.localPackage.readme }} </small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3">
+                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == ''">
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"
-                                class="umb-era-button -blue inline-flex">
+                                class="umb-era-button -blue inline-flex"
+                                ng-click="vm.installPackage()">
                                 Install package
                         </button>
-                        <label for="licens-accept" class="umb-package-installer-label">
-                            <input type="checkbox" id="licens-accept" ng-model="vm.localPackage.packageLicensAccept" required>
+                        <label for="license-accept" class="umb-package-installer-label">
+                            <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required>
                             <strong class="label-text">I accept <a href="#">terms of use</a></strong>
                         </label>
-
+                    </div>
+                    <div class="umb-info-local-item">
+                        <p>{{vm.installState.status}}</p>
                     </div>
 
                 </div>

@@ -1,29 +1,127 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore) {
 
         var vm = this;
         vm.state = "upload";
 
-        vm.localPackage = {
-            "icon":"https://our.umbraco.org/media/wiki/154472/635997115126742822_logopng.png?bgcolor=fff&height=154&width=281&format=png",
-            "name": "SvgIconPicker Version: 0.1.0",
-            "author": "Søren Kottal",
-            "authorLink": "https://github.com/skttl/",
-            "info": "https://github.com/skttl/Umbraco.SvgIconPicker",
-            "licens": "GPLv3",
-            "licensLink": "http://www.gnu.org/licenses/quick-guide-gplv3.en.html",
-            "licensAccept": false,
-            "readme": "Color Palettes is a simple property editor that let you define different color palettes (or get them from Adobe Kuler or COLOURlovers) and present them to the editor as a list of radio buttons.",
-            "filePath": "",
-            "riskAccept": false
+        vm.localPackage = {};
+        vm.loadPackage = loadPackage;
+        vm.installPackage = installPackage;
+        vm.installState = {
+            status: ""
+        };
+        vm.zipFile = {
+            uploadStatus: "idle",
+            uploadProgress: 0,
+            serverErrorMessage: null
         };
 
-        vm.loadPackage = loadPackage;
+        $scope.handleFiles = function (files, event) {
+            for (var i = 0; i < files.length; i++) {
+                upload(files[i]);
+            }
+        };
 
-        function loadPackage(){
-            vm.state = "packageDetails";
+        function upload(file) {
+
+            Upload.upload({
+                url: umbRequestHelper.getApiUrl("packageInstallApiBaseUrl", "UploadLocalPackage"),
+                fields: {},
+                file: file
+            }).progress(function (evt) {
+
+                // calculate progress in percentage
+                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+
+                // set percentage property on file
+                vm.zipFile.uploadProgress = progressPercentage;
+
+                // set uploading status on file
+                vm.zipFile.uploadStatus = "uploading";
+
+            }).success(function (data, status, headers, config) {
+
+                if (data.notifications && data.notifications.length > 0) {
+
+                    // set error status on file
+                    vm.zipFile.uploadStatus = "error";
+
+                    // Throw message back to user with the cause of the error
+                    vm.zipFile.serverErrorMessage = data.notifications[0].message;
+
+                    //TODO: Handle the error in UI
+
+                } else {
+
+                    // set done status on file
+                    vm.zipFile.uploadStatus = "done";
+
+                    vm.localPackage = data;
+                }
+
+            }).error(function (evt, status, headers, config) {
+
+                //TODO: Handle the error in UI
+
+                // set status done
+                vm.zipFile.uploadStatus = "error";
+
+                //if the service returns a detailed error
+                if (evt.InnerException) {
+                    vm.zipFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
+
+                    //Check if its the common "too large file" exception
+                    if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
+                        vm.zipFile.serverErrorMessage = "File too large to upload";
+                    }
+
+                } else if (evt.Message) {
+                    file.serverErrorMessage = evt.Message;
+                }
+
+                // If file not found, server will return a 404 and display this message
+                if (status === 404) {
+                    vm.zipFile.serverErrorMessage = "File not found";
+                }
+
+            });
+        }
+
+        function loadPackage() {
+            if (vm.zipFile.uploadStatus === "done") {
+                vm.state = "packageDetails";
+            }
+        }
+
+        function installPackage() {
+            vm.installState.status = "Installing";
+
+            //TODO: If any of these fail, will they keep calling the next one?
+            packageResource
+                .installFiles(vm.localPackage)
+                .then(function(pack) {
+                        vm.installState.status = "Restarting, please hold...";
+                        return packageResource.installData(pack);
+                    },
+                    installError)
+                .then(function(pack) {
+                        vm.installState.status = "All done, your browser will now refresh";
+                        return packageResource.cleanUp(pack);
+                    },
+                    installError)
+                .then(installComplete, installError);
+        }
+
+        function installComplete() {
+            var url = window.location.href + "?installed=" + vm.localPackage.packageGuid;
+            $cookieStore.put("umbPackageInstallId", vm.localPackage.packageGuid);
+            window.location.reload(true);
+        }
+
+        function installError() {
+            
         }
     }
 

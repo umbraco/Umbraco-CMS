@@ -12,7 +12,7 @@
         </div>
 
         <div ng-show="vm.loading === false">
-            <div class="umb-packages-section">
+            <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
                 <div class="umb-packages-categories">
                     <a href=""
                        class="umb-packages-category"
@@ -37,7 +37,7 @@
 
                             <div class="umb-package-info">
                                 <div class="umb-package-name">{{ package.name }}</div>
-                                <div class="umb-package-description">{{ package.description | limitTo: 40 }}<span ng-if="package.description > (package.description | limitTo: 40)">...</span></div>
+                                <div class="umb-package-description">{{ package.excerpt | limitTo: 40 }}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
@@ -68,7 +68,7 @@
 
                             <div class="umb-package-info">
                                 <div class="umb-package-name">{{ package.name }}</div>
-                                <div class="umb-package-description">{{ package.description | limitTo: 40 }}<span ng-if="package.description > (package.description | limitTo: 40)">...</span></div>
+                                <div class="umb-package-description">{{ package.excerpt | limitTo: 40 }}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
@@ -86,7 +86,7 @@
                 </div> <!-- end packages -->
             </div>
 
-            <div class="umb-packages__pagination" ng-if="vm.pagination.totalPages > 1">
+            <div class="umb-packages__pagination" ng-if="vm.pagination.totalPages > 1 && vm.loading === false">
 
                 <umb-pagination page-number="vm.pagination.pageNumber"
                                 total-pages="vm.pagination.totalPages"
