@@ -86,7 +86,7 @@
                 </div> <!-- end packages -->
             </div>
 
-            <div class="umb-packages__pagination">
+            <div class="umb-packages__pagination" ng-if="vm.pagination.totalPages > 1">
 
                 <umb-pagination page-number="vm.pagination.pageNumber"
                                 total-pages="vm.pagination.totalPages"

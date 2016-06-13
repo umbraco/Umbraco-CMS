@@ -101,20 +101,29 @@
         }
 
         function selectCategory(selectedCategory, categories) {
+            var reset = false;
             for (var i = 0; i < categories.length; i++) {
                 var category = categories[i];
+                if (category.name === selectedCategory.name && category.active === true) {
+                    //it's already selected, let's unselect to show all again
+                    reset = true;
+                }
                 category.active = false;
             }
 
             vm.loading = true;
             vm.searchQuery = "";
+            var searchCategory = selectedCategory.name;
+            if (reset === true) {
+                searchCategory = "";
+            }
 
             $q.all([                    
-                    ourPackageRepositoryResource.getPopular(8, selectedCategory.name)
+                    ourPackageRepositoryResource.getPopular(8, searchCategory)
                     .then(function(pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, selectedCategory.name, vm.searchQuery)
+                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, searchCategory, vm.searchQuery)
                     .then(function(pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -123,7 +132,7 @@
                 ])
                 .then(function() {
                     vm.loading = false;
-                    selectedCategory.active = true;
+                    selectedCategory.active = reset === false;
                 });
         }
 
