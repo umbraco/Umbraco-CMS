@@ -17,20 +17,21 @@
                 controller,
                 nada = function() {};
 
-            beforeEach(function() {
-                angular.module('umbraco.filters', []);
-                angular.module('umbraco.directives', []);
-                angular.module('umbraco.resources', []);
-                angular.module('umbraco.services', []);
-                angular.module('umbraco.packages', []);
-                angular.module('umbraco.views', []);
-                angular.module('ngCookies', []);
-                angular.module('ngSanitize', []);
-                angular.module('ngMobile', []);
-                angular.module('tmh.dynamicLocale', []);
-                angular.module('ngFileUpload', []);
-                angular.module('LocalStorageModule', []);
-            });
+            // UNCOMMENT TO RUN WITH RESHARPERS TESTRUNNER FOR JS
+            //beforeEach(function() {
+            //    angular.module('umbraco.filters', []);
+            //    angular.module('umbraco.directives', []);
+            //    angular.module('umbraco.resources', []);
+            //    angular.module('umbraco.services', []);
+            //    angular.module('umbraco.packages', []);
+            //    angular.module('umbraco.views', []);
+            //    angular.module('ngCookies', []);
+            //    angular.module('ngSanitize', []);
+            //    angular.module('ngMobile', []);
+            //    angular.module('tmh.dynamicLocale', []);
+            //    angular.module('ngFileUpload', []);
+            //    angular.module('LocalStorageModule', []);
+            //});
 
             beforeEach(module("umbraco"));
 
