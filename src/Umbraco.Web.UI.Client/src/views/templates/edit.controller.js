@@ -138,11 +138,24 @@
         function openDictionaryItemOverlay() {
             vm.dictionaryItemOverlay = {
                 view: "treepicker",
-                dialogOptions: {section: "settings", treeAlias: "dictionary"},
+                section: "settings", 
+                treeAlias: "dictionary",
+                entityType: "dictionary",
+                multiPicker: false,
+
                 show: true,
 
                 submit: function(model) {
-                    console.log(model);
+                    
+                },
+
+                select: function(node){
+                	//crappy hack due to dictionary items not in umbracoNode table
+                	var code = "@Umbraco.GetDictionaryValue(\"" + node.name + "\")";
+                	vm.insert(code);
+                	
+                	vm.dictionaryItemOverlay.show = false;
+                    vm.dictionaryItemOverlay = null;
                 },
 
                 close: function(model) {

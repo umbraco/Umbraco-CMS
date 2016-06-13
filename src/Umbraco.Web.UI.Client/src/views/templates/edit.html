@@ -41,10 +41,9 @@
                             </a>
 
                             <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
+                                <li><a href="" ng-click="vm.openPageFieldOverlay()">Value</a></li>
+                                <li><a href="" ng-click="vm.openDictionaryItemOverlay()">Dictionary</a></li>
                                 <li><a href="" ng-click="vm.openMacroOverlay()">Macro</a></li>
-                                <li><a href="" ng-click="">Value</a></li>
-                                <li><a href="" ng-click="vm.insert('@RenderDictionary()')">Dictionary</a></li>
-                                <li><a href="" ng-click="">Partial</a></li>
                             </ul>
 
                         </div>
@@ -54,7 +53,7 @@
                             button-style="link"
                             label="Query Builder"
                             icon="icon-wand"
-                            action="vm.openDictionaryItemOverlay()">
+                            action="vm.openQueryBuilderOverlay()">
                         </umb-button>
 
                         <umb-button
