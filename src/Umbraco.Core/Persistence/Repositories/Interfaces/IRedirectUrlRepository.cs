@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IRedirectUrlRepository : IRepositoryQueryable<int, IRedirectUrl>
+    internal interface IRedirectUrlRepository : IRepositoryQueryable<int, IRedirectUrl>
     {
         IRedirectUrl Get(string url, int contentId);
         void Delete(int id);
