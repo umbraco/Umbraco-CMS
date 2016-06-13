@@ -110,7 +110,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     }
                 }
 
-                return multiNodeTreePicker.Yield().Where(x => x != null);
+                var multiNodeTreePickerEnumerable = multiNodeTreePicker.Yield().Where(x => x != null);
+
+                // in v8 should return multiNodeTreePickerEnumerable but for v7 need to return as PublishedContentEnumerable so that string can be returned for legacy compatibility
+                return new PublishedContentEnumerable(multiNodeTreePickerEnumerable);
             }
 
             return null;

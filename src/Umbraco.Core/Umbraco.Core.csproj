@@ -379,6 +379,7 @@
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentEnumerable.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
@@ -483,6 +484,7 @@
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="PublishedContentTypeConverter.cs" />
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
