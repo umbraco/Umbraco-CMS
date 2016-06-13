@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
 {
+    using System.Text.RegularExpressions;
+
     [HealthCheck(
         "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
         "Click-Jacking Protection",
@@ -15,6 +18,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class ClickJackingCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+
+        private const string XFrameOptionsHeader = "X-Frame-Options";
 
         public ClickJackingCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
@@ -47,15 +52,23 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
             var url = HealthCheckContext.HttpContext.Request.Url;
 
-            // Access the site home page and check for the click-jack protection header
+            // Access the site home page and check for the click-jack protection header or meta tag
             var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
-            request.Method = "HEAD";
-
+            request.Method = "GET";
             try
             {
                 var response = request.GetResponse();
-                success = response.Headers.AllKeys.Contains("X-Frame-Options");
+
+                // Check first for header
+                success = DoHeadersContainFrameOptions(response);
+
+                // If not found, check for meta-tag
+                if (success == false)
+                {
+                    success = DoMetaTagsContainFrameOptions(response);
+                }
+
                 message = success
                     ? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
                     : _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
@@ -74,5 +87,33 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                     Actions = actions
                 };
         }
-   }
+
+        private static bool DoHeadersContainFrameOptions(WebResponse response)
+        {
+            return response.Headers.AllKeys.Contains(XFrameOptionsHeader);
+        }
+
+        private static bool DoMetaTagsContainFrameOptions(WebResponse response)
+        {
+            using (var stream = response.GetResponseStream())
+            {
+                if (stream == null) return false;
+                using (var reader = new StreamReader(stream))
+                {
+                    var html = reader.ReadToEnd();
+                    var metaTags = ParseMetaTags(html);
+                    return metaTags.ContainsKey(XFrameOptionsHeader);
+                }
+            }
+        }
+
+        private static Dictionary<string, string> ParseMetaTags(string html)
+        {
+            var regex = new Regex("<meta http-equiv=\"(.+?)\" content=\"(.+?)\">");
+
+            return regex.Matches(html)
+                .Cast<Match>()
+                .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
+        }
+    }
 }
