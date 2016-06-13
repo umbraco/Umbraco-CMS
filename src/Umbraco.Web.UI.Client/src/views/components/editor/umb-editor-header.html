@@ -43,8 +43,10 @@
                     class="umb-panel-header-description"
                     localize="placeholder"
                     placeholder="@placeholders_enterDescription"
-                    ng-if="!hideDescription"
+                    ng-if="!hideDescription && !descriptionLocked"
                     ng-model="$parent.description" />
+
+                    <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
 
                </div>
 
