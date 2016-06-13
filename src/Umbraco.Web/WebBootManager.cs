@@ -47,6 +47,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Web.HealthCheck;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -533,6 +534,9 @@ namespace Umbraco.Web
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
+
+            HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
         }
 
         /// <summary>
