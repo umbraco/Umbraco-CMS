@@ -33,7 +33,7 @@
                                 button-style="link"
                                 label="Insert"
                                 icon="icon-add"
-                                action="vm.openDocumentation()">
+                                action="vm.openInsertOverlay()">
                             </umb-button>
 
                             <a class="btn btn-link dropdown-toggle umb-button-group__toggle" style="margin-left: -13px;" data-toggle="dropdown">
@@ -134,10 +134,17 @@
        position="right">
    </umb-overlay>
 
+    <umb-overlay
+       ng-if="vm.insertOverlay.show"
+       model="vm.insertOverlay"
+       view="vm.insertOverlay.view"
+       position="right">
+   </umb-overlay>
+
    <umb-overlay
-       ng-if="vm.partialOverlay.show"
-       model="vm.partialOverlay"
-       view="vm.partialOverlay.view"
+       ng-if="vm.partialItemOverlay.show"
+       model="vm.partialItemOverlay"
+       view="vm.partialItemOverlay.view"
        position="right">
    </umb-overlay>
 
