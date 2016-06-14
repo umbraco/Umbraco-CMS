@@ -256,7 +256,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<FacadeService>("Loading content from local db...");
             var sw = Stopwatch.StartNew();
-            var kits = _localContentDb.Select(x => x.Value);
+            var kits = _localContentDb.Select(x => x.Value).OrderBy(x => x.Node.Level);
             _contentStore.SetAll(kits);
             sw.Stop();
             _logger.Debug<FacadeService>("Loaded content from local db (" + sw.ElapsedMilliseconds + "ms).");
