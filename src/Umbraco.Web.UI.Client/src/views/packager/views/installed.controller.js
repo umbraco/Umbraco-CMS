@@ -18,6 +18,8 @@
                 .then(function (packs) {
                     vm.installedPackages = packs;
                 });
+            vm.installState.status = "";
+            vm.state = "list";
         }
 
         function confirmUninstall(pck) {
@@ -28,9 +30,16 @@
         function uninstallPackage(installedPackage) {
             vm.installState.status = "Uninstalling package...";
             packageResource.uninstall(installedPackage.id)
-                .then(function() {
-                    var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
-                    window.location.reload(true);
+                .then(function () {
+                    if (installedPackage.files.length > 0) {
+                        vm.installState.status = "All done, your browser will now refresh";
+
+                        var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
+                        window.location.reload(true);
+                    }
+                    else {
+                        init();                        
+                    }
                 });
         }
 

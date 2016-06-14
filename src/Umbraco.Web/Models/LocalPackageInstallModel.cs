@@ -22,6 +22,12 @@ namespace Umbraco.Web.Models
         public List<Notification> Notifications { get; private set; }
 
         /// <summary>
+        /// A flag to determine if this package is compatible to be installed
+        /// </summary>
+        [DataMember(Name = "isCompatible")]
+        public bool IsCompatible { get; set; }
+
+        /// <summary>
         /// The minimum umbraco version that this package is pinned to
         /// </summary>
         [DataMember(Name = "umbracoVersion")]

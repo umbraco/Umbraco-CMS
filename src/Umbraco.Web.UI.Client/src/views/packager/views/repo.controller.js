@@ -1,26 +1,30 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q) {
+    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, $cookieStore) {
 
         var vm = this;
 
         vm.packageViewState = "packageList";
         vm.categories = [];
-        vm.loading = false;
+        vm.loading = true;
         vm.pagination = {
             pageNumber: 1,
             totalPages: 10,
-            pageSize: 2
+            pageSize: 8
         };
         vm.searchQuery = "";
-
+        vm.installState = {
+            status: ""
+        };
         vm.selectCategory = selectCategory;
         vm.showPackageDetails = showPackageDetails;
         vm.setPackageViewState = setPackageViewState;
         vm.nextPage = nextPage;
         vm.prevPage = prevPage;
         vm.goToPage = goToPage;
+        vm.installPackage = installPackage;
+        vm.downloadPackage = downloadPackage;
 
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
@@ -91,10 +95,7 @@
                                     canceler = null;
                                 });
                         }
-                    }
-                    else {
-                        vm.loading = false;
-                    }
+                    }                    
                 });
             }, 200));
 
@@ -173,6 +174,61 @@
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                 });
+        }
+
+        function downloadPackage(selectedPackage) {
+            vm.loading = true;
+
+            packageResource
+                .fetch(selectedPackage.id)
+                .then(function(pack) {
+                        vm.packageViewState = "packageInstall";
+                        vm.loading = false;
+                        vm.localPackage = pack;
+                        vm.localPackage.allowed = true;                       
+                    },
+                    error);
+        }
+
+        function error(e, args) {
+            
+        }
+
+        function installPackage(selectedPackage) {
+            
+            vm.installState.status = "importing...";
+
+            packageResource
+                .import(selectedPackage)                
+                .then(function(pack) {
+                        vm.installState.status = "Installing...";
+                        return packageResource.installFiles(pack);
+                    },
+                    error)
+                .then(function(pack) {
+                        vm.installState.status = "Restarting, please wait...";
+                        return packageResource.installData(pack);
+                    },
+                    error)
+                .then(function(pack) {
+                        vm.installState.status = "All done, your browser will now refresh";
+                        return packageResource.cleanUp(pack);
+                    },
+                    error)
+                .then(function(result) {
+
+                        if (result.postInstallationPath) {
+                            //Put the redirect Uri in a cookie so we can use after reloading
+                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
+                        }
+                        
+                        //reload on next digest (after cookie)
+                        $timeout(function () {
+                            window.location.reload(true);
+                        });
+
+                    },
+                    error);
         }
 
         init();

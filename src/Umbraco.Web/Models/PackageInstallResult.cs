@@ -9,6 +9,6 @@ namespace Umbraco.Web.Models
     public class PackageInstallResult : PackageInstallModel
     {
         [DataMember(Name = "postInstallationPath")]
-        public Guid PostInstallationPath { get; set; }
+        public string PostInstallationPath { get; set; }
     }
 }

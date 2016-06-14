@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, versionHelper) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, $timeout) {
 
         var vm = this;
         vm.state = "upload";
@@ -57,30 +57,7 @@
                     // set done status on file
                     vm.zipFile.uploadStatus = "done";
                     loadPackage();
-
                     vm.localPackage = data;
-                    vm.localPackage.allowed = true;
-
-                    //now we need to determine if this package is compatible to be installed
-                    if (vm.localPackage.umbracoVersion) {
-                        //0 if the versions are equal
-                        //a negative integer iff v1 < v2
-                        //a positive integer iff v1 > v2
-
-                        //ensure we aren't comparing the pre-release value
-                        var versionNumber = Umbraco.Sys.ServerVariables.application.version.split("-")[0];
-
-                        var compare = versionHelper.versionCompare(
-                            versionNumber,
-                            vm.localPackage.umbracoVersion);
-                        if (compare < 0) {
-                            //this is not compatible!
-                            vm.localPackage.allowed = false;
-                            vm.installState.status =
-                                "This package cannot be installed, it requires a minimum Umbraco version of " +
-                                vm.localPackage.umbracoVersion;
-                        }
-                    }
                 }
 
             }).error(function (evt, status, headers, config) {
@@ -124,6 +101,16 @@
             packageResource
                 .installFiles(vm.localPackage)
                 .then(function(pack) {
+                        vm.installState.status = "Importing...";
+                        return packageResource.import(pack);
+                    },
+                    installError)
+                .then(function(pack) {
+                        vm.installState.status = "Installing...";
+                        return packageResource.installFiles(pack);
+                    },
+                    installError)
+                .then(function(pack) {
                         vm.installState.status = "Restarting, please wait...";
                         return packageResource.installData(pack);
                     },
@@ -133,17 +120,20 @@
                         return packageResource.cleanUp(pack);
                     },
                     installError)
-                .then(function (result) {
+                .then(function(result) {
 
-                    if (result.postInstallationPath) {
-                        window.location.href = url;
-                    }
-                    else {
-                        var url = window.location.href + "?installed=" + vm.localPackage.packageGuid;
-                        window.location.reload(true);
-                    }
+                        if (result.postInstallationPath) {
+                            //Put the redirect Uri in a cookie so we can use after reloading
+                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
+                        }
+                        //reload on next digest (after cookie)
+                        $timeout(function() {
+                            window.location.reload(true);
+                        });
 
-                }, installError);
+
+                    },
+                    installError);
         }
 
         function installError() {

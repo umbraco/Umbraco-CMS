@@ -83,11 +83,11 @@
                                 Uninstall package
                             </button>
                             <label for="confirm-uninstall" class="umb-package-installer-label">
-                                <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required>
+                                <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
                                 <strong class="label-text">Confirm package uninstall</strong>
                             </label>
                         </div>
-                        <div class="umb-info-local-item">
+                        <div class="umb-info-local-item text-info">
                             <p>{{vm.installState.status}}</p>
                         </div>
 

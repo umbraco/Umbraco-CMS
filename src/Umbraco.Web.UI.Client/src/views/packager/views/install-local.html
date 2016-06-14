@@ -73,7 +73,7 @@
 
                     <div class="umb-info-local-item">
                         <strong>Version</strong>
-                        {{ vm.package.version }}
+                        {{ vm.localPackage.version }}
                     </div>
 
                     <div class="umb-info-local-item">
@@ -84,10 +84,10 @@
                     <div class="umb-info-local-item">
                         <strong>Read me</strong>
                         <br>
-                        <small> {{ vm.localPackage.readme }} </small>
+                        <small ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == '' && vm.localPackage.allowed">
+                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"
@@ -96,11 +96,14 @@
                                 Install package
                         </button>
                         <label for="license-accept" class="umb-package-installer-label">
-                            <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required>
-                            <strong class="label-text">I accept <a href="{{ vm.package.licenseUrl }}">terms of use</a></strong>
+                            <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
+                            <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
                         </label>
                     </div>
-                    <div class="umb-info-local-item">
+                    <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
+                        This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
+                    </div>
+                    <div class="umb-info-local-item text-info">
                         <p>{{vm.installState.status}}</p>
                     </div>
 

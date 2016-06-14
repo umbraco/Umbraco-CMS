@@ -178,24 +178,25 @@ namespace umbraco.cms.businesslogic.packager
         /// <summary>
         /// Imports the specified package
         /// </summary>
-        /// <param name="InputFile">Filename of the umbracopackage</param>
+        /// <param name="inputFile">Filename of the umbracopackage</param>
+        /// <param name="deleteFile">true if the input file should be deleted after import</param>
         /// <returns></returns>
-        public string Import(string InputFile)
+        public string Import(string inputFile, bool deleteFile)
         {
             using (DisposableTimer.DebugDuration<Installer>(
-                () => "Importing package file " + InputFile,
-                () => "Package file " + InputFile + "imported"))
+                () => "Importing package file " + inputFile,
+                () => "Package file " + inputFile + "imported"))
             {
                 var tempDir = "";
-                if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile)))
+                if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + inputFile)))
                 {
-                    var fi = new FileInfo(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile));
+                    var fi = new FileInfo(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + inputFile));
                     // Check if the file is a valid package
                     if (fi.Extension.ToLower() == ".umb")
                     {
                         try
                         {
-                            tempDir = UnPack(fi.FullName);
+                            tempDir = UnPack(fi.FullName, deleteFile);
                             LoadConfig(tempDir);
                         }
                         catch (Exception unpackE)
@@ -207,9 +208,20 @@ namespace umbraco.cms.businesslogic.packager
                         throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
                 }
                 else
-                    throw new Exception("Error - file not found. Could find file named '" + IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile) + "'");
+                    throw new Exception("Error - file not found. Could find file named '" + IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + inputFile) + "'");
                 return tempDir;
             }
+
+        }
+
+        /// <summary>
+        /// Imports the specified package
+        /// </summary>
+        /// <param name="inputFile">Filename of the umbracopackage</param>
+        /// <returns></returns>
+        public string Import(string inputFile)
+        {
+            return Import(inputFile, true);
         }
 
         public int CreateManifest(string tempDir, string guid, string repoGuid)
@@ -713,7 +725,8 @@ namespace umbraco.cms.businesslogic.packager
                 return path + fileName;
             return path + Path.DirectorySeparatorChar + fileName;
         }
-        private static string UnPack(string zipName)
+
+        private static string UnPack(string zipName, bool deleteFile)
         {
             // Unzip
 
@@ -762,7 +775,12 @@ namespace umbraco.cms.businesslogic.packager
 
             // Clean up
             s.Close();
-            File.Delete(zipName);
+
+            if (deleteFile)
+            {
+                File.Delete(zipName);
+            }
+            
 
             return tempDir;
 
