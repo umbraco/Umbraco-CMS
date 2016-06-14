@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Services
             var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
             
             Assert.IsNotNull(resolvedMedia);
-            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
+            Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
         }
 
         [Test]
