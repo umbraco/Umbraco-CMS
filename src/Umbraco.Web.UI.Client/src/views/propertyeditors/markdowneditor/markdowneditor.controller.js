@@ -47,7 +47,7 @@ function MarkdownEditorController($scope, $element, assetsService, dialogService
                 // so run the init on a timeout
                 $timeout(function () {
                     var converter2 = new Markdown.Converter();
-                    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+                    var editor2 = new Markdown.Editor(converter2, $element, "-" + $scope.model.alias);
                     editor2.run();
 
                     //subscribe to the image dialog clicks
