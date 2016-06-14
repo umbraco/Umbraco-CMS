@@ -7,6 +7,31 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
     
     return {
         
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.packageInstallResource#getInstalled
+         * @methodOf umbraco.resources.packageInstallResource
+         *
+         * @description
+         * Gets a list of installed packages       
+         */
+        getInstalled: function() {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "packageInstallApiBaseUrl",
+                       "GetInstalled")),
+               'Failed to get installed packages');
+        },
+
+        uninstall: function(packageId) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                  umbRequestHelper.getApiUrl(
+                      "packageInstallApiBaseUrl",
+                      "Uninstall", { packageId: packageId })),
+              'Failed to uninstall package');
+        },
 
         /**
          * @ngdoc method

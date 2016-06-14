@@ -31,7 +31,7 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
               return packageResource.installFiles(pack);
             }, $scope.error)
             .then(function(pack){
-              $scope.state = "Restarting, please hold...";
+              $scope.state = "Restarting, please wait...";
               return packageResource.installData(pack);
             }, $scope.error)
             .then(function(pack){

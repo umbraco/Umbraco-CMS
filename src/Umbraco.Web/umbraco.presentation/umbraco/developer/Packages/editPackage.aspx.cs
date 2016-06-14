@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.presentation.developer.packages
@@ -65,8 +66,8 @@ namespace umbraco.presentation.developer.packages
                 if (Page.IsPostBack == false)
                 {
                     ClientTools
-                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
-                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, false);
+                        .SetActiveTreeType(Constants.Trees.Packages)
+                        .SyncTree("-1,created," + createdPackage.Data.Id, false);
 
                     packageAuthorName.Text = pack.Author;
                     packageAuthorUrl.Text = pack.AuthorUrl;
@@ -182,8 +183,8 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     ClientTools
-                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
-                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, true);
+                        .SetActiveTreeType(Constants.Trees.Packages)
+                        .SyncTree("-1,created," + createdPackage.Data.Id, true);
                 }
             }
         }
