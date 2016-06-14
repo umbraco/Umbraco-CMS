@@ -94,6 +94,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		}
 
 		[Test]
+        [Ignore]
 		public void Index_Move_Media_To_Non_Indexable_ParentID()
 		{
 			//get a node from the data repo (this one exists underneath 2222)
@@ -177,6 +178,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		/// This will delete an item from the index and ensure that all children of the node are deleted too!
 		/// </summary>
 		[Test]
+        [Ignore]
 		public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
 		{
 
