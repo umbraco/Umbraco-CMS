@@ -62,7 +62,7 @@ namespace Umbraco.Web.Install.InstallSteps
             else
             {
                 dbContext.ConfigureDatabaseConnection(
-                    database.Server, database.DatabaseName, database.Login, database.Password,
+                    database.Server, database.DatabaseName, database.Login, string.Format("'{0}'", database.Password),
                     database.DatabaseType.ToString());
             }
         }
