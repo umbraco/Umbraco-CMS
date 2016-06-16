@@ -1,28 +1,15 @@
 <div ng-controller="Umbraco.Overlays.MediaTypePickerController">
 
-  <div class="umb-pane">
-
-        <ul class="umb-actions">
-			<li class="action">
-				<ul class="umb-actions-child">
-
-					<li ng-repeat="mediatype in model.allowedTypes">
-					    <a ng-click="select(mediatype)">
-
-					        <i class="large {{mediatype.icon}}"></i>
-					        
-					        <span class="menu-label">
-	        		        	{{mediatype.name}}
-	        		            <small>
-	        		                {{mediatype.description}}
-	        		            </small>
-	        		        </span>
-					    </a>
-					</li>
-
-				</ul>
-			</li>
-		</ul>
-    </div>   
+  	<ul class="umb-card-grid">
+      <li
+	  	ng-repeat="mediatype in model.allowedTypes | orderBy:'name'"
+        ng-click="select(mediatype)"
+        class="-three-in-row">
+        <a class="umb-card-grid-item" href="" title="{{mediatype.name}}">
+            <i class="{{ mediatype.icon }}"></i>
+            {{ mediatype.name }}
+        </a>
+      </li>
+    </ul>
 
 </div>
