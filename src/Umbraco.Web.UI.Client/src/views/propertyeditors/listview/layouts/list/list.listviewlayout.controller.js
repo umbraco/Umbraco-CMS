@@ -11,6 +11,7 @@
       vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
       vm.activeDrag = false;
       vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+      vm.acceptedMediatypes = [];
 
       vm.selectItem = selectItem;
       vm.clickItem = clickItem;

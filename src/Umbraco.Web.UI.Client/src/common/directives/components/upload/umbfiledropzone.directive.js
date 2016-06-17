@@ -25,7 +25,7 @@ TODO
 
 angular.module("umbraco.directives")
 
-.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper, editorState, mediaTypeResource, notificationsService, $q) {
+.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper, editorState) {
 	return {
 
 		restrict: 'E',
@@ -42,6 +42,7 @@ angular.module("umbraco.directives")
 
 			compact: '@',
 			hideDropzone: '@',
+			acceptedMediatypes: '=',
 
 			filesQueued: '=',
 			handleFile: '=',
@@ -94,65 +95,28 @@ angular.module("umbraco.directives")
 				//when queue is done, kick the uploader
 				if(!scope.working){
 
-					_checkMediaType().then(function(types){
+console.log(scope.acceptedMediatypes);
+					// Upload not allowed
+					if(!scope.acceptedMediatypes || !scope.acceptedMediatypes.length){
+						files.map(function(file){
+							file.uploadStatus = "error";
+							file.serverErrorMessage = "File type is not allowed here";
+							scope.rejected.push(file);
+						});
+						scope.queue = [];
+					}	
 
-						scope.allowedTypes = types;
-						// One allowed mediaType, pick this one 
-							if(scope.allowedTypes.length === 1){
-								scope.contentTypeAlias = scope.allowedTypes[0].alias;
-								_processQueueItem();
-							}
-							
-							// More than one, open dialog
-							if(scope.allowedTypes.length > 1){
-								_chooseMediaType();
-							}
-							
-							// Default, upload not allowed
-							if(!scope.allowedTypes.length){
-
-								files.map(function(file){
-									file.uploadStatus = "error";
-									file.serverErrorMessage = "File type is not allowed here";
-									scope.rejected.push(file);
-								});
-								scope.queue = [];
-							}	
-					});
+					// One allowed mediaType, pick this one 
+					if(scope.acceptedMediatypes && scope.acceptedMediatypes.length === 1){
+						scope.contentTypeAlias = scope.acceptedMediatypes[0].alias;
+						_processQueueItem();
+					}
 					
-					
+					// More than one, open dialog
+					if(scope.acceptedMediatypes && scope.acceptedMediatypes.length > 1){
+						_chooseMediaType();
+					}
 				}				
-			}
-
-			function _checkMediaType(){
-				var nodeId = -1;
-				if(editorState.current){
-					nodeId = editorState.current.id;
-				}
-
-				// Get All allowedTypes
-				return mediaTypeResource.getAllowedTypes(nodeId)
-					.then(function(types){
-						var allowedQ = types.map(function(type){
-							return mediaTypeResource.getById(type.id);
-						});
-
-						// Get full list
-						return $q.all(allowedQ).then(function(fullTypes){
-							// Only mediatypes with 'umbracoFile' property
-							return fullTypes.filter(function(mediatype){
-								for(var i = 0; i < mediatype.groups.length; i++){
-									var group = mediatype.groups[i];
-									for(var j = 0; j < group.properties.length; j++){
-										var property = group.properties[j];
-										if(property.alias === allowedPropertyAlias){
-											return mediatype;
-										}
-									}
-								}
-							});
-						});
-				});
 			}
 
 			function _processQueueItem(){
@@ -267,7 +231,7 @@ angular.module("umbraco.directives")
 				scope.mediatypepickerOverlay = {
 					view: "mediatypepicker",
 					title: "Choose media type",
-					allowedTypes: scope.allowedTypes,
+					acceptedMediatypes: scope.acceptedMediatypes,
 					hideSubmitButton: true,
 					show: true,
 					submit: function(model) {

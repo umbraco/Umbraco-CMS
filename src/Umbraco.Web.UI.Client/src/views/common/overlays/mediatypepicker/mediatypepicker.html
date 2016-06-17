@@ -2,7 +2,7 @@
 
   	<ul class="umb-card-grid">
       <li
-	  	ng-repeat="mediatype in model.allowedTypes | orderBy:'name'"
+	  	ng-repeat="mediatype in model.acceptedMediatypes | orderBy:'name'"
         ng-click="select(mediatype)"
         class="-three-in-row">
         <a class="umb-card-grid-item" href="" title="{{mediatype.name}}">
