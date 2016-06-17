@@ -25,7 +25,7 @@ TODO
 
 angular.module("umbraco.directives")
 
-.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper, editorState, mediaTypeResource, $q) {
+.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper, editorState, mediaTypeResource, notificationsService, $q) {
 	return {
 
 		restrict: 'E',
@@ -53,21 +53,7 @@ angular.module("umbraco.directives")
 			scope.queue = [];
 			scope.done = [];
 			scope.rejected = [];
-			// todo: dummydata, replace with the real thing 
-			
-			scope.allowedTypes = [
-				{
-					alias: 'wine',
-					icon: 'icon-wine-glass',
-					name: 'Wine',					
-				},
-				{
-					alias: 'heavy',
-					icon: 'icon-weight',
-					name: 'Heavy',
-					description: 'Only the heavy stuff'
-				}
-			];
+
 			scope.currentFile = undefined;
 
 			function _filterFile(file) {
@@ -108,46 +94,10 @@ angular.module("umbraco.directives")
 				//when queue is done, kick the uploader
 				if(!scope.working){
 
-					_checkMediaType();
-					
-					
-				}				
-			}
+					_checkMediaType().then(function(types){
 
-			function _checkMediaType(){
-				var nodeId = -1;
-				if(editorState.current){
-					nodeId = editorState.current.id;
-				}
-
-				// Get All allowedTypes
-				// Considering to expand te request to include if it's an image mediatype
-				mediaTypeResource.getAllowedTypes(nodeId)
-					.then(function(types){
-
-						var allowedQ = types.map(function(type){
-							return mediaTypeResource.getById(type.id);
-						});
-
-						// Get full list
-						$q.all(allowedQ).then(function(fullTypes){
-							
-							// Only mediatypes with 'umbracoFile' property
-							scope.allowedTypes = fullTypes.filter(function(mediatype){
-								for(var i = 0; i < mediatype.groups.length; i++){
-									var group = mediatype.groups[i];
-									for(var j = 0; j < group.properties.length; j++){
-										var property = group.properties[j];
-										var allowedPropertyAlias  = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
-										if(property.alias === allowedPropertyAlias){
-											return mediatype;
-										}
-									}
-								}
-							});
-
-
-							// One allowed mediaType, pick this one 
+						scope.allowedTypes = types;
+						// One allowed mediaType, pick this one 
 							if(scope.allowedTypes.length === 1){
 								scope.contentTypeAlias = scope.allowedTypes[0].alias;
 								_processQueueItem();
@@ -160,14 +110,49 @@ angular.module("umbraco.directives")
 							
 							// Default, upload not allowed
 							if(!scope.allowedTypes.length){
-								// Needs a warning
-								//_processQueueItem();
-							}	
 
+								files.map(function(file){
+									file.uploadStatus = "error";
+									file.serverErrorMessage = "File type is not allowed here";
+									scope.rejected.push(file);
+								});
+								scope.queue = [];
+							}	
+					});
+					
+					
+				}				
+			}
+
+			function _checkMediaType(){
+				var nodeId = -1;
+				if(editorState.current){
+					nodeId = editorState.current.id;
+				}
+
+				// Get All allowedTypes
+				return mediaTypeResource.getAllowedTypes(nodeId)
+					.then(function(types){
+						var allowedQ = types.map(function(type){
+							return mediaTypeResource.getById(type.id);
 						});
 
+						// Get full list
+						return $q.all(allowedQ).then(function(fullTypes){
+							// Only mediatypes with 'umbracoFile' property
+							return fullTypes.filter(function(mediatype){
+								for(var i = 0; i < mediatype.groups.length; i++){
+									var group = mediatype.groups[i];
+									for(var j = 0; j < group.properties.length; j++){
+										var property = group.properties[j];
+										if(property.alias === allowedPropertyAlias){
+											return mediatype;
+										}
+									}
+								}
+							});
+						});
 				});
-				
 			}
 
 			function _processQueueItem(){
@@ -286,21 +271,21 @@ angular.module("umbraco.directives")
 					hideSubmitButton: true,
 					show: true,
 					submit: function(model) {
-						console.log(model);
-						
 						scope.contentTypeAlias = model.selectedType.alias;
 																					  
 						scope.mediatypepickerOverlay.show = false;
 						scope.mediatypepickerOverlay = null;
 						
 						_processQueueItem();
-						
 					},
 					close: function(oldModel) {
-						console.log('close');
-						console.log(oldModel);
 						
-						// not sure what to do here, yet
+						scope.queue.map(function(file){
+							file.uploadStatus = "error";
+							file.serverErrorMessage = "Cannot upload this file, no mediatype selected";
+							scope.rejected.push(file);
+						});
+						scope.queue = [];
 
 						scope.mediatypepickerOverlay.show = false;
 						scope.mediatypepickerOverlay = null;
