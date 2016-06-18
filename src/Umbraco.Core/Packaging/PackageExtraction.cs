@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace Umbraco.Core.Packaging
 {
@@ -75,8 +75,7 @@ namespace Umbraco.Core.Packaging
         public void CopyFilesFromArchive(string packageFilePath, IEnumerable<KeyValuePair<string, string>> sourceDestination)
         {
             var d = sourceDestination.ToDictionary(k => k.Key.ToLower(), v => v.Value);
-
-
+            
             ReadZipfileEntries(packageFilePath, (entry, stream) =>
             {
                 string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
@@ -152,47 +151,46 @@ namespace Umbraco.Core.Packaging
 
             using (var fs = File.OpenRead(packageFilePath))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                using (var zipArchive = new ZipArchive(fs))
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    foreach(var zipEntry in zipArchive.Entries)
                     {
-                        
-                        if (zipEntry.IsDirectory) continue;
-
                         if (files.Contains(zipEntry.Name))
                         {
                             using (var memStream = new MemoryStream())
                             {
-                                zipInputStream.CopyTo(memStream);
+                                var zippedFile = zipEntry.Open();
+                                zippedFile.CopyTo(memStream);
                                 yield return memStream.ToArray();
                                 memStream.Close();
                             }
                         }
                     }
-
-                    zipInputStream.Close();
+                    
                 }
                 fs.Close();
             }
         }
 
-        private void ReadZipfileEntries(string packageFilePath, Func<ZipEntry, ZipInputStream, bool> entryFunc, bool skipsDirectories = true)
+        /// <summary>
+        /// Open a package file, and run entryFunc for every one of these
+        /// </summary>
+        /// <param name="packageFilePath">the file path of the package file</param>
+        /// <param name="entryFunc">The function to perform on every Entry</param>
+        /// <param name="skipsDirectories"></param>
+        private void ReadZipfileEntries(string packageFilePath, Func<ZipArchiveEntry, Stream, bool> entryFunc, bool skipsDirectories = true)
         {
             CheckPackageExists(packageFilePath);
 
             using (var fs = File.OpenRead(packageFilePath))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                using (var zipArchive = new ZipArchive(fs))
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    foreach (var zipEntry in zipArchive.Entries)
                     {
-                        if (zipEntry.IsDirectory && skipsDirectories) continue;
-                        if (entryFunc(zipEntry, zipInputStream) == false) break;
+                        // if (zipEntry.IsDirectory && skipsDirectories) continue;
+                        if (entryFunc(zipEntry, zipEntry.Open()) == false) break;
                     }
-
-                    zipInputStream.Close();
                 }
                 fs.Close();
             }
