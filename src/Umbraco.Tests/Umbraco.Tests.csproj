@@ -225,6 +225,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
+    <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="TestHelpers\TestIndexCollectionAccessor.cs" />
@@ -724,7 +725,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
 xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>

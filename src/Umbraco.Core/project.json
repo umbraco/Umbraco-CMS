@@ -14,14 +14,13 @@
     "NPoco": "3.3.3",
     "semver": "1.*",
     "SqlServerCE": "4.*",
-    "SharpZipLib": "0.86.0",
     "MySql.Data": "6.9.*"
   },
   "frameworks": {
-    "net461": { }
+    "net461": {}
   },
   "runtimes": {
-    "win": { },
-    "win-anycpu": { }
+    "win": {},
+    "win-anycpu": {}
   }
 }

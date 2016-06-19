@@ -9,19 +9,23 @@ using System.Web;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Hosting;
-using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using System.IO.Compression;
 
 namespace Umbraco.Core.IO
 {
-	public static class IOHelper
+    public static class IOHelper
     {
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
+        /// <summary>
+        /// Provides a platform-specific character used to separate directory levels in a
+        /// path string that reflects a hierarchical file system organization.
+        /// </summary>
         public static char DirSepChar
         {
             get
@@ -30,53 +34,29 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
-	    {
-	        // Unzip
-	        string tempDir = unPackDirectory;
-	        Directory.CreateDirectory(tempDir);
+        /// <summary>
+        /// extract a zip file into a destination folder
+        /// </summary>
+        /// <param name="zipFilePath"></param>
+        /// <param name="unPackDirectory"></param>
+        /// <param name="deleteZipFile"></param>
+        internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
+        {
+            // Unzip
+            string tempDir = unPackDirectory;
+            Directory.CreateDirectory(tempDir);
 
-            //TODO: Get rid of SharpZipLib library
-	        using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
-	        {
-                ZipEntry theEntry;
-                while ((theEntry = s.GetNextEntry()) != null)
-                {
-                    string directoryName = Path.GetDirectoryName(theEntry.Name);
-                    string fileName = Path.GetFileName(theEntry.Name);
+            ZipFile.ExtractToDirectory(zipFilePath, unPackDirectory);
 
-                    if (fileName != String.Empty)
-                    {
-                        FileStream streamWriter = File.Create(tempDir + Path.DirectorySeparatorChar + fileName);
+            if (deleteZipFile)
+                File.Delete(zipFilePath);
+        }
 
-                        int size = 2048;
-                        byte[] data = new byte[2048];
-                        while (true)
-                        {
-                            size = s.Read(data, 0, data.Length);
-                            if (size > 0)
-                            {
-                                streamWriter.Write(data, 0, size);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        streamWriter.Close();
-
-                    }
-                }
-
-                // Clean up
-                s.Close();
-                if (deleteZipFile)
-                    File.Delete(zipFilePath);
-            }
-	    }
-
-	    //helper to try and match the old path to a new virtual one
+        /// <summary>
+        /// Helper to try and match the old path to a new virtual one
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public static string FindFile(string virtualPath)
         {
             string retval = virtualPath;
@@ -90,10 +70,14 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
-        //Replaces tildes with the root dir
+        /// <summary>
+        /// Replaces tildes with the root dir
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns>the absolute path</returns>
         public static string ResolveUrl(string virtualPath)
         {
-             if (virtualPath.StartsWith("~"))
+            if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
@@ -125,8 +109,8 @@ namespace Umbraco.Core.IO
             {
                 return path;
             }
-			// Check that we even have an HttpContext! otherwise things will fail anyways
-			// http://umbraco.codeplex.com/workitem/30946
+            // Check that we even have an HttpContext! otherwise things will fail anyways
+            // http://umbraco.codeplex.com/workitem/30946
 
             if (useHttpContext && HttpContext.Current != null)
             {
@@ -137,11 +121,11 @@ namespace Umbraco.Core.IO
                     return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
 
-        	var root = GetRootDirectorySafe();
-        	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
-        	var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var root = GetRootDirectorySafe();
+            var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+            var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
-        	return retval;
+            return retval;
         }
 
         public static string MapPath(string path)
@@ -150,7 +134,7 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+        internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
@@ -280,10 +264,10 @@ namespace Umbraco.Core.IO
                 return _rootDir;
             }
 
-			var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-			var uri = new Uri(codeBase);
-			var path = uri.LocalPath;
-        	var baseDirectory = Path.GetDirectoryName(path);
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
             if (String.IsNullOrEmpty(baseDirectory))
                 throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
 
@@ -327,9 +311,9 @@ namespace Umbraco.Core.IO
         /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
         /// <param name="rootPath"></param>
         internal static void SetRootDirectory(string rootPath)
-	    {
+        {
             _rootDir = rootPath;
-	    }
+        }
 
         /// <summary>
         /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
@@ -342,23 +326,23 @@ namespace Umbraco.Core.IO
             return filePath.ToSafeFileName();
         }
 
-	    public static void EnsurePathExists(string path)
-	    {
-	        var absolutePath = MapPath(path);
-	        if (Directory.Exists(absolutePath) == false)
-	            Directory.CreateDirectory(absolutePath);
-	    }
+        public static void EnsurePathExists(string path)
+        {
+            var absolutePath = MapPath(path);
+            if (Directory.Exists(absolutePath) == false)
+                Directory.CreateDirectory(absolutePath);
+        }
 
-	    public static void EnsureFileExists(string path, string contents)
-	    {
-	        var absolutePath = IOHelper.MapPath(path);
-	        if (File.Exists(absolutePath)) return;
+        public static void EnsureFileExists(string path, string contents)
+        {
+            var absolutePath = IOHelper.MapPath(path);
+            if (File.Exists(absolutePath)) return;
 
-	        using (var writer = File.CreateText(absolutePath))
-	        {
-	            writer.Write(contents);
-	        }
-	    }
+            using (var writer = File.CreateText(absolutePath))
+            {
+                writer.Write(contents);
+            }
+        }
 
         /// <summary>
         /// Deletes all files passed in.
@@ -385,11 +369,11 @@ namespace Umbraco.Core.IO
 
                     var parentDirectory = Path.GetDirectoryName(relativeFilePath);
 
-                    // don't want to delete the media folder if not using directories.
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                // don't want to delete the media folder if not using directories.
+                if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
                     {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    //issue U4-771: if there is a parent directory the recursive parameter should be true
+                    fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
                     }
                     else
                     {
