@@ -22,6 +22,10 @@ namespace Umbraco.Core.IO
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
+        /// <summary>
+        /// Provides a platform-specific character used to separate directory levels in a
+        /// path string that reflects a hierarchical file system organization.
+        /// </summary>
         public static char DirSepChar
         {
             get
@@ -30,6 +34,12 @@ namespace Umbraco.Core.IO
             }
         }
 
+        /// <summary>
+        /// extract a zip file into a destination folder
+        /// </summary>
+        /// <param name="zipFilePath"></param>
+        /// <param name="unPackDirectory"></param>
+        /// <param name="deleteZipFile"></param>
         internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
         {
             // Unzip
@@ -42,7 +52,11 @@ namespace Umbraco.Core.IO
                 File.Delete(zipFilePath);
         }
 
-        //helper to try and match the old path to a new virtual one
+        /// <summary>
+        /// Helper to try and match the old path to a new virtual one
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public static string FindFile(string virtualPath)
         {
             string retval = virtualPath;
@@ -56,7 +70,11 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
-        //Replaces tildes with the root dir
+        /// <summary>
+        /// Replaces tildes with the root dir
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns>the absolute path</returns>
         public static string ResolveUrl(string virtualPath)
         {
             if (virtualPath.StartsWith("~"))
