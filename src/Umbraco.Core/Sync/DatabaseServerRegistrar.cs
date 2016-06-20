@@ -7,7 +7,7 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// A registrar that stores registered server nodes in the database.
     /// </summary>
-    public sealed class DatabaseServerRegistrar : IServerRegistrar2
+    public sealed class DatabaseServerRegistrar : IServerRegistrar
     {
         private readonly Lazy<IServerRegistrationService> _registrationService;
 

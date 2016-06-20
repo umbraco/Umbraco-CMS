@@ -121,7 +121,7 @@ namespace Umbraco.Tests
 
             Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Master, role);
         }
@@ -152,7 +152,7 @@ namespace Umbraco.Tests
 
             Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Slave, role);
         }
@@ -183,7 +183,7 @@ namespace Umbraco.Tests
 
             Assert.IsNull(appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Single, role);
         }
@@ -200,7 +200,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Single, role);
         }
@@ -217,7 +217,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Unknown, role);
         }
@@ -237,7 +237,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            var registrar = ServerRegistrarResolver.Current.Registrar;
             var role = registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Slave, role);
         }

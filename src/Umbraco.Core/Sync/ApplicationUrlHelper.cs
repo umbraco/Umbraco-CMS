@@ -114,8 +114,8 @@ namespace Umbraco.Core.Sync
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
             // eg "http://www.mysite.com/umbraco"
-            var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
-            url = registrar == null ? null : registrar.GetCurrentServerUmbracoApplicationUrl();
+            var registrar = ServerRegistrarResolver.Current.Registrar;
+            url = registrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
                 appContext._umbracoApplicationUrl = url.TrimEnd('/');

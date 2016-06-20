@@ -185,15 +185,19 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
         internal class TestServerRegistrar : IServerRegistrar
         {
-            public IEnumerable<IServerAddress> Registrations
+            public IEnumerable<IServerAddress> Registrations => new List<IServerAddress>
             {
-                get
-                {
-                    return new List<IServerAddress>()
-                        {
-                            new TestServerAddress("localhost")
-                        };
-                }
+                new TestServerAddress("localhost")
+            };
+
+            public ServerRole GetCurrentServerRole()
+            {
+                throw new NotImplementedException();
+            }
+
+            public string GetCurrentServerUmbracoApplicationUrl()
+            {
+                throw new NotImplementedException();
             }
         }
 

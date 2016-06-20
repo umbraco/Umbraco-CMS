@@ -11,7 +11,7 @@ namespace Umbraco.Core.Sync
     /// Provides server registrations to the distributed cache by reading the legacy Xml configuration
     /// in umbracoSettings to get the list of (manually) configured server nodes.
     /// </summary>
-    internal class ConfigServerRegistrar : IServerRegistrar2
+    internal class ConfigServerRegistrar : IServerRegistrar
     {
         private readonly List<IServerAddress> _addresses;
         private readonly ServerRole _serverRole;
