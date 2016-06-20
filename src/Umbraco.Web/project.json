@@ -30,7 +30,7 @@
     "Microsoft.Web.Infrastructure": "1.0.0.0",
     "MiniProfiler": "3.2.*",
     "Newtonsoft.Json": "8.0.*",
-    "NPoco": "3.3.3",
+    "NPoco": "3.3.4",
     "Owin": "1.0.*",
     "semver": "1.*",
     "SharpZipLib": "0.86.0",
