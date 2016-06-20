@@ -233,6 +233,7 @@ namespace Umbraco.Web.Editors
             model.Name = ins.Name;
             model.Author = ins.Author;
             model.AuthorUrl = ins.AuthorUrl;
+            model.IconUrl = ins.IconUrl;
             model.License = ins.License;
             model.LicenseUrl = ins.LicenseUrl;
             model.ReadMe = ins.ReadMe;
