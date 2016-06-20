@@ -28,7 +28,8 @@ angular.module("umbraco.directives")
             eventhandler: '=',
             currentNode: '=',
             node: '=',
-            tree: '='
+            tree: '=',
+            sortableOptions: '='
         },
 
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
@@ -227,7 +228,8 @@ angular.module("umbraco.directives")
 
             setupNodeDom(scope.node, scope.tree);
 
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+            var isSortable = (attrs.isdialog === 'true') ? "" : " ui-sortable=\"sortableOptions\"";
+            var template = '<ul ' + isSortable + ' class="item" ng-model="node.children" ng-class="{collapsed: !node.expanded}" ><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()" sortable-options="sortableOptions"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.append(newElement);

@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService) {
+function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService, $injector) {
 
     return {
         restrict: 'E',
@@ -34,8 +34,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<a href="#/{{section}}" ng-click="select(tree.root, $event)"  class="root-link"><i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i> {{tree.name}}</a></h5>' +
                 '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
-            template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+            template += '<ul ui-sortable="sortableOptions" class="item" ng-model="tree.root.children">' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()" sortable-options="sortableOptions"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
@@ -407,6 +407,168 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         lastSection = newVal;
                     }
                 });
+				
+                scope.sortableOptions = {
+                    connectWith: ".item",
+                    cursor: "move",
+                    items: '>li',
+                    axis: 'y',
+                    tolerance: 'pointer',
+                    containment: '.umb-tree .root>ul',
+                    delay: 300,
+                    disabled: !scope.section.match("content|media") || scope.isdialog === "true",
+                    update: function (e, ui) {
+                        if (!scope.section.match("content|media") || scope.isdialog === "true")
+                            return;
+
+                        var node = ui.item.scope() ? ui.item.scope().node : scope.dragCurrentNode;
+
+                        scope.newParentNode = $(e.target.parentElement).scope().node;
+
+                        // Ignore if this is just a sort order change.
+                        if (node.parentId == scope.newParentNode.id) {
+                            scope.dragCurrentNode = node;
+                            return;
+                        }
+
+                        //Now we need to check if this is for media or content because that will depend on the resources we use
+                        var contentResource, contentTypeResource;
+                        if (scope.section === "media") {
+                            contentResource = $injector.get('mediaResource');
+                            contentTypeResource = $injector.get('mediaTypeResource');
+                        }
+                        else if (scope.section === "content") {
+                            contentResource = $injector.get('contentResource');
+                            contentTypeResource = $injector.get('contentTypeResource');
+                        } else {
+                            return;
+                        }
+
+                        if (scope.newParentNode.id == -20 || scope.newParentNode.id == -21)
+                            // Delete the node
+                            contentResource.deleteById(node.id)
+                                .then(function () {
+                                    scope.loadChildren(scope.newParentNode, true);
+                                });
+                        else
+                            // Move node, this will automaticaly validate the move.
+                            contentResource.move({ parentId: scope.newParentNode.id, id: node.id })
+                                .then(function () {
+                                    // Sync client side ui changes.  Tis will relaod the relevent part of the tree.  It could probubly jsut update the new with the new values instead and simplify the back and forth a bit.
+                                    scope.dragMoved = true;
+
+                                    // Reload collapsed destination.
+                                    if ($(e.target.parentElement).children("ul.item").is(".collapsed")) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                    }
+                                }, function (err) {
+                                    // Reload source and destination on a invalide move.
+                                    scope.loadChildren(scope.newParentNode, true);
+                                    scope.loadChildren(ui.item.scope().node.parent(), true);
+                                })
+                    },
+                    start: function (e, ui) {
+                        if (!scope.section.match("content|media") || scope.isdialog === "true")
+                            return;
+
+                        // Store the original sort order.
+                        scope.newParentNode = ui.item.scope().node.parent();
+                        scope.originalSort = _.map(
+                            _.filter(
+                                scope.newParentNode.children,
+                                function (item) {
+                                    return parseInt(item.id) > -1;
+                                }),
+                            function (item) {
+                                return item.id;
+                            });
+
+                        // Tempararily enable collapsed nodes as valid targets for putting items inside them without expanding them.
+                        ui.item.parents(".umb-tree").addClass("ui-dragging")
+                    },
+                    stop: function (e, ui) {
+                        if (!scope.section.match("content|media") || scope.isdialog === "true")
+                            return;
+
+                        // Remove extra elements for child dropping.
+                        ui.item.parents(".umb-tree").removeClass("ui-dragging")
+
+                        // Update sort order for all children of the parent node.
+                        var sortOrder = _.map(
+                            _.filter(
+                               scope.newParentNode.children
+                                , function (item) {
+                                    return parseInt(item.id) > -1;
+                                })
+                            , function (item) {
+                                return item.id;
+                            });
+
+                        // Don't do anything if there are no changes.
+                        if (sortOrder.join() === scope.originalSort.join()) {
+                            return;
+                        }
+
+                        // Don't do anything if this is moved to a collapsed node.
+                        if (sortOrder.join() == "") {
+                            return;
+                        }
+
+
+                        //Now we need to check if this is for media or content because that will depend on the resources we use
+                        /*var contentResource, contentTypeResource;
+                        if (scope.section === "media") {
+                            contentResource = $injector.get('mediaResource');
+                            contentTypeResource = $injector.get('mediaTypeResource');
+                        }
+                        else if (scope.section === "content") {
+                            contentResource = $injector.get('contentResource');
+                            contentTypeResource = $injector.get('contentTypeResource');
+                        } else {
+                            return;
+                        }*/
+
+                        // Post new sort order
+                        $timeout(function () {
+                            //console.log("id:" + scope.newParentNode.id + "; sort:" + sortOrder.join());
+
+                            // Use custom UpdateSortOrder service privided by native Sort tool as the contentResource.sort() service doesn't appear to save changes properly.
+                            $.ajax({
+                                type: "POST",
+                                url: "/umbraco/WebServices/NodeSorter.asmx/UpdateSortOrder?app=" + scope.section,
+                                data: '{ "ParentId": ' + parseInt(scope.newParentNode.id) + ', "SortOrder": "' + sortOrder.join() + '"}',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                success: function (msg) {
+                                    scope.complete = true;
+
+                                    // reload parent to get a clean node.
+                                    if (scope.dragMoved) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                        scope.dragMoved = false;
+                                    }
+                                }
+                            });
+
+
+                            /* // This is a more direct way to save sort changes but it appears to be non-functinal in 7.2.8
+                            contentResource.sort({ parentId: scope.newParentNode.id, sortedIds: sortOrder })
+                                .then(function () {
+                                    console.log("Sort Done");
+                                    scope.complete = true;
+
+                                    // reload parent to get a clean node.
+                                    if (scope.dragMoved) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                        //$(e.target.parentElement).scope().loadChildren(scope.newParentNode, true);
+                                        scope.dragMoved = false;
+                                    }
+                                });*/
+                            // This delay is to allow the move to finish before we resort.  We can get the sort index untill the stop() 
+                            //  so we can't attach it to the move promise, thus the short delay.
+                        }, 250, false);
+                    }
+                };
 
                 setupExternalEvents();
                 loadTree();
