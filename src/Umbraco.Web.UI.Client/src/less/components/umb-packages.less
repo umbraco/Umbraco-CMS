@@ -96,6 +96,9 @@
     text-align: center;
     background-color: white;
 
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+
     min-height: 60px;
 }
 
@@ -113,6 +116,9 @@
     padding-top: 15px;
     text-align: center;
     background: @grayLighter;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+
     border-top: 1px solid #ececec;
 }
 
@@ -139,6 +145,11 @@
     color: @grayMed;
     word-wrap: break-word;
     line-height: 1.1rem;
+
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 // Numbers
