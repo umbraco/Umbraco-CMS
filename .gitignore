@@ -56,6 +56,7 @@ build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
+src/Umbraco.Web.UI/Config/ClientDependency.config
 *.orig
 src/Umbraco.Tests/config/404handlers.config
 src/Umbraco.Web.UI/[Vv]iews/*.cshtml
