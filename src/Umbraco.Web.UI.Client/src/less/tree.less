@@ -86,11 +86,20 @@
     display:none;
 }
 
-.umb-tree.ui-dragging ul.collapsed{
-    display: block;
-    height: 5px;
-    margin-bottom: -5px;
-    overflow: hidden;
+.umb-tree.ui-dragging ul.collapsed {
+	display: block;
+	height: 15px;
+	margin-top: -10px;
+	margin-bottom: -5px;
+	overflow: hidden;
+}
+
+.umb-tree.ui-dragging ul.collapsed li {
+	display: none;
+}
+
+.umb-tree.ui-dragging li.ui-dragging-over {
+	background: lightblue;
 }
 
 .umb-tree a {

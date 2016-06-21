@@ -417,6 +417,14 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     containment: '.umb-tree .root>ul',
                     delay: 300,
                     disabled: !scope.section.match("content|media") || scope.isdialog === "true",
+                    over: function (e, ui) {
+                        if($(e.target).hasClass("collapsed"))
+                            $(e.target.parentElement).addClass("ui-dragging-over");
+                    },
+                    out: function (e, ui) {
+                        if ($(e.target).hasClass("collapsed"))
+                            $(e.target.parentElement).removeClass("ui-dragging-over");
+                    },
                     update: function (e, ui) {
                         if (!scope.section.match("content|media") || scope.isdialog === "true")
                             return;
@@ -440,8 +448,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         else if (scope.section === "content") {
                             contentResource = $injector.get('contentResource');
                             contentTypeResource = $injector.get('contentTypeResource');
-                        } else {
-                            return;
                         }
 
                         if (scope.newParentNode.id == -20 || scope.newParentNode.id == -21)
@@ -514,20 +520,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             return;
                         }
 
-
-                        //Now we need to check if this is for media or content because that will depend on the resources we use
-                        /*var contentResource, contentTypeResource;
-                        if (scope.section === "media") {
-                            contentResource = $injector.get('mediaResource');
-                            contentTypeResource = $injector.get('mediaTypeResource');
-                        }
-                        else if (scope.section === "content") {
-                            contentResource = $injector.get('contentResource');
-                            contentTypeResource = $injector.get('contentTypeResource');
-                        } else {
-                            return;
-                        }*/
-
                         // Post new sort order
                         $timeout(function () {
                             //console.log("id:" + scope.newParentNode.id + "; sort:" + sortOrder.join());
@@ -550,11 +542,17 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 }
                             });
 
-
-                            /* // This is a more direct way to save sort changes but it appears to be non-functinal in 7.2.8
+                            /*var contentResource;
+                            if (scope.section === "media") {
+                                contentResource = $injector.get('mediaResource');
+                            }
+                            else if (scope.section === "content") {
+                                contentResource = $injector.get('contentResource');
+                            }
+							
+                            // This is a more direct way to save sort changes but it appears to be non-functinal in 7.2.8
                             contentResource.sort({ parentId: scope.newParentNode.id, sortedIds: sortOrder })
                                 .then(function () {
-                                    console.log("Sort Done");
                                     scope.complete = true;
 
                                     // reload parent to get a clean node.
