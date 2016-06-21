@@ -125,7 +125,7 @@ namespace Umbraco.Web.Models
             {
                 if (Enum.TryParse(this._linkItem.Value<string>("type"), true, out this._type))
                 {
-                    return this._type;    
+                    return this._type;
                 }
 
                 return null;
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Models
                         else
                         {
                             this._linkDeleted = false;
-                        }                        
+                        }
                     }
                     else
                     {
@@ -166,6 +166,22 @@ namespace Umbraco.Web.Models
                 }
 
                 return this._link;
+            }
+        }
+
+        /// <summary>
+        /// Gets the id of the umbraco node if the link type is internal
+        /// </summary>
+        public int? Id
+        {
+            get
+            {
+                if (this.IsInternal)
+                {
+                    return this._linkItem.Value<int>("internal");
+                }
+
+                return null;
             }
         }
 
