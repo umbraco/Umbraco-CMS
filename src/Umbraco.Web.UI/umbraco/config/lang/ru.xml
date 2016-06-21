@@ -1168,6 +1168,7 @@
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
     <key alias="xslt">Файлы XSLT</key>
+    <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="userTypes">Типы пользователей</key>
     <key alias="users">пользователи</key>
   </area>

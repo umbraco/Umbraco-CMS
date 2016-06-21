@@ -748,6 +748,7 @@ Miłego dnia!]]></key>
     <key alias="stylesheets">Arkusze stylów</key>
     <key alias="templates">Szablony</key>
     <key alias="xslt">Pliki XSLT</key>
+    <key alias="userPermissions">Prawa dostępu użytkownika</key>
     <key alias="userTypes">Typy Użytkowników</key>
     <key alias="users">Użytkowników</key>
   </area>

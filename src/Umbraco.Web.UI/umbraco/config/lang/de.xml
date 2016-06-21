@@ -952,6 +952,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="templates">Vorlagen</key>
     <key alias="xslt">XSLT-Dateien</key>
     <key alias="analytics">Auswertungen</key>
+    <key alias="userPermissions">Berechtigungen</key>
     <key alias="userTypes">Benutzertypen</key>
     <key alias="users">Benutzer</key>
   </area>

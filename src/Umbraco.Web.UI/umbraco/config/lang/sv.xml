@@ -857,6 +857,7 @@
     <key alias="stylesheets">Stilmallar</key>
     <key alias="templates">Sidmallar</key>
     <key alias="xslt">XSLT-filer</key>
+    <key alias="userPermissions">Användarrättigheter</key>
     <key alias="userTypes">Användartyper</key>
     <key alias="users">Användare</key>
   </area>

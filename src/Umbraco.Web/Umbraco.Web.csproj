@@ -183,6 +183,7 @@
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
+    <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
@@ -1381,7 +1382,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeService.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\UserPermissions.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>

@@ -836,6 +836,7 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Modelos</key>
     <key alias="xslt">Arquivos XSLT</key>
+    <key alias="userPermissions">Permissões de usuário</key>
     <key alias="userTypes">Tipos de Usuários</key>
     <key alias="users">Usuários</key>
   </area>

@@ -1009,6 +1009,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="templates">Skabeloner</key>
     <key alias="xslt">XSLT-filer</key>
     <key alias="analytics">Analytics</key>
+    <key alias="userPermissions">Brugertilladelser</key>
     <key alias="userTypes">Bruger Typer</key>
     <key alias="users">Brugere</key>
   </area>
