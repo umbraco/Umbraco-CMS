@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models
             AddContentType(parent);
         }
 
-        private static readonly PropertyInfo ContentTypeCompositionSelector =
+        public readonly PropertyInfo ContentTypeCompositionSelector =
             ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(
                 x => x.ContentTypeComposition);
 

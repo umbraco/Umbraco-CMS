@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <returns>True if Property was changed, otherwise False. Returns false if the entity had not been previously changed.</returns>
         public virtual bool WasPropertyDirty(string propertyName)
         {
-            return WasDirty() && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
+            return _lastPropertyChangedInfo != null && _lastPropertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
@@ -133,7 +133,10 @@ namespace Umbraco.Core.Models.EntityBase
             if (rememberPreviouslyChangedProperties)
             {
                 //copy the changed properties to the last changed properties
-                _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
+                if (_propertyChangedInfo != null)
+                {
+                    _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
+                }
             }
 
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
@@ -161,8 +164,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// Used by inheritors to set the value of properties, this will detect if the property value actually changed and if it did
         /// it will ensure that the property has a dirty flag set.
         /// </summary>
-        /// <param name="setValue"></param>
-        /// <param name="value"></param>
+        /// <param name="newVal"></param>
+        /// <param name="origVal"></param>
         /// <param name="propertySelector"></param>
         /// <returns>returns true if the value changed</returns>
         /// <remarks>
@@ -170,26 +173,22 @@ namespace Umbraco.Core.Models.EntityBase
         /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector)
+        internal T SetPropertyValueAndDetectChanges<T>(T newVal, T origVal, PropertyInfo propertySelector)
         {
             if ((typeof(T) == typeof(string) == false) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(typeof(T)))
             {
                 throw new InvalidOperationException("This method does not support IEnumerable instances. For IEnumerable instances a manual custom equality check will be required");
             }
 
-            return SetPropertyValueAndDetectChanges(setValue, value, propertySelector,
-                new DelegateEqualityComparer<T>(
-                    //Standard Equals comparison
-                    (arg1, arg2) => Equals(arg1, arg2),
-                    arg => arg.GetHashCode()));
+            return SetPropertyValueAndDetectChanges(newVal, origVal, propertySelector, EqualityComparer<T>.Default);
         }
 
         /// <summary>
         /// Used by inheritors to set the value of properties, this will detect if the property value actually changed and if it did
         /// it will ensure that the property has a dirty flag set.
         /// </summary>
-        /// <param name="setValue"></param>
-        /// <param name="value"></param>
+        /// <param name="newVal"></param>
+        /// <param name="origVal"></param>
         /// <param name="propertySelector"></param>
         /// <param name="comparer">The equality comparer to use</param>
         /// <returns>returns true if the value changed</returns>
@@ -198,18 +197,17 @@ namespace Umbraco.Core.Models.EntityBase
         /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
+        internal T SetPropertyValueAndDetectChanges<T>(T newVal, T origVal, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
         {
-            var initVal = value;
-            var newVal = setValue(value);
+            //don't track changes, just return the value
+            if (_changeTrackingEnabled == false) return newVal;
 
-            //don't track changes, just set the value (above)
-            if (_changeTrackingEnabled == false) return false;
+            if (comparer.Equals(origVal, newVal) == false)
+            {
+                OnPropertyChanged(propertySelector);
+            }
 
-            if (comparer.Equals(initVal, newVal)) return false;
-
-            OnPropertyChanged(propertySelector);
-            return true;
+            return newVal;
         }
     }
 }
