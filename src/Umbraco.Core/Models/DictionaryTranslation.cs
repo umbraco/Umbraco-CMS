@@ -19,9 +19,7 @@ namespace Umbraco.Core.Models
         private string _value;
         //note: this will be memberwise cloned
         private int _languageId;
-
-        private Lazy<Guid> TESTID = new Lazy<Guid>(() => Guid.NewGuid());
-
+        
         public DictionaryTranslation(ILanguage language, string value)
         {
             if (language == null) throw new ArgumentNullException("language");
