@@ -9,6 +9,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,6 +20,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// The related links model
     /// </summary>
+    [TypeConverter(typeof(RelatedLinksTypeConverter))]
     public class RelatedLinks : IEnumerable<RelatedLink>
     {
         // ReSharper disable InconsistentNaming
@@ -105,6 +107,14 @@ namespace Umbraco.Web.Models
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Ensure that json is returned if a string conversion is requested
+        /// </summary>
+        public override string ToString()
+        {
+            return _propertyData;
         }
     }
 }
