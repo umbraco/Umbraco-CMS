@@ -173,14 +173,14 @@ namespace Umbraco.Core.Models.EntityBase
         /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal T SetPropertyValueAndDetectChanges<T>(T newVal, T origVal, PropertyInfo propertySelector)
+        internal void SetPropertyValueAndDetectChanges<T>(T newVal, ref T origVal, PropertyInfo propertySelector)
         {
             if ((typeof(T) == typeof(string) == false) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(typeof(T)))
             {
                 throw new InvalidOperationException("This method does not support IEnumerable instances. For IEnumerable instances a manual custom equality check will be required");
             }
 
-            return SetPropertyValueAndDetectChanges(newVal, origVal, propertySelector, EqualityComparer<T>.Default);
+            SetPropertyValueAndDetectChanges(newVal, ref origVal, propertySelector, EqualityComparer<T>.Default);
         }
 
         /// <summary>
@@ -197,17 +197,16 @@ namespace Umbraco.Core.Models.EntityBase
         /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal T SetPropertyValueAndDetectChanges<T>(T newVal, T origVal, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
+        internal void SetPropertyValueAndDetectChanges<T>(T newVal, ref T origVal, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
         {
             //don't track changes, just return the value
-            if (_changeTrackingEnabled == false) return newVal;
+            if (_changeTrackingEnabled == false) return;
 
             if (comparer.Equals(origVal, newVal) == false)
             {
+                origVal = newVal;
                 OnPropertyChanged(propertySelector);
             }
-
-            return newVal;
         }
     }
 }
