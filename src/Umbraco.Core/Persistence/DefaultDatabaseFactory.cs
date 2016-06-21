@@ -107,6 +107,13 @@ namespace Umbraco.Core.Persistence
             if (settings == null)
                 return; // not configured
 
+            // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
+            // so need to test the values too
+            var connectionString = settings.ConnectionString;
+            var providerName = settings.ProviderName;
+            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
+                return; // not configured
+
             Configure(settings.ConnectionString, settings.ProviderName);
         }
 
@@ -148,8 +155,8 @@ namespace Umbraco.Core.Persistence
 
                 if (Configured) throw new InvalidOperationException("Already configured.");
 
-                Mandate.ParameterNotNullOrEmpty(connectionString, nameof(connectionString));
-                Mandate.ParameterNotNullOrEmpty(providerName, nameof(providerName));
+                if (connectionString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(connectionString));
+                if (providerName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(providerName));
 
                 _connectionString = connectionString;
                 _providerName = providerName;
