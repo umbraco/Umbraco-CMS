@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Cache
             public string Name
             {
                 get { return _name; }
-                set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.WriterSelector); }
+                set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.WriterSelector); }
             }
 
             public Guid CloneId { get; set; }
