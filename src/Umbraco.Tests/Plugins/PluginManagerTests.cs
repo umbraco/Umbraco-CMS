@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Plugins
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(6, trees.Count()); // 6 classes in the solution implement BaseTree
+            Assert.AreEqual(5, trees.Count()); // 5 classes in the solution implement BaseTree
         }
 
         [Test]
