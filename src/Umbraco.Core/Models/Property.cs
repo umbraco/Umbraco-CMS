@@ -103,7 +103,7 @@ namespace Umbraco.Core.Models
         public Guid Version
         {
             get { return _version; }
-            set { _version = SetPropertyValueAndDetectChanges(value, _version, Ps.Value.VersionSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                _value = SetPropertyValueAndDetectChanges(value, _value, Ps.Value.ValueSelector,
+                SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector,
                     new DelegateEqualityComparer<object>(
                         (o, o1) =>
                         {

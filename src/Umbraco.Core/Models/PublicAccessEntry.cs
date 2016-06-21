@@ -117,21 +117,21 @@ namespace Umbraco.Core.Models
         public int LoginNodeId
         {
             get { return _loginNodeId; }
-            set { _loginNodeId = SetPropertyValueAndDetectChanges(value, _loginNodeId, Ps.Value.LoginNodeIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _loginNodeId, Ps.Value.LoginNodeIdSelector); }
         }
 
         [DataMember]
         public int NoAccessNodeId
         {
             get { return _noAccessNodeId; }
-            set { _noAccessNodeId = SetPropertyValueAndDetectChanges(value, _noAccessNodeId, Ps.Value.NoAccessNodeIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, Ps.Value.NoAccessNodeIdSelector); }
         }
        
         [DataMember]
         public int ProtectedNodeId
         {
             get { return _protectedNodeId; }
-            set { _protectedNodeId = SetPropertyValueAndDetectChanges(value, _protectedNodeId, Ps.Value.ProtectedNodeIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, Ps.Value.ProtectedNodeIdSelector); }
         }
 
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)

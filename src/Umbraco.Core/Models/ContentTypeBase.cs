@@ -131,7 +131,7 @@ namespace Umbraco.Core.Models
         public virtual string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
         public virtual int Level //NOTE Is this relevant for a ContentType?
         {
             get { return _level; }
-            set { _level = SetPropertyValueAndDetectChanges(value, _level, Ps.Value.LevelSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Models
         public virtual string Path //NOTE Is this relevant for a ContentType?
         {
             get { return _path; }
-            set { _path = SetPropertyValueAndDetectChanges(value, _path, Ps.Value.PathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         /// <summary>
@@ -163,9 +163,9 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = SetPropertyValueAndDetectChanges(
+                SetPropertyValueAndDetectChanges(
                     value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
-                    _alias, 
+                    ref _alias, 
                     Ps.Value.AliasSelector);
             }
         }
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Models
         public virtual string Description
         {
             get { return _description; }
-            set { _description = SetPropertyValueAndDetectChanges(value, _description, Ps.Value.DescriptionSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Models
         public virtual int SortOrder
         {
             get { return _sortOrder; }
-            set { _sortOrder = SetPropertyValueAndDetectChanges(value, _sortOrder, Ps.Value.SortOrderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Models
         public virtual string Icon
         {
             get { return _icon; }
-            set { _icon = SetPropertyValueAndDetectChanges(value, _icon, Ps.Value.IconSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Models
         public virtual string Thumbnail
         {
             get { return _thumbnail; }
-            set { _thumbnail = SetPropertyValueAndDetectChanges(value, _thumbnail, Ps.Value.ThumbnailSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector); }
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Models
         public virtual int CreatorId
         {
             get { return _creatorId; }
-            set { _creatorId = SetPropertyValueAndDetectChanges(value, _creatorId, Ps.Value.CreatorIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Models
         public virtual bool AllowedAsRoot
         {
             get { return _allowedAsRoot; }
-            set { _allowedAsRoot = SetPropertyValueAndDetectChanges(value, _allowedAsRoot, Ps.Value.AllowedAsRootSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, Ps.Value.AllowedAsRootSelector); }
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Models
         public virtual bool IsContainer
         {
             get { return _isContainer; }
-            set { _isContainer = SetPropertyValueAndDetectChanges(value, _isContainer, Ps.Value.IsContainerSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector); }
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Models
         public virtual bool Trashed //NOTE Is this relevant for a ContentType?
         {
             get { return _trashed; }
-            set { _trashed = SetPropertyValueAndDetectChanges(value, _trashed, Ps.Value.TrashedSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
         private IDictionary<string, object> _additionalData;
@@ -273,7 +273,7 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                _allowedContentTypes = SetPropertyValueAndDetectChanges(value, _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
+                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
                         (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),

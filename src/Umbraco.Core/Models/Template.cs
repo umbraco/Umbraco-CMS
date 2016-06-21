@@ -58,27 +58,27 @@ namespace Umbraco.Core.Models
         public Lazy<int> MasterTemplateId
         {
             get { return _masterTemplateId; }
-            set { _masterTemplateId = SetPropertyValueAndDetectChanges(value, _masterTemplateId, Ps.Value.MasterTemplateIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, Ps.Value.MasterTemplateIdSelector); }
         }
 
         public string MasterTemplateAlias
         {
             get { return _masterTemplateAlias; }
-            set { _masterTemplateAlias = SetPropertyValueAndDetectChanges(value, _masterTemplateAlias, Ps.Value.MasterTemplateAliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, Ps.Value.MasterTemplateAliasSelector); }
         }
 
         [DataMember]
         public new string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         [DataMember]
         public new string Alias
         {
             get { return _alias; }
-            set { _alias = SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), _alias, Ps.Value.AliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>

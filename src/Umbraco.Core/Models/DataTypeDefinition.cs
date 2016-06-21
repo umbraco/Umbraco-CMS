@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models
         public int ParentId
         {
             get { return _parentId; }
-            set { _parentId = SetPropertyValueAndDetectChanges(value, _parentId, Ps.Value.ParentIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get { return _sortOrder; }
-            set { _sortOrder = SetPropertyValueAndDetectChanges(value, _sortOrder, Ps.Value.SortOrderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Models
         public int Level
         {
             get { return _level; }
-            set { _level = SetPropertyValueAndDetectChanges(value, _level, Ps.Value.LevelSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Models
         public string Path //Setting this value should be handled by the class not the user
         {
             get { return _path; }
-            set { _path = SetPropertyValueAndDetectChanges(value, _path, Ps.Value.PathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Models
         public int CreatorId
         {
             get { return _creatorId; }
-            set { _creatorId = SetPropertyValueAndDetectChanges(value, _creatorId, Ps.Value.UserIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.UserIdSelector); }
         }
 
         //NOTE: SD: Why do we have this ??
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             internal set
             {
-                _trashed = SetPropertyValueAndDetectChanges(value, _trashed, Ps.Value.TrashedSelector);
+                SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["Trashed"] = value;
             }
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Models
             get { return _propertyEditorAlias; }
             set
             {
-                _propertyEditorAlias = SetPropertyValueAndDetectChanges(value, _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
+                SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["DatabaseType"] = value;
             }
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Models
             get { return _databaseType; }
             set 
             {
-                _databaseType = SetPropertyValueAndDetectChanges(value, _databaseType, Ps.Value.DatabaseTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);                
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["DatabaseType"] = value;
             }

@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
         public bool Closed
         {
             get { return _closed; }
-            set { _closed = SetPropertyValueAndDetectChanges(value, _closed, Ps.Value.ClosedSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _closed, Ps.Value.ClosedSelector); }
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
         public TaskType TaskType
         {
             get { return _taskType; }
-            set { _taskType = SetPropertyValueAndDetectChanges(value, _taskType, Ps.Value.TaskTypeSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _taskType, Ps.Value.TaskTypeSelector); }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Models
         public int EntityId
         {
             get { return _entityId; }
-            set { _entityId = SetPropertyValueAndDetectChanges(value, _entityId, Ps.Value.EntityIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _entityId, Ps.Value.EntityIdSelector); }
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models
         public int OwnerUserId
         {
             get { return _ownerUserId; }
-            set { _ownerUserId = SetPropertyValueAndDetectChanges(value, _ownerUserId, Ps.Value.OwnerUserIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _ownerUserId, Ps.Value.OwnerUserIdSelector); }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models
         public int AssigneeUserId
         {
             get { return _assigneeUserId; }
-            set { _assigneeUserId = SetPropertyValueAndDetectChanges(value, _assigneeUserId, Ps.Value.AssigneeUserIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _assigneeUserId, Ps.Value.AssigneeUserIdSelector); }
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models
         public string Comment
         {
             get { return _comment; }
-            set { _comment = SetPropertyValueAndDetectChanges(value, _comment, Ps.Value.CommentSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _comment, Ps.Value.CommentSelector); }
         }
 
     }

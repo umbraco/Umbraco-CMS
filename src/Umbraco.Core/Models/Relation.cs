@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
         public int ParentId
         {
             get { return _parentId; }
-            set { _parentId = SetPropertyValueAndDetectChanges(value, _parentId, Ps.Value.ParentIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
         public int ChildId
         {
             get { return _childId; }
-            set { _childId = SetPropertyValueAndDetectChanges(value, _childId, Ps.Value.ChildIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _childId, Ps.Value.ChildIdSelector); }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Models
         public IRelationType RelationType
         {
             get { return _relationType; }
-            set { _relationType = SetPropertyValueAndDetectChanges(value, _relationType, Ps.Value.RelationTypeSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _relationType, Ps.Value.RelationTypeSelector); }
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models
         public string Comment
         {
             get { return _comment; }
-            set { _comment = SetPropertyValueAndDetectChanges(value, _comment, Ps.Value.CommentSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _comment, Ps.Value.CommentSelector); }
         }
 
         /// <summary>

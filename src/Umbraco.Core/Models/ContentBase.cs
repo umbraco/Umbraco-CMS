@@ -130,7 +130,7 @@ namespace Umbraco.Core.Models
         public virtual string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Models
         public virtual int SortOrder
         {
             get { return _sortOrder; }
-            set { _sortOrder = SetPropertyValueAndDetectChanges(value, _sortOrder, Ps.Value.SortOrderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Models
         public virtual int Level
         {
             get { return _level; }
-            set { _level = SetPropertyValueAndDetectChanges(value, _level, Ps.Value.LevelSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Models
         public virtual string Path //Setting this value should be handled by the class not the user
         {
             get { return _path; }
-            set { _path = SetPropertyValueAndDetectChanges(value, _path, Ps.Value.PathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Umbraco.Core.Models
         public virtual int CreatorId
         {
             get { return _creatorId; }
-            set { _creatorId = SetPropertyValueAndDetectChanges(value, _creatorId, Ps.Value.CreatorIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
         
         /// <summary>
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Models
         public virtual bool Trashed //Setting this value should be handled by the class not the user
         {
             get { return _trashed; }
-            internal set { _trashed = SetPropertyValueAndDetectChanges(value, _trashed, Ps.Value.TrashedSelector); }
+            internal set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Models
                 }
                 return _contentTypeId;
             }
-            protected set { _contentTypeId = SetPropertyValueAndDetectChanges(value, _contentTypeId, Ps.Value.DefaultContentTypeIdSelector); }
+            protected set { SetPropertyValueAndDetectChanges(value, ref _contentTypeId, Ps.Value.DefaultContentTypeIdSelector); }
         }
 
         /// <summary>

@@ -36,13 +36,13 @@ namespace Umbraco.Core.Models
         public string RuleValue
         {
             get { return _ruleValue; }
-            set { _ruleValue = SetPropertyValueAndDetectChanges(value, _ruleValue, Ps.Value.RuleValueSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _ruleValue, Ps.Value.RuleValueSelector); }
         }
 
         public string RuleType
         {
             get { return _ruleType; }
-            set { _ruleType = SetPropertyValueAndDetectChanges(value, _ruleType, Ps.Value.RuleTypeSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _ruleType, Ps.Value.RuleTypeSelector); }
         }
 
         

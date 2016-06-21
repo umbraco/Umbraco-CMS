@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models
         internal int DefaultTemplateId
         {
             get { return _defaultTemplate; }
-            set { _defaultTemplate = SetPropertyValueAndDetectChanges(value, _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                _allowedTemplates = SetPropertyValueAndDetectChanges(value, _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<ITemplate>>(
                         (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),

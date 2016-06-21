@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set { _alias = SetPropertyValueAndDetectChanges(value, _alias, Ps.Value.AliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set { _value = SetPropertyValueAndDetectChanges(value, _value, Ps.Value.ValueSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
         }
 
     }

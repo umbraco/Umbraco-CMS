@@ -74,7 +74,7 @@ namespace Umbraco.Core.Models
         public string ServerAddress
         {
             get { return _serverAddress; }
-            set { _serverAddress = SetPropertyValueAndDetectChanges(value, _serverAddress, Ps.Value.ServerAddressSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _serverAddress, Ps.Value.ServerAddressSelector); }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models
         public string ServerIdentity
         {
             get { return _serverIdentity; }
-            set { _serverIdentity = SetPropertyValueAndDetectChanges(value, _serverIdentity, Ps.Value.ServerIdentitySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _serverIdentity, Ps.Value.ServerIdentitySelector); }
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Models
         public bool IsActive
         {
             get { return _isActive; }
-            set { _isActive = SetPropertyValueAndDetectChanges(value, _isActive, Ps.Value.IsActiveSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _isActive, Ps.Value.IsActiveSelector); }
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Models
         public bool IsMaster
         {
             get { return _isMaster; }
-            set { _isMaster = SetPropertyValueAndDetectChanges(value, _isMaster, Ps.Value.IsMasterSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _isMaster, Ps.Value.IsMasterSelector); }
         }
 
         /// <summary>

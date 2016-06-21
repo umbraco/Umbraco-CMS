@@ -41,13 +41,13 @@ namespace Umbraco.Core.Models
         public string Text
         {
             get { return _text; }
-            set { _text = SetPropertyValueAndDetectChanges(value, _text, Ps.Value.TextSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _text, Ps.Value.TextSelector); }
         }
 
         public string Group
         {
             get { return _group; }
-            set { _group = SetPropertyValueAndDetectChanges(value, _group, Ps.Value.GroupSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _group, Ps.Value.GroupSelector); }
         }
 
         public int NodeCount { get; internal set; }

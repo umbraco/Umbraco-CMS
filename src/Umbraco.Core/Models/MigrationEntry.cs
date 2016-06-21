@@ -33,13 +33,13 @@ namespace Umbraco.Core.Models
         public string MigrationName
         {
             get { return _migrationName; }
-            set { _migrationName = SetPropertyValueAndDetectChanges(value, _migrationName, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _migrationName, Ps.Value.NameSelector); }
         }
 
         public SemVersion Version
         {
             get { return _version; }
-            set { _version = SetPropertyValueAndDetectChanges(value, _version, Ps.Value.VersionSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
         }
     }
 }

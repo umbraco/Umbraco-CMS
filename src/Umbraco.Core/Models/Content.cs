@@ -101,7 +101,7 @@ namespace Umbraco.Core.Models
         public virtual ITemplate Template
         {
             get { return _template; }
-            set { _template = SetPropertyValueAndDetectChanges(value, _template, Ps.Value.TemplateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector); }
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Models
         public bool Published
         {
             get { return _published; }
-            internal set { _published = SetPropertyValueAndDetectChanges(value, _published, Ps.Value.PublishedSelector); }
+            internal set { SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector); }
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Models
         public string Language
         {
             get { return _language; }
-            set { _language = SetPropertyValueAndDetectChanges(value, _language, Ps.Value.LanguageSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Models
         public DateTime? ReleaseDate
         {
             get { return _releaseDate; }
-            set { _releaseDate = SetPropertyValueAndDetectChanges(value, _releaseDate, Ps.Value.ReleaseDateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector); }
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Models
         public DateTime? ExpireDate
         {
             get { return _expireDate; }
-            set { _expireDate = SetPropertyValueAndDetectChanges(value, _expireDate, Ps.Value.ExpireDateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector); }
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Models
         public virtual int WriterId
         {
             get { return _writer; }
-            set { _writer = SetPropertyValueAndDetectChanges(value, _writer, Ps.Value.WriterSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector); }
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Models
         internal string NodeName
         {
             get { return _nodeName; }
-            set { _nodeName = SetPropertyValueAndDetectChanges(value, _nodeName, Ps.Value.NodeNameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Models
         internal bool PermissionsChanged
         {
             get { return _permissionsChanged; }
-            set { _permissionsChanged = SetPropertyValueAndDetectChanges(value, _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
         }
 
         /// <summary>

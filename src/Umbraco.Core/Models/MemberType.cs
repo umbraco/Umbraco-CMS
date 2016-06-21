@@ -59,7 +59,7 @@ namespace Umbraco.Core.Models
                         ? value
                         : (value == null ? string.Empty : value.ToSafeAlias());
 
-                _alias = SetPropertyValueAndDetectChanges(newVal, _alias, Ps.Value.AliasSelector);
+                SetPropertyValueAndDetectChanges(newVal, ref _alias, Ps.Value.AliasSelector);
             }
         }
 

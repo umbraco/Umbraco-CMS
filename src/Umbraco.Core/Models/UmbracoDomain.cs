@@ -37,21 +37,21 @@ namespace Umbraco.Core.Models
         public int? LanguageId
         {
             get { return _languageId; }
-            set { _languageId = SetPropertyValueAndDetectChanges(value, _languageId, Ps.Value.DefaultLanguageSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _languageId, Ps.Value.DefaultLanguageSelector); }
         }
 
         [DataMember]
         public string DomainName
         {
             get { return _domainName; }
-            set { _domainName = SetPropertyValueAndDetectChanges(value, _domainName, Ps.Value.DomainNameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _domainName, Ps.Value.DomainNameSelector); }
         }
 
         [DataMember]
         public int? RootContentId
         {
             get { return _contentId; }
-            set { _contentId = SetPropertyValueAndDetectChanges(value, _contentId, Ps.Value.ContentSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentSelector); }
         }
 
         public bool IsWildcard

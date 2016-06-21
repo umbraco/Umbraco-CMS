@@ -20,6 +20,8 @@ namespace Umbraco.Core.Models
         //note: this will be memberwise cloned
         private int _languageId;
 
+        private Lazy<Guid> TESTID = new Lazy<Guid>(() => Guid.NewGuid());
+
         public DictionaryTranslation(ILanguage language, string value)
         {
             if (language == null) throw new ArgumentNullException("language");
@@ -84,7 +86,7 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                _language = SetPropertyValueAndDetectChanges(value, _language, Ps.Value.LanguageSelector);
+                SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
                 _languageId = _language == null ? -1 : _language.Id;                
             }
         }
@@ -101,7 +103,7 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set { _value = SetPropertyValueAndDetectChanges(value, _value, Ps.Value.ValueSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
         }
 
         public override object DeepClone()

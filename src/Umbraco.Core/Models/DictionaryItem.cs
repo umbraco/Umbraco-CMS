@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models
         public Guid? ParentId
         {
             get { return _parentId; }
-            set { _parentId = SetPropertyValueAndDetectChanges(value, _parentId, Ps.Value.ParentIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
         public string ItemKey
         {
             get { return _itemKey; }
-            set { _itemKey = SetPropertyValueAndDetectChanges(value, _itemKey, Ps.Value.ItemKeySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _itemKey, Ps.Value.ItemKeySelector); }
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                _translations = SetPropertyValueAndDetectChanges(asArray, _translations, Ps.Value.TranslationsSelector,
+                SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
                         (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),

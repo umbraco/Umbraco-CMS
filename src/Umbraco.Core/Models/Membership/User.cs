@@ -118,61 +118,61 @@ namespace Umbraco.Core.Models.Membership
         public string Username
         {
             get { return _username; }
-            set { _username = SetPropertyValueAndDetectChanges(value, _username, Ps.Value.UsernameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
         }
         [DataMember]
         public string Email
         {
             get { return _email; }
-            set { _email = SetPropertyValueAndDetectChanges(value, _email, Ps.Value.EmailSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
         [DataMember]
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
-            set { _rawPasswordValue = SetPropertyValueAndDetectChanges(value, _rawPasswordValue, Ps.Value.PasswordSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
         }
 
         [DataMember]
         public bool IsApproved
         {
             get { return _isApproved; }
-            set { _isApproved = SetPropertyValueAndDetectChanges(value, _isApproved, Ps.Value.IsApprovedSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _isApproved, Ps.Value.IsApprovedSelector); }
         }
 
         [IgnoreDataMember]
         public bool IsLockedOut
         {
             get { return _isLockedOut; }
-            set { _isLockedOut = SetPropertyValueAndDetectChanges(value, _isLockedOut, Ps.Value.IsLockedOutSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _isLockedOut, Ps.Value.IsLockedOutSelector); }
         }
 
         [IgnoreDataMember]
         public DateTime LastLoginDate
         {
             get { return _lastLoginDate; }
-            set { _lastLoginDate = SetPropertyValueAndDetectChanges(value, _lastLoginDate, Ps.Value.LastLoginDateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, Ps.Value.LastLoginDateSelector); }
         }
 
         [IgnoreDataMember]
         public DateTime LastPasswordChangeDate
         {
             get { return _lastPasswordChangedDate; }
-            set { _lastPasswordChangedDate = SetPropertyValueAndDetectChanges(value, _lastPasswordChangedDate, Ps.Value.LastPasswordChangeDateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangedDate, Ps.Value.LastPasswordChangeDateSelector); }
         }
 
         [IgnoreDataMember]
         public DateTime LastLockoutDate
         {
             get { return _lastLockoutDate; }
-            set { _lastLockoutDate = SetPropertyValueAndDetectChanges(value, _lastLockoutDate, Ps.Value.LastLockoutDateSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, Ps.Value.LastLockoutDateSelector); }
         }
 
         [IgnoreDataMember]
         public int FailedPasswordAttempts
         {
             get { return _failedLoginAttempts; }
-            set { _failedLoginAttempts = SetPropertyValueAndDetectChanges(value, _failedLoginAttempts, Ps.Value.FailedPasswordAttemptsSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, Ps.Value.FailedPasswordAttemptsSelector); }
         }
 
         //TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Models.Membership
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         public IEnumerable<string> AllowedSections
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Models.Membership
         public string SecurityStamp
         {
             get { return _securityStamp; }
-            set { _securityStamp = SetPropertyValueAndDetectChanges(value, _securityStamp, Ps.Value.SecurityStampSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Models.Membership
         public int SessionTimeout
         {
             get { return _sessionTimeout; }
-            set { _sessionTimeout = SetPropertyValueAndDetectChanges(value, _sessionTimeout, Ps.Value.SessionTimeoutSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sessionTimeout, Ps.Value.SessionTimeoutSelector); }
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace Umbraco.Core.Models.Membership
         public int StartContentId
         {
             get { return _startContentId; }
-            set { _startContentId = SetPropertyValueAndDetectChanges(value, _startContentId, Ps.Value.StartContentIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
         }
 
         /// <summary>
@@ -284,14 +284,14 @@ namespace Umbraco.Core.Models.Membership
         public int StartMediaId
         {
             get { return _startMediaId; }
-            set { _startMediaId = SetPropertyValueAndDetectChanges(value, _startMediaId, Ps.Value.StartMediaIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
         }
 
         [DataMember]
         public string Language
         {
             get { return _language; }
-            set { _language = SetPropertyValueAndDetectChanges(value, _language, Ps.Value.LanguageSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
         }
 
         //TODO: This should be a private set
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Models.Membership
         internal bool DefaultToLiveEditing
         {
             get { return _defaultToLiveEditing; }
-            set { _defaultToLiveEditing = SetPropertyValueAndDetectChanges(value, _defaultToLiveEditing, Ps.Value.DefaultToLiveEditingSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, Ps.Value.DefaultToLiveEditingSelector); }
         }
 
         [IgnoreDataMember]
@@ -320,7 +320,7 @@ namespace Umbraco.Core.Models.Membership
                     throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
                 }
 
-                _userType = SetPropertyValueAndDetectChanges(value, _userType, Ps.Value.UserTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _userType, Ps.Value.UserTypeSelector);                
             }
         }
 

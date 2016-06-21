@@ -209,7 +209,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set { _alias = SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), _alias, Ps.Value.AliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Models
         public bool UseInEditor
         {
             get { return _useInEditor; }
-            set { _useInEditor = SetPropertyValueAndDetectChanges(value, _useInEditor, Ps.Value.UseInEditorSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _useInEditor, Ps.Value.UseInEditorSelector); }
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Models
         public int CacheDuration
         {
             get { return _cacheDuration; }
-            set { _cacheDuration = SetPropertyValueAndDetectChanges(value, _cacheDuration, Ps.Value.CacheDurationSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheDuration, Ps.Value.CacheDurationSelector); }
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Models
         public bool CacheByPage
         {
             get { return _cacheByPage; }
-            set { _cacheByPage = SetPropertyValueAndDetectChanges(value, _cacheByPage, Ps.Value.CacheByPageSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheByPage, Ps.Value.CacheByPageSelector); }
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace Umbraco.Core.Models
         public bool CacheByMember
         {
             get { return _cacheByMember; }
-            set { _cacheByMember = SetPropertyValueAndDetectChanges(value, _cacheByMember, Ps.Value.CacheByMemberSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheByMember, Ps.Value.CacheByMemberSelector); }
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Models
         public bool DontRender
         {
             get { return _dontRender; }
-            set { _dontRender = SetPropertyValueAndDetectChanges(value, _dontRender, Ps.Value.DontRenderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _dontRender, Ps.Value.DontRenderSelector); }
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace Umbraco.Core.Models
         public string ControlType
         {
             get { return _scriptFile; }
-            set { _scriptFile = SetPropertyValueAndDetectChanges(value, _scriptFile, Ps.Value.ControlPathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptFile, Ps.Value.ControlPathSelector); }
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Models
         public string ControlAssembly
         {
             get { return _scriptAssembly; }
-            set { _scriptAssembly = SetPropertyValueAndDetectChanges(value, _scriptAssembly, Ps.Value.ControlAssemblySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptAssembly, Ps.Value.ControlAssemblySelector); }
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace Umbraco.Core.Models
         public string ScriptPath
         {
             get { return _scriptPath; }
-            set { _scriptPath = SetPropertyValueAndDetectChanges(value, _scriptPath, Ps.Value.ScriptPathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptPath, Ps.Value.ScriptPathSelector); }
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Models
         public string XsltPath
         {
             get { return _xslt; }
-            set { _xslt = SetPropertyValueAndDetectChanges(value, _xslt, Ps.Value.XsltPathSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _xslt, Ps.Value.XsltPathSelector); }
         }
 
         /// <summary>

@@ -35,9 +35,9 @@ namespace Umbraco.Core.Models.Membership
             get { return _alias; }
             set
             {
-                _alias = SetPropertyValueAndDetectChanges(
+                SetPropertyValueAndDetectChanges(
                     value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
-                    _alias, 
+                    ref _alias, 
                     Ps.Value.AliasSelector);                
             }
         }
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models.Membership
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models.Membership
             get { return _permissions; }
             set
             {
-                _permissions = SetPropertyValueAndDetectChanges(value, _permissions, Ps.Value.PermissionsSelector,
+                SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector,
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<string>>(
                         (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),

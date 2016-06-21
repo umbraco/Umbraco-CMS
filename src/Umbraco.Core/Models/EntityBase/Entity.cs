@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models.EntityBase
             get { return _id; }
             set
             {
-                _id = SetPropertyValueAndDetectChanges(value, _id, Ps.Value.IdSelector);
+                SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector);
                 HasIdentity = true; //set the has Identity
             }
         }
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Models.EntityBase
                     _key = Guid.NewGuid();
                 return _key;
             }
-            set { _key = SetPropertyValueAndDetectChanges(value, _key, Ps.Value.KeySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Models.EntityBase
         public DateTime CreateDate
         {
             get { return _createDate; }
-            set { _createDate = SetPropertyValueAndDetectChanges(value, _createDate, Ps.Value.CreateDateSelector); }            
+            set { SetPropertyValueAndDetectChanges(value, ref _createDate, Ps.Value.CreateDateSelector); }            
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models.EntityBase
         internal bool WasCancelled
         {
             get { return _wasCancelled; }
-            set { _wasCancelled = SetPropertyValueAndDetectChanges(value, _wasCancelled, Ps.Value.WasCancelledSelector); }            
+            set { SetPropertyValueAndDetectChanges(value, ref _wasCancelled, Ps.Value.WasCancelledSelector); }            
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models.EntityBase
         public DateTime UpdateDate
         {
             get { return _updateDate; }
-            set { _updateDate = SetPropertyValueAndDetectChanges(value, _updateDate, Ps.Value.UpdateDateSelector); }           
+            set { SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector); }           
         }
 
         internal virtual void ResetIdentity()
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Models.EntityBase
             {
                 return _hasIdentity;
             }
-            protected set { _hasIdentity = SetPropertyValueAndDetectChanges(value, _hasIdentity, Ps.Value.HasIdentitySelector); }
+            protected set { SetPropertyValueAndDetectChanges(value, ref _hasIdentity, Ps.Value.HasIdentitySelector); }
         }
 
         //TODO: Make this NOT virtual or even exist really!

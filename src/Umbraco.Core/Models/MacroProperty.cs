@@ -90,7 +90,7 @@ namespace Umbraco.Core.Models
         public int Id
         {
             get { return _id; }
-            set { _id = SetPropertyValueAndDetectChanges(value, _id, Ps.Value.IdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector); }
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set { _alias = SetPropertyValueAndDetectChanges(value, _alias, Ps.Value.AliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get { return _sortOrder; }
-            set { _sortOrder = SetPropertyValueAndDetectChanges(value, _sortOrder, Ps.Value.SortOrderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Models
                 //try to get the new mapped parameter editor
                 var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
                 var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
-                _editorAlias = SetPropertyValueAndDetectChanges(newVal, _editorAlias, Ps.Value.PropertyTypeSelector);                
+                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);                
             }
         }
 

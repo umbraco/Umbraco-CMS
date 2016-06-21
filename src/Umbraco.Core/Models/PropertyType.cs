@@ -111,7 +111,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set { _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set { _alias = SetPropertyValueAndDetectChanges(GetAlias(value), _alias, Ps.Value.AliasSelector); }
+            set { SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Models
         public string Description
         {
             get { return _description; }
-            set { _description = SetPropertyValueAndDetectChanges(value, _description, Ps.Value.DescriptionSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
         }
 
         /// <summary>
@@ -142,14 +142,14 @@ namespace Umbraco.Core.Models
         public int DataTypeDefinitionId
         {
             get { return _dataTypeDefinitionId; }
-            set { _dataTypeDefinitionId = SetPropertyValueAndDetectChanges(value, _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector); }
         }
 
         [DataMember]
         public string PropertyEditorAlias
         {
             get { return _propertyEditorAlias; }
-            set { _propertyEditorAlias = SetPropertyValueAndDetectChanges(value, _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector); }
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Models
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
 
-                _dataTypeDatabaseType = SetPropertyValueAndDetectChanges(value, _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);                
             }
         }
 
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Models
         internal Lazy<int> PropertyGroupId
         {
             get { return _propertyGroupId; }
-            set { _propertyGroupId = SetPropertyValueAndDetectChanges(value, _propertyGroupId, Ps.Value.PropertyGroupIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector); }
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Models
         public bool Mandatory
         {
             get { return _mandatory; }
-            set { _mandatory = SetPropertyValueAndDetectChanges(value, _mandatory, Ps.Value.MandatorySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector); }
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Models
         public string HelpText
         {
             get { return _helpText; }
-            set { _helpText = SetPropertyValueAndDetectChanges(value, _helpText, Ps.Value.HelpTextSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector); }
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get { return _sortOrder; }
-            set { _sortOrder = SetPropertyValueAndDetectChanges(value, _sortOrder, Ps.Value.SortOrderSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Models
         public string ValidationRegExp
         {
             get { return _validationRegExp; }
-            set { _validationRegExp = SetPropertyValueAndDetectChanges(value, _validationRegExp, Ps.Value.ValidationRegExpSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
         }
 
         private string GetAlias(string value)

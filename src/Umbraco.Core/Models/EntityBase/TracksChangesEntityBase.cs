@@ -199,13 +199,25 @@ namespace Umbraco.Core.Models.EntityBase
         /// </remarks>
         internal void SetPropertyValueAndDetectChanges<T>(T newVal, ref T origVal, PropertyInfo propertySelector, IEqualityComparer<T> comparer)
         {
-            //don't track changes, just return the value
-            if (_changeTrackingEnabled == false) return;
-
-            if (comparer.Equals(origVal, newVal) == false)
+            //don't track changes, just set the value
+            if (_changeTrackingEnabled == false)
             {
+                //set the original value
                 origVal = newVal;
-                OnPropertyChanged(propertySelector);
+            }
+            else
+            {
+                //check changed
+                var changed = comparer.Equals(origVal, newVal) == false;
+
+                //set the original value
+                origVal = newVal;
+
+                //raise the event if it was changed
+                if (changed)
+                {
+                    OnPropertyChanged(propertySelector);
+                }
             }
         }
     }

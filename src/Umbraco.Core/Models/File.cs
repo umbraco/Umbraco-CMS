@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models
                 _alias = null;
                 _name = null;
 
-                _path = SetPropertyValueAndDetectChanges(SanitizePath(value), _path, Ps.Value.PathSelector);                
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);                
             }
         }
 
@@ -133,9 +133,9 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                _content = SetPropertyValueAndDetectChanges(
+                SetPropertyValueAndDetectChanges(
                     value ?? string.Empty, // cannot set to null
-                    _content, Ps.Value.ContentSelector);                
+                    ref _content, Ps.Value.ContentSelector);                
             }
         }
 

@@ -126,7 +126,7 @@ namespace Umbraco.Core.Models
         public string Username
         {
             get { return _username; }
-            set { _username = SetPropertyValueAndDetectChanges(value, _username, Ps.Value.UsernameSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Models
         public string Email
         {
             get { return _email; }
-            set { _email = SetPropertyValueAndDetectChanges(value, _email, Ps.Value.EmailSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Models
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
-            set { _rawPasswordValue = SetPropertyValueAndDetectChanges(value, _rawPasswordValue, Ps.Value.PasswordSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace Umbraco.Core.Models
             {
                 return _providerUserKey;
             }
-            set { _providerUserKey = SetPropertyValueAndDetectChanges(value, _providerUserKey, Ps.Value.ProviderUserKeySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
       

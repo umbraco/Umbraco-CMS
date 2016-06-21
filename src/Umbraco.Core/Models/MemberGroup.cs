@@ -43,14 +43,14 @@ namespace Umbraco.Core.Models
                     AdditionalData["previousName"] = _name;
                 }
 
-                _name = SetPropertyValueAndDetectChanges(value, _name, Ps.Value.NameSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);                
             }
         }
 
         public int CreatorId
         {
             get { return _creatorId; }
-            set { _creatorId = SetPropertyValueAndDetectChanges(value, _creatorId, Ps.Value.CreatorIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
 
         public IDictionary<string, object> AdditionalData { get; private set; }
