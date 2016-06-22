@@ -82,7 +82,7 @@
                         <small ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3 flex flex-align-center flex-direction-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+                    <div class="umb-info-local-item mt-3 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                         <label for="license-accepts" class="umb-package-installer-label">
                             <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
                             <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
@@ -90,7 +90,7 @@
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"
-                                class="umb-era-button -blue inline-flex mt-2"
+                                class="umb-era-button -blue flex-inline mt-2"
                                 ng-click="vm.installPackage()">
                                 Install package
                         </button>

@@ -98,11 +98,13 @@
 
             </div>
 
-
-            <div class="umb-package-section__no-results tc" ng-if="vm.packages.length === 0">
+            <!-- Empty state -->
+            <div class="umb-package-section__no-results tc" ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''">
                 <h4><strong>We couldn't find anything for '{{ vm.searchQuery }}'</strong></h4>
                 <p class="faded">Please try searching for another package or browse through the categories.</p>
             </div>
+
+
         </div>
 
     </div>
@@ -285,7 +287,7 @@
                         <small  ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3 flex flex-align-center flex-direction-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+                    <div class="umb-info-local-item mt-3 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                         <label for="license-accept" class="umb-package-installer-label">
                             <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
                             <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
@@ -293,7 +295,7 @@
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"
-                                class="umb-era-button -blue inline-flex mt-2"
+                                class="umb-era-button -blue flex-inline mt-2"
                                 ng-click="vm.installPackage(vm.localPackage)">
                             Install package
                         </button>

@@ -74,7 +74,7 @@
                             <small> {{ vm.package.readme }} </small>
                         </div>
 
-                        <div class="umb-info-local-item mt-3 flex flex-align-center flex-direction-column" ng-if="vm.installState.status == ''">
+                        <div class="umb-info-local-item mt-3 flex items-center flex-column" ng-if="vm.installState.status == ''">
                             <label for="confirm-uninstall" class="umb-package-installer-label">
                                 <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
                                 <strong class="label-text">Confirm package uninstall</strong>
@@ -82,7 +82,7 @@
                             <button type="button"
                                     ng-class="{'-inactive' : uninstallForm.$invalid}"
                                     ng-disabled="uninstallForm.$invalid"
-                                    class="umb-era-button -blue inline-flex mt-2"
+                                    class="umb-era-button -blue flex-inline mt-2"
                                     ng-click="vm.uninstallPackage(vm.package)">
                                 Uninstall package
                             </button>
