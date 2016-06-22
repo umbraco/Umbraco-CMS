@@ -120,11 +120,18 @@
 
                 <div class="umb-gallery">
                     <div class="umb-gallery__thumbnails">
-                        <a class="umb-gallery__thumbnail" target="_blank" href="{{ image.source }}" ng-repeat="image in vm.package.images">
+                        <a class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
                             <img ng-src="{{ image.thumbnail }}" />
                         </a>
                     </div>
                 </div>
+
+                <umb-lightbox
+                    ng-if="vm.lightbox.show"
+                    items="vm.lightbox.items"
+                    active-item-index="vm.lightbox.activeIndex"
+                    on-close="vm.closeLightbox">
+                </umb-lightbox>
 
             </div>
 
