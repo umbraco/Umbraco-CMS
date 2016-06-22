@@ -17,7 +17,7 @@
                 <div class="umb-package-list__item-content">
                     <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
                     <div class="umb-package-list__item-description">
-                        {{ installedPackage.version }} | <a href="{{ installedPackage.url }}">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                        {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
                     </div>
                 </div>
 
@@ -65,7 +65,7 @@
 
                         <div class="umb-info-local-item">
                             <strong>License</strong>
-                            <a href="{{ vm.package.licenseUrl }}">{{ vm.package.license }}</a>
+                            <a href="{{ vm.package.licenseUrl }}" target="_blank">{{ vm.package.license }}</a>
                         </div>
 
                         <div class="umb-info-local-item">
