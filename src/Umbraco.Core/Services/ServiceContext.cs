@@ -1,5 +1,4 @@
 using System;
-using log4net;
 using Umbraco.Core.Logging;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
-using umbraco.interfaces;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -64,6 +62,7 @@ namespace Umbraco.Core.Services
         private Lazy<IMemberGroupService> _memberGroupService;
         private Lazy<INotificationService> _notificationService;
         private Lazy<IExternalLoginService> _externalLoginService;
+        private Lazy<IRedirectUrlService> _redirectUrlService;
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
@@ -93,6 +92,7 @@ namespace Umbraco.Core.Services
         /// <param name="publicAccessService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="migrationEntryService"></param>
+        /// <param name="redirectUrlService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -118,7 +118,8 @@ namespace Umbraco.Core.Services
             IMacroService macroService = null,
             IPublicAccessService publicAccessService = null,
             IExternalLoginService externalLoginService = null,
-            IMigrationEntryService migrationEntryService = null)
+            IMigrationEntryService migrationEntryService = null,
+            IRedirectUrlService redirectUrlService = null)
         {
             if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
@@ -145,6 +146,7 @@ namespace Umbraco.Core.Services
             if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
             if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
+            if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
         }
 
         /// <summary>
@@ -310,6 +312,8 @@ namespace Umbraco.Core.Services
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger, eventMessagesFactory));
 
+            if (_redirectUrlService == null)
+                _redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, repositoryFactory, logger, eventMessagesFactory));
         }
 
         /// <summary>
@@ -515,6 +519,14 @@ namespace Umbraco.Core.Services
         public IExternalLoginService ExternalLoginService
         {
             get { return _externalLoginService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the RedirectUrlService.
+        /// </summary>
+        public IRedirectUrlService RedirectUrlService
+        {
+            get { return _redirectUrlService.Value; }
         }
     }
 }

@@ -87,6 +87,8 @@ namespace umbraco.uicontrols
                     
                 }
 
+                ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/addon/edit/matchbrackets.js", "UmbracoRoot", ClientDependencyType.Javascript);
+
                 ClientDependencyLoader.Instance.RegisterDependency(2, "lib/CodeMirror/addon/search/search.js", "UmbracoRoot", ClientDependencyType.Javascript);
                 ClientDependencyLoader.Instance.RegisterDependency(2, "lib/CodeMirror/addon/search/searchcursor.js", "UmbracoRoot", ClientDependencyType.Javascript);
                 ClientDependencyLoader.Instance.RegisterDependency(2, "lib/CodeMirror/addon/dialog/dialog.js", "UmbracoRoot", ClientDependencyType.Javascript);

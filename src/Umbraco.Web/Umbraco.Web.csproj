@@ -119,9 +119,8 @@
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.68.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.68.0\lib\Examine.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Examine, Version=0.1.69.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.69.0-beta\lib\Examine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -319,6 +318,33 @@
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\GravatarController.cs" />
+    <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ConfigurationServiceResult.cs" />
+    <Compile Include="HealthCheck\Checks\Config\MacroErrorsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\NotificationEmailCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\TrySkipIisCustomErrorsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\CustomErrorsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ValueComparisonType.cs" />
+    <Compile Include="HealthCheck\Checks\Config\CompilationDebugCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Services\SmtpCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Permissions\FolderAndFilePermissionsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\ExcessiveHeadersCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\ClickJackingCheck.cs" />
+    <Compile Include="HealthCheck\HealthCheckAction.cs" />
+    <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
+    <Compile Include="HealthCheck\HealthCheckContext.cs" />
+    <Compile Include="HealthCheck\HealthCheckController.cs" />
+    <Compile Include="HealthCheck\HealthCheckGroup.cs" />
+    <Compile Include="HealthCheck\HealthCheckResolver.cs" />
+    <Compile Include="HealthCheck\HealthCheck.cs" />
+    <Compile Include="HealthCheck\HealthCheckStatus.cs" />
+    <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
+    <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
+    <Compile Include="HealthCheck\StatusResultType.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
@@ -330,18 +356,22 @@
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\InstalledPackageModel.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeSave.cs" />
     <Compile Include="Models\ContentEditing\MemberPropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\PostedFiles.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
+    <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
+    <Compile Include="Models\PackageInstallResult.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
@@ -358,8 +388,10 @@
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
+    <Compile Include="Redirects\RedirectTrackingEventHandler.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="RouteDataExtensions.cs" />
+    <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
@@ -376,6 +408,7 @@
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
+    <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\OwinExtensions.cs" />

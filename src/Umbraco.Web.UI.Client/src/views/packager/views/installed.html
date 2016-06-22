@@ -1,0 +1,102 @@
+<div ng-controller="Umbraco.Editors.Packages.InstalledController as vm">
+
+    <!-- Package list-->
+    <div class="umb-packages-view-wrapper" ng-if="vm.state == 'list'">
+
+        <div class="umb-packages-view-title">Installed packages</div>
+
+        <div class="umb-package-list">
+
+            <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
+
+                <div class="umb-package-list__item-icon">
+                    <i ng-if="!installedPackage.icon" class="icon-box"></i>
+                    <img ng-if="installedPackage.icon" ng-src="{{installedPackage.icon}}" />
+                </div>
+
+                <div class="umb-package-list__item-content">
+                    <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
+                    <div class="umb-package-list__item-description">
+                        {{ installedPackage.version }} | <a href="{{ installedPackage.url }}">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                    </div>
+                </div>
+
+                <div class="umb-package-list__item-actions">
+                    <button type="button" class="umb-era-button" ng-click="vm.confirmUninstall(installedPackage)">Uninstall</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Package details -->
+    <div ng-if="vm.state === 'packageDetails'">
+
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'list'">&larr; Take me back</a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="umb-info-local">
+
+            <div class="umb-info-local-items">
+
+                <form novalidate name="uninstallForm">
+                    <div class="umb-package-icon">
+                        <i ng-if="!vm.package.icon" class="icon-box"></i>
+                        <img ng-if="vm.package.icon" ng-src="{{vm.package.icon}}" alt="" />
+                    </div>
+
+
+                    <div class="umb-package-info">
+                        <h4 class="umb-info-local-item"><strong>{{ vm.package.name }}</strong></h4>
+
+                        <div class="umb-info-local-item">
+                            <strong>Author</strong>
+                            <a href="{{ vm.package.authorLink }}" target="_blank">{{ vm.package.author }}</a>
+                        </div>
+
+                        <div class="umb-info-local-item">
+                            <strong>Version</strong>
+                            {{ vm.package.version }}
+                        </div>
+
+                        <div class="umb-info-local-item">
+                            <strong>License</strong>
+                            <a href="{{ vm.package.licenseUrl }}">{{ vm.package.license }}</a>
+                        </div>
+
+                        <div class="umb-info-local-item">
+                            <strong>Read me</strong>
+                            <br>
+                            <small> {{ vm.package.readme }} </small>
+                        </div>
+
+                        <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == ''">
+                            <button type="button"
+                                    ng-class="{'-inactive' : uninstallForm.$invalid}"
+                                    ng-disabled="uninstallForm.$invalid"
+                                    class="umb-era-button -blue inline-flex"
+                                    ng-click="vm.uninstallPackage(vm.package)">
+                                Uninstall package
+                            </button>
+                            <label for="confirm-uninstall" class="umb-package-installer-label">
+                                <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
+                                <strong class="label-text">Confirm package uninstall</strong>
+                            </label>
+                        </div>
+                        <div class="umb-info-local-item text-info">
+                            <p>{{vm.installState.status}}</p>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

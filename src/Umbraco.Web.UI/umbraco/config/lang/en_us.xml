@@ -1276,4 +1276,106 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterCustomValidation">...or enter a custom validation</key>
     <key alias="fieldIsMandatory">Field is mandatory</key>
   </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
+    <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
+
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
+
+    <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely when there's any errors in macros. Rectifying this will set the value to '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
+
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+
+    <key alias="xmlDataIntegrityCheckMembers">Total XML: %0%, Total: %1%</key>
+    <key alias="xmlDataIntegrityCheckMedia">Total XML: %0%, Total: %1%</key>
+    <key alias="xmlDataIntegrityCheckContent">Total XML: %0%, Total published: %1%</key>
+
+    <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+
+    <key alias="rectifyButton">Fix</key>
+    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
+    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+
+    <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
+    <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+
+    <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
+    <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
+
+    <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+
+    <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMed by another was not found.]]></key>
+    <key alias="clickJackingSetHeaderInConfig">Set Header in Config</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMed by other websites.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMing of the site by other websites has been added to your web.config file.</key>
+    <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
+
+    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
+
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+  </area>
 </language>

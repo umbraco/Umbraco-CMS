@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
                 repository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
 
@@ -56,6 +56,33 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+
+                TestHelper.AssertAllPropertyValuesAreEquals(sut, memberType, "yyyy-MM-dd HH:mm:ss");
+            }
+        }
+
+        [Test]
+        public void Can_Persist_Member_Type_Same_Property_Keys()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
+                
+                repository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var propertyKeys = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
+                var groupKeys = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
+
+                memberType = repository.Get(memberType.Id);
+                var propertyKeys2 = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
+                var groupKeys2 = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
+
+                Assert.IsTrue(propertyKeys.SequenceEqual(propertyKeys2));
+                Assert.IsTrue(groupKeys.SequenceEqual(groupKeys2));
+
             }
         }
 

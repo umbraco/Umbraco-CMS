@@ -28,6 +28,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -350,6 +351,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
                                     controller => controller.CheckContentXmlTable())
+                            },
+                            {
+                                "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
+                                    controller => controller.GetAllHealthChecks())
                             }
                         }
                     },

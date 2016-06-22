@@ -619,6 +619,7 @@ namespace Umbraco.Core.Services
         public IMedia GetMediaByPath(string mediaPath)
         {
             var umbracoFileValue = mediaPath;
+            
             const string Pattern = ".*[_][0-9]+[x][0-9]+[.].*";
             var isResized = Regex.IsMatch(mediaPath, Pattern);
 
@@ -649,6 +650,30 @@ namespace Umbraco.Core.Services
                 {
                     sql = createSql(mediaPath);
                     propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+                }
+
+                // If no reults far, try getting from a json value stored in the ntext column query
+                if (propertyDataDto == null)
+                {
+                    var ntextQuery = new Sql().Select("*")
+                        .From<PropertyDataDto>()
+                        .InnerJoin<PropertyTypeDto>()
+                        .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                        .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                        .Where("dataNtext LIKE @0", "%" + umbracoFileValue + "%");
+                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(ntextQuery).FirstOrDefault();
+                }
+
+                // If still no results, try getting from a json value stored in the nvarchar column
+                if (propertyDataDto == null)
+                {
+                    var nvarcharQuery = new Sql().Select("*")
+                        .From<PropertyDataDto>()
+                        .InnerJoin<PropertyTypeDto>()
+                        .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                        .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                        .Where("dataNvarchar LIKE @0", "%" + umbracoFileValue + "%");
+                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(nvarcharQuery).FirstOrDefault();
                 }
 
                 return propertyDataDto == null ? null : GetById(propertyDataDto.NodeId);

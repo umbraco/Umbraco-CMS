@@ -21,6 +21,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -266,17 +267,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                Content textpage = MockedContent.CreateSimpleContent(contentType);
+                IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
                 contentTypeRepository.AddOrUpdate(contentType);
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
-
+                
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
 
+                
             }
         }
 
@@ -305,9 +307,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Commit();
 
+                var fetched = repository.Get(textpage.Id);
+
                 // Assert
                 Assert.That(textpage.Template, Is.Not.Null);
                 Assert.That(textpage.Template, Is.EqualTo(contentType.DefaultTemplate));
+
+                TestHelper.AssertAllPropertyValuesAreEquals(textpage, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 

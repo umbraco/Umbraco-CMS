@@ -1,0 +1,73 @@
+body {
+	color: rgba(0,0,0,.8);
+}
+.navbar-inverse {
+  background: #a3db78;
+}
+.navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
+  color: rgba(0,0,0,.8);
+}
+
+.navbar-inverse {
+    border-color: transparent;
+}
+
+.sidetoc {
+  background-color: #f5fbf1;
+}
+body .toc {
+  background-color: #f5fbf1;
+}
+.sidefilter {
+  background-color: #daf0c9;
+}
+.subnav {
+  background-color: #f5fbf1;
+}
+
+.navbar-inverse .navbar-nav>.active>a {
+	color: rgba(0,0,0,.8);
+    background-color: #daf0c9;
+}
+
+.navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover {
+	color: rgba(0,0,0,.8);
+    background-color: #daf0c9;
+}
+
+.btn-primary {
+    color: rgba(0,0,0,.8);
+    background-color: #fff;
+    border-color: rgba(0,0,0,.8);
+}
+.btn-primary:hover {
+    background-color: #daf0c9;
+	color: rgba(0,0,0,.8);
+	border-color: rgba(0,0,0,.8);
+}
+
+.toc .nav > li > a {
+    color: rgba(0,0,0,.8);
+}
+
+button, a {
+    color: #f36f21;
+}
+
+button:hover,
+button:focus,
+a:hover,
+a:focus {
+  color: #143653;
+  text-decoration: none;
+}
+
+.navbar-header .navbar-brand {
+    background: url(https://our.umbraco.org/assets/images/logo.svg) left center no-repeat;
+    background-size: 40px auto;
+    width:50px;
+}
+
+.toc .nav > li.active > a {
+    color: #f36f21;
+}

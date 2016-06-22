@@ -331,6 +331,9 @@ namespace umbraco
 
             using (var safeXml = GetSafeXmlWriter(false))
             {
+                //TODO: This can be null: safeXml.Xml!!!!
+
+
                 var node = safeXml.Xml.GetElementById(c.Id.ToString(CultureInfo.InvariantCulture));
                 if (node == null) return;
                 var attr = node.GetAttributeNode("sortOrder");
