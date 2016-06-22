@@ -143,8 +143,6 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
 			var s = (IndexSearcher)_searcher.GetSearcher();
 
-            
-
 			//first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
 			
 			var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
@@ -209,23 +207,24 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		private Lucene.Net.Store.Directory _luceneDir;
 
-		public override void TestTearDown()
-		{
-            base.TestTearDown();
-			_luceneDir.Dispose();
+	    public override void TearDown()
+	    {
+	        base.TearDown();
+            _luceneDir.Dispose();
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;
-		}
+        }
+        
 
-		public override void TestSetup()
-		{
-            base.TestSetup();
-			_luceneDir = new RAMDirectory();
-			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
-			_indexer.RebuildIndex();
-			_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
-		}
-
+	    public override void Initialize()
+	    {
+	        base.Initialize();
+            _luceneDir = new RAMDirectory();
+            _indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
+            _indexer.RebuildIndex();
+            _searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
+        }
+        
 
 		#endregion
 	}

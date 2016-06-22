@@ -101,20 +101,18 @@ namespace Umbraco.Tests.Cache
                 CloneId = Guid.NewGuid();
             }
 
-            private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+            private class PropertySelectors
+            {
+                public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            }
 
             private string _name;
             public string Name
             {
                 get { return _name; }
-                set
-                {
-                    SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _name = value;
-                        return _name;
-                    }, _name, WriterSelector);
-                }
+                set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.WriterSelector); }
             }
 
             public Guid CloneId { get; set; }

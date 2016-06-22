@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models
         public PropertyType(IDataTypeDefinition dataTypeDefinition, string propertyTypeAlias)
             : this(dataTypeDefinition)
         {
-            SetAlias(propertyTypeAlias);
+            _alias = GetAlias(propertyTypeAlias);
         }
         
         public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
@@ -84,20 +84,25 @@ namespace Umbraco.Core.Models
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDatabaseType;
-            SetAlias(propertyTypeAlias);
+            _alias = GetAlias(propertyTypeAlias);
         }
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
-        private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-        private static readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
-        private static readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-        private static readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
-        private static readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
-        private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
-        private static readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-        private static readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
+            public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
+            public readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
+            public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
+            public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
+            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+            public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
+            public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+            public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
+        }
 
         /// <summary>
         /// Gets of Sets the Name of the PropertyType
@@ -106,14 +111,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -123,14 +121,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    SetAlias(value);
-                    return _alias;
-                }, _alias, AliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -140,14 +131,7 @@ namespace Umbraco.Core.Models
         public string Description
         {
             get { return _description; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _description = value;
-                    return _description;
-                }, _description, DescriptionSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
         }
 
         /// <summary>
@@ -158,28 +142,14 @@ namespace Umbraco.Core.Models
         public int DataTypeDefinitionId
         {
             get { return _dataTypeDefinitionId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _dataTypeDefinitionId = value;
-                    return _dataTypeDefinitionId;
-                }, _dataTypeDefinitionId, DataTypeDefinitionIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector); }
         }
 
         [DataMember]
         public string PropertyEditorAlias
         {
             get { return _propertyEditorAlias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _propertyEditorAlias = value;
-                    return _propertyEditorAlias;
-                }, _propertyEditorAlias, PropertyEditorAliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector); }
         }
 
         /// <summary>
@@ -213,11 +183,7 @@ namespace Umbraco.Core.Models
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
 
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _dataTypeDatabaseType = value;
-                    return _dataTypeDatabaseType;
-                }, _dataTypeDatabaseType, DataTypeDatabaseTypeSelector);
+                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);                
             }
         }
 
@@ -229,14 +195,7 @@ namespace Umbraco.Core.Models
         internal Lazy<int> PropertyGroupId
         {
             get { return _propertyGroupId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _propertyGroupId = value;
-                    return _propertyGroupId;
-                }, _propertyGroupId, PropertyGroupIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector); }
         }
 
         /// <summary>
@@ -246,14 +205,7 @@ namespace Umbraco.Core.Models
         public bool Mandatory
         {
             get { return _mandatory; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _mandatory = value;
-                    return _mandatory;
-                }, _mandatory, MandatorySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector); }
         }
 
         /// <summary>
@@ -264,14 +216,7 @@ namespace Umbraco.Core.Models
         public string HelpText
         {
             get { return _helpText; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _helpText = value;
-                    return _helpText;
-                }, _helpText, HelpTextSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector); }
         }
 
         /// <summary>
@@ -281,14 +226,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -298,23 +236,16 @@ namespace Umbraco.Core.Models
         public string ValidationRegExp
         {
             get { return _validationRegExp; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _validationRegExp = value;
-                    return _validationRegExp;
-                }, _validationRegExp, ValidationRegExpSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
         }
 
-        private void SetAlias(string value)
+        private string GetAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
             // which is used internally
 
-            _alias = value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+            return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
                         ? value
                         : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
         }

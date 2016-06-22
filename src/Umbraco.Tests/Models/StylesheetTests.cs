@@ -3,12 +3,19 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
     public class StylesheetTests
     {
+        [SetUp]
+        public virtual void Initialize()
+        {
+            SettingsForTests.Reset();
+        }
+
         [Test]
         public void Can_Create_Stylesheet()
         {
@@ -55,7 +62,10 @@ namespace Umbraco.Tests.Models
         public void Can_Update_Property()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css") { Content = @"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}" };
+            var stylesheet = new Stylesheet("/css/styles.css")
+            {
+                Content = @"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}"
+            };
 
             var prop = stylesheet.Properties.Single();
             prop.Alias = "li";

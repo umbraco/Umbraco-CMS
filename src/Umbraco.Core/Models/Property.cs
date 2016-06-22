@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -45,8 +43,42 @@ namespace Umbraco.Core.Models
             Value = value;
         }
 
-        private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
-        private static readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
+            public readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
+        }
+
+        private static readonly DelegateEqualityComparer<object> ValueComparer = new DelegateEqualityComparer<object>(
+            (o, o1) =>
+            {
+                if (o == null && o1 == null) return true;
+
+                //custom comparer for strings.                        
+                if (o is string || o1 is string)
+                {
+                    //if one is null and another is empty then they are the same
+                    if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
+                    {
+                        return true;
+                    }
+                    if (o == null || o1 == null) return false;
+                    return o.Equals(o1);
+                }
+
+                if (o == null || o1 == null) return false;
+
+                //Custom comparer for enumerable if it is enumerable
+                var enum1 = o as IEnumerable;
+                var enum2 = o1 as IEnumerable;
+                if (enum1 != null && enum2 != null)
+                {
+                    return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
+                }
+                return o.Equals(o1);
+            }, o => o.GetHashCode());
         
         /// <summary>
         /// Returns the instance of the tag support, by default tags are not enabled
@@ -98,14 +130,7 @@ namespace Umbraco.Core.Models
         public Guid Version
         {
             get { return _version; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _version = value;
-                    return _version;
-                }, _version, VersionSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
         }
 
         /// <summary>
@@ -173,39 +198,7 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _value = value;
-                    return _value;
-                }, _value, ValueSelector, 
-                new DelegateEqualityComparer<object>(
-                    (o, o1) =>
-                    {
-                        if (o == null && o1 == null) return true;
-
-                        //custom comparer for strings.                        
-                        if (o is string || o1 is string)                            
-                        {
-                            //if one is null and another is empty then they are the same
-                            if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
-                            {
-                                return true;   
-                            }
-                            if (o == null || o1 == null) return false;
-                            return o.Equals(o1);
-                        }
-                        
-                        if (o == null || o1 == null) return false;
-
-                        //Custom comparer for enumerable if it is enumerable
-                        var enum1 = o as IEnumerable;
-                        var enum2 = o1 as IEnumerable;
-                        if (enum1 != null && enum2 != null)
-                        {
-                            return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
-                        }
-                        return o.Equals(o1);
-                    }, o => o.GetHashCode()));
+                SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector, ValueComparer);
             }
         }
 

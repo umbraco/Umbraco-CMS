@@ -29,32 +29,41 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IContent BuildEntity(DocumentDto dto)
         {
-            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
+            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType);
+
+            try
             {
-                Id = _id,
-                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
-                Name = dto.Text,
-                NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text,
-                Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
-                CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
-                WriterId = dto.WriterUserId,
-                Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,
-                ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId,
-                SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder,
-                Trashed = dto.ContentVersionDto.ContentDto.NodeDto.Trashed,
-                Published = dto.Published,
-                CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                UpdateDate = dto.ContentVersionDto.VersionDate,
-                ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null,
-                ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null,
-                Version = dto.ContentVersionDto.VersionId,
-                PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished,
-                PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId
-            };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            content.ResetDirtyProperties(false);
-            return content;
+                content.DisableChangeTracking();
+
+                content.Id = _id;
+                content.Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId;
+                content.Name = dto.Text;
+                content.NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text;
+                content.Path = dto.ContentVersionDto.ContentDto.NodeDto.Path;
+                content.CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value;
+                content.WriterId = dto.WriterUserId;
+                content.Level = dto.ContentVersionDto.ContentDto.NodeDto.Level;
+                content.ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId;
+                content.SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder;
+                content.Trashed = dto.ContentVersionDto.ContentDto.NodeDto.Trashed;
+                content.Published = dto.Published;
+                content.CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate;
+                content.UpdateDate = dto.ContentVersionDto.VersionDate;
+                content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?) null;
+                content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?) null;
+                content.Version = dto.ContentVersionDto.VersionId;
+                content.PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished;
+                content.PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                content.ResetDirtyProperties(false);
+                return content;
+            }
+            finally
+            {
+                content.EnableChangeTracking();
+            }
         }
 
         public DocumentDto BuildDto(IContent entity)

@@ -772,22 +772,22 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null)
         {
 
             //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
             // what we always require for a paged result, so we'll ensure it's included in the filter
-
-            var args = new List<object>();
-            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
-
-            if (filter.IsNullOrWhiteSpace() == false)
+            
+            var filterSql = new Sql().Append("AND (cmsDocument.newest = 1)");
+            if (filter != null)
             {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                }
             }
-
-            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
+            
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
 
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
