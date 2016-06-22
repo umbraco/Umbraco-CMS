@@ -14,9 +14,14 @@ namespace Umbraco.Core.Models
             CreateDateUtc = DateTime.UtcNow;
         }
 
-        private static readonly PropertyInfo ContentIdSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, int>(x => x.ContentId);
-        private static readonly PropertyInfo CreateDateUtcSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, DateTime>(x => x.CreateDateUtc);
-        private static readonly PropertyInfo UrlSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Url);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ContentIdSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, int>(x => x.ContentId);
+            public readonly PropertyInfo CreateDateUtcSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, DateTime>(x => x.CreateDateUtc);
+            public readonly PropertyInfo UrlSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Url);
+        }
 
         private int _contentId;
         private DateTime _createDateUtc;
@@ -27,10 +32,7 @@ namespace Umbraco.Core.Models
             get { return _contentId; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    return _contentId = value;
-                }, _contentId, ContentIdSelector);
+                SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentIdSelector);
             }
         }
 
@@ -39,10 +41,7 @@ namespace Umbraco.Core.Models
             get {  return _createDateUtc; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    return _createDateUtc = value;
-                }, _createDateUtc, CreateDateUtcSelector);
+                SetPropertyValueAndDetectChanges(value, ref _createDateUtc, Ps.Value.CreateDateUtcSelector);
             }
         }
 
@@ -51,10 +50,7 @@ namespace Umbraco.Core.Models
             get { return _url; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    return _url = value;
-                }, _url, UrlSelector);
+                SetPropertyValueAndDetectChanges(value, ref _url, Ps.Value.UrlSelector);
             }
         }
     }

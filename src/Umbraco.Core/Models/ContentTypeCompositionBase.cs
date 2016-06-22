@@ -106,7 +106,7 @@ namespace Umbraco.Core.Models
                     throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
-                OnPropertyChanged(ContentTypeCompositionSelector);
+                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
                 return true;
             }
             return false;
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Models
                 if (compositionIdsToRemove.Any())
                     RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
-                OnPropertyChanged(ContentTypeCompositionSelector);
+                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
             return false;

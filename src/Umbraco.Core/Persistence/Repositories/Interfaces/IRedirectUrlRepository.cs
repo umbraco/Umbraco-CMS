@@ -10,8 +10,8 @@ namespace Umbraco.Core.Persistence.Repositories
         void DeleteAll();
         void DeleteContentUrls(int contentId);
         IRedirectUrl GetMostRecentUrl(string url);
-        IEnumerable<RedirectUrl> GetContentUrls(int contentId);
-        IEnumerable<RedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total);
-        IEnumerable<RedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total);
+        IEnumerable<IRedirectUrl> GetContentUrls(int contentId);
+        IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total);
+        IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total);
     }
 }
