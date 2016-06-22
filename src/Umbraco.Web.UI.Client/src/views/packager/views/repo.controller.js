@@ -11,7 +11,7 @@
         vm.pagination = {
             pageNumber: 1,
             totalPages: 10,
-            pageSize: 8
+            pageSize: 24
         };
         vm.searchQuery = "";
         vm.installState = {
