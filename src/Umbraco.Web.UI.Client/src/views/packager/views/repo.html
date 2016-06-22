@@ -99,11 +99,12 @@
             </div>
 
             <!-- Empty state -->
-            <div class="umb-package-section__no-results tc" ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''">
+            <umb-empty-state
+                ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
+                position="center">
                 <h4><strong>We couldn't find anything for '{{ vm.searchQuery }}'</strong></h4>
                 <p class="faded">Please try searching for another package or browse through the categories.</p>
-            </div>
-
+            </umb-empty-state>
 
         </div>
 
