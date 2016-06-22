@@ -14,6 +14,9 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.Logging
 {
+    /// <summary>
+    /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8
+    /// </summary>
     [TestFixture]
     public class ParallelForwarderTest : IDisposable
     {
@@ -84,7 +87,7 @@ namespace Umbraco.Tests.Logging
             badAppender
                 .Setup(ba => ba.DoAppend(It.IsAny<LoggingEvent>()))
                 .Throws(new Exception("Bad Appender"));
-            //.Verifiable();
+                //.Verifiable();
 
             // Act
             log.Info("InitialMessage");
@@ -103,7 +106,7 @@ namespace Umbraco.Tests.Logging
             const int testSize = 1000;
 
             // Arrange
-            debugAppender.AppendDelay = TimeSpan.FromSeconds(10);
+            debugAppender.AppendDelay = TimeSpan.FromSeconds(30);
             var watch = new Stopwatch();
 
             // Act
@@ -118,8 +121,6 @@ namespace Umbraco.Tests.Logging
             Assert.That(debugAppender.LoggedEventCount, Is.EqualTo(0));
             Assert.That(watch.ElapsedMilliseconds, Is.LessThan(testSize));
             Console.WriteLine("Logged {0} errors in {1}ms", testSize, watch.ElapsedMilliseconds);
-
-            debugAppender.Cancel = true;
         }
 
         [Test]
@@ -173,8 +174,7 @@ namespace Umbraco.Tests.Logging
             Console.WriteLine("Flushed {0} events during shutdown", numberLoggedAfterClose - numberLoggedBeforeClose);
         }
 
-		[NUnit.Framework.Ignore("Keeps failing very randomly")]
-        [Test]
+        [Test, Explicit("Long-running")]
         public void WillShutdownIfBufferCannotBeFlushedFastEnough()
         {
             const int testSize = 250;

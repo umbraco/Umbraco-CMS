@@ -1,20 +1,21 @@
-using System;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Util;
+using System;
+using System.Runtime.Remoting.Messaging;
 
 namespace Umbraco.Core.Logging
 {
-    /// <remarks>
-    /// Based on https://github.com/cjbhaines/Log4Net.Async
-    /// </remarks>
+    /// <summary>
+    /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8
+    /// </summary>
     public abstract class AsyncForwardingAppenderBase : ForwardingAppender
     {
         #region Private Members
 
         private const FixFlags DefaultFixFlags = FixFlags.Partial;
-        private FixFlags _fixFlags = DefaultFixFlags;
-        private LoggingEventHelper _loggingEventHelper;
+        private FixFlags fixFlags = DefaultFixFlags;
+        private LoggingEventHelper loggingEventHelper;
 
         #endregion Private Members
 
@@ -22,8 +23,23 @@ namespace Umbraco.Core.Logging
 
         public FixFlags Fix
         {
-            get { return _fixFlags; }
+            get { return fixFlags; }
             set { SetFixFlags(value); }
+        }
+
+        /// <summary>
+        /// Returns HttpContext.Current
+        /// </summary>
+        protected internal object HttpContext
+        {
+            get
+            {
+                return CallContext.HostContext;
+            }
+            set
+            {
+                CallContext.HostContext = value;
+            }
         }
 
         /// <summary>
@@ -38,7 +54,7 @@ namespace Umbraco.Core.Logging
         public override void ActivateOptions()
         {
             base.ActivateOptions();
-            _loggingEventHelper = new LoggingEventHelper(InternalLoggerName, DefaultFixFlags);
+            loggingEventHelper = new LoggingEventHelper(InternalLoggerName, DefaultFixFlags);
             InitializeAppenders();
         }
 
@@ -52,10 +68,10 @@ namespace Umbraco.Core.Logging
 
         private void SetFixFlags(FixFlags newFixFlags)
         {
-            if (newFixFlags != _fixFlags)
+            if (newFixFlags != fixFlags)
             {
-                _loggingEventHelper.Fix = newFixFlags;
-                _fixFlags = newFixFlags;
+                loggingEventHelper.Fix = newFixFlags;
+                fixFlags = newFixFlags;
                 InitializeAppenders();
             }
         }
@@ -84,7 +100,7 @@ namespace Umbraco.Core.Logging
         protected void ForwardInternalError(string message, Exception exception, Type thisType)
         {
             LogLog.Error(thisType, message, exception);
-            var loggingEvent = _loggingEventHelper.CreateLoggingEvent(Level.Error, message, exception);
+            var loggingEvent = loggingEventHelper.CreateLoggingEvent(Level.Error, message, exception);
             ForwardLoggingEvent(loggingEvent, thisType);
         }
 
