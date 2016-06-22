@@ -28,6 +28,7 @@
         vm.openLightbox = openLightbox;
         vm.reloadView = reloadView;
         vm.closeLightbox = closeLightbox;
+        vm.search = search;
 
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
@@ -66,41 +67,6 @@
                 .then(function() {
                     vm.loading = false;
                 });
-
-            $scope.$watch(function() {
-                return vm.searchQuery;
-            }, _.debounce(function (newVal, oldVal) {
-                $scope.$apply(function () {
-                    if (vm.searchQuery) {
-                        if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                            vm.loading = true;
-
-                            //a canceler exists, so perform the cancelation operation and reset
-                            if (canceler) {
-                                canceler.resolve();
-                                canceler = $q.defer();
-                            }
-                            else {
-                                canceler = $q.defer();
-                            }
-
-                            ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
-                                    vm.pagination.pageSize,
-                                    "",
-                                    vm.searchQuery,
-                                    canceler)
-                                .then(function(pack) {
-                                    vm.packages = pack.packages;
-                                    vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
-                                    vm.pagination.pageNumber = 1;
-                                    vm.loading = false;
-                                    //set back to null so it can be re-created
-                                    canceler = null;
-                                });
-                        }
-                    }
-                });
-            }, 200));
 
         }
 
@@ -227,7 +193,7 @@
         function reloadView() {
             window.location.reload(true);
         }
-
+        
         function openLightbox(itemIndex, items) {
             vm.lightbox = {
                 show: true,
@@ -239,6 +205,43 @@
         function closeLightbox() {
             vm.lightbox.show = false;
             vm.lightbox = null;
+	}
+        
+
+        var searchDebounced = _.debounce(function(e) {
+
+            $scope.$apply(function () {
+
+                //a canceler exists, so perform the cancelation operation and reset
+                if (canceler) {
+                    canceler.resolve();
+                    canceler = $q.defer();
+                }
+                else {
+                    canceler = $q.defer();
+                }
+
+                ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
+                        vm.pagination.pageSize,
+                        "",
+                        vm.searchQuery,
+                        canceler)
+                    .then(function(pack) {
+                        vm.packages = pack.packages;
+                        vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
+                        vm.pagination.pageNumber = 1;
+                        vm.loading = false;
+                        //set back to null so it can be re-created
+                        canceler = null;
+                    });
+
+            });
+
+        }, 200);
+
+        function search(searchQuery) {
+            vm.loading = true;
+            searchDebounced();
         }
 
         init();

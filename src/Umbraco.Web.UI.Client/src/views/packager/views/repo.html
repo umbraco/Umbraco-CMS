@@ -7,7 +7,7 @@
 
         <div class="umb-packages-section">
             <div class="umb-packages-search">
-                <input class="-full-width-input" type="text" name="query" placeholder="Search for packages" umb-auto-focus ng-model="vm.searchQuery" no-dirty-check>
+                <input class="-full-width-input" type="text" name="query" placeholder="Search for packages" umb-auto-focus ng-model="vm.searchQuery" ng-change="vm.search()" no-dirty-check>
             </div>
         </div>
 
