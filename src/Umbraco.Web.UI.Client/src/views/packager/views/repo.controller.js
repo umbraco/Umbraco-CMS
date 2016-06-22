@@ -25,6 +25,8 @@
         vm.goToPage = goToPage;
         vm.installPackage = installPackage;
         vm.downloadPackage = downloadPackage;
+        vm.openLightbox = openLightbox;
+        vm.closeLightbox = closeLightbox;
 
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
@@ -229,6 +231,19 @@
 
                     },
                     error);
+        }
+
+        function openLightbox(itemIndex, items) {
+            vm.lightbox = {
+                show: true,
+                items: items,
+                activeIndex: itemIndex
+            };
+        }
+
+        function closeLightbox() {
+            vm.lightbox.show = false;
+            vm.lightbox = null;
         }
 
         init();
