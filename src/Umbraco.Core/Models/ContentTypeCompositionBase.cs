@@ -32,9 +32,13 @@ namespace Umbraco.Core.Models
             AddContentType(parent);
         }
 
-        public readonly PropertyInfo ContentTypeCompositionSelector =
-            ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(
-                x => x.ContentTypeComposition);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ContentTypeCompositionSelector =
+                ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(x => x.ContentTypeComposition);
+        }
 
         /// <summary>
         /// Gets or sets the content types that compose this content type.
@@ -46,7 +50,7 @@ namespace Umbraco.Core.Models
             set
             {
                 _contentTypeComposition = value.ToList();
-                OnPropertyChanged(ContentTypeCompositionSelector);
+                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
             }
         }
 

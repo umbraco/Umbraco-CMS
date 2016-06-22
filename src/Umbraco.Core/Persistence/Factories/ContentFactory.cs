@@ -54,16 +54,16 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Version = dto.ContentVersionDto.VersionId;
                 content.PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished;
                 content.PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                content.ResetDirtyProperties(false);
+                return content;
             }
             finally
             {
                 content.EnableChangeTracking();
             }
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            content.ResetDirtyProperties(false);
-            return content;
         }
 
         public DocumentDto BuildDto(IContent entity)
