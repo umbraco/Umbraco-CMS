@@ -63,7 +63,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //sets the scope model value accordingly - this is the value to be sent up to the server and depends on 
     // if the picker is configured to offset time. We always format the date/time in a specific format for sending
     // to the server, this is different from the format used to display the date/time.
-    function setModelValue() {       
+    function setModelValue() {
         if ($scope.hasDatetimePickerValue) {
             var elementData = $element.find("div:first").data().DateTimePicker;
             if ($scope.model.config.pickTime) {
@@ -95,6 +95,19 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     }
 
     $scope.serverTime = null;
+    $scope.serverTimeNeedsOffsetting = false;
+    if (Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
+        // Will return something like 120
+        var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+        
+        // Will return something like -120
+        var localOffset = new Date().getTimezoneOffset();
+
+        // If these aren't equal then offsetting is needed
+        // note the minus in front of serverOffset needed 
+        // because C# and javascript return the inverse offset
+        $scope.serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+    }
 
     //get the current user to see if we can localize this picker
     userService.getCurrentUser().then(function (user) {
