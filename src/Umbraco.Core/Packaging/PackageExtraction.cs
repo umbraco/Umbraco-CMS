@@ -155,18 +155,20 @@ namespace Umbraco.Core.Packaging
                 {
                     foreach(var zipEntry in zipArchive.Entries)
                     {
-                        if (files.Contains(zipEntry.Name))
+                        if (files.Contains(zipEntry.Name) == false)
                         {
-                            using (var memStream = new MemoryStream())
+                            continue;
+                        }
+
+                        using (var memStream = new MemoryStream())
+                        {
+                            using (var zippedFile = zipEntry.Open())
                             {
-                                var zippedFile = zipEntry.Open();
                                 zippedFile.CopyTo(memStream);
                                 yield return memStream.ToArray();
-                                memStream.Close();
                             }
                         }
                     }
-                    
                 }
                 fs.Close();
             }
