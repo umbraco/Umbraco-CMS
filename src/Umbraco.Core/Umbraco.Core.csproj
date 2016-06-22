@@ -352,8 +352,10 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
+    <Compile Include="Logging\IQueue.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
     <Compile Include="Logging\LoggingEventHelper.cs" />
+    <Compile Include="Logging\RingBuffer.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
