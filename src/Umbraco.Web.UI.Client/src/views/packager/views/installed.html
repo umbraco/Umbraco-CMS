@@ -43,7 +43,7 @@
 
             <div class="umb-info-local-items">
 
-                <form novalidate name="uninstallForm">
+                <form novalidate name="uninstallForm" class="width-100">
                     <div class="umb-package-icon">
                         <i ng-if="!vm.package.icon" class="icon-box"></i>
                         <img ng-if="vm.package.icon" ng-src="{{vm.package.icon}}" alt="" />
@@ -74,18 +74,18 @@
                             <small> {{ vm.package.readme }} </small>
                         </div>
 
-                        <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == ''">
-                            <button type="button"
-                                    ng-class="{'-inactive' : uninstallForm.$invalid}"
-                                    ng-disabled="uninstallForm.$invalid"
-                                    class="umb-era-button -blue inline-flex"
-                                    ng-click="vm.uninstallPackage(vm.package)">
-                                Uninstall package
-                            </button>
+                        <div class="umb-info-local-item mt-3 flex flex-align-center flex-direction-column" ng-if="vm.installState.status == ''">
                             <label for="confirm-uninstall" class="umb-package-installer-label">
                                 <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
                                 <strong class="label-text">Confirm package uninstall</strong>
                             </label>
+                            <button type="button"
+                                    ng-class="{'-inactive' : uninstallForm.$invalid}"
+                                    ng-disabled="uninstallForm.$invalid"
+                                    class="umb-era-button -blue inline-flex mt-2"
+                                    ng-click="vm.uninstallPackage(vm.package)">
+                                Uninstall package
+                            </button>
                         </div>
                         <div class="umb-info-local-item text-info">
                             <p>{{vm.installState.status}}</p>

@@ -26,11 +26,12 @@
         vm.installPackage = installPackage;
         vm.downloadPackage = downloadPackage;
         vm.openLightbox = openLightbox;
+        vm.reloadView = reloadView;
         vm.closeLightbox = closeLightbox;
 
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
-        
+
         function getActiveCategory() {
             if (vm.searchQuery !== "") {
                 return "";
@@ -38,7 +39,7 @@
             for (var i = 0; i < vm.categories.length; i++) {
                 if (vm.categories[i].active === true) {
                     return vm.categories[i].name;
-                }                
+                }
             }
             return "";
         }
@@ -73,7 +74,7 @@
                     if (vm.searchQuery) {
                         if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
                             vm.loading = true;
-                            
+
                             //a canceler exists, so perform the cancelation operation and reset
                             if (canceler) {
                                 canceler.resolve();
@@ -97,7 +98,7 @@
                                     canceler = null;
                                 });
                         }
-                    }                    
+                    }
                 });
             }, 200));
 
@@ -121,7 +122,7 @@
                 searchCategory = "";
             }
 
-            $q.all([                    
+            $q.all([
                     ourPackageRepositoryResource.getPopular(8, searchCategory)
                     .then(function(pack) {
                         vm.popular = pack.packages;
@@ -187,21 +188,21 @@
                         vm.packageViewState = "packageInstall";
                         vm.loading = false;
                         vm.localPackage = pack;
-                        vm.localPackage.allowed = true;                       
+                        vm.localPackage.allowed = true;
                     },
                     error);
         }
 
         function error(e, args) {
-            
+
         }
 
         function installPackage(selectedPackage) {
-            
+
             vm.installState.status = "importing...";
 
             packageResource
-                .import(selectedPackage)                
+                .import(selectedPackage)
                 .then(function(pack) {
                         vm.installState.status = "Installing...";
                         return packageResource.installFiles(pack);
@@ -218,19 +219,13 @@
                     },
                     error)
                 .then(function(result) {
-
-                        if (result.postInstallationPath) {
-                            //Put the redirect Uri in a cookie so we can use after reloading
-                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
-                        }
-                        
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            window.location.reload(true);
-                        });
-
+                        vm.packageViewState = "packageInstalledSucces";
                     },
                     error);
+        }
+
+        function reloadView() {
+            window.location.reload(true);
         }
 
         function openLightbox(itemIndex, items) {

@@ -16,6 +16,7 @@
             uploadProgress: 0,
             serverErrorMessage: null
         };
+        vm.reloadView = reloadView;
 
         $scope.handleFiles = function (files, event) {
             for (var i = 0; i < files.length; i++) {
@@ -121,23 +122,17 @@
                     },
                     installError)
                 .then(function(result) {
-
-                        if (result.postInstallationPath) {
-                            //Put the redirect Uri in a cookie so we can use after reloading
-                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
-                        }
-                        //reload on next digest (after cookie)
-                        $timeout(function() {
-                            window.location.reload(true);
-                        });
-
-
+                        vm.state = "packageInstalledSucces";
                     },
                     installError);
         }
 
+        function reloadView() {
+            window.location.reload(true);
+        }
+
         function installError() {
-            //TODO: Need to do something about this?    
+            //TODO: Need to do something about this?
         }
     }
 

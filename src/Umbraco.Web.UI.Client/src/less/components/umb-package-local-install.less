@@ -7,16 +7,7 @@
     color: @grayMed;
 }
 
-.inline-flex {
-    display: inline-flex;
-}
-
-.mt-3 {
-    margin-top: 30px;
-}
-
 // Upload state
-
 .umb-upload-local,
 .umb-info-local {
     display: flex;
@@ -36,6 +27,7 @@
     margin: 0;
 
     max-width: 640px;
+    width: 100%;
 }
 
 .umb-upload-local__dropzone {
@@ -150,4 +142,26 @@
 
 .umb-info-local-items .umb-package-installer-label {
     margin-left: 10px;
+}
+
+.umb-info-success {
+
+}
+
+.umb-info-success .icon {
+    font-size: 62px;
+
+    width: 35px;
+    height: 35px;
+    padding: 35px;
+    margin-bottom: 35px;
+
+    background-color: #50C878;
+    color: white;
+
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

@@ -82,18 +82,18 @@
                         <small ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                     </div>
 
-                    <div class="umb-info-local-item mt-3" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+                    <div class="umb-info-local-item mt-3 flex flex-align-center flex-direction-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+                        <label for="license-accepts" class="umb-package-installer-label">
+                            <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
+                            <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
+                        </label>
                         <button type="button"
                                 ng-class="{'-inactive' : localPackageForm.$invalid}"
                                 ng-disabled="localPackageForm.$invalid"
-                                class="umb-era-button -blue inline-flex"
+                                class="umb-era-button -blue inline-flex mt-2"
                                 ng-click="vm.installPackage()">
                                 Install package
                         </button>
-                        <label for="license-accept" class="umb-package-installer-label">
-                            <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
-                            <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
-                        </label>
                     </div>
                     <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
                         This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
@@ -104,6 +104,29 @@
 
                 </div>
             </form>
+
+        </div>
+    </div>
+
+
+    <!-- Package installed succes -->
+    <div class="umb-info-local" ng-if="vm.state === 'packageInstalledSucces'">
+        <div class="umb-info-success">
+
+            <div class="icon ma-center">
+                <i class="icon-check" draggable="false"></i>
+            </div>
+
+            <h3><strong>Packed was installed</strong></h3>
+            <p class="faded">
+                Yippy, the package was installed successfully – now let's take it to use.
+            </p>
+
+            <button type="button"
+                    class="umb-era-button -blue ma-center mt-3"
+                    ng-click="vm.reloadView()">
+                    Go to at package details
+            </button>
 
         </div>
     </div>
