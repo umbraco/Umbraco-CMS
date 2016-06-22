@@ -12,6 +12,7 @@
         </div>
 
         <div ng-show="vm.loading === false">
+
             <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
                 <div class="umb-packages-categories">
                     <a href=""
@@ -55,7 +56,7 @@
                 </div> <!-- end packages -->
             </div>
 
-            <div class="umb-packages-section">
+            <div class="umb-packages-section" ng-if="vm.packages.length > 0">
                 <h4><strong>Latest</strong></h4>
                 <div class="umb-packages clearfix">
 
@@ -95,6 +96,12 @@
                                 on-go-to-page="vm.goToPage">
                 </umb-pagination>
 
+            </div>
+
+
+            <div class="umb-package-section__no-results tc" ng-if="vm.packages.length === 0">
+                <h4><strong>We couldn't find anything for '{{ vm.searchQuery }}'</strong></h4>
+                <p class="faded">Please try searching for another package or browse through the categories.</p>
             </div>
         </div>
 
