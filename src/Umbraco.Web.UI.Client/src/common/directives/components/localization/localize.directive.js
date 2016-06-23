@@ -3,9 +3,9 @@ angular.module("umbraco.directives")
     /**
     * @ngdoc directive
     * @name umbraco.directives.directive:localize
-    * @restrict E
+    * @restrict EA
     * @function
-    * @description Localize element directive
+    * @description Localize directive
     **/
     .directive('localize', function ($log, localizationService) {
         return {
@@ -24,13 +24,6 @@ angular.module("umbraco.directives")
         };
     })
 
-    /**
-    * @ngdoc directive
-    * @name umbraco.directives.directive:localize
-    * @restrict A
-    * @function
-    * @description Localize attribute directive
-    **/
     .directive('localize', function ($log, localizationService) {
         return {
             restrict: 'A',
