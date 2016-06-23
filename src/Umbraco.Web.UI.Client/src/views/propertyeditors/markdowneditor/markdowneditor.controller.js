@@ -58,7 +58,7 @@ function MarkdownEditorController($scope, $element, assetsService, dialogService
 
                     editor2.hooks.set("onPreviewRefresh", function () {
                         // We must manually update the model as there is no way to hook into the markdown editor events without exstensive edits to the library.
-                        if ($scope.model.value != $("textarea", $element).val()) {
+                        if ($scope.model.value !== $("textarea", $element).val()) {
                             angularHelper.getCurrentForm($scope).$setDirty();
                             $scope.model.value = $("textarea", $element).val();
                         }
