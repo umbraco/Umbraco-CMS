@@ -228,7 +228,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    //return ConvertFromXPathNodeIterator(media, id);
 
             var media = ApplicationContext.Current.Services.MediaService.GetById(id);
-            return ConvertFromIMedia(media);
+            return media == null ? null : ConvertFromIMedia(media);
         }
 
         internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
@@ -370,14 +370,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        var values = new Dictionary<string, string>();
 
+	        var creator = _applicationContext.Services.UserService.GetProfileById(media.CreatorId);
+            var creatorName = creator == null ? "" : creator.Name;
+
 	        values["id"] = media.Id.ToString();
 	        values["key"] = media.Key.ToString();
 	        values["parentID"] = media.ParentId.ToString();
 	        values["level"] = media.Level.ToString();
 	        values["creatorID"] = media.CreatorId.ToString();
-	        values["creatorName"] = "";
-            values["writerID"] = "0";
-            values["writerName"] = "";
+	        values["creatorName"] = creatorName;
+            values["writerID"] = media.CreatorId.ToString();
+	        values["writerName"] = creatorName;
             values["template"] = "0";
             values["urlName"] = "";
             values["sortOrder"] = media.SortOrder.ToString();
