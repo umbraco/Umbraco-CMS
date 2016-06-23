@@ -75,7 +75,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		public override IPublishedProperty GetProperty(string alias)
 		{
-		    IPublishedProperty property;
+            if (_nodeInitialized == false) InitializeNode();
+            IPublishedProperty property;
 		    return _properties.TryGetValue(alias, out property) ? property : null;
 		}
 
@@ -93,7 +94,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var key = string.Format("RECURSIVE_PROPERTY::{0}::{1}", Id, alias.ToLowerInvariant());
             var value = cache.GetOrAdd(key, k => base.GetProperty(alias, true));
-            if (value == null) 
+            if (value == null)
                 return null;
 
             var property = value as IPublishedProperty;
@@ -297,12 +298,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return _contentType;
             }
         }
-		
+
 		private void InitializeParent()
 		{
             if (_xmlNode == null) return;
 
-            var parent = _xmlNode.ParentNode;            
+            var parent = _xmlNode.ParentNode;
             if (parent == null) return;
 
 		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
@@ -341,7 +342,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		            _creatorName = _writerName;
 		        }
 
-		        //Added the actual userID, as a user cannot be looked up via full name only... 
+		        //Added the actual userID, as a user cannot be looked up via full name only...
 		        if (_xmlNode.Attributes.GetNamedItem("creatorID") != null)
 		            _creatorId = int.Parse(_xmlNode.Attributes.GetNamedItem("creatorID").Value);
 		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
