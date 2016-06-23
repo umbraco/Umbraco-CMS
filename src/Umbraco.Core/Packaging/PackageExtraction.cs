@@ -155,7 +155,7 @@ namespace Umbraco.Core.Packaging
                 {
                     foreach(var zipEntry in zipArchive.Entries)
                     {
-                        if (files.Contains(zipEntry.Name) == false)
+                        if (files.Contains(zipEntry.Name.ToLower()) == false)
                         {
                             continue;
                         }

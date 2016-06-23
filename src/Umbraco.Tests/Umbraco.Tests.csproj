@@ -602,7 +602,9 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
-    <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
+    <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
