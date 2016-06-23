@@ -3,31 +3,43 @@
     <!-- Package list-->
     <div class="umb-packages-view-wrapper" ng-if="vm.state == 'list'">
 
-        <div class="umb-packages-view-title">Installed packages</div>
+        <div ng-if="vm.installedPackages.length > 0">
 
-        <div class="umb-package-list">
+            <div class="umb-packages-view-title">Installed packages</div>
 
-            <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
+            <div class="umb-package-list">
 
-                <div class="umb-package-list__item-icon">
-                    <i ng-if="!installedPackage.icon" class="icon-box"></i>
-                    <img ng-if="installedPackage.icon" ng-src="{{installedPackage.icon}}" />
-                </div>
+                <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
 
-                <div class="umb-package-list__item-content">
-                    <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
-                    <div class="umb-package-list__item-description">
-                        {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                    <div class="umb-package-list__item-icon">
+                        <i ng-if="!installedPackage.icon" class="icon-box"></i>
+                        <img ng-if="installedPackage.icon" ng-src="{{installedPackage.icon}}" />
                     </div>
-                </div>
 
-                <div class="umb-package-list__item-actions">
-                    <button type="button" class="umb-era-button" ng-click="vm.confirmUninstall(installedPackage)">Uninstall</button>
+                    <div class="umb-package-list__item-content">
+                        <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
+                        <div class="umb-package-list__item-description">
+                            {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                        </div>
+                    </div>
+
+                    <div class="umb-package-list__item-actions">
+                        <button type="button" class="umb-era-button" ng-click="vm.confirmUninstall(installedPackage)">Uninstall</button>
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
+
+        <umb-empty-state
+            ng-if="vm.installedPackages.length === 0"
+            position="center">
+            <h4><strong>You have not installed any packages</strong></h4>
+            <p class="faded">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </umb-empty-state>
+
     </div>
 
     <!-- Package details -->
