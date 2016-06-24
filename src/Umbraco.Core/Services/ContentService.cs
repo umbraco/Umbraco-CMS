@@ -1991,7 +1991,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //we are successfully published if our publishStatus is still Successful
-                var published = publishStatus.StatusType == PublishStatusType.Success;
+                bool published = publishStatus.StatusType == PublishStatusType.Success;
 
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
@@ -2008,8 +2008,6 @@ namespace Umbraco.Core.Services
                     content.WriterId = userId;
 
                     repository.AddOrUpdate(content);
-                    
-                    content = repository.Get(content.Id);
 
                     //Generate a new preview
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
