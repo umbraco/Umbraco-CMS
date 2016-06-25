@@ -375,7 +375,21 @@ namespace Umbraco.Web
 		{
             return CultureDictionary[key];
 		}
-
+        /// <summary>
+        /// Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+        /// </summary>
+        /// <param name="key">key of dictionary item</param>
+        /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+        /// <returns></returns>
+        public string GetDictionaryValue(string key, string altText)
+        {
+            var dictionaryValue = GetDictionaryValue(key);
+            if (String.IsNullOrWhiteSpace(dictionaryValue))
+            {
+                dictionaryValue = altText;
+            }
+            return dictionaryValue;
+        }
         /// <summary>
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
