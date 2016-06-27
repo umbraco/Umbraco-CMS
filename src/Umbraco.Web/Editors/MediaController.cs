@@ -365,7 +365,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.MediaService.EmptyRecycleBin();
-            return Request.CreateResponse(HttpStatusCode.OK);
+
+            return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
