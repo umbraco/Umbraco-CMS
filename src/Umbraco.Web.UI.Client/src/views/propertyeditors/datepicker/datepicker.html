@@ -18,6 +18,10 @@
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">Invalid date</span>
         
+        <p ng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value" class="muted">
+            <small><localize key="content_scheduledPublishServerTime">This translates to the following time on the server:</localize> {{serverTime}}</small><br/>
+            <small><localize key="content_scheduledPublishDocumentation">What does this mean?</localize></small>
+        </p>
         <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
             <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
         </p>

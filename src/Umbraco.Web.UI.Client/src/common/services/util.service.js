@@ -58,6 +58,44 @@ function versionHelper() {
 }
 angular.module('umbraco.services').factory('versionHelper', versionHelper);
 
+function dateHelper() {
+
+    return {
+        
+        convertToServerStringTime: function(momentLocal, serverOffsetMinutes, format) {
+
+            //get the formatted offset time in HH:mm (server time offset is in minutes)
+            var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
+                moment()
+                .startOf('day')
+                .minutes(Math.abs(serverOffsetMinutes))
+                .format('HH:mm');
+
+            var server = moment.utc(momentLocal).zone(formattedOffset);
+            return server.format(format ? format : "YYYY-MM-DD HH:mm:ss");
+        },
+
+        convertToLocalMomentTime: function (strVal, serverOffsetMinutes) {
+
+            //get the formatted offset time in HH:mm (server time offset is in minutes)
+            var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
+                moment()
+                .startOf('day')
+                .minutes(Math.abs(serverOffsetMinutes))
+                .format('HH:mm');
+
+            //convert to the iso string format
+            var isoFormat = moment(strVal).format("YYYY-MM-DDTHH:mm:ss") + formattedOffset;
+
+            //create a moment with the iso format which will include the offset with the correct time
+            // then convert it to local time
+            return moment.parseZone(isoFormat).local();
+        }
+
+    };
+}
+angular.module('umbraco.services').factory('dateHelper', dateHelper);
+
 function packageHelper(assetsService, treeService, eventsService, $templateCache) {
 
     return {

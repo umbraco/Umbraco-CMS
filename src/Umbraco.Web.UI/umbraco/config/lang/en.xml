@@ -169,6 +169,8 @@
     <key alias="notmemberof">Not a member of group(s)</key>
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
+    <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
