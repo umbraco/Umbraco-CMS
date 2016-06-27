@@ -84,6 +84,7 @@ namespace Umbraco.Web.Cache
             Permission.Updated += PermissionUpdated;
             Permission.Deleted += PermissionDeleted;
             PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
+            GroupPermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedGroupPermissions;
 
             //Bind to template events
 
@@ -507,10 +508,16 @@ namespace Umbraco.Web.Cache
         
         #region User/permissions event handlers
 
-        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<UserEntityPermission> e)
         {
             var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
             userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
+        }
+
+        static void CacheRefresherEventHandler_AssignedGroupPermissions(GroupPermissionRepository<IContent> sender, SaveEventArgs<GroupEntityPermission> e)
+        {
+            var groupIds = e.SavedEntities.Select(x => x.GroupId).Distinct();
+            groupIds.ForEach(x => DistributedCache.Instance.RefreshUserGroupPermissionsCache(x));
         }
 
         static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)

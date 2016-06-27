@@ -8,7 +8,6 @@ using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
 
-
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
@@ -29,6 +28,7 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection = new ObservableCollection<string>();
             _addedSections = new List<string>();
             _removedSections = new List<string>();
+            _groupCollection = new List<IUserGroup>();
             _language = GlobalSettings.DefaultUILanguage;
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
             _isApproved = true;
@@ -58,6 +58,8 @@ namespace Umbraco.Core.Models.Membership
         private List<string> _addedSections;
         private List<string> _removedSections;
         private ObservableCollection<string> _sectionCollection;
+        private List<IUserGroup> _groupCollection;
+        private bool _groupsLoaded;
         private int _sessionTimeout;
         private int _startContentId;
         private int _startMediaId;
@@ -217,21 +219,6 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        public IProfile ProfileData
-        {
-            get { return new UserProfile(this); }
-        }
-
-        /// <summary>
-        /// The security stamp used by ASP.Net identity
-        /// </summary>
-        [IgnoreDataMember]
-        public string SecurityStamp
-        {
-            get { return _securityStamp; }
-            set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
-        }
-
         /// <summary>
         /// Used internally to check if we need to add a section in the repository to the db
         /// </summary>
@@ -246,6 +233,21 @@ namespace Umbraco.Core.Models.Membership
         internal IEnumerable<string> RemovedSections
         {
             get { return _removedSections; }
+        }
+
+        public IProfile ProfileData
+        {
+            get { return new UserProfile(this); }
+        }
+
+        /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        [IgnoreDataMember]
+        public string SecurityStamp
+        {
+            get { return _securityStamp; }
+            set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
         }
 
         /// <summary>
@@ -324,6 +326,41 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
+        /// <summary>
+        /// Gets or sets the groups that user is part of
+        /// </summary>
+        [DataMember]
+        public IEnumerable<IUserGroup> Groups
+        {
+            get { return _groupCollection; }
+        }
+
+        /// <summary>
+        /// Indicates if the groups for a user have been loaded
+        /// </summary>
+        public bool GroupsLoaded { get { return _groupsLoaded; } }
+
+        public void RemoveGroup(IUserGroup group)
+        {
+            if (_groupCollection.Select(x => x.Id).Contains(group.Id))
+            {
+                _groupCollection.Remove(group);
+            }
+        }
+
+        public void AddGroup(IUserGroup group)
+        {
+            if (_groupCollection.Select(x => x.Id).Contains(group.Id) == false)
+            {
+                _groupCollection.Add(group);
+            }
+        }
+
+        public void SetGroupsLoaded()
+        {
+            _groupsLoaded = true;
+        }
+
         #endregion
 
         /// <summary>
@@ -365,7 +402,6 @@ namespace Umbraco.Core.Models.Membership
                 {
                     _removedSections.Add(item);    
                 }
-
             }
         }
 
@@ -378,6 +414,7 @@ namespace Umbraco.Core.Models.Membership
             clone._addedSections = new List<string>();
             clone._removedSections = new List<string>();
             clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
+            clone._groupCollection = new List<IUserGroup>(_groupCollection.ToList());
             clone._defaultPermissions = new List<string>(_defaultPermissions.ToList());
             //re-create the event handler
             clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;

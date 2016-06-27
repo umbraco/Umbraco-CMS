@@ -3,15 +3,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Tests.Services
 {
@@ -549,6 +547,207 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_With_None_Set_On_Path_User_Or_Type_And_No_Group_Checks()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests();
+ 
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1,1234", PermissionsFrom.DirectlyAssigned);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_With_Type_Fallback_Only()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests(userTypePermissions: "AB");
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1,1234", PermissionsFrom.DirectlyAssigned);
+
+            // Assert
+            Assert.AreEqual("AB", result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_When_Set_For_User()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests(userTypePermissions: "AB");
+            var content = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            SetNodeUserPermissions(content, "ABC", user.Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1," + content.Id, PermissionsFrom.DirectlyAssigned);
+
+            // Assert
+            Assert.AreEqual("ABC", result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_When_Set_For_User_And_Groups()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests();
+            var content = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            SetNodeUserPermissions(content, "ABC", user.Id);
+            SetNodeGroupPermissions(content, "ABD", user.Groups.First().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1," + content.Id, PermissionsFrom.DirectlyAssignedOrViaGroups);
+
+            // Assert (groups should be ignored)
+            Assert.AreEqual("ABC", result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_When_Null_Action_Set_For_User_And_Groups()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests();
+            var content = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            SetNodeUserPermissions(content, "-", user.Id);
+            SetNodeGroupPermissions(content, "AB", user.Groups.First().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1," + content.Id, PermissionsFrom.DirectlyAssignedOrViaGroups);
+
+            // Assert (groups should NOT be ignored but we'll get the "null "action from the user type)
+            Assert.AreEqual("AB-", result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_When_Set_For_Groups()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests();
+            var content = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            SetNodeGroupPermissions(content, "ABC", user.Groups.First().Id);
+            SetNodeGroupPermissions(content, "BDE", user.Groups.Last().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1," + content.Id, PermissionsFrom.DirectlyAssignedOrViaGroups);
+
+            // Assert (should be distinct values from groups)
+            Assert.AreEqual("ABCDE", result);
+        }
+
+        [Test]
+        public void UserService_Get_Permissions_For_Path_When_Set_For_UserType_And_Groups()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests(userTypePermissions: "ADF");
+            var content = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            SetNodeGroupPermissions(content, "ABC", user.Groups.First().Id);
+            SetNodeGroupPermissions(content, "BDE", user.Groups.Last().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissionsForPath(user, "-1," + content.Id, PermissionsFrom.DirectlyAssignedOrViaGroups);
+
+            // Assert (should be distinct values from groups and user type)
+            Assert.AreEqual("ABCDEF", result);
+        }
+
+        [Test]
+        public void UserService_Get_Aggregate_Permissions_For_User_And_Groups_With_No_Explicit_Permissions()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests(userTypePermissions: "ADF");
+            var content1 = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            var content2 = ServiceContext.ContentService.GetChildren(content1.Id).First();
+            SetNodeGroupPermissions(content1, "ABC", user.Groups.First().Id);
+            SetNodeGroupPermissions(content1, "BDE", user.Groups.Last().Id);
+            SetNodeGroupPermissions(content2, "AFG", user.Groups.First().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissions(user, content1.Id, content2.Id).ToList();
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+            var perm1 = result.Single(x => x.EntityId == content1.Id);
+            Assert.AreEqual("ABCDEF", string.Join(string.Empty, perm1.AssignedPermissions.OrderBy(x => x)));
+            var perm2 = result.Single(x => x.EntityId == content2.Id);
+            Assert.AreEqual("ADFG", string.Join(string.Empty, perm2.AssignedPermissions.OrderBy(x => x)));
+        }
+
+        [Test]
+        public void UserService_Get_Aggregate_Permissions_For_User_And_Groups_With_Explicit_Permissions()
+        {
+            // Arrange
+            var user = CreateUserForPermissionsTests(userTypePermissions: "ADF");
+            var content1 = ServiceContext.ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            var content2 = ServiceContext.ContentService.GetChildren(content1.Id).First();
+            SetNodeUserPermissions(content1, "ABC", user.Id);
+            SetNodeGroupPermissions(content1, "ABC", user.Groups.First().Id);
+            SetNodeGroupPermissions(content1, "BDE", user.Groups.Last().Id);
+            SetNodeGroupPermissions(content2, "AFG", user.Groups.First().Id);
+
+            // Act
+            var result = ServiceContext.UserService.GetPermissions(user, content1.Id, content2.Id).ToList();
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+            var perm1 = result.Single(x => x.EntityId == content1.Id);
+            Assert.AreEqual("ABC", string.Join(string.Empty, perm1.AssignedPermissions.OrderBy(x => x)));
+            var perm2 = result.Single(x => x.EntityId == content2.Id);
+            Assert.AreEqual("ADFG", string.Join(string.Empty, perm2.AssignedPermissions.OrderBy(x => x)));
+        }
+        
+        private IUser CreateUserForPermissionsTests(string userTypePermissions = "")
+        {
+            var userType = new UserType
+            {
+                Alias = "TypeA",
+                Name = "Type A",
+                Permissions = userTypePermissions.ToCharArray().Select(x => x.ToString())
+            };
+            ServiceContext.UserService.SaveUserType(userType, false);
+
+            var user = new User(userType)
+            {
+                Name = "Test user",
+                Username = "testUser",
+                Email = "testuser@test.com"
+            };
+            ServiceContext.UserService.Save(user, false);
+
+            var userGroupA = new UserGroup
+            {
+                Alias = "GroupA",
+                Name = "Group A"
+            };
+            ServiceContext.UserService.SaveUserGroup(userGroupA, true, new[] { user.Id }, false);
+
+            var userGroupB = new UserGroup
+            {
+                Alias = "GroupB",
+                Name = "Group B"
+            };
+            ServiceContext.UserService.SaveUserGroup(userGroupB, true, new[] { user.Id }, false);
+
+            return ServiceContext.UserService.GetUserById(user.Id);
+        }
+
+        private void SetNodeUserPermissions(IContent content, string permissions, int userId)
+        {
+            foreach (var permission in permissions.ToCharArray())
+            {
+                ServiceContext.ContentService.AssignContentPermission(content, permission, new[] { userId });
+            }
+        }
+
+        private void SetNodeGroupPermissions(IContent content, string permissions, int groupId)
+        {
+            foreach (var permission in permissions.ToCharArray())
+            {
+                ServiceContext.ContentService.AssignContentPermissionForGroup(content, permission, new[] { groupId });
+            }
         }
     }
 }

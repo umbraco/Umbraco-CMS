@@ -312,6 +312,8 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
+    <Compile Include="Cache\UserGroupCacheRefresher.cs" />
+    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
@@ -413,6 +415,41 @@
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\UserGroups.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\UserGroupPermissionsBaseTree.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\UserGroupPermissions.cs" />
+    <Compile Include="umbraco.presentation\umbraco\users\EditUserGroup.aspx.cs">
+      <DependentUpon>EditUserGroup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\EditUserGroup.aspx.designer.cs">
+      <DependentUpon>EditUserGroup.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\EditUserGroupsBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\GroupPermissionEditor.aspx.cs">
+      <DependentUpon>GroupPermissionEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\GroupNodePermissions.ascx.cs">
+      <DependentUpon>GroupNodePermissions.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\NodePermissionsBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\PermissionEditorBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\GroupPermissionsHandler.asmx.cs">
+      <DependentUpon>GroupPermissionsHandler.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\PermissionsHandlerBase.cs" />
+    <Compile Include="umbraco.presentation\umbraco\users\UserGroupTasks.cs" />
+    <Compile Include="umbraco.presentation\umbraco\users\UserGroupPermissionsBase.cs" />
+    <Compile Include="umbraco.presentation\umbraco\users\UserGroupPermissions.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
@@ -1856,15 +1893,9 @@
       <DependentUpon>NodePermissions.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.designer.cs">
-      <DependentUpon>NodePermissions.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.cs">
       <DependentUpon>PermissionEditor.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.designer.cs">
-      <DependentUpon>PermissionEditor.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx.cs">
       <DependentUpon>PermissionsHandler.asmx</DependentUpon>
@@ -2025,6 +2056,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\EditUserGroup.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\GroupPermissionEditor.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\GroupNodePermissions.ascx" />
+    <Content Include="umbraco.presentation\umbraco\users\GroupPermissionsHandler.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
@@ -2101,12 +2136,8 @@
     </None>
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
-    <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />
+    <Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
@@ -2139,9 +2170,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>

@@ -401,9 +401,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions
                     from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+                    select new UserEntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
 
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
+                permissionsRepo.ReplaceEntityPermissions(new UserEntityPermissionSet(entity.Id, userPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content)entity).PermissionsChanged = true;
@@ -695,7 +695,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.ExecuteScalar<int>(sql);
         }
 
-        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        public void ReplaceContentPermissions(UserEntityPermissionSet permissionSet)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             repo.ReplaceEntityPermissions(permissionSet);
@@ -724,7 +724,19 @@ namespace Umbraco.Core.Persistence.Repositories
             repo.AssignEntityPermission(entity, permission, userIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified group ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="groupIds"></param>        
+        public void AssignEntityPermissionForGroup(IContent entity, char permission, IEnumerable<int> groupIds)
+        {
+            var repo = new GroupPermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
+            repo.AssignEntityPermission(entity, permission, groupIds);
+        }
+
+        public IEnumerable<UserEntityPermission> GetPermissionsForEntity(int entityId)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             return repo.GetPermissionsForEntity(entityId);

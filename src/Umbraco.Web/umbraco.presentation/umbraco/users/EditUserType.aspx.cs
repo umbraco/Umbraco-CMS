@@ -35,8 +35,8 @@ namespace umbraco.cms.presentation.user
             save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
 
-            pp_alias.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("alias", base.getUser());
-            pp_name.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("name", base.getUser());
+            pp_alias.Text = umbraco.ui.Text("alias", base.getUser());
+            pp_name.Text = umbraco.ui.Text("name", base.getUser());
 
             pp_rights.Text = umbraco.ui.Text("default", base.getUser()) + " " + umbraco.ui.Text("rights", base.getUser());
             

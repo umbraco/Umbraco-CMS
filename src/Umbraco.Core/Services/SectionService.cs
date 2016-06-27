@@ -184,14 +184,23 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            
             var user = _userService.GetUserById(userId);
             if (user == null)
             {
                 throw new InvalidOperationException("No user found with id " + userId);
             }
 
-            return GetSections().Where(x => user.AllowedSections.Contains(x.Alias));
+            // Combine user associated sections with those for the groups the user is in
+            var allowedSections = user.AllowedSections.ToList();
+            var groupSections = user.Groups
+                .SelectMany(x => x.AllowedSections)
+                .Distinct();
+            allowedSections.AddRange(groupSections);
+            allowedSections = allowedSections
+                .Distinct()
+                .ToList();
+
+            return GetSections().Where(x => allowedSections.Contains(x.Alias));
         }
 
         /// <summary>
@@ -212,7 +221,14 @@ namespace Umbraco.Core.Services
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         public void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, GetSections().Max(x => x.SortOrder) + 1);
+            var existingSections = GetSections().ToArray();
+            var sortOrder = 1;
+            if (existingSections.Any())
+            {
+                sortOrder = existingSections.Max(x => x.SortOrder) + 1;
+            }
+
+            MakeNew(name, alias, icon, sortOrder);
         }
 
         /// <summary>

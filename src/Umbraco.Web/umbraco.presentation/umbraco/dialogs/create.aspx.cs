@@ -99,7 +99,7 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return CurrentUser.GetPermissions(new CMSNode(nodeId).Path)
+            return CurrentUser.GetPermissions(new CMSNode(nodeId).Path, true)
                 .Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture));
         }
 

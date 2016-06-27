@@ -31,7 +31,7 @@ namespace umbraco.dialogs
                 return;
             }
 
-            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
+            if (UmbracoUser.GetPermissions(node.Path, true).Contains(ActionAssignDomain.Instance.Letter) == false)
             {
                 feedback.Text = ui.Text("assignDomain", "permissionDenied");
                 pane_language.Visible = false;

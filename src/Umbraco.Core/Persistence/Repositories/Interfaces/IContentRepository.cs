@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// assigned to an entity with a list of user id & permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
-        void ReplaceContentPermissions(EntityPermissionSet permissionSet);
+        void ReplaceContentPermissions(UserEntityPermissionSet permissionSet);
 
         /// <summary>
         /// Clears the published flag for a content.
@@ -49,11 +49,19 @@ namespace Umbraco.Core.Persistence.Repositories
         void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds);
 
         /// <summary>
+        /// Assigns a single permission to the current content item for the specified group ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="groupIds"></param>
+        void AssignEntityPermissionForGroup(IContent entity, char permission, IEnumerable<int> groupIds);
+
+        /// <summary>
         /// Gets the list of permissions for the content item
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
+        IEnumerable<UserEntityPermission> GetPermissionsForEntity(int entityId);
 
         /// <summary>
         /// Used to add/update published xml for the content item

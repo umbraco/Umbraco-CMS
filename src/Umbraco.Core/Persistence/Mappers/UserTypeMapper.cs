@@ -38,7 +38,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<UserType, UserTypeDto>(src => src.Permissions, dto => dto.DefaultPermissions);
         }
 
-
         #endregion
     }
 }

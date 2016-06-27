@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             contentServiceMock.Setup(x => x.GetById(0)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>();
+            var permissions = new List<UserEntityPermission>();
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
             
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>();
+            var permissions = new List<UserEntityPermission>();
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
 
@@ -98,9 +98,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A", "B", "C" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A", "B", "C" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -127,9 +127,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A", "F", "C" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A", "F", "C" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -215,9 +215,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, -1)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -239,9 +239,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, -1)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -263,9 +263,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, -20)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -287,9 +287,9 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new List<UserEntityPermission>
                 {
-                    new EntityPermission(9, 1234, new string[]{ "A" })
+                    new UserEntityPermission(9, 1234, new string[]{ "A" })
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, -20)).Returns(permissions);
             var userService = userServiceMock.Object;

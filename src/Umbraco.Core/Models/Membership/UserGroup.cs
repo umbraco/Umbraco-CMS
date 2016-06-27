@@ -1,20 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents a Group for a Backoffice User
     /// </summary>
-    /// <remarks>
-    /// Should be internal until a proper user/membership implementation
-    /// is part of the roadmap.
-    /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserGroup : Entity
+    internal class UserGroup : UserTypeGroupBase, IUserGroup
     {
-         //Add UserCollection ?
+        private List<string> _sectionCollection;
+
+        public UserGroup()
+        {
+            _sectionCollection = new List<string>();
+        }
+
+        public IEnumerable<string> AllowedSections
+        {
+            get { return _sectionCollection; }
+        }
+
+        public void RemoveAllowedSection(string sectionAlias)
+        {
+            if (_sectionCollection.Contains(sectionAlias))
+            {
+                _sectionCollection.Remove(sectionAlias);
+            }
+        }
+
+        public void AddAllowedSection(string sectionAlias)
+        {
+            if (_sectionCollection.Contains(sectionAlias) == false)
+            {
+                _sectionCollection.Add(sectionAlias);
+            }
+        }
     }
 }

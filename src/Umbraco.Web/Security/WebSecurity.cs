@@ -65,8 +65,8 @@ namespace Umbraco.Web.Security
         {
             get
             {
-                //only load it once per instance!
-                if (_currentUser == null)
+                //only load it once per instance! (but make sure groups are loaded)
+                if (_currentUser == null || _currentUser.GroupsLoaded == false)
                 {
                     var id = GetUserId();
                     if (id == -1)
@@ -278,7 +278,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
         {
-            var permissions = umbracoUser.GetPermissions(path);
+            var permissions = umbracoUser.GetPermissions(path, true);
             if (permissions.IndexOf(action, StringComparison.Ordinal) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId + ",")))
                 return true;
 

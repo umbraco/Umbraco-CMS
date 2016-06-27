@@ -265,6 +265,14 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
+        public virtual IUserGroupRepository CreateUserGroupRepository(IDatabaseUnitOfWork uow)
+        {
+            return new UserGroupRepository(
+                uow,
+                _cacheHelper,
+                _logger, _sqlSyntax);
+        }
+
         public virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
         {            
             return new UserRepository(

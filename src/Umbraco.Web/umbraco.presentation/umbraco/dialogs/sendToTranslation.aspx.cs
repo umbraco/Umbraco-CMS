@@ -87,7 +87,7 @@ namespace umbraco.presentation.dialogs
         private bool UserHasTranslatePermission(BusinessLogic.User u, CMSNode node)
         {
             //the permissions column in umbracoUserType is legacy and needs to be rewritten but for now this is the only way to test 
-            return u.GetPermissions(node.Path).Contains("4");
+            return u.GetPermissions(node.Path, true).Contains("4");
         }
 
         protected void doTranslation_Click(object sender, EventArgs e)

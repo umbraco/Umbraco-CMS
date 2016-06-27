@@ -102,7 +102,7 @@ namespace umbraco.presentation
             int? pageId = UmbracoContext.Current.PageId;
             return pageId.HasValue
                     && UmbracoEnsuredPage.CurrentUser != null
-                    && UmbracoEnsuredPage.CurrentUser.GetPermissions(new Document(pageId.Value).Path)
+                    && UmbracoEnsuredPage.CurrentUser.GetPermissions(new Document(pageId.Value).Path, true)
                         .Contains(permissionToken.ToString());
         }
 
