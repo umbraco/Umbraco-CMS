@@ -217,9 +217,11 @@
                             <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
                             <span class="umb-package-details__information-item-label-2">({{compatibility.percentage}}%)</span>
                         </div>
-                        <div class="umb-progress-bar">
-                            <span class="umb-progress-bar__progress" style="width: {{compatibility.percentage}}%"></span>
-                        </div>
+
+                        <umb-progress-bar
+                            percentage="{{compatibility.percentage}}">
+                        </umb-progress-bar>
+
                     </div>
                 </div>
 
