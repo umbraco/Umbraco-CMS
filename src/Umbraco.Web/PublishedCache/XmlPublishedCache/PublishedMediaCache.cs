@@ -224,10 +224,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
-			var media = global::umbraco.library.GetMedia(id, false);
+			//var media = global::umbraco.library.GetMedia(id, false);
+		    //return ConvertFromXPathNodeIterator(media, id);
 
-		    return ConvertFromXPathNodeIterator(media, id);
-		}
+            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            return media == null ? null : ConvertFromIMedia(media);
+        }
 
         internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
 	    {
@@ -364,14 +366,49 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    //return content.CreateModel();
 		}
 
-		/// <summary>
-		/// We will need to first check if the document was loaded by Examine, if so we'll need to check if this property exists
-		/// in the results, if it does not, then we'll have to revert to looking up in the db.
-		/// </summary>
-		/// <param name="dd"> </param>
-		/// <param name="alias"></param>
-		/// <returns></returns>
-		private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
+	    internal CacheValues ConvertFromIMedia(IMedia media)
+	    {
+	        var values = new Dictionary<string, string>();
+
+	        var creator = _applicationContext.Services.UserService.GetProfileById(media.CreatorId);
+            var creatorName = creator == null ? "" : creator.Name;
+
+	        values["id"] = media.Id.ToString();
+	        values["key"] = media.Key.ToString();
+	        values["parentID"] = media.ParentId.ToString();
+	        values["level"] = media.Level.ToString();
+	        values["creatorID"] = media.CreatorId.ToString();
+	        values["creatorName"] = creatorName;
+            values["writerID"] = media.CreatorId.ToString();
+	        values["writerName"] = creatorName;
+            values["template"] = "0";
+            values["urlName"] = "";
+            values["sortOrder"] = media.SortOrder.ToString();
+	        values["createDate"] = media.CreateDate.ToString("yyyy-MM-dd HH:mm:ss");
+	        values["updateDate"] = media.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss");
+	        values["nodeName"] = media.Name;
+	        values["path"] = media.Path;
+	        values["nodeType"] = media.ContentType.Id.ToString();
+	        values["nodeTypeAlias"] = media.ContentType.Alias;
+
+            // add the user props
+	        foreach (var prop in media.Properties)
+	            values[prop.Alias] = prop.Value == null ? null : prop.Value.ToString();
+
+            return new CacheValues
+            {
+                Values = values
+            };
+        }
+
+        /// <summary>
+        /// We will need to first check if the document was loaded by Examine, if so we'll need to check if this property exists
+        /// in the results, if it does not, then we'll have to revert to looking up in the db.
+        /// </summary>
+        /// <param name="dd"> </param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
             //lets check if the alias does not exist on the document.
             //NOTE: Examine will not index empty values and we do not output empty XML Elements to the cache - either of these situations
@@ -601,7 +638,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     _keysAdded.Add(alias);
                     string value;
                     const bool isPreviewing = false; // false :: never preview a media
-                    var property = valueDictionary.TryGetValue(alias, out value) == false
+                    var property = valueDictionary.TryGetValue(alias, out value) == false || value == null
                         ? new XmlPublishedProperty(propertyType, isPreviewing)
                         : new XmlPublishedProperty(propertyType, isPreviewing, value);
                     _properties.Add(property);

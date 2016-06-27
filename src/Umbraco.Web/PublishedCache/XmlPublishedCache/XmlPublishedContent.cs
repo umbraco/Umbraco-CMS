@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -26,44 +25,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// </summary>
 		/// <param name="xmlNode">The Xml node.</param>
         /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
-        public XmlPublishedContent(XmlNode xmlNode, bool isPreviewing)
+        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing)
 		{
 			_xmlNode = xmlNode;
 		    _isPreviewing = isPreviewing;
-			InitializeStructure();
-			Initialize();
-            InitializeChildren();
-		}
-
-        /// <summary>
-        /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node,
-        /// and a value indicating whether to lazy-initialize the instance.
-        /// </summary>
-        /// <param name="xmlNode">The Xml node.</param>
-        /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
-        /// <param name="lazyInitialize">A value indicating whether to lazy-initialize the instance.</param>
-        /// <remarks>Lazy-initializationg is NOT thread-safe.</remarks>
-        internal XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, bool lazyInitialize)
-		{
-			_xmlNode = xmlNode;
-            _isPreviewing = isPreviewing;
-			InitializeStructure();
-            if (lazyInitialize == false)
-            {
-                Initialize();
-                InitializeChildren();
-            }
 		}
 
         private readonly XmlNode _xmlNode;
-        
-        private bool _initialized;
+        private readonly bool _isPreviewing;
+
+        private bool _nodeInitialized;
+	    private bool _parentInitialized;
 	    private bool _childrenInitialized;
 
-		private readonly ICollection<IPublishedContent> _children = new Collection<IPublishedContent>();
+		private IEnumerable<IPublishedContent> _children = Enumerable.Empty<IPublishedContent>();
 		private IPublishedContent _parent;
 
-		private int _id;
+        private PublishedContentType _contentType;
+        private Dictionary<string, IPublishedProperty> _properties;
+
+        private int _id;
 	    private Guid _key;
 		private int _template;
 		private string _name;
@@ -78,28 +59,25 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		private DateTime _createDate;
 		private DateTime _updateDate;
 		private Guid _version;
-	    private IPublishedProperty[] _properties;
 		private int _sortOrder;
 		private int _level;
 	    private bool _isDraft;
-	    private readonly bool _isPreviewing;
-	    private PublishedContentType _contentType;
 
 		public override IEnumerable<IPublishedContent> Children
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
-                if (_childrenInitialized == false)
-                    InitializeChildren();
-				return _children.OrderBy(x => x.SortOrder);
+				if (_nodeInitialized == false) InitializeNode();
+                if (_childrenInitialized == false) InitializeChildren();
+				return _children;
 			}
 		}
 
 		public override IPublishedProperty GetProperty(string alias)
 		{
-			return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+            if (_nodeInitialized == false) InitializeNode();
+            IPublishedProperty property;
+		    return _properties.TryGetValue(alias, out property) ? property : null;
 		}
 
         // override to implement cache
@@ -116,7 +94,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var key = string.Format("RECURSIVE_PROPERTY::{0}::{1}", Id, alias.ToLowerInvariant());
             var value = cache.GetOrAdd(key, k => base.GetProperty(alias, true));
-            if (value == null) 
+            if (value == null)
                 return null;
 
             var property = value as IPublishedProperty;
@@ -135,8 +113,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
+                if (_parentInitialized == false) InitializeParent();
 				return _parent;
 			}
 		}
@@ -145,8 +123,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _id;
 			}
 		}
@@ -155,8 +132,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_initialized == false)
-                    Initialize();
+	            if (_nodeInitialized == false) InitializeNode();
 	            return _key;
 	        }
 	    }
@@ -165,8 +141,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _template;
 			}
 		}
@@ -175,8 +150,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _sortOrder;
 			}
 		}
@@ -185,8 +159,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _name;
 			}
 		}
@@ -195,8 +168,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _docTypeAlias;
 			}
 		}
@@ -205,8 +177,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _docTypeId;
 			}
 		}
@@ -215,8 +186,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _writerName;
 			}
 		}
@@ -225,8 +195,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _creatorName;
 			}
 		}
@@ -235,8 +204,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _writerId;
 			}
 		}
@@ -245,8 +213,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _creatorId;
 			}
 		}
@@ -255,8 +222,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _path;
 			}
 		}
@@ -265,8 +231,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _createDate;
 			}
 		}
@@ -275,8 +240,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _updateDate;
 			}
 		}
@@ -285,8 +249,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _version;
 			}
 		}
@@ -295,8 +258,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _urlName;
 			}
 		}
@@ -305,8 +267,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
+				if (_nodeInitialized == false) InitializeNode();
 				return _level;
 			}
 		}
@@ -315,8 +276,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_initialized == false)
-                    Initialize();
+	            if (_nodeInitialized == false) InitializeNode();
 	            return _isDraft;
 	        }
 	    }
@@ -325,9 +285,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_initialized == false)
-					Initialize();
-				return _properties;
+				if (_nodeInitialized == false) InitializeNode();
+				return _properties.Values;
 			}
 		}
 
@@ -335,24 +294,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             get
             {
-                if (_initialized == false)
-                    Initialize();
+                if (_nodeInitialized == false) InitializeNode();
                 return _contentType;
             }
         }
-		
-		private void InitializeStructure()
-		{
-			// load parent if it exists and is a node
 
-		    var parent = _xmlNode == null ? null : _xmlNode.ParentNode;            
+		private void InitializeParent()
+		{
+            if (_xmlNode == null) return;
+
+            var parent = _xmlNode.ParentNode;
             if (parent == null) return;
 
 		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
-		        _parent = (new XmlPublishedContent(parent, _isPreviewing, true)).CreateModel();
+		        _parent = Get(parent, _isPreviewing);
+
+            // warn: this is not thread-safe...
+            _parentInitialized = true;
 		}
 
-		private void Initialize()
+		private void InitializeNode()
 		{
 		    if (_xmlNode == null) return;
 
@@ -381,7 +342,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		            _creatorName = _writerName;
 		        }
 
-		        //Added the actual userID, as a user cannot be looked up via full name only... 
+		        //Added the actual userID, as a user cannot be looked up via full name only...
 		        if (_xmlNode.Attributes.GetNamedItem("creatorID") != null)
 		            _creatorId = int.Parse(_xmlNode.Attributes.GetNamedItem("creatorID").Value);
 		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
@@ -423,22 +384,27 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (nodes != null)
                 foreach (XmlNode n in nodes)
                 {
+                    var attrs = n.Attributes;
+                    if (attrs == null) continue;
                     var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                        ? n.Attributes.GetNamedItem("alias").Value
+                        ? attrs.GetNamedItem("alias").Value
                         : n.Name;
                     propertyNodes[alias.ToLowerInvariant()] = n;
                 }
 
-            _properties = _contentType.PropertyTypes.Select(p =>
-		        {
-                    XmlNode n;
-                    return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-                        ? new XmlPublishedProperty(p, _isPreviewing, n)
-                        : new XmlPublishedProperty(p, _isPreviewing);		        
-		        }).Cast<IPublishedProperty>().ToArray();
+		    _properties = _contentType.PropertyTypes.Select(p =>
+		    {
+		        XmlNode n;
+		        return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
+		            ? new XmlPublishedProperty(p, _isPreviewing, n)
+		            : new XmlPublishedProperty(p, _isPreviewing);
+		    }).Cast<IPublishedProperty>().ToDictionary(
+		        x => x.PropertyTypeAlias,
+		        x => x,
+		        StringComparer.OrdinalIgnoreCase);
 
             // warn: this is not thread-safe...
-            _initialized = true;
+            _nodeInitialized = true;
 		}
 
 	    private void InitializeChildren()
@@ -449,14 +415,37 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var childXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
             var nav = _xmlNode.CreateNavigator();
             var expr = nav.Compile(childXPath);
-            expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
+            //expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
             var iterator = nav.Select(expr);
-            while (iterator.MoveNext())
-		        _children.Add(
-                    (new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), _isPreviewing, true)).CreateModel());
-            
+
+            _children = iterator.Cast<XPathNavigator>()
+                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing))
+                .OrderBy(x => x.SortOrder)
+                .ToList();
+
             // warn: this is not thread-safe
             _childrenInitialized = true;
 	    }
+
+        /// <summary>
+        /// Gets an IPublishedContent corresponding to an Xml cache node.
+        /// </summary>
+        /// <param name="node">The Xml node.</param>
+        /// <param name="isPreviewing">A value indicating whether we are previewing or not.</param>
+        /// <returns>The IPublishedContent corresponding to the Xml cache node.</returns>
+        /// <remarks>Maintains a per-request cache of IPublishedContent items in order to make
+        /// sure that we create only one instance of each for the duration of a request. The
+        /// returned IPublishedContent is a model, if models are enabled.</remarks>
+        public static IPublishedContent Get(XmlNode node, bool isPreviewing)
+        {
+            // only 1 per request
+
+            var attrs = node.Attributes;
+            var id = attrs == null ? null : attrs.GetNamedItem("id").Value;
+            if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
+            var cache = ApplicationContext.Current.ApplicationCache.RequestCache;
+            var key = "XMLPUBLISHEDCONTENT_" + id; // dont bother with preview, wont change during request in v7
+            return (IPublishedContent) cache.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing)).CreateModel());
+        }
     }
 }
