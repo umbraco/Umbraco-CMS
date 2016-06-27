@@ -1,7 +1,7 @@
 <div class="umb-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
     <ng-form name="datePickerForm">
-        <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">
-            
+        <div class="input-append date datepicker" ng-class="{'onlytime': onlyTimePicker}" id="datepicker{{model.alias}}">
+
             <input name="datepicker" data-format="{{model.config.format}}" id="{{model.alias}}" type="text"
                    ng-model="datetimePickerValue"
                    ng-required="model.validation.mandatory"
@@ -9,18 +9,26 @@
                    class="datepickerinput" />
 
             <span class="add-on">
-                <i class="icon-calendar"></i>
+                <i class="icon-{{datetimePickerIcon}}"></i>
             </span>
-            
+
         </div>
 
-        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>
+        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">{{errorMsg.required}}</span>
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
-        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">Invalid date</span>
-        
+        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">{{errorMsg.invalid}}</span>
+
         <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
-            <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
+            <a href ng-click="clearDate()">
+                <i class="icon-delete"></i>
+                <small ng-show="!onlyTimePicker">
+                    <localize key="content_removeDate">Clear date</localize>
+                </small>
+                <small ng-show="onlyTimePicker">
+                    <localize key="content_removeTime">Clear time</localize>
+                </small>
+            </a>
         </p>
-         
+
     </ng-form>
 </div>

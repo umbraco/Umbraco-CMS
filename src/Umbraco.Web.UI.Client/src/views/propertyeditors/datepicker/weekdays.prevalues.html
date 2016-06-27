@@ -1,0 +1,5 @@
+﻿<div ng-controller="Umbraco.PrevalueEditors.WeekdaysController">
+    <div ng-repeat="day in weekdays">
+        <label><input type="checkbox" name="weekdays" checklist-model="selectedDays" checklist-value="day.id" /> {{day.name}}</label>
+    </div>
+</div>

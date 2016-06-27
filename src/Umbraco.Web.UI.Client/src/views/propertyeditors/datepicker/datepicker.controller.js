@@ -1,29 +1,83 @@
-function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element) {
+function dateTimePickerController($scope, notificationsService, localizationService, assetsService, angularHelper, userService, $element) {
 
     //setup the default config
     var config = {
         pickDate: true,
         pickTime: true,
-		useSeconds: true,
+        useMinutes: true,
+        useSeconds: true,
+        minuteStepping: 1,
+        calendarWeeks: false,
+        showToday: false,
         format: "YYYY-MM-DD HH:mm:ss",
 		icons: {
-                    time: "icon-time",
-                    date: "icon-calendar",
-                    up: "icon-chevron-up",
-                    down: "icon-chevron-down"
-                }
-
+            time: "icon-time",
+            date: "icon-calendar",
+            up: "icon-chevron-up",
+            down: "icon-chevron-down"
+		},
+		daysOfWeekDisabled: []
     };
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+
+    //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
+    $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
+
+    $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
+
+    if ($scope.model.config.daysOfWeekDisabled !== undefined || $scope.model.config.daysOfWeekDisabled !== null) {
+        $scope.model.config.daysOfWeekDisabled = angular.isArray($scope.model.config.daysOfWeekDisabled) ? $scope.model.config.daysOfWeekDisabled : [];
+    }
+
+    if ($scope.model.config.minuteStepping !== undefined || $scope.model.config.minuteStepping !== null) {
+        $scope.model.config.minuteStepping = parseInt($scope.model.config.minuteStepping) > 0 ? parseInt($scope.model.config.minuteStepping) : 1;
+    }
+
+    if ($scope.model.config.minDate !== "" || $scope.model.config.minDate !== undefined || $scope.model.config.minDate !== null) {
+        $scope.model.config.minDate = new Date($scope.model.config.minDate);
+    }
+
+    if ($scope.model.config.maxDate !== "" || $scope.model.config.maxDate !== undefined || $scope.model.config.maxDate !== null) {
+        $scope.model.config.maxDate = new Date($scope.model.config.maxDate);
+    }
+
     //ensure the format doesn't get overwritten with an empty string
     if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
         $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
     }
 
+    //set value of these boolean properties based on config format - in v4 and v5 of the datepicker plugin it decide the "viewModes" based on format
+    $scope.model.config.useSeconds = containsChar($scope.model.config.format, "s") ? true : false;
+    $scope.model.config.useMinutes = containsChar($scope.model.config.format, "m") ? true : false;
+    $scope.model.config.pickTime = containsChar($scope.model.config.format, "H") || containsChar($scope.model.config.format, "m") ? true : false;
+    $scope.model.config.pickDate = containsChar($scope.model.config.format, "Y") || containsChar($scope.model.config.format, "M") || containsChar($scope.model.config.format, "D") ? true : false;
+
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
+
+    $scope.onlyTimePicker = $scope.model.config.pickTime && !$scope.model.config.pickDate;
+    $scope.datetimePickerIcon = $scope.onlyTimePicker ? "time" : "calendar";
+    $scope.errorMsg = {
+        required: "Required",
+        invalid: "Invalid " + ($scope.onlyTimePicker ? "time" : "date")
+    };
+
+    localizationService.localize("general_required").then(function (value) {
+        $scope.errorMsg.required = value;
+    });
+
+    if ($scope.onlyTimePicker) {
+        localizationService.localize("content_invalidTime").then(function (value) {
+            $scope.errorMsg.invalid = value;
+        });
+    }
+    else {
+        localizationService.localize("content_invalidDate").then(function (value) {
+            $scope.errorMsg.invalid = value;
+        });
+    }
 
     //hide picker if clicking on the document 
     $scope.hidePicker = function () {
@@ -57,6 +111,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         });
     }
 
+    function containsChar(string, it) {
+        return string.indexOf(it) != -1;
+    };
+
     var picker = null;
 
     $scope.clearDate = function() {
@@ -73,14 +131,16 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
         var filesToLoad = ["lib/moment/moment-with-locales.js",
 						   "lib/datetimepicker/bootstrap-datetimepicker.js"];
-
-            
+        
 		$scope.model.config.language = user.locale;
-		
 
 		assetsService.load(filesToLoad, $scope).then(
             function () {
-				//The Datepicker js and css files are available and all components are ready to use.
+                //The Datepicker js and css files are available and all components are ready to use.
+
+                // Set min and max date and parse date from dateformat and locale http://momentjs.com/docs/#/parsing/
+                $scope.model.config.minDate = moment($scope.model.config.minDate, ["DD/MM/YYYY HH:mm:ss"], $scope.model.config.language);
+                $scope.model.config.maxDate = moment($scope.model.config.maxDate, ["DD/MM/YYYY HH:mm:ss"], $scope.model.config.language);
 
 				// Get the id of the datepicker button that was clicked
 				var pickerId = $scope.model.alias;
@@ -88,13 +148,25 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			    var element = $element.find("div:first");
 
 				// Open the datepicker and add a changeDate eventlistener
-			    element
-			        .datetimepicker(angular.extend({ useCurrent: true }, $scope.model.config))
-			        .on("dp.change", applyDate)
-			        .on("dp.error", function(a, b, c) {
-			            $scope.hasDatetimePickerValue = false;
-			            $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
-			        });
+			    element.datetimepicker(angular.extend({
+                    useCurrent: true,
+                    minDate: moment($scope.model.config.minDate).isValid() ? $scope.model.config.minDate : moment({ y: 1900 }),
+                    maxDate: moment($scope.model.config.maxDate).isValid() ? $scope.model.config.maxDate : moment().add(100, 'y')
+			    }, $scope.model.config))
+			    .on("dp.change", applyDate)
+			    .on("dp.error", function (a, b, c) {
+			        $scope.hasDatetimePickerValue = false;
+			        $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
+			    });
+
+                // Ensure table table cell with class "picker-switch" fill 5 cols, when not using calendarWeeks.
+			    if ($scope.model.config.calendarWeeks == false) {
+			        var currentDateInput = element.find(".datepickerinput"),
+                        dateInputs = $("input[name=datepicker].datepickerinput"),
+                        datePickerIndex = dateInputs.index(currentDateInput);
+
+			        $(".bootstrap-datetimepicker-widget").eq(datePickerIndex).find("table > thead .picker-switch").attr("colspan", 5);
+			    }
 
 			    if ($scope.hasDatetimePickerValue) {
 			        //assign value to plugin/picker
@@ -115,12 +187,27 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 					element.datetimepicker("destroy");
 			    });
 
-
 			    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 			        if ($scope.hasDatetimePickerValue) {
 			            var elementData = $element.find("div:first").data().DateTimePicker;
-			            if ($scope.model.config.pickTime) {
-			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+			            if ($scope.model.config.pickDate && $scope.model.config.pickTime) {
+			                if ($scope.model.config.useSeconds) {
+			                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+			                }
+			                else {
+			                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm");
+			                }
+			            }
+			            else if ($scope.model.config.pickDate && !$scope.model.config.pickTime) {
+			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
+			            }
+			            else if (!$scope.model.config.pickDate && $scope.model.config.pickTime) {
+			                if ($scope.model.config.useSeconds) {
+			                    $scope.model.value = elementData.getDate().format("HH:mm:ss");
+			                }
+			                else {
+			                    $scope.model.value = elementData.getDate().format("HH:mm");
+			                }
 			            }
 			            else {
 			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
@@ -143,11 +230,28 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         if ($scope.hasDatetimePickerValue) {
-            if ($scope.model.config.pickTime) {
-                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD HH:mm:ss");
+            var elementData = $element.find("div:first").data().DateTimePicker;
+            if ($scope.model.config.pickDate && $scope.model.config.pickTime) {
+                if ($scope.model.config.useSeconds) {
+                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+                }
+                else {
+                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm");
+                }
+            }
+            else if ($scope.model.config.pickDate && !$scope.model.config.pickTime) {
+                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
+            }
+            else if (!$scope.model.config.pickDate && $scope.model.config.pickTime) {
+                if ($scope.model.config.useSeconds) {
+                    $scope.model.value = elementData.getDate().format("HH:mm:ss");
+                }
+                else {
+                    $scope.model.value = elementData.getDate().format("HH:mm");
+                }
             }
             else {
-                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD");
+                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
             }
         }
         else {

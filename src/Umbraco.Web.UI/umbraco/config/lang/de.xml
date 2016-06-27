@@ -146,6 +146,9 @@
     <key alias="releaseDate">Veröffentlichen am</key>
     <key alias="unpublishDate">Veröffentlichung widerrufen am</key>
     <key alias="removeDate">Datum entfernen</key>
+    <key alias="removeTime">Zeit entfernen</key>
+    <key alias="invalidDate">Datum ungültig</key>
+    <key alias="invalidTime">Zeit ungültig</key>
     <key alias="sortDone">Sortierung abgeschlossen</key>
     <key alias="sortHelp">Um die Dokumente zu sortieren, ziehen Sie sie einfach an die gewünschte Position. Sie können mehrere Zeilen markieren indem Sie die Umschalttaste ("Shift") oder die Steuerungstaste ("Strg") gedrückt halten</key>
     <key alias="statistics">Statistiken</key>
