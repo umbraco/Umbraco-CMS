@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -443,6 +444,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            //Update property values with correct types from DataTypeDatabaseType
+            UpdatePropertyTypeValues(entity);
+
             //lastly, check if we are a creating a published version , then update the tags table
             if (entity.Published)
             {
@@ -607,6 +611,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
+
+            //Update property values with correct types from DataTypeDatabaseType
+            UpdatePropertyTypeValues(entity);
 
             //lastly, check if we are a newly published version and then update the tags table
             if (publishedStateChanged && entity.Published)

@@ -335,6 +335,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            //Update property values with correct types from DataTypeDatabaseType
+            UpdatePropertyTypeValues(entity);
+
             UpdatePropertyTags(entity, _tagRepository);
 
             entity.ResetDirtyProperties();
@@ -416,6 +419,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
+
+            //Update property values with correct types from DataTypeDatabaseType
+            UpdatePropertyTypeValues(entity);
 
             UpdatePropertyTags(entity, _tagRepository);
 

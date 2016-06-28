@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -283,6 +281,25 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void DisposeResources()
         {
             UnitOfWork.DisposeIfDisposable();
+        }
+
+        /// <summary>
+        /// Updating property type values to correct types/format.
+        /// See test for more details:
+        /// ContentRepositoryTests.Property_Values_With_Special_DatabaseTypes_Are_Equal_Before_And_After_Being_Persisted
+        /// </summary>
+        /// <param name="entity">Entity containing the properties to be updated</param>
+        protected void UpdatePropertyTypeValues(IContentBase entity)
+        {
+            foreach (var p in entity.Properties)
+            {
+                // If decimal type, ensure that the value is saved in the exact same format as the decimal database column
+                if (p.DataTypeDatabaseType == DataTypeDatabaseType.Decimal)
+                    p.Value = decimal.Parse(decimal.Parse(p.Value.ToString()).ToString("F6"));
+                // If integer type and value isn't integer, make sure to parse it as such
+                else if (p.DataTypeDatabaseType == DataTypeDatabaseType.Integer && p.Value is int == false)
+                    p.Value = int.Parse(p.Value.ToString());
+            }
         }
     }
 }
