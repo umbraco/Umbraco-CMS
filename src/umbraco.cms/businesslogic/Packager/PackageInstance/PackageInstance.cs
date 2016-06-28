@@ -66,20 +66,23 @@ namespace umbraco.cms.businesslogic.packager
 
        public List<string> DataTypes { get; set; }
 
+       public string IconUrl { get; set; }
+
        public PackageInstance()
         {
            SkinRepoGuid = Guid.Empty;
-           Name = "";
-           Url = "";
-           Folder = "";
-           PackagePath = "";
-           Version = "";
-           Author = "";
-           AuthorUrl = "";
-           License = "";
-           LicenseUrl = "";
-           Readme = "";
-           ContentNodeId = "";
+           Name = string.Empty;
+           Url = string.Empty;
+           Folder = string.Empty;
+           PackagePath = string.Empty;
+           Version = string.Empty;
+           Author = string.Empty;
+           AuthorUrl = string.Empty;
+           License = string.Empty;
+           LicenseUrl = string.Empty;
+           Readme = string.Empty;
+           ContentNodeId = string.Empty;
+           IconUrl = string.Empty;
            Macros = new List<string>();
            Languages = new List<string>();
            DictionaryItems = new List<string>();
@@ -87,7 +90,7 @@ namespace umbraco.cms.businesslogic.packager
            Documenttypes = new List<string>();
            Stylesheets = new List<string>();
            Files = new List<string>();
-           LoadControl = "";
+           LoadControl = string.Empty;
            DataTypes = new List<string>();
             EnableSkins = false;
             ContentLoadChildNodes = false;

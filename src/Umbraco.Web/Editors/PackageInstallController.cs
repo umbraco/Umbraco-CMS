@@ -219,7 +219,8 @@ namespace Umbraco.Web.Editors
                     Url = pack.Url,
                     License = pack.License,
                     LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files
+                    Files = pack.Files,
+                    IconUrl = pack.IconUrl
                 }).ToList();
         }
 

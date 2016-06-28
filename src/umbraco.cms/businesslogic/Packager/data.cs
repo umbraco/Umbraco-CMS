@@ -9,6 +9,9 @@ using Umbraco.Core.Logging;
 
 namespace umbraco.cms.businesslogic.packager
 {
+    /// <summary>
+    /// This is the xml data for installed packages. This is not the same xml as a pckage format!
+    /// </summary>
     public class data
     {
         private static XmlDocument _source;
@@ -39,10 +42,12 @@ namespace umbraco.cms.businesslogic.packager
                     Directory.CreateDirectory(IOHelper.MapPath(Settings.InstalledPackagesStorage));
                 }
 
-                StreamWriter sw = File.CreateText(dataSource);
-                sw.Write(umbraco.cms.businesslogic.Packager.FileResources.PackageFiles.Packages);
-                sw.Flush();
-                sw.Close();
+                using (StreamWriter sw = File.CreateText(dataSource))
+                {
+                    sw.Write(umbraco.cms.businesslogic.Packager.FileResources.PackageFiles.Packages);
+                    sw.Flush();
+                }
+                    
             }
 
             if (_source == null)
@@ -87,72 +92,65 @@ namespace umbraco.cms.businesslogic.packager
 
         public static PackageInstance MakeNew(string Name, string dataSource)
         {
-            PackageInstance retVal = new PackageInstance();
+            Reload(dataSource);
 
-            try
+            int maxId = 1;
+            // Find max id
+            foreach (XmlNode n in Source.SelectNodes("packages/package"))
             {
-                Reload(dataSource);
-
-                int _maxId = 1;
-                // Find max id
-                foreach (XmlNode n in Source.SelectNodes("packages/package"))
-                {
-                    if (int.Parse(n.Attributes.GetNamedItem("id").Value) >= _maxId)
-                        _maxId = int.Parse(n.Attributes.GetNamedItem("id").Value) + 1;
-                }
-
-                XmlElement instance = Source.CreateElement("package");
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "id", _maxId.ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "version", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "url", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "name", Name));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "folder", System.Guid.NewGuid().ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "packagepath", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "repositoryGuid", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "packageGuid", System.Guid.NewGuid().ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "hasUpdate", "false"));
-
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "enableSkins", "false"));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "skinRepoGuid", ""));
-
-                XmlElement license = Source.CreateElement("license");
-                license.InnerText = "MIT License";
-                license.Attributes.Append(xmlHelper.addAttribute(Source, "url", "http://opensource.org/licenses/MIT"));
-                instance.AppendChild(license);
-
-                XmlElement author = Source.CreateElement("author");
-                author.InnerText = "";
-                author.Attributes.Append(xmlHelper.addAttribute(Source, "url", ""));
-                instance.AppendChild(author);
-                
-                instance.AppendChild(xmlHelper.addTextNode(Source, "readme", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "actions", ""));
-
-                instance.AppendChild(xmlHelper.addTextNode(Source, "datatypes", ""));
-
-                XmlElement content = Source.CreateElement("content");
-                content.InnerText = "";
-                content.Attributes.Append(xmlHelper.addAttribute(Source, "nodeId", ""));
-                content.Attributes.Append(xmlHelper.addAttribute(Source, "loadChildNodes", "false"));
-                instance.AppendChild(content);
-
-                instance.AppendChild(xmlHelper.addTextNode(Source, "templates", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "stylesheets", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "documenttypes", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "macros", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "files", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "languages", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "dictionaryitems", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "loadcontrol", ""));
-
-                Source.SelectSingleNode("packages").AppendChild(instance);
-                Source.Save(dataSource);
-                retVal = data.Package(_maxId, dataSource);
+                if (int.Parse(n.Attributes.GetNamedItem("id").Value) >= maxId)
+                    maxId = int.Parse(n.Attributes.GetNamedItem("id").Value) + 1;
             }
-            catch (Exception ex)
-            {
-				LogHelper.Error<data>("An error occurred", ex);
-            }
+
+            XmlElement instance = Source.CreateElement("package");
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "id", maxId.ToString()));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "version", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "name", Name));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "folder", Guid.NewGuid().ToString()));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packagepath", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "repositoryGuid", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "iconUrl", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packageGuid", Guid.NewGuid().ToString()));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "hasUpdate", "false"));
+
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "enableSkins", "false"));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "skinRepoGuid", ""));
+
+            XmlElement license = Source.CreateElement("license");
+            license.InnerText = "MIT License";
+            license.Attributes.Append(XmlHelper.AddAttribute(Source, "url", "http://opensource.org/licenses/MIT"));
+            instance.AppendChild(license);
+
+            XmlElement author = Source.CreateElement("author");
+            author.InnerText = "";
+            author.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
+            instance.AppendChild(author);
+
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "readme", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "actions", ""));
+
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "datatypes", ""));
+
+            XmlElement content = Source.CreateElement("content");
+            content.InnerText = "";
+            content.Attributes.Append(XmlHelper.AddAttribute(Source, "nodeId", ""));
+            content.Attributes.Append(XmlHelper.AddAttribute(Source, "loadChildNodes", "false"));
+            instance.AppendChild(content);
+
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "templates", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "stylesheets", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "documenttypes", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "macros", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "files", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "languages", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "dictionaryitems", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "loadcontrol", ""));
+
+            Source.SelectSingleNode("packages").AppendChild(instance);
+            Source.Save(dataSource);
+            var retVal = data.Package(maxId, dataSource);
+
 
             return retVal;
         }
@@ -162,19 +160,11 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         public static PackageInstance Package(string guid, string datasource) {
-			try
-			{
-				XmlNode node = GetFromGuid(guid, datasource, true);
-				if (node != null)
-					return ConvertXmlToPackage(node);
-				else
-					return new PackageInstance();
-			}
-			catch (Exception ex)
-			{
-				LogHelper.Error<data>("An error occurred", ex);
-				return new PackageInstance();
-			}
+            XmlNode node = GetFromGuid(guid, datasource, true);
+            if (node != null)
+                return ConvertXmlToPackage(node);
+            else
+                return new PackageInstance();
         }
 
         public static List<PackageInstance> GetAllPackages(string dataSource) {
@@ -202,43 +192,45 @@ namespace umbraco.cms.businesslogic.packager
             PackageInstance retVal = new PackageInstance();
                 
                 if (n != null) {
-                    retVal.Id = int.Parse(safeAttribute("id",n));
-                    retVal.Name = safeAttribute("name",n);
-                    retVal.Folder = safeAttribute("folder", n);
-                    retVal.PackagePath = safeAttribute("packagepath", n);
-                    retVal.Version = safeAttribute("version", n);
-                    retVal.Url = safeAttribute("url", n);
-                    retVal.RepositoryGuid = safeAttribute("repositoryGuid", n);
-                    retVal.PackageGuid = safeAttribute("packageGuid", n);
-                    retVal.HasUpdate = bool.Parse(safeAttribute("hasUpdate",n));
+                    retVal.Id = int.Parse(SafeAttribute("id",n));
+                    retVal.Name = SafeAttribute("name",n);
+                    retVal.Folder = SafeAttribute("folder", n);
+                    retVal.PackagePath = SafeAttribute("packagepath", n);
+                    retVal.Version = SafeAttribute("version", n);
+                    retVal.Url = SafeAttribute("url", n);
+                    retVal.RepositoryGuid = SafeAttribute("repositoryGuid", n);
+                    retVal.PackageGuid = SafeAttribute("packageGuid", n);
+                    retVal.HasUpdate = bool.Parse(SafeAttribute("hasUpdate",n));
 
-                    bool _enableSkins = false;
-                    bool.TryParse(safeAttribute("enableSkins", n), out _enableSkins);
-                    retVal.EnableSkins = _enableSkins;
+                    retVal.IconUrl = SafeAttribute("iconUrl", n);
 
-                    retVal.SkinRepoGuid = string.IsNullOrEmpty(safeAttribute("skinRepoGuid", n)) ? Guid.Empty : new Guid(safeAttribute("skinRepoGuid", n));
+                    bool enableSkins = false;
+                    bool.TryParse(SafeAttribute("enableSkins", n), out enableSkins);
+                    retVal.EnableSkins = enableSkins;
 
-                    retVal.License = safeNodeValue(n.SelectSingleNode("license"));
+                    retVal.SkinRepoGuid = string.IsNullOrEmpty(SafeAttribute("skinRepoGuid", n)) ? Guid.Empty : new Guid(SafeAttribute("skinRepoGuid", n));
+
+                    retVal.License = SafeNodeValue(n.SelectSingleNode("license"));
                     retVal.LicenseUrl = n.SelectSingleNode("license").Attributes.GetNamedItem("url").Value;
 
-                    retVal.Author = safeNodeValue(n.SelectSingleNode("author"));
-                    retVal.AuthorUrl = safeAttribute("url", n.SelectSingleNode("author"));
+                    retVal.Author = SafeNodeValue(n.SelectSingleNode("author"));
+                    retVal.AuthorUrl = SafeAttribute("url", n.SelectSingleNode("author"));
 
-                    retVal.Readme = safeNodeValue(n.SelectSingleNode("readme"));
-                    retVal.Actions = safeNodeInnerXml(n.SelectSingleNode("actions"));
+                    retVal.Readme = SafeNodeValue(n.SelectSingleNode("readme"));
+                    retVal.Actions = SafeNodeInnerXml(n.SelectSingleNode("actions"));
 
-                    retVal.ContentNodeId = safeAttribute("nodeId", n.SelectSingleNode("content"));
-                    retVal.ContentLoadChildNodes = bool.Parse(safeAttribute("loadChildNodes",n.SelectSingleNode("content")));
+                    retVal.ContentNodeId = SafeAttribute("nodeId", n.SelectSingleNode("content"));
+                    retVal.ContentLoadChildNodes = bool.Parse(SafeAttribute("loadChildNodes",n.SelectSingleNode("content")));
                     
 
-                    retVal.Macros = new List<string>(safeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
-                    retVal.Macros = new List<string>(safeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
-                    retVal.Templates = new List<string>(safeNodeValue(n.SelectSingleNode("templates")).Trim(',').Split(','));
-                    retVal.Stylesheets = new List<string>(safeNodeValue(n.SelectSingleNode("stylesheets")).Trim(',').Split(','));
-                    retVal.Documenttypes = new List<string>(safeNodeValue(n.SelectSingleNode("documenttypes")).Trim(',').Split(','));
-                    retVal.Languages = new List<string>(safeNodeValue(n.SelectSingleNode("languages")).Trim(',').Split(','));
-                    retVal.DictionaryItems = new List<string>(safeNodeValue(n.SelectSingleNode("dictionaryitems")).Trim(',').Split(','));
-                    retVal.DataTypes = new List<string>(safeNodeValue(n.SelectSingleNode("datatypes")).Trim(',').Split(','));
+                    retVal.Macros = new List<string>(SafeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
+                    retVal.Macros = new List<string>(SafeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
+                    retVal.Templates = new List<string>(SafeNodeValue(n.SelectSingleNode("templates")).Trim(',').Split(','));
+                    retVal.Stylesheets = new List<string>(SafeNodeValue(n.SelectSingleNode("stylesheets")).Trim(',').Split(','));
+                    retVal.Documenttypes = new List<string>(SafeNodeValue(n.SelectSingleNode("documenttypes")).Trim(',').Split(','));
+                    retVal.Languages = new List<string>(SafeNodeValue(n.SelectSingleNode("languages")).Trim(',').Split(','));
+                    retVal.DictionaryItems = new List<string>(SafeNodeValue(n.SelectSingleNode("dictionaryitems")).Trim(',').Split(','));
+                    retVal.DataTypes = new List<string>(SafeNodeValue(n.SelectSingleNode("datatypes")).Trim(',').Split(','));
 
                     XmlNodeList xmlFiles = n.SelectNodes("files/file");
                     retVal.Files = new List<string>();
@@ -246,7 +238,7 @@ namespace umbraco.cms.businesslogic.packager
                     for (int i = 0; i < xmlFiles.Count; i++)
                         retVal.Files.Add(xmlFiles[i].InnerText);
 
-                    retVal.LoadControl = safeNodeValue(n.SelectSingleNode("loadcontrol"));
+                    retVal.LoadControl = SafeNodeValue(n.SelectSingleNode("loadcontrol"));
                 }
 
             return retVal;
@@ -283,97 +275,104 @@ namespace umbraco.cms.businesslogic.packager
 
 		public static void Save(PackageInstance package, string dataSource) 
 		{
-			try
-			{
-                Reload(dataSource);
-                XmlNode _xmlDef = GetFromId(package.Id, dataSource, false);
-                _xmlDef.Attributes.GetNamedItem("name").Value = package.Name;
-                _xmlDef.Attributes.GetNamedItem("version").Value = package.Version;
-                _xmlDef.Attributes.GetNamedItem("url").Value = package.Url;
-                _xmlDef.Attributes.GetNamedItem("packagepath").Value = package.PackagePath;
-                _xmlDef.Attributes.GetNamedItem("repositoryGuid").Value = package.RepositoryGuid;
-                _xmlDef.Attributes.GetNamedItem("packageGuid").Value = package.PackageGuid;
+            Reload(dataSource);
+            var xmlDef = GetFromId(package.Id, dataSource, false);
+            XmlHelper.SetAttribute(Source, xmlDef, "name", package.Name);
+            XmlHelper.SetAttribute(Source, xmlDef, "version",package.Version);
+            XmlHelper.SetAttribute(Source, xmlDef, "url",package.Url);
+            XmlHelper.SetAttribute(Source, xmlDef, "packagepath",package.PackagePath);
+            XmlHelper.SetAttribute(Source, xmlDef, "repositoryGuid",package.RepositoryGuid);
+            XmlHelper.SetAttribute(Source, xmlDef, "packageGuid",package.PackageGuid);
+            XmlHelper.SetAttribute(Source, xmlDef, "hasUpdate",package.HasUpdate.ToString());
+            XmlHelper.SetAttribute(Source, xmlDef, "enableSkins",package.EnableSkins.ToString());
+            XmlHelper.SetAttribute(Source, xmlDef, "skinRepoGuid",package.SkinRepoGuid.ToString());
+            XmlHelper.SetAttribute(Source, xmlDef, "iconUrl", package.IconUrl);            
 
-                _xmlDef.Attributes.GetNamedItem("hasUpdate").Value = package.HasUpdate.ToString();
-                _xmlDef.Attributes.GetNamedItem("enableSkins").Value = package.EnableSkins.ToString();
-                _xmlDef.Attributes.GetNamedItem("skinRepoGuid").Value = package.SkinRepoGuid.ToString();
+		    var licenseNode = xmlDef.SelectSingleNode("license");
+		    if (licenseNode == null)
+		    {
+		        licenseNode = Source.CreateElement("license");
+		        xmlDef.AppendChild(licenseNode);
+		    }
+            licenseNode.InnerText = package.License;
+            XmlHelper.SetAttribute(Source, licenseNode, "url", package.LicenseUrl);
 
-                    
-
-                _xmlDef.SelectSingleNode("license").FirstChild.Value = package.License;
-                _xmlDef.SelectSingleNode("license").Attributes.GetNamedItem("url").Value = package.LicenseUrl;
-
-                _xmlDef.SelectSingleNode("author").InnerText = package.Author;
-                _xmlDef.SelectSingleNode("author").Attributes.GetNamedItem("url").Value = package.AuthorUrl;
-
-                _xmlDef.SelectSingleNode("readme").InnerXml = "<![CDATA[" + package.Readme + "]]>";
-
-                if(_xmlDef.SelectSingleNode("actions") == null)
-                    _xmlDef.AppendChild(xmlHelper.addTextNode(Source, "actions", ""));
-
-                _xmlDef.SelectSingleNode("actions").InnerXml = package.Actions;
-
-                _xmlDef.SelectSingleNode("content").Attributes.GetNamedItem("nodeId").Value =  package.ContentNodeId.ToString();
-                _xmlDef.SelectSingleNode("content").Attributes.GetNamedItem("loadChildNodes").Value = package.ContentLoadChildNodes.ToString();
-                
-                _xmlDef.SelectSingleNode("macros").InnerText = joinList(package.Macros, ',');
-                _xmlDef.SelectSingleNode("templates").InnerText = joinList(package.Templates, ',');
-                _xmlDef.SelectSingleNode("stylesheets").InnerText = joinList(package.Stylesheets, ',');
-                _xmlDef.SelectSingleNode("documenttypes").InnerText = joinList(package.Documenttypes, ',');
-
-                _xmlDef.SelectSingleNode("languages").InnerText = joinList(package.Languages, ',');
-                _xmlDef.SelectSingleNode("dictionaryitems").InnerText = joinList(package.DictionaryItems, ',');
-                _xmlDef.SelectSingleNode("datatypes").InnerText = joinList(package.DataTypes, ',');
-                
-                _xmlDef.SelectSingleNode("files").InnerXml = "";
-
-                foreach (string fileStr in package.Files) {
-                    if(!string.IsNullOrEmpty(fileStr.Trim()))
-                        _xmlDef.SelectSingleNode("files").AppendChild(xmlHelper.addTextNode(data.Source, "file", fileStr));
-                }
-
-                _xmlDef.SelectSingleNode("loadcontrol").InnerText = package.LoadControl;
-
-                Source.Save(dataSource);
-
-               
+            var authorNode = xmlDef.SelectSingleNode("author");
+		    if (authorNode == null)
+		    {
+                authorNode = Source.CreateElement("author");
+                xmlDef.AppendChild(authorNode);
             }
-			catch(Exception F)
-			{
-				LogHelper.Error<data>("An error occurred", F);
-			}   
-			
-		}
+            authorNode.InnerText = package.Author;
+            XmlHelper.SetAttribute(Source, authorNode, "url", package.AuthorUrl);
 
-        private static string safeAttribute(string name, XmlNode n) {
+            XmlHelper.SetCDataNode(Source, xmlDef, "readme", package.Readme);
+            XmlHelper.SetTextNode(Source, xmlDef, "actions", package.Actions);
+
+		    var contentNode = xmlDef.SelectSingleNode("content");
+		    if (contentNode == null)
+		    {
+                contentNode = Source.CreateElement("content");
+                xmlDef.AppendChild(contentNode);
+            }
+            XmlHelper.SetAttribute(Source, contentNode, "nodeId", package.ContentNodeId);
+            XmlHelper.SetAttribute(Source, contentNode, "loadChildNodes", package.ContentLoadChildNodes.ToString());
+
+            XmlHelper.SetTextNode(Source, xmlDef, "macros", JoinList(package.Macros, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "templates", JoinList(package.Templates, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "stylesheets", JoinList(package.Stylesheets, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "documenttypes", JoinList(package.Documenttypes, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "languages", JoinList(package.Languages, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "dictionaryitems", JoinList(package.DictionaryItems, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "datatypes", JoinList(package.DataTypes, ','));
+
+            var filesNode = xmlDef.SelectSingleNode("files");
+            if (filesNode == null)
+            {
+                filesNode = Source.CreateElement("files");
+                xmlDef.AppendChild(filesNode);
+            }
+            filesNode.InnerXml = "";
+
+            foreach (var fileStr in package.Files)
+            {
+                if (string.IsNullOrWhiteSpace(fileStr) == false)
+                    filesNode.AppendChild(XmlHelper.AddTextNode(Source, "file", fileStr));
+            }
+
+            XmlHelper.SetTextNode(Source, xmlDef, "loadcontrol", package.LoadControl);
+
+            Source.Save(dataSource);
+        }
+
+        
+
+        private static string SafeAttribute(string name, XmlNode n)
+        {
+            return n.Attributes == null || n.Attributes[name] == null ? string.Empty : n.Attributes[name].Value;            
+        }
+
+        private static string SafeNodeValue(XmlNode n) {
             try {
-                return n.Attributes.GetNamedItem(name).Value;
+                return XmlHelper.GetNodeValue(n);
             } catch {
-                return "";
+                return string.Empty;
             }
         }
 
-        private static string safeNodeValue(XmlNode n) {
-            try {
-                return xmlHelper.GetNodeValue(n);
-            } catch {
-                return "";
-            }
-        }
-
-        private static string safeNodeInnerXml(XmlNode n) {
+        private static string SafeNodeInnerXml(XmlNode n) {
             try {
                 return n.InnerXml;
             } catch {
-                return "";
+                return string.Empty;
             }
         }
 
 
-        private static string joinList(List<string> list, char seperator) {
+        private static string JoinList(List<string> list, char seperator) {
             string retVal = "";
             foreach (string str in list) {
-                retVal += str + seperator.ToString();
+                retVal += str + seperator;
             }
 
             return retVal.Trim(seperator);

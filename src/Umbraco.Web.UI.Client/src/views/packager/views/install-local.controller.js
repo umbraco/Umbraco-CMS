@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, $timeout) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, $timeout, $q) {
 
         var vm = this;
         vm.state = "upload";
@@ -95,16 +95,11 @@
         }
 
         function installPackage() {
-            vm.installState.status = "Installing";
+            vm.installState.status = "Importing";
 
             //TODO: If any of these fail, will they keep calling the next one?
             packageResource
-                .installFiles(vm.localPackage)
-                .then(function(pack) {
-                        vm.installState.status = "Importing...";
-                        return packageResource.import(pack);
-                    },
-                    installError)
+                .import(vm.localPackage)                
                 .then(function(pack) {
                         vm.installState.status = "Installing...";
                         return packageResource.installFiles(pack);
@@ -116,7 +111,7 @@
                     },
                     installError)
                 .then(function(pack) {
-                        vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.status = "All done, your browser will now refresh, please wait...";
                         return packageResource.cleanUp(pack);
                     },
                     installError)
@@ -135,9 +130,10 @@
                     },
                     installError);
         }
-
+        
         function installError() {
-            //TODO: Need to do something about this?    
+            //This will return a rejection meaning that the promise change above will stop
+            return $q.reject();
         }
     }
 
