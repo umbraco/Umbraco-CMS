@@ -212,12 +212,17 @@ namespace Umbraco.Core.Sync
             {
                 using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
-                    ProcessDatabaseInstructions();
+                    var processed = ProcessDatabaseInstructions();
                     switch (_appContext.GetCurrentServerRole())
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:
-                            PruneOldInstructions();
+                            //Only prune instructions if there were actually any processed, otherwise
+                            // it's a wasted effort running SQL that doesn't need to be executed
+                            if (processed > 0)
+                            {
+                                PruneOldInstructions();
+                            }
                             break;
                     }
                 }
@@ -235,7 +240,10 @@ namespace Umbraco.Core.Sync
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
-        private void ProcessDatabaseInstructions()
+        /// <returns>
+        /// Returns the number of processed instructions
+        /// </returns>
+        private int ProcessDatabaseInstructions()
         {
             // NOTE
             // we 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -251,7 +259,7 @@ namespace Umbraco.Core.Sync
                 .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
-            if (dtos.Count <= 0) return;
+            if (dtos.Count <= 0) return 0;
 
             // only process instructions coming from a remote server, and ignore instructions coming from
             // the local server as they've already been processed. We should NOT assume that the sequence of
@@ -300,6 +308,9 @@ namespace Umbraco.Core.Sync
 
             if (lastId > 0)
                 SaveLastSynced(lastId);
+
+            //return the number found/processed
+            return dtos.Count;
         }
 
         /// <summary>
