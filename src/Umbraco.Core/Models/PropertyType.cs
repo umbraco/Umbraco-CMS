@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
         {
             _alias = GetAlias(propertyTypeAlias);
         }
-        
+
         public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
             : this(propertyEditorAlias, dataTypeDatabaseType, false)
         {
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
 
         public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, string propertyTypeAlias)
             : this(propertyEditorAlias, dataTypeDatabaseType, false, propertyTypeAlias)
-        {           
+        {
         }
 
         /// <summary>
@@ -298,18 +298,21 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Validates the Value from a Property according to its type
+        /// Gets a value indicating whether the value is of the expected type
+        /// for the property, and can be assigned to the property "as is".
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns>True if valid, otherwise false</returns>
+        /// <param name="value">The value.</param>
+        /// <returns>True if the value is of the expected type for the property,
+        /// and can be assigned to the property "as is". Otherwise, false, to indicate
+        /// that some conversion is required.</returns>
         public bool IsPropertyTypeValid(object value)
         {
-            //Can't validate null values, so just allow it to pass the current validation
+            // null values are assumed to be ok
             if (value == null)
                 return true;
 
-            //Check type if the type of the value match the type from the DataType/PropertyEditor
-            Type type = value.GetType();
+            // check if the type of the value matches the type from the DataType/PropertyEditor
+            var valueType = value.GetType();
 
             //TODO Add PropertyEditor Type validation when its relevant to introduce
             /*bool isEditorModel = value is IEditorModel;
@@ -326,48 +329,32 @@ namespace Umbraco.Core.Models
                 return argument == type;
             }*/
 
-            if (PropertyEditorAlias.IsNullOrWhiteSpace() == false)
+            if (PropertyEditorAlias.IsNullOrWhiteSpace() == false) // fixme - always true?
             {
-                //Find DataType by Id
-                //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);
-                //Check if dataType is null (meaning that the ControlId is valid) ?
-                //Possibly cast to BaseDataType and get the DbType from there (which might not be possible because it lives in umbraco.cms.businesslogic.datatype) ?
-
-                //Simple validation using the DatabaseType from the DataTypeDefinition and Type of the passed in value
-                if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
-                    return true;
-
-                if (DataTypeDatabaseType == DataTypeDatabaseType.Decimal && type == typeof(decimal))
-                    return true;
-
-                if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))
-                    return true;
-
-                if (DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && type == typeof(string))
-                    return true;
-
-                if (DataTypeDatabaseType == DataTypeDatabaseType.Ntext && type == typeof(string))
-                    return true;
+                // simple validation using the DatabaseType from the DataTypeDefinition
+                // and the Type of the passed in value
+                switch (DataTypeDatabaseType)
+                {
+                    // fixme breaking!
+                    case DataTypeDatabaseType.Integer:
+                        return valueType == typeof(int);
+                    case DataTypeDatabaseType.Decimal:
+                        return valueType == typeof(decimal);
+                    case DataTypeDatabaseType.Date:
+                        return valueType == typeof(DateTime);
+                    case DataTypeDatabaseType.Nvarchar:
+                        return valueType == typeof(string);
+                    case DataTypeDatabaseType.Ntext:
+                        return valueType == typeof(string);
+                }
             }
 
-            //Fallback for simple value types when no Control Id or Database Type is set
-            if (type.IsPrimitive || value is string)
+            // fixme - never reached + makes no sense?
+            // fallback for simple value types when no Control Id or Database Type is set
+            if (valueType.IsPrimitive || value is string)
                 return true;
 
             return false;
-        }
-
-        /// <summary>
-        /// Checks the underlying property editor prevalues to see if the one that allows changing of the database field
-        /// to which data is saved (dataInt, dataVarchar etc.) is included.  If so that means the field could be changed when the data
-        /// type is saved.
-        /// </summary>
-        /// <returns></returns>
-        internal bool CanHaveDataValueTypeChanged()
-        {
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(_propertyEditorAlias);
-            return propertyEditor.PreValueEditor.Fields
-                .SingleOrDefault(x => x.Key == Constants.PropertyEditors.PreValueKeys.DataValueType) != null;
         }
 
         /// <summary>
@@ -389,15 +376,15 @@ namespace Umbraco.Core.Models
                     var regexPattern = new Regex(ValidationRegExp);
                     return regexPattern.IsMatch(value.ToString());
                 }
-                catch 
+                catch
                 {
                          throw new Exception(string .Format("Invalid validation expression on property {0}",this.Alias));
                 }
-                
+
             }
-            
+
             //TODO: We must ensure that the property value can actually be saved based on the specified database type
-            
+
             //TODO Add PropertyEditor validation when its relevant to introduce
             /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
             {
@@ -415,19 +402,19 @@ namespace Umbraco.Core.Models
         {
             if (base.Equals(other)) return true;
 
-            //Check whether the PropertyType's properties are equal. 
+            //Check whether the PropertyType's properties are equal.
             return Alias.InvariantEquals(other.Alias);
         }
 
         public override int GetHashCode()
         {
-            //Get hash code for the Name field if it is not null. 
+            //Get hash code for the Name field if it is not null.
             int baseHash = base.GetHashCode();
 
-            //Get hash code for the Alias field. 
+            //Get hash code for the Alias field.
             int hashAlias = Alias.ToLowerInvariant().GetHashCode();
 
-            //Calculate the hash code for the product. 
+            //Calculate the hash code for the product.
             return baseHash ^ hashAlias;
         }
 
@@ -439,7 +426,7 @@ namespace Umbraco.Core.Models
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
-                clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);    
+                clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);
             }
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
