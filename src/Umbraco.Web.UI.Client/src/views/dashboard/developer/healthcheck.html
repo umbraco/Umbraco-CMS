@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
-    <h3>Health Check</h3>
-    <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button. <br/>
+    <h3 class="bold">Health Check</h3>
+    <p class="faded">The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button. <br/>
     You can add your own health checks, have a look at <a href="https://our.umbraco.org/documentation/Extending/Healthcheck/" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
 
     <div class="umb-healthcheck" ng-if="vm.viewState === 'list'">
@@ -86,7 +86,7 @@
                             <div class="umb-healthcheck-group__details-status-actions">
                                 <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
                                     <span ng-show="action.valueRequired">
-                                        Set new value: 
+                                        Set new value:
                                         <input type="text" ng-model="action.providedValue" required/>
                                     </span>
                                     <button type="button" class="umb-era-button" ng-click="vm.executeAction(check, $index, action);">{{action.name}}</button>
