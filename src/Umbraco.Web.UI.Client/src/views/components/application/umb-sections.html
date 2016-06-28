@@ -1,9 +1,13 @@
 <div>
-    <div id="applications" ng-class="{faded:stickyNavigation}"> 
+    <div id="applications" ng-class="{faded:stickyNavigation}">
         <ul class="sections">
             <li class="avatar">
                 <a href="#" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
-                    <img id="avatar-img" ng-src="{{avatar[0].value}}" ng-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x" />
+                    <umb-avatar
+                        size="xs"
+                        src="{{avatar[0].value}}"
+                        srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
+                    </umb-avatar>
                 </a>
             </li>
             <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
@@ -11,11 +15,11 @@
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick($event, section)"
                    prevent-default>
-                    <section-icon icon="{{section.cssclass}}"></section-icon>  
+                    <section-icon icon="{{section.cssclass}}"></section-icon>
                     <span>{{section.name}}</span>
                 </a>
             </li>
-            
+
             <li class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
                 <a href ng-click="trayClick()">
                     <i class="icon icon-arrow-right"></i>
