@@ -174,7 +174,9 @@ namespace Umbraco.Core.Models
                         case DataTypeDatabaseType.Decimal:
                             var convDecimal = value.TryConvertTo<decimal>();
                             if (convDecimal == false) ThrowTypeException(value, typeof(decimal), _propertyType.Alias);
-                            value = convDecimal.Result;
+                            // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                            // because the underlying database is going to mess with the scaling factor anyways.
+                            value = convDecimal.Result.Normalize();
                             break;
                         case DataTypeDatabaseType.Date:
                             var convDateTime = value.TryConvertTo<DateTime>();
