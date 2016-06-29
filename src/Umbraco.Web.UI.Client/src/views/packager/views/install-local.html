@@ -3,8 +3,8 @@
     <div class="umb-packages-view-wrapper" ng-if="vm.state === 'upload'">
 
         <!-- Upload -->
-        <div class="umb-upload-local">
-            <form novalidate name="localPackageForm">
+        <div class="flex items-center justify-center">
+            <form novalidate name="localPackageForm" class="flex flex-column justify-center items-center tc">
 
                 <!-- Drag and drop files area -->
                 <div ngf-drop
@@ -60,7 +60,7 @@
         <div class="umb-packages-view-wrapper">
 
             <!-- Package details -->
-            <div class="umb-info-local" >
+            <div class="flex items-center justify-center">
                 <div class="umb-info-local-items">
 
                     <form novalidate name="localPackageForm">
