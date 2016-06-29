@@ -19,61 +19,38 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Extend
 
+        private static IPublishedContent Unwrap(IPublishedContent content)
+        {
+            if (content == null) return null;
+
+            while (true)
+            {
+                var extended = content as PublishedContentExtended;
+                if (extended != null)
+                {
+                    if (((IPublishedContentExtended)extended).HasAddedProperties) return extended;
+                    content = extended.Unwrap();
+                    continue;
+                }
+                var wrapped = content as PublishedContentWrapped;
+                if (wrapped != null)
+                {
+                    content = wrapped.Unwrap();
+                    continue;
+                }
+                return content;
+            }
+        }
+
         internal static IPublishedContentExtended Extend(IPublishedContent content)
         {
             // first unwrap content down to the lowest possible level, ie either the deepest inner
             // IPublishedContent or the first extended that has added properties. this is to avoid
             // nesting extended objects as much as possible, so we try to re-extend that lowest
-            // object.
+            // object. Then extend. But do NOT create a model, else we would not be able to add
+            // properties. BEWARE means that whatever calls Extend MUST create the model.
 
-            var wrapped = content as PublishedContentExtended;
-            while (wrapped != null && ((IPublishedContentExtended)wrapped).HasAddedProperties == false)
-                wrapped = (content = wrapped.Unwrap()) as PublishedContentExtended;
-
-            // if the factory returns something else than content it means it has created
-            // a model, and then that model has to inherit from PublishedContentExtended,
-            // => implements the internal IPublishedContentExtended.
-
-            // here we assume that either the factory just created a model that implements
-            // IPublishedContentExtended and therefore does not need to be extended again,
-            // because it can carry the extra property - or that it did *not* create a
-            // model and therefore returned the original content unchanged.
-
-            var model = content.CreateModel();
-            IPublishedContent extended;
-            if (model == content) // == means the factory did not create a model
-            {
-                // so we have to extend
-                extended = new PublishedContentExtended(content);
-            }
-            else
-            {
-                // else we can use what the factory returned
-                extended = model;
-            }
-
-            // so extended should always implement IPublishedContentExtended, however if
-            // by mistake the factory returned a different object that does not implement
-            // IPublishedContentExtended (which would be an error), throw.
-            //
-            // see also PublishedContentExtensionsForModels.CreateModel
-
-            // NOTE
-            // could we lift that constraint and accept that models just be IPublishedContent?
-            // would then mean that we cannot assume a model is IPublishedContentExtended, so
-            // either it is, or we need to wrap it. so instead of having
-            //   (Model:IPublishedContentExtended (IPublishedContent))
-            // we'd have
-            //   (PublishedContentExtended (Model (IPublishedContent)))
-            // and it is that bad? any other consequences?
-            //
-            // would also allow the factory to cache the model (though that should really
-            // be done by the content cache, not by the factory).
-
-            var extended2 = extended as IPublishedContentExtended;
-            if (extended2 == null)
-                throw new Exception("Extended does not implement IPublishedContentExtended.");
-            return extended2;
+            return new PublishedContentExtended(Unwrap(content));
         }
 
         #endregion

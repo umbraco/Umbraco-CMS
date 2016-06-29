@@ -57,12 +57,5 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             protected override void DisposeResources()
             { }
         }
-
-        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-        {
-            // fixme
-            throw new NotImplementedException();
-        }
-
     }
 }

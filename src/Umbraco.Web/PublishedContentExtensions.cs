@@ -9,202 +9,10 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
-    // fixme! + migrate a few more of them
-    /// <summary>
-    /// Provides extension methods for <c>IPublishedItem</c>.
-    /// </summary>
-    public static class PublishedItemExtensions
-    {
-        #region IsComposedOf
-
-        /// <summary>
-        /// Gets a value indicating whether the content is of a content type composed of the given alias
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
-        public static bool IsComposedOf(this IPublishedFragment content, string alias)
-        {
-            return content.ContentType.CompositionAliases.Contains(alias);
-        }
-
-        #endregion
-
-        #region HasProperty
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>A value indicating whether the content has the property identified by the alias.</returns>
-        /// <remarks>The content may have a property, and that property may not have a value.</remarks>
-        public static bool HasProperty(this IPublishedFragment content, string alias)
-        {
-            return content.ContentType.GetPropertyType(alias) != null;
-        }
-
-        #endregion
-
-        #region HasValue
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a value for a property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
-        /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedFragment content, string alias)
-        {
-            var prop = content.GetProperty(alias);
-            return prop != null && prop.HasValue;
-        }
-
-        /// <summary>
-        /// Returns one of two strings depending on whether the content has a value for a property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="valueIfTrue">The value to return if the content has a value for the property.</param>
-        /// <param name="valueIfFalse">The value to return if the content has no value for the property.</param>
-        /// <returns>Either <paramref name="valueIfTrue"/> or <paramref name="valueIfFalse"/> depending on whether the content
-        /// has a value for the property identified by the alias.</returns>
-        public static IHtmlString HasValue(this IPublishedFragment content, string alias,
-            string valueIfTrue, string valueIfFalse = null)
-        {
-            return content.HasValue(alias)
-                ? new HtmlString(valueIfTrue)
-                : new HtmlString(valueIfFalse ?? string.Empty);
-        }
-
-        #endregion
-
-        #region GetPropertyValue
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The value of the content's property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <c>null</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias)
-        {
-            var property = content.GetProperty(alias);
-            return property?.Value;
-        }
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias, string defaultValue)
-        {
-            var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.Value;
-        }
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias, object defaultValue)
-        {
-            var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.Value;
-        }
-
-        #endregion
-
-        #region GetPropertyValue<T>
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, converted to a specified type.
-        /// </summary>
-        /// <typeparam name="T">The target property type.</typeparam>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <c>default(T)</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedFragment content, string alias)
-        {
-            return content.GetPropertyValue(alias, false, default(T));
-        }
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, converted to a specified type, if it exists, otherwise a default value.
-        /// </summary>
-        /// <typeparam name="T">The target property type.</typeparam>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <returns>The value of the content's property identified by the alias, converted to the specified type, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedFragment content, string alias, T defaultValue)
-        {
-            return content.GetPropertyValue(alias, true, defaultValue);
-        }
-
-        internal static T GetPropertyValue<T>(this IPublishedFragment content, string alias, bool withDefaultValue, T defaultValue)
-        {
-            var property = content.GetProperty(alias);
-            if (property == null) return defaultValue;
-
-            return property.GetValue(withDefaultValue, defaultValue);
-        }
-
-        #endregion
-
-        #region ToIndexedArray
-
-        public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
-            where TContent : class, IPublishedFragment
-        {
-            var set = source.Select((content, index) => new IndexedArrayItem<TContent>(content, index)).ToArray();
-            foreach (var setItem in set) setItem.TotalCount = set.Length;
-            return set;
-        }
-
-        #endregion
-    }
-
     /// <summary>
     /// Provides extension methods for <c>IPublishedContent</c>.
     /// </summary>
@@ -494,19 +302,19 @@ namespace Umbraco.Web
 
         public static HtmlString Where(this IPublishedContent content, string predicate, string valueIfTrue)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             return content.Where(predicate, valueIfTrue, string.Empty);
         }
 
         public static HtmlString Where(this IPublishedContent content, string predicate, string valueIfTrue, string valueIfFalse)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             return new HtmlString(content.Where(predicate) ? valueIfTrue : valueIfFalse);
         }
 
         public static bool Where(this IPublishedContent content, string predicate)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             var dynamicDocumentList = new DynamicPublishedContentList { content.AsDynamicOrNull() };
             var filtered = dynamicDocumentList.Where<DynamicPublishedContent>(predicate);
             return filtered.Count() == 1;
@@ -521,7 +329,7 @@ namespace Umbraco.Web
         // content should NOT be null
 		public static dynamic AsDynamic(this IPublishedContent content)
 		{
-			if (content == null) throw new ArgumentNullException("content");
+			if (content == null) throw new ArgumentNullException(nameof(content));
 			return new DynamicPublishedContent(content);
 		}
 
@@ -575,9 +383,7 @@ namespace Umbraco.Web
 			if (content.IsDocumentType(docTypeAlias))
 				return true;
 
-			if (recursive)
-				return IsDocumentTypeRecursive(content, docTypeAlias);
-			return false;
+			return recursive && IsDocumentTypeRecursive(content, docTypeAlias);
 		}
 
 		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
@@ -996,7 +802,7 @@ namespace Umbraco.Web
         /// <returns>Enumerates bottom-up ie walking up the tree (parent, grand-parent, etc).</returns>
         internal static IEnumerable<IPublishedContent> EnumerateAncestors(this IPublishedContent content, bool orSelf)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
             while ((content = content.Parent) != null)
                 yield return content;
@@ -1169,21 +975,19 @@ namespace Umbraco.Web
 
         internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
 
-            foreach (var child in content.Children)
-                foreach (var child2 in child.EnumerateDescendants())
-                    yield return child2;
+            foreach (var desc in content.Children.SelectMany(x => x.EnumerateDescendants()))
+                yield return desc;
         }
 
         internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content)
         {
             yield return content;
 
-            foreach (var child in content.Children)
-                foreach (var child2 in child.EnumerateDescendants())
-                    yield return child2;
+            foreach (var desc in content.Children.SelectMany(x => x.EnumerateDescendants()))
+                yield return desc;
         }
 
         #endregion
@@ -1202,7 +1006,7 @@ namespace Umbraco.Web
 		public static IPublishedContent Up(this IPublishedContent content, int number)
 		{
             if (number < 0)
-                throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
+                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
 		    return number == 0 ? content : content.EnumerateAncestors(false).Skip(number).FirstOrDefault();
 		}
 
@@ -1225,7 +1029,7 @@ namespace Umbraco.Web
 		public static IPublishedContent Down(this IPublishedContent content, int number)
 		{
             if (number < 0)
-                throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
+                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
 		    if (number == 0) return content;
 
             content = content.Children.FirstOrDefault();
@@ -1260,7 +1064,7 @@ namespace Umbraco.Web
         public static T Parent<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             return content.Parent as T;
         }
 
@@ -1279,7 +1083,7 @@ namespace Umbraco.Web
 		/// </remarks>
 		public static IEnumerable<IPublishedContent> Children(this IPublishedContent content)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             return content.Children;
         }
 
@@ -1328,24 +1132,26 @@ namespace Umbraco.Web
             return content.Children<T>().FirstOrDefault();
         }
 
-		/// <summary>
-		/// Gets the children of the content in a DataTable.
-		/// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
-        /// <returns>The children of the content.</returns>
-		public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "")
-		{
-            return GenerateDataTable(content, contentTypeAliasFilter);
-		}
-
-		/// <summary>
+        /// <summary>
         /// Gets the children of the content in a DataTable.
         /// </summary>
         /// <param name="content">The content.</param>
+        /// <param name="services">A service context.</param>
         /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
         /// <returns>The children of the content.</returns>
-        private static DataTable GenerateDataTable(IPublishedContent content, string contentTypeAliasFilter = "")
+        public static DataTable ChildrenAsTable(this IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "")
+		{
+            return GenerateDataTable(content, services, contentTypeAliasFilter);
+		}
+
+        /// <summary>
+        /// Gets the children of the content in a DataTable.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="services">A service context.</param>
+        /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
+        /// <returns>The children of the content.</returns>
+        private static DataTable GenerateDataTable(IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "")
 		{
 			var firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
 								? content.Children.Any()
@@ -1360,7 +1166,7 @@ namespace Umbraco.Web
 				//pass in the alias of the first child node since this is the node type we're rendering headers for
 				firstNode.DocumentTypeAlias,
 				//pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
-				alias => GetPropertyAliasesAndNames(alias),
+				alias => GetPropertyAliasesAndNames(services, alias),
 				//pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
 				() =>
 				{
@@ -1404,72 +1210,45 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region OfTypes
-
-        // the .OfType<T>() filter is nice when there's only one type
-        // this is to support filtering with multiple types
-
-        public static IEnumerable<IPublishedContent> OfTypes(this IEnumerable<IPublishedContent> contents, params Type[] types)
-        {
-            return contents.Where(x => types.Contains(x.GetType()));
-        }
-
-        public static IEnumerable<IPublishedContent> OfTypes(this IEnumerable<IPublishedContent> contents, params string[] types)
-        {
-            types = types.Select(x => x.ToLowerInvariant()).ToArray();
-            return contents.Where(x => types.Contains(x.DocumentTypeAlias.ToLowerInvariant()));
-        }
-
-        public static T OfType<T>(this IPublishedContent content)
-            where T : class, IPublishedContent
-        {
-            return content as T;
-        }
-
-        #endregion
-
         #region PropertyAliasesAndNames
 
-        private static Func<string, Dictionary<string, string>> _getPropertyAliasesAndNames;
+        private static Func<ServiceContext, string, Dictionary<string, string>> _getPropertyAliasesAndNames;
 
 		/// <summary>
 		/// This is used only for unit tests to set the delegate to look up aliases/names dictionary of a content type
 		/// </summary>
-		internal static Func<string, Dictionary<string, string>> GetPropertyAliasesAndNames
+		internal static Func<ServiceContext, string, Dictionary<string, string>> GetPropertyAliasesAndNames
 		{
-			get
-			{
-				return _getPropertyAliasesAndNames ?? (_getPropertyAliasesAndNames = alias =>
-					{
-						var userFields = GetAliasesAndNames(alias);
-						//ensure the standard fields are there
-						var allFields = new Dictionary<string, string>
-							{
-								{"Id", "Id"},
-								{"NodeName", "NodeName"},
-								{"NodeTypeAlias", "NodeTypeAlias"},
-								{"CreateDate", "CreateDate"},
-								{"UpdateDate", "UpdateDate"},
-								{"CreatorName", "CreatorName"},
-								{"WriterName", "WriterName"},
-								{"Url", "Url"}
-							};
-						foreach (var f in userFields.Where(f => allFields.ContainsKey(f.Key) == false))
-						{
-							allFields.Add(f.Key, f.Value);
-						}
-						return allFields;
-					});
-			}
+			get { return _getPropertyAliasesAndNames ?? GetAliasesAndNames; }
 			set { _getPropertyAliasesAndNames = value; }
         }
 
-        // fixme - temp, issue w/singleton, but removes dep on legacy
-        // should it work for media/members too?
-        private static Dictionary<string, string> GetAliasesAndNames(string alias)
+        private static Dictionary<string, string> GetAliasesAndNames(ServiceContext services, string alias)
         {
-            var type = ApplicationContext.Current.Services.ContentTypeService.Get(alias);
-            return GetAliasesAndNames(type);
+            var type = services.ContentTypeService.Get(alias)
+                ?? services.MediaTypeService.Get(alias)
+                ?? (IContentTypeBase)services.MemberTypeService.Get(alias);
+            var fields = GetAliasesAndNames(type);
+
+            // ensure the standard fields are there
+            var stdFields = new Dictionary<string, string>
+            {
+                {"Id", "Id"},
+                {"NodeName", "NodeName"},
+                {"NodeTypeAlias", "NodeTypeAlias"},
+                {"CreateDate", "CreateDate"},
+                {"UpdateDate", "UpdateDate"},
+                {"CreatorName", "CreatorName"},
+                {"WriterName", "WriterName"},
+                {"Url", "Url"}
+            };
+
+            foreach (var field in stdFields.Where(x => fields.ContainsKey(x.Key) == false))
+            {
+                fields[field.Key] = field.Value;
+            }
+
+            return fields;
         }
 
         private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType)

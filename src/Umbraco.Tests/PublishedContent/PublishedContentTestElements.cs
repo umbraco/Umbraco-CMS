@@ -27,11 +27,6 @@ namespace Umbraco.Tests.PublishedContent
             throw new NotImplementedException();
         }
 
-        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Resync()
         { }
     }
@@ -279,7 +274,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    class PublishedContentStrong1 : PublishedContentExtended
+    class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content)
             : base(content)
@@ -297,7 +292,7 @@ namespace Umbraco.Tests.PublishedContent
         public int AnotherValue => this.GetPropertyValue<int>("anotherValue");
     }
 
-    class PublishedContentStrong2 : PublishedContentExtended
+    class PublishedContentStrong2 : PublishedContentModel
     {
         public PublishedContentStrong2(IPublishedContent content)
             : base(content)

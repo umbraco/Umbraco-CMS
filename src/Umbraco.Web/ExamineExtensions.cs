@@ -16,9 +16,8 @@ namespace Umbraco.Web
 	{
         internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
 		{
-			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent,
-			// however this is currently not the case:
-			// http://examine.codeplex.com/workitem/10350
+            // no need to think about creating the IPublishedContent from the Examine result
+            // content cache is fast and optimized - use it!
 
 		    var list = new List<IPublishedContent>();
 
@@ -35,13 +34,13 @@ namespace Umbraco.Web
                 // returned by the cache, in case the cache can create real types.
                 // so we have to ask it to please extend itself.
 
-			    //var extend = set.MapContent(content);
 			    var extend = PublishedContentExtended.Extend(content);
-                list.Add(extend);
+                list.Add(extend.CreateModel()); // take care, must create the model!
 
                 var property = new PropertyResult("examineScore",
                     result.Score,
 			        PropertyResultType.CustomProperty);
+
                 extend.AddProperty(property);
 			}
 

@@ -1482,7 +1482,7 @@ AND cmsContentNu.nodeId IS NULL
 
         #region Fragments
 
-        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public override IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
             return new PublishedFragmentProperty(_facadeAccessor, propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
         }

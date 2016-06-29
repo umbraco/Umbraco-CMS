@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
@@ -197,6 +200,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
             _routesCache.Clear();
+        }
+
+        #endregion
+
+        #region Fragments
+
+        public override IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

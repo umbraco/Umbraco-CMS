@@ -1,5 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
@@ -9,7 +11,7 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     public interface IFacadeService : IDisposable
     {
-        #region PublishedCaches
+        #region Facade
 
         /* Various places (such as Node) want to access the XML content, today as an XmlDocument
          * but to migrate to a new cache, they're migrating to an XPathNavigator. Still, they need
@@ -36,6 +38,11 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="previewToken">A preview token, or <c>null</c> if not previewing.</param>
         /// <returns>A facade.</returns>
         IFacade CreateFacade(string previewToken);
+
+        /// <summary>
+        /// Gets the facade accessor.
+        /// </summary>
+        IFacadeAccessor FacadeAccessor { get; }
 
         #endregion
 
@@ -135,6 +142,21 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="payloads">The changes.</param>
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
+        #endregion
+
+        #region Fragment
+
+        /// <summary>
+        /// Creates a fragment property.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <param name="itemKey">The fragment key.</param>
+        /// <param name="previewing">A value indicating whether previewing.</param>
+        /// <param name="referenceCacheLevel">The reference cache level.</param>
+        /// <param name="sourceValue">The source value.</param>
+        /// <returns>A fragment property.</returns>
+        IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        
         #endregion
     }
 }

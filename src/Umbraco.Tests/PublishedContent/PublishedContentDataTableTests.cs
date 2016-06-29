@@ -23,14 +23,14 @@ namespace Umbraco.Tests.PublishedContent
 			base.Initialize();
 
             // need to specify a different callback for testing
-			PublishedContentExtensions.GetPropertyAliasesAndNames = s =>
+			PublishedContentExtensions.GetPropertyAliasesAndNames = (services, alias) =>
 				{
 					var userFields = new Dictionary<string, string>()
 						{
 							{"property1", "Property 1"},
 							{"property2", "Property 2"}					
 						};
-					if (s == "Child")
+					if (alias == "Child")
 					{
 						userFields.Add("property4", "Property 4");
 					}
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PublishedContent
 		public void To_DataTable()
 		{	
 			var doc = GetContent(true, 1);
-			var dt = doc.ChildrenAsTable();
+			var dt = doc.ChildrenAsTable(ApplicationContext.Services);
 
 			Assert.AreEqual(11, dt.Columns.Count);
 			Assert.AreEqual(3, dt.Rows.Count);
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.PublishedContent
 			//change a doc type alias
 			((TestPublishedContent) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
 
-			var dt = doc.ChildrenAsTable("Child");
+			var dt = doc.ChildrenAsTable(ApplicationContext.Services, "Child");
 
 			Assert.AreEqual(11, dt.Columns.Count);
 			Assert.AreEqual(2, dt.Rows.Count);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.PublishedContent
 		public void To_DataTable_No_Rows()
 		{
 			var doc = GetContent(false, 1);			
-			var dt = doc.ChildrenAsTable();
+			var dt = doc.ChildrenAsTable(ApplicationContext.Services);
 			//will return an empty data table
 			Assert.AreEqual(0, dt.Columns.Count);
 			Assert.AreEqual(0, dt.Rows.Count);			

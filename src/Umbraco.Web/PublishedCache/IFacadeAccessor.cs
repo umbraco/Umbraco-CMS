@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides access to IFacade.
     /// </summary>
-    interface IFacadeAccessor
+    public interface IFacadeAccessor
     {
         IFacade Facade { get; set; }
     }

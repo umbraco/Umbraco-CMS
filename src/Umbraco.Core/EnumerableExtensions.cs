@@ -347,5 +347,12 @@ namespace Umbraco.Core
         {
             return items ?? Enumerable.Empty<T>();
         }
+
+        // the .OfType<T>() filter is nice when there's only one type
+        // this is to support filtering with multiple types
+        public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params Type[] types)
+        {
+            return contents.Where(x => types.Contains(x.GetType()));
+        }
     }
 }

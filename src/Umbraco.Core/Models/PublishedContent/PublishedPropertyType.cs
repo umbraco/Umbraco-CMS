@@ -36,6 +36,7 @@ namespace Umbraco.Core.Models.PublishedContent
             PropertyEditorAlias = propertyType.PropertyEditorAlias;
         }
 
+        /*
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with an existing <see cref="PublishedPropertyType"/>
         /// and a new property type alias.
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Models.PublishedContent
         internal PublishedPropertyType(string propertyTypeAlias, PublishedPropertyType propertyType)
             : this(propertyTypeAlias, propertyType.DataTypeId, propertyType.PropertyEditorAlias)
         { }
-
+        */
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a property editor alias.
@@ -68,6 +69,7 @@ namespace Umbraco.Core.Models.PublishedContent
             : this(propertyTypeAlias, 0, propertyEditorAlias)
         { }
 
+        /*
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a datatype definition.
         /// </summary>
@@ -79,6 +81,7 @@ namespace Umbraco.Core.Models.PublishedContent
         internal PublishedPropertyType(string propertyTypeAlias, IDataTypeDefinition dataTypeDefinition)
             : this(propertyTypeAlias, dataTypeDefinition.Id, dataTypeDefinition.PropertyEditorAlias)
         { }
+        */
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias,

@@ -96,11 +96,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-        {
-            return _service.CreateFragmentProperty(propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
-        }
-
         #endregion
 
         #region IDisposable

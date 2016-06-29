@@ -6,36 +6,27 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {
-    // fixme document & review
+    // notes:
+    // a published fragment does NOT manage any tree-like elements, neither the
+    // original NestedContent (from Lee) nor the DetachedPublishedContent POC did.
     //
-    // these things should NOT manage any tree-like elements (fixme:discuss?)
-    // Lee's NestedContent package DetachedPublishedContent does NOT
-    // and yet we need to be able to figure out what happens when nesting things?
-    //
-    // how would we create MODELS for published items? should it be automatic
-    // or explicit when creating the items? probably cannot be automatic because
-    // then, how would we cast the returned object?
-    //
-    // note: could also have a totally detached one in Core?
+    // at the moment we do NOT support models for fragments - that would require
+    // an entirely new models factory + not even sure it makes sense at all since
+    // fragments are created manually
     //
     internal class PublishedFragment : IPublishedFragment
     {
-        private readonly IFacadeAccessor _facadeAccessor;
-
+        // initializes a new instance of the PublishedFragment class
+        // within the context of a facade service (eg a published content property value)
         public PublishedFragment(PublishedContentType contentType,
-            IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel,
+            IFacadeService facadeService, PropertyCacheLevel referenceCacheLevel,
             Guid key, Dictionary<string, object> values,
             bool previewing)
         {
             ContentType = contentType;
-            _facadeAccessor = facadeAccessor;
             Key = key;
 
-            // ensure we ignore case for property aliases
-            var comparer = values.Comparer;
-            var ignoreCase = comparer == StringComparer.OrdinalIgnoreCase || comparer == StringComparer.InvariantCultureIgnoreCase || comparer == StringComparer.CurrentCultureIgnoreCase;
-            if (ignoreCase == false)
-                values = new Dictionary<string, object>(values, StringComparer.OrdinalIgnoreCase);
+            values = GetCaseInsensitiveValueDictionary(values);
 
             _propertiesArray = contentType
                 .PropertyTypes
@@ -43,10 +34,42 @@ namespace Umbraco.Web.PublishedCache
                 {
                     object value;
                     values.TryGetValue(propertyType.PropertyTypeAlias, out value);
-                    return _facadeAccessor.Facade.CreateFragmentProperty(propertyType, Key, previewing, referenceCacheLevel, value);
+                    return facadeService.CreateFragmentProperty(propertyType, Key, previewing, referenceCacheLevel, value);
                 })
                 .ToArray();
+        }
 
+        // initializes a new instance of the PublishedFragment class
+        // without any context, so it's purely 'standalone' and should NOT interfere with the facade service
+        public PublishedFragment(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
+        {
+            ContentType = contentType;
+            Key = key;
+
+            values = GetCaseInsensitiveValueDictionary(values);
+
+            // using an initial reference cache level of .None ensures that
+            // everything will be cached at .Content level
+            // that reference cache level will propagate to all properties
+            const PropertyCacheLevel cacheLevel = PropertyCacheLevel.None;
+
+            _propertiesArray = contentType
+                .PropertyTypes
+                .Select(propertyType =>
+                {
+                    object value;
+                    values.TryGetValue(propertyType.PropertyTypeAlias, out value);
+                    return (IPublishedProperty) new PublishedFragmentProperty(propertyType, Key, previewing, cacheLevel, value);
+                })
+                .ToArray();
+        }
+
+        private static Dictionary<string, object> GetCaseInsensitiveValueDictionary(Dictionary<string, object> values)
+        {
+            // ensure we ignore case for property aliases
+            var comparer = values.Comparer;
+            var ignoreCase = comparer == StringComparer.OrdinalIgnoreCase || comparer == StringComparer.InvariantCultureIgnoreCase || comparer == StringComparer.CurrentCultureIgnoreCase;
+            return ignoreCase ? values :  new Dictionary<string, object>(values, StringComparer.OrdinalIgnoreCase);
         }
 
         #region ContentType

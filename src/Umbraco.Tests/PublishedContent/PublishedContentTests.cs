@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -5,8 +6,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
-using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -293,7 +295,7 @@ namespace Umbraco.Tests.PublishedContent
             var rVal = doc.GetPropertyValue("testRecursive", true);
             var nullVal = doc.GetPropertyValue("DoNotFindThis", true);
             Assert.AreEqual("This is the recursive val", rVal);
-            Assert.AreEqual("", nullVal);
+            Assert.AreEqual(null, nullVal);
         }
 
         [Test]
@@ -530,66 +532,60 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(1174, result.Id);
 		}
 
-	    [Test]
-	    public void FragmentTest()
-	    {
-	        
-	    }
-
         [Test]
-        public void DetachedProperty1()
+        public void FragmentProperty()
         {
-            var type = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
-            var prop = PublishedProperty.GetDetached(type.Detached(), "5548");
+            var pt = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
+            var ct = new PublishedContentType(0, "alias", new[] { pt });
+            var prop = new PublishedFragmentProperty(pt, Guid.NewGuid(), false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.Value);
             Assert.AreEqual(5548, prop.Value);
         }
 
-	    public void CreateDetachedContentSample()
+	    public void Fragment1()
 	    {
-            bool previewing = false;
-            var t = ContentTypesCache.Get(PublishedItemType.Content, "detachedSomething");
+            var type = ContentTypesCache.Get(PublishedItemType.Content, "detachedSomething");
             var values = new Dictionary<string, object>();
-            var properties = t.PropertyTypes.Select(x =>
-            {
-                object value;
-                if (values.TryGetValue(x.PropertyTypeAlias, out value) == false) value = null;
-                return PublishedProperty.GetDetached(x.Detached(), value, previewing);
-            });
-            // and if you want some sort of "model" it's up to you really...
-            var c = new DetachedContent(properties);
+            var f = new PublishedFragment(type, Guid.NewGuid(), values, false);
         }
 
-	    public void CreatedDetachedContentInConverterSample()
+        [Test]
+	    public void Fragment2()
 	    {
-            // the converter args
-	        PublishedPropertyType argPropertyType = null;
-	        object argSource = null;
-	        bool argPreview = false;
-
 	        var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
 	        var pt2 = new PublishedPropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
-	        string val1 = "";
-	        int val2 = 0;
+            var pt3 = new PublishedPropertyType("size", 0, Constants.PropertyEditors.IntegerAlias);
+	        const string val1 = "boom bam";
+	        const int val2 = 0;
+            const int val3 = 666;
 
-            var c = new ImageWithLegendModel(
-                PublishedProperty.GetDetached(pt1.Nested(argPropertyType), val1, argPreview),
-                PublishedProperty.GetDetached(pt2.Nested(argPropertyType), val2, argPreview));
+	        var guid = Guid.NewGuid();
+
+            var ct = new PublishedContentType(0, "alias", new[] { pt1, pt2, pt3 });
+
+            var c = new ImageWithLegendModel(ct, guid, new Dictionary<string, object>
+            {
+                { "legend", val1 },
+                { "image", val2 },
+                { "size", val3 },
+            }, false);
+
+            Assert.AreEqual(val1, c.Legend);
+            Assert.AreEqual(val3, c.Size);
         }
 
-	    class ImageWithLegendModel
+	    class ImageWithLegendModel : PublishedFragment
 	    {
-	        private readonly IPublishedProperty _legendProperty;
-	        private readonly IPublishedProperty _imageProperty;
+            public ImageWithLegendModel(PublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
+                : base(contentType, fragmentKey, values, previewing)
+	        { }
 
-	        public ImageWithLegendModel(IPublishedProperty legendProperty, IPublishedProperty imageProperty)
-	        {
-	            _legendProperty = legendProperty;
-	            _imageProperty = imageProperty;
-	        }
 
-            public string Legend => _legendProperty.GetValue<string>();
-	        public IPublishedContent Image => _imageProperty.GetValue<IPublishedContent>();
+            public string Legend => this.GetPropertyValue<string>("legend");
+
+	        public IPublishedContent Image => this.GetPropertyValue<IPublishedContent>("image");
+
+	        public int Size => this.GetPropertyValue<int>("size");
 	    }
     }
 }
