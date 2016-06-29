@@ -255,6 +255,8 @@ namespace umbraco.presentation.developer.packages
             pack.Name = packageName.Text;
             pack.Url = packageUrl.Text;
             pack.Version = packageVersion.Text;
+            pack.IconUrl = iconUrl.Text;
+            pack.UmbracoVersion = Version.Parse(umbracoVersion.Text);
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
