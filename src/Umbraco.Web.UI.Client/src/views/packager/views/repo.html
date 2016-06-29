@@ -179,46 +179,46 @@
                         <div class="umb-package-details__section-title">Information</div>
                         <div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.owner">
                                 <div class="umb-package-details__information-item-label">Owner:</div>
-                                <div>{{vm.package.ownerInfo.owner}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.owner}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.contributors">
                                 <div class="umb-package-details__information-item-label">Contributors:</div>
-                                <div ng-repeat="contributor in vm.package.ownerInfo.contributors">
-                                    <a class="umb-package-details__link" href="{{ contributor.profileUrl }}" target="_blank">{{ contributor.name }}<span ng-if="!$last">,&nbsp;&nbsp;</span></a>
+                                <div class="umb-package-details__information-item-content">
+                                    <span ng-repeat="contributor in vm.package.ownerInfo.contributors">{{ contributor }}<span ng-if="!$last">,&nbsp;</span></span>
                                 </div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.created">
                                 <div class="umb-package-details__information-item-label">Created:</div>
-                                <div>{{vm.package.created}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.created}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
                                 <div class="umb-package-details__information-item-label">Current version:</div>
-                                <div>{{vm.package.latestVersion}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.latestVersion}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.information.netVersion">
                                 <div class="umb-package-details__information-item-label">.Net Version:</div>
-                                <div>{{vm.package.information.netVersion}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.information.netVersion}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.licenseName">
                                 <div class="umb-package-details__information-item-label">License:</div>
-                                <div>{{vm.package.licenseName}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.licenseName}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.downloads">
                                 <div class="umb-package-details__information-item-label">Downloads:</div>
-                                <div>{{vm.package.downloads}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.downloads}}</div>
                             </div>
 
-                            <div class="umb-package-details__information-item">
+                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
                                 <div class="umb-package-details__information-item-label">Karma:</div>
-                                <div>{{vm.package.ownerInfo.karma}}</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.karma}}</div>
                             </div>
 
                         </div>
