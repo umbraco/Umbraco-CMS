@@ -240,7 +240,7 @@
                         </div>
                     </div>
 
-                    <div class="umb-package-details__section">
+                    <div class="umb-package-details__section" ng-if="vm.package.externalSources">
                         <div class="umb-package-details__section-title">External sources</div>
                         <div>
                             <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
