@@ -29,16 +29,19 @@
 
         function uninstallPackage(installedPackage) {
             vm.installState.status = "Uninstalling package...";
+            vm.installState.progress = "0";
+
             packageResource.uninstall(installedPackage.id)
                 .then(function () {
                     if (installedPackage.files.length > 0) {
                         vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.progress = "100";
 
                         var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
                         window.location.reload(true);
                     }
                     else {
-                        init();                        
+                        init();
                     }
                 });
         }

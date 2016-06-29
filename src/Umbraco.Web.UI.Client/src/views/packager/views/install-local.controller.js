@@ -96,27 +96,32 @@
 
         function installPackage() {
             vm.installState.status = "Installing";
+            vm.installState.progress = "0";
 
             //TODO: If any of these fail, will they keep calling the next one?
             packageResource
                 .installFiles(vm.localPackage)
                 .then(function(pack) {
                         vm.installState.status = "Importing...";
+                        vm.installState.progress = "25";
                         return packageResource.import(pack);
                     },
                     installError)
                 .then(function(pack) {
                         vm.installState.status = "Installing...";
+                        vm.installState.progress = "50";
                         return packageResource.installFiles(pack);
                     },
                     installError)
                 .then(function(pack) {
                         vm.installState.status = "Restarting, please wait...";
+                        vm.installState.progress = "75";
                         return packageResource.installData(pack);
                     },
                     installError)
                 .then(function(pack) {
                         vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },
                     installError)

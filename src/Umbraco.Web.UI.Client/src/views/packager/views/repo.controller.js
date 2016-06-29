@@ -165,21 +165,25 @@
         function installPackage(selectedPackage) {
 
             vm.installState.status = "importing...";
+            vm.installState.progress = "0";
 
             packageResource
                 .import(selectedPackage)
                 .then(function(pack) {
                         vm.installState.status = "Installing...";
+                        vm.installState.progress = "33";
                         return packageResource.installFiles(pack);
                     },
                     error)
                 .then(function(pack) {
                         vm.installState.status = "Restarting, please wait...";
+                        vm.installState.progress = "66";
                         return packageResource.installData(pack);
                     },
                     error)
                 .then(function(pack) {
                         vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },
                     error)

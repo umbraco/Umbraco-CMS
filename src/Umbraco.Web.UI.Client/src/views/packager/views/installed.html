@@ -99,6 +99,14 @@
                                 Uninstall package
                             </button>
                         </div>
+
+                        <div class="umb-info-local-item">
+                            <umb-progress-bar
+                                ng-if="vm.installState.status !== ''"
+                                percentage="{{vm.installState.progress}}">
+                            </umb-progress-bar>
+                        </div>
+
                         <div class="umb-info-local-item text-info">
                             <p>{{vm.installState.status}}</p>
                         </div>

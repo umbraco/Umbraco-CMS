@@ -317,9 +317,18 @@
                                     Install package
                                 </button>
                             </div>
+
+                            <div class="umb-info-local-item">
+                                <umb-progress-bar
+                                    ng-if="vm.installState.status !== ''"
+                                    percentage="{{vm.installState.progress}}">
+                                </umb-progress-bar>
+                            </div>
+
                             <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
                                 This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
                             </div>
+
                             <div class="umb-info-local-item text-info">
                                 <p>{{vm.installState.status}}</p>
                             </div>
