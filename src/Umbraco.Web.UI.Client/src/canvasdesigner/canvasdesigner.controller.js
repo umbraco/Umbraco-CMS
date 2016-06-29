@@ -482,6 +482,26 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
         }, 100);
     }, true);
 
+    // signalr hub
+    var previewHub = $.connection.previewHub;
+
+    previewHub.client.refreshed = function (message, sender) {
+        console.log("Notified by SignalR preview hub (" + message+ ").");
+
+        if ($scope.pageId != message) {
+            console.log("Not a notification for us (" + $scope.pageId + ").");
+            return;
+        }
+
+        var resultFrame = document.getElementById("resultFrame");
+        var iframe = (resultFrame.contentWindow || resultFrame.contentDocument);
+        //setTimeout(function() { iframe.location.reload(); }, 1000);
+        iframe.location.reload();
+    };
+
+    $.connection.hub.start()
+        .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
+        .fail(function () { console.log("Could not connect to SignalR preview hub."); });
 })
 
 .directive('onFinishRenderFilters', function ($timeout) {

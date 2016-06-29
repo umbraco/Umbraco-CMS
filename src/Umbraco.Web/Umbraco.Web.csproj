@@ -254,6 +254,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="Routing\Domain.cs" />
+    <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />

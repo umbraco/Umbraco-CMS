@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -7,8 +9,12 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Security.Identity;
+using Umbraco.Web.SignalR;
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 
@@ -32,6 +38,7 @@ namespace Umbraco.Web
 
             ConfigureServices(app);
             ConfigureMiddleware(app);
+            ConfigureSignalR(app);
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace Umbraco.Web
         {
             app.SetUmbracoLoggerFactory();
 
-            //Configure the Identity user manager for use with Umbraco Back office 
+            //Configure the Identity user manager for use with Umbraco Back office
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext,
@@ -64,20 +71,27 @@ namespace Umbraco.Web
                 .FinalizeMiddlewareConfiguration();
         }
 
-        /// <summary>
-        /// Raised when the middelware has been configured
-        /// </summary>
-        public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;
+        private IHubContext _previewHubContext;
 
-        protected virtual ApplicationContext ApplicationContext
+        /// <summary>
+        /// Configures SignalR.
+        /// </summary>
+        /// <param name="app"></param>
+        protected virtual void ConfigureSignalR(IAppBuilder app)
         {
-            get { return ApplicationContext.Current; }
+            app.MapSignalR();
+
+            _previewHubContext = GlobalHost.ConnectionManager.GetHubContext<PreviewHub>();
+            PreviewHub.Initialize(_previewHubContext);
         }
+
+        protected virtual ApplicationContext ApplicationContext => ApplicationContext.Current;
+
+        public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;
 
         internal static void OnMiddlewareConfigured(OwinMiddlewareConfiguredEventArgs args)
         {
-            var handler = MiddlewareConfigured;
-            if (handler != null) handler(null, args);
+            MiddlewareConfigured?.Invoke(null, args);
         }
     }
 }
