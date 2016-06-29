@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, $timeout) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout) {
 
         var vm = this;
         vm.state = "upload";
@@ -16,7 +16,6 @@
             uploadProgress: 0,
             serverErrorMessage: null
         };
-        vm.reloadView = reloadView;
 
         $scope.handleFiles = function (files, event) {
             for (var i = 0; i < files.length; i++) {
@@ -122,13 +121,19 @@
                     },
                     installError)
                 .then(function(result) {
-                        vm.state = "packageInstalledSucces";
+
+                        if (result.postInstallationPath) {
+                            //Put the redirect Uri in a cookie so we can use after reloading
+                            localStorageService.set("packageInstallUri", result.postInstallationPath);
+                        }
+
+                        //reload on next digest (after cookie)
+                        $timeout(function() {
+                            window.location.reload(true);
+                        });
+
                     },
                     installError);
-        }
-
-        function reloadView() {
-            window.location.reload(true);
         }
 
         function installError() {

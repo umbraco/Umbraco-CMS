@@ -1,17 +1,18 @@
 (function () {
     "use strict";
 
-    function PackagesOverviewController($scope, $route, $location, navigationService, $timeout, $cookieStore) {
+    function PackagesOverviewController($scope, $route, $location, navigationService, $timeout, localStorageService) {
 
         //Hack!
         // if there is a cookie value for packageInstallUri then we need to redirect there,
-        // the issue is that we still have webforms and we cannot go to a hash location and then window.reload 
+        // the issue is that we still have webforms and we cannot go to a hash location and then window.reload
         // because it will double load it.
         // we will refresh and then navigate there.
-        
-        var installPackageUri = window.localStorage.getItem("packageInstallUri");
-        if (installPackageUri) {            
-            window.localStorage.removeItem("packageInstallUri");
+
+        var installPackageUri = localStorageService.get("packageInstallUri");
+
+        if (installPackageUri) {
+            localStorageService.remove("packageInstallUri");
             $location.path(installPackageUri).search("");
         }
         else {

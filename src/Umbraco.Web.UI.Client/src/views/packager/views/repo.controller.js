@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, $cookieStore) {
+    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService) {
 
         var vm = this;
 
@@ -26,7 +26,6 @@
         vm.installPackage = installPackage;
         vm.downloadPackage = downloadPackage;
         vm.openLightbox = openLightbox;
-        vm.reloadView = reloadView;
         vm.closeLightbox = closeLightbox;
         vm.search = search;
 
@@ -185,15 +184,21 @@
                     },
                     error)
                 .then(function(result) {
-                        vm.packageViewState = "packageInstalledSucces";
+
+                        if (result.postInstallationPath) {
+                            //Put the redirect Uri in a cookie so we can use after reloading
+                            localStorageService.set("packageInstallUri", result.postInstallationPath);
+                        }
+
+                        //reload on next digest (after cookie)
+                        $timeout(function() {
+                            window.location.reload(true);
+                        });
+
                     },
                     error);
         }
 
-        function reloadView() {
-            window.location.reload(true);
-        }
-        
         function openLightbox(itemIndex, items) {
             vm.lightbox = {
                 show: true,
@@ -205,8 +210,8 @@
         function closeLightbox() {
             vm.lightbox.show = false;
             vm.lightbox = null;
-	}
-        
+        }
+
 
         var searchDebounced = _.debounce(function(e) {
 
