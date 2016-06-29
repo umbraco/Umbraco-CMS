@@ -425,9 +425,14 @@ a.umb-package-details__back-link {
     text-decoration: none;
 }
 
+
+@sidebarwidthFlax: 350px; // Width of sidebar. Ugly hack because of old version of Less
+
 .umb-package-details__main-content {
     flex: 1 1 auto;
     margin-right: 40px;
+
+    width: ~"calc(100% - @{sidebarwidthFlax})"; // Make sure that the main content area doesn't gets affected by inline styling
 }
 
 .umb-package-details__sidebar {
