@@ -42,8 +42,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 // are single threaded, so the following code should be safe & fast
 
                 if (_objectValueComputed) return _objectValue;
-                var sourceValue = PropertyType.ConvertDataToSource(_xmlValue, _isPreviewing);
-                _objectValue = PropertyType.ConvertSourceToObject(sourceValue, _isPreviewing);
+                var inter = PropertyType.ConvertSourceToInter(_sourceValue, _isPreviewing);
+                // initial reference cache level always is .Content
+                _objectValue = PropertyType.ConvertInterToObject(PropertyCacheLevel.Content, inter, _isPreviewing);
                 _objectValueComputed = true;
                 return _objectValue;
             }

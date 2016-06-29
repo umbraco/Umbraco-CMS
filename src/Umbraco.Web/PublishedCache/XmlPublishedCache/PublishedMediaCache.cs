@@ -63,6 +63,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    /// Generally used for unit testing to use an explicit examine searcher
 	    /// </summary>
 	    /// <param name="mediaService"></param>
+	    /// <param name="userService"></param>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
 	    /// <param name="cacheProvider"></param>
@@ -299,12 +300,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
-			//var media = library.GetMedia(id, false);
-		    //return ConvertFromXPathNodeIterator(media, id);
-
-            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            var media = _mediaService.GetById(id);
             return media == null ? null : ConvertFromIMedia(media);
-        }
+		}
 
         internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
 	    {
@@ -389,34 +387,34 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    };
 		}
 
-	    internal CacheValues ConvertFromIMedia(IMedia media)
-	    {
-	        var values = new Dictionary<string, string>();
+        internal CacheValues ConvertFromIMedia(IMedia media)
+        {
+            var values = new Dictionary<string, string>();
 
-	        var creator = _userService.GetProfileById(media.CreatorId);
+            var creator = _userService.GetProfileById(media.CreatorId);
             var creatorName = creator == null ? "" : creator.Name;
 
-	        values["id"] = media.Id.ToString();
-	        values["key"] = media.Key.ToString();
-	        values["parentID"] = media.ParentId.ToString();
-	        values["level"] = media.Level.ToString();
-	        values["creatorID"] = media.CreatorId.ToString();
-	        values["creatorName"] = creatorName;
+            values["id"] = media.Id.ToString();
+            values["key"] = media.Key.ToString();
+            values["parentID"] = media.ParentId.ToString();
+            values["level"] = media.Level.ToString();
+            values["creatorID"] = media.CreatorId.ToString();
+            values["creatorName"] = creatorName;
             values["writerID"] = media.CreatorId.ToString();
-	        values["writerName"] = creatorName;
+            values["writerName"] = creatorName;
             values["template"] = "0";
             values["urlName"] = "";
             values["sortOrder"] = media.SortOrder.ToString();
-	        values["createDate"] = media.CreateDate.ToString("yyyy-MM-dd HH:mm:ss");
-	        values["updateDate"] = media.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss");
-	        values["nodeName"] = media.Name;
-	        values["path"] = media.Path;
-	        values["nodeType"] = media.ContentType.Id.ToString();
-	        values["nodeTypeAlias"] = media.ContentType.Alias;
+            values["createDate"] = media.CreateDate.ToString("yyyy-MM-dd HH:mm:ss");
+            values["updateDate"] = media.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss");
+            values["nodeName"] = media.Name;
+            values["path"] = media.Path;
+            values["nodeType"] = media.ContentType.Id.ToString();
+            values["nodeTypeAlias"] = media.ContentType.Alias;
 
             // add the user props
-	        foreach (var prop in media.Properties)
-	            values[prop.Alias] = prop.Value == null ? null : prop.Value.ToString();
+            foreach (var prop in media.Properties)
+                values[prop.Alias] = prop.Value?.ToString();
 
             return new CacheValues
             {

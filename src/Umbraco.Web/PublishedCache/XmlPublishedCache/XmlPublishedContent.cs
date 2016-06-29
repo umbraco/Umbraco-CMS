@@ -6,7 +6,6 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 
@@ -20,24 +19,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
 	internal class XmlPublishedContent : PublishedContentBase
 	{
-	    /// <summary>
-	    /// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node.
-	    /// </summary>
-	    /// <param name="xmlNode">The Xml node.</param>
-	    /// <param name="isPreviewing">A value indicating whether the published content is being previewed.</param>
-	    /// <param name="cacheProvider">A cache provider.</param>
-        /// <param name="contentTypeCache">A content type cache.</param>
         private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
 		{
 			_xmlNode = xmlNode;
 		    _isPreviewing = isPreviewing;
-		    _cacheProvider = cacheProvider;
-            _contentTypeCache = contentTypeCache;
-		}
-
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
-	    private readonly ICacheProvider _cacheProvider;
+	    private readonly ICacheProvider _cacheProvider; // at facade/request level (see PublishedContentCache)
 	    private readonly PublishedContentTypeCache _contentTypeCache;
 
         private bool _nodeInitialized;
@@ -371,16 +359,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     propertyNodes[alias.ToLowerInvariant()] = n;
                 }
 
-		    _properties = _contentType.PropertyTypes.Select(p =>
-		    {
-		        XmlNode n;
-		        return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-		            ? new XmlPublishedProperty(p, _isPreviewing, n)
-		            : new XmlPublishedProperty(p, _isPreviewing);
-		    }).Cast<IPublishedProperty>().ToDictionary(
-		        x => x.PropertyTypeAlias,
-		        x => x,
-		        StringComparer.OrdinalIgnoreCase);
+            _properties = _contentType.PropertyTypes.Select(p =>
+            {
+                XmlNode n;
+                return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
+                    ? new XmlPublishedProperty(p, _isPreviewing, n)
+                    : new XmlPublishedProperty(p, _isPreviewing);
+            }).Cast<IPublishedProperty>().ToDictionary(
+                x => x.PropertyTypeAlias,
+                x => x,
+                StringComparer.OrdinalIgnoreCase);
 
             // warn: this is not thread-safe...
             _nodeInitialized = true;
@@ -424,9 +412,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var attrs = node.Attributes;
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
-            var cache = ApplicationContext.Current.ApplicationCache.RequestCache;
-            var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in v7
-            return (IPublishedContent) cache.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
+            var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
+            return (IPublishedContent) cacheProvider.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
         }
 
 	    public static void ClearRequest()
