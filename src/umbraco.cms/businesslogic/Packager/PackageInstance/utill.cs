@@ -42,7 +42,8 @@ namespace umbraco.cms.businesslogic.packager {
             XmlNode package = doc.CreateElement("package");
             package.AppendChild(_node("name", pack.Name, doc));
             package.AppendChild(_node("version", pack.Version, doc));
-            
+            package.AppendChild(_node("iconUrl", pack.IconUrl, doc));
+
             XmlNode license = _node("license", pack.License, doc);
             license.Attributes.Append(_attribute("url", pack.LicenseUrl, doc));
             package.AppendChild(license);
