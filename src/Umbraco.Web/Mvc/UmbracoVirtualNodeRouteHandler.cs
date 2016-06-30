@@ -32,7 +32,7 @@ namespace Umbraco.Web.Mvc
             PreparePublishedContentRequest(umbracoContext.PublishedContentRequest);
 
             //create the render model
-            var renderModel = new RenderModel(umbracoContext.PublishedContentRequest.PublishedContent, umbracoContext.PublishedContentRequest.Culture);
+            var renderModel = new ContentModel(umbracoContext.PublishedContentRequest.PublishedContent);
 
             //assigns the required tokens to the request
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, renderModel);

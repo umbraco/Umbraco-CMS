@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Web.Mvc
                 if (x.ReturnParameter == null || x.ReturnParameter.ParameterType != typeof (ActionResult)) return false;
                 var p = x.GetParameters();
                 if (p.Length != 1) return false;
-                if (p[0].ParameterType != typeof (RenderModel)) return false;
+                if (p[0].ParameterType != typeof (ContentModel)) return false;
                 return true;
             });
         }
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Web.Mvc
             {
             }
             
-            public override ActionResult Index(RenderModel model)
+            public override ActionResult Index(ContentModel model)
             {
                 return base.Index(model);
             }
@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Web.Mvc
             {
             }
 
-            public ActionResult Index(RenderModel model, int page)
+            public ActionResult Index(ContentModel model, int page)
             {
                 return base.Index(model);
             }
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Web.Mvc
             {
             }
 
-            public new async Task<ActionResult> Index(RenderModel model)
+            public new async Task<ActionResult> Index(ContentModel model)
             {
                 return await Task.FromResult(base.Index(model));
             }

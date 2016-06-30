@@ -7,7 +7,6 @@ using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
@@ -16,99 +15,79 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// The View that umbraco front-end views inherit from
+    /// Represents the properties and methods that are needed in order to render an Umbraco view.
     /// </summary>
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
-        /// <summary>
-        /// Returns the current UmbracoContext
-        /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get
-            {
-                //we should always try to return the context from the data tokens just in case its a custom context and not 
-                //using the UmbracoContext.Current, we will fallback to the singleton if necessary.
-                var umbCtx = ViewContext.GetUmbracoContext()
-                    //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
-                    //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
-                    ?? UmbracoContext.Current;
-                
-                return umbCtx;
-            }
-        }
+        private UmbracoContext _umbracoContext;
+        private UmbracoHelper _helper;
+        private MembershipHelper _membershipHelper;
 
         /// <summary>
-        /// Returns the current ApplicationContext
+        /// Gets the current <see cref="UmbracoContext"/>.
         /// </summary>
-        public ApplicationContext ApplicationContext
-        {
-            get { return UmbracoContext.Application; }
-        }
+        // always try to return the context from the data tokens just in case its a custom context and not 
+        // using the Current.UmbracoContext. Fallback to that singleton if necessary, the only reason this
+        // should ever happen is is someone is rendering a page that inherits from this class and are rendering
+        // it outside of the normal Umbraco routing process. Very unlikely.
+        public UmbracoContext UmbracoContext => _umbracoContext ?? 
+            (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>
-        /// Returns the current PublishedContentRequest
+        /// Gets the current <see cref="ApplicationContext"/>.
+        /// </summary>
+        public ApplicationContext ApplicationContext => UmbracoContext.Application;
+
+        /// <summary>
+        /// Gets the current <see cref="PublishedContentRequest"/>.
         /// </summary>
         internal PublishedContentRequest PublishedContentRequest
         {
             get
             {
-                //we should always try to return the object from the data tokens just in case its a custom object and not 
-                //using the UmbracoContext.Current.
-                //we will fallback to the singleton if necessary.
-                if (ViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
-                {
-                    return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
-                }
-                //next check if it is a child action and see if the parent has it set in data tokens
-                if (ViewContext.IsChildAction)
-                {
-                    if (ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken))
-                    {
-                        return (PublishedContentRequest)ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(Core.Constants.Web.PublishedDocumentRequestDataToken);
-                    }
-                }
+                const string token = Core.Constants.Web.PublishedDocumentRequestDataToken;
 
-                //lastly, we will use the singleton, the only reason this should ever happen is is someone is rendering a page that inherits from this
-                //class and are rendering it outside of the normal Umbraco routing process. Very unlikely.
-                return UmbracoContext.Current.PublishedContentRequest;
+                // we should always try to return the object from the data tokens just in case its a custom object and not 
+                // the one from UmbracoContext. Fallback to UmbracoContext if necessary.
+
+                // try view context
+                if (ViewContext.RouteData.DataTokens.ContainsKey(token))
+                    return (PublishedContentRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+
+                // child action, try parent view context
+                if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
+                    return (PublishedContentRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+
+                // fallback to UmbracoContext
+                return UmbracoContext.PublishedContentRequest;
             }
         }
 
-        private UmbracoHelper _helper;
-        private MembershipHelper _membershipHelper;
-
         /// <summary>
-        /// Gets an UmbracoHelper
+        /// Gets an <see cref="UmbracoHelper"/> instance.
         /// </summary>
-        /// <remarks>
-        /// This constructs the UmbracoHelper with the content model of the page routed to
-        /// </remarks>
         public virtual UmbracoHelper Umbraco
         {
             get
             {
-                if (_helper == null)
-                {
-                    var model = ViewData.Model;
-                    var content = model as IPublishedContent;
-                    if (content == null && model is IRenderModel)
-                        content = ((IRenderModel) model).Content;
-                    _helper = content == null
-                        ? new UmbracoHelper(UmbracoContext)
-                        : new UmbracoHelper(UmbracoContext, content);
-                }
+                if (_helper != null) return _helper;
+
+                var model = ViewData.Model;
+                var content = model as IPublishedContent;
+                if (content == null && model is IContentModel)
+                    content = ((IContentModel) model).Content;
+                _helper = content == null
+                    ? new UmbracoHelper(UmbracoContext)
+                    : new UmbracoHelper(UmbracoContext, content);
                 return _helper;
             }
         }
 
         /// <summary>
-        /// Returns the MemberHelper instance
+        /// Gets a <see cref="MembershipHelper"/> instance.
         /// </summary>
-        public MembershipHelper Members
-        {
-            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
-        }
+        public MembershipHelper Members => _membershipHelper ??
+            (_membershipHelper = new MembershipHelper(UmbracoContext));
 
         /// <summary>
         /// Ensure that the current view context is added to the route data tokens so we can extract it if we like
@@ -119,17 +98,14 @@ namespace Umbraco.Web.Mvc
         protected override void InitializePage()
         {
             base.InitializePage();
-            if (ViewContext.IsChildAction == false)
-            {
-                //this is used purely for partial view macros that contain forms 
-                // and mostly just when rendered within the RTE - This should already be set with the 
-                // EnsurePartialViewMacroViewContextFilterAttribute
-                if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
-                {
-                    ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
-                }
-            }
 
+            if (ViewContext.IsChildAction) return;
+
+            // this is used purely for partial view macros that contain forms and mostly 
+            // just when rendered within the RTE - this should already be set with the 
+            // EnsurePartialViewMacroViewContextFilterAttribute
+            if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
+                ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
         }
 
         // maps model
@@ -141,11 +117,8 @@ namespace Umbraco.Web.Mvc
             // map the view data (may change its type, may set model to null)
             viewData = MapViewDataDictionary(viewData, typeof (TModel));
 
-            var culture = CultureInfo.CurrentCulture;
-            // bind the model (use context culture as default, if available)
-            if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
-                culture = UmbracoContext.PublishedContentRequest.Culture;
-            viewData.Model = RenderModelBinder.BindModel(viewDataModel, typeof (TModel), culture);
+            // bind the model
+            viewData.Model = ContentModelBinder.BindModel(viewDataModel, typeof (TModel));
 
             // set the view data
             base.SetViewData(viewData);
@@ -209,7 +182,7 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                String.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
+                                string.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                     Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Routing
 		    {
 		    }
 
-		    public ActionResult HomePage(RenderModel model)
+		    public ActionResult HomePage(ContentModel model)
 			{
 				return View();
 			}

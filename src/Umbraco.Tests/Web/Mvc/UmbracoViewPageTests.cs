@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_To_RenderModel()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelTestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -106,14 +106,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -121,14 +121,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType2_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType2>(view.Model.Content);
         }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModel()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelTestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel<ContentType2>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType2>(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new ContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -207,14 +207,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -222,14 +222,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType2_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel<ContentType2>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType2>(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType2>(view.Model.Content);
         }
 
@@ -237,7 +237,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel>(view.Model);
+            Assert.IsInstanceOf<ContentModel>(view.Model);
         }
 
         [Test]
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -286,7 +286,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -355,13 +355,13 @@ namespace Umbraco.Tests.Web.Mvc
             }
         }
 
-        public class RenderModelTestPage : TestPage<RenderModel>
+        public class RenderModelTestPage : TestPage<ContentModel>
         { }
 
-        public class RenderModelOfContentType1TestPage : TestPage<RenderModel<ContentType1>>
+        public class RenderModelOfContentType1TestPage : TestPage<ContentModel<ContentType1>>
         { }
 
-        public class RenderModelOfContentType2TestPage : TestPage<RenderModel<ContentType2>>
+        public class RenderModelOfContentType2TestPage : TestPage<ContentModel<ContentType2>>
         { }
 
         public class ContentType1TestPage : TestPage<ContentType1>

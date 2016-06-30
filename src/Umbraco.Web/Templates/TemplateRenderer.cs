@@ -138,7 +138,7 @@ namespace Umbraco.Web.Templates
 					});
 					var routeHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory(), _umbracoContext);
 					var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, contentRequest);
-					var renderModel = new RenderModel(contentRequest.PublishedContent, contentRequest.Culture);
+					var renderModel = new ContentModel(contentRequest.PublishedContent);
 					//manually add the action/controller, this is required by mvc
 					requestContext.RouteData.Values.Add("action", routeDef.ActionName);
 					requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);

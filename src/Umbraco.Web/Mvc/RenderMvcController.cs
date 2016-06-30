@@ -109,7 +109,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="model"></param>
         /// <returns></returns>
         [RenderIndexActionSelector]
-        public virtual ActionResult Index(RenderModel model)
+        public virtual ActionResult Index(ContentModel model)
         {
             return CurrentTemplate(model);
         }

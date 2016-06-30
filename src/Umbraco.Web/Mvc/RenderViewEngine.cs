@@ -97,13 +97,13 @@ namespace Umbraco.Web.Mvc
 
             //first check if we're rendering a partial view for the back office, or surface controller, etc...
             //anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.
-            if (isPartial && ((umbracoToken is RenderModel) == false))
+            if (isPartial && ((umbracoToken is ContentModel) == false))
             {
                 return true;
             }
 
             //only find views if we're rendering the umbraco front end
-            if (umbracoToken is RenderModel)
+            if (umbracoToken is ContentModel)
             {
                 return true;
             }

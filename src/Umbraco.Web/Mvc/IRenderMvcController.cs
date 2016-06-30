@@ -17,6 +17,6 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        ActionResult Index(RenderModel model);
+        ActionResult Index(ContentModel model);
     }
 }

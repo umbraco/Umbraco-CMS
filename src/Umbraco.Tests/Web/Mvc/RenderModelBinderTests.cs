@@ -30,35 +30,35 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Returns_Binder_For_IPublishedContent_And_IRenderModel()
         {
-            var binder = new RenderModelBinder();
+            var binder = new ContentModelBinder();
             var found = binder.GetBinder(typeof (IPublishedContent));
             Assert.IsNotNull(found);            
-            found = binder.GetBinder(typeof(RenderModel));
+            found = binder.GetBinder(typeof(ContentModel));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(MyContent));
             Assert.IsNotNull(found);
-            found = binder.GetBinder(typeof(RenderModel<MyContent>));
+            found = binder.GetBinder(typeof(ContentModel<MyContent>));
             Assert.IsNotNull(found);
 
             found = binder.GetBinder(typeof(MyOtherContent));
             Assert.IsNull(found);
-            found = binder.GetBinder(typeof(MyCustomRenderModel));
+            found = binder.GetBinder(typeof(MyCustomContentModel));
             Assert.IsNull(found);            
-            found = binder.GetBinder(typeof(IRenderModel));
+            found = binder.GetBinder(typeof(IContentModel));
             Assert.IsNull(found);
         }
 
         [Test]
         public void BindModel_Null_Source_Returns_Null()
         {
-            Assert.IsNull(RenderModelBinder.BindModel(null, typeof(MyContent), CultureInfo.CurrentCulture));
+            Assert.IsNull(ContentModelBinder.BindModel(null, typeof(MyContent)));
         }
 
         [Test]
         public void BindModel_Returns_If_Same_Type()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = RenderModelBinder.BindModel(content, typeof (IPublishedContent), CultureInfo.CurrentCulture);
+            var bound = ContentModelBinder.BindModel(content, typeof (IPublishedContent));
             Assert.AreSame(content, bound);
         }
 
@@ -66,8 +66,8 @@ namespace Umbraco.Tests.Web.Mvc
         public void BindModel_RenderModel_To_IPublishedContent()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var renderModel = new RenderModel(content, CultureInfo.CurrentCulture);
-            var bound = RenderModelBinder.BindModel(renderModel, typeof(IPublishedContent), CultureInfo.CurrentCulture);
+            var renderModel = new ContentModel(content);
+            var bound = ContentModelBinder.BindModel(renderModel, typeof(IPublishedContent));
             Assert.AreSame(content, bound);
         }
 
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void BindModel_IPublishedContent_To_RenderModel()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = (IRenderModel)RenderModelBinder.BindModel(content, typeof(RenderModel), CultureInfo.CurrentCulture);
+            var bound = (IContentModel)ContentModelBinder.BindModel(content, typeof(ContentModel));
             Assert.AreSame(content, bound.Content);
         }
 
@@ -83,14 +83,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void BindModel_IPublishedContent_To_Generic_RenderModel()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = (IRenderModel)RenderModelBinder.BindModel(content, typeof(RenderModel<MyContent>), CultureInfo.CurrentCulture);
+            var bound = (IContentModel)ContentModelBinder.BindModel(content, typeof(ContentModel<MyContent>));
             Assert.AreSame(content, bound.Content);
         }
 
         [Test]
         public void No_DataToken_Returns_Null()
         {
-            var binder = new RenderModelBinder();
+            var binder = new ContentModelBinder();
             var routeData = new RouteData();
             var result = binder.BindModel(new ControllerContext(Mock.Of<HttpContextBase>(), routeData, Mock.Of<ControllerBase>()),
                 new ModelBindingContext());
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Invalid_DataToken_Model_Type_Returns_Null()
         {
-            var binder = new RenderModelBinder();
+            var binder = new ContentModelBinder();
             var routeData = new RouteData();
             routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = "hello";
 
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void IPublishedContent_DataToken_Model_Type_Uses_DefaultImplementation()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var binder = new RenderModelBinder();
+            var binder = new ContentModelBinder();
             var routeData = new RouteData();
             routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = content;
 
@@ -156,14 +156,11 @@ namespace Umbraco.Tests.Web.Mvc
             Assert.AreEqual(content, result);
         }
 
-        public class MyCustomRenderModel : RenderModel
+        public class MyCustomContentModel : ContentModel
         {           
-            public MyCustomRenderModel(IPublishedContent content, CultureInfo culture) : base(content, culture)
-            {
-            }            
-            public MyCustomRenderModel(IPublishedContent content) : base(content)
-            {
-            }
+            public MyCustomContentModel(IPublishedContent content) 
+                : base(content)
+            { }
         }
         
         public class MyOtherContent
