@@ -180,7 +180,7 @@ namespace Umbraco.Web.Editors
             bool localizeMessage = true)
         {
             //if there's already a default event message, don't add our default one
-            var msgs = UmbracoContext.GetCurrentEventMessages();
+            var msgs = Current.EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(

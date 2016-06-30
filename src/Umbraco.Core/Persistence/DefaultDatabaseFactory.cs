@@ -28,11 +28,10 @@ namespace Umbraco.Core.Persistence
     internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
     {
         private readonly IMappingResolver _mappingResolver;
-        private readonly IScopeContextAdapter _scopeContextAdapter;
+        private readonly IUmbracoDatabaseAccessor _umbracoDatabaseAccessor;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly ILogger _logger;
 
-        private const string HttpItemKey = "Umbraco.Core.Persistence.DefaultDatabaseFactory";
         private DatabaseFactory _databaseFactory;
         private IPocoDataFactory _pocoDataFactory;
         private string _connectionString;
@@ -69,11 +68,11 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="scopeContextAdapter"></param>
+        /// <param name="umbracoDatabaseAccessor"></param>
         /// <param name="mappingResolver"></param>
         /// <remarks>Used by LightInject.</remarks>
-        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, scopeContextAdapter, mappingResolver)
+        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappingResolver)
         {
             if (Configured == false)
                 DatabaseContext.GiveLegacyAChance(this, logger);
@@ -85,21 +84,21 @@ namespace Umbraco.Core.Persistence
         /// <param name="connectionStringName">The name of the connection string in web.config.</param>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
-        /// <param name="scopeContextAdapter"></param>
+        /// <param name="umbracoDatabaseAccessor"></param>
         /// <param name="mappingResolver"></param>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
+        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (scopeContextAdapter == null) throw new ArgumentNullException(nameof(scopeContextAdapter));
+            if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
             if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
 
             _mappingResolver = mappingResolver;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
-            _scopeContextAdapter = scopeContextAdapter;
+            _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
 
             _logger.Debug<DefaultDatabaseFactory>("Created!");
 
@@ -124,20 +123,20 @@ namespace Umbraco.Core.Persistence
         /// <param name="providerName">The name of the database provider.</param>
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="scopeContextAdapter"></param>
+        /// <param name="umbracoDatabaseAccessor"></param>
         /// <param name="mappingResolver"></param>
         /// <remarks>Used in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IScopeContextAdapter scopeContextAdapter, IMappingResolver mappingResolver)
+        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (scopeContextAdapter == null) throw new ArgumentNullException(nameof(scopeContextAdapter));
+            if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
             if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
 
             _mappingResolver = mappingResolver;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
-            _scopeContextAdapter = scopeContextAdapter;
+            _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
 
             _logger.Debug<DefaultDatabaseFactory>("Created!");
 
@@ -240,10 +239,10 @@ namespace Umbraco.Core.Persistence
             EnsureConfigured();
 
             // check if it's in scope
-            var db = _scopeContextAdapter.Get(HttpItemKey) as UmbracoDatabase;
+            var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             if (db != null) return db;
-            db = (UmbracoDatabase) _databaseFactory.GetDatabase();
-            _scopeContextAdapter.Set(HttpItemKey, db);
+            db = (UmbracoDatabase)_databaseFactory.GetDatabase();
+            _umbracoDatabaseAccessor.UmbracoDatabase = db;
             return db;
         }
 
@@ -255,8 +254,8 @@ namespace Umbraco.Core.Persistence
             //
             // besides, we don't really want to dispose the factory, which is a singleton...
 
-            var db = _scopeContextAdapter.Get(HttpItemKey) as UmbracoDatabase;
-            _scopeContextAdapter.Clear(HttpItemKey);
+            var db = _umbracoDatabaseAccessor.UmbracoDatabase;
+            _umbracoDatabaseAccessor.UmbracoDatabase = null;
             db?.Dispose();
             Configured = false;
         }

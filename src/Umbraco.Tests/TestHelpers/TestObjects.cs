@@ -204,7 +204,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger)
         {
-            var adapter = new DefaultScopeContextAdapter();
+            var adapter = new TestUmbracoDatabaseAccessor();
             var mappingResolver = Mock.Of<IMappingResolver>();
             var databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, adapter, mappingResolver);
             var repositoryFactory = new RepositoryFactory(Mock.Of<IServiceContainer>());

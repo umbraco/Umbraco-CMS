@@ -239,7 +239,7 @@
     <Compile Include="TestHelpers\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="TestHelpers\TestScopeContextAdapter.cs" />
+    <Compile Include="TestHelpers\TestUmbracoDatabaseAccessor.cs" />
     <Compile Include="TestSetup\FacadeServiceAttribute.cs" />
     <Compile Include="TestHelpers\TestUmbracoContextAccessor.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />

@@ -1,39 +1,17 @@
-﻿using System;
-
-namespace Umbraco.Web
+﻿namespace Umbraco.Web
 {
-    internal class HybridUmbracoContextAccessor : IUmbracoContextAccessor
+    internal class HybridUmbracoContextAccessor : HybridAccessorBase<UmbracoContext>, IUmbracoContextAccessor
     {
-        private const string HttpContextItemKey = "Umbraco.Web.UmbracoContext";
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        [ThreadStatic]
-        private static UmbracoContext _umbracoContext;
+        protected override string HttpContextItemKey => "Umbraco.Web.UmbracoContext";
 
         public HybridUmbracoContextAccessor(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+            : base(httpContextAccessor)
+        { }
 
         public UmbracoContext UmbracoContext
         {
-            get
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) return _umbracoContext; //throw new Exception("oops:httpContext");
-                return (UmbracoContext) httpContext.Items[HttpContextItemKey];
-            }
-
-            set
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) //throw new Exception("oops:httpContext");
-                {
-                    _umbracoContext = value;
-                    return;
-                }
-                httpContext.Items[HttpContextItemKey] = value;
-            }
+            get { return Value; }
+            set { Value = value; }
         }
     }
 }

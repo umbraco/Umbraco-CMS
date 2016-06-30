@@ -1384,7 +1384,7 @@ namespace Umbraco.Tests.Services
                 Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                 Logger,
-                new TestScopeContextAdapter(),
+                new TestUmbracoDatabaseAccessor(),
                 MappingResolver);
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);

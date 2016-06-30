@@ -26,7 +26,7 @@ namespace Umbraco.Web.WebApi.Filters
             var notifications = obj.Value as INotificationModel;
             if (notifications == null) return;
 
-            var msgs = UmbracoContext.Current.GetCurrentEventMessages();
+            var msgs = Current.EventMessages;
             if (msgs == null) return;
 
             foreach (var eventMessage in msgs.GetAll())

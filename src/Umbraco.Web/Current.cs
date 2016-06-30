@@ -1,5 +1,6 @@
 ﻿using System;
 using LightInject;
+using Umbraco.Core.Events;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -72,5 +73,8 @@ namespace Umbraco.Web
 
         // cannot set - it's set by whatever creates the facade, which should have the accessor injected
         public static IFacade Facade => FacadeAccessor.Facade;
+
+        // cannot set - this is temp
+        public static EventMessages EventMessages => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
     }
 }

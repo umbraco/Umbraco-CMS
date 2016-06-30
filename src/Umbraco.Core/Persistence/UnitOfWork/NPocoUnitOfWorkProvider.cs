@@ -28,22 +28,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _repositoryFactory = repositoryFactory;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NPocoUnitOfWorkProvider"/> class with a logger.
-        /// </summary>
-        /// <param name="logger">A logger.</param>
-        /// <param name="mappingResolver"></param>
-        /// <remarks>
-        /// <para>FOR UNIT TESTS ONLY</para>
-        /// <para>Creates a new <see cref="IDatabaseFactory"/> each time it is called, by initializing a new
-        /// <see cref="DefaultDatabaseFactory"/> with the default connection name, and default sql syntax providers.</para>
-        /// </remarks>
-        internal NPocoUnitOfWorkProvider(ILogger logger, IMappingResolver mappingResolver)
-        {
-            _databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, new DefaultScopeContextAdapter(), mappingResolver);
-            // careful, _repositoryFactory remains null!
-        }
-
         // this should NOT be here, all tests should supply the appropriate providers,
         // however the above ctor is used in hundreds of tests at the moment, so...
         // will refactor later

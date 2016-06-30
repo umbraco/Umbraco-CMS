@@ -25,13 +25,14 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
             container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
 
-            container.RegisterSingleton<IScopeContextAdapter, DefaultScopeContextAdapter>();
-
             // register database factory
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
             // until the database context configures it properly (eg when installing)
             container.RegisterSingleton<IDatabaseFactory, DefaultDatabaseFactory>();
+
+            // register a database accessor - will be replaced
+            container.RegisterSingleton<IUmbracoDatabaseAccessor, ThreadStaticUmbracoDatabaseAccessor>();
 
             // register database context
             container.RegisterSingleton<DatabaseContext>();

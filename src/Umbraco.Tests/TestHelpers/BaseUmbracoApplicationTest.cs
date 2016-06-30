@@ -217,7 +217,7 @@ namespace Umbraco.Tests.TestHelpers
             var dbFactory = new DefaultDatabaseFactory(
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
-                Logger, new TestScopeContextAdapter(),
+                Logger, new TestUmbracoDatabaseAccessor(),
                 Mock.Of<IMappingResolver>());
             dbFactory.ResetForTests();
             var applicationContext = new ApplicationContext(
