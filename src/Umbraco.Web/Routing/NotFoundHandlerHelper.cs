@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
             IContentErrorPage[] error404Collection,
             string requestServerName,
             IEntityService entityService,
-            ITypedPublishedContentQuery publishedContentQuery,
+            IPublishedContentQuery publishedContentQuery,
             IDomainService domainService)
         {
             throw new NotImplementedException();
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
         internal static int? GetCurrentNotFoundPageId(
             IContentErrorPage[] error404Collection, 
             IEntityService entityService,
-            ITypedPublishedContentQuery publishedContentQuery,
+            IPublishedContentQuery publishedContentQuery,
             CultureInfo errorCulture)
         {
             if (error404Collection.Length > 1)
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <returns></returns>
-        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, ITypedPublishedContentQuery publishedContentQuery)
+        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
         {
             if (errorPage.HasContentId) return errorPage.ContentId;
 
@@ -97,10 +97,10 @@ namespace Umbraco.Web.Routing
                             var ent = entityService.Get(nodeid);
                             return ent.Path.Split(',').Reverse();
                         },
-                        publishedContentExists: i => publishedContentQuery.TypedContent(i) != null);
+                        publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
                     //now we'll try to execute the expression
-                    var nodeResult = publishedContentQuery.TypedContentSingleAtXPath(xpathResult);
+                    var nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
                     if (nodeResult != null)
                         return nodeResult.Id;
                 }

@@ -146,7 +146,7 @@ namespace Umbraco.Tests
 
             var helper = new UmbracoHelper(umbCtx,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<ITypedPublishedContentQuery>(),
+                Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<IDataTypeService>(),
                 new UrlProvider(umbCtx, new[] {Mock.Of<IUrlProvider>()}, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
@@ -182,7 +182,7 @@ namespace Umbraco.Tests
 
             var helper = new UmbracoHelper(umbCtx,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<ITypedPublishedContentQuery>(),
+                Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<IDataTypeService>(),
                 new UrlProvider(umbCtx, new[]

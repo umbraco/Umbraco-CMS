@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Web.Mvc
             var helper = new UmbracoHelper(
                 umbCtx,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<ITypedPublishedContentQuery>(query => query.TypedContent(It.IsAny<int>()) ==
+                Mock.Of<IPublishedContentQuery>(query => query.Content(It.IsAny<int>()) ==
                     //return mock of IPublishedContent for any call to GetById
                     Mock.Of<IPublishedContent>(content => content.Id == 2)),
                 Mock.Of<ITagQuery>(),
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             public ActionResult GetContent(int id)
             {
-                var content = Umbraco.TypedContent(id);
+                var content = Umbraco.Content(id);
 
                 return new PublishedContentResult(content);
             }

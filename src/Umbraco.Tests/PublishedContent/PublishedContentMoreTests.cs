@@ -188,7 +188,7 @@ namespace Umbraco.Tests.PublishedContent
         public void PublishedContentQueryTypedContentList()
         {
             var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
-            var result = query.TypedContent(new[] { 1, 2, 4 }).ToArray();
+            var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);
             Assert.AreEqual(2, result[1].Id);

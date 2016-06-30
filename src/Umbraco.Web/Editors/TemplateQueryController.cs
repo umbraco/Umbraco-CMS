@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
             
             timer.Start();
 
-            var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
+            var currentPage = umbraco.ContentAtRoot().FirstOrDefault();
             timer.Stop();
 
 
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
             // adjust the "FROM"
             if (model != null && model.Source.Id > 0)
             {
-                var targetNode = umbraco.TypedContent(model.Source.Id);
+                var targetNode = umbraco.Content(model.Source.Id);
 
                 if (targetNode != null)
                 {

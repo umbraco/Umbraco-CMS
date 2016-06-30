@@ -171,7 +171,7 @@ namespace Umbraco.Web.Editors
 
 
             var q = ParseXPathQuery(query, nodeContextId);
-            var node = Umbraco.TypedContentSingleAtXPath(q);
+            var node = Umbraco.ContentSingleAtXPath(q);
 
             if (node == null)
                 return null;
@@ -190,7 +190,7 @@ namespace Umbraco.Web.Editors
                     var ent = Services.EntityService.Get(nodeid);
                     return ent.Path.Split(',').Reverse();
                 },
-                publishedContentExists: i => Umbraco.TypedContent(i) != null);
+                publishedContentExists: i => Umbraco.Content(i) != null);
         }
 
         public EntityBasic GetById(int id, UmbracoEntityTypes type)

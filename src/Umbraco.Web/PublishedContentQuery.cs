@@ -4,7 +4,6 @@ using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 
@@ -13,9 +12,9 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : ITypedPublishedContentQuery
+    public class PublishedContentQuery : IPublishedContentQuery
     {
-        private readonly ITypedPublishedContentQuery _typedContentQuery;
+        private readonly IPublishedContentQuery _query;
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
 
@@ -35,80 +34,80 @@ namespace Umbraco.Web
         /// <summary>
         /// Constructor used to wrap the ITypedPublishedContentQuery object passed in
         /// </summary>
-        /// <param name="typedContentQuery"></param>
-        public PublishedContentQuery(ITypedPublishedContentQuery typedContentQuery)
+        /// <param name="query"></param>
+        public PublishedContentQuery(IPublishedContentQuery query)
         {
-            if (typedContentQuery == null) throw new ArgumentNullException(nameof(typedContentQuery));
-            _typedContentQuery = typedContentQuery;
+            if (query == null) throw new ArgumentNullException(nameof(query));
+            _query = query;
         }
 
         #region Content
 
-        public IPublishedContent TypedContent(int id)
+        public IPublishedContent Content(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _contentCache)
-                : _typedContentQuery.TypedContent(id);
+            return _query == null
+                ? ItemById(id, _contentCache)
+                : _query.Content(id);
         }
 
-        public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentSingleAtXPath(xpath, vars);
+            return _query == null
+                ? ItemByXPath(xpath, vars, _contentCache)
+                : _query.ContentSingleAtXPath(xpath, vars);
         }
         
-        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_contentCache, ids)
-                : _typedContentQuery.TypedContent(ids);
+            return _query == null
+                ? ItemsByIds(_contentCache, ids)
+                : _query.Content(ids);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
+        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return _query == null
+                ? ItemsByXPath(xpath, vars, _contentCache)
+                : _query.ContentAtXPath(xpath, vars);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
+        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return _query == null
+                ? ItemsByXPath(xpath, vars, _contentCache)
+                : _query.ContentAtXPath(xpath, vars);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtRoot()
+        public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_contentCache)
-                : _typedContentQuery.TypedContentAtRoot();
+            return _query == null
+                ? ItemsAtRoot(_contentCache)
+                : _query.ContentAtRoot();
         }
 
         #endregion
 
         #region Media
         
-        public IPublishedContent TypedMedia(int id)
+        public IPublishedContent Media(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _mediaCache)
-                : _typedContentQuery.TypedMedia(id);
+            return _query == null
+                ? ItemById(id, _mediaCache)
+                : _query.Media(id);
         }
         
-        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_mediaCache, ids)
-                : _typedContentQuery.TypedMedia(ids);
+            return _query == null
+                ? ItemsByIds(_mediaCache, ids)
+                : _query.Media(ids);
         }
 
-        public IEnumerable<IPublishedContent> TypedMediaAtRoot()
+        public IEnumerable<IPublishedContent> MediaAtRoot()
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_mediaCache)
-                : _typedContentQuery.TypedMediaAtRoot();
+            return _query == null
+                ? ItemsAtRoot(_mediaCache)
+                : _query.MediaAtRoot();
         }
 
 
@@ -116,43 +115,43 @@ namespace Umbraco.Web
 
         #region Used by Content/Media
 
-        private IPublishedContent TypedDocumentById(int id, IPublishedCache cache)
+        private static IPublishedContent ItemById(int id, IPublishedCache cache)
         {
             var doc = cache.GetById(id);
             return doc;
         }
 
-        private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, IPublishedContentCache cache)
+        private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
             return doc;
         }
 
         //NOTE: Not used?
-        //private IPublishedContent TypedDocumentByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedContentCache cache)
+        //private IPublishedContent ItemByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
         //{
         //    var doc = cache.GetSingleByXPath(xpath, vars);
         //    return doc;
         //}        
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByIds(IPublishedCache cache, IEnumerable<int> ids)
+        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
         {
-            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+            return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, IPublishedContentCache cache)
-        {
-            var doc = cache.GetByXPath(xpath, vars);
-            return doc;
-        }
-
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedContentCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
         {
             var doc = cache.GetByXPath(xpath, vars);
             return doc;
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(IPublishedCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
+        {
+            var doc = cache.GetByXPath(xpath, vars);
+            return doc;
+        }
+
+        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache)
         {
             return cache.GetAtRoot();
         }
@@ -168,9 +167,9 @@ namespace Umbraco.Web
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<IPublishedContent> Search(string term, bool useWildCards = true, string searchProvider = null)
         {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(term, useWildCards, searchProvider);
+            if (_query != null) return _query.Search(term, useWildCards, searchProvider);
 
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (string.IsNullOrEmpty(searchProvider) == false)
@@ -186,9 +185,9 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<IPublishedContent> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(criteria, searchProvider);
+            if (_query != null) return _query.Search(criteria, searchProvider);
 
             var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (searchProvider != null)
