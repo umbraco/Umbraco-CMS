@@ -368,38 +368,34 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    }
 
    $scope.delete = function () {
-      applySelected(
-             function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-             function (count, total) {
-                 var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
-                 localizationService.localize(key, [count, total]).then(function (value) {
-                     return value;
-                 });
-             },
-             function (total) {
-                 var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
-                 localizationService.localize(key, [total]).then(function (value) {
-                     return value;
-                 });
-             },
-             localizationService.localize("defaultdialogs_confirmdelete") + "?");
+       var confirmDeleteText = '';
+       localizationService.localize("defaultdialogs_confirmdelete").then(function (value) {
+           confirmDeleteText = value;
+           applySelected(
+                function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+                function (count, total) {
+                    var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
+                    return localizationService.localize(key, [count, total]);
+                },
+                function (total) {
+                    var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
+                    return localizationService.localize(key, [total]);
+                },
+                confirmDeleteText + "?");
+       });
    };
 
-   $scope.publish = function () {        
-      applySelected(
-             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-             function (count, total) {
-                var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
-                localizationService.localize(key, [count, total]).then(function (value) {
-                    return value;
+   $scope.publish = function () {
+        applySelected(
+                function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
+                function (count, total) {
+                    var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
+                    return localizationService.localize(key, [count, total]);
+                },
+                function (total) {
+                    var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
+                    return localizationService.localize(key, [total]);
                 });
-             },
-             function (total) {
-                var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
-                localizationService.localize(key, [total]).then(function (value) {
-                    return value;
-                });
-             });
    };
 
    $scope.unpublish = function () {
@@ -407,15 +403,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
              function (count, total) {
                  var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
-                 localizationService.localize(key, [count, total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [count, total]);
              },
              function (total) {
                  var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
-                 localizationService.localize(key, [total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [total]);
              });
    };
 
@@ -450,15 +442,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              function (selected, index) { return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) }); },
              function (count, total) {
                  var key = (total === 1 ? "bulk_movedItemOfItem" : "bulk_movedItemOfItems");
-                 localizationService.localize(key, [count, total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [count, total]);
              },
              function (total) {
                  var key = (total === 1 ? "bulk_movedItem" : "bulk_movedItems");
-                 localizationService.localize(key, [total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [total]);
              });
    }
 
@@ -491,15 +479,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
              function (count, total) {
                  var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
-                 localizationService.localize(key, [count, total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [count, total]);
              },
              function (total) {
                  var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
-                 localizationService.localize(key, [total]).then(function (value) {
-                     return value;
-                 });
+                 return localizationService.localize(key, [total]);
              });
    }
 
