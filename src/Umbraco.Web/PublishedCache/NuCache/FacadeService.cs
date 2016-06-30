@@ -8,6 +8,7 @@ using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -21,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
@@ -206,6 +208,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             public bool FacadeCacheIsApplicationRequestCache;
 
             public bool IgnoreLocalDb;
+        }
+
+        #endregion
+
+        #region Environment
+
+        public override bool EnsureEnvironment(out IEnumerable<string> errors)
+        {
+            // must have app_data and be able to write files into it
+            var ok = FilePermissionHelper.TryCreateDirectory(SystemDirectories.Data);
+            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local DB files." };
+            return ok;
         }
 
         #endregion

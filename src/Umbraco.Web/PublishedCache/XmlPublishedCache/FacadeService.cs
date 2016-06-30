@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
@@ -80,7 +81,29 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #endregion
 
-        #region PublishedCachesService Caches
+        #region Environment
+
+        public override bool EnsureEnvironment(out IEnumerable<string> errors)
+        {
+            // Test creating/saving/deleting a file in the same location as the content xml file
+            // NOTE: We cannot modify the xml file directly because a background thread is responsible for
+            // that and we might get lock issues.
+            try
+            {
+                XmlStore.EnsureFilePermission();
+                errors = Enumerable.Empty<string>();
+                return true;
+            }
+            catch
+            {
+                errors = new[] { SystemFiles.ContentCacheXml };
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Caches
 
         public override IFacade CreateFacade(string previewToken)
         {
@@ -100,7 +123,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #endregion
 
-        #region PublishedCachesService Preview
+        #region Preview
 
         public override string EnterPreview(IUser user, int contentId)
         {

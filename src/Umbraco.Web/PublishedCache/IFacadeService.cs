@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -43,6 +44,13 @@ namespace Umbraco.Web.PublishedCache
         /// Gets the facade accessor.
         /// </summary>
         IFacadeAccessor FacadeAccessor { get; }
+
+        /// <summary>
+        /// Ensures that the facade has the proper environment to run.
+        /// </summary>
+        /// <param name="errors">The errors, if any.</param>
+        /// <returns>A value indicating whether the facade has the proper environment to run.</returns>
+        bool EnsureEnvironment(out IEnumerable<string> errors);
 
         #endregion
 

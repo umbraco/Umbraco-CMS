@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -20,6 +21,8 @@ namespace Umbraco.Web.PublishedCache
         public abstract IFacade CreateFacade(string previewToken);
 
         protected IFacade CurrentFacade => FacadeAccessor.Facade;
+
+        public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
 
         public abstract IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
