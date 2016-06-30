@@ -259,7 +259,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #endregion
 
-        public int Prop1 => this.GetPropertyValue<int>("prop1");
+        public int Prop1 => this.Value<int>("prop1");
     }
 
     [PublishedContentModel("ContentType2Sub")]
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int StrongValue => this.GetPropertyValue<int>("strongValue");
+        public int StrongValue => this.Value<int>("strongValue");
     }
 
     class PublishedContentStrong1Sub : PublishedContentStrong1
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int AnotherValue => this.GetPropertyValue<int>("anotherValue");
+        public int AnotherValue => this.Value<int>("anotherValue");
     }
 
     class PublishedContentStrong2 : PublishedContentModel
@@ -298,7 +298,7 @@ namespace Umbraco.Tests.PublishedContent
             : base(content)
         { }
 
-        public int StrongValue => this.GetPropertyValue<int>("strongValue");
+        public int StrongValue => this.Value<int>("strongValue");
     }
 
     class AutoPublishedContentType : PublishedContentType

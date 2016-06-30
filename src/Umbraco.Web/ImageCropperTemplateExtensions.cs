@@ -123,7 +123,7 @@ namespace Umbraco.Web
                 return string.Empty;
             
             //get the default obj from the value converter
-            var cropperValue = mediaItem.GetPropertyValue(propertyAlias);
+            var cropperValue = mediaItem.Value(propertyAlias);
 
             //is it strongly typed?
             var stronglyTyped = cropperValue as ImageCropDataSet;

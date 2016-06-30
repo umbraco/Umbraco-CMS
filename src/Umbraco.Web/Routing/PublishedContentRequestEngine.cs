@@ -485,7 +485,7 @@ namespace Umbraco.Web.Routing
 				throw new InvalidOperationException("There is no PublishedContent.");
 
 			var redirect = false;
-			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
+			var internalRedirect = _pcr.PublishedContent.Value<string>(Constants.Conventions.Content.InternalRedirectId);
 
 		    if (string.IsNullOrWhiteSpace(internalRedirect))
                 return false;
@@ -685,7 +685,7 @@ namespace Umbraco.Web.Routing
 		{
 		    if (_pcr.HasPublishedContent == false) return;
 
-		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
+		    var redirectId = _pcr.PublishedContent.Value(Constants.Conventions.Content.Redirect, -1);
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
 				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 
@@ -48,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias);
+            return Content.Value<T>(propertyTypeAlias);
         }
 
         protected T Resolve<T>(MethodBase methodBase, T ifCannotConvert)
@@ -59,7 +58,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, T ifCannotConvert)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
+            return Content.Value<T>(propertyTypeAlias, false, ifCannotConvert);
         }
 
         protected T Resolve<T>(MethodBase methodBase, bool recursive, T ifCannotConvert)
@@ -70,7 +69,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, bool recursive, T ifCannotConvert)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
+            return Content.Value<T>(propertyTypeAlias, recursive, ifCannotConvert);
         }
         #endregion
 

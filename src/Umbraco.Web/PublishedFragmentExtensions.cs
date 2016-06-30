@@ -75,7 +75,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region GetPropertyValue
+        #region Value
 
         /// <summary>
         /// Gets the value of a content's property identified by its alias.
@@ -89,7 +89,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias)
+        public static object Value(this IPublishedFragment content, string alias)
         {
             var property = content.GetProperty(alias);
             return property?.Value;
@@ -108,7 +108,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias, string defaultValue)
+        public static object Value(this IPublishedFragment content, string alias, string defaultValue)
         {
             var property = content.GetProperty(alias);
             return property == null || property.HasValue == false ? defaultValue : property.Value;
@@ -127,7 +127,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object GetPropertyValue(this IPublishedFragment content, string alias, object defaultValue)
+        public static object Value(this IPublishedFragment content, string alias, object defaultValue)
         {
             var property = content.GetProperty(alias);
             return property == null || property.HasValue == false ? defaultValue : property.Value;
@@ -135,7 +135,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region GetPropertyValue<T>
+        #region Value<T>
 
         /// <summary>
         /// Gets the value of a content's property identified by its alias, converted to a specified type.
@@ -150,9 +150,9 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedFragment content, string alias)
+        public static T Value<T>(this IPublishedFragment content, string alias)
         {
-            return content.GetPropertyValue(alias, false, default(T));
+            return content.Value(alias, false, default(T));
         }
 
         /// <summary>
@@ -169,18 +169,36 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedFragment content, string alias, T defaultValue)
+        public static T Value<T>(this IPublishedFragment content, string alias, T defaultValue)
         {
-            return content.GetPropertyValue(alias, true, defaultValue);
+            return content.Value(alias, true, defaultValue);
         }
 
-        internal static T GetPropertyValue<T>(this IPublishedFragment content, string alias, bool withDefaultValue, T defaultValue)
+        internal static T Value<T>(this IPublishedFragment content, string alias, bool withDefaultValue, T defaultValue)
         {
             var property = content.GetProperty(alias);
             if (property == null) return defaultValue;
 
-            return property.GetValue(withDefaultValue, defaultValue);
+            return property.Value(withDefaultValue, defaultValue);
         }
+
+        #endregion
+
+        #region Value
+
+        // trying to reproduce Umbraco.Field so we can get rid of it
+        //
+        // what we want:
+        // - alt aliases
+        // - recursion
+        // - default value
+        // - before & after (if value)
+        //
+        // convertLineBreaks: should be an extension string.ConvertLineBreaks()
+        // stripParagraphs: should be an extension string.StripParagraphs()
+        // format: should use the standard .ToString(format)
+        //
+        // see UmbracoComponentRenderer.Field - which is ugly ;-(
 
         #endregion
 

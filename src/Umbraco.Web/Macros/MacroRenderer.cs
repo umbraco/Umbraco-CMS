@@ -553,7 +553,7 @@ namespace Umbraco.Web.Macros
             {
                 var content = cache.GetById(int.Parse(splitpath[i]));
                 if (content == null) continue;
-                value = content.GetPropertyValue(name)?.ToString();
+                value = content.Value(name)?.ToString();
                 if (string.IsNullOrEmpty(value) == false) break;
             }
 

@@ -10,19 +10,19 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedPropertyExtension
     {
-        #region GetValue<T>
+        #region Value<T>
 
-        public static T GetValue<T>(this IPublishedProperty property)
+        public static T Value<T>(this IPublishedProperty property)
         {
-            return property.GetValue(false, default(T));
+            return property.Value(false, default(T));
         }
 
-        public static T GetValue<T>(this IPublishedProperty property, T defaultValue)
+        public static T Value<T>(this IPublishedProperty property, T defaultValue)
         {
-            return property.GetValue(true, defaultValue);
+            return property.Value(true, defaultValue);
         }
 
-        internal static T GetValue<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue)
+        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue)
         {
             if (property.HasValue == false && withDefaultValue) return defaultValue;
 

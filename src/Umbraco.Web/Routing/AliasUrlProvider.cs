@@ -58,7 +58,7 @@ namespace Umbraco.Web.Routing
             var node = umbracoContext.ContentCache.GetById(id);
             string umbracoUrlName = null;
             if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
-                umbracoUrlName = node.GetPropertyValue<string>(Constants.Conventions.Content.UrlAlias);
+                umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 

@@ -151,7 +151,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Position()
         {
             var items = UmbracoContext.Current.ContentCache.GetAtRoot()
-                .Where(x => x.GetPropertyValue<int>("prop1") == 1234)
+                .Where(x => x.Value<int>("prop1") == 1234)
                 .ToIndexedArray();
 
             Assert.IsTrue(items.First().IsFirst());

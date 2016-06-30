@@ -118,7 +118,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region GetPropertyValue
+        #region Value
 
         /// <summary>
         /// Recursively gets the value of a content's property identified by its alias.
@@ -134,7 +134,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object GetPropertyValue(this IPublishedContent content, string alias, bool recurse)
+        public static object Value(this IPublishedContent content, string alias, bool recurse)
         {
             var property = content.GetProperty(alias, recurse);
             return property?.Value;
@@ -155,7 +155,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object GetPropertyValue(this IPublishedContent content, string alias, bool recurse, object defaultValue)
+        public static object Value(this IPublishedContent content, string alias, bool recurse, object defaultValue)
         {
             var property = content.GetProperty(alias, recurse);
             return property == null || property.HasValue == false ? defaultValue : property.Value;
@@ -163,7 +163,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region GetPropertyValue<T>
+        #region Value<T>
 
         /// <summary>
         /// Recursively gets the value of a content's property identified by its alias, converted to a specified type.
@@ -180,9 +180,9 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedContent content, string alias, bool recurse)
+        public static T Value<T>(this IPublishedContent content, string alias, bool recurse)
         {
-            return content.GetPropertyValue(alias, recurse, false, default(T));
+            return content.Value(alias, recurse, false, default(T));
         }
 
         /// <summary>
@@ -201,17 +201,17 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T GetPropertyValue<T>(this IPublishedContent content, string alias, bool recurse, T defaultValue)
+        public static T Value<T>(this IPublishedContent content, string alias, bool recurse, T defaultValue)
         {
-            return content.GetPropertyValue(alias, recurse, true, defaultValue);
+            return content.Value(alias, recurse, true, defaultValue);
         }
 
-        internal static T GetPropertyValue<T>(this IPublishedContent content, string alias, bool recurse, bool withDefaultValue, T defaultValue)
+        internal static T Value<T>(this IPublishedContent content, string alias, bool recurse, bool withDefaultValue, T defaultValue)
         {
             var property = content.GetProperty(alias, recurse);
             if (property == null) return defaultValue;
 
-            return property.GetValue(withDefaultValue, defaultValue);
+            return property.Value(withDefaultValue, defaultValue);
 		}
 
 		#endregion
@@ -283,7 +283,7 @@ namespace Umbraco.Web
 
             // rely on the property converter - will return default bool value, ie false, if property
             // is not defined, or has no value, else will return its value.
-            return content.GetPropertyValue<bool>(Constants.Conventions.Content.NaviHide) == false;
+            return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
         }
 
         /// <summary>

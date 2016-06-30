@@ -48,7 +48,7 @@ namespace Umbraco.Web.Media
                     else
                     {
                         var p = UmbracoContext.Current.ContentCache.GetById(nodeId.GetValueOrDefault());
-                        var v = p.GetPropertyValue(field);
+                        var v = p.Value(field);
                         fieldValue = v == null ? string.Empty : v.ToString();
                     }
                 }

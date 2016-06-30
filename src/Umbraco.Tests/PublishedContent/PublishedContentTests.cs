@@ -292,8 +292,8 @@ namespace Umbraco.Tests.PublishedContent
         public void GetPropertyValueRecursiveTest()
         {
             var doc = GetNode(1174);
-            var rVal = doc.GetPropertyValue("testRecursive", true);
-            var nullVal = doc.GetPropertyValue("DoNotFindThis", true);
+            var rVal = doc.Value("testRecursive", true);
+            var nullVal = doc.Value("DoNotFindThis", true);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }
@@ -303,15 +303,15 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var propVal = doc.GetPropertyValue("content");
+			var propVal = doc.Value("content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal);
 			Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-			var propVal2 = doc.GetPropertyValue<IHtmlString>("content");
+			var propVal2 = doc.Value<IHtmlString>("content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
-            var propVal3 = doc.GetPropertyValue("Content");
+            var propVal3 = doc.Value("Content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
 		}
@@ -324,7 +324,7 @@ namespace Umbraco.Tests.PublishedContent
 			var result = doc.Ancestors().OrderBy(x => x.Level)
 				.Single()
 				.Descendants()
-				.FirstOrDefault(x => x.GetPropertyValue<string>("selectedNodes", "").Split(',').Contains("1173"));
+				.FirstOrDefault(x => x.Value<string>("selectedNodes", "").Split(',').Contains("1173"));
 
 			Assert.IsNotNull(result);
 		}
@@ -581,11 +581,11 @@ namespace Umbraco.Tests.PublishedContent
 	        { }
 
 
-            public string Legend => this.GetPropertyValue<string>("legend");
+            public string Legend => this.Value<string>("legend");
 
-	        public IPublishedContent Image => this.GetPropertyValue<IPublishedContent>("image");
+	        public IPublishedContent Image => this.Value<IPublishedContent>("image");
 
-	        public int Size => this.GetPropertyValue<int>("size");
+	        public int Size => this.Value<int>("size");
 	    }
     }
 }

@@ -171,6 +171,7 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
+    <Compile Include="IUmbracoComponentRendererWithField.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
