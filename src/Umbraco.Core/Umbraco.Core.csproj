@@ -220,9 +220,6 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="Dynamics\CaseInsensitiveDynamicObject.cs" />
-    <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
-    <Compile Include="Dynamics\DynamicXmlConverter.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
@@ -261,6 +258,8 @@
     </Compile>
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
+    <Compile Include="Models\PublishedContent\PropertyResult.cs" />
+    <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
@@ -1040,16 +1039,6 @@
     <Compile Include="PropertyEditors\PropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
-    <Compile Include="Dynamics\ClassFactory.cs" />
-    <Compile Include="Dynamics\DynamicClass.cs" />
-    <Compile Include="Dynamics\DynamicDictionary.cs" />
-    <Compile Include="Dynamics\DynamicNull.cs" />
-    <Compile Include="Dynamics\DynamicOrdering.cs" />
-    <Compile Include="Dynamics\DynamicProperty.cs" />
-    <Compile Include="Dynamics\DynamicQueryableGetMemberBinder.cs" />
-    <Compile Include="Dynamics\DynamicXml.cs" />
-    <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
-    <Compile Include="Dynamics\PropertyResultType.cs" />
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
@@ -1117,10 +1106,6 @@
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
-    <Compile Include="Dynamics\ParseException.cs" />
-    <Compile Include="Dynamics\PropertyResult.cs" />
-    <Compile Include="Dynamics\Res.cs" />
-    <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
     <Compile Include="Cache\CacheRefreshersResolver.cs" />
@@ -1147,7 +1132,6 @@
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Services\PublishStatus.cs" />
     <Compile Include="Services\PublishStatusType.cs" />
-    <Compile Include="Dynamics\QueryableExtensions.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />

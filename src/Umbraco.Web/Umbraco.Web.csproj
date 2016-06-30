@@ -169,7 +169,6 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="DependencyInjection\WebModelMappersCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
-    <Compile Include="IDynamicPublishedContentQuery.cs" />
     <Compile Include="ITypedPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
@@ -525,7 +524,6 @@
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
-    <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
@@ -805,14 +803,6 @@
     <Compile Include="Models\ContentEditing\ContentPropertyBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDto.cs" />
-    <Compile Include="Dynamics\DynamicExpression.cs" />
-    <Compile Include="Dynamics\DynamicGrouping.cs" />
-    <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
-    <Compile Include="Dynamics\DynamicPublishedContentListOrdering.cs" />
-    <Compile Include="Dynamics\DynamicQueryable.cs" />
-    <Compile Include="Dynamics\ExpressionParser.cs" />
-    <Compile Include="Dynamics\ExtensionMethods.cs" />
-    <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
@@ -824,12 +814,9 @@
     <Compile Include="Media\ImageUrl.cs" />
     <Compile Include="Media\ImageUrlProviderResolver.cs" />
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
-    <Compile Include="Models\DynamicPublishedContent.cs" />
-    <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="IPublishedContentCacheExtensions.cs" />
     <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
@@ -1086,7 +1073,6 @@
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RenderViewEngine.cs" />
-    <Compile Include="Mvc\UmbracoTemplatePage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\UmbracoRequestEventArgs.cs" />

@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -16,10 +13,9 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : ITypedPublishedContentQuery, IDynamicPublishedContentQuery
+    public class PublishedContentQuery : ITypedPublishedContentQuery
     {
         private readonly ITypedPublishedContentQuery _typedContentQuery;
-        private readonly IDynamicPublishedContentQuery _dynamicContentQuery;
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
 
@@ -37,16 +33,13 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Constructor used to wrap the ITypedPublishedContentQuery and IDynamicPublishedContentQuery objects passed in
+        /// Constructor used to wrap the ITypedPublishedContentQuery object passed in
         /// </summary>
         /// <param name="typedContentQuery"></param>
-        /// <param name="dynamicContentQuery"></param>
-        public PublishedContentQuery(ITypedPublishedContentQuery typedContentQuery, IDynamicPublishedContentQuery dynamicContentQuery)
+        public PublishedContentQuery(ITypedPublishedContentQuery typedContentQuery)
         {
             if (typedContentQuery == null) throw new ArgumentNullException(nameof(typedContentQuery));
-            if (dynamicContentQuery == null) throw new ArgumentNullException(nameof(dynamicContentQuery));
             _typedContentQuery = typedContentQuery;
-            _dynamicContentQuery = dynamicContentQuery;
         }
 
         #region Content
@@ -93,55 +86,6 @@ namespace Umbraco.Web
                 : _typedContentQuery.TypedContentAtRoot();
         }
 
-        public dynamic Content(int id)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.Content(id);
-        }
-        
-        public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-        
-        public dynamic Content(IEnumerable<int> ids)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_contentCache, ids.ToArray())
-                : _dynamicContentQuery.Content(ids);
-        }
-
-        public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtRoot()
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_contentCache)
-                : _dynamicContentQuery.ContentAtRoot();
-        }
-
         #endregion
 
         #region Media
@@ -167,26 +111,6 @@ namespace Umbraco.Web
                 : _typedContentQuery.TypedMediaAtRoot();
         }
 
-        public dynamic Media(int id)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _mediaCache, DynamicNull.Null)
-                : _dynamicContentQuery.Media(id);
-        }
-        
-        public dynamic Media(IEnumerable<int> ids)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_mediaCache, ids)
-                : _dynamicContentQuery.Media(ids);
-        }
-
-        public dynamic MediaAtRoot()
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_mediaCache)
-                : _dynamicContentQuery.MediaAtRoot();
-        }
 
         #endregion
 
@@ -233,95 +157,9 @@ namespace Umbraco.Web
             return cache.GetAtRoot();
         }
 
-        private dynamic DocumentById(int id, IPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetById(id);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByIds(IPublishedCache cache, IEnumerable<int> ids)
-        {
-            var dNull = DynamicNull.Null;
-            var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-                           .Where(x => TypeHelper.IsTypeAssignableFrom<DynamicNull>(x) == false)
-                           .Cast<DynamicPublishedContent>();
-            return new DynamicPublishedContentList(nodes);
-        }
-
-        private dynamic DocumentsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
-        }
-
-        private dynamic DocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
-        }
-
-        private dynamic DocumentsAtRoot(IPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetAtRoot()
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
-        }
-
         #endregion
 
         #region Search
-
-        /// <summary>
-        /// Searches content
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
-        {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(term, useWildCards, searchProvider))
-                : _dynamicContentQuery.Search(term, useWildCards, searchProvider);
-        }
-
-        /// <summary>
-        /// Searhes content
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(criteria, searchProvider))
-                : _dynamicContentQuery.Search(criteria, searchProvider);
-        }
 
         /// <summary>
         /// Searches content

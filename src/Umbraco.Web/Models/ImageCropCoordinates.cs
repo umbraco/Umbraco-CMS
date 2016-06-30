@@ -1,11 +1,10 @@
 using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropCoordinates")]
-    public class ImageCropCoordinates : CaseInsensitiveDynamicObject<ImageCropCoordinates>, IEquatable<ImageCropCoordinates>
+    public class ImageCropCoordinates : IEquatable<ImageCropCoordinates>
     {
         [DataMember(Name = "x1")]
         public decimal X1 { get; set; }
@@ -44,7 +43,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ImageCropCoordinates) obj);
         }
 
@@ -73,7 +72,7 @@ namespace Umbraco.Web.Models
 
         public static bool operator !=(ImageCropCoordinates left, ImageCropCoordinates right)
         {
-            return !Equals(left, right);
+            return Equals(left, right) == false;
         }
     }
 }

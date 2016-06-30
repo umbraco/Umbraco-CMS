@@ -8,7 +8,6 @@ using Umbraco.Web.WebApi;
 using System;
 using System.Diagnostics;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Dynamics;
 using Umbraco.Web.Models.TemplateQuery;
 
 namespace Umbraco.Web.Editors
@@ -159,7 +158,9 @@ namespace Umbraco.Web.Editors
 
                     //clause = "Visible && " + clause;
 
-                    contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
+                    // fixme - that cannot work anymore now that we have killed dynamic support
+                    //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
+
                     // contents = contents.Where(clause, values.ToArray());
                     contents = contents.Where(x => x.IsVisible());
 

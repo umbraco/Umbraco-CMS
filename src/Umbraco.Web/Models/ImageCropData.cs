@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropData")]
-    public class ImageCropData : CaseInsensitiveDynamicObject<ImageCropData>, IEquatable<ImageCropData>
+    public class ImageCropData : IEquatable<ImageCropData>
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
@@ -45,7 +43,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ImageCropData) obj);
         }
 
@@ -59,10 +57,10 @@ namespace Umbraco.Web.Models
         {
             unchecked
             {
-                var hashCode = (Alias != null ? Alias.GetHashCode() : 0);
+                var hashCode = Alias?.GetHashCode() ?? 0;
                 hashCode = (hashCode*397) ^ Width;
                 hashCode = (hashCode*397) ^ Height;
-                hashCode = (hashCode*397) ^ (Coordinates != null ? Coordinates.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Coordinates?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }
@@ -74,7 +72,7 @@ namespace Umbraco.Web.Models
 
         public static bool operator !=(ImageCropData left, ImageCropData right)
         {
-            return !Equals(left, right);
+            return Equals(left, right) == false;
         }
     }
 

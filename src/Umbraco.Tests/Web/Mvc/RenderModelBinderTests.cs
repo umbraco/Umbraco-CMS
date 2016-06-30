@@ -35,8 +35,6 @@ namespace Umbraco.Tests.Web.Mvc
             Assert.IsNotNull(found);            
             found = binder.GetBinder(typeof(RenderModel));
             Assert.IsNotNull(found);
-            found = binder.GetBinder(typeof(DynamicPublishedContent));
-            Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(MyContent));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(RenderModel<MyContent>));

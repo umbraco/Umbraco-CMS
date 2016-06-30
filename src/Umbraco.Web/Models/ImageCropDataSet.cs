@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
@@ -19,7 +14,7 @@ namespace Umbraco.Web.Models
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropDataSet>))]
     [TypeConverter(typeof(ImageCropDataSetConverter))]
     [DataContract(Name="imageCropDataSet")]
-    public class ImageCropDataSet : CaseInsensitiveDynamicObject<ImageCropDataSet>, IHtmlString, IEquatable<ImageCropDataSet>
+    public class ImageCropDataSet : IHtmlString, IEquatable<ImageCropDataSet>
     {   
 
         [DataMember(Name="src")]
@@ -81,7 +76,7 @@ namespace Umbraco.Web.Models
 
         public string ToHtmlString()
         {
-            return this.Src;
+            return Src;
         }
 
         /// <summary>
@@ -122,7 +117,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ImageCropDataSet) obj);
         }
 
@@ -136,9 +131,9 @@ namespace Umbraco.Web.Models
         {
             unchecked
             {
-                var hashCode = (Src != null ? Src.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (FocalPoint != null ? FocalPoint.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (Crops != null ? Crops.GetHashCode() : 0);
+                var hashCode = Src?.GetHashCode() ?? 0;
+                hashCode = (hashCode*397) ^ (FocalPoint?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (Crops?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }
@@ -150,7 +145,7 @@ namespace Umbraco.Web.Models
 
         public static bool operator !=(ImageCropDataSet left, ImageCropDataSet right)
         {
-            return !Equals(left, right);
+            return Equals(left, right) == false;
         }
     }
 }

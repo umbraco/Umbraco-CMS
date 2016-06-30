@@ -58,29 +58,36 @@ namespace Umbraco.Web
             return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
         }
 
-        internal string Join<TIgnore>(string seperator, params object[] args)
+        internal string Join(string separator, params object[] args)
         {
-            var results = args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)).ToList();
-            return string.Join(seperator, results);
+            var results = args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .Where(x => string.IsNullOrWhiteSpace(x) == false);
+            return string.Join(separator, results);
         }
 
-        internal string Concatenate<TIgnore>(params object[] args)
+        internal string Concatenate(params object[] args)
         {
-            var result = new StringBuilder();
-            foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
+            var sb = new StringBuilder();
+            foreach (var arg in args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .Where(x => string.IsNullOrWhiteSpace(x) == false))
             {
-                result.Append(sArg);
+                sb.Append(arg);
             }
-            return result.ToString();
+            return sb.ToString();
         }
 
-        internal string Coalesce<TIgnore>(params object[] args)
+        internal string Coalesce(params object[] args)
         {
-            foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
-            {
-                return sArg;
-            }
-            return string.Empty;
+            var arg = args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
+
+            return arg ?? string.Empty;
         }
 
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)

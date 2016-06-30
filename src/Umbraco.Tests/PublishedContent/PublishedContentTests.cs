@@ -124,7 +124,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children.Where("Visible").ToIndexedArray();
+            var items = doc.Children.Where(x => x.IsVisible()).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -334,7 +334,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1046);
 
-			var found1 = doc.Children.GroupBy("DocumentTypeAlias").ToArray();
+			var found1 = doc.Children.GroupBy(x => x.DocumentTypeAlias).ToArray();
 
 			Assert.AreEqual(2, found1.Length);
 			Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
@@ -346,8 +346,8 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1046);
 
-			var found1 = doc.Children.Where("DocumentTypeAlias == \"CustomDocument\"");
-			var found2 = doc.Children.Where("DocumentTypeAlias == \"Home\"");
+			var found1 = doc.Children.Where(x => x.DocumentTypeAlias == "CustomDocument");
+			var found2 = doc.Children.Where(x => x.DocumentTypeAlias == "Home");
 
 			Assert.AreEqual(1, found1.Count());
 			Assert.AreEqual(2, found2.Count());
@@ -358,7 +358,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var ordered = doc.Children.OrderBy("UpdateDate");
+			var ordered = doc.Children.OrderBy(x => x.UpdateDate);
 
 			var correctOrder = new[] { 1178, 1177, 1174, 1176 };
 			for (var i = 0; i < correctOrder.Length; i++)
@@ -419,7 +419,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1174);
 
-			var whereVisible = doc.Ancestors().Where("Visible");
+			var whereVisible = doc.Ancestors().Where(x => x.IsVisible());
 			Assert.AreEqual(1, whereVisible.Count());
 
 		}

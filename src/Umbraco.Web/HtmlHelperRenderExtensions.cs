@@ -9,7 +9,6 @@ using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -842,7 +841,7 @@ namespace Umbraco.Web
 		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
 		{
 			string innerText = null;
-			if (inner != null && inner.GetType() != typeof(DynamicNull))
+			if (inner != null)
 			{
 				innerText = string.Format("{0}", inner);
 			}
@@ -856,7 +855,7 @@ namespace Umbraco.Web
 		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner)
 		{
 			string innerText = null;
-			if (inner != null && inner.GetType() != typeof(DynamicNull))
+			if (inner != null)
 			{
 				innerText = string.Format("{0}", inner);
 			}

@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
 
         public virtual object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
-            return PublishedPropertyType.ConvertUsingDarkMagic(source);
+            return source;
         }
 
         public virtual object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)

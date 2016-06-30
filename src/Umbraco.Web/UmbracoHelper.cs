@@ -6,8 +6,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
@@ -16,7 +14,6 @@ using Umbraco.Web.Security;
 using System.Collections.Generic;
 using System.IO;
 using System.Web.Mvc;
-using System.Web.Routing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -30,10 +27,9 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
         private readonly ITypedPublishedContentQuery _typedQuery;
-        private readonly IDynamicPublishedContentQuery _dynamicQuery;       
         private readonly HtmlStringUtilities _stringUtilities = new HtmlStringUtilities();
 
-        private IUmbracoComponentRenderer _componentRenderer;        
+        private IUmbracoComponentRenderer _componentRenderer;
         private PublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
@@ -44,31 +40,17 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the tag context
         /// </summary>
-        public ITagQuery TagQuery
-        {
-            get
-            {
-                return _tag ??
-                       (_tag = new TagQuery(UmbracoContext.Application.Services.TagService,
-                           _typedQuery ?? ContentQuery));
-            }
-        }
+        public ITagQuery TagQuery => _tag ??
+            (_tag = new TagQuery(UmbracoContext.Application.Services.TagService,
+                _typedQuery ?? ContentQuery));
 
         /// <summary>
         /// Lazy instantiates the query context if not specified in the constructor
         /// </summary>
-        public PublishedContentQuery ContentQuery
-        {
-            get
-            {
-                //If the content query doesn't exist it will either be created with the ITypedPublishedContentQuery, IDynamicPublishedContentQuery
-                // used to construct this instance or with the content caches of the UmbracoContext
-                return _query ??
-                       (_query = _typedQuery != null
-                           ? new PublishedContentQuery(_typedQuery, _dynamicQuery)
-                           : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
-            }
-        }
+        public PublishedContentQuery ContentQuery => _query ??
+            (_query = _typedQuery != null
+                ? new PublishedContentQuery(_typedQuery)
+                : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
 
         /// <summary>
         /// Helper method to ensure an umbraco context is set when it is needed
@@ -88,34 +70,25 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the membership helper if not specified in the constructor
         /// </summary>
-        public MembershipHelper MembershipHelper
-        {
-            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
-        }
+        public MembershipHelper MembershipHelper => _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
 
         /// <summary>
         /// Lazy instantiates the UrlProvider if not specified in the constructor
         /// </summary>
-        public UrlProvider UrlProvider
-        {
-            get { return _urlProvider ?? (_urlProvider = UmbracoContext.UrlProvider); }
-        }
+        public UrlProvider UrlProvider => _urlProvider ??
+            (_urlProvider = UmbracoContext.UrlProvider);
 
         /// <summary>
         /// Lazy instantiates the IDataTypeService if not specified in the constructor
         /// </summary>
-        public IDataTypeService DataTypeService
-        {
-            get { return _dataTypeService ?? (_dataTypeService = UmbracoContext.Application.Services.DataTypeService); }
-        }
+        public IDataTypeService DataTypeService => _dataTypeService ??
+            (_dataTypeService = UmbracoContext.Application.Services.DataTypeService);
 
         /// <summary>
         /// Lazy instantiates the IUmbracoComponentRenderer if not specified in the constructor
         /// </summary>
-        public IUmbracoComponentRenderer UmbracoComponentRenderer
-        {
-            get { return _componentRenderer ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext)); }
-        }
+        public IUmbracoComponentRenderer UmbracoComponentRenderer => _componentRenderer ??
+            (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
 
         #region Constructors
         /// <summary>
@@ -143,7 +116,6 @@ namespace Umbraco.Web
         /// </remarks>
         public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
             ITypedPublishedContentQuery typedQuery,
-            IDynamicPublishedContentQuery dynamicQuery,
             ITagQuery tagQuery,
             IDataTypeService dataTypeService,
             UrlProvider urlProvider,
@@ -151,16 +123,15 @@ namespace Umbraco.Web
             IUmbracoComponentRenderer componentRenderer,
             MembershipHelper membershipHelper)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (content == null) throw new ArgumentNullException("content");
-            if (typedQuery == null) throw new ArgumentNullException("typedQuery");
-            if (dynamicQuery == null) throw new ArgumentNullException("dynamicQuery");
-            if (tagQuery == null) throw new ArgumentNullException("tagQuery");
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            if (urlProvider == null) throw new ArgumentNullException("urlProvider");
-            if (cultureDictionary == null) throw new ArgumentNullException("cultureDictionary");
-            if (componentRenderer == null) throw new ArgumentNullException("componentRenderer");
-            if (membershipHelper == null) throw new ArgumentNullException("membershipHelper");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (typedQuery == null) throw new ArgumentNullException(nameof(typedQuery));
+            if (tagQuery == null) throw new ArgumentNullException(nameof(tagQuery));
+            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
+            if (urlProvider == null) throw new ArgumentNullException(nameof(urlProvider));
+            if (cultureDictionary == null) throw new ArgumentNullException(nameof(cultureDictionary));
+            if (componentRenderer == null) throw new ArgumentNullException(nameof(componentRenderer));
+            if (membershipHelper == null) throw new ArgumentNullException(nameof(membershipHelper));
 
             _umbracoContext = umbracoContext;
             _tag = new TagQuery(tagQuery);
@@ -171,7 +142,6 @@ namespace Umbraco.Web
             _membershipHelper = membershipHelper;
             _currentPage = content;
             _typedQuery = typedQuery;
-            _dynamicQuery = dynamicQuery;
         }
 
         /// <summary>
@@ -182,7 +152,7 @@ namespace Umbraco.Web
         public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content)
             : this(umbracoContext)
         {
-            if (content == null) throw new ArgumentNullException("content");
+            if (content == null) throw new ArgumentNullException(nameof(content));
             _currentPage = content;
         }
 
@@ -192,7 +162,7 @@ namespace Umbraco.Web
         /// <param name="umbracoContext"></param>
         public UmbracoHelper(UmbracoContext umbracoContext)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
 
             _umbracoContext = umbracoContext;
@@ -210,7 +180,7 @@ namespace Umbraco.Web
         /// <remarks>
         /// Note that this is the assigned IPublishedContent item to the UmbracoHelper, this is not necessarily the Current IPublishedContent item
         /// being rendered. This IPublishedContent object is contextual to the current UmbracoHelper instance.
-        /// 
+        ///
         /// In some cases accessing this property will throw an exception if there is not IPublishedContent assigned to the Helper
         /// this will only ever happen if the Helper is constructed with an UmbracoContext and it is not a front-end request
         /// </remarks>
@@ -221,7 +191,7 @@ namespace Umbraco.Web
 	        {
 	            if (_currentPage == null)
                     throw new InvalidOperationException("Cannot return the " + typeof(IPublishedContent).Name + " because the " + typeof(UmbracoHelper).Name + " was constructed with an " + typeof(UmbracoContext).Name + " and the current request is not a front-end request.");
-                
+
                 return _currentPage;
 	        }
 	    }
@@ -293,15 +263,15 @@ namespace Umbraco.Web
         /// <param name="formatAsDateWithTimeSeparator"></param>
         //// <param name="formatString"></param>
 		/// <returns></returns>
-		public IHtmlString Field(string fieldAlias, 
+		public IHtmlString Field(string fieldAlias,
 			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
-            bool formatAsDate = false, 
+            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
+            bool formatAsDate = false,
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
-		{			
+		{
             return UmbracoComponentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
@@ -326,11 +296,11 @@ namespace Umbraco.Web
         /// <param name="formatAsDateWithTimeSeparator"></param>
 		//// <param name="formatString"></param>
 		/// <returns></returns>
-		public IHtmlString Field(IPublishedContent currentPage, string fieldAlias, 
+		public IHtmlString Field(IPublishedContent currentPage, string fieldAlias,
 			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
             bool formatAsDate =  false,
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
@@ -402,7 +372,7 @@ namespace Umbraco.Web
         /// Check if the current user has access to a document
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
-        /// <returns>True if the current user has access or if the current document isn't protected</returns>        
+        /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public bool MemberHasAccess(string path)
         {
             if (IsProtected(path))
@@ -433,7 +403,7 @@ namespace Umbraco.Web
 		public bool MemberIsLoggedOn()
 		{
             return MembershipHelper.IsLoggedIn();
-		} 
+		}
 
 		#endregion
 
@@ -473,7 +443,7 @@ namespace Umbraco.Web
 	    }
 
 		/// <summary>
-		/// This method will always add the domain to the path if the hostnames are set up correctly. 
+		/// This method will always add the domain to the path if the hostnames are set up correctly.
 		/// </summary>
 		/// <param name="nodeId">Identifier for the node that should be returned</param>
 		/// <returns>String with a friendly url with full domain from a node</returns>
@@ -511,27 +481,6 @@ namespace Umbraco.Web
         {
             var asInt = id.TryConvertTo<int>();
             return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
-        }
-
-        public dynamic Member(object id)
-        {
-            var asInt = id.TryConvertTo<int>();
-            return asInt
-                ? MembershipHelper.GetById(asInt.Result).AsDynamic()
-                : MembershipHelper.GetByProviderKey(id).AsDynamic();
-        }
-
-        public dynamic Member(int id)
-        {
-            return MembershipHelper.GetById(id).AsDynamic();
-        }
-
-        public dynamic Member(string id)
-        {
-            var asInt = id.TryConvertTo<int>();
-            return asInt
-                ? MembershipHelper.GetById(asInt.Result).AsDynamic()
-                : MembershipHelper.GetByProviderKey(id).AsDynamic();
         }
 
         #endregion
@@ -635,114 +584,6 @@ namespace Umbraco.Web
             return ContentQuery.TypedContentAtRoot();
         }
 
-		public dynamic Content(object id)
-		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
-		}
-
-		public dynamic Content(int id)
-		{
-            return ContentQuery.Content(id);
-		}
-
-		public dynamic Content(string id)
-		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
-		}
-
-        public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return ContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return ContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(params object[] ids)
-		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(params int[] ids)
-		{
-            return ContentQuery.Content(ids);
-		}
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(params string[] ids)
-		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(IEnumerable<object> ids)
-		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(IEnumerable<int> ids)
-		{
-            return ContentQuery.Content(ids);
-		}
-
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public dynamic Content(IEnumerable<string> ids)
-		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
-
-        public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return ContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return ContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtRoot()
-        {
-            return ContentQuery.ContentAtRoot();
-        }
-
         private bool ConvertIdObjectToInt(object id, out int intId)
         {
             var s = id as string;
@@ -750,7 +591,7 @@ namespace Umbraco.Web
             {
                 return int.TryParse(s, out intId);
             }
-                
+
             if (id is int)
             {
                 intId = (int) id;
@@ -784,7 +625,7 @@ namespace Umbraco.Web
 		/// <param name="id"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
@@ -876,120 +717,9 @@ namespace Umbraco.Web
             return ContentQuery.TypedMediaAtRoot();
         }
 
-		public dynamic Media(object id)
-		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
-		}
-
-		public dynamic Media(int id)
-		{
-            return ContentQuery.Media(id);
-		}
-
-		public dynamic Media(string id)
-		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(params object[] ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(params int[] ids)
-		{
-            return ContentQuery.Media(ids);
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(params string[] ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(IEnumerable<object> ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(IEnumerable<int> ids)
-		{
-            return ContentQuery.Media(ids);
-		}
-
-        /// <summary>
-        /// Gets the medias corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The media identifiers.</param>
-        /// <returns>The existing medias corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public dynamic Media(IEnumerable<string> ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
-
-        public dynamic MediaAtRoot()
-        {
-            return ContentQuery.MediaAtRoot();
-        }
-
 		#endregion
-        
+
 		#region Search
-
-		/// <summary>
-		/// Searches content
-		/// </summary>
-		/// <param name="term"></param>
-		/// <param name="useWildCards"></param>
-		/// <param name="searchProvider"></param>
-		/// <returns></returns>
-		public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
-		{
-		    return ContentQuery.Search(term, useWildCards, searchProvider);
-		}
-
-		/// <summary>
-		/// Searhes content
-		/// </summary>
-		/// <param name="criteria"></param>
-		/// <param name="searchProvider"></param>
-		/// <returns></returns>
-		public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-		{
-            return ContentQuery.Search(criteria, searchProvider);
-		}
 
 		/// <summary>
 		/// Searches content
@@ -1012,27 +742,6 @@ namespace Umbraco.Web
 		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
             return ContentQuery.TypedSearch(criteria, searchProvider);
-		}
-
-		#endregion
-
-		#region Xml
-
-		public dynamic ToDynamicXml(string xml)
-		{
-			if (string.IsNullOrWhiteSpace(xml)) return null;
-			var xElement = XElement.Parse(xml);
-			return new DynamicXml(xElement);
-		}
-
-		public dynamic ToDynamicXml(XElement xElement)
-		{
-			return new DynamicXml(xElement);
-		}
-
-		public dynamic ToDynamicXml(XPathNodeIterator xpni)
-		{
-			return new DynamicXml(xpni);
 		}
 
 		#endregion
@@ -1070,14 +779,6 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Strips all html tags from a given string, all contents of the tags will remain.
 		/// </summary>
-		public HtmlString StripHtml(DynamicNull html, params string[] tags)
-		{
-			return new HtmlString(string.Empty);
-		}
-
-		/// <summary>
-		/// Strips all html tags from a given string, all contents of the tags will remain.
-		/// </summary>
 		public HtmlString StripHtml(string html, params string[] tags)
 		{
             return _stringUtilities.StripHtmlTags(html, tags);
@@ -1088,7 +789,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public string Coalesce(params object[] args)
 		{
-            return _stringUtilities.Coalesce<DynamicNull>(args);
+            return _stringUtilities.Coalesce(args);
 		}
 
 		/// <summary>
@@ -1096,15 +797,15 @@ namespace Umbraco.Web
 		/// </summary>
 		public string Concatenate(params object[] args)
 		{
-            return _stringUtilities.Concatenate<DynamicNull>(args);
+            return _stringUtilities.Concatenate(args);
 		}
 
 		/// <summary>
 		/// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
 		/// </summary>
-		public string Join(string seperator, params object[] args)
+		public string Join(string separator, params object[] args)
 		{
-            return _stringUtilities.Join<DynamicNull>(seperator, args);
+            return _stringUtilities.Join(separator, args);
 		}
 
 		/// <summary>
@@ -1129,30 +830,6 @@ namespace Umbraco.Web
 		public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
 			return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
-		}
-
-		/// <summary>
-		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-		/// </summary>
-		public IHtmlString Truncate(DynamicNull html, int length)
-		{
-			return new HtmlString(string.Empty);
-		}
-
-		/// <summary>
-		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-		/// </summary>
-		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis)
-		{
-			return new HtmlString(string.Empty);
-		}
-
-		/// <summary>
-		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-		/// </summary>
-		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis, bool treatTagsAsContent)
-		{
-			return new HtmlString(string.Empty);
 		}
 
 		/// <summary>
@@ -1212,7 +889,7 @@ namespace Umbraco.Web
         #endregion
 
         #region canvasdesigner
-        
+
         [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
         public IHtmlString EnableCanvasDesigner()
         {
@@ -1271,12 +948,9 @@ namespace Umbraco.Web
             Mandate.ParameterNotNull(area, "area");
 
             //need to create a params string as Base64 to put into our hidden field to use during the routes
-            var surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
-                                                      HttpUtility.UrlEncode(controllerName),
-                                                      HttpUtility.UrlEncode(controllerAction),
-                                                      area);
+            var surfaceRouteParams = $"c={HttpUtility.UrlEncode(controllerName)}&a={HttpUtility.UrlEncode(controllerAction)}&ar={area}";
 
-            var additionalRouteValsAsQuery = additionalRouteVals != null ? additionalRouteVals.ToDictionary<object>().ToQueryString() : null;
+            var additionalRouteValsAsQuery = additionalRouteVals?.ToDictionary<object>().ToQueryString();
 
             if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
                 surfaceRouteParams += "&" + additionalRouteValsAsQuery;

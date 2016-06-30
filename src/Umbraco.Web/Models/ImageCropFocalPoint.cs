@@ -1,11 +1,10 @@
 using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropFocalPoint")]
-    public class ImageCropFocalPoint : CaseInsensitiveDynamicObject<ImageCropFocalPoint>, IEquatable<ImageCropFocalPoint>
+    public class ImageCropFocalPoint : IEquatable<ImageCropFocalPoint>
     {
         [DataMember(Name = "left")]
         public decimal Left { get; set; }
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ImageCropFocalPoint) obj);
         }
 
@@ -63,7 +62,7 @@ namespace Umbraco.Web.Models
 
         public static bool operator !=(ImageCropFocalPoint left, ImageCropFocalPoint right)
         {
-            return !Equals(left, right);
+            return Equals(left, right) == false;
         }
     }
 }

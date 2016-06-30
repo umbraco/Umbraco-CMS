@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Xml;
 
@@ -248,7 +247,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // use the converter else use dark (& performance-wise expensive) magic
             return _converter != null
                 ? _converter.ConvertSourceToInter(this, source, preview)
-                : ConvertUsingDarkMagic(source);
+                : source;
         }
 
         // converts the inter value into the clr value
@@ -285,37 +284,6 @@ namespace Umbraco.Core.Models.PublishedContent
             if (xElement != null)
                 return xElement.CreateNavigator();
             return inter.ToString().Trim();
-        }
-
-        internal static object ConvertUsingDarkMagic(object source)
-        {
-            // convert to string
-            var stringSource = source as string;
-            if (stringSource == null) return source; // not a string => return the object
-            stringSource = stringSource.Trim();
-            if (stringSource.Length == 0) return null; // empty string => return null
-
-            // try numbers and booleans
-            // make sure we use the invariant culture ie a dot decimal point, comma is for csv
-            // NOTE far from perfect: "01a" is returned as a string but "012" is returned as an integer...
-            int i;
-            if (int.TryParse(stringSource, NumberStyles.Integer, CultureInfo.InvariantCulture, out i))
-                return i;
-            float f;
-            if (float.TryParse(stringSource, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
-                return f;
-            bool b;
-            if (bool.TryParse(stringSource, out b))
-                return b;
-
-            //TODO: We can change this just like we do for the JSON converter - but to maintain compatibility might mean this still has to remain here
-
-            // try xml - that is expensive, performance-wise
-            XElement elt;
-            if (XmlHelper.TryCreateXElementFromPropertyValue(stringSource, out elt))
-                return new DynamicXml(elt); // xml => return DynamicXml for compatiblity's sake
-
-            return source;
         }
 
         // gets the property CLR type

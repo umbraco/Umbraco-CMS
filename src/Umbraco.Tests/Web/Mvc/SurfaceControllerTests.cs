@@ -135,7 +135,6 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ITypedPublishedContentQuery>(query => query.TypedContent(It.IsAny<int>()) ==
                     //return mock of IPublishedContent for any call to GetById
                     Mock.Of<IPublishedContent>(content => content.Id == 2)),
-                Mock.Of<IDynamicPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<IDataTypeService>(),
                 new UrlProvider(umbCtx, Enumerable.Empty<IUrlProvider>()),
