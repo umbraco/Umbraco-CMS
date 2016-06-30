@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -199,6 +200,39 @@ namespace Umbraco.Web
         // format: should use the standard .ToString(format)
         //
         // see UmbracoComponentRenderer.Field - which is ugly ;-(
+
+        // recurse first, on each alias (that's how it's done in Field)
+        // TODO: strongly typed properties howto?
+        // there is no strongly typed recurse, etc => needs to be in ModelsBuilder?
+
+        public static IHtmlString Value<T>(this IPublishedFragment content, string aliases, Func<T, string> format, string alt = "")
+        {
+            if (format == null) format = x => x.ToString();
+
+            var property = aliases.Split(',')
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .Select(x => content.GetProperty(x.Trim()))
+                .FirstOrDefault(x => x != null);
+
+            return property != null
+                ? new HtmlString(format(property.Value<T>()))
+                : new HtmlString(alt);
+        }
+
+        // fixme - move that one!
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
+        {
+            if (format == null) format = x => x.ToString();
+
+            var property = aliases.Split(',')
+                .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                .Select(x => content.GetProperty(x.Trim(), recurse))
+                .FirstOrDefault(x => x != null);
+
+            return property != null
+                ? new HtmlString(format(property.Value<T>()))
+                : new HtmlString(alt);
+        }
 
         #endregion
 
