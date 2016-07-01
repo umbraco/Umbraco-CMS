@@ -3,7 +3,7 @@
     "AutoMapper": "4.2.1",
     "HtmlAgilityPack": "1.4.9.5",
     "ImageProcessor": "2.4.*",
-    "LightInject": "4.0.9",
+    "LightInject": "4.0.10",
     "LightInject.Annotation": "1.0.0.4",
     "log4net": "2.0.5",
     "Microsoft.AspNet.Identity.Core": "2.2.1",
@@ -13,7 +13,7 @@
     "MiniProfiler": "3.2.0.157",
     "MySql.Data": "6.9.8",
     "Newtonsoft.Json": "8.0.3",
-    "NPoco": "3.3.4",
+    "NPoco": "3.4.0",
     "semver": "1.1.2",
     "SharpZipLib": "0.86.0",
     "SqlServerCE": "4.0.0.1"

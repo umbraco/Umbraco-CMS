@@ -53,9 +53,8 @@ namespace Umbraco.Tests.TestHelpers
         public static UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
         {
             var syntax = new SqlCeSyntaxProvider();
-            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
             var connection = TestObjects.GetDbConnection();
-            return new UmbracoDatabase(connection, syntax, DatabaseType.SQLCe, dbProviderFactory, logger);
+            return new UmbracoDatabase(connection, syntax, DatabaseType.SQLCe, logger);
         }
 
         /// <summary>
@@ -68,9 +67,8 @@ namespace Umbraco.Tests.TestHelpers
         public static UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
             var syntax = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)); // do NOT try to get the server's version!
-            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
             var connection = TestObjects.GetDbConnection();
-            return new UmbracoDatabase(connection, syntax, DatabaseType.SqlServer2008, dbProviderFactory, logger);
+            return new UmbracoDatabase(connection, syntax, DatabaseType.SqlServer2008, logger);
         }
 
         /// <summary>
