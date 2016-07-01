@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using LightInject;
 
@@ -95,14 +96,31 @@ namespace Umbraco.Core.ObjectResolution
             {
                 if (_container != null)
                 {
-                    _container.Override(
-                        sr => sr.ServiceType == typeof (TResolved),
-                        (factory, registration) =>
+                    var avail = _container.AvailableServices.Any(x => x.ServiceType == typeof (TResolved));
+
+                    if (avail)
+                    {
+                        _container.Override(
+                            sr => sr.ServiceType == typeof (TResolved),
+                            (factory, registration) =>
+                            {
+                                registration.Value = value;
+                                registration.Lifetime = new PerContainerLifetime();
+                                return registration;
+                            });
+                    }
+                    else
+                    {
+                        // cannot override something that hasn't been registered yet!
+                        _container.Register(new ServiceRegistration
                         {
-                            registration.Value = value;
-                            registration.Lifetime = new PerContainerLifetime();
-                            return registration;
+                            ServiceType = typeof (TResolved),
+                            ImplementingType = value.GetType(),
+                            ServiceName = "",
+                            Lifetime = new PerContainerLifetime(),
+                            Value = value
                         });
+                    }
                 }
                 base.Value = value;
             }
