@@ -40,13 +40,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the converters.
         /// </summary>
-        public IEnumerable<IPropertyValueConverter> Converters
-        {
-            get { return Values; }
-        }
+        public IEnumerable<IPropertyValueConverter> Converters => Values;
 
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-        private Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>[] _defaults = null;
+        private Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>[] _defaults;
 
         /// <summary>
         /// Caches and gets the default converters with their metadata
@@ -57,24 +54,23 @@ namespace Umbraco.Core.PropertyEditors
             {
                 using (var locker = new UpgradeableReadLock(_lock))
                 {
-                    if (_defaults == null)
-                    {
-                        locker.UpgradeToWriteLock();
+                    if (_defaults != null) return _defaults;
 
-                        var defaultConvertersWithAttributes = Converters
-                            .Select(x => new
-                                {
-                                    attribute = x.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false),
-                                    converter = x
-                                })
-                            .Where(x => x.attribute != null)
-                            .ToArray();
+                    locker.UpgradeToWriteLock();
 
-                        _defaults = defaultConvertersWithAttributes
-                            .Select(
-                                x => new Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>(x.converter, x.attribute))
-                            .ToArray();
-                    }
+                    var defaultConvertersWithAttributes = Converters
+                        .Select(x => new
+                        {
+                            attribute = x.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false),
+                            converter = x
+                        })
+                        .Where(x => x.attribute != null)
+                        .ToArray();
+
+                    _defaults = defaultConvertersWithAttributes
+                        .Select(
+                            x => new Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>(x.converter, x.attribute))
+                        .ToArray();
 
                     return _defaults;
                 }

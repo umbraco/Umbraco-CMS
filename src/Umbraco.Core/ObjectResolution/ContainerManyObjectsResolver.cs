@@ -40,7 +40,7 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerManyObjectsResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(serviceProvider, logger, value, scope)
         {
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Umbraco.Core.ObjectResolution
             _container = container;
             Resolution.Frozen += Resolution_Frozen;
         }
-             
+
         /// <summary>
         /// When resolution is frozen add all the types to the container
         /// </summary>
@@ -69,7 +69,7 @@ namespace Umbraco.Core.ObjectResolution
             var i = 0;
             foreach (var type in InstanceTypes)
             {
-                var name = prefix + i++;
+                var name = $"{prefix}{i++:00000}";
                 _container.Register(typeof(TResolved), type, name, GetLifetime(LifetimeScope));
             }
         }
@@ -97,27 +97,25 @@ namespace Umbraco.Core.ObjectResolution
         /// Creates the instances from IoC
         /// </summary>
         /// <returns>A list of objects of type <typeparamref name="TResolved"/>.</returns>
-        protected override IEnumerable<TResolved> CreateValues(ObjectLifetimeScope scope)
+        protected override IEnumerable<TResolved> CreateInstances()
         {
             //NOTE: we ignore scope because objects are registered under this scope and not build based on the scope.
 
             var prefix = GetType().FullName + "_";
-            var services = _container.AvailableServices
-                .Where(x => x.ServiceName.StartsWith(prefix))
-                .OrderBy(x => x.ServiceName);
-            var allInstances = _container.GetAllInstances<TResolved>()
-                .ToDictionary(x => x.GetType(), x => x);
-
-            //foreach (var service in services)
-            //    LogHelper.Debug<object>("SERVICE " + service.ImplementingType.FullName + " " + service.ServiceName);
-            //foreach (var instance in allInstances)
-            //    LogHelper.Debug<object>("INSTANCE " + instance.Key.FullName);
 
             // GetAllInstances could return more than what *this* resolver has registered,
             // and there is no guarantee instances will be in the right order - have to do
             // it differently
-            //return _container.GetAllInstances<TResolved>();
-            return services.Select(x => allInstances[x.ImplementingType]);
-        }    
+
+            var services = _container.AvailableServices
+                .Where(x => x.ServiceName.StartsWith(prefix))
+                .OrderBy(x => x.ServiceName);
+
+            var values = services
+                .Select(x => _container.GetInstance<TResolved>(x.ServiceName))
+                .ToArray();
+
+            return values;
+        }
     }
 }

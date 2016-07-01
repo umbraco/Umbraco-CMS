@@ -1,7 +1,5 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -22,10 +20,8 @@ namespace Umbraco.Core.ObjectResolution
         private Lazy<IEnumerable<TResolved>> _applicationInstances;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly string _httpContextKey;
-        private readonly List<Type> _instanceTypes = new List<Type>();
+        private readonly List<Type> _instanceTypes;
         private IEnumerable<TResolved> _sortedValues;
-
-        private int _defaultPluginWeight = 10;
 
         #region Constructors
 
@@ -38,12 +34,15 @@ namespace Umbraco.Core.ObjectResolution
         /// <param name="scope"></param>
         internal ManyObjectsResolverBase(ILogger logger, IEnumerable<Type> types, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (types == null) throw new ArgumentNullException("types");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (types == null) throw new ArgumentNullException(nameof(types));
             CanResolveBeforeFrozen = false;
             _instanceTypes = types.ToList();
             LifetimeScope = scope;
             Logger = logger;
+
+            if (scope == ObjectLifetimeScope.Application)
+                InitializeAppInstances();
         }
 
         /// <summary>
@@ -53,13 +52,8 @@ namespace Umbraco.Core.ObjectResolution
         /// <param name="logger"></param>
         /// <param name="scope"></param>
         internal ManyObjectsResolverBase(ILogger logger, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-        {
-            if (logger == null) throw new ArgumentNullException("logger");
-            CanResolveBeforeFrozen = false;            
-            Logger = logger;
-            LifetimeScope = scope;            
-            _instanceTypes = new List<Type>();
-        }
+            : this(logger, new List<Type>(), scope)
+        { }
 
 
         /// <summary>
@@ -73,25 +67,28 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
         protected ManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
         {
-            if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             CanResolveBeforeFrozen = false;
+
             if (scope == ObjectLifetimeScope.HttpRequest)
             {
                 if (HttpContext.Current == null)
                     throw new InvalidOperationException("Use alternative constructor accepting a HttpContextBase object in order to set the lifetime scope to HttpRequest when HttpContext.Current is null");
 
                 CurrentHttpContext = new HttpContextWrapper(HttpContext.Current);
+                _httpContextKey = GetType().FullName;
             }
 
             ServiceProvider = serviceProvider;
             Logger = logger;
             LifetimeScope = scope;
-            if (scope == ObjectLifetimeScope.HttpRequest)
-                _httpContextKey = GetType().FullName;
+
             _instanceTypes = new List<Type>();
 
-            InitializeAppInstances();
+            if (scope == ObjectLifetimeScope.Application)
+                InitializeAppInstances();
         }
 
         /// <summary>
@@ -104,8 +101,8 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="ArgumentNullException"><paramref name="httpContext"/> is <c>null</c>.</exception>
         protected ManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext)
         {
-            if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             CanResolveBeforeFrozen = false;
             Logger = logger;
             LifetimeScope = ObjectLifetimeScope.HttpRequest;
@@ -147,28 +144,25 @@ namespace Umbraco.Core.ObjectResolution
         /// <summary>
         /// Gets the list of types to create instances from.
         /// </summary>
-        protected virtual IEnumerable<Type> InstanceTypes
-        {
-            get { return _instanceTypes; }
-        }
+        protected virtual IEnumerable<Type> InstanceTypes => _instanceTypes;
 
         /// <summary>
         /// Gets or sets the <see cref="HttpContextBase"/> used to initialize this object, if any.
         /// </summary>
         /// <remarks>If not null, then <c>LifetimeScope</c> will be <c>ObjectLifetimeScope.HttpRequest</c>.</remarks>
-        protected HttpContextBase CurrentHttpContext { get; private set; }
+        protected HttpContextBase CurrentHttpContext { get; }
 
         /// <summary>
         /// Returns the service provider used to instantiate objects
         /// </summary>
-        public IServiceProvider ServiceProvider { get; private set; }
+        public IServiceProvider ServiceProvider { get; }
 
-        public ILogger Logger { get; private set; }
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets or sets the lifetime scope of resolved objects.
         /// </summary>
-        protected ObjectLifetimeScope LifetimeScope { get; private set; }
+        protected ObjectLifetimeScope LifetimeScope { get; }
 
         /// <summary>
         /// Gets the resolved object instances, sorted by weight.
@@ -180,12 +174,11 @@ namespace Umbraco.Core.ObjectResolution
         /// </remarks>
         protected IEnumerable<TResolved> GetSortedValues()
         {
-            if (_sortedValues == null)
-            {
-                var values = Values.ToList();
-                values.Sort((f1, f2) => GetObjectWeight(f1).CompareTo(GetObjectWeight(f2)));
-                _sortedValues = values;
-            }
+            if (_sortedValues != null) return _sortedValues;
+
+            var values = Values.ToList();
+            values.Sort((f1, f2) => GetObjectWeight(f1).CompareTo(GetObjectWeight(f2)));
+            _sortedValues = values;
             return _sortedValues;
         }
 
@@ -194,11 +187,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <remarks>Determines the weight of types that do not have a <c>WeightedPluginAttribute</c> set on 
         /// them, when calling <c>GetSortedValues</c>.</remarks>
-        protected virtual int DefaultPluginWeight
-        {
-            get { return _defaultPluginWeight; }
-            set { _defaultPluginWeight = value; }
-        }
+        protected virtual int DefaultPluginWeight { get; set; } = 10;
 
         /// <summary>
         /// Returns the weight of an object for user with GetSortedValues
@@ -209,17 +198,14 @@ namespace Umbraco.Core.ObjectResolution
         {
             var type = o.GetType();
             var attr = type.GetCustomAttribute<WeightedPluginAttribute>(true);
-            return attr == null ? DefaultPluginWeight : attr.Weight;
+            return attr?.Weight ?? DefaultPluginWeight;
         }
 
         /// <summary>
         /// Gets the resolved object instances.
         /// </summary>
         /// <exception cref="InvalidOperationException"><c>CanResolveBeforeFrozen</c> is false, and resolution is not frozen.</exception>
-        protected IEnumerable<TResolved> Values
-        {
-            get { return CreateValues(LifetimeScope); }
-        }
+        protected IEnumerable<TResolved> Values => CreateValues(LifetimeScope);
 
         /// <summary>
         /// Creates the values collection based on the scope

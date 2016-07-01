@@ -100,8 +100,9 @@ namespace Umbraco.Core.ObjectResolution
 
                     if (avail)
                     {
+                        // must override with the proper name!
                         _container.Override(
-                            sr => sr.ServiceType == typeof (TResolved),
+                            sr => sr.ServiceType == typeof (TResolved) && sr.ServiceName == GetType().FullName,
                             (factory, registration) =>
                             {
                                 registration.Value = value;
@@ -116,7 +117,7 @@ namespace Umbraco.Core.ObjectResolution
                         {
                             ServiceType = typeof (TResolved),
                             ImplementingType = value.GetType(),
-                            ServiceName = "",
+                            ServiceName = GetType().FullName,
                             Lifetime = new PerContainerLifetime(),
                             Value = value
                         });
