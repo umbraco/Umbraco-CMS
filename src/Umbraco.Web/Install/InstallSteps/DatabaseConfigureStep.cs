@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -56,13 +49,23 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else if (database.IntegratedAuth)
             {
+                var name = database.DatabaseName.Replace("&", "&amp;")
+                            .Replace(">", "&gt;")
+                            .Replace("<", "&lt;")
+                            .Replace("\"", "&quot;")
+                            .Replace("'", "''");
+
                 dbContext.ConfigureIntegratedSecurityDatabaseConnection(
-                    database.Server, database.DatabaseName);
+                    database.Server, name);
             }
             else
             {
                 var password = string.Format("'{0}'", database.Password);
-                password = password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
+                password = password.Replace("&", "&amp;")
+                            .Replace(">", "&gt;")
+                            .Replace("<", "&lt;")
+                            .Replace("\"", "&quot;")
+                            .Replace("'", "''");
 
                 dbContext.ConfigureDatabaseConnection(
                     database.Server, database.DatabaseName, database.Login, password,
