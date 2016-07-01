@@ -37,12 +37,12 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 var constructor = type.GetConstructor(ctorArgTypes);
                 if (constructor == null)
-                    throw new InvalidOperationException(string.Format("Type {0} is missing a public constructor with one argument of type IPublishedContent.", type.FullName));
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedContent.");
                 var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (constructors.ContainsKey(typeName))
-                    throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
+                    throw new InvalidOperationException($"More that one type want to be a model for content type {typeName}.");
 
                 // should work everywhere, but slow
                 //_constructors[typeName] = constructor;
