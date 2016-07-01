@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO.MemoryMappedFiles;
-using System.Text;
+using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core
 {
@@ -25,7 +21,7 @@ namespace Umbraco.Core
         private readonly AsyncLock _asyncLock;
         private IDisposable _asyncLocker;
 
-        // event wait handle used to notify current main domain that it should 
+        // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
@@ -34,7 +30,7 @@ namespace Umbraco.Core
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
-        private readonly SortedList<int, Action> _callbacks = new SortedList<int, Action>();
+        private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
         private const int LockTimeoutMilliseconds = 90000; // (1.5 * 60 * 1000) == 1 min 30 seconds
 
@@ -73,10 +69,9 @@ namespace Umbraco.Core
             lock (_locko)
             {
                 if (_signaled) return false;
-                if (install != null)
-                    install();
+                install?.Invoke();
                 if (release != null)
-                    _callbacks.Add(weight, release);
+                    _callbacks.Add(new KeyValuePair<int, Action>(weight, release));
                 return true;
             }
         }
@@ -98,7 +93,7 @@ namespace Umbraco.Core
             try
             {
                 _logger.Debug<MainDom>("Stopping...");
-                foreach (var callback in _callbacks.Values)
+                foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                 {
                     try
                     {
@@ -109,7 +104,7 @@ namespace Umbraco.Core
                         _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
                         throw;
                     }
-                    
+
                 }
                 _logger.Debug<MainDom>("Stopped.");
             }
@@ -168,10 +163,7 @@ namespace Umbraco.Core
         }
 
         // gets a value indicating whether we are the main domain
-        public bool IsMainDom
-        {
-            get { return _isMainDom; }
-        }
+        public bool IsMainDom => _isMainDom;
 
         // IRegisteredObject
         public void Stop(bool immediate)
