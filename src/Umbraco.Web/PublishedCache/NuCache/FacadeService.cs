@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Web.Hosting;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
@@ -35,7 +36,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     class FacadeService : FacadeServiceBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
         private readonly ServiceContext _serviceContext;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly Database _dataSource;
@@ -74,10 +74,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
+        //private static int _singletonCheck;
+
         public FacadeService(Options options, MainDom mainDom, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger)
             : base(facadeAccessor)
         {
-            _facadeAccessor = facadeAccessor;
+            //if (Interlocked.Increment(ref _singletonCheck) > 1)
+            //    throw new Exception("Singleton must be instancianted only once!");
+
             _serviceContext = serviceContext;
             _uowProvider = uowProvider;
             _dataSource = new Database();
@@ -945,7 +949,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, facadeCache, snapshotCache, new DomainHelper(domainCache)),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, facadeCache, snapshotCache),
-                MemberCache = new MemberCache(previewDefault, facadeCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, _facadeAccessor),
+                MemberCache = new MemberCache(previewDefault, facadeCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, FacadeAccessor),
                 DomainCache = domainCache,
                 FacadeCache = facadeCache,
                 SnapshotCache = snapshotCache
@@ -1498,9 +1502,9 @@ AND cmsContentNu.nodeId IS NULL
 
         public override IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
-            return new PublishedFragmentProperty(_facadeAccessor, propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
+            return new PublishedFragmentProperty(FacadeAccessor, propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
         }
-        
+
         #endregion
     }
 }
