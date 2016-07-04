@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var rurl = new RedirectUrl
                 {
-                    ContentId = _textpage.Id,
+                    ContentKey = _textpage.Key,
                     Url = "blah"
                 };
                 repo.AddOrUpdate(rurl);
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var rurl = new RedirectUrl
                 {
-                    ContentId = _textpage.Id,
+                    ContentKey = _textpage.Key,
                     Url = "blah"
                 };
                 repo.AddOrUpdate(rurl);
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 rurl = new RedirectUrl
                 {
-                    ContentId = _otherpage.Id,
+                    ContentKey = _otherpage.Key,
                     Url = "blah"
                 };
                 repo.AddOrUpdate(rurl);
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var rurl = new RedirectUrl
                 {
-                    ContentId = _textpage.Id,
+                    ContentKey = _textpage.Key,
                     Url = "blah"
                 };
                 repo.AddOrUpdate(rurl);
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 rurl = new RedirectUrl
                 {
-                    ContentId = _textpage.Id,
+                    ContentKey = _textpage.Key,
                     Url = "durg"
                 };
                 repo.AddOrUpdate(rurl);
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var uow = provider.GetUnitOfWork())
             using (var repo = CreateRepository(uow))
             {
-                var rurls = repo.GetContentUrls(_textpage.Id).ToArray();
+                var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
                 uow.Commit();
 
                 Assert.AreEqual(2, rurls.Length);
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var rurl = new RedirectUrl
                 {
-                    ContentId = _textpage.Id,
+                    ContentKey = _textpage.Key,
                     Url = "blah"
                 };
                 repo.AddOrUpdate(rurl);
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 rurl = new RedirectUrl
                 {
-                    ContentId = _otherpage.Id,
+                    ContentKey = _otherpage.Key,
                     Url = "durg"
                 };
                 repo.AddOrUpdate(rurl);
@@ -170,10 +170,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var uow = provider.GetUnitOfWork())
             using (var repo = CreateRepository(uow))
             {
-                repo.DeleteContentUrls(_textpage.Id);
+                repo.DeleteContentUrls(_textpage.Key);
                 uow.Commit();
 
-                var rurls = repo.GetContentUrls(_textpage.Id);
+                var rurls = repo.GetContentUrls(_textpage.Key);
 
                 Assert.AreEqual(0, rurls.Count());
             }
@@ -190,27 +190,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+            contentType.Key = Guid.NewGuid();
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = MockedContent.CreateSimpleContent(contentType);
-            _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            ServiceContext.ContentService.Save(_textpage, 0);
+            _textpage.Key = Guid.NewGuid();
+            ServiceContext.ContentService.Save(_textpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             _subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
-            _subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
-            ServiceContext.ContentService.Save(_subpage, 0);
+            _subpage.Key = Guid.NewGuid();
+            ServiceContext.ContentService.Save(_subpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             _otherpage = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
-            ServiceContext.ContentService.Save(_otherpage, 0);
+            _otherpage.Key = Guid.NewGuid();
+            ServiceContext.ContentService.Save(_otherpage);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
             _trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+            _trashed.Key = Guid.NewGuid();
             ((Content) _trashed).Trashed = true;
-            ServiceContext.ContentService.Save(_trashed, 0);
+            ServiceContext.ContentService.Save(_trashed);
         }
     }
 }

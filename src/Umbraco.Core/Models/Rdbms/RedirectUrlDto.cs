@@ -18,10 +18,13 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn(IdentitySeed = 1, Name = "PK_umbracoRedirectUrl")]
         public int Id { get; set; }
 
-        [Column("contentId")]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
-        [ForeignKey(typeof(NodeDto), Column = "id")]
+        [ResultColumn]
         public int ContentId { get; set; }
+
+        [Column("contentKey")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [ForeignKey(typeof(NodeDto), Column = "uniqueID")]
+        public Guid ContentKey { get; set; }
 
         [Column("createDateUtc")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
