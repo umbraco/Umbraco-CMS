@@ -97,6 +97,80 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Sends the notifications for the specified user regarding the specified node and action.
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="operatingUser"></param>
+        /// <param name="action"></param>
+        /// <param name="actionName"></param>
+        /// <param name="http"></param>
+        /// <param name="createSubject"></param>
+        /// <param name="createBody"></param>
+        /// <remarks>
+        /// Currently this will only work for Content entities!
+        /// </remarks>
+        public void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, HttpContextBase http,
+            Func<IUser, string[], string> createSubject,
+            Func<IUser, string[], string> createBody)
+        {
+            if ((entities is IEnumerable<IContent>) == false)
+            {
+                throw new NotSupportedException();
+            }
+
+            //we'll lazily get these if we need to send notifications
+            Dictionary<int, IEnumerable<IContent>> allVersionsDictionary = new Dictionary<int, IEnumerable<IContent>>();
+
+            int totalUsers;
+            var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
+            foreach (var u in allUsers)
+            {
+                if (u.IsApproved == false) continue;
+                var userNotifications = GetUserNotifications(u).ToArray();
+
+                foreach (var entity in entities)
+                {
+                    var content = (IContent) entity;
+
+                    var userNotificationsByPath = FilterUserNotificationsByPath(userNotifications, content.Path);
+                    var notificationForAction = userNotificationsByPath
+                        .FirstOrDefault(x => x.Action == action);
+
+                    if (notificationForAction != null)
+                    {
+                        IEnumerable<IContent> allVersions = null;
+                        if (allVersionsDictionary.ContainsKey(entity.Id))
+                        {
+                            allVersions = allVersionsDictionary[entity.Id];
+                        }
+
+                        //lazy load versions if notifications are required
+                        if (allVersions == null)
+                        {
+                            allVersions = _contentService.GetVersions(entity.Id);
+                            allVersionsDictionary[entity.Id] = allVersions;
+                        }
+
+                        try
+                        {
+                            SendNotification(
+                                operatingUser, u, content,                            
+                                allVersions, 
+                                actionName, http, createSubject, createBody);
+
+                            _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Gets the notifications for the user
         /// </summary>
         /// <param name="user"></param>
@@ -120,6 +194,17 @@ namespace Umbraco.Core.Services
         public IEnumerable<Notification> GetUserNotifications(IUser user, string path)
         {
             var userNotifications = GetUserNotifications(user).ToArray();
+            var result = FilterUserNotificationsByPath(userNotifications, path);
+            return result;
+        }
+
+        /// <summary>
+        /// Filters a userNotifications collection by a path
+        /// </summary>
+        /// <param name="userNotifications"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path) {
             var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             var result = userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
             return result;

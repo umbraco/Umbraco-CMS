@@ -177,13 +177,15 @@ namespace umbraco.presentation.webservices
             var sortedContent = new List<IContent>();
             try
             {
-                for (var i = 0; i < ids.Length; i++)
-                {
-                    var id = int.Parse(ids[i]);
-                    var c = contentService.GetById(id);
-                    sortedContent.Add(c);
-                }
+                int [] intIds = ids.Select(id => int.Parse(id)).ToArray();
 
+                sortedContent = contentService.GetByIds(intIds).ToList();
+
+                sortedContent = (from id in intIds
+                                join content in sortedContent
+                                on id equals content.Id
+                                select content).ToList();
+                
                 // Save content with new sort order and update db+cache accordingly
                 var sorted = contentService.Sort(sortedContent);
 
