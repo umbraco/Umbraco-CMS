@@ -128,20 +128,22 @@ namespace Umbraco.Web.Trees
                 : Attempt<TreeNode>.Succeed(node);
         }
 
-        internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        internal static Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
-            {
                 return Attempt<TreeNodeCollection>.Fail(foundControllerTreeAttempt.Exception);
-            }
-            var foundControllerTree = foundControllerTreeAttempt.Result;
 
-            //instantiate it, since we are proxying, we need to setup the instance with our current context
-            var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
+            // instantiate it, since we are proxying, we need to setup the instance with our current context
+            var foundControllerTree = foundControllerTreeAttempt.Result;
+            var instance = (TreeController) DependencyResolver.Current.GetService(foundControllerTree);
+            if (instance == null)
+                throw new Exception("Failed to get tree " + foundControllerTree.FullName + ".");
+
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
-            //return it's data
+
+            // return its data
             return Attempt.Succeed(instance.GetNodes(id, formCollection));
         }
 

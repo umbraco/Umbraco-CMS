@@ -26,7 +26,6 @@ using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.UI.JavaScript;
@@ -40,7 +39,6 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
 using Umbraco.Web.HealthCheck;
@@ -394,9 +392,9 @@ namespace Umbraco.Web
 
             // IoC setup for LightInject for MVC/WebApi
             Container.EnableMvc();
-            Container.RegisterMvcControllers(PluginManager);
+            Container.RegisterMvcControllers(PluginManager, GetType().Assembly);
             container.EnableWebApi(GlobalConfiguration.Configuration);
-            container.RegisterApiControllers(PluginManager);
+            container.RegisterApiControllers(PluginManager, GetType().Assembly);
         }
 
         /// <summary>
