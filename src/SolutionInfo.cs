@@ -12,4 +12,4 @@ using System.Resources;
 [assembly: AssemblyVersion("1.0.*")]
 
 [assembly: AssemblyFileVersion("8.0.0")]
-[assembly: AssemblyInformationalVersion("8.0.0-alpha0007")]
+[assembly: AssemblyInformationalVersion("8.0.0-alpha0011")]
