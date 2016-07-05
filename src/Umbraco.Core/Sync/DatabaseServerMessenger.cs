@@ -355,19 +355,39 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Ensure that the last instruction that was processed is still in the database.
         /// </summary>
-        /// <remarks>If the last instruction is not in the database anymore, then the messenger
+        /// <remarks>
+        /// If the last instruction is not in the database anymore, then the messenger
         /// should not try to process any instructions, because some instructions might be lost,
-        /// and it should instead cold-boot.</remarks>
+        /// and it should instead cold-boot.
+        /// However, if the last synced instruction id is '0' and there are '0' records, then this indicates
+        /// that it's a fresh site and no user actions have taken place, in this circumstance we do not want to cold
+        /// boot. See: http://issues.umbraco.org/issue/U4-8627
+        /// </remarks>
         private void EnsureInstructions()
         {
-            var sql = new Sql().Select("*")
+            if (_lastId == 0)
+            {
+                var sql = new Sql().Select("COUNT(*)")
+                    .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax);
+
+                var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>(sql);
+
+                //if there are instructions but we haven't synced, then a cold boot is necessary
+                if (count > 0)
+                    _lastId = -1;
+            }
+            else
+            {
+                var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
                 .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
 
-            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+                var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
 
-            if (dtos.Count == 0)
-                _lastId = -1;
+                //if the last synced instruction is not found in the db, then a cold boot is necessary
+                if (dtos.Count == 0)
+                    _lastId = -1;
+            }
         }
 
         /// <summary>
