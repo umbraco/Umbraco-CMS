@@ -56,42 +56,35 @@ namespace Umbraco.Core.Services
             Func<IUser, string[], string> createBody)
         {
             if ((entity is IContent) == false)
-            {
                 throw new NotSupportedException();
-            }
+
             var content = (IContent) entity;
-            //we'll lazily get these if we need to send notifications
-            IEnumerable<IContent> allVersions = null;
+
+            // lazily get versions - into a list to ensure we can enumerate multiple times
+            List<IContent> allVersions = null;
 
             int totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers)
+            foreach (var u in allUsers.Where(x => x.IsApproved))
             {
-                if (u.IsApproved == false) continue;
-                var userNotifications = GetUserNotifications(u, content.Path).ToArray();
+                var userNotifications = GetUserNotifications(u, content.Path);
                 var notificationForAction = userNotifications.FirstOrDefault(x => x.Action == action);
-                if (notificationForAction != null)
+                if (notificationForAction == null) continue;
+
+                if (allVersions == null) // lazy load
+                    allVersions = _contentService.GetVersions(entity.Id).ToList();
+
+                try
                 {
-                    //lazy load versions if notifications are required
-                    if (allVersions == null)
-                    {
-                        allVersions = _contentService.GetVersions(entity.Id);
-                    }
+                    SendNotification(operatingUser, u, content, allVersions, 
+                        actionName, http, createSubject, createBody);
 
-                    try
-                    {
-                        SendNotification(
-                            operatingUser, u, content,                            
-                            allVersions, 
-                            actionName, http, createSubject, createBody);
-
-
-                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                    }
+                    _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
+                        action, u.Name, u.Email));
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error<NotificationService>("An error occurred sending notification", ex);
                 }
             }
         }
@@ -114,56 +107,41 @@ namespace Umbraco.Core.Services
             Func<IUser, string[], string> createBody)
         {
             if ((entities is IEnumerable<IContent>) == false)
-            {
                 throw new NotSupportedException();
-            }
 
-            //we'll lazily get these if we need to send notifications
-            Dictionary<int, IEnumerable<IContent>> allVersionsDictionary = new Dictionary<int, IEnumerable<IContent>>();
+            // ensure we can enumerate multiple times
+            var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
+
+            // lazily get versions - into lists to ensure we can enumerate multiple times
+            var allVersionsDictionary = new Dictionary<int, List<IContent>>();
 
             int totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers)
+            foreach (var u in allUsers.Where(x => x.IsApproved))
             {
-                if (u.IsApproved == false) continue;
                 var userNotifications = GetUserNotifications(u).ToArray();
 
-                foreach (var entity in entities)
+                foreach (var content in entitiesL)
                 {
-                    var content = (IContent) entity;
-
                     var userNotificationsByPath = FilterUserNotificationsByPath(userNotifications, content.Path);
-                    var notificationForAction = userNotificationsByPath
-                        .FirstOrDefault(x => x.Action == action);
+                    var notificationForAction = userNotificationsByPath.FirstOrDefault(x => x.Action == action);
+                    if (notificationForAction == null) continue;
 
-                    if (notificationForAction != null)
+                    var allVersions = allVersionsDictionary.ContainsKey(content.Id) // lazy load
+                        ? allVersionsDictionary[content.Id]
+                        : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
+
+                    try
                     {
-                        IEnumerable<IContent> allVersions = null;
-                        if (allVersionsDictionary.ContainsKey(entity.Id))
-                        {
-                            allVersions = allVersionsDictionary[entity.Id];
-                        }
+                        SendNotification(operatingUser, u, content, allVersions, 
+                            actionName, http, createSubject, createBody);
 
-                        //lazy load versions if notifications are required
-                        if (allVersions == null)
-                        {
-                            allVersions = _contentService.GetVersions(entity.Id);
-                            allVersionsDictionary[entity.Id] = allVersions;
-                        }
-
-                        try
-                        {
-                            SendNotification(
-                                operatingUser, u, content,                            
-                                allVersions, 
-                                actionName, http, createSubject, createBody);
-
-                            _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                        }
+                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
+                            action, u.Name, u.Email));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
                     }
                 }
             }
@@ -193,9 +171,8 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public IEnumerable<Notification> GetUserNotifications(IUser user, string path)
         {
-            var userNotifications = GetUserNotifications(user).ToArray();
-            var result = FilterUserNotificationsByPath(userNotifications, path);
-            return result;
+            var userNotifications = GetUserNotifications(user);
+            return FilterUserNotificationsByPath(userNotifications, path);
         }
 
         /// <summary>
@@ -204,10 +181,10 @@ namespace Umbraco.Core.Services
         /// <param name="userNotifications"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path) {
+        public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
+        {
             var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            var result = userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
-            return result;
+            return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
         }
 
         /// <summary>

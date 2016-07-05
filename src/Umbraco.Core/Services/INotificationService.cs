@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services
                                Func<IUser, string[], string> createBody);
 
         /// <summary>
-        /// Sends the notifications for the specified user regarding the specified node and action.
+        /// Sends the notifications for the specified user regarding the specified nodes and action.
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="operatingUser"></param>
