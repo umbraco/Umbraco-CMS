@@ -686,6 +686,10 @@ namespace Umbraco.Web.Editors
             app.Add("cdf", ClientDependencySettings.Instance.Version);
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+
+            //add the server's GMT time offset in minutes
+            app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
+
             return app;
         }
         

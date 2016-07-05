@@ -1081,66 +1081,121 @@ namespace Umbraco.Web
 			return text.ToMd5();
 		}
 
+		/// <summary>
+		/// Strips all html tags from a given string, all contents of the tags will remain.
+		/// </summary>
 		public HtmlString StripHtml(IHtmlString html, params string[] tags)
 		{
 			return StripHtml(html.ToHtmlString(), tags);
 		}
+
+		/// <summary>
+		/// Strips all html tags from a given string, all contents of the tags will remain.
+		/// </summary>
 		public HtmlString StripHtml(DynamicNull html, params string[] tags)
 		{
 			return new HtmlString(string.Empty);
 		}
+
+		/// <summary>
+		/// Strips all html tags from a given string, all contents of the tags will remain.
+		/// </summary>
 		public HtmlString StripHtml(string html, params string[] tags)
 		{
             return _stringUtilities.StripHtmlTags(html, tags);
 		}
-        
+
+		/// <summary>
+		/// Will take the first non-null value in the collection and return the value of it.
+		/// </summary>
 		public string Coalesce(params object[] args)
 		{
             return _stringUtilities.Coalesce<DynamicNull>(args);
 		}
 
+		/// <summary>
+		/// Will take the first non-null value in the collection and return the value of it.
+		/// </summary>
 		public string Concatenate(params object[] args)
 		{
             return _stringUtilities.Concatenate<DynamicNull>(args);
 		}
 
+		/// <summary>
+		/// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
+		/// </summary>
 		public string Join(string seperator, params object[] args)
 		{
             return _stringUtilities.Join<DynamicNull>(seperator, args);
 		}
 
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(IHtmlString html, int length)
 		{
 			return Truncate(html.ToHtmlString(), length, true, false);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
 		{
 			return Truncate(html.ToHtmlString(), length, addElipsis, false);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
 			return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(DynamicNull html, int length)
 		{
 			return new HtmlString(string.Empty);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis)
 		{
 			return new HtmlString(string.Empty);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
 			return new HtmlString(string.Empty);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(string html, int length)
 		{
 			return Truncate(html, length, true, false);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(string html, int length, bool addElipsis)
 		{
 			return Truncate(html, length, addElipsis, false);
 		}
+
+		/// <summary>
+		/// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+		/// </summary>
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
@@ -1151,10 +1206,17 @@ namespace Umbraco.Web
 
 		#region If
 
+		/// <summary>
+		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+		/// </summary>
 		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}
+
+		/// <summary>
+		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+		/// </summary>
 		public HtmlString If(bool test, string valueIfTrue)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);

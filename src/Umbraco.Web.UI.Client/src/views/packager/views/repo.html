@@ -143,9 +143,14 @@
 
                 <div class="umb-package-details__section">
                     <div class="umb-package-details__owner-profile">
+
                         <div class="umb-package-details__owner-profile-avatar">
-                            <img class="umb-avatar" ng-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}" />
+                            <umb-avatar
+                                size="m"
+                                src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
+                            </umb-avatar>
                         </div>
+
                         <div>
                             <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
                             <div class="umb-package-details__owner-profile-karma">
@@ -212,9 +217,11 @@
                             <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
                             <span class="umb-package-details__information-item-label-2">({{compatibility.percentage}}%)</span>
                         </div>
-                        <div class="umb-progress-bar">
-                            <span class="umb-progress-bar__progress" style="width: {{compatibility.percentage}}%"></span>
-                        </div>
+
+                        <umb-progress-bar
+                            percentage="{{compatibility.percentage}}">
+                        </umb-progress-bar>
+
                     </div>
                 </div>
 
