@@ -35,6 +35,7 @@ namespace Umbraco.Core.Sync
         private readonly ILogger _logger;
         private int _lastId = -1;
         private DateTime _lastSync;
+        private DateTime _lastPruned;
         private bool _initialized;
         private bool _syncing;
         private bool _released;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Sync
 
             _appContext = appContext;
             _options = options;
-            _lastSync = DateTime.UtcNow;
+            _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _profilingLogger = appContext.ProfilingLogger;
             _logger = appContext.ProfilingLogger.Logger;
@@ -212,17 +213,18 @@ namespace Umbraco.Core.Sync
             {
                 using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
-                    var processed = ProcessDatabaseInstructions();
+                    ProcessDatabaseInstructions();
+
+                    if ((DateTime.UtcNow - _lastPruned).TotalSeconds <= _options.PruneThrottleSeconds)
+                        return;
+
+                    _lastPruned = _lastSync;
+
                     switch (_appContext.GetCurrentServerRole())
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:
-                            //Only prune instructions if there were actually any processed, otherwise
-                            // it's a wasted effort running SQL that doesn't need to be executed
-                            if (processed > 0)
-                            {
-                                PruneOldInstructions();
-                            }
+                            PruneOldInstructions();
                             break;
                     }
                 }
@@ -243,7 +245,7 @@ namespace Umbraco.Core.Sync
         /// <returns>
         /// Returns the number of processed instructions
         /// </returns>
-        private int ProcessDatabaseInstructions()
+        private void ProcessDatabaseInstructions()
         {
             // NOTE
             // we 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -259,7 +261,7 @@ namespace Umbraco.Core.Sync
                 .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
-            if (dtos.Count <= 0) return 0;
+            if (dtos.Count <= 0) return;
 
             // only process instructions coming from a remote server, and ignore instructions coming from
             // the local server as they've already been processed. We should NOT assume that the sequence of
@@ -308,9 +310,6 @@ namespace Umbraco.Core.Sync
 
             if (lastId > 0)
                 SaveLastSynced(lastId);
-
-            //return the number found/processed
-            return dtos.Count;
         }
 
         /// <summary>
@@ -324,32 +323,15 @@ namespace Umbraco.Core.Sync
         private void PruneOldInstructions()
         {
             var pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions);
-            var sqlSyntax = _appContext.DatabaseContext.SqlSyntax;
 
-            //NOTE: this query could work on SQL server and MySQL:
-            /*
-                SELECT id
-                FROM    umbracoCacheInstruction
-                WHERE   utcStamp < getdate()
-                AND id <> (SELECT MAX(id) FROM umbracoCacheInstruction)
-            */
-            // However, this will not work on SQLCE and in fact it will be slower than the query we are
-            // using if the SQL server doesn't perform it's own query optimizations (i.e. since the above
-            // query could actually execute a sub query for every row found). So we've had to go with an
-            // inner join which is faster and works on SQLCE but it's uglier to read.
+            // using 2 queries is faster than convoluted joins
 
-            var deleteQuery = new Sql().Select("cacheIns.id")
-                .From("umbracoCacheInstruction cacheIns")
-                .InnerJoin("(SELECT MAX(id) id FROM umbracoCacheInstruction) tMax")
-                .On("cacheIns.id <> tMax.id")
-                .Where("cacheIns.utcStamp < @pruneDate", new {pruneDate = pruneDate});
+            var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
 
-            var deleteSql = sqlSyntax.GetDeleteSubquery(
-                "umbracoCacheInstruction",
-                "id",
-                deleteQuery);
+            var delete = new Sql().Append(@"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
+                new { pruneDate, maxId });
 
-            _appContext.DatabaseContext.Database.Execute(deleteSql);
+            _appContext.DatabaseContext.Database.Execute(delete);
         }
 
         /// <summary>
