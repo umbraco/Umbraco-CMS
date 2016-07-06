@@ -1,3 +1,26 @@
+/**
+ * @ngdoc service
+ * @name umbraco.services.localizationService
+ *
+ * @requires $http
+ * @requires $q
+ * @requires $window
+ * @requires $filter
+ *
+ * @description
+ * Application-wide service for handling localization
+ *
+ * ##usage
+ * To use, simply inject the localizationService into any controller that needs it, and make
+ * sure the umbraco.services module is accesible - which it should be by default.
+ *
+ * <pre>
+ *    localizationService.localize("area_key").then(function(value){
+ *        element.html(value);
+ *    });
+ * </pre>
+ */
+
 angular.module('umbraco.services')
 .factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
 
@@ -78,7 +101,17 @@ angular.module('umbraco.services')
             return deferred.promise;
         },
 
-        //helper to tokenize and compile a localization string
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#tokenize
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Helper to tokenize and compile a localization string
+         * @param {String} value the value to tokenize
+         * @param {Object} scope the $scope object 
+         * @returns {String} tokenized resource string
+         */
         tokenize: function (value, scope) {
             if (value) {
                 var localizer = value.split(':');
@@ -95,7 +128,17 @@ angular.module('umbraco.services')
             return value;
         },
 
-        // checks the dictionary for a localized resource string
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#localize
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Checks the dictionary for a localized resource string
+         * @param {String} value the area/key to localize
+         * @param {Array} tokens if specified this array will be sent as parameter values 
+         * @returns {String} localized resource string
+         */
         localize: function (value, tokens) {
             return service.initLocalizedResources().then(function (dic) {
                 var val = _lookup(value, tokens, dic);

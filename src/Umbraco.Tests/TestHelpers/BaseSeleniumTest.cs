@@ -51,9 +51,11 @@ namespace Umbraco.Tests.TestHelpers
             var connectionString = string.Format(@"Data Source={0}", databaseDataPath);
 
             //Create the Sql CE database
-            var engine = new SqlCeEngine(connectionString);
-            if (File.Exists(databaseDataPath) == false)
-                engine.CreateDatabase();
+            using (var engine = new SqlCeEngine(connectionString))
+            {
+                if (File.Exists(databaseDataPath) == false)
+                    engine.CreateDatabase();
+            }
 
             var syntaxProvider = new SqlCeSyntaxProvider();
             SqlSyntaxContext.SqlSyntaxProvider = syntaxProvider;

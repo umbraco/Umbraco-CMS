@@ -179,7 +179,11 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
                     //TODO: Fix up hard coded datepicker
                 } ,
                 new ContentPropertyDisplay
@@ -188,7 +192,11 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
                     //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay

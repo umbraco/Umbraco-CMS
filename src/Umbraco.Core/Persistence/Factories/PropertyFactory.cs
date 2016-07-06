@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Factories
                     decimal val;
                     if (decimal.TryParse(property.Value.ToString(), out val))
                     {
-                        dto.Decimal = val;
+                        dto.Decimal = val; // property value should be normalized already
                     }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
