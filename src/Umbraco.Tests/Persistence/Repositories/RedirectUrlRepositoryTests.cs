@@ -62,6 +62,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
 
+            Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+
             using (var uow = provider.GetUnitOfWork())
             using (var repo = CreateRepository(uow))
             {
