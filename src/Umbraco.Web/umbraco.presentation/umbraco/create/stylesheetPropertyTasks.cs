@@ -18,7 +18,8 @@ namespace umbraco
             s.AddProperty(new StylesheetProperty(Alias, "." + Alias.ToSafeAlias(), ""));
             ApplicationContext.Current.Services.FileService.SaveStylesheet(s);
 
-            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", HttpUtility.UrlEncode(s.Path), Alias);
+            // SJ - Note: The Alias is NOT in fact the alias but the name of the new property, need to UrlEncode it!
+            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", HttpUtility.UrlEncode(s.Path), HttpUtility.UrlEncode(Alias));
             return true;
         }
 
