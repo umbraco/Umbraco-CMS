@@ -189,8 +189,10 @@ namespace Umbraco.Tests.TestHelpers
                     }
                     else
                     {
-                        var engine = new SqlCeEngine(settings.ConnectionString);
-                        engine.CreateDatabase();
+                        using (var engine = new SqlCeEngine(settings.ConnectionString))
+                        {
+                            engine.CreateDatabase();
+                        }
                     }
                 }
 
