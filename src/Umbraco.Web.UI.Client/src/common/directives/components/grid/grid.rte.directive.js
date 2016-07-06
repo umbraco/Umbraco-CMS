@@ -64,20 +64,30 @@ angular.module("umbraco.directives")
                                     await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
                                           var r = {};
-                                          r.title = rule.name;
-                                          if (rule.selector[0] === ".") {
-                                              r.inline = "span";
-                                              r.classes = rule.selector.substring(1);
-                                          }else if (rule.selector[0] === "#") {
-                                              //Even though this will render in the style drop down, it will not actually be applied
-                                              // to the elements, don't think TinyMCE even supports this and it doesn't really make much sense
-                                              // since only one element can have one id.
-                                              r.inline = "span";
-                                              r.attributes = { id: rule.selector.substring(1) };
-                                          }else {
-                                              r.block = rule.selector;
-                                          }
-                                          styleFormats.push(r);
+                                            r.title = rule.name;
+                                            if (rule.selector[0] == ".") {
+                                                r.inline = "span";
+                                                r.classes = rule.selector.substring(1);
+                                            }
+                                            else if (rule.selector[0] == "#") {
+                                                r.inline = "span";
+                                                r.attributes = { id: rule.selector.substring(1) };
+                                            }
+                                            else if (rule.selector[0] != "." && rule.selector.indexOf(".") > -1) {
+                                                var split = rule.selector.split(".");
+                                                r.block = split[0];
+                                                r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).split(".").join(" ");
+                                            }
+                                            else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
+                                                var split = rule.selector.split("#");
+                                                r.block = split[0];
+                                                r.classes = rule.selector.substring(rule.selector.indexOf("#") + 1).split(".").join(" ");
+                                            }
+                                            else {
+                                                r.block = rule.selector;
+                                            }
+                                            
+                                            styleFormats.push(r);
                                         });
                                     }));
                             });
