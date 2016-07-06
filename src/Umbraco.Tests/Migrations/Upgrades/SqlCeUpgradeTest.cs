@@ -42,8 +42,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 //Create the Sql CE database
                 //Get the connectionstring settings from config
                 var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                var engine = new SqlCeEngine(settings.ConnectionString);
-                engine.CreateDatabase();
+                using (var engine = new SqlCeEngine(settings.ConnectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
             else
             {
