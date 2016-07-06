@@ -75,10 +75,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreNotEqual(0, rurl.Id);
 
+                // fixme - too fast = same date = key violation?
+                // and... can that happen in real life?
+                // we don't really *care* about the IX, only supposed to make things faster...
+                // BUT in realife we AddOrUpdate in a trx so it should be safe, always
+
                 rurl = new RedirectUrl
                 {
                     ContentKey = _otherpage.Key,
-                    Url = "blah"
+                    Url = "blah",
+                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
                 repo.AddOrUpdate(rurl);
                 uow.Commit();
@@ -115,10 +121,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreNotEqual(0, rurl.Id);
 
+                // fixme - goes too fast and bam, errors, first is blah
+
                 rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
-                    Url = "durg"
+                    Url = "durg",
+                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
                 repo.AddOrUpdate(rurl);
                 uow.Commit();

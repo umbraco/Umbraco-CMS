@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -102,7 +104,8 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 Id = redirectUrl.Id,
                 ContentKey = redirectUrl.ContentKey,
                 CreateDateUtc = redirectUrl.CreateDateUtc,
-                Url = redirectUrl.Url
+                Url = redirectUrl.Url,
+                Hurl = HashUrl(redirectUrl.Url)
             };
         }
 
@@ -129,7 +132,8 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey)
         {
-            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.ContentKey == contentKey);
+            var hurl = HashUrl(url);
+            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.Hurl == hurl && x.ContentKey == contentKey);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
@@ -151,8 +155,9 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
+            var hurl = HashUrl(url);
             var sql = GetBaseQuery(false)
-                .Where<RedirectUrlDto>(x => x.Url == url)
+                .Where<RedirectUrlDto>(x => x.Url == url && x.Hurl == hurl)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault();
@@ -187,6 +192,14 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
             var rules = result.Items.Select(Map);
             return rules;
+        }
+
+        private static string HashUrl(string url)
+        {
+            var h = new MD5CryptoServiceProvider();
+            var i = Encoding.UTF8.GetBytes(url);
+            var o = h.ComputeHash(i);
+            return Encoding.UTF8.GetString(o);
         }
     }
 }
