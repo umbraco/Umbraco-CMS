@@ -121,7 +121,10 @@ namespace Umbraco.Tests.TestHelpers
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
         /// to be set to true if the SetupPluginManager has been overridden.
         /// </summary>
-        protected virtual bool PluginManagerResetRequired => false;
+        protected virtual bool PluginManagerResetRequired
+        {
+            get { return false; }
+        }
 
         /// <summary>
         /// Inheritors can resset the plugin manager if they choose to on teardown
