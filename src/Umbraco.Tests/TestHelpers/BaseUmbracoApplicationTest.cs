@@ -207,9 +207,15 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
         }
 
-        protected ApplicationContext ApplicationContext => ApplicationContext.Current;
+        protected ApplicationContext ApplicationContext
+        {
+            get { return ApplicationContext.Current; }
+        }
 
-        protected ILogger Logger => ProfilingLogger.Logger;
+        protected ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
 
         protected ProfilingLogger ProfilingLogger { get; private set; }
 

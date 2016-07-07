@@ -110,7 +110,7 @@ namespace Umbraco.Tests.TestHelpers
             get
             {
                 var att = GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
-                return att?.Behavior ?? DatabaseBehavior.NoDatabasePerFixture;
+                return att != null ? att.Behavior : DatabaseBehavior.NoDatabasePerFixture;
             }
         }
 
@@ -327,13 +327,20 @@ namespace Umbraco.Tests.TestHelpers
                 LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
-                onFail?.Invoke(ex);
+                if (onFail != null)
+                    onFail(ex);
             }
         }
 
-        protected ServiceContext ServiceContext => ApplicationContext.Services;
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
+        }
 
-        protected DatabaseContext DatabaseContext => ApplicationContext.DatabaseContext;
+        protected DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
