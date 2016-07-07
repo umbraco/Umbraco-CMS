@@ -105,7 +105,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 ContentKey = redirectUrl.ContentKey,
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
-                Hurl = HashUrl(redirectUrl.Url)
+                UrlHash = HashUrl(redirectUrl.Url)
             };
         }
 
@@ -132,8 +132,8 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey)
         {
-            var hurl = HashUrl(url);
-            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.Hurl == hurl && x.ContentKey == contentKey);
+            var urlHash = HashUrl(url);
+            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
@@ -155,9 +155,9 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var hurl = HashUrl(url);
+            var urlHash = HashUrl(url);
             var sql = GetBaseQuery(false)
-                .Where<RedirectUrlDto>(x => x.Url == url && x.Hurl == hurl)
+                .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault();
@@ -196,10 +196,10 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         private static string HashUrl(string url)
         {
-            var h = new MD5CryptoServiceProvider();
-            var i = Encoding.UTF8.GetBytes(url);
-            var o = h.ComputeHash(i);
-            return Encoding.UTF8.GetString(o);
+            var crypto = new MD5CryptoServiceProvider();
+            var inputBytes = Encoding.UTF8.GetBytes(url);
+            var hashedBytes = crypto.ComputeHash(inputBytes);
+            return Encoding.UTF8.GetString(hashedBytes);
         }
     }
 }

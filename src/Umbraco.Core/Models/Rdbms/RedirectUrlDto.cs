@@ -42,9 +42,9 @@ namespace Umbraco.Core.Models.Rdbms
         //[Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "url, createDateUtc")]
         public string Url { get; set; }
 
-        [Column("hurl")]
+        [Column("urlHash")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "hurl, contentKey, createDateUtc")]
-        public string Hurl { get; set; }
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, createDateUtc")]
+        public string UrlHash { get; set; }
     }
 }
