@@ -8,15 +8,14 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Resolves the last chance IPublishedContentFinder object.
     /// </summary>
-    public sealed class ContentLastChanceFinderResolver : ContainerSingleObjectResolver<ContentLastChanceFinderResolver, IContentFinder>
+    public sealed class ContentLastChanceFinderResolver : ContainerSingleObjectResolver<ContentLastChanceFinderResolver, IContentLastChanceFinder>
     {
         /// <summary>
         /// Initializes the resolver to use IoC
         /// </summary>
         /// <param name="container"></param>
-        /// <param name="implementationType"></param>
-        internal ContentLastChanceFinderResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
+        internal ContentLastChanceFinderResolver(IServiceContainer container)
+            : base(container)
         { }
    
         /// <summary>
@@ -24,7 +23,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="finder">The finder.</param>
         /// <remarks>For developers, at application startup.</remarks>
-        public void SetFinder(IContentFinder finder)
+        public void SetFinder(IContentLastChanceFinder finder)
         {
             Value = finder;
         }

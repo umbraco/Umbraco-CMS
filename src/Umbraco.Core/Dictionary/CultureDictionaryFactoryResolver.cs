@@ -15,11 +15,9 @@ namespace Umbraco.Core.Dictionary
 	    /// Initializes the resolver to use IoC
 	    /// </summary>
 	    /// <param name="container"></param>
-	    /// <param name="implementationType"></param>
-        internal CultureDictionaryFactoryResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
-	    {
-	    }
+        internal CultureDictionaryFactoryResolver(IServiceContainer container)
+            : base(container)
+	    { }
 
 	    internal CultureDictionaryFactoryResolver(ICultureDictionaryFactory factory)
 			: base(factory)

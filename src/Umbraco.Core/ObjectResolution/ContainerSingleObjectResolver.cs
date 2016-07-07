@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using LightInject;
+using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -41,21 +41,8 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerSingleObjectResolver(TResolved value, bool canBeNull)
             : base(value, canBeNull)
         {
-        } 
-        #endregion
-
-        /// <summary>
-        /// Initializes the resolver to use IoC
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="implementationType"></param>
-        internal ContainerSingleObjectResolver(IServiceContainer container, Type implementationType)
-        {
-            if (container == null) throw new ArgumentNullException("container");
-            if (implementationType == null) throw new ArgumentNullException("implementationType");
-            _container = container;
-            _container.Register(typeof(TResolved), implementationType, new PerContainerLifetime());
         }
+        #endregion
 
         /// <summary>
         /// Initialize the resolver to use IoC, when using this contructor the type must be set manually
@@ -63,7 +50,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <param name="container"></param>
         internal ContainerSingleObjectResolver(IServiceContainer container)
         {
-            if (container == null) throw new ArgumentNullException("container");
+            if (container == null) throw new ArgumentNullException(nameof(container));
             _container = container;
         }
 
@@ -75,7 +62,7 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerSingleObjectResolver(IServiceContainer container, Func<IServiceFactory, TResolved> implementationType)
         {
             _container = container;
-            _container.Register<TResolved>(implementationType, new PerContainerLifetime());
+            _container.Register(implementationType, new PerContainerLifetime());
         }
 
         /// <summary>
@@ -89,8 +76,9 @@ namespace Umbraco.Core.ObjectResolution
         {
             get
             {
-                if (_container == null) return base.Value;
-                return _container.GetInstance<TResolved>();
+                return _container == null
+                    ? base.Value
+                    : _container.GetInstance<TResolved>();
             }
             set
             {
@@ -102,7 +90,7 @@ namespace Umbraco.Core.ObjectResolution
                     {
                         // must override with the proper name!
                         _container.Override(
-                            sr => sr.ServiceType == typeof (TResolved) && sr.ServiceName == GetType().FullName,
+                            sr => sr.ServiceType == typeof (TResolved),
                             (factory, registration) =>
                             {
                                 registration.Value = value;
@@ -116,8 +104,9 @@ namespace Umbraco.Core.ObjectResolution
                         _container.Register(new ServiceRegistration
                         {
                             ServiceType = typeof (TResolved),
-                            ImplementingType = value.GetType(),
-                            ServiceName = GetType().FullName,
+                            // no! use Value below!
+                            //ImplementingType = value.GetType(),
+                            ServiceName = "",
                             Lifetime = new PerContainerLifetime(),
                             Value = value
                         });
@@ -134,7 +123,7 @@ namespace Umbraco.Core.ObjectResolution
         {
             get
             {
-                if (_container == null) return base.HasValue;   
+                if (_container == null) return base.HasValue;
                 return (_container.TryGetInstance<TResolved>() == null) == false;
             }
         }

@@ -10,15 +10,13 @@ namespace Umbraco.Core.Sync
     /// </summary>
     public sealed class ServerMessengerResolver : ContainerSingleObjectResolver<ServerMessengerResolver, IServerMessenger>
     {
-        internal ServerMessengerResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
-        {
-        }
+        internal ServerMessengerResolver(IServiceContainer container)
+            : base(container)
+        { }
 
         internal ServerMessengerResolver(IServiceContainer container, Func<IServiceFactory, IServerMessenger> implementationType)
             : base(container, implementationType)
-        {
-        }
+        { }
 
         /// <summary>
         /// Sets the messenger.

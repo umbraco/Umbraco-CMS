@@ -26,7 +26,7 @@ namespace Umbraco.Core.ObjectResolution
             Container = container;
 
             //Register ourselves in the case that a resolver instance should be injected someplace
-            Container.Register<TResolver>(factory => (TResolver)(object)this);
+            Container.Register(factory => (TResolver)(object)this);
         }
 
         /// <summary>

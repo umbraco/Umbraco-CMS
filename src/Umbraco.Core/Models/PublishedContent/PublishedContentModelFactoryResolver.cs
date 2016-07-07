@@ -10,16 +10,6 @@ namespace Umbraco.Core.Models.PublishedContent
     public class PublishedContentModelFactoryResolver : ContainerSingleObjectResolver<PublishedContentModelFactoryResolver, IPublishedContentModelFactory>
     {
         /// <summary>
-        /// Initializes the resolver to use IoC
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="implementationType"></param>
-        internal PublishedContentModelFactoryResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModelFactoryResolver"/>.
         /// </summary>
         /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
@@ -37,13 +27,12 @@ namespace Umbraco.Core.Models.PublishedContent
         { }
 
         /// <summary>
-        /// Initialize the resolver to use IoC, when using this contructor the type must be set manually
+        /// Initialize the resolver to use IoC
         /// </summary>
         /// <param name="container"></param>
         internal PublishedContentModelFactoryResolver(IServiceContainer container)
             : base(container)
-        {
-        }
+        { }
 
         /// <summary>
         /// Sets the factory.

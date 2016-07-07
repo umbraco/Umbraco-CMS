@@ -51,7 +51,8 @@ namespace Umbraco.Tests.Integration
             base.ConfigureContainer();
 
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(new DistributedCacheTests.TestServerRegistrar()); // localhost-only
-            ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof(WebServiceServerMessenger));
+            ServerMessengerResolver.Current = new ServerMessengerResolver(Container);
+            Container.Register<IServerMessenger, WebServiceServerMessenger>();
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(Container, Mock.Of<ILogger>(), () => new[]
             {
                 typeof(ContentTypeCacheRefresher),

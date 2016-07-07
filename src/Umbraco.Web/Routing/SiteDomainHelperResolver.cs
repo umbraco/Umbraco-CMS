@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using LightInject;
+using umbraco.cms.presentation;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Routing
@@ -14,11 +15,9 @@ namespace Umbraco.Web.Routing
         /// Initializes the resolver to use IoC
         /// </summary>
         /// <param name="container"></param>
-        /// <param name="implementationType"></param>
-        internal SiteDomainHelperResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
-        {
-        }
+        internal SiteDomainHelperResolver(IServiceContainer container)
+            : base(container)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteDomainHelperResolver"/> class with an <see cref="ISiteDomainHelper"/> implementation.

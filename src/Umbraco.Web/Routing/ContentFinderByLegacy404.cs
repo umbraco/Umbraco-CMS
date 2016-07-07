@@ -17,7 +17,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides an implementation of <see cref="IContentFinder"/> that runs the legacy 404 logic.
 	/// </summary>
-	public class ContentFinderByLegacy404 : IContentFinder
+	public class ContentFinderByLegacy404 : IContentLastChanceFinder
 	{
 	    
         private readonly ILogger _logger;

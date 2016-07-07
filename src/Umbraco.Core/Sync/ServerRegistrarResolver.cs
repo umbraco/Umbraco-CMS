@@ -15,18 +15,17 @@ namespace Umbraco.Core.Sync
         /// </summary>
         /// <param name="value">An instance of a registrar.</param>
         /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
-        public ServerRegistrarResolver(IServerRegistrar value) : base(value)
-        {
-        }
-        internal ServerRegistrarResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
-        {
-        }
+        public ServerRegistrarResolver(IServerRegistrar value) 
+            : base(value)
+        { }
+
+        internal ServerRegistrarResolver(IServiceContainer container)
+            : base(container)
+        { }
 
         internal ServerRegistrarResolver(IServiceContainer container, Func<IServiceFactory, IServerRegistrar> implementationType)
             : base(container, implementationType)
-        {
-        }
+        { }
 
         /// <summary>
         /// Sets the registrar.

@@ -14,9 +14,8 @@ namespace Umbraco.Core.Strings
         /// Initializes the resolver to use IoC
         /// </summary>
         /// <param name="container"></param>
-        /// <param name="implementationType"></param>
-        internal ShortStringHelperResolver(IServiceContainer container, Type implementationType)
-            : base(container, implementationType)
+        internal ShortStringHelperResolver(IServiceContainer container)
+            : base(container)
         {
             Resolution.Frozen += (sender, args) => Value.Freeze();
         }

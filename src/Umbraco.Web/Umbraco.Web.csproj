@@ -263,6 +263,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedFragmentExtensions.cs" />
     <Compile Include="Routing\Domain.cs" />
+    <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
