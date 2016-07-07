@@ -23,6 +23,7 @@
   <files>
     <file src="..\_BuildOutput\Configs\**" target="Content\Config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
     <file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" exclude="..\_BuildOutput\WebApp\Views\Web.config" />
+    <file src="..\_BuildOutput\WebApp\Scripts\**" target="Content\Scripts" exclude="..\_BuildOutput\WebApp\Scripts\dummy.txt" />
     <file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
     <file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
     <file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
