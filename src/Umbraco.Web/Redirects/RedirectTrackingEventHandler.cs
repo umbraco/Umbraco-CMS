@@ -8,24 +8,27 @@ using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.Redirects
 {
-    // when content is renamed or moved, we want to create a permanent 301 redirect from it's old url
-    //
-    // not managing domains because we don't know how to do it
-    // changing domains => must create a higher level strategy using rewriting rules probably
-    //
-    // recycle bin = moving to and from does nothing
-    // to = the node is gone, where would we redirect? from = same
-    //
+    /// <summary>
+    /// Implements an Application Event Handler for managing redirect urls tracking.
+    /// </summary>
+    /// <remarks>
+    /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old url</para>
+    /// <para>not managing domains because we don't know how to do it - changing domains => must create a higher level strategy using rewriting rules probably</para>
+    /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
+    /// </remarks>
     public class RedirectTrackingEventHandler : ApplicationEventHandler
     {
         private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
         private const string ContextKey2 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.2";
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
+        /// <inheritdoc />
         protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             // if any of these dlls are loaded we don't want to run our finder
@@ -40,17 +43,15 @@ namespace Umbraco.Web.Redirects
             };
 
             // assuming all assemblies have been loaded already
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var name = assembly.FullName.Split(',')[0];
-                if (dlls.Contains(name))
-                {
-                    ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
-                    return;
-                }
-            }
+            // check if any of them matches one of the above dlls
+            var found = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(x => x.FullName.Split(',')[0])
+                .Any(x => dlls.Contains(x));
+            if (found)
+                ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
         }
 
+        /// <inheritdoc />
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             // events are weird
@@ -78,13 +79,13 @@ namespace Umbraco.Web.Redirects
             // rolled back items have to be published, so publishing will take care of that
         }
 
-        private static Dictionary<int, string> OldRoutes
+        private static Dictionary<int, Tuple<Guid, string>> OldRoutes
         {
             get
             {
-                var oldRoutes = (Dictionary<int, string>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
+                var oldRoutes = (Dictionary<int, Tuple<Guid, string>>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
                 if (oldRoutes == null)
-                    UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<int, string>();
+                    UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<int, Tuple<Guid, string>>();
                 return oldRoutes;
             }
         }
@@ -129,11 +130,27 @@ namespace Umbraco.Web.Redirects
                 {
                     var route = contentCache.GetRouteById(x.Id);
                     if (IsNotRoute(route)) continue;
-                    OldRoutes[x.Id] = route;
+                    var wk = UnwrapToKey(x);
+                    if (wk == null) continue;
+                    OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
                 }
             }
 
             LockedEvents = true; // we only want to see the "first batch"
+        }
+
+        private static IPublishedContentWithKey UnwrapToKey(IPublishedContent content)
+        {
+            if (content == null) return null;
+            var withKey = content as IPublishedContentWithKey;
+            if (withKey != null) return withKey;
+
+            var extended = content as PublishedContentExtended;
+            while (extended != null)
+                extended = (content = extended.Unwrap()) as PublishedContentExtended;
+
+            withKey = content as IPublishedContentWithKey;
+            return withKey;
         }
 
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
@@ -144,7 +161,7 @@ namespace Umbraco.Web.Redirects
             {
                 // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
                 // to set a flag in 'Published' to indicate which entities have been refreshed ok
-                CreateRedirect(oldRoute.Key, oldRoute.Value);
+                CreateRedirect(oldRoute.Key, oldRoute.Value.Item1, oldRoute.Value.Item2);
                 removeKeys.Add(oldRoute.Key);
             }
 
@@ -169,13 +186,13 @@ namespace Umbraco.Web.Redirects
             LockedEvents = false;
         }
 
-        private static void CreateRedirect(int contentId, string oldRoute)
+        private static void CreateRedirect(int contentId, Guid contentKey, string oldRoute)
         {
             var contentCache = UmbracoContext.Current.ContentCache;
             var newRoute = contentCache.GetRouteById(contentId);
             if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
             var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
-            redirectUrlService.Register(oldRoute, contentId);
+            redirectUrlService.Register(oldRoute, contentKey);
         }
 
         private static bool IsNotRoute(string route)
