@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Moq;
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Migrations
 
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
 
             Assert.That(migrations.Count(), Is.EqualTo(12));

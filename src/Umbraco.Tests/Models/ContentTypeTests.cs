@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -285,7 +286,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]
@@ -390,7 +391,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]
@@ -498,7 +499,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
     }
 }

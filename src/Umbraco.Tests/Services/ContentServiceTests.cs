@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Moq;
@@ -1587,7 +1588,7 @@ namespace Umbraco.Tests.Services
                 list.Add(content);
                 list.AddRange(CreateChildrenOf(contentType, content, 4));
 
-                Console.WriteLine("Created: 'Hierarchy Simple Text Page {0}'", i);
+                Debug.Print("Created: 'Hierarchy Simple Text Page {0}'", i);
             }
 
             return list;
@@ -1601,7 +1602,7 @@ namespace Umbraco.Tests.Services
 				var c = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content);
                 list.Add(c);
 
-                Console.WriteLine("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
+                Debug.Print("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
             }
             return list;
         }

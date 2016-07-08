@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
-            Console.WriteLine("INIT LIB {0}",
+            Debug.Print("INIT LIB {0}",
                 PublishedContentType.Get(PublishedItemType.Content, "anything")
                     .PropertyTypes.Count());
             
