@@ -41,6 +41,7 @@ test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
 artifacts:
 - path: build\UmbracoCms.*
+- path: build\msbuild.log
 notifications:
 - provider: Slack
   auth_token:
