@@ -265,7 +265,9 @@ namespace Umbraco.Core.Persistence
         // this method provides a way to force-reset the variable
 	    internal void ResetForTests()
 	    {
-            DisposeResources();
-	    }
+            var db = _scopeContextAdapter.Get(HttpItemKey) as UmbracoDatabase;
+            _scopeContextAdapter.Clear(HttpItemKey);
+            db?.Dispose();
+        }
     }
 }
