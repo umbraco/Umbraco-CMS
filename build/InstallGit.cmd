@@ -2,13 +2,13 @@
 SETLOCAL
 REM SETLOCAL is on, so changes to the path not persist to the actual user's path
 
-git.exe 2> NUL
+git.exe --version 2> NUL
 if %ERRORLEVEL%==9009 GOTO :trydefaultpath
 GOTO :EOF
 
 :trydefaultpath
 path=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
-git.exe 2> NUL
+git.exe --version 2> NUL
 if %ERRORLEVEL%==9009 GOTO :showerror
 GOTO :EOF
 
