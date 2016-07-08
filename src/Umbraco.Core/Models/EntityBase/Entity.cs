@@ -23,13 +23,17 @@ namespace Umbraco.Core.Models.EntityBase
         private DateTime _updateDate;
         private bool _wasCancelled;
 
-        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
-        private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Entity, Guid>(x => x.Key);
-        private static readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.CreateDate);
-        private static readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.UpdateDate);
-        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.HasIdentity);
-        private static readonly PropertyInfo WasCancelledSelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.WasCancelled);
-        
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
+            public readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Entity, Guid>(x => x.Key);
+            public readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.CreateDate);
+            public readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.UpdateDate);
+            public readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.HasIdentity);
+            public readonly PropertyInfo WasCancelledSelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.WasCancelled);
+        }
 
         /// <summary>
         /// Integer Id
@@ -37,18 +41,11 @@ namespace Umbraco.Core.Models.EntityBase
         [DataMember]
         public int Id
         {
-            get
-            {
-                return _id;
-            }
+            get { return _id; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _id = value;
-                    HasIdentity = true; //set the has Identity
-                    return _id;
-                }, _id, IdSelector);
+                SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector);
+                HasIdentity = true; //set the has Identity
             }
         }
         
@@ -67,14 +64,7 @@ namespace Umbraco.Core.Models.EntityBase
                     _key = Guid.NewGuid();
                 return _key;
             }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _key = value;
-                    return _key;
-                }, _key, KeySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
         }
 
         /// <summary>
@@ -84,14 +74,7 @@ namespace Umbraco.Core.Models.EntityBase
         public DateTime CreateDate
         {
             get { return _createDate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _createDate = value;
-                    return _createDate;
-                }, _createDate, CreateDateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _createDate, Ps.Value.CreateDateSelector); }            
         }
 
         /// <summary>
@@ -105,14 +88,7 @@ namespace Umbraco.Core.Models.EntityBase
         internal bool WasCancelled
         {
             get { return _wasCancelled; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _wasCancelled = value;
-                    return _wasCancelled;
-                }, _wasCancelled, WasCancelledSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _wasCancelled, Ps.Value.WasCancelledSelector); }            
         }
 
         /// <summary>
@@ -122,14 +98,7 @@ namespace Umbraco.Core.Models.EntityBase
         public DateTime UpdateDate
         {
             get { return _updateDate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _updateDate = value;
-                    return _updateDate;
-                }, _updateDate, UpdateDateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector); }           
         }
 
         internal virtual void ResetIdentity()
@@ -166,14 +135,7 @@ namespace Umbraco.Core.Models.EntityBase
             {
                 return _hasIdentity;
             }
-            protected set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _hasIdentity = value;
-                    return _hasIdentity;
-                }, _hasIdentity, HasIdentitySelector);
-            }
+            protected set { SetPropertyValueAndDetectChanges(value, ref _hasIdentity, Ps.Value.HasIdentitySelector); }
         }
 
         //TODO: Make this NOT virtual or even exist really!

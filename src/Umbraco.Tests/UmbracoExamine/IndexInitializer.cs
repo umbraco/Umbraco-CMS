@@ -41,8 +41,8 @@ namespace Umbraco.Tests.UmbracoExamine
 		{            
 		    if (contentService == null)
 		    {
-                long totalRecs;
-
+                long longTotalRecs;
+                int intTotalRecs;
                 var demoData = new ExamineDemoDataContentService();
 
                 var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
@@ -69,16 +69,21 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 contentService = Mock.Of<IContentService>(
                     x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>())
                         ==
                         allRecs
-                        
-                        &&
-
-                        x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
                         ==
-                        allRecs); 
+                        allRecs
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out intTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        ==
+                        allRecs
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
+                        ==
+                        allRecs);
             }
 		    if (userService == null)
 		    {

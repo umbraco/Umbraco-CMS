@@ -13,7 +13,8 @@ using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Developer, "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
+    //[Tree(Constants.Applications.Developer, "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadPackages : BaseTree
     {
 

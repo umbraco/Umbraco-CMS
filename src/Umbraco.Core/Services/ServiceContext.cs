@@ -130,6 +130,7 @@ namespace Umbraco.Core.Services
             if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
             if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
+            if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
         }
 
         /// <summary>
@@ -263,5 +264,10 @@ namespace Umbraco.Core.Services
         public IMemberGroupService MemberGroupService => _memberGroupService.Value;
 
         public IExternalLoginService ExternalLoginService => _externalLoginService.Value;
+
+        /// <summary>
+        /// Gets the RedirectUrlService.
+        /// </summary>
+        public IRedirectUrlService RedirectUrlService => _redirectUrlService.Value;
     }
 }

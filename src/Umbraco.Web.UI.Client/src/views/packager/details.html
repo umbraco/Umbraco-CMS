@@ -1,0 +1,141 @@
+<div ng-controller="Umbraco.Editors.Packages.DetailsController as vm">
+
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="packagesForm" ng-submit="save()" novalidate>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-editor-header
+                name="vm.package.name"
+                name-locked="true"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <div class="umb-package-details">
+
+                    <div class="umb-package-details__main-content">
+
+                        <div class="umb-package-details__description" ng-bind-html-unsafe="vm.package.description"></div>
+
+                        <div class="umb-gallery">
+                            <div class="umb-gallery__thumbnails">
+                                <a class="umb-gallery__thumbnail" target="_blank" href="{{ image.source }}" ng-repeat="image in vm.package.images">
+                                    <img ng-src="{{ image.thumbnail }}" />
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="umb-package-details__sidebar">
+
+                        <div class="umb-package-details__section">
+                            <button class="umb-era-button -blue -full-width">Install package</button>
+                        </div>
+
+                        <div class="umb-package-details__section">
+                            <div class="umb-package-details__owner-profile">
+                                <div class="umb-package-details__owner-profile-avatar">
+                                    <img class="umb-avatar" ng-src="{{vm.package.information.ownerAvatar}}" />
+                                </div>
+                                <div>
+                                    <div class="umb-package-details__owner-profile-name">{{ vm.package.information.owner }}</div>
+                                    <div class="umb-package-details__owner-profile-karma">
+                                        {{ vm.package.information.owner }} has <strong>{{ vm.package.information.ownerKarma }}</strong> karma points
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="umb-package-details__section">
+                            <div class="umb-package-details__section-title">Information</div>
+                            <div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Owner:</div>
+                                    <div>{{vm.package.information.owner}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Contributors:</div>
+                                    <div ng-repeat="contributor in vm.package.information.contributors">
+                                        <a class="umb-package-details__link" href="{{ contributor.profileUrl }}" target="_blank">{{ contributor.name }}<span ng-if="!$last">,&nbsp;&nbsp;</span></a>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Created:</div>
+                                    <div>{{vm.package.information.created}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Current version:</div>
+                                    <div>{{vm.package.information.created}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">.Net Version:</div>
+                                    <div>{{vm.package.information.netVersion}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">License:</div>
+                                    <div>{{vm.package.information.license}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Downloads:</div>
+                                    <div>{{vm.package.information.downloads}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Karma:</div>
+                                    <div>{{vm.package.information.karma}}</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="umb-package-details__section">
+                            <div class="umb-package-details__section-title">Compatibility</div>
+                            <div class="umb-package-details__section-description">This project is compatible with the following versions as reported by community members who have downloaded this package:</div>
+                            <div class="umb-package-details__compatability" ng-repeat="compatibility in vm.package.compatibility | filter:percentage > 0">
+                                <div class="umb-package-details__compatability-label">
+                                    <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
+                                    <span class="umb-package-details__information-item-label-2">({{compatibility.percentage}}%)</span>
+                                </div>
+                                <div class="umb-progress-bar">
+                                    <span class="umb-progress-bar__progress" style="width: {{compatibility.percentage}}%"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="umb-package-details__section">
+                            <div class="umb-package-details__section-title">External sources</div>
+                            <div>
+                                <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
+                                    <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
+                                        <i class="icon-out"></i>
+                                        {{ externalSource.name }}
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </umb-editor-container>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

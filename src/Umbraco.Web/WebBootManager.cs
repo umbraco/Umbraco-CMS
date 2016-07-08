@@ -42,6 +42,7 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.DependencyInjection;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web._Legacy.Actions;
 using UmbracoExamine;
 using Action = System.Action;
@@ -488,8 +489,9 @@ namespace Umbraco.Web
                 typeof(ContentFinderByIdPath),
                 typeof(ContentFinderByNiceUrlAndTemplate),
                 typeof(ContentFinderByProfile),
-                typeof(ContentFinderByUrlAlias)
+                typeof(ContentFinderByUrlAlias),
 
+                typeof(ContentFinderByRedirectUrl)
             );
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container, typeof(SiteDomainHelper));
@@ -506,6 +508,9 @@ namespace Umbraco.Web
                 PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container, typeof(DefaultCultureDictionaryFactory));
+#error inject!
+            HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
         }
 
         /// <summary>

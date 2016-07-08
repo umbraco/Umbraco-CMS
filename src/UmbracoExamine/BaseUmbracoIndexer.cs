@@ -435,9 +435,7 @@ namespace UmbracoExamine
             if (e.OriginalValues.ContainsKey("icon") && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {
                 e.IndexItem.ValueSet.Values[IconFieldName] = new List<object> { e.OriginalValues["icon"] };
-            }
-            
+            }            
         }
-
     }
 }

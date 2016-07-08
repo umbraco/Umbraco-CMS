@@ -127,9 +127,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(image);
                 unitOfWork.Flush();
 
+                var fetched = repository.Get(image.Id);
+
                 // Assert
                 Assert.That(mediaType.HasIdentity, Is.True);
                 Assert.That(image.HasIdentity, Is.True);
+
+                TestHelper.AssertAllPropertyValuesAreEquals(image, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 

@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web._Legacy.Actions;
+using System.Collections.Generic;
 
 namespace Umbraco.Web
 {
@@ -26,6 +27,16 @@ namespace Umbraco.Web
             service.SendNotification(entity, action, UmbracoContext.Current);
         }
 
+        internal static void SendNotification(this INotificationService service, IEnumerable<IUmbracoEntity> entities, IAction action, ApplicationContext applicationContext)
+        {
+            if (UmbracoContext.Current == null)
+            {
+                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                return;
+            }
+            service.SendNotification(entities, action, UmbracoContext.Current);
+        }
+
         internal static void SendNotification(this INotificationService service, IUmbracoEntity entity, IAction action, UmbracoContext umbracoContext)
         {
             if (umbracoContext == null)
@@ -34,6 +45,16 @@ namespace Umbraco.Web
                 return;
             }
             service.SendNotification(entity, action, umbracoContext, umbracoContext.Application);
+        }
+
+        internal static void SendNotification(this INotificationService service, IEnumerable<IUmbracoEntity> entities, IAction action, UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null)
+            {
+                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                return;
+            }
+            service.SendNotification(entities, action, umbracoContext, umbracoContext.Application);
         }
 
         internal static void SendNotification(this INotificationService service, IUmbracoEntity entity, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
@@ -60,6 +81,30 @@ namespace Umbraco.Web
             service.SendNotification(user, entity, action, umbracoContext, applicationContext);
         }
 
+        internal static void SendNotification(this INotificationService service, IEnumerable<IUmbracoEntity> entities, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
+        {
+            if (umbracoContext == null)
+            {
+                LogHelper.Warn(typeof(NotificationServiceExtensions), "Cannot send notifications, there is no current UmbracoContext");
+                return;
+            }
+
+            var user = umbracoContext.Security.CurrentUser;
+
+            //if there is no current user, then use the admin 
+            if (user == null)
+            {
+                LogHelper.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                user = applicationContext.Services.UserService.GetUserById(0);
+                if (user == null)
+                {
+                    LogHelper.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id 0 could be resolved");
+                    return;
+                }
+            }
+            service.SendNotification(user, entities, action, umbracoContext, applicationContext);
+        }
+
         internal static void SendNotification(this INotificationService service, IUser sender, IUmbracoEntity entity, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
         {
             if (sender == null) throw new ArgumentNullException("sender");
@@ -77,6 +122,25 @@ namespace Umbraco.Web
                 (mailingUser, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
                                               ? applicationContext.Services.TextService.Localize("notifications/mailBody", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings)
                                               : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings));
+        }
+
+         internal static void SendNotification(this INotificationService service, IUser sender, IEnumerable<IUmbracoEntity> entities, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
+        {
+            if (sender == null) throw new ArgumentNullException("sender");
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+
+            
+            applicationContext.Services.NotificationService.SendNotifications(
+                sender,
+                entities,
+                action.Letter.ToString(CultureInfo.InvariantCulture),
+                applicationContext.Services.TextService.Localize("actions", action.Alias),
+                umbracoContext.HttpContext,
+                (mailingUser, strings) => applicationContext.Services.TextService.Localize("notifications/mailSubject", strings, mailingUser),
+                (mailingUser, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
+                                              ? applicationContext.Services.TextService.Localize("notifications/mailBody", strings, mailingUser)
+                                              : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", strings, mailingUser));
         }
     }
 }

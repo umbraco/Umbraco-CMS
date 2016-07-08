@@ -52,5 +52,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("dbType")]
         public string DbType { get; set; }
+
+        [Column("UniqueID")]        
+        public Guid UniqueId { get; set; }
     }
 }

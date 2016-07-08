@@ -29,6 +29,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.Security;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -358,6 +359,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
                                     controller => controller.CheckContentXmlTable())
+                            },
+                            {
+                                "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
+                                    controller => controller.GetAllHealthChecks())
                             }
                         }
                     },
@@ -696,6 +701,10 @@ namespace Umbraco.Web.Editors
             app.Add("cdf", ClientDependencySettings.Instance.Version);
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+
+            //add the server's GMT time offset in minutes
+            app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
+
             return app;
         }
         

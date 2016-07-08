@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Web;
-using System.Web.Services.Description;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
-using Umbraco.Web;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.UI;
 using Umbraco.Core.Services;
@@ -45,10 +33,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
             if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
-            var propName = IsPostBack ? OriginalName.Value : Request.QueryString["prop"];
+            var property = HttpUtility.UrlDecode(Request.QueryString["prop"]);
+            var propName = IsPostBack ? OriginalName.Value : property;
 
             _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
-            if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
+            if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + property);
 
             Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheetproperty");
 
@@ -72,7 +61,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             var path = _sheet.Path.Replace('\\', '/');
             var nodePath = string.Format(BaseTree.GetTreePathFromFilePath(path) +
-                        ",{0}_{1}", path, _stylesheetproperty.Name);
+                        ",{0}_{1}", path, HttpUtility.UrlEncode(_stylesheetproperty.Name));
 
             ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)

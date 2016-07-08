@@ -3,14 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// A cache provider that statically caches everything in an in memory dictionary
+    /// Represents a cache provider that statically caches item in a concurrent dictionary.
     /// </summary>
-    internal class StaticCacheProvider : ICacheProvider
+    public class StaticCacheProvider : ICacheProvider
     {
         internal readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();
 
@@ -75,7 +74,6 @@ namespace Umbraco.Core.Cache
         public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return StaticCache.GetOrAdd(cacheKey, key => getCacheItem());
-        }
-        
+        }        
     }
 }

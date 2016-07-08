@@ -15,10 +15,15 @@ namespace Umbraco.Core.Models
         private bool _isActive;
         private bool _isMaster;
 
-        private static readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
-        private static readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
-        private static readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
-        private static readonly PropertyInfo IsMasterSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsMaster);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
+            public readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
+            public readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
+            public readonly PropertyInfo IsMasterSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsMaster);
+        }
 
         /// <summary>
         /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
@@ -69,14 +74,7 @@ namespace Umbraco.Core.Models
         public string ServerAddress
         {
             get { return _serverAddress; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _serverAddress = value;
-                    return _serverAddress;
-                }, _serverAddress, ServerAddressSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _serverAddress, Ps.Value.ServerAddressSelector); }
         }
 
         /// <summary>
@@ -85,14 +83,7 @@ namespace Umbraco.Core.Models
         public string ServerIdentity
         {
             get { return _serverIdentity; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _serverIdentity = value;
-                    return _serverIdentity;
-                }, _serverIdentity, ServerIdentitySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _serverIdentity, Ps.Value.ServerIdentitySelector); }
         }
 
         /// <summary>
@@ -101,14 +92,7 @@ namespace Umbraco.Core.Models
         public bool IsActive
         {
             get { return _isActive; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isActive = value;
-                    return _isActive;
-                }, _isActive, IsActiveSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _isActive, Ps.Value.IsActiveSelector); }
         }
 
         /// <summary>
@@ -117,14 +101,7 @@ namespace Umbraco.Core.Models
         public bool IsMaster
         {
             get { return _isMaster; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isMaster = value;
-                    return _isMaster;
-                }, _isMaster, IsMasterSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _isMaster, Ps.Value.IsMasterSelector); }
         }
 
         /// <summary>

@@ -1,0 +1,109 @@
+<div ng-controller="Umbraco.Editors.Packages.CategoryController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="packagesForm" ng-submit="save()" novalidate>
+
+        <umb-editor-view footer="false" ng-if="!page.loading">
+
+            <umb-editor-header
+                name="vm.page.name"
+                name-locked="true"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+
+                <umb-editor-sub-header>
+                    <umb-editor-sub-header-content-left>
+
+                        <umb-editor-sub-header-section>
+                            <div class="umb-packages-categories -collapsed">
+                                <a href="" class="umb-packages-category" ng-class="{'-active': category.active === true}" ng-click="vm.selectCategory(category)" ng-repeat="category in vm.categories">
+                                    <i class="umb-packages-category-icon" ng-class="category.icon"></i>
+                                    <div>{{ category.name }}</div>
+                                </a>
+                            </div>
+                        </umb-editor-sub-header-section>
+
+                    </umb-editor-sub-header-content-left>
+                </umb-editor-sub-header>
+
+
+                <h4><strong>Popular</strong></h4>
+                <div class="umb-packages clearfix">
+
+                    <div class="umb-package" ng-repeat="package in vm.packages">
+                        <a class="umb-package-link" href="#">
+
+                            <div class="umb-package-icon">
+                                <img ng-src="{{package.icon}}" alt="" />
+                            </div>
+
+                            <div class="umb-package-info">
+                                <div class="umb-package-name">{{ package.name }}</div>
+
+                                <div class="umb-package-numbers">
+                                    <small class="umb-package-downloads">
+                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                    </small>
+                                    <small class="umb-package-karma">
+                                        <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
+                                    </small>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div> <!-- end package -->
+
+                </div> <!-- end packages -->
+
+
+                <h4><strong>Latest</strong></h4>
+                <div class="umb-packages clearfix">
+
+                    <div class="umb-package" ng-repeat="package in vm.packages">
+                        <a class="umb-package-link" href="#">
+
+                            <div class="umb-package-icon">
+                                <img src="{{ package.icon }}" alt="" />
+                            </div>
+
+                            <div class="umb-package-info">
+                                <h4 class="umb-package-name">
+                                    {{ package.name }}
+                                </h4>
+
+                                <div class="umb-package-numbers">
+                                    <small class="umb-package-downloads">
+                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                    </small>
+                                    <small class="umb-package-karma">
+                                        <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
+                                    </small>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div> <!-- end package -->
+
+                </div> <!-- end packages -->
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+                    Breadcrumbs here
+                </umb-editor-footer-content-left>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

@@ -2,10 +2,8 @@
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
-using System.Linq;
 using System.Web.Routing;
 using System.Xml;
-using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
@@ -32,9 +30,10 @@ using File = System.IO.File;
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-    /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
-    /// The NPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
+    /// Provides a base class for Umbraco application tests that require a database.
     /// </summary>
+    /// <remarks>Can provide a SqlCE database populated with the Umbraco schema. The database should be accessed
+    /// through the <see cref="DefaultDatabaseFactory"/>.</remarks>
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
     {
@@ -45,15 +44,15 @@ namespace Umbraco.Tests.TestHelpers
         private bool _firstTestInFixture = true;
 
         //Used to flag if its the first test in the current session
-        private bool _isFirstRunInTestSession = false;
+        private bool _isFirstRunInTestSession;
         //Used to flag if its the first test in the current fixture
-        private bool _isFirstTestInFixture = false;
+        private bool _isFirstTestInFixture;
 
         private ApplicationContext _appContext;
 
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
-        private static Byte[] _dbBytes;
+        private static byte[] _dbBytes;
 
         [SetUp]
         public override void Initialize()
@@ -100,6 +99,8 @@ namespace Umbraco.Tests.TestHelpers
             var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
                 ? TestObjects.GetIDatabaseFactoryMock()
                 : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
+#error ok?
+            databaseFactory.Reset();
 
             // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
@@ -151,6 +152,13 @@ namespace Umbraco.Tests.TestHelpers
                 var att = GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
                 return att?.Behavior ?? DatabaseBehavior.NoDatabasePerFixture;
             }
+        }
+
+        protected virtual ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
+
+        protected virtual ISqlSyntaxProvider GetSyntaxProvider()
+        {
+            return new SqlCeSyntaxProvider();
         }
 
         protected virtual string GetDbProviderName()
@@ -216,8 +224,10 @@ namespace Umbraco.Tests.TestHelpers
                     }
                     else
                     {
-                        var engine = new SqlCeEngine(settings.ConnectionString);
-                        engine.CreateDatabase();
+                        using (var engine = new SqlCeEngine(settings.ConnectionString))
+                        {
+                            engine.CreateDatabase();
+                        }
                     }
                 }
 
@@ -326,23 +336,21 @@ namespace Umbraco.Tests.TestHelpers
                     }
                 }
             }
-            if (_firstTestInFixture)
+            if (_firstTestInFixture == false) return;
+
+            lock (Locker)
             {
-                lock (Locker)
-                {
-                    if (_firstTestInFixture)
-                    {
-                        _isFirstTestInFixture = true; //set the flag
-                        _firstTestInFixture = false;
-                    }
-                }
+                if (_firstTestInFixture == false) return;
+
+                _isFirstTestInFixture = true; //set the flag
+                _firstTestInFixture = false;
             }
         }
 
         private void RemoveDatabaseFile(UmbracoDatabase database, Action<Exception> onFail = null)
         {
             CloseDbConnections(database);
-            string path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.CurrentAssemblyDirectory;
             try
             {
                 string filePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
@@ -357,9 +365,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
                 if (onFail != null)
-                {
                     onFail(ex);
-                }
             }
         }
 

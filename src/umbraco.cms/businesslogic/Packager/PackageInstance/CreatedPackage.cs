@@ -32,8 +32,10 @@ namespace umbraco.cms.businesslogic.packager
 
         public static CreatedPackage MakeNew(string name)
         {
-            var pack = new CreatedPackage();
-            pack.Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings));
+            var pack = new CreatedPackage
+            {
+                Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings))
+            };
 
 
             return pack;

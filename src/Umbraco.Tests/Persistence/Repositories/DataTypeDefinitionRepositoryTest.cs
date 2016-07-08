@@ -353,9 +353,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
                 var exists = repository.Exists(dataTypeDefinition.Id);
 
+                var fetched = repository.Get(dataTypeDefinition.Id);
+
                 // Assert
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
                 Assert.That(exists, Is.True);
+
+                TestHelper.AssertAllPropertyValuesAreEquals(dataTypeDefinition, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 

@@ -260,5 +260,12 @@ namespace Umbraco.Core.Persistence
             db?.Dispose();
             Configured = false;
         }
+
+        // during tests, the thread static var can leak between tests
+        // this method provides a way to force-reset the variable
+	    internal void ResetForTests()
+	    {
+            DisposeResources();
+	    }
     }
 }

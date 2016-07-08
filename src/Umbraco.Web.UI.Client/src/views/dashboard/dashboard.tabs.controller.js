@@ -22,22 +22,26 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
         $scope.state = "Installng package";
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
-            .then(function(pack){
-              $scope.state = "importing";
-              return packageResource.import(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "Installing";
-              return packageResource.installFiles(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "Restarting, please hold...";
-              return packageResource.installData(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "All done, your browser will now refresh";
-              return packageResource.cleanUp(pack);
-            }, $scope.error)
+            .then(function(pack) {
+                    $scope.state = "importing";
+                    return packageResource.import(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                    $scope.state = "Installing";
+                    return packageResource.installFiles(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                    $scope.state = "Restarting, please wait...";
+                    return packageResource.installData(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                    $scope.state = "All done, your browser will now refresh";
+                    return packageResource.cleanUp(pack);
+                },
+                $scope.error)
             .then($scope.complete, $scope.error);
     };
 
@@ -50,6 +54,8 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
     $scope.error = function(err){
         $scope.state = undefined;
         $scope.error = err;
+        //This will return a rejection meaning that the promise change above will stop
+        return $q.reject();
     };
 
 

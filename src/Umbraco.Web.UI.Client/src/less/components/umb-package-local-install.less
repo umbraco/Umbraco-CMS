@@ -1,0 +1,153 @@
+//
+//     Install local package
+//
+
+// Helpers
+.faded {
+    color: @grayMed;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.mt-3 {
+    margin-top: 30px;
+}
+
+// Upload state
+
+.umb-upload-local,
+.umb-info-local {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.umb-upload-local form,
+.umb-info-local-items {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    margin: 0;
+
+    max-width: 640px;
+}
+
+.umb-upload-local__dropzone {
+    position: relative;
+    width: 500px;
+    height: 300px;
+    border: 2px dashed @grayLight;
+    border-radius: 3px;
+    background: @grayLighter;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 30px;
+
+    transition: 100ms box-shadow ease, 100ms border ease;
+
+    &:hover,
+    &.drag-over {
+        border-color: @blue;
+        border-style: solid;
+        box-shadow: 0 3px 8px rgba(0,0,0, .1);
+        transition: 100ms box-shadow ease, 100ms border ease;
+    }
+}
+
+.umb-upload-local__dropzone i {
+    display: block;
+    color: @grayLight;
+    font-size: 110px;
+    line-height: 1;
+}
+
+.umb-upload-local__select-file {
+    font-weight: bold;
+    color: @blue;
+    cursor: pointer;
+}
+
+
+// Accept terms
+.umb-accept-terms {
+    display: flex;
+    align-items: center;
+
+    font-size: 13px;
+}
+
+.umb-package-installer-label .label-text {
+    margin-left: 5px;
+}
+
+.umb-package-installer-label input[type="radio"],
+.umb-package-installer-label input[type="checkbox"] {
+    margin-top: 0px;
+}
+
+.umb-package-installer-label {
+    display: inline-flex;
+    align-items: center;
+
+    font-size: 13px;
+    user-select: none;
+}
+
+
+// Info state
+.umb-info-local-items {
+    border: 2px solid @grayLight;
+    border-radius: 3px;
+    background: @grayLighter;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 20px;
+    max-width: 540px;
+}
+
+.umb-info-local-items a {
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.umb-info-local-item {
+    margin-bottom: 20px;
+}
+
+.umb-info-local-items .umb-package-icon {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 150px;
+    font-size: 60px;
+}
+
+.umb-info-local-items .umb-package-icon img {
+    max-width: 100px;
+}
+
+.umb-info-local-items .umb-package-info {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 40px;
+}
+
+.umb-info-local-items .umb-package-installer-label {
+    margin-left: 10px;
+}
