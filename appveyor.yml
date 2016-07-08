@@ -32,9 +32,9 @@ build_script:
 
     SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 
-    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /verbosity:minimal
+    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly
 
-    build.bat %release% build%APPVEYOR_BUILD_NUMBER%
+    build.bat nopause %release% build%APPVEYOR_BUILD_NUMBER%
 
     ECHO %PATH%
 test:

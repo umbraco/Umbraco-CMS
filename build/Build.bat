@@ -11,8 +11,8 @@ FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SE
 FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SET "comment=%%i"
 
 REM If there's arguments on the command line overrule UmbracoVersion.txt and use that as the version
-IF [%1] NEQ [] (SET release=%1)
-IF [%2] NEQ [] (SET comment=%2) ELSE (IF [%1] NEQ [] (SET "comment="))
+IF [%2] NEQ [] (SET release=%2)
+IF [%3] NEQ [] (SET comment=%3) ELSE (IF [%2] NEQ [] (SET "comment="))
 
 SET version=%release%
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
@@ -63,8 +63,11 @@ REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version% -Symbols -Verbosity quiet
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version% -Verbosity quiet
-                        
-IF ERRORLEVEL 1 GOTO :showerror
+
+REM If there's one argument then don't go to :showerror
+REM We want this so PAUSE doesn't make the build server wait forever before cancelling the build                        
+IF ERRORLEVEL 1 IF [%1] NEQ [] GOTO :EOF
+IF ERRORLEVEL 1 IF [%1] EQ [] :showerror
 
 ECHO No errors were detected but you still may see some in the output, then it's time to investigate.
 ECHO You might see some warnings but that is completely normal.
