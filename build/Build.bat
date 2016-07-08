@@ -25,6 +25,9 @@ ECHO.
 ECHO Building Umbraco %version%
 ECHO.
 
+SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
 
 ECHO.
@@ -67,7 +70,7 @@ ECHO This takes a few minutes and logging is set to report warnings
 ECHO and errors only so it might seems like nothing is happening for a while. 
 ECHO You can check the msbuild.log file for progress.
 ECHO.
-"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
+%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
 IF ERRORLEVEL 1 GOTO :error
 
 ECHO.
@@ -90,12 +93,15 @@ ECHO.
 ECHO No errors were detected!
 ECHO There may still be some in the output, which you would need to investigate.
 ECHO Warnings are usually normal.
+ECHO.
+ECHO.
 GOTO :EOF
 
 :error
 
 ECHO.
 ECHO. Errors were detected!
+ECHO.
 
 REM don't pause if continuous integration else the build server waits forever
 REM before cancelling the build (and, there is noone to read the output anyways)
