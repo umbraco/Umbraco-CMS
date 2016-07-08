@@ -33,14 +33,25 @@ DEL /F /Q webpihash.txt
 
 ECHO Making sure Git is in the path so that the build can succeed
 CALL InstallGit.cmd
+REM Adding the default Git path so that if it's installed it can actually be found
+REM This is necessary because SETLOCAL is on in InstallGit.cmd so that one might find Git, 
+REM but the path setting is lost due to SETLOCAL 
+path=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
+
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 
+ECHO.
+ECHO Performing MSBuild and producing Umbraco binaries zip files
+ECHO This takes a few minutes and logging is set to report warnigns 
+ECHO and errors only so it might seems like nothing is happening for a while. 
+ECHO You can check the msbuild.log file for progress 
+ECHO.
 SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
+"%ProgramFiles(x86)%"\MSBuild\14.0\Bin\MSBuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
 
 ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
