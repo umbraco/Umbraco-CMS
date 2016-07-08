@@ -7,6 +7,6 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public interface IMigrationExpression
     {
-        string Process(Database database);
+        string Process(UmbracoDatabase database);
     }
 }

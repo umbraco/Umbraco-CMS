@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
+using System.Linq;
 using System.Web.Routing;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
@@ -96,11 +98,17 @@ namespace Umbraco.Tests.TestHelpers
 
             // create the database factory - if the test does not require an actual database,
             // use a mock factory; otherwise use a real factory.
-            var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
-                ? TestObjects.GetIDatabaseFactoryMock()
-                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
-#error ok?
-            databaseFactory.Reset();
+            IDatabaseFactory databaseFactory;
+            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+            {
+                databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            }
+            else
+            {
+                var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
+                f.ResetForTests();
+                databaseFactory = f;
+            }
 
             // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect

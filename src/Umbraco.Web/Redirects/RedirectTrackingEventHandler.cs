@@ -2,13 +2,11 @@
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Events;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 
@@ -117,7 +115,7 @@ namespace Umbraco.Web.Redirects
             }
         }
 
-        private static void ContentService_Publishing(IPublishingStrategy sender, PublishEventArgs<IContent> args)
+        private static void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
         {
             if (LockedEvents) return;
 
@@ -169,7 +167,7 @@ namespace Umbraco.Web.Redirects
                 OldRoutes.Remove(k);
         }
 
-        private static void ContentService_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        private static void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e)
         {
             // look note in CacheUpdated
             // we might want to set a flag on the entities we are seeing here

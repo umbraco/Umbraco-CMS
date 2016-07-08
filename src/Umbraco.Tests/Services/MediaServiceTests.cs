@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Services
         {
             var mediaService = ServiceContext.MediaService;
             var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
-            ServiceContext.ContentTypeService.Save(mediaType);
+            ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             mediaService.Save(media);
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Services
         {
             var mediaService = ServiceContext.MediaService;
             var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
-            ServiceContext.ContentTypeService.Save(mediaType);
+            ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
             mediaService.Save(media);

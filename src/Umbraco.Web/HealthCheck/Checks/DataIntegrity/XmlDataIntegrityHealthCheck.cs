@@ -73,11 +73,11 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         {
             var total = _services.MemberService.Count();
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = new Sql()
+            var subQuery = _database.Sql()
                 .Select("Count(*)")
-                .From<ContentXmlDto>(_sqlSyntax)
-                .InnerJoin<NodeDto>(_sqlSyntax)
-                .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
+                .From<ContentXmlDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
             var totalXml = _database.ExecuteScalar<int>(subQuery);
 
@@ -96,11 +96,11 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         {
             var total = _services.MediaService.Count();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql()
+            var subQuery = _database.Sql()
                 .Select("Count(*)")
-                .From<ContentXmlDto>(_sqlSyntax)
-                .InnerJoin<NodeDto>(_sqlSyntax)
-                .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
+                .From<ContentXmlDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
             var totalXml = _database.ExecuteScalar<int>(subQuery);
 
@@ -118,11 +118,11 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         private HealthCheckStatus CheckContent()
         {
             var total = _services.ContentService.CountPublished();
-            var subQuery = new Sql()
+            var subQuery = _database.Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>(_sqlSyntax)
-                .InnerJoin<DocumentDto>(_sqlSyntax)
-                .On<DocumentDto, ContentXmlDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId);
+                .From<ContentXmlDto>()
+                .InnerJoin<DocumentDto>()
+                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
             var totalXml = _database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
 
             var actions = new List<HealthCheckAction>();

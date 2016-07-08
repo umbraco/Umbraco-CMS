@@ -1,19 +1,13 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
-using Umbraco.Core.Persistence.Migrations.Syntax.Create;
-using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
-using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
 {
     [Migration("7.5.0", 101, GlobalSettings.UmbracoMigrationName)]
     public class AddRedirectUrlTable2 : MigrationBase
     {
-        public AddRedirectUrlTable2(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddRedirectUrlTable2(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()
@@ -22,14 +16,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(Database database)
+        private string MigrationCode(UmbracoDatabase database)
         {
             var columns = SqlSyntax.GetColumnsInSchema(database).ToArray();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoRedirectUrl") && x.ColumnName.InvariantEquals("contentKey")))
                 return null;
 
-            var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+            var localContext = new LocalMigrationContext(database, Logger);
 
             localContext.Execute.Sql("DELETE FROM umbracoRedirectUrl"); // else cannot add non-nullable field
 

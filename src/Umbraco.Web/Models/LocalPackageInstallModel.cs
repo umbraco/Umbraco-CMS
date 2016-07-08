@@ -16,10 +16,10 @@ namespace Umbraco.Web.Models
             Notifications = new List<Notification>();
         }
         
-        public List<ContentItemFile> UploadedFiles { get; private set; }
+        public List<ContentItemFile> UploadedFiles { get; }
         
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<Notification> Notifications { get; }
 
         /// <summary>
         /// A flag to determine if this package is compatible to be installed
@@ -53,9 +53,6 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "containsMacroConflict")]
         public bool ContainsMacroConflict { get; set; }
-
-        [DataMember(Name = "containsLegacyPropertyEditors")]
-        public bool ContainsLegacyPropertyEditors { get; set; }
 
         [DataMember(Name = "containsBinaryFileErrors")]
         public bool ContainsBinaryFileErrors { get; set; }

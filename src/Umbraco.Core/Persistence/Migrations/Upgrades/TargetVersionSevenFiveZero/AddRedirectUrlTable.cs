@@ -1,16 +1,13 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations.Syntax.Create;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
 {
     [Migration("7.5.0", 100, GlobalSettings.UmbracoMigrationName)]
     public class AddRedirectUrlTable : MigrationBase
     {
-        public AddRedirectUrlTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddRedirectUrlTable(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()
@@ -19,13 +16,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(Database database)
+        private string MigrationCode(UmbracoDatabase database)
         {
             // don't execute if the table is already there
             var tables = SqlSyntax.GetTablesInSchema(database).ToArray();
             if (tables.InvariantContains("umbracoRedirectUrl")) return null;
 
-            var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+            var localContext = new LocalMigrationContext(database, Logger);
 
             localContext.Create.Table("umbracoRedirectUrl")
                 .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoRedirectUrl")

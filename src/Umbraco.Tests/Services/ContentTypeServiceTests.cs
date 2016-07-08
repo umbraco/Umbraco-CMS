@@ -282,7 +282,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
             cts.Save(contentType);
 
-            ContentTypeService.DeletedContentType += (sender, args) =>
+            ContentTypeService.Deleted += (sender, args) =>
             {
                 deletedEntities += args.DeletedEntities.Count();
             };
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Services
             var contentType2 = MockedContentTypes.CreateSimpleContentType("otherPage", "Other page");
             cts.Save(contentType2);
 
-            ContentTypeService.DeletedContentType += (sender, args) =>
+            ContentTypeService.Deleted += (sender, args) =>
             {
                 deletedEntities += args.DeletedEntities.Count();
             };
@@ -324,7 +324,7 @@ namespace Umbraco.Tests.Services
             contentType2.ParentId = contentType.Id;
             cts.Save(contentType2);
 
-            ContentTypeService.DeletedContentType += (sender, args) =>
+            ContentTypeService.Deleted += (sender, args) =>
             {
                 deletedEntities += args.DeletedEntities.Count();
             };

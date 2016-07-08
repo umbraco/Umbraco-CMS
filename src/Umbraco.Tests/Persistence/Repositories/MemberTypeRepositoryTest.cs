@@ -66,14 +66,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Persist_Member_Type_Same_Property_Keys()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
                 
                 repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
 
                 var propertyKeys = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
                 var groupKeys = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();

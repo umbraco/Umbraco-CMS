@@ -508,8 +508,8 @@ namespace Umbraco.Web
                 PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container, typeof(DefaultCultureDictionaryFactory));
-#error inject!
-            HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
+
+            HealthCheckResolver.Current = new HealthCheckResolver(ProfilingLogger.Logger,
                 () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
         }
 

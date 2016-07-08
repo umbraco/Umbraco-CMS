@@ -282,21 +282,6 @@ namespace Umbraco.Core.Services
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
-
-        /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id
         /// </summary>
         /// <param name="id"></param>

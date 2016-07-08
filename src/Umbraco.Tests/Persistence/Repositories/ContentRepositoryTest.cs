@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, MappingResolver);
             return ctRepository;
         }
 
@@ -249,16 +249,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Property_Values_With_Special_DatabaseTypes_Are_Equal_Before_And_After_Being_Persisted()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository contentTypeRepository;
-            DataTypeDefinitionRepository dataTypeDefinitionRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository, out dataTypeDefinitionRepository))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                ContentTypeRepository contentTypeRepository;
+                DataTypeDefinitionRepository dataTypeDefinitionRepository;
+
+                var repository = CreateRepository(unitOfWork, out contentTypeRepository, out dataTypeDefinitionRepository);
+
                 // Setup
                 var dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.DecimalAlias) { Name = "test", DatabaseType = DataTypeDatabaseType.Decimal };
                 dataTypeDefinitionRepository.AddOrUpdate(dtd);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
 
                 const string decimalPropertyAlias = "decimalProperty";
                 const string intPropertyAlias = "intProperty";
@@ -274,14 +276,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                     });
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage", propertyTypeCollection);
                 contentTypeRepository.AddOrUpdate(contentType);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
                 
                 // Int and decimal values are passed in as strings as they would be from the backoffice UI
                 var textpage = MockedContent.CreateSimpleContentWithSpecialDatabaseTypes(contentType, "test@umbraco.org", -1, "100", "150", dateValue);
                 
                 // Act
                 repository.AddOrUpdate(textpage);
-                unitOfWork.Commit();
+                unitOfWork.Complete();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -785,7 +787,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
-                var filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains("Page 2"));
                 
                 long totalRecords;
 
@@ -810,7 +811,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
-                var filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains("Page"));
 
                 long totalRecords;
 

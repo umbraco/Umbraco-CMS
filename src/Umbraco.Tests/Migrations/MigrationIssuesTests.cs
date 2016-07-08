@@ -6,12 +6,9 @@ using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -107,8 +104,11 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
+            var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
+
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
                 new SemVersion(7, 4, 0),
@@ -116,24 +116,22 @@ namespace Umbraco.Tests.Migrations
                 GlobalSettings.UmbracoMigrationName,
 
                 //pass in explicit migrations
-                new DeleteRedirectUrlTable(SqlSyntax, logger),
-                new AddRedirectUrlTable(SqlSyntax, logger),
-                new AddRedirectUrlTable2(SqlSyntax, logger),
-                new AddRedirectUrlTable3(SqlSyntax, logger),
-                new AddRedirectUrlTable4(SqlSyntax, logger)
+                new DeleteRedirectUrlTable(migrationContext),
+                new AddRedirectUrlTable(migrationContext),
+                new AddRedirectUrlTable2(migrationContext),
+                new AddRedirectUrlTable3(migrationContext),
+                new AddRedirectUrlTable4(migrationContext)
             );
 
-            var db = new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Logger);
-
-            var upgraded = migrationRunner.Execute(db, DatabaseProviders.SqlServerCE, true);
+            var upgraded = migrationRunner.Execute(migrationContext, true);
             Assert.IsTrue(upgraded);
         }
 
         [Migration("7.5.0", 99, GlobalSettings.UmbracoMigrationName)]
         public class DeleteRedirectUrlTable : MigrationBase
         {
-            public DeleteRedirectUrlTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-                : base(sqlSyntax, logger)
+            public DeleteRedirectUrlTable(IMigrationContext context)
+                : base(context)
             { }
 
             public override void Up()

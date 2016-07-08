@@ -107,9 +107,9 @@ namespace Umbraco.Web
 
         internal static void SendNotification(this INotificationService service, IUser sender, IUmbracoEntity entity, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
         {
-            if (sender == null) throw new ArgumentNullException("sender");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (sender == null) throw new ArgumentNullException(nameof(sender));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
 
             
             applicationContext.Services.NotificationService.SendNotifications(
@@ -126,9 +126,9 @@ namespace Umbraco.Web
 
          internal static void SendNotification(this INotificationService service, IUser sender, IEnumerable<IUmbracoEntity> entities, IAction action, UmbracoContext umbracoContext, ApplicationContext applicationContext)
         {
-            if (sender == null) throw new ArgumentNullException("sender");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (sender == null) throw new ArgumentNullException(nameof(sender));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
 
             
             applicationContext.Services.NotificationService.SendNotifications(
@@ -137,10 +137,10 @@ namespace Umbraco.Web
                 action.Letter.ToString(CultureInfo.InvariantCulture),
                 applicationContext.Services.TextService.Localize("actions", action.Alias),
                 umbracoContext.HttpContext,
-                (mailingUser, strings) => applicationContext.Services.TextService.Localize("notifications/mailSubject", strings, mailingUser),
+                (mailingUser, strings) => applicationContext.Services.TextService.Localize("notifications/mailSubject", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings),
                 (mailingUser, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                                              ? applicationContext.Services.TextService.Localize("notifications/mailBody", strings, mailingUser)
-                                              : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", strings, mailingUser));
+                                              ? applicationContext.Services.TextService.Localize("notifications/mailBody", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings)
+                                              : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings));
         }
     }
 }

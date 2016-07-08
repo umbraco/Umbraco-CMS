@@ -25,20 +25,17 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
-        private readonly RepositoryFactory _repositoryFactory;
         private readonly ILogger _logger;
 
-        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, RepositoryFactory repositoryFactory,  ILogger logger)
+        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
         {
-            if (provider == null) throw new ArgumentNullException("provider");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
+            if (userService == null) throw new ArgumentNullException(nameof(userService));
+            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             _uowProvider = provider;
             _userService = userService;
             _contentService = contentService;
-            _repositoryFactory = repositoryFactory;
             _logger = logger;
         }
 
@@ -83,8 +80,7 @@ namespace Umbraco.Core.Services
                     SendNotification(operatingUser, u, content, allVersions, 
                         actionName, http, createSubject, createBody);
 
-                    _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
-                        action, u.Name, u.Email));
+                    _logger.Debug<NotificationService>($"Notification type: {action} sent to {u.Name} ({u.Email})");
                 }
                 catch (Exception ex)
                 {
@@ -119,7 +115,7 @@ namespace Umbraco.Core.Services
             // lazily get versions - into lists to ensure we can enumerate multiple times
             var allVersionsDictionary = new Dictionary<int, List<IContent>>();
 
-            int totalUsers;
+            long totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
             foreach (var u in allUsers.Where(x => x.IsApproved))
             {
@@ -140,8 +136,7 @@ namespace Umbraco.Core.Services
                         SendNotification(operatingUser, u, content, allVersions, 
                             actionName, http, createSubject, createBody);
 
-                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
-                            action, u.Name, u.Email));
+                        _logger.Debug<NotificationService>($"Notification type: {action} sent to {u.Name} ({u.Email})");
                     }
                     catch (Exception ex)
                     {
@@ -496,9 +491,9 @@ namespace Umbraco.Core.Services
             var diffs = Diff.DiffText1(oldText, newText);
 
             int pos = 0;
-            for (int n = 0; n < diffs.Length; n++)
+            for (var n = 0; n < diffs.Length; n++)
             {
-                Diff.Item it = diffs[n];
+                var it = diffs[n];
 
                 // write unchanged chars
                 while ((pos < it.StartB) && (pos < newText.Length))
@@ -511,7 +506,7 @@ namespace Umbraco.Core.Services
                 if (displayDeletedText && it.DeletedA > 0)
                 {
                     sb.Append(deletedStyle);
-                    for (int m = 0; m < it.DeletedA; m++)
+                    for (var m = 0; m < it.DeletedA; m++)
                     {
                         sb.Append(oldText[it.StartA + m]);
                     } // for

@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class RedirectUrlRepository : PetaPocoRepositoryBase<int, IRedirectUrl>, IRedirectUrlRepository
+    internal class RedirectUrlRepository : NPocoRepositoryBase<int, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
-            : base(work, cache, logger, sqlSyntax)
+        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver) 
+            : base(work, cache, logger, mappingResolver)
         { }
 
         protected override int PerformCount(IQuery<IRedirectUrl> query)
@@ -49,9 +51,9 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method.");
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
                 sql.Select(@"COUNT(*)
 FROM umbracoRedirectUrl
@@ -158,7 +160,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             var urlHash = HashUrl(url);
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -168,7 +170,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         {
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.ContentKey == contentKey)
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             return dtos.Select(Map);
         }
@@ -176,7 +178,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         public IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total)
         {
             var sql = GetBaseQuery(false)
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
             return result.Items.Select(Map);
@@ -186,7 +188,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         {
             var sql = GetBaseQuery(false)
                 .Where("umbracoNode.path LIKE @path", new { path = "%," + rootContentId + ",%" })
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
 

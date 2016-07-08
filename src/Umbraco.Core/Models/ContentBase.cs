@@ -127,11 +127,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets the ParentId from the lazy integer id
         /// </summary>
-        /// <param name="id">Id of the Parent</param>
+        /// <param name="parentId">Id of the Parent</param>
         internal protected void SetLazyParentId(Lazy<int> parentId)
         {
             _parentId = parentId;
-            OnPropertyChanged(ParentIdSelector);
+            OnPropertyChanged(Ps.Value.ParentIdSelector);
         }
 
         /// <summary>

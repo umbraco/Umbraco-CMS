@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
             {
                 int nId;
                 if (int.TryParse(item, out nId) == false) continue;
-                var contentType = contentTypeService.GetContentType(nId);
+                var contentType = contentTypeService.Get(nId);
                 if (contentType == null) continue;
                 contentTypes.Add(contentType);
                 pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
@@ -204,7 +204,7 @@ namespace Umbraco.Web.Editors
                 library.RefreshContent();
             }            
             TreeDefinitionCollection.Instance.ReRegisterTrees();
-            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
+            _Legacy.Actions.Action.ReRegisterActionsAndHandlers();
         }
 
         public IEnumerable<InstalledPackageModel> GetInstalled()
@@ -260,7 +260,6 @@ namespace Umbraco.Web.Editors
             model.ConflictingStyleSheetNames = ins.ConflictingStyleSheetNames;
             model.ConflictingTemplateAliases = ins.ConflictingTemplateAliases;
             model.ContainsBinaryFileErrors = ins.ContainsBinaryFileErrors;
-            model.ContainsLegacyPropertyEditors = ins.ContainsLegacyPropertyEditors;
             model.ContainsMacroConflict = ins.ContainsMacroConflict;
             model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
             model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;

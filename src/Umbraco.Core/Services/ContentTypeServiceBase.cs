@@ -614,7 +614,7 @@ namespace Umbraco.Core.Services
 
                 // all descendants are going to be deleted
                 var allDescendantsAndSelf = itemsA.SelectMany(xx => xx.DescendantsAndSelf(this))
-                    .Distinct()
+                    .DistinctBy(x => x.Id)
                     .ToArray();
 
                 // delete content

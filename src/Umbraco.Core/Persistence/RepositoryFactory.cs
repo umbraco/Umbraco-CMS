@@ -51,14 +51,5 @@ namespace Umbraco.Core.Persistence
                 ? _container.GetInstance<FileUnitOfWork, TRepository>(uow)
                 : _container.GetInstance<FileUnitOfWork, TRepository>(uow, name);
         }
-
-        public IRedirectUrlRepository CreateRedirectUrlRepository(IDatabaseUnitOfWork uow)
-        {
-            return new RedirectUrlRepository(
-                uow,
-                _cacheHelper,
-                _logger,
-                _sqlSyntax);
-        }
     }
 }
