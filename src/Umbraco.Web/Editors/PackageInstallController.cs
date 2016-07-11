@@ -466,17 +466,11 @@ namespace Umbraco.Web.Editors
 
 
             var redirectUrl = "";
-            if (ins.Control.IsNullOrWhiteSpace())
+            if (ins.Control.IsNullOrWhiteSpace() == false)
             {
                 redirectUrl = string.Format("/developer/framed/{0}",
                     Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customUrl={2}", tempDir, model.Id, ins.Url)));                
-            }
-            else
-            {
-                redirectUrl = string.Format("/developer/framed/{0}",
-                    Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));                
+                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
             }
 
             return new PackageInstallResult

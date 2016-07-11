@@ -10,9 +10,12 @@
         // we will refresh and then navigate there.
 
         var installPackageUri = localStorageService.get("packageInstallUri");
-
-        if (installPackageUri) {
-            localStorageService.remove("packageInstallUri");
+        if (installPackageUri) {            
+            localStorageService.remove("packageInstallUri");                       
+        }
+        if (installPackageUri && installPackageUri !== "installed") {
+            //navigate to the custom installer screen, if it is just "installed", then we'll 
+            //show the installed view
             $location.path(installPackageUri).search("");
         }
         else {
@@ -25,17 +28,19 @@
                     "name": "Packages",
                     "icon": "icon-cloud",
                     "view": "views/packager/views/repo.html",
-                    "active": true
+                    "active": !installPackageUri || installPackageUri === "navigation"
                 },
                 {
                     "name": "Installed",
                     "icon": "icon-box",
-                    "view": "views/packager/views/installed.html"
+                    "view": "views/packager/views/installed.html",
+                    "active": installPackageUri === "installed"
                 },
                 {
                     "name": "Install local",
                     "icon": "icon-add",
-                    "view": "views/packager/views/install-local.html"
+                    "view": "views/packager/views/install-local.html",
+                    "active": installPackageUri === "local"
                 }
             ];
 

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window) {
 
         var vm = this;
         vm.state = "upload";
@@ -122,10 +122,14 @@
                             //Put the redirect Uri in a cookie so we can use after reloading
                             localStorageService.set("packageInstallUri", result.postInstallationPath);
                         }
+                        else {
+                            //set to a constant value so it knows to just go to the installed view
+                            localStorageService.set("packageInstallUri", "installed");
+                        }
 
                         //reload on next digest (after cookie)
-                        $timeout(function() {
-                            window.location.reload(true);
+                        $timeout(function () {
+                            $window.location.reload(true);
                         });
 
                     },
