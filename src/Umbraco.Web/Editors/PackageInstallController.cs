@@ -37,6 +37,7 @@ using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Settings = umbraco.cms.businesslogic.packager.Settings;
+using Version = System.Version;
 
 namespace Umbraco.Web.Editors
 {
@@ -47,6 +48,21 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// This checks if this package & version is alraedy installed
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public IHttpActionResult ValidateInstalled(string name, string version)
+        {
+            var validate = ValidateInstalledInternal(name, version);
+            if (validate == false)
+                return BadRequest();
+            return Ok();
+        }
+
         [HttpPost]
         public IHttpActionResult Uninstall(int packageId)
         {
@@ -54,6 +70,14 @@ namespace Umbraco.Web.Editors
             if (pack == null) return NotFound();
 
             PerformUninstall(pack);
+
+            //now get all other packages by this name since we'll uninstall all versions
+            foreach (var installed in InstalledPackage.GetAllInstalledPackages()
+                .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
+            {
+                //remove from teh xml
+                installed.Delete(Security.GetUserId());
+            }
 
             return Ok();
         }
@@ -209,21 +233,44 @@ namespace Umbraco.Web.Editors
             global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
         }
 
+        /// <summary>
+        /// Returns all installed packages - only shows their latest versions
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<InstalledPackageModel> GetInstalled()
         {
-            return data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings))
+            return InstalledPackage.GetAllInstalledPackages()
+                .GroupBy(
+                    //group by name
+                    x => x.Data.Name,
+                    //select the package with a parsed version
+                    pck =>
+                    {
+                        Version pckVersion;
+                        return Version.TryParse(pck.Data.Version, out pckVersion)
+                            ? new {package = pck, version = pckVersion}
+                            : new {package = pck, version = new Version(0, 0, 0)};
+                    })
+                .Select(grouping =>
+                {
+                    //get the max version for the package
+                    var maxVersion = grouping.Max(x => x.version);
+                    //only return the first package with this version
+                    return grouping.First(x => x.version == maxVersion).package;
+                })
                 .Select(pack => new InstalledPackageModel
                 {
-                    Name = pack.Name,
-                    Id = pack.Id,
-                    Author = pack.Author,
-                    Version = pack.Version,
-                    Url = pack.Url,
-                    License = pack.License,
-                    LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files,
-                    IconUrl = pack.IconUrl
-                }).ToList();
+                    Name = pack.Data.Name,
+                    Id = pack.Data.Id,
+                    Author = pack.Data.Author,
+                    Version = pack.Data.Version,
+                    Url = pack.Data.Url,
+                    License = pack.Data.License,
+                    LicenseUrl = pack.Data.LicenseUrl,
+                    Files = pack.Data.Files,
+                    IconUrl = pack.Data.IconUrl
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -286,6 +333,34 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private bool ValidateInstalledInternal(string name, string version)
+        {
+            var allInstalled = InstalledPackage.GetAllInstalledPackages();
+            var found = allInstalled.FirstOrDefault(x =>
+            {
+                if (x.Data.Name != name) return false;
+                //match the exact version
+                if (x.Data.Version == version)
+                {
+                    return true;
+                }
+                //now try to compare the versions
+                Version installed;
+                Version selected;
+                if (Version.TryParse(x.Data.Version, out installed) && Version.TryParse(version, out selected))
+                {
+                    if (installed >= selected) return true;
+                }
+                return false;
+            });
+            if (found != null)
+            {
+                //this package is already installed
+                return false;
+            }
+            return true;
+        }
+
         [HttpPost]
         [FileUploadCleanupFilter(false)]
         public async Task<LocalPackageInstallModel> UploadLocalPackage()
@@ -338,9 +413,17 @@ namespace Umbraco.Web.Editors
                     File.Copy(file.LocalFileName, packageTempFileLocation, true);
 
                     //Populate the model from the metadata in the package file (zip file)
-                    PopulateFromPackageData(model);                    
+                    PopulateFromPackageData(model);
 
-                    //TODO: We need to add the 'strict' requirement to the installer
+                    var validate = ValidateInstalledInternal(model.Name, model.Version);
+                    
+                    if (validate == false)
+                    {
+                        //this package is already installed
+                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("packager/packageAlreadyInstalled")));                        
+                    }
+                    
                 }
                 else
                 {
@@ -385,6 +468,15 @@ namespace Umbraco.Web.Editors
             //Populate the model from the metadata in the package file (zip file)
             PopulateFromPackageData(model);
 
+            var validate = ValidateInstalledInternal(model.Name, model.Version);
+
+            if (validate == false)
+            {
+                //this package is already installed
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                    Services.TextService.Localize("packager/packageAlreadyInstalled")));
+            }
+
             return model;
         }
 
@@ -405,7 +497,8 @@ namespace Umbraco.Web.Editors
                 var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
-                    throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("This package cannot be installed, it requires a minimum Umbraco version of " + packageMinVersion));
+                    throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
                 }
             }
 
@@ -466,17 +559,11 @@ namespace Umbraco.Web.Editors
 
 
             var redirectUrl = "";
-            if (ins.Control.IsNullOrWhiteSpace())
+            if (ins.Control.IsNullOrWhiteSpace() == false)
             {
                 redirectUrl = string.Format("/developer/framed/{0}",
                     Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customUrl={2}", tempDir, model.Id, ins.Url)));                
-            }
-            else
-            {
-                redirectUrl = string.Format("/developer/framed/{0}",
-                    Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));                
+                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
             }
 
             return new PackageInstallResult

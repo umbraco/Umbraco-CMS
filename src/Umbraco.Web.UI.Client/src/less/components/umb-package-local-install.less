@@ -1,42 +1,15 @@
-//
-//     Install local package
-//
+/*
+
+    Install local package
+
+*/
 
 // Helpers
 .faded {
     color: @grayMed;
 }
 
-.inline-flex {
-    display: inline-flex;
-}
 
-.mt-3 {
-    margin-top: 30px;
-}
-
-// Upload state
-
-.umb-upload-local,
-.umb-info-local {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.umb-upload-local form,
-.umb-info-local-items {
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    margin: 0;
-
-    max-width: 640px;
-}
 
 .umb-upload-local__dropzone {
     position: relative;
@@ -75,7 +48,12 @@
     font-weight: bold;
     color: @blue;
     cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
+
 
 
 // Accept terms
@@ -104,6 +82,7 @@
 }
 
 
+
 // Info state
 .umb-info-local-items {
     border: 2px solid @grayLight;
@@ -116,6 +95,8 @@
     align-items: center;
 
     margin: 0 20px;
+
+    width: 100%;
     max-width: 540px;
 }
 
@@ -127,9 +108,6 @@
     }
 }
 
-.umb-info-local-item {
-    margin-bottom: 20px;
-}
 
 .umb-info-local-items .umb-package-icon {
     width: 100%;
@@ -148,6 +126,10 @@
     padding: 20px 40px;
 }
 
-.umb-info-local-items .umb-package-installer-label {
-    margin-left: 10px;
+.umb-info-local-item {
+    margin-bottom: 20px;
+}
+
+.umb-upload-local__dropzone .umb-info-local-item {
+    margin:20px;
 }

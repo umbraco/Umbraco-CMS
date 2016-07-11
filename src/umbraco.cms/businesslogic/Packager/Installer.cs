@@ -514,7 +514,7 @@ namespace umbraco.cms.businesslogic.packager
                 ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true) 
                 : RequirementsType.Legacy;
             var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl");
-            if (iconNode != null)
+            if (iconNode != null && iconNode.FirstChild != null)
             {
                 IconUrl = iconNode.FirstChild.Value;
             }
