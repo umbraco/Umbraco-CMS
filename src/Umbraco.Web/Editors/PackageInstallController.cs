@@ -48,6 +48,21 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// This checks if this package & version is alraedy installed
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public IHttpActionResult ValidateInstalled(string name, string version)
+        {
+            var validate = ValidateInstalledInternal(name, version);
+            if (validate == false)
+                return BadRequest();
+            return Ok();
+        }
+
         [HttpPost]
         public IHttpActionResult Uninstall(int packageId)
         {
@@ -318,6 +333,34 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private bool ValidateInstalledInternal(string name, string version)
+        {
+            var allInstalled = InstalledPackage.GetAllInstalledPackages();
+            var found = allInstalled.FirstOrDefault(x =>
+            {
+                if (x.Data.Name != name) return false;
+                //match the exact version
+                if (x.Data.Version == version)
+                {
+                    return true;
+                }
+                //now try to compare the versions
+                Version installed;
+                Version selected;
+                if (Version.TryParse(x.Data.Version, out installed) && Version.TryParse(version, out selected))
+                {
+                    if (installed >= selected) return true;
+                }
+                return false;
+            });
+            if (found != null)
+            {
+                //this package is already installed
+                return false;
+            }
+            return true;
+        }
+
         [HttpPost]
         [FileUploadCleanupFilter(false)]
         public async Task<LocalPackageInstallModel> UploadLocalPackage()
@@ -372,28 +415,11 @@ namespace Umbraco.Web.Editors
                     //Populate the model from the metadata in the package file (zip file)
                     PopulateFromPackageData(model);
 
-                    var allInstalled = InstalledPackage.GetAllInstalledPackages();
-                    var found = allInstalled.FirstOrDefault(x =>
-                    {
-                        if (x.Data.Name != model.Name) return false;
-                        //match the exact version
-                        if (x.Data.Version == model.Version)
-                        {
-                            return true;
-                        }
-                        //now try to compare the versions
-                        Version installed;
-                        Version selected;
-                        if (Version.TryParse(x.Data.Version, out installed) && Version.TryParse(model.Version, out selected))
-                        {
-                            if (installed >= selected) return true;
-                        }
-                        return false;
-                    });
-                    if (found != null)
+                    var validate = ValidateInstalledInternal(model.Name, model.Version);
+                    
+                    if (validate == false)
                     {
                         //this package is already installed
-
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                             Services.TextService.Localize("packager/packageAlreadyInstalled")));                        
                     }
@@ -441,6 +467,15 @@ namespace Umbraco.Web.Editors
 
             //Populate the model from the metadata in the package file (zip file)
             PopulateFromPackageData(model);
+
+            var validate = ValidateInstalledInternal(model.Name, model.Version);
+
+            if (validate == false)
+            {
+                //this package is already installed
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                    Services.TextService.Localize("packager/packageAlreadyInstalled")));
+            }
 
             return model;
         }

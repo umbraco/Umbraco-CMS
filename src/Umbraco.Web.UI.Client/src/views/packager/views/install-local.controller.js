@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService) {
 
         var vm = this;
         vm.state = "upload";
@@ -9,7 +9,8 @@
         vm.localPackage = {};
         vm.installPackage = installPackage;
         vm.installState = {
-            status: ""
+            status: "",
+            progress:0
         };
         vm.zipFile = {
             uploadStatus: "idle",
@@ -98,7 +99,7 @@
         }
 
         function installPackage() {
-            vm.installState.status = "Importing";
+            vm.installState.status = localizationService.localize("packager_installStateImporting");
             vm.installState.progress = "0";
 
             //TODO: If any of these fail, will they keep calling the next one?
@@ -106,19 +107,19 @@
                 .import(vm.localPackage)                
                 .then(function(pack) {
                         vm.installState.progress = "25";
-                        vm.installState.status = "Installing...";
+                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
                         vm.installState.progress = "50";
                         return packageResource.installFiles(pack);
                     },
                     installError)
                 .then(function(pack) {
-                        vm.installState.status = "Restarting, please wait...";
+                    vm.installState.status = localizationService.localize("packager_installStateRestarting");
                         vm.installState.progress = "75";
                         return packageResource.installData(pack);
                     },
                     installError)
                 .then(function(pack) {
-                        vm.installState.status = "All done, your browser will now refresh, please wait...";
+                    vm.installState.status = localizationService.localize("packager_installStateComplete");
                         vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },

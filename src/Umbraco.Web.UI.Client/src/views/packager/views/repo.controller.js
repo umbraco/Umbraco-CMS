@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService) {
+    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
 
         var vm = this;
 
@@ -15,7 +15,9 @@
         };
         vm.searchQuery = "";
         vm.installState = {
-            status: ""
+            status: "",
+            progress: 0,
+            type: "ok"
         };
         vm.selectCategory = selectCategory;
         vm.showPackageDetails = showPackageDetails;
@@ -107,11 +109,20 @@
 
         function showPackageDetails(selectedPackage) {
             ourPackageRepositoryResource.getDetails(selectedPackage.id)
-                .then(function(pack) {
-                    vm.package = pack;
-                    vm.packageViewState = "packageDetails";
+                .then(function (pack) {
+                    packageResource.validateInstalled(pack.name, pack.latestVersion)
+                        .then(function() {
+                            //ok, can install
+                            vm.package = pack;
+                            vm.package.isValid = true;
+                            vm.packageViewState = "packageDetails";
+                        }, function() {
+                            //nope, cannot install
+                            vm.package = pack;
+                            vm.package.isValid = false;
+                            vm.packageViewState = "packageDetails";
+                        })
                 });
-
         }
 
         function setPackageViewState(state) {
@@ -154,35 +165,42 @@
                         vm.loading = false;
                         vm.localPackage = pack;
                         vm.localPackage.allowed = true;
-                    },
-                    error);
+                }, function (evt, status, headers, config) {
+                    
+                    if (status == 400) {
+                        //it's a validation error
+                        vm.installState.type = "error";
+                        vm.zipFile.serverErrorMessage = evt.message;
+                    }
+                });
         }
 
         function error(e, args) {
-
+            //This will return a rejection meaning that the promise change above will stop
+            return $q.reject();
         }
 
         function installPackage(selectedPackage) {
 
-            vm.installState.status = "importing...";
+            vm.installState.status = localizationService.localize("packager_installStateImporting");
             vm.installState.progress = "0";
 
             packageResource
                 .import(selectedPackage)
                 .then(function(pack) {
-                        vm.installState.status = "Installing...";
+                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
                         vm.installState.progress = "33";
                         return packageResource.installFiles(pack);
                     },
                     error)
                 .then(function(pack) {
-                        vm.installState.status = "Restarting, please wait...";
+                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
                         vm.installState.progress = "66";
                         return packageResource.installData(pack);
                     },
                     error)
                 .then(function(pack) {
-                        vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.status = localizationService.localize("packager_installStateComplete");
                         vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },
