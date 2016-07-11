@@ -30,7 +30,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "packageInstallApiBaseUrl",
                        "DeleteCreatedPackage", { packageId: packageId })),
-               'Failed to get installed packages');
+               'Failed to delete package ' + packageId);
         },
 
         uninstall: function(packageId) {

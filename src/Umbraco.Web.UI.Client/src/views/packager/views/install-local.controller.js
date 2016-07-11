@@ -50,8 +50,6 @@
                     // Throw message back to user with the cause of the error
                     vm.zipFile.serverErrorMessage = data.notifications[0].message;
 
-                    //TODO: Handle the error in UI
-
                 } else {
 
                     // set done status on file
@@ -61,8 +59,6 @@
                 }
 
             }).error(function (evt, status, headers, config) {
-
-                //TODO: Handle the error in UI
 
                 // set status done
                 vm.zipFile.uploadStatus = "error";
