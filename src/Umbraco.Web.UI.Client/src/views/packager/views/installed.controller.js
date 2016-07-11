@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstalledController($scope, $route, $location, packageResource) {
+    function PackagesInstalledController($scope, $route, $location, packageResource, $timeout, $window, localStorageService) {
 
         var vm = this;
 
@@ -33,12 +33,19 @@
 
             packageResource.uninstall(installedPackage.id)
                 .then(function () {
+
                     if (installedPackage.files.length > 0) {
                         vm.installState.status = "All done, your browser will now refresh";
                         vm.installState.progress = "100";
 
-                        var url = window.location.href + "?uninstalled=" + vm.package.packageGuid;
-                        window.location.reload(true);
+                        //set this flag so that on refresh it shows the installed packages list
+                        localStorageService.set("packageInstallUri", "installed");
+                        
+                        //reload on next digest (after cookie)
+                        $timeout(function () {
+                            $window.location.reload(true);
+                        });
+                        
                     }
                     else {
                         init();
