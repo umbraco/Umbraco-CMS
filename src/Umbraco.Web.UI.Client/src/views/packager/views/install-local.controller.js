@@ -18,8 +18,10 @@
         };
 
         $scope.handleFiles = function (files, event) {
-            for (var i = 0; i < files.length; i++) {
-                upload(files[i]);
+            if (files) {
+                for (var i = 0; i < files.length; i++) {
+                    upload(files[i]);
+                }
             }
         };
 
@@ -63,24 +65,29 @@
                 // set status done
                 vm.zipFile.uploadStatus = "error";
 
-                //if the service returns a detailed error
-                if (evt.InnerException) {
-                    vm.zipFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
-
-                    //Check if its the common "too large file" exception
-                    if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                        vm.zipFile.serverErrorMessage = "File too large to upload";
-                    }
-
-                } else if (evt.Message) {
-                    file.serverErrorMessage = evt.Message;
-                }
-
                 // If file not found, server will return a 404 and display this message
                 if (status === 404) {
                     vm.zipFile.serverErrorMessage = "File not found";
                 }
+                else if (status == 400) {
+                    //it's a validation error
+                    vm.zipFile.serverErrorMessage = evt.message;
+                }
+                else {
+                    //it's an unhandled error
+                    //if the service returns a detailed error
+                    if (evt.InnerException) {
+                        vm.zipFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
 
+                        //Check if its the common "too large file" exception
+                        if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
+                            vm.zipFile.serverErrorMessage = "File too large to upload";
+                        }
+
+                    } else if (evt.Message) {
+                        file.serverErrorMessage = evt.Message;
+                    }
+                }
             });
         }
 

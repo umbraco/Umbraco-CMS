@@ -36,6 +36,10 @@
                              ngf-max-size="{{ maxFileSize }}">
                             - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
                         </div>
+                        
+                        <div class="umb-info-local-item text-error" ng-if="vm.zipFile.uploadStatus === 'error'">
+                            {{vm.zipFile.serverErrorMessage}}
+                        </div>
                     </div>
                 </div>
 

@@ -37,6 +37,7 @@ using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Settings = umbraco.cms.businesslogic.packager.Settings;
+using Version = System.Version;
 
 namespace Umbraco.Web.Editors
 {
@@ -54,6 +55,14 @@ namespace Umbraco.Web.Editors
             if (pack == null) return NotFound();
 
             PerformUninstall(pack);
+
+            //now get all other packages by this name since we'll uninstall all versions
+            foreach (var installed in InstalledPackage.GetAllInstalledPackages()
+                .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
+            {
+                //remove from teh xml
+                installed.Delete(Security.GetUserId());
+            }
 
             return Ok();
         }
@@ -209,21 +218,44 @@ namespace Umbraco.Web.Editors
             global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
         }
 
+        /// <summary>
+        /// Returns all installed packages - only shows their latest versions
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<InstalledPackageModel> GetInstalled()
         {
-            return data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings))
+            return InstalledPackage.GetAllInstalledPackages()
+                .GroupBy(
+                    //group by name
+                    x => x.Data.Name,
+                    //select the package with a parsed version
+                    pck =>
+                    {
+                        Version pckVersion;
+                        return Version.TryParse(pck.Data.Version, out pckVersion)
+                            ? new {package = pck, version = pckVersion}
+                            : new {package = pck, version = new Version(0, 0, 0)};
+                    })
+                .Select(grouping =>
+                {
+                    //get the max version for the package
+                    var maxVersion = grouping.Max(x => x.version);
+                    //only return the first package with this version
+                    return grouping.First(x => x.version == maxVersion).package;
+                })
                 .Select(pack => new InstalledPackageModel
                 {
-                    Name = pack.Name,
-                    Id = pack.Id,
-                    Author = pack.Author,
-                    Version = pack.Version,
-                    Url = pack.Url,
-                    License = pack.License,
-                    LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files,
-                    IconUrl = pack.IconUrl
-                }).ToList();
+                    Name = pack.Data.Name,
+                    Id = pack.Data.Id,
+                    Author = pack.Data.Author,
+                    Version = pack.Data.Version,
+                    Url = pack.Data.Url,
+                    License = pack.Data.License,
+                    LicenseUrl = pack.Data.LicenseUrl,
+                    Files = pack.Data.Files,
+                    IconUrl = pack.Data.IconUrl
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -338,9 +370,34 @@ namespace Umbraco.Web.Editors
                     File.Copy(file.LocalFileName, packageTempFileLocation, true);
 
                     //Populate the model from the metadata in the package file (zip file)
-                    PopulateFromPackageData(model);                    
+                    PopulateFromPackageData(model);
 
-                    //TODO: We need to add the 'strict' requirement to the installer
+                    var allInstalled = InstalledPackage.GetAllInstalledPackages();
+                    var found = allInstalled.FirstOrDefault(x =>
+                    {
+                        if (x.Data.Name != model.Name) return false;
+                        //match the exact version
+                        if (x.Data.Version == model.Version)
+                        {
+                            return true;
+                        }
+                        //now try to compare the versions
+                        Version installed;
+                        Version selected;
+                        if (Version.TryParse(x.Data.Version, out installed) && Version.TryParse(model.Version, out selected))
+                        {
+                            if (installed >= selected) return true;
+                        }
+                        return false;
+                    });
+                    if (found != null)
+                    {
+                        //this package is already installed
+
+                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("packager/packageAlreadyInstalled")));                        
+                    }
+                    
                 }
                 else
                 {
@@ -405,7 +462,8 @@ namespace Umbraco.Web.Editors
                 var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
-                    throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("This package cannot be installed, it requires a minimum Umbraco version of " + packageMinVersion));
+                    throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
+                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
                 }
             }
 
