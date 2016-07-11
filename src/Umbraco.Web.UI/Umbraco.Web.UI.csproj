@@ -695,6 +695,7 @@
       <SubType>Designer</SubType>
     </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
+    <Content Include="Media\Web.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -2383,7 +2384,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Media\" />
     <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />

@@ -24,6 +24,15 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to get installed packages');
         },
 
+        deleteCreatedPackage: function (packageId) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "packageInstallApiBaseUrl",
+                       "DeleteCreatedPackage", { packageId: packageId })),
+               'Failed to get installed packages');
+        },
+
         uninstall: function(packageId) {
             return umbRequestHelper.resourcePromise(
                 $http.post(

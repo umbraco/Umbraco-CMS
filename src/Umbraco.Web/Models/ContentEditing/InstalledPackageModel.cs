@@ -29,5 +29,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "licenseUrl")]
         public string LicenseUrl { get; set; }
+
+        [DataMember(Name = "iconUrl")]
+        public string IconUrl { get; set; }
     }
 }

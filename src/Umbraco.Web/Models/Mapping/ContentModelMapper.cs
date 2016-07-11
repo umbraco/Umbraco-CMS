@@ -229,7 +229,7 @@ namespace Umbraco.Web.Models.Mapping
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good

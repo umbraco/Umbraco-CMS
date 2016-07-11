@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
@@ -14,24 +15,31 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
         public override void Up()
         {
-            // don't exeucte if the table is already there
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
-            if (tables.InvariantContains("umbracoRedirectUrl")) return;
+            // defer, because we are making decisions based upon what's in the database
+            Execute.Code(MigrationCode);
+        }
 
-            Create.Table("umbracoRedirectUrl")
+        private string MigrationCode(Database database)
+        {
+            // don't execute if the table is already there
+            var tables = SqlSyntax.GetTablesInSchema(database).ToArray();
+            if (tables.InvariantContains("umbracoRedirectUrl")) return null;
+
+            var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+
+            localContext.Create.Table("umbracoRedirectUrl")
                 .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoRedirectUrl")
                 .WithColumn("contentId").AsInt32().NotNullable()
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()
                 .WithColumn("url").AsString(2048).NotNullable();
 
-            //Create.PrimaryKey("PK_umbracoRedirectUrl").OnTable("umbracoRedirectUrl").Columns(new[] { "id" });
+            localContext.Create.Index("IX_umbracoRedirectUrl")
+                .OnTable("umbracoRedirectUrl")
+                .OnColumn("url").Ascending()
+                .OnColumn("createDateUtc").Ascending()
+                .WithOptions().NonClustered();
 
-            Create.Index("IX_umbracoRedirectUrl").OnTable("umbracoRedirectUrl")
-                  .OnColumn("url")
-                  .Ascending()
-                  .OnColumn("createDateUtc")
-                  .Ascending()
-                  .WithOptions().NonClustered();
+            return localContext.GetSql();
         }
 
         public override void Down()

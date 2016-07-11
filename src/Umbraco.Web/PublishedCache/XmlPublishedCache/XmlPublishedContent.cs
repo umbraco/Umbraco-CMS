@@ -444,8 +444,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var id = attrs == null ? null : attrs.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var cache = ApplicationContext.Current.ApplicationCache.RequestCache;
-            var key = "XMLPUBLISHEDCONTENT_" + id; // dont bother with preview, wont change during request in v7
+            var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in v7
             return (IPublishedContent) cache.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing)).CreateModel());
         }
-    }
+
+	    public static void ClearRequest()
+	    {
+	        ApplicationContext.Current.ApplicationCache.RequestCache.ClearCacheByKeySearch(CacheKeyPrefix);
+	    }
+
+	    private const string CacheKeyPrefix = "CONTENTCACHE_XMLPUBLISHEDCONTENT_";
+	}
 }
