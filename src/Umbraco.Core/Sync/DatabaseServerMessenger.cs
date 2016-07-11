@@ -412,7 +412,7 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected readonly static string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+        protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
             + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
             + " [P" + Process.GetCurrentProcess().Id // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
