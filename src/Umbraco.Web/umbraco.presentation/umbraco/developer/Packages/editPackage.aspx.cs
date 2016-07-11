@@ -77,6 +77,8 @@ namespace umbraco.presentation.developer.packages
                     packageReadme.Text = pack.Readme;
                     packageVersion.Text = pack.Version;
                     packageUrl.Text = pack.Url;
+                    iconUrl.Text = pack.IconUrl;
+                    umbracoVersion.Text = pack.UmbracoVersion != null ? pack.UmbracoVersion.ToString(3) : string.Empty;
 
                     /*ACTIONS XML*/
                     tb_actions.Text = pack.Actions;
@@ -253,6 +255,8 @@ namespace umbraco.presentation.developer.packages
             pack.Name = packageName.Text;
             pack.Url = packageUrl.Text;
             pack.Version = packageVersion.Text;
+            pack.IconUrl = iconUrl.Text;
+            pack.UmbracoVersion = Version.Parse(umbracoVersion.Text);
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
@@ -374,9 +378,11 @@ namespace umbraco.presentation.developer.packages
             // Tab setup
             packageInfo = TabView1.NewTabPage("Package Properties");
             packageInfo.Controls.Add(Pane1);
+            packageInfo.Controls.Add(Pane5);
             packageInfo.Controls.Add(Pane1_1);
             packageInfo.Controls.Add(Pane1_2);
             packageInfo.Controls.Add(Pane1_3);
+            
 
             packageContents = TabView1.NewTabPage("Package Contents");
             packageContents.Controls.Add(Pane2);

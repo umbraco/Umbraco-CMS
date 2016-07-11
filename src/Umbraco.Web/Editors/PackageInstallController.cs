@@ -40,6 +40,9 @@ using Settings = umbraco.cms.businesslogic.packager.Settings;
 
 namespace Umbraco.Web.Editors
 {
+    /// <summary>
+    /// A controller used for installing packages and managing all of the data in the packages section in the back office
+    /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
@@ -206,7 +209,6 @@ namespace Umbraco.Web.Editors
             global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
         }
 
-
         public IEnumerable<InstalledPackageModel> GetInstalled()
         {
             return data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings))
@@ -219,8 +221,27 @@ namespace Umbraco.Web.Editors
                     Url = pack.Url,
                     License = pack.License,
                     LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files
+                    Files = pack.Files,
+                    IconUrl = pack.IconUrl
                 }).ToList();
+        }
+
+        /// <summary>
+        /// Deletes a created package
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [HttpDelete]
+        public IHttpActionResult DeleteCreatedPackage(int packageId)
+        {
+            var package = CreatedPackage.GetById(packageId);
+            if (package == null)
+                return NotFound();
+
+            package.Delete();
+
+            return Ok();
         }
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
@@ -233,6 +254,7 @@ namespace Umbraco.Web.Editors
             model.Name = ins.Name;
             model.Author = ins.Author;
             model.AuthorUrl = ins.AuthorUrl;
+            model.IconUrl = ins.IconUrl;
             model.License = ins.License;
             model.LicenseUrl = ins.LicenseUrl;
             model.ReadMe = ins.ReadMe;

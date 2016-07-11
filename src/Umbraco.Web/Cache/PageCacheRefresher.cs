@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -84,6 +85,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(new Document(instance));
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
@@ -94,6 +96,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(new Document(instance));
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();

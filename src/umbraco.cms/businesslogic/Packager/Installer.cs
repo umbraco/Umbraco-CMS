@@ -194,15 +194,8 @@ namespace umbraco.cms.businesslogic.packager
                     // Check if the file is a valid package
                     if (fi.Extension.ToLower() == ".umb")
                     {
-                        try
-                        {
-                            tempDir = UnPack(fi.FullName, deleteFile);
-                            LoadConfig(tempDir);
-                        }
-                        catch (Exception unpackE)
-                        {
-                            throw new Exception("Error unpacking extension...", unpackE);
-                        }
+                        tempDir = UnPack(fi.FullName, deleteFile);
+                        LoadConfig(tempDir);
                     }
                     else
                         throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
@@ -234,6 +227,7 @@ namespace umbraco.cms.businesslogic.packager
             var packReadme = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
             var packLicense = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
             var packUrl = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/url "));
+            var iconUrl = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl"));
 
             var enableSkins = false;
             var skinRepoGuid = "";
@@ -255,6 +249,7 @@ namespace umbraco.cms.businesslogic.packager
             insPack.Data.Readme = packReadme;
             insPack.Data.License = packLicense;
             insPack.Data.Url = packUrl;
+            insPack.Data.IconUrl = iconUrl;
 
             //skinning
             insPack.Data.EnableSkins = enableSkins;
@@ -285,31 +280,22 @@ namespace umbraco.cms.businesslogic.packager
 
                 foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
                 {
-                    //we enclose the whole file-moving to ensure that the entire installer doesn't crash
-                    try
-                    {
-                        var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
-                        var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
-                        var destFile = GetFileName(destPath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                    var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
+                    var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+                    var destFile = GetFileName(destPath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
 
-                        // Create the destination directory if it doesn't exist
-                        if (Directory.Exists(destPath) == false)
-                            Directory.CreateDirectory(destPath);
-                        //If a file with this name exists, delete it
-                        else if (File.Exists(destFile))
-                            File.Delete(destFile);
+                    // Create the destination directory if it doesn't exist
+                    if (Directory.Exists(destPath) == false)
+                        Directory.CreateDirectory(destPath);
+                    //If a file with this name exists, delete it
+                    else if (File.Exists(destFile))
+                        File.Delete(destFile);
 
-                        // Move the file
-                        File.Move(sourceFile, destFile);
+                    // Move the file
+                    File.Move(sourceFile, destFile);
 
-                        //PPH log file install
-                        insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
-
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error<Installer>("Package install error", ex);
-                    }
+                    //PPH log file install
+                    insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
                 }
 
                 // log that a user has install files
@@ -527,8 +513,8 @@ namespace umbraco.cms.businesslogic.packager
             RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null 
                 ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true) 
                 : RequirementsType.Legacy;
-            var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/iconUrl");
-            if (iconNode != null)
+            var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl");
+            if (iconNode != null && iconNode.FirstChild != null)
             {
                 IconUrl = iconNode.FirstChild.Value;
             }
@@ -638,17 +624,17 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-            try
+            var readmeNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/readme");
+            if (readmeNode != null)
             {
-                ReadMe = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
+                ReadMe = XmlHelper.GetNodeValue(readmeNode);
             }
-            catch { }
 
-            try
+            var controlNode = Config.DocumentElement.SelectSingleNode("/umbPackage/control");
+            if (controlNode != null)
             {
-                Control = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/control"));
+                Control = XmlHelper.GetNodeValue(controlNode);
             }
-            catch { }
         }
         
         /// <summary>

@@ -14,16 +14,16 @@ namespace Umbraco.Core.Services
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
-        public void Register(string url, int contentId)
+        public void Register(string url, Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var redir = repo.Get(url, contentId);
+                var redir = repo.Get(url, contentKey);
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
-                    redir = new RedirectUrl { Url = url, ContentId = contentId };
+                    redir = new RedirectUrl { Url = url, ContentKey = contentKey };
                 repo.AddOrUpdate(redir);
                 uow.Commit();
             }
@@ -49,12 +49,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentRedirectUrls(int contentId)
+        public void DeleteContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                repo.DeleteContentUrls(contentId);
+                repo.DeleteContentUrls(contentKey);
                 uow.Commit();
             }
         }
@@ -80,12 +80,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IRedirectUrl> GetContentRedirectUrls(int contentId)
+        public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
             {
-                var rules = repo.GetContentUrls(contentId);
+                var rules = repo.GetContentUrls(contentKey);
                 uow.Commit();
                 return rules;
             }
