@@ -44,8 +44,8 @@
                                     <small class="umb-package-downloads">
                                         <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
                                     </small>
-                                    <small class="umb-package-karma">
-                                        <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
+                                    <small class="umb-package-likes">
+                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
                                     </small>
                                 </div>
 
@@ -78,8 +78,8 @@
                                     <small class="umb-package-downloads">
                                         <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
                                     </small>
-                                    <small class="umb-package-karma">
-                                        <i class="icon-hearts"></i> <strong>{{ package.ownerInfo.karma }}</strong>
+                                    <small class="umb-package-likes">
+                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
                                     </small>
                                 </div>
 
@@ -217,8 +217,8 @@
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
-                                <div class="umb-package-details__information-item-label">Karma:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.karma}}</div>
+                                <div class="umb-package-details__information-item-label">Likes:</div>
+                                <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
                             </div>
 
                         </div>
