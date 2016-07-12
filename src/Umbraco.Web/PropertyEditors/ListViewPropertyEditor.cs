@@ -19,6 +19,7 @@ namespace Umbraco.Web.PropertyEditors
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
+                    {"displayAtTabNumber", "1"},
                     {"orderBy", "SortOrder"},
                     {"orderDirection", "asc"},
                     {
@@ -50,6 +51,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
+            [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
+            public int DisplayAtTabNumber { get; set; }
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
@@ -66,11 +69,9 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
                 Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
-
             [PreValueField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
                 Description = "The bulk actions that are allowed from the list view")]
             public BulkActionPermissionSettings BulkActionPermissions { get; set; }
-
             internal class BulkActionPermissionSettings
             {
                 public bool AllowBulkPublish { get; set; }

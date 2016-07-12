@@ -1,8 +1,11 @@
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbPhotoFolder
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
 * @restrict E
 **/
+
 angular.module("umbraco.directives.html")
     .directive('umbPhotoFolder', function($compile, $log, $timeout, $filter, umbPhotoFolderHelper) {
 

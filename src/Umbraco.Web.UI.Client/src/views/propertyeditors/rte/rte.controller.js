@@ -261,7 +261,7 @@ angular.module("umbraco")
                         };
 
                     });
-
+                    
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
 

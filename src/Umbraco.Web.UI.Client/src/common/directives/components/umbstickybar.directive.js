@@ -1,3 +1,41 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbStickyBar
+@restrict A
+
+@description
+Use this directive make an element sticky and follow the page when scrolling.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+
+        <div
+           class="my-sticky-bar"
+           umb-sticky-bar
+           scrollable-container=".container">
+        </div>
+
+    </div>
+</pre>
+
+<h3>CSS example</h3>
+<pre>
+    .my-sticky-bar {
+        padding: 15px 0;
+        background: #000000;
+        position: relative;
+        top: 0;
+    }
+
+    .my-sticky-bar.-umb-sticky-bar {
+        top: 100px;
+    }
+</pre>
+
+@param {string} scrollableContainer Set the class (".element") or the id ("#element") of the scrollable container element.
+**/
+
 (function() {
    'use strict';
 

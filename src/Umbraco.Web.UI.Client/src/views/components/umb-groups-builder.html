@@ -107,7 +107,7 @@
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
 
-                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited && !property.locked}" ng-repeat="property in tab.properties">
+                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
                         <a href=""
@@ -138,7 +138,7 @@
 
                         </a>
 
-                        <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited && !property.locked, '-sortable-locked': sortingMode && (property.inherited || property.locked)}">
+                        <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
                             <!-- property meta text -->
                             <div class="umb-group-builder__property-meta" ng-class="{'-full-width': sortingMode}">
@@ -184,7 +184,7 @@
                                 </ng-form>
 
                                 <div ng-if="sortingMode">
-                                    <i class="icon icon-navigation" ng-if="!property.inherited && !property.locked"></i>
+                                    <i class="icon icon-navigation" ng-if="!property.inherited"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
                                     <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
                                 </div>

@@ -1,11 +1,14 @@
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbContentName
+* @deprecated
+* We plan to remove this directive in the next major version of umbraco (8.0). The directive is not recommended to use.
 * @restrict E
 * @function
 * @description
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
+
 angular.module("umbraco.directives")
 	.directive('umbContentName', function ($timeout, localizationService) {
 	    return {

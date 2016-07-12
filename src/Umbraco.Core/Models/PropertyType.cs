@@ -221,8 +221,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
+        /// Gets or sets the identifier of the PropertyGroup this PropertyType belongs to.
         /// </summary>
+        /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {

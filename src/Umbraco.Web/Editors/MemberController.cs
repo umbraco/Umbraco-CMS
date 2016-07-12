@@ -103,7 +103,24 @@ namespace Umbraco.Web.Editors
             else
             {
                 int totalRecords;
-                var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+
+                MembershipUserCollection members;
+                if (filter.IsNullOrWhiteSpace())
+                {
+                    members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+                }
+                else
+                {
+                    //we need to search!
+
+                    //try by name first
+                    members = _provider.FindUsersByName(filter, (pageNumber - 1), pageSize, out totalRecords);
+                    if (totalRecords == 0)
+                    {
+                        //try by email then
+                        members = _provider.FindUsersByEmail(filter, (pageNumber - 1), pageSize, out totalRecords);
+                    }
+                }
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);
@@ -275,6 +292,14 @@ namespace Umbraco.Web.Editors
             {
                 throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
             }
+            
+            //We're gonna look up the current roles now because the below code can cause
+            // events to be raised and developers could be manually adding roles to members in 
+            // their handlers. If we don't look this up now there's a chance we'll just end up
+            // removing the roles they've assigned.
+            var currRoles = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
+            //find the ones to remove and remove them
+            var rolesToRemove = currRoles.Except(contentItem.Groups).ToArray();
 
             string generatedPassword = null;
             //Depending on the action we need to first do a create or update using the membership provider
@@ -316,18 +341,15 @@ namespace Umbraco.Web.Editors
                 //create/save the IMember
                 Services.MemberService.Save(contentItem.PersistedContent);
             }
-
+            
             //Now let's do the role provider stuff - now that we've saved the content item (that is important since
             // if we are changing the username, it must be persisted before looking up the member roles).
-            var currGroups = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
-            //find the ones to remove and remove them
-            var toRemove = currGroups.Except(contentItem.Groups).ToArray();
-            if (toRemove.Any())
+            if (rolesToRemove.Any())
             {
-                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, toRemove);
+                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, rolesToRemove);
             }
             //find the ones to add and add them
-            var toAdd = contentItem.Groups.Except(currGroups).ToArray();
+            var toAdd = contentItem.Groups.Except(currRoles).ToArray();
             if (toAdd.Any())
             {
                 //add the ones submitted

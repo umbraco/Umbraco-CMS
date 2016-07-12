@@ -51,7 +51,9 @@
    border: 1px solid @blue;
 }
 
-.umb-layout-selector__dropdown-item-icon {
+.umb-layout-selector__dropdown-item-icon,
+.umb-layout-selector__dropdown-item-icon[class^="icon-"],
+.umb-layout-selector__dropdown-item-icon[class*=" icon-"] {
    font-size: 20px;
    color: @gray;
    text-align: center;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,18 +28,21 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly IMigration[] _migrations;
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
             : this(LoggerResolver.Current.Logger, currentVersion, targetVersion, productName)
         {
         }
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
             : this(logger, currentVersion, targetVersion, productName, null)
         {
         }
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
             : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
         {
@@ -92,7 +96,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
             
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, _productName, true), this))
             {
                 _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
                 return false;
@@ -121,7 +125,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 throw;
             }
 
-            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, false), this);
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, _productName, false), this);
 
             return true;
         }

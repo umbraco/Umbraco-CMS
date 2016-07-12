@@ -8,6 +8,7 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -215,6 +216,19 @@ namespace Umbraco.Web.Editors
            return HasPermission(permissionToCheck, nodeId);
         }
 
+        /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            return Services.UserService
+                .GetPermissions(Security.CurrentUser, nodeIds)
+                .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
+        }
+
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
@@ -352,9 +366,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
         
-
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>

@@ -839,43 +839,43 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="template">Modèle</key>
   </area>
   <area alias="grid">
-    <key alias="insertControl">Choose type of content</key>
-    <key alias="chooseLayout">Choose a layout</key>
-    <key alias="addRows">Add a row</key>
-    <key alias="addElement">Add content</key>
-    <key alias="dropElement">Drop content</key>
-    <key alias="settingsApplied">Settings applied</key>
+    <key alias="insertControl">Choisissez le type de contenu</key>
+    <key alias="chooseLayout">Choisissez une mise en page</key>
+    <key alias="addRows">Ajouter une ligne</key>
+    <key alias="addElement">Ajouter du contenu</key>
+    <key alias="dropElement">Contenu goutte</key>
+    <key alias="settingsApplied">Paramètres appliqués</key>
 
-    <key alias="contentNotAllowed">This content is not allowed here</key>
-    <key alias="contentAllowed">This content is allowed here</key>
+    <key alias="contentNotAllowed">Ce contenu est pas autorisée ici</key>
+    <key alias="contentAllowed">Ce contenu est permis ici</key>
 
-    <key alias="clickToEmbed">Click to embed</key>
-    <key alias="clickToInsertImage">Click to insert image</key>
-    <key alias="placeholderImageCaption">Image caption...</key>
-    <key alias="placeholderWriteHere">Write here...</key>
+    <key alias="clickToEmbed">Cliquez pour intégrer</key>
+    <key alias="clickToInsertImage">Cliquez pour insérer l'image</key>
+    <key alias="placeholderImageCaption">Légende de l'image...</key>
+    <key alias="placeholderWriteHere">Ecrire ici...</key>
 
-    <key alias="gridLayouts">Grid Layouts</key>
-    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
-    <key alias="addGridLayout">Add Grid Layout</key>
-    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
-    <key alias="rowConfigurations">Row configurations</key>
-    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
-    <key alias="addRowConfiguration">Add row configuration</key>
-    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="gridLayouts">Layouts Grid</key>
+    <key alias="gridLayoutsDetail">Layouts sont la superficie totale de travail pour l'éditeur de grille, en général, vous avez seulement besoin d'une ou deux configurations différentes</key>
+    <key alias="addGridLayout">Ajouter Grid Layout</key>
+    <key alias="addGridLayoutDetail">Ajustez la mise en page en définissant la largeur des colonnes et ajouter des sections supplémentaires</key>
+    <key alias="rowConfigurations">Configurations des lignes</key>
+    <key alias="rowConfigurationsDetail">Les lignes sont des cellules prédéfinies disposées horizontalement</key>
+    <key alias="addRowConfiguration">Ajouter une configuration de la ligne</key>
+    <key alias="addRowConfigurationDetail">Ajustez la ligne en réglant la largeur des cellules et en ajoutant des cellules supplémentaires</key>
 
-    <key alias="columns">Columns</key>
-    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    <key alias="columns">Colonnes</key>
+    <key alias="columnsDetails">Nombre total combiné de colonnes dans la configuration de la grille</key>
 
-    <key alias="settings">Settings</key>
-    <key alias="settingsDetails">Configure what settings editors can change</key>
+    <key alias="settings">Paramètres</key>
+    <key alias="settingsDetails">Configurer quels paramètres éditeurs peuvent changer</key>
 
-    <key alias="styles">Styles</key>
-    <key alias="stylesDetails">Configure what styling editors can change</key>
+    <key alias="styles">Modes</key>
+    <key alias="stylesDetails">Configurer ce style éditeurs peuvent changer</key>
 
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+    <key alias="settingDialogDetails">Les réglages seulement économiser si la configuration du json saisi est valide</key>
 
-    <key alias="allowAllEditors">Allow all editors</key>
-    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+    <key alias="allowAllEditors">Autoriser tous les éditeurs</key>
+    <key alias="allowAllRowConfigurations">Autoriser toutes les configurations de lignes</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Champ alternatif</key>

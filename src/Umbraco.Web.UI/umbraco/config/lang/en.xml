@@ -265,12 +265,14 @@
     <key alias="selectContent">Select content</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="noIconsFound">No icons were found</key>
 
     <key alias="noMacroParams">There are no parameters for this macro</key>
 
     <key alias="externalLoginProviders">External login providers</key>
     <key alias="exceptionDetail">Exception Details</key>
-    <key alias="stracktrace">Stacktrace</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">Link your</key>
     <key alias="unLinkYour">Un-Link your</key>
@@ -1054,7 +1056,9 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="yesDelete">Yes, delete</key>
 
       <key alias="movedUnderneath">was moved underneath</key>
+      <key alias="copiedUnderneath">was copied underneath</key>
       <key alias="folderToMove">Select the folder to move</key>
+      <key alias="folderToCopy">Select the folder to copy</key>
       <key alias="structureBelow">to in the tree structure below</key>
 
       <key alias="allDocumentTypes">All Document types</key>

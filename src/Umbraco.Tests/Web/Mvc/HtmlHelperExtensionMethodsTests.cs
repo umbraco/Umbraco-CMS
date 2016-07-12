@@ -2,7 +2,7 @@ using System.Web.Mvc;
 using NUnit.Framework;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.Mvc
+namespace Umbraco.Tests.Web.Mvc
 {
 	[TestFixture]
 	public class HtmlHelperExtensionMethodsTests

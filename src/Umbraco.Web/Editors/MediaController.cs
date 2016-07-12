@@ -571,7 +571,7 @@ namespace Umbraco.Web.Editors
                 {
                     tempFiles.Notifications.Add(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                        "Cannot upload file " + file.Headers.ContentDisposition.FileName + ", it is not an approved file type",
+                        Services.TextService.Localize("media/disallowedFileType"),
                         SpeechBubbleIcon.Warning));
                 }
             }

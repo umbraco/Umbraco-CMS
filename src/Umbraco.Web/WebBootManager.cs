@@ -107,7 +107,7 @@ namespace Umbraco.Web
         public override IBootManager Initialize()
         {
              //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
              // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
              // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
              // boot process has completed. It's a hack but it works.
@@ -198,6 +198,9 @@ namespace Umbraco.Web
             //Wrap viewengines in the profiling engine
             WrapViewEngines(ViewEngines.Engines);
 
+            //add global filters
+            ConfigureGlobalFilters();
+
             //set routes
             CreateRoutes();
 
@@ -224,6 +227,11 @@ namespace Umbraco.Web
             return this;
         }
 
+        internal static void ConfigureGlobalFilters()
+        {
+            GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
+        }
+
         internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
         {
             if (viewEngines == null || viewEngines.Count == 0) return;
@@ -248,8 +256,8 @@ namespace Umbraco.Web
                 //all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
                 new StaticCacheProvider(),
-                //we have no request based cache when not running in web-based context
-                new NullCacheProvider(),
+                //we need request based cache when running in web-based context
+                new HttpRequestCacheProvider(),
                 new IsolatedRuntimeCache(type =>
                     //we need to have the dep clone runtime cache provider to ensure
                     //all entities are cached properly (cloned in and cloned out)

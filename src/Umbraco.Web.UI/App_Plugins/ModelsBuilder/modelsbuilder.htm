@@ -1,5 +1,9 @@
 ﻿<div id="modelsBuilder" ng-controller="Umbraco.Dashboard.ModelsBuilderController">
 
+    <div ng-show="ready" style="float: right;">
+        <button type="button" class="btn" ng-click="reload()"><span>Reload</span></button>
+    </div>
+
     <h3>Models Builder</h3>
 
     <div ng-show="!ready">
@@ -10,7 +14,8 @@
         <div ng-bind-html-unsafe="dashboard.text"></div>
 
         <div ng-if="dashboard.outOfDateModels">
-            <p>Models are <strong>out-of-date</strong>.</p>
+            <p>Models are <strong>out-of-date</strong>.
+            </p>
         </div>
 
         <div ng-if="dashboard.canGenerate">
@@ -25,6 +30,11 @@
             <div class="umb-loader-wrapper" ng-show="generating">
                 <div class="umb-loader"></div>
             </div>
+        </div>
+
+        <div ng-if="dashboard.lastError" style="margin-top: 32px;" ng-show="!generating">
+            <span style="color: red; font-weight: bold;">Last generation failed with the following error:</span>
+            <pre style="width: 80%; white-space: pre-line; background: #f8f8f8; padding: 4px; font-size: small;">{{dashboard.lastError}}</pre>
         </div>
     </div>
 

@@ -22,15 +22,35 @@ var packages = angular.module("umbraco.packages", []);
 //module is initilized.
 angular.module("umbraco.views", ["umbraco.viewcache"]);
 angular.module("umbraco.viewcache", [])
-	.run(function($rootScope, $templateCache){
-		/** For debug mode, always clear template cache to cut down on
+    .run(function($rootScope, $templateCache) {
+        /** For debug mode, always clear template cache to cut down on
             dev frustration and chrome cache on templates */
-        if(Umbraco.Sys.ServerVariables.isDebuggingEnabled){
-            //$rootScope.$on('$viewContentLoaded', function() {
-              	$templateCache.removeAll();
-            //});
+        if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+            $templateCache.removeAll();
         }
-	})
+    })
+    .config([
+        //This ensures that all of our angular views are cache busted, if the path starts with views/ and ends with .html, then
+        // we will append the cache busting value to it. This way all upgraded sites will not have to worry about browser cache.
+        "$provide", function($provide) {
+            return $provide.decorator("$http", [
+                "$delegate", function($delegate) {
+                    var get = $delegate.get;
+                    $delegate.get = function (url, config) {
+
+                        if (Umbraco.Sys.ServerVariables.application && url.startsWith("views/") && url.endsWith(".html")) {
+                            var rnd = Umbraco.Sys.ServerVariables.application.version + "." + Umbraco.Sys.ServerVariables.application.cdf;
+                            var _op = (url.indexOf("?") > 0) ? "&" : "?";
+                            url += _op + "umb__rnd=" + rnd;
+                        }
+                        
+                        return get(url, config);
+                    };
+                    return $delegate;
+                }
+            ]);
+        }
+    ]);
 
 //Call a document callback if defined, this is sort of a dodgy hack to
 // be able to configure angular values in the Default.cshtml

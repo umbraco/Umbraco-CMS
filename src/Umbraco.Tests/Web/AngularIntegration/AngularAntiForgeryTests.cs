@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
-using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Security;
 using NUnit.Framework;
-using Umbraco.Core.Security;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Tests.AngularIntegration
+namespace Umbraco.Tests.Web.AngularIntegration
 {
     [TestFixture]
     public class AngularAntiForgeryTests

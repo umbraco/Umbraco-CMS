@@ -4,7 +4,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 
-namespace Umbraco.Tests.Controllers
+namespace Umbraco.Tests.Web.Controllers
 {
 	[TestFixture]
 	public class PluginControllerAreaTests : BaseWebTest

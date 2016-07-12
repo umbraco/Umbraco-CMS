@@ -78,12 +78,12 @@
                <strong>{{ file.name }}</strong>
 
                <span class="file-error" ng-if="file.$error">
-                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red">(<localize key="media_onlyAllowedFiles"></localize>: "{{ accept }}")</span>
-                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red">(<localize key="media_maxFileSize"></localize> "{{maxFileSize}}")</span>
+                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
+                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
                </span>
 
                <span class="file-error" ng-if="file.serverErrorMessage">
-                   <span class="errorMessage color-red">({{file.serverErrorMessage}})</span>
+                   <span class="errorMessage color-red">{{file.serverErrorMessage}}</span>
                </span>
 
             </div>

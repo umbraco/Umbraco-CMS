@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     templateRepo.AddOrUpdate(template);
                 }
                 unitOfWork.Commit();
-                
+
                 var contentType = MockedContentTypes.CreateSimpleContentType();
                 contentType.AllowedTemplates = new[] {templates[0], templates[1]};
                 contentType.SetDefaultTemplate(templates[0]);
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
-                //create a 
+                //create a
                 var contentType2 = (IContentType)new ContentType(contentType, "hello")
                 {
                     Name = "Blahasdfsadf"
@@ -293,7 +293,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
-                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
+
+                Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!
@@ -301,11 +303,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var save = MapToContentTypeSave(display);
                 var mapped = Mapper.Map<IContentType>(save);
 
+                Assert.AreEqual(4, mapped.PropertyTypes.Count());
+
                 repository.AddOrUpdate(mapped);
                 unitOfWork.Commit();
 
+                Assert.AreEqual(4, mapped.PropertyTypes.Count());
+
                 //re-get
                 contentType = repository.Get(mapped.Id);
+
+                Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -316,7 +324,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
                 var groupId = contentType.PropertyGroups.ElementAt(0).Id;
-                Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
+
+                var propertyTypes = contentType.PropertyTypes.ToArray();
+                Assert.AreEqual("gen", propertyTypes[0].Alias); // just to be sure
+                Assert.IsNull(propertyTypes[0].PropertyGroupId);
+                Assert.IsTrue(propertyTypes.Skip(1).All((x => x.PropertyGroupId.Value == groupId)));
             }
 
         }
@@ -353,7 +365,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
             }
 
-            
+
         }
 
         // this is for tests only because it makes no sense at all to have such a
@@ -491,16 +503,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
-            {                
+            {
                 var ctMain = MockedContentTypes.CreateSimpleContentType();
                 var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
                 var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
-                
+
                 repository.AddOrUpdate(ctMain);
                 repository.AddOrUpdate(ctChild1);
-                repository.AddOrUpdate(ctChild2);                
+                repository.AddOrUpdate(ctChild2);
                 unitOfWork.Commit();
-                
+
                 // Act
 
                 var resolvedParent = repository.Get(ctMain.Id);
@@ -528,7 +540,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var child3 = MockedContentTypes.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child3);
                 var child2 = MockedContentTypes.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true);
-                repository.AddOrUpdate(child2);                
+                repository.AddOrUpdate(child2);
                 unitOfWork.Commit();
 
                 // Act
@@ -540,7 +552,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("aabc", contentTypes.ElementAt(1).Name);
                 Assert.AreEqual("zyx", contentTypes.ElementAt(2).Name);
             }
-            
+
         }
 
         [Test]
@@ -671,7 +683,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
-                // Act                
+                // Act
                 contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
@@ -841,7 +853,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
             }
-            
+
         }
 
         [Test]
