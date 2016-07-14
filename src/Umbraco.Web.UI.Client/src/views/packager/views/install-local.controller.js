@@ -102,7 +102,6 @@
             vm.installState.status = localizationService.localize("packager_installStateImporting");
             vm.installState.progress = "0";
 
-            //TODO: If any of these fail, will they keep calling the next one?
             packageResource
                 .import(vm.localPackage)                
                 .then(function(pack) {

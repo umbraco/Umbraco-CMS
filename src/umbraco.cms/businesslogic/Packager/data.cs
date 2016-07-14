@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using System.Xml.XPath;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -275,6 +276,8 @@ namespace umbraco.cms.businesslogic.packager
 
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method is no longer in use and will be removed in the future")]
         public static void UpdateValue(XmlNode n, string Value)
         {
             if (n.FirstChild != null)
@@ -283,7 +286,6 @@ namespace umbraco.cms.businesslogic.packager
             {
                 n.AppendChild(Source.CreateTextNode(Value));
             }
-            //Save();
         }
 
         public static void Save(PackageInstance package, string dataSource)
