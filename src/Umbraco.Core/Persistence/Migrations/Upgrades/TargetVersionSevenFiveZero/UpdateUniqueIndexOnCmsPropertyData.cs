@@ -33,63 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
             if (found != null)
             {
-                ////NOTE: WE cannot execute this SQL inside of an Execute block because even though we are removing duplicates,
-                ////we cannot drop/add an index until that trans is completed, so we need to do this eagerly.
-
-                //In order to apply this unique index, we must ensure that there is no duplicate data.
-                // so we need to query for this
-                Execute.Code(database =>
-                {
-                    const string sql = @"SELECT mt.id, mt.contentNodeId, mt.versionId, mt.propertytypeId FROM cmsPropertyData mt
-INNER JOIN (
-    SELECT contentNodeId, versionId, propertytypeId
-    FROM cmsPropertyData
-    GROUP BY contentNodeId, versionId, propertytypeId
-    HAVING COUNT(*) >1
-) T 
-ON mt.contentNodeId= T.contentNodeId
-and mt.versionId= T.versionId
-and mt.propertytypeId= T.propertytypeId
-ORDER BY mt.id";
-
-                    var duplicates = database.Query<dynamic>(sql);
-                    var currDuplicates = new List<Tuple<int, int, Guid, int>>();
-                    foreach (var duplicate in duplicates)
-                    {
-                        //check if the current duplicates batch is changing as we iterate
-                        if (currDuplicates.Count > 0                        
-                            && currDuplicates[0].Item2 == duplicate.contentNodeId
-                            && currDuplicates[0].Item3 == duplicate.versionId
-                            && currDuplicates[0].Item4 == duplicate.propertytypeId)
-                        {
-                            //this is still a duplicate so add it
-                            AddDuplicate(duplicate, currDuplicates);
-                        }
-                        else
-                        {
-                            //the batch is changing so perform the deletions except for last
-                            for (var index = 0; index < (currDuplicates.Count - 1); index++)
-                            {
-                                var currDuplicate = currDuplicates[index];
-                                database.Delete<PropertyTypeDto>(currDuplicate.Item1);
-                            }
-                            currDuplicates.Clear();
-                            //add the next batch
-                            AddDuplicate(duplicate, currDuplicates);
-                        }
-                    }
-
-                    //now we need to process the last batch
-                    for (var index = 0; index < (currDuplicates.Count - 1); index++)
-                    {
-                        var currDuplicate = currDuplicates[index];
-                        var result = database.Delete<PropertyDataDto>(currDuplicate.Item1);
-                        Debug.Assert(result == 1);
-                    }
-                    currDuplicates.Clear();
-
-                    return string.Empty;
-                });
+                Execute.Sql("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
 
                 //we need to re create this index
                 Delete.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData");
@@ -100,11 +44,6 @@ ORDER BY mt.id";
                     .WithOptions().NonClustered()
                     .WithOptions().Unique();
             }
-        }
-
-        private void AddDuplicate(dynamic duplicate, List<Tuple<int, int, Guid, int>> list)
-        {
-            list.Add(new Tuple<int, int, Guid, int>(duplicate.id, duplicate.contentNodeId, duplicate.versionId, duplicate.propertytypeId));
         }
 
         public override void Down()
