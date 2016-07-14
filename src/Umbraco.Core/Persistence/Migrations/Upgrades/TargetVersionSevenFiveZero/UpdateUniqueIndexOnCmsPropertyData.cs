@@ -33,7 +33,24 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
             if (found != null)
             {
-                Execute.Sql("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
+                //Check for MySQL
+                if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+                {
+                    //Use the special double nested sub query for MySQL since that is the only
+                    //way delete sub queries works
+                    SqlSyntax.GetDeleteSubquery(
+                        "cmsPropertyData",
+                        "id",
+                        new Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
+                        WhereInType.NotIn);
+                }
+                else
+                {
+                    //NOTE: Even though the above will work for MSSQL, we are not going to execute the
+                    // nested delete sub query logic since it will be slower and there could be a ton of property 
+                    // data here so needs to be as fast as possible.
+                    Execute.Sql("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
+                }
 
                 //we need to re create this index
                 Delete.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData");
