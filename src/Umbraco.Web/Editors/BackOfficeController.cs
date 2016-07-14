@@ -47,7 +47,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
-    [UmbracoUseHttps]
+    [UmbracoRequireHttps]
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
