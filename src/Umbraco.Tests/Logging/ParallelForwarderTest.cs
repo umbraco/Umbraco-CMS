@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Logging
             // Assert
             Assert.That(debugAppender.LoggedEventCount, Is.EqualTo(0));
             Assert.That(watch.ElapsedMilliseconds, Is.LessThan(testSize));
-            Console.WriteLine("Logged {0} errors in {1}ms", testSize, watch.ElapsedMilliseconds);
+            Debug.Print("Logged {0} errors in {1}ms", testSize, watch.ElapsedMilliseconds);
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Logging
             //On some systems, we may not be able to flush all events prior to close, but it is reasonable to assume in this test case
             //that some events should be logged after close.
             Assert.That(numberLoggedAfterClose, Is.GreaterThan(numberLoggedBeforeClose), "Some number of LoggingEvents should be logged after close.");
-            Console.WriteLine("Flushed {0} events during shutdown", numberLoggedAfterClose - numberLoggedBeforeClose);
+            Debug.Print("Flushed {0} events during shutdown", numberLoggedAfterClose - numberLoggedBeforeClose);
         }
 
         [Test, Explicit("Long-running")]
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Logging
             var events = debugAppender.GetEvents();
             var evnt = events[events.Length - 1];
             Assert.That(evnt.MessageObject, Is.EqualTo("The buffer was not able to be flushed before timeout occurred."));
-            Console.WriteLine("Flushed {0} events during shutdown which lasted {1}ms", numberLoggedAfterClose - numberLoggedBeforeClose, watch.ElapsedMilliseconds);
+            Debug.Print("Flushed {0} events during shutdown which lasted {1}ms", numberLoggedAfterClose - numberLoggedBeforeClose, watch.ElapsedMilliseconds);
         }
 
         [Test]

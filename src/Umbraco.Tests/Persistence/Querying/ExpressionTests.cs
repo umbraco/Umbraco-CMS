@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using Moq;
 using NUnit.Framework;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Querying
     //        var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
     //        var result = modelToSqlExpressionHelper.Visit(predicate);
 
-    //        Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+    //        Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
     //        Assert.AreEqual("[cmsContentType].[alias] = @0", result);
     //        Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result);
             Assert.AreEqual("-1%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("([umbracoNode].[parentID] = @0)", result);
             Assert.AreEqual(-1, modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("([umbracoUser].[userLogin] = @0)", result);
             Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper([umbracoUser].[userLogin]) = upper(@0)", result);
             Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper(`umbracoUser`.`userLogin`) = upper(@0)", result);
             Assert.AreEqual("mydomain\\myuser", modelToSqlExpressionHelper.GetSqlParameters()[0]);
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Poco to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Poco to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper(`umbracoUser`.`userLogin`) LIKE upper(@0)", result);
             Assert.AreEqual("mydomain\\myuser%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
