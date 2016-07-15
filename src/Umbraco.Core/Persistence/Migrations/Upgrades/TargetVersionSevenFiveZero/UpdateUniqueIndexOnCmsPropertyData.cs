@@ -38,11 +38,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                 {
                     //Use the special double nested sub query for MySQL since that is the only
                     //way delete sub queries works
-                    SqlSyntax.GetDeleteSubquery(
+                    var delPropQry = SqlSyntax.GetDeleteSubquery(
                         "cmsPropertyData",
                         "id",
                         new Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
                         WhereInType.NotIn);
+                    Execute.Sql(delPropQry.SQL);
                 }
                 else
                 {
@@ -52,7 +53,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                     Execute.Sql("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
                 }
 
-                //we need to re create this index
+                //we need to re create this index   
                 Delete.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData");
                 Create.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData")
                     .OnColumn("contentNodeId").Ascending()
