@@ -83,7 +83,6 @@ ECHO.
 ECHO No errors were detected!
 ECHO There may still be some in the output, which you would need to investigate.
 ECHO Warnings are usually normal.
-IF isci NEQ 1 PAUSE
 GOTO :EOF
 
 :error
