@@ -81,14 +81,16 @@ namespace Umbraco.Tests.Migrations
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "text"
+                Text = "text",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
             data = new PropertyDataDto
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>"
+                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
 
