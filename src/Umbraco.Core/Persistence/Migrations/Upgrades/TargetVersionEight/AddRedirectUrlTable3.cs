@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("7.5.0", 103, GlobalSettings.UmbracoMigrationName)]
-    public class AddRedirectUrlTable4 : MigrationBase
+    [Migration("8.0.0", 102, GlobalSettings.UmbracoMigrationName)]
+    public class AddRedirectUrlTable3 : MigrationBase
     {
-        public AddRedirectUrlTable4(IMigrationContext context)
+        public AddRedirectUrlTable3(IMigrationContext context)
             : base(context)
         { }
 
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
         {
             var columns = SqlSyntax.GetColumnsInSchema(database).ToArray();
 
-            if (columns.Any(x => x.TableName.InvariantEquals("umbracoRedirectUrl") && x.ColumnName.InvariantEquals("urlHash")))
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoRedirectUrl") && x.ColumnName.InvariantEquals("hurl")))
                 return null;
 
             var localContext = new LocalMigrationContext(database, Logger);
@@ -28,19 +28,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
             localContext.Delete.Index("IX_umbracoRedirectUrl").OnTable("umbracoRedirectUrl");
 
-            localContext.Delete.Column("hurl").FromTable("umbracoRedirectUrl");
-
             // SQL CE does not want to alter-add non-nullable columns ;-(
             // but it's OK to create as nullable then alter, go figure
             //localContext.Alter.Table("umbracoRedirectUrl")
             //    .AddColumn("urlHash").AsString(16).NotNullable();
             localContext.Alter.Table("umbracoRedirectUrl")
-                .AddColumn("urlHash").AsString(16).Nullable();
+                .AddColumn("hurl").AsString(16).Nullable();
             localContext.Alter.Table("umbracoRedirectUrl")
-                .AlterColumn("urlHash").AsString(16).NotNullable();
+                .AlterColumn("hurl").AsString(16).NotNullable();
 
             localContext.Create.Index("IX_umbracoRedirectUrl").OnTable("umbracoRedirectUrl")
-                .OnColumn("urlHash")
+                .OnColumn("hurl")
                 .Ascending()
                 .OnColumn("contentKey")
                 .Ascending()

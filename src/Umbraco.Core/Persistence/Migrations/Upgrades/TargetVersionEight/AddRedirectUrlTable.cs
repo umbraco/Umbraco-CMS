@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("7.5.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("8.0.0", 100, GlobalSettings.UmbracoMigrationName)]
     public class AddRedirectUrlTable : MigrationBase
     {
         public AddRedirectUrlTable(IMigrationContext context)

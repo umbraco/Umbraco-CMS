@@ -7,8 +7,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -111,8 +111,8 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
-                new SemVersion(7, 4, 0),
                 new SemVersion(7, 5, 0),
+                new SemVersion(8, 0, 0),
                 GlobalSettings.UmbracoMigrationName,
 
                 //pass in explicit migrations
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Migrations
             Assert.IsTrue(upgraded);
         }
 
-        [Migration("7.5.0", 99, GlobalSettings.UmbracoMigrationName)]
+        [Migration("8.0.0", 99, GlobalSettings.UmbracoMigrationName)]
         public class DeleteRedirectUrlTable : MigrationBase
         {
             public DeleteRedirectUrlTable(IMigrationContext context)
