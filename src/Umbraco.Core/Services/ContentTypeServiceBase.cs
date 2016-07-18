@@ -570,6 +570,8 @@ namespace Umbraco.Core.Services
             if (OnDeletingCancelled(new DeleteEventArgs<TItem>(item)))
                 return;
 
+            TItem[] deleted;
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
@@ -578,6 +580,7 @@ namespace Umbraco.Core.Services
                 // all descendants are going to be deleted
                 var descendantsAndSelf = item.DescendantsAndSelf(this)
                     .ToArray();
+                deleted = descendantsAndSelf;
 
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
@@ -596,7 +599,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            OnDeleted(new DeleteEventArgs<TItem>(item, false));
+            OnDeleted(new DeleteEventArgs<TItem>(deleted, false));
             Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
         }
 
@@ -607,6 +610,8 @@ namespace Umbraco.Core.Services
             if (OnDeletingCancelled(new DeleteEventArgs<TItem>(itemsA)))
                 return;
 
+            TItem[] deleted;
+
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<TRepository>();
@@ -616,6 +621,7 @@ namespace Umbraco.Core.Services
                 var allDescendantsAndSelf = itemsA.SelectMany(xx => xx.DescendantsAndSelf(this))
                     .DistinctBy(x => x.Id)
                     .ToArray();
+                deleted = allDescendantsAndSelf;
 
                 // delete content
                 DeleteItemsOfTypes(allDescendantsAndSelf.Select(x => x.Id));
@@ -633,7 +639,7 @@ namespace Umbraco.Core.Services
 
             }
 
-            OnDeleted(new DeleteEventArgs<TItem>(itemsA, false));
+            OnDeleted(new DeleteEventArgs<TItem>(deleted, false));
             Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
         }
 

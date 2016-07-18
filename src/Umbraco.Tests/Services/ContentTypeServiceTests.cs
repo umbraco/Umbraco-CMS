@@ -310,7 +310,7 @@ namespace Umbraco.Tests.Services
             cts.Delete(contentType);
             cts.Delete(contentType2);
 
-            Assert.AreEqual(deletedEntities, 2);
+            Assert.AreEqual(2, deletedEntities);
         }
 
         [Test]
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Services
 
             cts.Delete(contentType);
 
-            Assert.AreEqual(deletedEntities, 2);
+            Assert.AreEqual(2, deletedEntities);
         }
 
         [Test]
