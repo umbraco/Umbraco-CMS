@@ -91,10 +91,15 @@ namespace Umbraco.Core.Persistence
             EnableSqlTrace = false;
         }
 
-        // fixme: that could be an extension method of IUmbracoDatabaseConfig
+        // fixme: these two could be an extension method of IUmbracoDatabaseConfig
         public Sql<SqlContext> Sql()
         {
             return NPoco.Sql.BuilderFor(new SqlContext(this));
+        }
+
+        public Sql<SqlContext> Sql(string sql, params object[] args)
+        {
+            return NPoco.Sql.BuilderFor(new SqlContext(this)).Append(sql, args);
         }
 
         protected override DbConnection OnConnectionOpened(DbConnection connection)

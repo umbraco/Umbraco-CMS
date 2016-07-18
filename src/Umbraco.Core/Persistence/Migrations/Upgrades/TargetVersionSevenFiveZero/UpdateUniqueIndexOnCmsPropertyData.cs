@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
     [Migration("7.5.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUniqueIndexOnCmsPropertyData : MigrationBase
     {
-        public UpdateUniqueIndexOnCmsPropertyData(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public UpdateUniqueIndexOnCmsPropertyData(IMigrationContext context)
+            : base(context)
         {
         }
 
@@ -34,14 +34,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             if (found != null)
             {
                 //Check for MySQL
-                if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+                if (DatabaseType.IsMySql())
                 {
                     //Use the special double nested sub query for MySQL since that is the only
                     //way delete sub queries works
                     var delPropQry = SqlSyntax.GetDeleteSubquery(
                         "cmsPropertyData",
                         "id",
-                        new Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
+                        Context.Database.Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY contentNodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
                         WhereInType.NotIn);
                     Execute.Sql(delPropQry.SQL);
                 }

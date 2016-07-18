@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
     [Migration("7.5.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class RemoveStylesheetDataAndTablesAgain : MigrationBase
     {
-        public RemoveStylesheetDataAndTablesAgain(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public RemoveStylesheetDataAndTablesAgain(IMigrationContext context)
+            : base(context)
         {
         }
 
