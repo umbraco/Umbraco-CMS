@@ -100,7 +100,7 @@ GOTO :EOF
 :error
 
 ECHO.
-ECHO. Errors were detected!
+ECHO Errors were detected!
 ECHO.
 
 REM don't pause if continuous integration else the build server waits forever

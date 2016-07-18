@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, $cookieStore, $timeout, $q) {
+    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService) {
 
         var vm = this;
         vm.state = "upload";
@@ -9,7 +9,8 @@
         vm.localPackage = {};
         vm.installPackage = installPackage;
         vm.installState = {
-            status: ""
+            status: "",
+            progress:0
         };
         vm.zipFile = {
             uploadStatus: "idle",
@@ -18,8 +19,10 @@
         };
 
         $scope.handleFiles = function (files, event) {
-            for (var i = 0; i < files.length; i++) {
-                upload(files[i]);
+            if (files) {
+                for (var i = 0; i < files.length; i++) {
+                    upload(files[i]);
+                }
             }
         };
 
@@ -50,8 +53,6 @@
                     // Throw message back to user with the cause of the error
                     vm.zipFile.serverErrorMessage = data.notifications[0].message;
 
-                    //TODO: Handle the error in UI
-
                 } else {
 
                     // set done status on file
@@ -62,29 +63,32 @@
 
             }).error(function (evt, status, headers, config) {
 
-                //TODO: Handle the error in UI
-
                 // set status done
                 vm.zipFile.uploadStatus = "error";
-
-                //if the service returns a detailed error
-                if (evt.InnerException) {
-                    vm.zipFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
-
-                    //Check if its the common "too large file" exception
-                    if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                        vm.zipFile.serverErrorMessage = "File too large to upload";
-                    }
-
-                } else if (evt.Message) {
-                    file.serverErrorMessage = evt.Message;
-                }
 
                 // If file not found, server will return a 404 and display this message
                 if (status === 404) {
                     vm.zipFile.serverErrorMessage = "File not found";
                 }
+                else if (status == 400) {
+                    //it's a validation error
+                    vm.zipFile.serverErrorMessage = evt.message;
+                }
+                else {
+                    //it's an unhandled error
+                    //if the service returns a detailed error
+                    if (evt.InnerException) {
+                        vm.zipFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
 
+                        //Check if its the common "too large file" exception
+                        if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
+                            vm.zipFile.serverErrorMessage = "File too large to upload";
+                        }
+
+                    } else if (evt.Message) {
+                        file.serverErrorMessage = evt.Message;
+                    }
+                }
             });
         }
 
@@ -95,23 +99,27 @@
         }
 
         function installPackage() {
-            vm.installState.status = "Importing";
+            vm.installState.status = localizationService.localize("packager_installStateImporting");
+            vm.installState.progress = "0";
 
-            //TODO: If any of these fail, will they keep calling the next one?
             packageResource
                 .import(vm.localPackage)                
                 .then(function(pack) {
-                        vm.installState.status = "Installing...";
+                        vm.installState.progress = "25";
+                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
+                        vm.installState.progress = "50";
                         return packageResource.installFiles(pack);
                     },
                     installError)
                 .then(function(pack) {
-                        vm.installState.status = "Restarting, please wait...";
+                    vm.installState.status = localizationService.localize("packager_installStateRestarting");
+                        vm.installState.progress = "75";
                         return packageResource.installData(pack);
                     },
                     installError)
                 .then(function(pack) {
-                        vm.installState.status = "All done, your browser will now refresh, please wait...";
+                    vm.installState.status = localizationService.localize("packager_installStateComplete");
+                        vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },
                     installError)
@@ -119,13 +127,17 @@
 
                         if (result.postInstallationPath) {
                             //Put the redirect Uri in a cookie so we can use after reloading
-                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
+                            localStorageService.set("packageInstallUri", result.postInstallationPath);
                         }
-                        //reload on next digest (after cookie)
-                        $timeout(function() {
-                            window.location.reload(true);
-                        });
+                        else {
+                            //set to a constant value so it knows to just go to the installed view
+                            localStorageService.set("packageInstallUri", "installed");
+                        }
 
+                        //reload on next digest (after cookie)
+                        $timeout(function () {
+                            $window.location.reload(true);
+                        });
 
                     },
                     installError);

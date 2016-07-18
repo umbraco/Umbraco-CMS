@@ -35,6 +35,7 @@ namespace Umbraco.Core.Sync
         private readonly ILogger _logger;
         private int _lastId = -1;
         private DateTime _lastSync;
+        private DateTime _lastPruned;
         private bool _initialized;
         private bool _syncing;
         private bool _released;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Sync
 
             _appContext = appContext;
             _options = options;
-            _lastSync = DateTime.UtcNow;
+            _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _profilingLogger = appContext.ProfilingLogger;
             _logger = appContext.ProfilingLogger.Logger;
@@ -213,6 +214,12 @@ namespace Umbraco.Core.Sync
                 using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
                     ProcessDatabaseInstructions();
+
+                    if ((DateTime.UtcNow - _lastPruned).TotalSeconds <= _options.PruneThrottleSeconds)
+                        return;
+
+                    _lastPruned = _lastSync;
+
                     switch (_appContext.GetCurrentServerRole())
                     {
                         case ServerRole.Single:
@@ -235,6 +242,9 @@ namespace Umbraco.Core.Sync
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
+        /// <returns>
+        /// Returns the number of processed instructions
+        /// </returns>
         private void ProcessDatabaseInstructions()
         {
             // NOTE
@@ -313,32 +323,15 @@ namespace Umbraco.Core.Sync
         private void PruneOldInstructions()
         {
             var pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions);
-            var sqlSyntax = _appContext.DatabaseContext.SqlSyntax;
 
-            //NOTE: this query could work on SQL server and MySQL:
-            /*
-                SELECT id
-                FROM    umbracoCacheInstruction
-                WHERE   utcStamp < getdate()
-                AND id <> (SELECT MAX(id) FROM umbracoCacheInstruction)
-            */
-            // However, this will not work on SQLCE and in fact it will be slower than the query we are
-            // using if the SQL server doesn't perform it's own query optimizations (i.e. since the above
-            // query could actually execute a sub query for every row found). So we've had to go with an
-            // inner join which is faster and works on SQLCE but it's uglier to read.
+            // using 2 queries is faster than convoluted joins
 
-            var deleteQuery = new Sql().Select("cacheIns.id")
-                .From("umbracoCacheInstruction cacheIns")
-                .InnerJoin("(SELECT MAX(id) id FROM umbracoCacheInstruction) tMax")
-                .On("cacheIns.id <> tMax.id")
-                .Where("cacheIns.utcStamp < @pruneDate", new {pruneDate = pruneDate});
+            var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
 
-            var deleteSql = sqlSyntax.GetDeleteSubquery(
-                "umbracoCacheInstruction",
-                "id",
-                deleteQuery);
+            var delete = new Sql().Append(@"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
+                new { pruneDate, maxId });
 
-            _appContext.DatabaseContext.Database.Execute(deleteSql);
+            _appContext.DatabaseContext.Database.Execute(delete);
         }
 
         /// <summary>
@@ -419,7 +412,7 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected readonly static string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+        protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
             + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
             + " [P" + Process.GetCurrentProcess().Id // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22

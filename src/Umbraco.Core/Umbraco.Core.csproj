@@ -355,6 +355,8 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable3.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable2.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\RemoveStylesheetDataAndTablesAgain.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\UpdateUniqueIndexOnCmsPropertyData.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\FixListViewMediaSortOrder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUmbracoDeployTables.cs" />

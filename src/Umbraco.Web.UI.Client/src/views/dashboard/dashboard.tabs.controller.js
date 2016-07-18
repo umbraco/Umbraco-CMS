@@ -17,28 +17,28 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource) {
+function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
     $scope.installForms = function(){
-        $scope.state = "Installng package";
+        $scope.state = localizationService.localize("packager_installStateDownloading");
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack) {
-                    $scope.state = "importing";
+                $scope.state = localizationService.localize("packager_installStateImporting");
                     return packageResource.import(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                    $scope.state = "Installing";
+                $scope.state = localizationService.localize("packager_installStateInstalling");
                     return packageResource.installFiles(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                    $scope.state = "Restarting, please wait...";
+                $scope.state = localizationService.localize("packager_installStateRestarting");
                     return packageResource.installData(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                    $scope.state = "All done, your browser will now refresh";
+                $scope.state = localizationService.localize("packager_installStateComplete");
                     return packageResource.cleanUp(pack);
                 },
                 $scope.error)

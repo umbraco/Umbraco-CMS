@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -77,14 +78,16 @@ namespace Umbraco.Tests.Migrations
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "text"
+                Text = "text",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
             data = new PropertyDataDto
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>"
+                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
             var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
@@ -94,7 +97,7 @@ namespace Umbraco.Tests.Migrations
 
             data = DatabaseContext.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
             Assert.IsNotNull(data);
-            Console.WriteLine(data.Text);
+            Debug.Print(data.Text);
             Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
                 data.Text);
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(dtd);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
     
     }

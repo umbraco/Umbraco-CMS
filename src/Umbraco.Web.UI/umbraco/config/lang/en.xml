@@ -782,6 +782,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageVersion">Package version</key>
     <key alias="packageVersionHistory">Package version history</key>
     <key alias="viewPackageWebsite">View package website</key>
+    <key alias="packageAlreadyInstalled">The package and version chosen is already installed</key>
+    <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of %0%</key>
+    <key alias="installStateUninstalling">Uninstalling...</key>
+    <key alias="installStateDownloading">Downloading...</key>
+    <key alias="installStateImporting">Importing...</key>
+    <key alias="installStateInstalling">Installing...</key>
+    <key alias="installStateRestarting">Restarting, please wait...</key>
+    <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
+    
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>

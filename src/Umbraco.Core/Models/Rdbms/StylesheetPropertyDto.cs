@@ -1,12 +1,11 @@
-﻿using NPoco;
+﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsStylesheetProperty")]
-    [PrimaryKey("nodeId", AutoIncrement = false)]
-    [ExplicitColumns]
+    [Obsolete("This is no longer used and will be removed from Umbraco in future versions")]
     internal class StylesheetPropertyDto
     {
         [Column("nodeId")]

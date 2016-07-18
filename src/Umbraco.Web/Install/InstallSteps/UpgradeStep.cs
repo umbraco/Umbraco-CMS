@@ -1,3 +1,6 @@
+using Semver;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -18,5 +21,43 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             return null;
         }
+
+        public override object ViewModel
+        {
+            get
+            {
+                var currentVersion = CurrentVersion().GetVersion(3).ToString();
+                var newVersion = UmbracoVersion.Current.ToString();
+                var reportUrl = string.Format("https://our.umbraco.org/contribute/releases/compare?from={0}&to={1}&notes=1", currentVersion, newVersion);
+
+                return new
+                {
+                    currentVersion = currentVersion,
+                    newVersion = newVersion,
+                    reportUrl = reportUrl
+                };
+
+            }
+        }
+
+        /// <summary>
+        /// Gets the Current Version of the Umbraco Site before an upgrade
+        /// by using the last/most recent Umbraco Migration that has been run
+        /// </summary>
+        /// <returns>A SemVersion of the latest Umbraco DB Migration run</returns>
+        private SemVersion CurrentVersion()
+        {
+            //Set a default version of 0.0.0
+            var version = new SemVersion(0);
+
+            //If we have a db context available, if we don't then we are not installed anyways
+            if (ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured && ApplicationContext.Current.DatabaseContext.CanConnect)
+            {
+                version = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(ApplicationContext.Current.Services.MigrationEntryService);
+            }
+
+            return version;
+        }
+        
     }
 }

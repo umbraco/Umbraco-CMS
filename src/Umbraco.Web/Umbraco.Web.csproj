@@ -287,6 +287,7 @@
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
+    <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
@@ -636,6 +637,7 @@
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
+    <Compile Include="WebApi\Filters\UmbracoWebApiRequireHttpsAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUseHttps.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />

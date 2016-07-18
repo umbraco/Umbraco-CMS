@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Services
             Assert.That(element, Is.Not.Null);
             Assert.That(element.Element("name").Value, Is.EqualTo("Test"));
             Assert.That(element.Element("alias").Value, Is.EqualTo("test1"));
-            Console.Write(element.ToString());
+            Debug.Print(element.ToString());
         }
 
         [Test]

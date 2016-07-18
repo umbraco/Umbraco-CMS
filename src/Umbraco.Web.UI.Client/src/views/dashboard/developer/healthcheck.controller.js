@@ -19,22 +19,38 @@
 		vm.checkAllInGroup = checkAllInGroup;
         vm.openGroup = openGroup;
         vm.setViewState = setViewState;
+        vm.triggerChecks = triggerChecks;
+		vm.checksRunning = false;
 
-		// Get a (grouped) list of all health checks
-		healthCheckResource.getAllChecks().then(
-			function(response) {
+        vm.totalGroups = 0;
+        vm.totalGroupsChecked = 0;
 
-                // set number of checks which has been executed
-                for (var i = 0; i < response.length; i++) {
-                    var group = response[i];
-                    group.checkCounter = 0;
-                    checkAllInGroup(group, group.checks);
+        function triggerChecks(){
+
+            //Reset counter - inczse 
+
+            //Checks running - hide button that triggers check
+            //So we can't invoke multiple times & make further blocking requests
+            vm.checksRunning = true;
+
+            // Get a (grouped) list of all health checks
+            healthCheckResource.getAllChecks().then(
+                function(response) {
+
+                    //Total number of groups
+                    vm.totalGroups = response.length;
+
+                    // set number of checks which has been executed
+                    for (var i = 0; i < response.length; i++) {
+                        var group = response[i];
+                        group.checkCounter = 0;
+                        checkAllInGroup(group, group.checks);
+                    }
+
+                    vm.groups = response;
                 }
-
-				vm.groups = response;
-
-			}
-		);
+            );
+        }
 
         function setGroupGlobalResultType(group) {
 
@@ -104,6 +120,15 @@
                     if (group.checkCounter === checks.length) {
                         setGroupGlobalResultType(group);
                         group.loading = false;
+
+                        //This group of checks run - increment counter by one
+                        vm.totalGroupsChecked++;
+
+                        //Once we have all done all checks for this group
+                        //Verify if this was last group or not with counters & reset button
+                        if(vm.totalGroups === vm.totalGroupsChecked){
+                            vm.checksRunning = false;
+                        }
                     }
 
 				});
