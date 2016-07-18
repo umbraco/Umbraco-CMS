@@ -27,29 +27,6 @@ namespace Umbraco.Web.Redirects
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
         /// <inheritdoc />
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            // if any of these dlls are loaded we don't want to run our finder
-            var dlls = new[]
-            {
-                "InfoCaster.Umbraco.UrlTracker",
-                "SEOChecker",
-                "Simple301",
-                "Terabyte.Umbraco.Modules.PermanentRedirect",
-                "CMUmbracoTools",
-                "PWUrlRedirect"
-            };
-
-            // assuming all assemblies have been loaded already
-            // check if any of them matches one of the above dlls
-            var found = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(x => x.FullName.Split(',')[0])
-                .Any(x => dlls.Contains(x));
-            if (found)
-                ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
-        }
-
-        /// <inheritdoc />
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             // events are weird
@@ -62,6 +39,8 @@ namespace Umbraco.Web.Redirects
             // are processed more than once
             //
             // this is all verrrry weird but it seems to work
+
+            // fixme - refactor this in NuCache branch with new ContentCacheRefresher
 
             ContentService.Publishing += ContentService_Publishing;
             ContentService.Published += ContentService_Published;

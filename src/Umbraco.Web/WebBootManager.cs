@@ -490,7 +490,6 @@ namespace Umbraco.Web
                 typeof(ContentFinderByNiceUrlAndTemplate),
                 typeof(ContentFinderByProfile),
                 typeof(ContentFinderByUrlAlias),
-
                 typeof(ContentFinderByRedirectUrl)
             );
 
