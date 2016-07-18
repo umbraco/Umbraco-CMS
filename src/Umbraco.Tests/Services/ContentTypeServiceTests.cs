@@ -14,7 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class ContentTypeServiceTests : BaseServiceTest
@@ -311,7 +311,7 @@ namespace Umbraco.Tests.Services
             cts.Delete(contentType);
             cts.Delete(contentType2);
 
-            Assert.AreEqual(deletedEntities, 2);
+            Assert.AreEqual(2, deletedEntities);
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.Services
 
             cts.Delete(contentType);
 
-            Assert.AreEqual(deletedEntities, 2);
+            Assert.AreEqual(2, deletedEntities);
         }
 
         [Test]
@@ -634,7 +634,7 @@ namespace Umbraco.Tests.Services
              * -- Content Page
              * ---- Advanced Page -> Content Meta
              * Content Meta :: Composition, has 'Title'
-             * 
+             *
              * Content Meta has 'Title' PropertyType
              * Adding 'Title' to BasePage should fail
             */
@@ -665,7 +665,7 @@ namespace Umbraco.Tests.Services
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
-            
+
             var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
             service.Save(advancedPage);
 
@@ -824,7 +824,7 @@ namespace Umbraco.Tests.Services
             };
             var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
             service.Save(seoComposition);
-            
+
             var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
             var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
             service.Save(advancedPage);
@@ -931,7 +931,7 @@ namespace Umbraco.Tests.Services
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
             var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
             {
-                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 
+                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
             };
             var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(basePage);
@@ -1005,7 +1005,7 @@ namespace Umbraco.Tests.Services
         public void Can_Rename_PropertyGroup_With_Inherited_PropertyGroups()
         {
             //Related the first issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
-            
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
 
@@ -1278,8 +1278,8 @@ namespace Umbraco.Tests.Services
              * - Content Page
              * -- Advanced Page
              * Content Meta :: Composition
-            */ 
-            
+            */
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
             var basePage = MockedContentTypes.CreateBasicContentType();
