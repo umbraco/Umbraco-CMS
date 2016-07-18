@@ -51,7 +51,8 @@ namespace Umbraco.Core.Persistence
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlSyntax)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
+            var columnAttribute = column.FirstAttribute<ColumnAttribute>();
+            var columnName = columnAttribute == null || string.IsNullOrEmpty(columnAttribute.Name) ? column.Name : columnAttribute.Name;
 
             var type = typeof(TColumn);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -74,7 +75,8 @@ namespace Umbraco.Core.Persistence
         public static Sql OrderByDescending<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlSyntax)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
+            var columnAttribute = column.FirstAttribute<ColumnAttribute>();
+            var columnName = columnAttribute == null || string.IsNullOrEmpty(columnAttribute.Name) ? column.Name : columnAttribute.Name;
 
             var type = typeof(TColumn);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
@@ -96,7 +98,8 @@ namespace Umbraco.Core.Persistence
         public static Sql GroupBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlProvider)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
-            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
+            var columnAttribute = column.FirstAttribute<ColumnAttribute>();
+            var columnName = columnAttribute == null || string.IsNullOrEmpty(columnAttribute.Name) ? column.Name : columnAttribute.Name;
 
             return sql.GroupBy(sqlProvider.GetQuotedColumnName(columnName));
         }
@@ -178,8 +181,11 @@ namespace Umbraco.Core.Persistence
 
             var left = ExpressionHelper.FindProperty(leftMember) as PropertyInfo;
             var right = ExpressionHelper.FindProperty(rightMember) as PropertyInfo;
-            var leftColumnName = left.FirstAttribute<ColumnAttribute>().Name;
-            var rightColumnName = right.FirstAttribute<ColumnAttribute>().Name;
+
+            var leftColumnAttribute = left.FirstAttribute<ColumnAttribute>();
+            var leftColumnName = leftColumnAttribute == null || string.IsNullOrEmpty(leftColumnAttribute.Name) ? left.Name : leftColumnAttribute.Name;
+            var rightColumnAttribute = right.FirstAttribute<ColumnAttribute>();
+            var rightColumnName = rightColumnAttribute == null || string.IsNullOrEmpty(rightColumnAttribute.Name) ? right.Name : rightColumnAttribute.Name;
 
             string onClause = string.Format("{0}.{1} = {2}.{3}",
                 sqlSyntax.GetQuotedTableName(leftTableName),
