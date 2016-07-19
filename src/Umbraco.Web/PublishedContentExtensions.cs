@@ -1746,6 +1746,11 @@ namespace Umbraco.Web
             return content.Children().Where(predicate);
         }
 
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, params string[] alias)
+        {
+            return content.Children(x => alias.InvariantContains(x.DocumentTypeAlias));
+        }
+
         /// <summary>
         /// Gets the children of the content, of a given content type.
         /// </summary>
@@ -1850,6 +1855,16 @@ namespace Umbraco.Web
 				);
 			return dt;
 		}
+
+        #endregion
+
+        #region Axes: custom
+
+        // todo: in v8, rename this 'Root'
+        public static IPublishedContent Site(this IPublishedContent content)
+        {
+            return content.AncestorOrSelf(1);
+        }
 
         #endregion
 
