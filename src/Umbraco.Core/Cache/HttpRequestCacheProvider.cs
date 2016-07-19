@@ -37,6 +37,11 @@ namespace Umbraco.Core.Cache
             get { return _context != null ? _context.Items : HttpContext.Current.Items; }
         }
 
+        private bool HasContextItems
+        {
+            get { return (_context != null && _context.Items != null) || HttpContext.Current != null; }
+        }
+
         // for unit tests
         public HttpRequestCacheProvider(HttpContextBase context)
         {
@@ -54,7 +59,7 @@ namespace Umbraco.Core.Cache
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (ContextItems == null) return Enumerable.Empty<DictionaryEntry>();
+            if (HasContextItems == false) return Enumerable.Empty<DictionaryEntry>();
 
             return ContextItems.Cast<DictionaryEntry>()
                 .Where(x => x.Key is string && ((string)x.Key).StartsWith(prefix));
@@ -62,16 +67,14 @@ namespace Umbraco.Core.Cache
 
         protected override void RemoveEntry(string key)
         {
-            if (ContextItems == null) return;
+            if (HasContextItems == false) return;
 
             ContextItems.Remove(key);
         }
 
         protected override object GetEntry(string key)
         {
-            if (ContextItems == null) return null;
-
-            return ContextItems[key];
+            return HasContextItems ? ContextItems[key] : null;
         }
 
         #region Lock
@@ -91,8 +94,9 @@ namespace Umbraco.Core.Cache
 
             get
             {
-                if (ContextItems == null) return new NoopLocker();
-                return new MonitorLock(ContextItems.SyncRoot);
+                return HasContextItems 
+                    ? (IDisposable) new MonitorLock(ContextItems.SyncRoot) 
+                    : new NoopLocker();
             }
         }
 
@@ -103,7 +107,7 @@ namespace Umbraco.Core.Cache
         public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             //no place to cache so just return the callback result
-            if (ContextItems == null) return getCacheItem();
+            if (HasContextItems == false) return getCacheItem();
 
             cacheKey = GetCacheKey(cacheKey);
 
@@ -142,12 +146,10 @@ namespace Umbraco.Core.Cache
         #region Insert
         #endregion
 
-
         private class NoopLocker : DisposableObject
         {
             protected override void DisposeResources()
-            {                
-            }
+            { }
         }
     }
 }
