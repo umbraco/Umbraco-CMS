@@ -9,6 +9,9 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A cache provider that caches items in the HttpContext.Items
     /// </summary>
+    /// <remarks>
+    /// If the Items collection is null, then this provider has no effect
+    /// </remarks>
     internal class HttpRequestCacheProvider : DictionaryCacheProviderBase
     {
         // context provider
@@ -50,17 +53,24 @@ namespace Umbraco.Core.Cache
         protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
         {
             const string prefix = CacheItemPrefix + "-";
+
+            if (ContextItems == null) return Enumerable.Empty<DictionaryEntry>();
+
             return ContextItems.Cast<DictionaryEntry>()
                 .Where(x => x.Key is string && ((string)x.Key).StartsWith(prefix));
         }
 
         protected override void RemoveEntry(string key)
         {
+            if (ContextItems == null) return;
+
             ContextItems.Remove(key);
         }
 
         protected override object GetEntry(string key)
         {
+            if (ContextItems == null) return null;
+
             return ContextItems[key];
         }
 
@@ -81,6 +91,7 @@ namespace Umbraco.Core.Cache
 
             get
             {
+                if (ContextItems == null) return new NoopLocker();
                 return new MonitorLock(ContextItems.SyncRoot);
             }
         }
@@ -91,6 +102,9 @@ namespace Umbraco.Core.Cache
 
         public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
+            //no place to cache so just return the callback result
+            if (ContextItems == null) return getCacheItem();
+
             cacheKey = GetCacheKey(cacheKey);
 
             Lazy<object> result;
@@ -128,5 +142,12 @@ namespace Umbraco.Core.Cache
         #region Insert
         #endregion
 
+
+        private class NoopLocker : DisposableObject
+        {
+            protected override void DisposeResources()
+            {                
+            }
+        }
     }
 }
