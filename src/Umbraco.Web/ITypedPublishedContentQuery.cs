@@ -20,7 +20,7 @@ namespace Umbraco.Web
         IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> TypedContentAtRoot();
 
-        // note: we CANNOT implement TypedMedia in v7 without break-changing IPublishedCache,
+        // note: we CANNOT implement TypedMedia by Guid in v7 without break-changing IPublishedCache,
         // since we don't support XPath navigation of the media tree.
 
         IPublishedContent TypedMedia(int id);

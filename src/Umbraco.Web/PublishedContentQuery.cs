@@ -113,7 +113,14 @@ namespace Umbraco.Web
                 ? DocumentById(id, _contentCache, DynamicNull.Null)
                 : _dynamicContentQuery.Content(id);
         }
-        
+
+        public dynamic Content(Guid id)
+        {
+            return _dynamicContentQuery == null
+                ? DocumentById(id, _contentCache, DynamicNull.Null)
+                : _dynamicContentQuery.Content(id);
+        }
+
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _dynamicContentQuery == null
@@ -129,6 +136,13 @@ namespace Umbraco.Web
         }
         
         public dynamic Content(IEnumerable<int> ids)
+        {
+            return _dynamicContentQuery == null
+                ? DocumentByIds(_contentCache, ids.ToArray())
+                : _dynamicContentQuery.Content(ids);
+        }
+
+        public dynamic Content(IEnumerable<Guid> ids)
         {
             return _dynamicContentQuery == null
                 ? DocumentByIds(_contentCache, ids.ToArray())
@@ -270,6 +284,14 @@ namespace Umbraco.Web
                        : new DynamicPublishedContent(doc).AsDynamic();
         }
 
+        private dynamic DocumentById(Guid id, ContextualPublishedCache cache, object ifNotFound)
+        {
+            var doc = TypedDocumentById(id, cache);
+            return doc == null
+                       ? ifNotFound
+                       : new DynamicPublishedContent(doc).AsDynamic();
+        }
+
         private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
@@ -287,6 +309,15 @@ namespace Umbraco.Web
         }
 
         private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
+        {
+            var dNull = DynamicNull.Null;
+            var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
+                           .Where(x => TypeHelper.IsTypeAssignableFrom<DynamicNull>(x) == false)
+                           .Cast<DynamicPublishedContent>();
+            return new DynamicPublishedContentList(nodes);
+        }
+
+        private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
         {
             var dNull = DynamicNull.Null;
             var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))

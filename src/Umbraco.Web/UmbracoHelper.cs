@@ -15,6 +15,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Cache;
@@ -561,21 +562,35 @@ namespace Umbraco.Web
         #region Content
 
         public IPublishedContent TypedContent(object id)
-		{
-		    int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedContent(intId) : null;
+        {
+            return TypedContentForObject(id);
 		}
 
-		public IPublishedContent TypedContent(int id)
+        private IPublishedContent TypedContentForObject(object id)
+        {
+            int intId;
+            if (ConvertIdObjectToInt(id, out intId))
+                return ContentQuery.TypedContent(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return ContentQuery.TypedContent(guidId);
+            return null;
+        }
+
+        public IPublishedContent TypedContent(int id)
 		{
             return ContentQuery.TypedContent(id);
 		}
 
+        public IPublishedContent TypedContent(Guid id)
+        {
+            return ContentQuery.TypedContent(id);
+        }
+
 		public IPublishedContent TypedContent(string id)
 		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedContent(intId) : null;
-		}
+            return TypedContentForObject(id);
+        }
 
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -584,8 +599,20 @@ namespace Umbraco.Web
 
 		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
 		{
-            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
+		    return TypedContentForObjects(ids);
 		}
+
+        private IEnumerable<IPublishedContent> TypedContentForObjects(IEnumerable<object> ids)
+        {
+            var idsA = ids.ToArray();
+            IEnumerable<int> intIds;
+            if (ConvertIdsObjectToInts(idsA, out intIds))
+                return ContentQuery.TypedContent(intIds);
+            IEnumerable<Guid> guidIds;
+            if (ConvertIdsObjectToGuids(idsA, out guidIds))
+                return ContentQuery.TypedContent(guidIds);
+            return Enumerable.Empty<IPublishedContent>();
+        }
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -598,6 +625,11 @@ namespace Umbraco.Web
             return ContentQuery.TypedContent(ids);
 		}
 
+        public IEnumerable<IPublishedContent> TypedContent(params Guid[] ids)
+        {
+            return ContentQuery.TypedContent(ids);
+        }
+
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
         /// </summary>
@@ -605,8 +637,8 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
-		{
-            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
+        {
+            return TypedContentForObjects(ids);
 		}
 
         /// <summary>
@@ -616,8 +648,8 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
-		{
-            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
+        {
+            return TypedContentForObjects(ids);
 		}
 
         /// <summary>
@@ -628,7 +660,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
-            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
+            return TypedContentForObjects(ids);
 		}
 
         /// <summary>
@@ -659,20 +691,29 @@ namespace Umbraco.Web
 
 		public dynamic Content(object id)
 		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
+		    return ContentForObject(id);
 		}
 
-		public dynamic Content(int id)
+        private dynamic ContentForObject(object id)
+        {
+            int intId;
+            if (ConvertIdObjectToInt(id, out intId))
+                return ContentQuery.Content(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return ContentQuery.Content(guidId);
+            return DynamicNull.Null;
+        }
+
+        public dynamic Content(int id)
 		{
             return ContentQuery.Content(id);
 		}
 
 		public dynamic Content(string id)
 		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
-		}
+            return ContentForObject(id);
+        }
 
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -691,9 +732,21 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(params object[] ids)
-		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
+        {
+            return ContentForObjects(ids);
+        }
+
+        private dynamic ContentForObjects(IEnumerable<object> ids)
+        {
+            var idsA = ids.ToArray();
+            IEnumerable<int> intIds;
+            if (ConvertIdsObjectToInts(idsA, out intIds))
+                return ContentQuery.Content(intIds);
+            IEnumerable<Guid> guidIds;
+            if (ConvertIdsObjectToGuids(idsA, out guidIds))
+                return ContentQuery.Content(guidIds);
+            return Enumerable.Empty<IPublishedContent>();
+        }
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -714,8 +767,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(params string[] ids)
 		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
+            return ContentForObjects(ids);
+        }
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -725,8 +778,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(IEnumerable<object> ids)
 		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
+            return ContentForObjects(ids);
+        }
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -747,8 +800,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(IEnumerable<string> ids)
 		{
-            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
-		}
+            return ContentForObjects(ids);
+        }
 
         public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -765,35 +818,68 @@ namespace Umbraco.Web
             return ContentQuery.ContentAtRoot();
         }
 
-        private bool ConvertIdObjectToInt(object id, out int intId)
+        private static bool ConvertIdObjectToInt(object id, out int intId)
         {
             var s = id as string;
             if (s != null)
             {
                 return int.TryParse(s, out intId);
-            }
-                
+            }               
             if (id is int)
             {
                 intId = (int) id;
                 return true;
             }
-
-            throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
+            intId = default(int);
+            return false;
         }
 
-        private IEnumerable<int> ConvertIdsObjectToInts(IEnumerable<object> ids)
+        private static bool ConvertIdObjectToGuid(object id, out Guid guidId)
+        {
+            var s = id as string;
+            if (s != null)
+            {
+                return Guid.TryParse(s, out guidId);
+            }
+            if (id is Guid)
+            {
+                guidId = (Guid) id;
+                return true;
+            }
+            guidId = default(Guid);
+            return false;
+        }
+
+        private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
         {
             var list = new List<int>();
+            intIds = null;
             foreach (var id in ids)
             {
                 int intId;
                 if (ConvertIdObjectToInt(id, out intId))
-                {
                     list.Add(intId);
-                }
+                else
+                    return false; // if one of them is not an int, fail
             }
-            return list;
+            intIds = list;
+            return true;
+        }
+
+        private static bool ConvertIdsObjectToGuids(IEnumerable<object> ids, out IEnumerable<Guid> guidIds)
+        {
+            var list = new List<Guid>();
+            guidIds = null;
+            foreach (var id in ids)
+            {
+                Guid guidId;
+                if (ConvertIdObjectToGuid(id, out guidId))
+                    list.Add(guidId);
+                else
+                    return false; // if one of them is not a guid, fail
+            }
+            guidIds = list;
+            return true;
         }
 
 		#endregion
@@ -834,9 +920,21 @@ namespace Umbraco.Web
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
-		{
-            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
-		}
+        {
+            return TypedMediaForObjects(ids);
+        }
+
+        private IEnumerable<IPublishedContent> TypedMediaForObjects(IEnumerable<object> ids)
+        {
+            var idsA = ids.ToArray();
+            IEnumerable<int> intIds;
+            if (ConvertIdsObjectToInts(idsA, out intIds))
+                return ContentQuery.TypedMedia(intIds);
+            //IEnumerable<Guid> guidIds;
+            //if (ConvertIdsObjectToGuids(idsA, out guidIds))
+            //    return ContentQuery.TypedMedia(guidIds);
+            return Enumerable.Empty<IPublishedContent>();
+        }
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -857,8 +955,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
-            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
-		}
+            return TypedMediaForObjects(ids);
+        }
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -868,8 +966,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
 		{
-            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
-		}
+            return TypedMediaForObjects(ids);
+        }
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -890,8 +988,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
-            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
-		}
+            return TypedMediaForObjects(ids);
+        }
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
@@ -922,9 +1020,21 @@ namespace Umbraco.Web
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public dynamic Media(params object[] ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
+        {
+            return MediaForObjects(ids);
+        }
+
+        private dynamic MediaForObjects(IEnumerable<object> ids)
+        {
+            var idsA = ids.ToArray();
+            IEnumerable<int> intIds;
+            if (ConvertIdsObjectToInts(idsA, out intIds))
+                return ContentQuery.Media(intIds);
+            //IEnumerable<Guid> guidIds;
+            //if (ConvertIdsObjectToGuids(idsA, out guidIds))
+            //    return ContentQuery.Media(guidIds);
+            return Enumerable.Empty<IPublishedContent>();
+        }
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -944,8 +1054,8 @@ namespace Umbraco.Web
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public dynamic Media(params string[] ids)
-		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
+        {
+            return MediaForObjects(ids);
 		}
 
         /// <summary>
@@ -956,8 +1066,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public dynamic Media(IEnumerable<object> ids)
 		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
+            return MediaForObjects(ids);
+        }
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -978,8 +1088,8 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public dynamic Media(IEnumerable<string> ids)
 		{
-            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
-		}
+            return MediaForObjects(ids);
+        }
 
         public dynamic MediaAtRoot()
         {
