@@ -5,7 +5,9 @@
 {
     string markup = Model.editor.config.markup.ToString();
 
-    markup = markup.Replace("#value#", Model.value.ToString());
+    var UmbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+    
+    markup = markup.Replace("#value#", UmbracoHelper.ReplaceLineBreaksForHtml(Model.value.ToString()));
     markup = markup.Replace("#style#", Model.editor.config.style.ToString());
 
     <text>
