@@ -2417,6 +2417,7 @@ namespace Umbraco.Core.Persistence
 			else
 				_rhs = sql;
 
+			_sqlFinal = null;
 			return this;
 		}
 
