@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
+using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -56,6 +58,13 @@ namespace Umbraco.Web
                 : _typedContentQuery.TypedContent(id);
         }
 
+        public IPublishedContent TypedContent(Guid id)
+        {
+            return _typedContentQuery == null
+                ? TypedDocumentById(id, _contentCache)
+                : _typedContentQuery.TypedContent(id);
+        }
+
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _typedContentQuery == null
@@ -64,6 +73,13 @@ namespace Umbraco.Web
         }
         
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+        {
+            return _typedContentQuery == null
+                ? TypedDocumentsByIds(_contentCache, ids)
+                : _typedContentQuery.TypedContent(ids);
+        }
+
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<Guid> ids)
         {
             return _typedContentQuery == null
                 ? TypedDocumentsByIds(_contentCache, ids)
@@ -150,7 +166,7 @@ namespace Umbraco.Web
                 ? TypedDocumentById(id, _mediaCache)
                 : _typedContentQuery.TypedMedia(id);
         }
-        
+
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
         {
             return _typedContentQuery == null
@@ -196,6 +212,15 @@ namespace Umbraco.Web
             return doc;
         }
 
+        private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
+        {
+            // todo: in v8, implement in a more efficient way
+            var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@isDoc and @key=$guid]";
+            var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
+            return doc;
+        }
+
         private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
@@ -211,6 +236,12 @@ namespace Umbraco.Web
 
         private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
         {
+            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+        }
+
+        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
+        {
+            // todo: in v8, implement in a more efficient way
             return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
         }
 
