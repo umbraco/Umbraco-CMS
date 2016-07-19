@@ -100,7 +100,10 @@ namespace Umbraco.Tests.TestHelpers
             return _appContext;
         }
 
-        protected virtual ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
+        protected virtual ISqlSyntaxProvider SqlSyntax
+        {
+            get { return GetSyntaxProvider(); }
+        }
 
         /// <summary>
         /// The database behavior to use for the test/fixture
