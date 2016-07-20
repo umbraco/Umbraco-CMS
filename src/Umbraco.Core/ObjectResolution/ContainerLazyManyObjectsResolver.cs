@@ -6,7 +6,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.ObjectResolution
 {
-
     /// <summary>
     /// A lazy many objects resolver that uses IoC
     /// </summary>
@@ -18,12 +17,12 @@ namespace Umbraco.Core.ObjectResolution
     {
         protected IServiceContainer Container;
         private object _locker = new object();
-        private bool _isInitialized = false;
+        private bool _isInitialized;
 
         internal ContainerLazyManyObjectsResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(logger, typeListProducerList, scope)
         {
-            if (container == null) throw new ArgumentNullException("container");
+            if (container == null) throw new ArgumentNullException(nameof(container));
             Container = container;
 
             //Register ourselves in the case that a resolver instance should be injected someplace
@@ -43,14 +42,9 @@ namespace Umbraco.Core.ObjectResolution
             LazyInitializer.EnsureInitialized(ref Container, ref _isInitialized, ref _locker, () =>
             {
                 foreach (var type in InstanceTypes)
-                {
                     Container.Register(type, GetLifetime(LifetimeScope));
-                }
 
-                if (afterRegistered != null)
-                {
-                    afterRegistered(Container);
-                }
+                afterRegistered?.Invoke(Container);
 
                 return Container;
             });
@@ -82,7 +76,7 @@ namespace Umbraco.Core.ObjectResolution
                     return new PerRequestLifeTime();
                 case ObjectLifetimeScope.Application:
                     return new PerContainerLifetime();
-                case ObjectLifetimeScope.Transient:
+                //case ObjectLifetimeScope.Transient:
                 default:
                     return null;
             }

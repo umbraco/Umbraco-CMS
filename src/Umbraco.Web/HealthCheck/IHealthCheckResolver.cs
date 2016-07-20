@@ -4,6 +4,6 @@ namespace Umbraco.Web.HealthCheck
 {
     public interface IHealthCheckResolver
     {
-        IEnumerable<HealthCheck> HealthChecks { get; }
+        IEnumerable<HealthCheck> GetHealthChecks(HealthCheckContext context);
     }
 }

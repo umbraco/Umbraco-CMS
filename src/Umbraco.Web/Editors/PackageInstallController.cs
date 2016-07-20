@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             if (pack == null) throw new ArgumentNullException("pack");
 
             var refreshCache = false;
-            
+
             //Uninstall templates
             foreach (var item in pack.Data.Templates.ToArray())
             {
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Editors
                 if (macro != null)
                 {
                     Services.MacroService.Delete(macro);
-                }                    
+                }
                 pack.Data.Macros.Remove(nId.ToString());
             }
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Editors
                 if (di != null)
                 {
                     Services.LocalizationService.Delete(di);
-                }                    
+                }
                 pack.Data.DictionaryItems.Remove(nId.ToString());
             }
 
@@ -165,14 +165,14 @@ namespace Umbraco.Web.Editors
                 if (dtd != null)
                 {
                     Services.DataTypeService.Delete(dtd);
-                }                    
+                }
                 pack.Data.DataTypes.Remove(nId.ToString());
             }
 
             pack.Save();
 
             // uninstall actions
-            //TODO: We should probably report errors to the UI!! 
+            //TODO: We should probably report errors to the UI!!
             // This never happened before though, but we should do something now
             if (pack.Data.Actions.IsNullOrWhiteSpace() == false)
             {
@@ -214,19 +214,14 @@ namespace Umbraco.Web.Editors
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
-                        
+
                     }
                 }
                 pack.Data.Files.Remove(file);
             }
             pack.Save();
             pack.Delete(Security.GetUserId());
-            
-            //TODO: Legacy - probably not needed
-            if (refreshCache)
-            {
-                library.RefreshContent();
-            }            
+
             TreeDefinitionCollection.Instance.ReRegisterTrees();
             _Legacy.Actions.Action.ReRegisterActionsAndHandlers();
         }
@@ -317,7 +312,7 @@ namespace Umbraco.Web.Editors
             model.UmbracoVersion = ins.RequirementsType == RequirementsType.Strict
                 ? string.Format("{0}.{1}.{2}", ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch)
                 : string.Empty;
-            
+
             //now we need to check for version comparison
             model.IsCompatible = true;
             if (ins.RequirementsType == RequirementsType.Strict)
@@ -397,7 +392,7 @@ namespace Umbraco.Web.Editors
                 {
                     //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
                     var packageTempDir = IOHelper.MapPath(SystemDirectories.Data);
-                    
+
                     //ensure it's there
                     Directory.CreateDirectory(packageTempDir);
 
@@ -413,14 +408,14 @@ namespace Umbraco.Web.Editors
                     PopulateFromPackageData(model);
 
                     var validate = ValidateInstalledInternal(model.Name, model.Version);
-                    
+
                     if (validate == false)
                     {
                         //this package is already installed
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("packager/packageAlreadyInstalled")));                        
+                            Services.TextService.Localize("packager/packageAlreadyInstalled")));
                     }
-                    
+
                 }
                 else
                 {
@@ -429,7 +424,7 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("media/disallowedFileType"),
                         SpeechBubbleIcon.Warning));
                 }
-                
+
             }
 
             return model;
@@ -451,7 +446,7 @@ namespace Umbraco.Web.Editors
                 //our repo guid
                 using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
                 {
-                    path = our.fetch(packageGuid, Security.CurrentUser.Id);    
+                    path = our.fetch(packageGuid, Security.CurrentUser.Id);
                 }
             }
 

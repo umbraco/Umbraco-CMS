@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 {
@@ -19,22 +16,21 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly PublishedCache.XmlPublishedCache.FacadeService _facadeService;
 
         private const string CheckContentXmlTableAction = "checkContentXmlTable";
         private const string CheckMediaXmlTableAction = "checkMediaXmlTable";
         private const string CheckMembersXmlTableAction = "checkMembersXmlTable";
 
-        public XmlDataIntegrityHealthCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public XmlDataIntegrityHealthCheck(HealthCheckContext healthCheckContext, IFacadeService facadeService) 
+            : base(healthCheckContext)
         {
-            _sqlSyntax = HealthCheckContext.ApplicationContext.DatabaseContext.SqlSyntax;
-            _services = HealthCheckContext.ApplicationContext.Services;
-            _database = HealthCheckContext.ApplicationContext.DatabaseContext.Database;
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
-        }
 
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-        private readonly ServiceContext _services;
-        private readonly UmbracoDatabase _database;
+            _facadeService = facadeService as PublishedCache.XmlPublishedCache.FacadeService;
+            if (_facadeService == null)
+                throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
+        }
 
         /// <summary>
         /// Get the status for this health check
@@ -56,13 +52,13 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
             switch (action.Alias)
             {
                 case CheckContentXmlTableAction:
-                    _services.ContentService.RebuildXmlStructures();
+                    _facadeService.RebuildContentAndPreviewXml();
                     return CheckContent();
                 case CheckMediaXmlTableAction:
-                    _services.MediaService.RebuildXmlStructures();
+                    _facadeService.RebuildMediaXml();
                     return CheckMedia();
                 case CheckMembersXmlTableAction:
-                    _services.MemberService.RebuildXmlStructures();
+                    _facadeService.RebuildMemberXml();
                     return CheckMembers();
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -71,67 +67,28 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
         private HealthCheckStatus CheckMembers()
         {
-            var total = _services.MemberService.Count();
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = _database.Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
-            var totalXml = _database.ExecuteScalar<int>(subQuery);
-
-            var actions = new List<HealthCheckAction>();
-            if (totalXml != total)
-                actions.Add(new HealthCheckAction(CheckMembersXmlTableAction, Id));
-            
-            return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMembers", new[] { totalXml.ToString(), total.ToString() }))
-            {
-                ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
-                Actions = actions
-            };
+            return Check(_facadeService.VerifyMemberXml(), CheckMembersXmlTableAction, "healthcheck/xmlDataIntegrityCheckMembers");
         }
 
         private HealthCheckStatus CheckMedia()
         {
-            var total = _services.MediaService.Count();
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = _database.Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
-            var totalXml = _database.ExecuteScalar<int>(subQuery);
-
-            var actions = new List<HealthCheckAction>();
-            if (totalXml != total)
-                actions.Add(new HealthCheckAction(CheckMediaXmlTableAction, Id));
-
-            return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMedia", new[] { totalXml.ToString(), total.ToString() }))
-            {
-                ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
-                Actions = actions
-            };
+            return Check(_facadeService.VerifyMediaXml(), CheckMediaXmlTableAction, "healthcheck/xmlDataIntegrityCheckMedia");
         }
 
         private HealthCheckStatus CheckContent()
         {
-            var total = _services.ContentService.CountPublished();
-            var subQuery = _database.Sql()
-                .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>()
-                .InnerJoin<DocumentDto>()
-                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
-            var totalXml = _database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
+            return Check(_facadeService.VerifyContentAndPreviewXml(), CheckContentXmlTableAction, "healthcheck/xmlDataIntegrityCheckContent");
+        }
 
+        private HealthCheckStatus Check(bool ok, string action, string text)
+        {
             var actions = new List<HealthCheckAction>();
-            if (totalXml != total)
-                actions.Add(new HealthCheckAction(CheckContentXmlTableAction, Id));
+            if (ok == false)
+                actions.Add(new HealthCheckAction(action, Id));
 
-            return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckContent", new[] { totalXml.ToString(), total.ToString() }))
+            return new HealthCheckStatus(_textService.Localize(text, new[] { ok ? "ok" : "not ok" }))
             {
-                ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
+                ResultType = ok ? StatusResultType.Success : StatusResultType.Error,
                 Actions = actions
             };
         }

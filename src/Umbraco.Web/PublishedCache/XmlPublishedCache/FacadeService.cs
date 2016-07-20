@@ -22,6 +22,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IDomainService _domainService;
         private readonly IMemberService _memberService;
         private readonly IMediaService _mediaService;
+        private readonly IUserService _userService;
         private readonly ICacheProvider _requestCache;
 
         #region Constructors
@@ -60,6 +61,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
+            _userService = serviceContext.UserService;
 
             _requestCache = requestCache;
         }
@@ -84,7 +86,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             return new Facade(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _contentTypeCache, _routesCache, previewToken),
-                new PublishedMediaCache(_xmlStore, _mediaService, _requestCache, _contentTypeCache),
+                new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
                 domainCache);
         }

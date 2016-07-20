@@ -62,7 +62,7 @@ namespace Umbraco.Tests.PublishedContent
         /// <returns></returns>
         internal IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
         {
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), umbracoContext.Application.Services.MediaService, new StaticCacheProvider(), ContentTypesCache);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null), umbracoContext.Application.Services.MediaService, umbracoContext.Application.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = cache.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //ensure it is found
                 var publishedMedia = cache.GetById(3113);
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -217,7 +217,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -462,7 +462,7 @@ namespace Umbraco.Tests.PublishedContent
 			</Image>");
             var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null), ServiceContext.MediaService, new StaticCacheProvider(), ContentTypesCache);
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
 
             var nav = node.CreateNavigator();
 
@@ -482,7 +482,7 @@ namespace Umbraco.Tests.PublishedContent
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", 1234));
             var nav = errorXml.CreateNavigator();
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null), ServiceContext.MediaService, new StaticCacheProvider(), ContentTypesCache);
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/"), 1234);
 
             Assert.IsNull(converted);

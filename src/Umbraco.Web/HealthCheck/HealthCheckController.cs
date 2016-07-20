@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Http;
 using Umbraco.Web.Editors;
 
@@ -29,7 +30,8 @@ namespace Umbraco.Web.HealthCheck
         /// <returns>Returns a collection of anonymous objects representing each group.</returns>
         public object GetAllHealthChecks()
         {
-            var groups = _healthCheckResolver.HealthChecks
+            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
+            var groups = _healthCheckResolver.GetHealthChecks(context)
                 .GroupBy(x => x.Group)
                 .OrderBy(x => x.Key);
             var healthCheckGroups = new List<HealthCheckGroup>();
@@ -50,7 +52,8 @@ namespace Umbraco.Web.HealthCheck
 
         public object GetStatus(Guid id)
         {
-            var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == id);
+            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
+            var check = _healthCheckResolver.GetHealthChecks(context).FirstOrDefault(x => x.Id == id);
             if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
 
             return check.GetStatus();
@@ -59,7 +62,8 @@ namespace Umbraco.Web.HealthCheck
         [HttpPost]
         public HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            var check = _healthCheckResolver.HealthChecks.FirstOrDefault(x => x.Id == action.HealthCheckId);
+            var context = new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current);
+            var check = _healthCheckResolver.GetHealthChecks(context).FirstOrDefault(x => x.Id == action.HealthCheckId);
             if (check == null) throw new InvalidOperationException("No health check found with id " + action.HealthCheckId);
 
             return check.ExecuteAction(action);

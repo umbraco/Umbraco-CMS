@@ -517,8 +517,8 @@ namespace Umbraco.Web
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container, typeof(DefaultCultureDictionaryFactory));
 
-            HealthCheckResolver.Current = new HealthCheckResolver(ProfilingLogger.Logger,
-                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+            HealthCheckResolver.Current = new HealthCheckResolver(Container, ProfilingLogger.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>()); // fixme XML cache vs NuCache?!
         }
 
         /// <summary>

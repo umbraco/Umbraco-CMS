@@ -21,7 +21,6 @@ namespace Umbraco.Web.WebServices
             _facadeService = facadeService as FacadeService;
             if (_facadeService == null)
                 throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
-
         }
 
         [HttpPost]

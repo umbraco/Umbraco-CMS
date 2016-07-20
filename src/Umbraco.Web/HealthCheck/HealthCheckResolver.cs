@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
+using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -12,41 +14,33 @@ namespace Umbraco.Web.HealthCheck
     /// <remarks>
     /// Each instance scoped to the lifespan of the http request
     /// </remarks>
-    internal class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
+    internal class HealthCheckResolver : ContainerLazyManyObjectsResolver<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
-        public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList) 
-            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.HttpRequest)
+        public HealthCheckResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> types)
+            : base(container, logger, types, ObjectLifetimeScope.HttpRequest)
+        { }
+
+        protected override IEnumerable<HealthCheck> CreateValues(ObjectLifetimeScope scope)
         {
+            EnsureTypesRegisterred(scope, container =>
+            {
+                // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
+                // the container, 'info' describes the ctor argument, and 'args' contains the args that
+                // were passed to GetInstance() - use first arg if it is the right type,
+                //
+                // for HealthCheckContext
+                container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as HealthCheckContext : null);
+            });
+
+            return InstanceTypes.Select(x => (HealthCheck) Container.GetInstance(x, new object[] { _healthCheckContext }));
         }
 
-        /// <summary>
-        /// Returns all health check instances
-        /// </summary>
-        public IEnumerable<HealthCheck> HealthChecks => Values;
+        private HealthCheckContext _healthCheckContext;
 
-        /// <summary>
-        /// This will ctor the HealthCheck instances
-        /// </summary>
-        /// <remarks>
-        /// This is like a super crappy DI - in v8 we have real DI
-        /// </remarks>
-	    private class HealthCheckServiceProvider : IServiceProvider
+        public IEnumerable<HealthCheck> GetHealthChecks(HealthCheckContext context)
         {
-            public object GetService(Type serviceType)
-            {
-                var normalArgs = new[] { typeof(HealthCheckContext) };
-                var found = serviceType.GetConstructor(normalArgs);
-                if (found != null)
-                {
-                    return found.Invoke(new object[]
-                    {
-                        new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
-                    });
-                }
-                    
-                //use normal ctor
-                return Activator.CreateInstance(serviceType);
-            }
+            _healthCheckContext = context;
+            return Values;
         }
     }
 }
