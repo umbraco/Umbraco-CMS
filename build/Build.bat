@@ -1,4 +1,4 @@
-@ECHO OFF
+::@ECHO OFF
 
 :: UMBRACO BUILD FILE
 
@@ -36,10 +36,15 @@ FOR /F "tokens=1,* delims=: " %%a IN ("%SWITCHPARSE%") DO SET SWITCH=%%a& SET VA
 
 :: route arg
 IF '%SWITCH%'=='/release' GOTO argRelease
+IF '%SWITCH%'=='-release' GOTO argRelease
 IF '%SWITCH%'=='/comment' GOTO argComment
+IF '%SWITCH%'=='-comment' GOTO argComment
 IF '%SWITCH%'=='/integration' GOTO argIntegration
+IF '%SWITCH%'=='-integration' GOTO argIntegration
 IF '%SWITCH%'=='/nugetfolder' GOTO argNugetFolder
+IF '%SWITCH%'=='-nugetfolder' GOTO argNugetFolder
 IF '%SWITCH%'=='/skipnuget' GOTO argSkipNuget
+IF '%SWITCH%'=='-skipnuget' GOTO argSkipNuget
 ECHO "Invalid switch %SWITCH%"
 GOTO error
 
@@ -80,6 +85,10 @@ IF [%COMMENT%] EQU [] (SET VERSION=%RELEASE%) ELSE (SET VERSION=%RELEASE%-%COMME
 ECHO.
 ECHO Building Umbraco %VERSION%
 ECHO.
+
+ECHO INTEGRATION=%INTEGRATION%
+ECHO nuGetPackages=%nuGetFolder%
+GOTO :eof
 
 SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%

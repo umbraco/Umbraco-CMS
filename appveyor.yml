@@ -36,7 +36,7 @@ build_script:
     
     %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%nuGetFolder%
     
-    build.bat /integration /release:%release% /comment:build%APPVEYOR_BUILD_NUMBER% /nugetfolder:%nuGetFolder%
+    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%nuGetFolder%
     
     ECHO %PATH%
 test:
