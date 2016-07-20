@@ -2,27 +2,31 @@ version: '{build}'
 shallow_clone: true
 build_script:
 - cmd: >-
-    cd build
+    SET SLN=%CD%
+    
+    SET SRC=%SLN%\xsrc
+    
+    SET PACKAGES=%SLN%\packages
+
+    CD build
 
     SET "release="
     
     FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+    
+    %SLN%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
 
-    SET nuGetFolder=C:\Users\appveyor\.nuget\packages
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Core\project.json -OutputDirectory %PACKAGES% -Verbosity quiet
     
-    ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
-
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.datalayer\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet
     
-    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Web\project.json -OutputDirectory %PACKAGES% -Verbosity quiet
     
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Web.UI\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet  
     
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet  
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Tests\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet    
     
-    ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Tests\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
-    
-    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.controls\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.controls\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet
 
     ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
     
@@ -30,13 +34,12 @@ build_script:
     
     SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 
-    XCOPY "..\src\Umbraco.Tests\unit-test-log4net.CI.config" "..\src\Umbraco.Tests\unit-test-log4net.config" /Y
+    XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj"  /p:NugetPackagesDirectory=%nuGetFolder%
+    %MSBUILD% "%SLN%/src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%PACKAGES%
     
-    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%nuGetFolder%
+    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%PACKAGES%
     
-    ECHO %PATH%
 test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
 artifacts:
