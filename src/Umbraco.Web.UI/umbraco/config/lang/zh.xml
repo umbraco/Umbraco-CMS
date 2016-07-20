@@ -926,6 +926,7 @@
     <key alias="stylesheets">样式表</key>
     <key alias="templates">模板</key>
     <key alias="xslt">XSLT文件</key>
+    <key alias="userPermissions">用户权限</key>
     <key alias="userTypes">用户类型</key>
     <key alias="users">Users</key>
   </area>

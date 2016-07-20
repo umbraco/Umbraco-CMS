@@ -41,9 +41,8 @@ namespace Umbraco.Tests.UmbracoExamine
 		{            
 		    if (contentService == null)
 		    {
-                long totalRecs;
-
-                var demoData = new ExamineDemoDataContentService();
+                long longTotalRecs;
+		        var demoData = new ExamineDemoDataContentService();
 
                 var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
                     .Root
@@ -69,16 +68,13 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 contentService = Mock.Of<IContentService>(
                     x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
                         ==
                         allRecs
-                        
-                        &&
-
-                        x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
+                        && x.GetPagedDescendants(
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
                         ==
-                        allRecs); 
+                        allRecs);
             }
 		    if (userService == null)
 		    {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
 
         [Test]
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
             }
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
         }
     }
 }

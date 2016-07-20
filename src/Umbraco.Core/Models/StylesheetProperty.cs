@@ -25,8 +25,13 @@ namespace Umbraco.Core.Models
             _value = value;
         }
 
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Alias);
-        private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Value);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Alias);
+            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Value);
+        }
 
         /// <summary>
         /// The CSS rule name that can be used by Umbraco in the back office
@@ -39,14 +44,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value;
-                    return _alias;
-                }, _alias, AliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -55,14 +53,7 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _value = value;
-                    return _value;
-                }, _value, ValueSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
         }
 
     }

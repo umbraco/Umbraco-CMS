@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -13,7 +20,7 @@ namespace Umbraco.Tests.Migrations
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class MigrationIssuesTests : BaseDatabaseFactoryTest
     {
-        [Test, Ignore("TODO: Ask stephan if he knows why this fails")]
+        [Test]
         public void Issue8370Test()
         {
             // fixme maybe we need to create some content?
@@ -71,14 +78,16 @@ namespace Umbraco.Tests.Migrations
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "text"
+                Text = "text",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
             data = new PropertyDataDto
             {
                 NodeId = n.NodeId,
                 PropertyTypeId = pt.Id,
-                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>"
+                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
+                VersionId = Guid.NewGuid()
             };
             DatabaseContext.Database.Insert(data);
             var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
@@ -88,9 +97,53 @@ namespace Umbraco.Tests.Migrations
 
             data = DatabaseContext.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
             Assert.IsNotNull(data);
-            Console.WriteLine(data.Text);
+            Debug.Print(data.Text);
             Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
                 data.Text);
+        }
+
+        [Test]
+        public void Issue8361Test()
+        {
+            var logger = new DebugDiagnosticsLogger();
+
+            var migrationContext = new MigrationContext(DatabaseContext.Database, Logger);
+
+            //Setup the MigrationRunner
+            var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationEntryService>(),
+                logger,
+                new SemVersion(7, 5, 0),
+                new SemVersion(8, 0, 0),
+                GlobalSettings.UmbracoMigrationName,
+
+                //pass in explicit migrations
+                new DeleteRedirectUrlTable(migrationContext),
+                new AddRedirectUrlTable(migrationContext),
+                new AddRedirectUrlTable2(migrationContext),
+                new AddRedirectUrlTable3(migrationContext),
+                new AddRedirectUrlTable4(migrationContext)
+            );
+
+            var upgraded = migrationRunner.Execute(migrationContext, true);
+            Assert.IsTrue(upgraded);
+        }
+
+        [Migration("8.0.0", 99, GlobalSettings.UmbracoMigrationName)]
+        public class DeleteRedirectUrlTable : MigrationBase
+        {
+            public DeleteRedirectUrlTable(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Up()
+            {
+                Delete.Table("umbracoRedirectUrl");
+            }
+
+            public override void Down()
+            { }
         }
     }
 }

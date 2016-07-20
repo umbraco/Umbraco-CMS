@@ -30,13 +30,12 @@ using UmbracoExamine;
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-    /// A base test class used for umbraco tests whcih sets up the logging, plugin manager any base resolvers, etc... and
-    /// ensures everything is torn down properly.
+    /// Provides a base class for Umbraco application tests.
     /// </summary>
+    /// <remarks>Sets logging, pluging manager, application context, base resolvers...</remarks>
     [TestFixture]
     public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
-
         [TestFixtureSetUp]
         public void InitializeFixture()
         {
@@ -76,18 +75,19 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.TearDown();
 
-            //reset settings
+            // reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
-            //reset the app context, this should reset most things that require resetting like ALL resolvers
+
+            // reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
+
+            // reset plugin manager
             ResetPluginManager();
-
             Container.Dispose();
-
         }
 
         protected virtual void ConfigureContainer()
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
                 {
-                    //Create the legacy prop-eds mapping
+                    // create the legacy prop-eds mapping
                     LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
                 }
             }
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </remarks>
         private void InitializeMappers()
         {
-            if (this.GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
             {
                 Mapper.Initialize(configuration =>
                 {
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
-        /// to be set to true if the  SetupPluginManager has been overridden.
+        /// to be set to true if the SetupPluginManager has been overridden.
         /// </summary>
         protected virtual bool PluginManagerResetRequired
         {
@@ -215,14 +215,16 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual ApplicationContext CreateApplicationContext()
         {
             var evtMsgs = new TransientEventMessagesFactory();
+            var dbFactory = new DefaultDatabaseFactory(
+                Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                TestObjects.GetDefaultSqlSyntaxProviders(Logger),
+                Logger, new TestScopeContextAdapter(),
+                Mock.Of<IMappingResolver>());
+            dbFactory.ResetForTests();
             var applicationContext = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(
-                    Core.Configuration.GlobalSettings.UmbracoConnectionName,
-                    TestObjects.GetDefaultSqlSyntaxProviders(Logger),
-                    Logger, new TestScopeContextAdapter(),
-                    Mock.Of<IMappingResolver>()), Logger),
-                //assign the service context
+                // assign the db context
+                new DatabaseContext(dbFactory, Logger),
+                // assign the service context
                 TestObjects.GetServiceContext(
                     Container.GetInstance<RepositoryFactory>(),
                     TestObjects.GetDatabaseUnitOfWorkProvider(Logger),
@@ -273,7 +275,9 @@ namespace Umbraco.Tests.TestHelpers
         protected ApplicationContext ApplicationContext => ApplicationContext.Current;
 
         protected ILogger Logger => ProfilingLogger.Logger;
+
         protected ProfilingLogger ProfilingLogger { get; private set; }
+
         protected CacheHelper CacheHelper { get; private set; }
 
         //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests

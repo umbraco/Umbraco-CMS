@@ -34,9 +34,10 @@ using File = System.IO.File;
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-    /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
-    /// The NPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
+    /// Provides a base class for Umbraco application tests that require a database.
     /// </summary>
+    /// <remarks>Can provide a SqlCE database populated with the Umbraco schema. The database should be accessed
+    /// through the <see cref="DefaultDatabaseFactory"/>.</remarks>
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
     {
@@ -103,9 +104,17 @@ namespace Umbraco.Tests.TestHelpers
 
             // create the database factory - if the test does not require an actual database,
             // use a mock factory; otherwise use a real factory.
-            var databaseFactory = DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture
-                ? TestObjects.GetIDatabaseFactoryMock()
-                : new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
+            IDatabaseFactory databaseFactory;
+            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+            {
+                databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            }
+            else
+            {
+                var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestScopeContextAdapter(), MappingResolver);
+                f.ResetForTests();
+                databaseFactory = f;
+            }
 
             // so, using the above code to create a mock IDatabaseFactory if we don't have a real database
             // but, that will NOT prevent _appContext from NOT being configured, because it cannot connect
@@ -157,6 +166,13 @@ namespace Umbraco.Tests.TestHelpers
                 var att = GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
                 return att?.Behavior ?? DatabaseBehavior.NoDatabasePerFixture;
             }
+        }
+
+        protected virtual ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
+
+        protected virtual ISqlSyntaxProvider GetSyntaxProvider()
+        {
+            return new SqlCeSyntaxProvider();
         }
 
         protected virtual string GetDbProviderName()
@@ -222,8 +238,10 @@ namespace Umbraco.Tests.TestHelpers
                     }
                     else
                     {
-                        var engine = new SqlCeEngine(settings.ConnectionString);
-                        engine.CreateDatabase();
+                        using (var engine = new SqlCeEngine(settings.ConnectionString))
+                        {
+                            engine.CreateDatabase();
+                        }
                     }
                 }
 
@@ -376,23 +394,21 @@ namespace Umbraco.Tests.TestHelpers
                     }
                 }
             }
-            if (_firstTestInFixture)
+            if (_firstTestInFixture == false) return;
+
+            lock (Locker)
             {
-                lock (Locker)
-                {
-                    if (_firstTestInFixture)
-                    {
-                        _isFirstTestInFixture = true; //set the flag
-                        _firstTestInFixture = false;
-                    }
-                }
+                if (_firstTestInFixture == false) return;
+
+                _isFirstTestInFixture = true; //set the flag
+                _firstTestInFixture = false;
             }
         }
 
         private void RemoveDatabaseFile(UmbracoDatabase database, Action<Exception> onFail = null)
         {
             CloseDbConnections(database);
-            string path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.CurrentAssemblyDirectory;
             try
             {
                 string filePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");

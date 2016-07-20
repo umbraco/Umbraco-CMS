@@ -179,20 +179,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
-            var nodeId = GetMediaNodeIdByPath(umbracoFileValue);
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(mediaPath);
+            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar== umbracoFileValue));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar == mediaPath));
+
+            // If no result so far, try getting from a json value stored in the ntext / nvarchar column
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNtext LIKE @0", "%" + umbracoFileValue + "%"));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNvarchar LIKE @0", "%" + umbracoFileValue + "%"));
 
             return nodeId < 0 ? null : Get(nodeId);
         }
 
-        private int GetMediaNodeIdByPath(string url)
+        private int GetMediaNodeIdByPath(Sql query)
         {
             var sql = Sql().SelectAll()
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                .Where<PropertyDataDto>(x => x.VarChar == url);
+                .Append(query);
 
             var dto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
             return dto?.NodeId ?? -1;

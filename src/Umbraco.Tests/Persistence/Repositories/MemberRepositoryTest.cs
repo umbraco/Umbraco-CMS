@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
@@ -156,6 +157,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
                 Assert.That(sut.Username, Is.EqualTo("hefty"));
+
+                TestHelper.AssertAllPropertyValuesAreEquals(sut, member, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
@@ -269,7 +272,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
             Assert.That(sql.SQL, Is.Not.Empty);
         }
 

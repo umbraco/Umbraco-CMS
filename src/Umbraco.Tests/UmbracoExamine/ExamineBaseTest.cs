@@ -1,7 +1,10 @@
-﻿using System.IO;
+﻿using Moq;
+using System.IO;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -10,7 +13,7 @@ using UmbracoExamine;
 namespace Umbraco.Tests.UmbracoExamine
 {
     [TestFixture]
-    public abstract class ExamineBaseTest : BaseUmbracoConfigurationTest
+    public abstract class ExamineBaseTest : BaseDatabaseFactoryTest
     {
         [TestFixtureSetUp]
         public void InitializeFixture()
@@ -21,21 +24,17 @@ namespace Umbraco.Tests.UmbracoExamine
 
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
-        [SetUp]
-        public virtual void TestSetup()
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
         {
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
-            Resolution.Freeze();
+            base.FreezeResolution();
         }
 
-        [TearDown]
-        public virtual void TestTearDown()
-        {
-            //reset all resolvers
-            ResolverCollection.ResetAll();
-            //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
-            Resolution.Reset();
-        }
+
+
     }
 }

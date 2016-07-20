@@ -43,7 +43,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {3, typeof (ContentDto)},
                                                                               {4, typeof (ContentVersionDto)},
                                                                               {5, typeof (DocumentDto)},
-
                                                                               {6, typeof (ContentTypeTemplateDto)},
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},
@@ -64,8 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {23, typeof (PropertyDataDto)},
                                                                               {24, typeof (RelationTypeDto)},
                                                                               {25, typeof (RelationDto)},
-                                                                              {26, typeof (StylesheetDto)},
-                                                                              {27, typeof (StylesheetPropertyDto)},
+                                                                              
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
                                                                               {31, typeof (UserTypeDto)},
@@ -80,12 +78,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {40, typeof (ServerRegistrationDto)},
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
-                                                                              {43, typeof(CacheInstructionDto)},
+                                                                              {43, typeof (CacheInstructionDto)},
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
                                                                               {47, typeof (UmbracoDeployDependencyDto)},
-                                                                              {48, typeof (LockDto) }
+                                                                              {48, typeof (RedirectUrlDto) },
+                                                                              {49, typeof (LockDto) }
                                                                           };
         #endregion
 

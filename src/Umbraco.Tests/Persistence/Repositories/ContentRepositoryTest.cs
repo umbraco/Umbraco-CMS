@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -42,6 +43,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
+        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository)
+        {
+            TemplateRepository tr;
+            var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, MappingResolver);
+            return ctRepository;
+        }
+
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             TemplateRepository tr;
@@ -55,6 +64,69 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, MappingResolver);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
+        }
+
+        /// <summary>
+        /// This test ensures that when property values using special database fields are saved, the actual data in the
+        /// object being stored is also transformed in the same way as the data being stored in the database is.
+        /// Before you would see that ex: a decimal value being saved as 100 or "100", would be that exact value in the 
+        /// object, but the value saved to the database was actually 100.000000.
+        /// When querying the database for the value again - the value would then differ from what is in the object. 
+        /// This caused inconsistencies between saving+publishing and simply saving and then publishing, due to the former 
+        /// sending the non-transformed data directly on to publishing.
+        /// </summary>
+        [Test]
+        public void Property_Values_With_Special_DatabaseTypes_Are_Equal_Before_And_After_Being_Persisted()
+        {
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                ContentTypeRepository contentTypeRepository;
+                DataTypeDefinitionRepository dataTypeDefinitionRepository;
+
+                var repository = CreateRepository(unitOfWork, out contentTypeRepository, out dataTypeDefinitionRepository);
+
+                // Setup
+                var dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.DecimalAlias) { Name = "test", DatabaseType = DataTypeDatabaseType.Decimal };
+                dataTypeDefinitionRepository.AddOrUpdate(dtd);
+                unitOfWork.Complete();
+
+                const string decimalPropertyAlias = "decimalProperty";
+                const string intPropertyAlias = "intProperty";
+                const string dateTimePropertyAlias = "datetimeProperty";
+                var dateValue = new DateTime(2016, 1, 6);
+
+                var propertyTypeCollection = new PropertyTypeCollection(
+                    new List<PropertyType>
+                    {
+                        MockedPropertyTypes.CreateDecimalProperty(decimalPropertyAlias, "Decimal property", dtd.Id),
+                        MockedPropertyTypes.CreateIntegerProperty(intPropertyAlias, "Integer property"),
+                        MockedPropertyTypes.CreateDateTimeProperty(dateTimePropertyAlias, "DateTime property")
+                    });
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage", propertyTypeCollection);
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Complete();
+                
+                // Int and decimal values are passed in as strings as they would be from the backoffice UI
+                var textpage = MockedContent.CreateSimpleContentWithSpecialDatabaseTypes(contentType, "test@umbraco.org", -1, "100", "150", dateValue);
+                
+                // Act
+                repository.AddOrUpdate(textpage);
+                unitOfWork.Complete();
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(textpage.HasIdentity, Is.True);
+                
+                var persistedTextpage = repository.Get(textpage.Id);
+                Assert.That(persistedTextpage.Name, Is.EqualTo(textpage.Name));
+                Assert.AreEqual(100m, persistedTextpage.GetValue(decimalPropertyAlias));
+                Assert.AreEqual(persistedTextpage.GetValue(decimalPropertyAlias), textpage.GetValue(decimalPropertyAlias));
+                Assert.AreEqual(150, persistedTextpage.GetValue(intPropertyAlias));
+                Assert.AreEqual(persistedTextpage.GetValue(intPropertyAlias), textpage.GetValue(intPropertyAlias));
+                Assert.AreEqual(dateValue, persistedTextpage.GetValue(dateTimePropertyAlias));
+                Assert.AreEqual(persistedTextpage.GetValue(dateTimePropertyAlias), textpage.GetValue(dateTimePropertyAlias));
+            }
         }
 
         [Test]
@@ -101,7 +173,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                Content textpage = MockedContent.CreateSimpleContent(contentType);
+                IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
                 contentTypeRepository.AddOrUpdate(contentType);
@@ -141,11 +213,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(textpage);
                 unitOfWork.Flush();
 
+                var fetched = repository.Get(textpage.Id);
+
                 // Assert
                 Assert.That(textpage.Template, Is.Not.Null);
                 Assert.That(textpage.Template, Is.EqualTo(contentType.DefaultTemplate));
 
                 unitOfWork.Complete();
+                
+                TestHelper.AssertAllPropertyValuesAreEquals(textpage, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
@@ -539,11 +615,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
+                
                 long totalRecords;
 
                 var filterQuery = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Name.Contains("Page 2"));
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true,
-                    filterQuery);
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -563,11 +639,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 var query = repository.Query.Where(x => x.Level == 2);
+
                 long totalRecords;
 
                 var filterQuery = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Name.Contains("text"));
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true,
-                    filterQuery);
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));

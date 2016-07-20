@@ -32,6 +32,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache
 	{
         private readonly IMediaService _mediaService;
+	    private readonly IUserService _userService;
 
         // by default these are null unless specified by the ctor dedicated to tests
         // when they are null the cache derives them from the ExamineManager, see
@@ -45,12 +46,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // must be specified by the ctor
 	    private readonly ICacheProvider _cacheProvider;
 
-	    public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+	    public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
 	        : base(false)
 		{
             if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-	        _mediaService = mediaService;
-	        _cacheProvider = cacheProvider;
+            if (userService == null) throw new ArgumentNullException(nameof(userService));
+            _mediaService = mediaService;
+            _userService = userService;
+
+            _cacheProvider = cacheProvider;
 	        _xmlStore = xmlStore;
 	        _contentTypeCache = contentTypeCache;
 		}
@@ -63,15 +67,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    /// <param name="indexProvider"></param>
 	    /// <param name="cacheProvider"></param>
 	    /// <param name="contentTypeCache"></param>
-	    internal PublishedMediaCache(IMediaService mediaService, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+	    internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
 	    {
             if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-	        if (searchProvider == null) throw new ArgumentNullException(nameof(searchProvider));
+            if (userService == null) throw new ArgumentNullException(nameof(userService));
+            if (searchProvider == null) throw new ArgumentNullException(nameof(searchProvider));
 	        if (indexProvider == null) throw new ArgumentNullException(nameof(indexProvider));
 
             _mediaService = mediaService;
-	        _searchProvider = searchProvider;
+            _userService = userService;
+            _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
 	        _cacheProvider = cacheProvider;
             _contentTypeCache = contentTypeCache;
@@ -293,10 +299,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
-			var media = library.GetMedia(id, false);
+			//var media = library.GetMedia(id, false);
+		    //return ConvertFromXPathNodeIterator(media, id);
 
-		    return ConvertFromXPathNodeIterator(media, id);
-		}
+            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            return media == null ? null : ConvertFromIMedia(media);
+        }
 
         internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
 	    {
@@ -381,14 +389,49 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    };
 		}
 
-		/// <summary>
-		/// We will need to first check if the document was loaded by Examine, if so we'll need to check if this property exists
-		/// in the results, if it does not, then we'll have to revert to looking up in the db.
-		/// </summary>
-		/// <param name="dd"> </param>
-		/// <param name="alias"></param>
-		/// <returns></returns>
-		private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
+	    internal CacheValues ConvertFromIMedia(IMedia media)
+	    {
+	        var values = new Dictionary<string, string>();
+
+	        var creator = _userService.GetProfileById(media.CreatorId);
+            var creatorName = creator == null ? "" : creator.Name;
+
+	        values["id"] = media.Id.ToString();
+	        values["key"] = media.Key.ToString();
+	        values["parentID"] = media.ParentId.ToString();
+	        values["level"] = media.Level.ToString();
+	        values["creatorID"] = media.CreatorId.ToString();
+	        values["creatorName"] = creatorName;
+            values["writerID"] = media.CreatorId.ToString();
+	        values["writerName"] = creatorName;
+            values["template"] = "0";
+            values["urlName"] = "";
+            values["sortOrder"] = media.SortOrder.ToString();
+	        values["createDate"] = media.CreateDate.ToString("yyyy-MM-dd HH:mm:ss");
+	        values["updateDate"] = media.UpdateDate.ToString("yyyy-MM-dd HH:mm:ss");
+	        values["nodeName"] = media.Name;
+	        values["path"] = media.Path;
+	        values["nodeType"] = media.ContentType.Id.ToString();
+	        values["nodeTypeAlias"] = media.ContentType.Alias;
+
+            // add the user props
+	        foreach (var prop in media.Properties)
+	            values[prop.Alias] = prop.Value == null ? null : prop.Value.ToString();
+
+            return new CacheValues
+            {
+                Values = values
+            };
+        }
+
+        /// <summary>
+        /// We will need to first check if the document was loaded by Examine, if so we'll need to check if this property exists
+        /// in the results, if it does not, then we'll have to revert to looking up in the db.
+        /// </summary>
+        /// <param name="dd"> </param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
             //lets check if the alias does not exist on the document.
             //NOTE: Examine will not index empty values and we do not output empty XML Elements to the cache - either of these situations
@@ -605,7 +648,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     _keysAdded.Add(alias);
                     string value;
                     const bool isPreviewing = false; // false :: never preview a media
-                    var property = valueDictionary.TryGetValue(alias, out value) == false
+                    var property = valueDictionary.TryGetValue(alias, out value) == false || value == null
                         ? new XmlPublishedProperty(propertyType, isPreviewing)
                         : new XmlPublishedProperty(propertyType, isPreviewing, value);
                     _properties.Add(property);

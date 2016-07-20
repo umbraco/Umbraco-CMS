@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
         public virtual string OldName { get; set; }
         public virtual string NewName { get; set; }
 
-        public override string Process(Database database)
+        public override string Process(UmbracoDatabase database)
         {
             if (CurrentDatabaseType.IsMySql())
             {

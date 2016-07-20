@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Data;
 using System.Linq;
 using LightInject;
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Migrations
             //Console output
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
         }
     }

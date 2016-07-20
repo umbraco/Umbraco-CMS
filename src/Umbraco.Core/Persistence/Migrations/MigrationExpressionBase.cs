@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 || SupportedDatabaseTypes.Any(x => CurrentDatabaseType.GetType().Inherits(x.GetType()));
         }
 
-        public virtual string Process(Database database)
+        public virtual string Process(UmbracoDatabase database)
         {
             return ToString();
         }

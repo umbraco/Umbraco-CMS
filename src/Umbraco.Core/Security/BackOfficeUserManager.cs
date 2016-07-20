@@ -123,7 +123,7 @@ namespace Umbraco.Core.Security
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
 
             manager.EmailService = new EmailService();
-
+            
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Security
         /// We've allowed this check to be overridden with a simple callback so that developers don't actually
         /// have to implement/override this class.
         /// </remarks>
-        public async override Task<bool> CheckPasswordAsync(T user, string password)
+        public override async Task<bool> CheckPasswordAsync(T user, string password)
         {
             if (BackOfficeUserPasswordChecker != null)
             {

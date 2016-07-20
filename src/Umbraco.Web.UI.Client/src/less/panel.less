@@ -286,14 +286,14 @@
 // form styles
 .umb-dialog .muted,
 .umb-panel .muted {
-    color: @grayLight;
+    color: @grayMed;
 }
 
 .umb-dialog a.muted:hover,
 .umb-dialog a.muted:focus,
 .umb-panel a.muted:hover,
 .umb-panel a.muted:focus {
-    color: darken(@grayLight, 10%);
+    color: darken(@grayMed, 10%);
 }
 
 .umb-dialog .text-warning,
@@ -366,15 +366,15 @@
   flex: 1;
 }
 
-.umb-panel-header-content.-top-position {
-  position: relative;
-  top: -12px;
-}
-
 .umb-panel-header-left-side {
    display: flex;
    flex: 1;
    flex-direction: row;
+}
+
+.umb-panel-header-left-side.-top-position {
+  position: relative;
+  top: -12px;
 }
 
 .umb-panel-header-icon {

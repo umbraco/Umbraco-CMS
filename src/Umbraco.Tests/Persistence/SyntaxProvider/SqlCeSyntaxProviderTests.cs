@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Data.Common;
 using Moq;
 using NPoco;
@@ -58,16 +59,16 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var indexes = SqlContext.SqlSyntax.Format(definition.Indexes);
             var keys = SqlContext.SqlSyntax.Format(definition.ForeignKeys);
 
-            Console.WriteLine(create);
-            Console.WriteLine(primaryKey);
+            Debug.Print(create);
+            Debug.Print(primaryKey);
             foreach (var sql in keys)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
 
             foreach (var sql in indexes)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
         }
 

@@ -934,6 +934,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="templates">Maler</key>
     <key alias="xslt">XSLT Filer</key>
     <key alias="analytics">Analytics</key>
+    <key alias="userPermissions">Brukertillatelser</key>
     <key alias="userTypes">Brukertyper typer</key>
     <key alias="users">Brukere</key>
   </area>

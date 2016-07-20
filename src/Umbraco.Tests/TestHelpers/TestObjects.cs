@@ -146,7 +146,7 @@ namespace Umbraco.Tests.TestHelpers
             var userService = new Lazy<IUserService>(() => new UserService(provider, logger, eventMessagesFactory));
             var dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, logger, eventMessagesFactory));
             var contentService = new Lazy<IContentService>(() => new ContentService(provider, logger, eventMessagesFactory));
-            var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, repositoryFactory, logger));
+            var notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, userService.Value, contentService.Value, logger));
             var serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, logger, eventMessagesFactory));
             var memberService = new Lazy<IMemberService>(() => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value));
@@ -169,6 +169,7 @@ namespace Umbraco.Tests.TestHelpers
             var treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(logger, cache));
             var tagService = new Lazy<ITagService>(() => new TagService(provider, logger, eventMessagesFactory));
             var sectionService = new Lazy<ISectionService>(() => new SectionService(userService.Value, treeService.Value, provider, cache));
+            var redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, logger, eventMessagesFactory));
 
             return new ServiceContext(
                 migrationEntryService,
@@ -197,7 +198,8 @@ namespace Umbraco.Tests.TestHelpers
                 memberTypeService,
                 memberGroupService,
                 notificationService,
-                externalLoginService);
+                externalLoginService,
+                redirectUrlService);
         }
 
         public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger)

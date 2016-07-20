@@ -191,11 +191,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
 
+                var fetched = repository.Get(contentType.Id);
+
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
-                Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                TestHelper.AssertAllPropertyValuesAreEquals(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new[] { "UpdateDate" });
             }
 
             

@@ -73,8 +73,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Resolution.Freeze();
 
             //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString);
-            engine.CreateDatabase();
+            using (var engine = new SqlCeEngine(settings.ConnectionString))
+            {
+                engine.CreateDatabase();
+            }
 
         }
 

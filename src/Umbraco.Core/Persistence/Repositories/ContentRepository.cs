@@ -145,6 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
@@ -697,8 +698,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (filter != null)
             {
-                foreach (var filterClaus in filter.GetWhereClauses())
-                    filterSql.Append($"AND ({filterClaus.Item1})", filterClaus.Item2);
+                foreach (var filterClause in filter.GetWhereClauses())
+                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
             }
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,

@@ -1,0 +1,75 @@
+.umb-lightbox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.umb-lightbox__backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: 100%;
+}
+
+.umb-lightbox__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.umb-lightbox__images {
+    position: relative;
+    z-index: 1000;
+}
+
+.umb-lightbox__image {
+    background: @white;
+    border-radius: 3px;
+    padding: 10px;
+    img {
+        max-width: 50vw;
+        max-height: 70vh;
+    }
+}
+
+.umb-lightbox__control {
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+}
+
+.umb-lightbox__control.-next {
+    right: 20px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.umb-lightbox__control.-prev {
+    left: 20px;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.umb-lightbox__control-icon {
+    color: @blue;
+    font-size: 20px;
+}
