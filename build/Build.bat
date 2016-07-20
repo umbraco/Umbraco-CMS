@@ -124,6 +124,7 @@ ECHO Into %nuGetFolder%
 ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+..\src\.nuget\NuGet.exe restore ..\src\UmbracoExamine\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
 ECHO.
 ECHO Performing MSBuild and producing Umbraco binaries zip files
