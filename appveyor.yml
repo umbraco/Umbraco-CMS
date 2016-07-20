@@ -22,8 +22,6 @@ build_script:
     
     ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Tests\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet    
     
-    ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-    
     ..\src\.nuget\NuGet.exe restore ..\src\umbraco.controls\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
     ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
@@ -34,7 +32,7 @@ build_script:
 
     XCOPY "..\src\Umbraco.Tests\unit-test-log4net.CI.config" "..\src\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%nuGetFolder%
+    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj"  /p:NugetPackagesDirectory=%nuGetFolder%
     
     build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%nuGetFolder%
     
