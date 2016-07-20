@@ -1,34 +1,95 @@
-@ECHO OFF
-IF NOT EXIST UmbracoVersion.txt (
-	ECHO UmbracoVersion.txt missing!
-	GOTO :showerror
-)
+::@ECHO OFF
 
-REM Get the version and comment from UmbracoVersion.txt lines 2 and 3
-SET "release="
-SET "comment="
-FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
-FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SET "comment=%%i"
-
-REM If there's arguments on the command line overrule UmbracoVersion.txt and use that as the version
-IF [%2] NEQ [] (SET release=%2)
-IF [%3] NEQ [] (SET comment=%3) ELSE (IF [%2] NEQ [] (SET "comment="))
-
-REM Get the "is continuous integration" from the parameters
-SET "isci=0"
-IF [%1] NEQ [] (SET isci=1)
-
-SET version=%release%
-IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
+:: UMBRACO BUILD FILE
 
 ECHO.
-ECHO Building Umbraco %version%
+
+:: ensure we have UmbracoVersion.txt
+IF NOT EXIST UmbracoVersion.txt (
+	ECHO UmbracoVersion.txt is missing!
+	GOTO error
+)
+
+:: get the version and comment from UmbracoVersion.txt lines 2 and 3
+SET RELEASE=
+SET COMMENT=
+FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED RELEASE SET RELEASE=%%i
+FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED COMMENT SET COMMENT=%%i
+
+:: process args
+
+SET INTEGRATION=0
+SET nuGetFolder=%CD%\..\src\packages\
+SET SKIPNUGET=0
+
+:processArgs
+
+:: grab the first parameter as a whole eg "/action:start"
+:: end if no more parameter
+SET SWITCHPARSE=%1
+IF [%SWITCHPARSE%] == [] goto endProcessArgs
+
+:: get switch and value
+SET SWITCH=
+SET VALUE=
+FOR /F "tokens=1,* delims=: " %%a IN ("%SWITCHPARSE%") DO SET SWITCH=%%a& SET VALUE=%%b
+
+:: route arg
+IF '%SWITCH%'=='/release' GOTO argRelease
+IF '%SWITCH%'=='-release' GOTO argRelease
+IF '%SWITCH%'=='/comment' GOTO argComment
+IF '%SWITCH%'=='-comment' GOTO argComment
+IF '%SWITCH%'=='/integration' GOTO argIntegration
+IF '%SWITCH%'=='-integration' GOTO argIntegration
+IF '%SWITCH%'=='/nugetfolder' GOTO argNugetFolder
+IF '%SWITCH%'=='-nugetfolder' GOTO argNugetFolder
+IF '%SWITCH%'=='/skipnuget' GOTO argSkipNuget
+IF '%SWITCH%'=='-skipnuget' GOTO argSkipNuget
+ECHO "Invalid switch %SWITCH%"
+GOTO error
+
+:: handle each arg
+
+:argRelease
+set RELEASE=%VALUE%
+SHIFT
+goto processArgs
+
+:argComment
+SET COMMENT=%VALUE%
+SHIFT
+GOTO processArgs
+
+:argIntegration
+SET INTEGRATION=1
+SHIFT
+GOTO processArgs
+
+:argNugetFolder
+SET nuGetFolder=%VALUE%
+SHIFT
+GOTO processArgs
+
+:argSkipNuget
+SET SKIPNUGET=1
+SHIFT
+GOTO processArgs
+
+:endProcessArgs 
+
+:: run
+
+SET VERSION=%RELEASE%
+IF [%COMMENT%] EQU [] (SET VERSION=%RELEASE%) ELSE (SET VERSION=%RELEASE%-%COMMENT%)
+
+ECHO.
+ECHO Building Umbraco %VERSION%
 ECHO.
 
 SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
-ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
+ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
 ECHO.
 ECHO Removing the belle build folder and bower_components folder to make sure everything is clean as a whistle
@@ -58,11 +119,12 @@ IF NOT EXIST %CD%\..\src\Umbraco.Web.UI\web.config COPY %CD%\..\src\Umbraco.Web.
 
 ECHO.
 ECHO Restoring NuGet packages
-SET nuGetFolder=%CD%\..\src\packages\
+ECHO Into %nuGetFolder%
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Core\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\umbraco.datalayer\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web\project.json -OutputDirectory %nuGetFolder% -Verbosity quiet
 ..\src\.nuget\NuGet.exe restore ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+..\src\.nuget\NuGet.exe restore ..\src\UmbracoExamine\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
 ECHO.
 ECHO Performing MSBuild and producing Umbraco binaries zip files
@@ -70,23 +132,25 @@ ECHO This takes a few minutes and logging is set to report warnings
 ECHO and errors only so it might seems like nothing is happening for a while. 
 ECHO You can check the msbuild.log file for progress.
 ECHO.
-%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
-IF ERRORLEVEL 1 GOTO :error
+%MSBUILD% "Build.proj" /p:BUILD_RELEASE=%RELEASE% /p:BUILD_COMMENT=%COMMENT% /p:NugetPackagesDirectory=%nuGetFolder% /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /fileLogger
+IF ERRORLEVEL 1 GOTO error
 
 ECHO.
 ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
 
+IF %SKIPNUGET% EQU 1 GOTO success
+
 ECHO.
 ECHO Adding Web.config transform files to the NuGet package
 REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
-REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
+:: REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO.
 ECHO Packing the NuGet release files
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version% -Symbols -Verbosity quiet
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version% -Verbosity quiet
-IF ERRORLEVEL 1 GOTO :error
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %VERSION% -Symbols -Verbosity quiet
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %VERSION% -Verbosity quiet
+IF ERRORLEVEL 1 GOTO error
 
 :success
 ECHO.
@@ -103,6 +167,6 @@ ECHO.
 ECHO Errors were detected!
 ECHO.
 
-REM don't pause if continuous integration else the build server waits forever
-REM before cancelling the build (and, there is noone to read the output anyways)
-IF isci NEQ 1 PAUSE
+:: don't pause if continuous integration else the build server waits forever
+:: before cancelling the build (and, there is noone to read the output anyways)
+IF %INTEGRATION% NEQ 1 PAUSE
