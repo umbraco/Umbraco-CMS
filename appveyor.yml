@@ -14,7 +14,7 @@ build_script:
     
     FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
     
-    %SLN%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+    %SRC%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
 
     %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Core\project.json -OutputDirectory %PACKAGES% -Verbosity quiet
     
