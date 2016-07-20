@@ -34,9 +34,9 @@ build_script:
 
     XCOPY "..\src\Umbraco.Tests\unit-test-log4net.CI.config" "..\src\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly
+    %MSBUILD% "../src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%nuGetFolder%
     
-    build.bat nopause %release% build%APPVEYOR_BUILD_NUMBER%
+    build.bat /integration /release:%release% /comment:build%APPVEYOR_BUILD_NUMBER% /nugetfolder:%nuGetFolder%
     
     ECHO %PATH%
 test:
