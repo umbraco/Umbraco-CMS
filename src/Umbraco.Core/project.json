@@ -1,8 +1,8 @@
 ﻿{
   "dependencies": {
     "AutoMapper": "4.2.*",
+    "HtmlAgilityPack": "1.4.9.5",
     "ImageProcessor": "2.4.*",
-    "HtmlAgilityPack": "1.4.*",
     "LightInject": "4.0.*",
     "LightInject.Annotation": "1.0.*",
     "log4net": "2.0.*",
