@@ -86,10 +86,6 @@ ECHO.
 ECHO Building Umbraco %VERSION%
 ECHO.
 
-ECHO INTEGRATION=%INTEGRATION%
-ECHO nuGetPackages=%nuGetFolder%
-GOTO :eof
-
 SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
