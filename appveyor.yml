@@ -6,7 +6,7 @@ build_script:
     
     SET SRC=%SLN%\src
     
-    SET PACKAGES=%SLN%\packages
+    SET PACKAGES=%SRC%\packages
 
     CD build
 
