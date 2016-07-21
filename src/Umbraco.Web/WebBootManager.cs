@@ -42,6 +42,7 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 using Umbraco.Web._Legacy.Actions;
 using UmbracoExamine;
 using Action = System.Action;
@@ -550,7 +551,11 @@ namespace Umbraco.Web
             Container.Register<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             HealthCheckResolver.Current = new HealthCheckResolver(Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>()); // fixme XML cache vs NuCache?!
+                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+
+            // fixme - remove for NuCache else it fails
+            // but we should also have one for NuCache AND NuCache should be a component that does all this
+            HealthCheckResolver.Current.RemoveType<XmlDataIntegrityHealthCheck>();
         }
 
         /// <summary>
