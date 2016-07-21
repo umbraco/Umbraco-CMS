@@ -409,7 +409,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
         {
-            return GetXmlDelegate(umbracoContext, preview);
+            var xml = GetXmlDelegate(umbracoContext, preview);
+            if (xml == null)
+                throw new Exception("The Xml cache is corrupt. Use the Health Check data integrity dashboard to fix it.");
+            return xml;
         }
 
         #endregion
