@@ -33,6 +33,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
 
             localContext.Execute.Sql("DELETE FROM umbracoRedirectUrl"); // else cannot add non-nullable field
 
+            var keyConstraints = SqlSyntax.GetConstraintsPerColumn(database).Distinct();
+            var fk= keyConstraints
+                .SingleOrDefault(x => x.Item1 == "umbracoRedirectUrl" && x.Item2 == "contentId" && x.Item3.InvariantStartsWith("PK_") == false);
+            if (fk != null)
+                localContext.Delete.ForeignKey(fk.Item3).OnTable("umbracoRedirectUrl");
             localContext.Delete.Column("contentId").FromTable("umbracoRedirectUrl");
 
             // SQL CE does not want to alter-add non-nullable columns ;-(
