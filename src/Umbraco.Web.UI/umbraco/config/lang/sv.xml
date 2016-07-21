@@ -492,6 +492,7 @@
     <key alias="greeting5">Happy friendly Friday</key>
     <key alias="greeting6">Happy shiny Saturday</key>
     <key alias="instruction">Logga in nedan</key>
+    <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
   </area>
   <area alias="main">

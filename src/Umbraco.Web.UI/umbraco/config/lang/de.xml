@@ -537,6 +537,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="greeting5">Frohen freundlichen Freitag</key>
     <key alias="greeting6">Wunderbaren sonnigen Samstag</key>
     <key alias="instruction">Hier anmelden:</key>
+    <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>
     <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
   </area>
