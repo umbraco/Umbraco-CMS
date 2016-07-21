@@ -94,7 +94,7 @@ namespace Umbraco.Core
                     return Attempt<object>.Succeed(null);
 
                 // value type is nok, else can be null, so is ok
-		        return Attempt<object>.SucceedIf(destinationType.IsValueType == false, null);
+		        return Attempt<object>.If(destinationType.IsValueType == false, null);
             }
 
             // easy
@@ -251,7 +251,7 @@ namespace Umbraco.Core
                     // makes sense that string "100.01" *also* converts to integer 100.
                     decimal value2;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt32(value2));
+                    return Attempt<object>.If(decimal.TryParse(input2, out value2), Convert.ToInt32(value2));
                 }
 
                 if (destinationType == typeof(long)) // aka Int64
@@ -262,7 +262,7 @@ namespace Umbraco.Core
                     // same as int
                     decimal value2;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt64(value2));
+			        return Attempt<object>.If(decimal.TryParse(input2, out value2), Convert.ToInt64(value2));
 			    }
 
                 // fixme - should we do the decimal trick for short, byte, unsigned?
@@ -278,63 +278,63 @@ namespace Umbraco.Core
 			    if (destinationType == typeof(short)) // aka Int16
 			    {
 			        short value;
-			        return Attempt<object>.SucceedIf(short.TryParse(input, out value), value);
+			        return Attempt<object>.If(short.TryParse(input, out value), value);
 			    }
 
 			    if (destinationType == typeof(double)) // aka Double
 			    {
 			        double value;
 			        var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Attempt<object>.SucceedIf(double.TryParse(input2, out value), value);
+			        return Attempt<object>.If(double.TryParse(input2, out value), value);
 			    }
 
 			    if (destinationType == typeof(float)) // aka Single
 			    {
 			        float value;
 			        var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Attempt<object>.SucceedIf(float.TryParse(input2, out value), value);
+			        return Attempt<object>.If(float.TryParse(input2, out value), value);
 			    }
 
 			    if (destinationType == typeof(char)) // aka Char
 			    {
 			        char value;
-			        return Attempt<object>.SucceedIf(char.TryParse(input, out value), value);
+			        return Attempt<object>.If(char.TryParse(input, out value), value);
 			    }
 
 			    if (destinationType == typeof(byte)) // aka Byte
 			    {
 			        byte value;
-			        return Attempt<object>.SucceedIf(byte.TryParse(input, out value), value);
+			        return Attempt<object>.If(byte.TryParse(input, out value), value);
 			    }
 
 			    if (destinationType == typeof(sbyte)) // aka SByte
                 {
 			        sbyte value;
-			        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out value), value);
+			        return Attempt<object>.If(sbyte.TryParse(input, out value), value);
                 }
 
 			    if (destinationType == typeof(uint)) // aka UInt32
                 {
 			        uint value;
-			        return Attempt<object>.SucceedIf(uint.TryParse(input, out value), value);
+			        return Attempt<object>.If(uint.TryParse(input, out value), value);
                 }
 
 			    if (destinationType == typeof(ushort)) // aka UInt16
                 {
 			        ushort value;
-			        return Attempt<object>.SucceedIf(ushort.TryParse(input, out value), value);
+			        return Attempt<object>.If(ushort.TryParse(input, out value), value);
                 }
 
 			    if (destinationType == typeof(ulong)) // aka UInt64
                 {
 			        ulong value;
-                    return Attempt<object>.SucceedIf(ulong.TryParse(input, out value), value);
+                    return Attempt<object>.If(ulong.TryParse(input, out value), value);
 			    }
 			}
 			else if (destinationType == typeof(Guid))
 			{
 				Guid value;
-			    return Attempt<object>.SucceedIf(Guid.TryParse(input, out value), value);
+			    return Attempt<object>.If(Guid.TryParse(input, out value), value);
 			}
 			else if (destinationType == typeof(DateTime))
 			{
@@ -357,23 +357,23 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(DateTimeOffset))
 			{
 				DateTimeOffset value;
-			    return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out value), value);
+			    return Attempt<object>.If(DateTimeOffset.TryParse(input, out value), value);
 			}
 			else if (destinationType == typeof(TimeSpan))
 			{
 				TimeSpan value;
-			    return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out value), value);
+			    return Attempt<object>.If(TimeSpan.TryParse(input, out value), value);
 			}
 			else if (destinationType == typeof(decimal)) // aka Decimal
 			{
 				decimal value;
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value), value);
+                return Attempt<object>.If(decimal.TryParse(input2, out value), value);
 			}
 			else if (destinationType == typeof(Version))
 			{
 				Version value;
-			    return Attempt<object>.SucceedIf(Version.TryParse(input, out value), value);
+			    return Attempt<object>.If(Version.TryParse(input, out value), value);
 			}
 			// E_NOTIMPL IPAddress, BigInteger
 

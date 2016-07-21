@@ -19,11 +19,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
 	internal class XmlPublishedContent : PublishedContentBase
 	{
-        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
-		{
-			_xmlNode = xmlNode;
-		    _isPreviewing = isPreviewing;
-        private readonly XmlNode _xmlNode;
+	    private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+	    {
+	        _xmlNode = xmlNode;
+	        _isPreviewing = isPreviewing;
+
+	        _cacheProvider = cacheProvider;
+	        _contentTypeCache = contentTypeCache;
+	    }
+
+	    private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
 	    private readonly ICacheProvider _cacheProvider; // at facade/request level (see PublishedContentCache)
 	    private readonly PublishedContentTypeCache _contentTypeCache;

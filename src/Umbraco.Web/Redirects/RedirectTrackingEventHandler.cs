@@ -134,27 +134,11 @@ namespace Umbraco.Web.Redirects
                 {
                     var route = contentCache.GetRouteById(x.Id);
                     if (IsNotRoute(route)) continue;
-                    var wk = UnwrapToKey(x);
-                    if (wk == null) continue;
-                    OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
+                    OldRoutes[x.Id] = Tuple.Create(x.Key, route);
                 }
             }
 
             LockedEvents = true; // we only want to see the "first batch"
-        }
-
-        private static IPublishedContentWithKey UnwrapToKey(IPublishedContent content)
-        {
-            if (content == null) return null;
-            var withKey = content as IPublishedContentWithKey;
-            if (withKey != null) return withKey;
-
-            var extended = content as PublishedContentExtended;
-            while (extended != null)
-                extended = (content = extended.Unwrap()) as PublishedContentExtended;
-
-            withKey = content as IPublishedContentWithKey;
-            return withKey;
         }
 
         private static void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e)

@@ -21,7 +21,7 @@ namespace Umbraco.Web.Routing
         public bool TryFindContent(PublishedContentRequest contentRequest)
         {
             var route = contentRequest.HasDomain
-                ? contentRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(contentRequest.DomainUri, contentRequest.Uri.GetAbsolutePathDecoded())
+                ? contentRequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(contentRequest.Domain.Uri, contentRequest.Uri.GetAbsolutePathDecoded())
                 : contentRequest.Uri.GetAbsolutePathDecoded();
 
             var service = contentRequest.RoutingContext.UmbracoContext.Application.Services.RedirectUrlService;
