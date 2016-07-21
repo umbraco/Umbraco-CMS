@@ -4,9 +4,6 @@ using System.Linq;
 using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence.SqlSyntax;
-using System.Threading;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -15,9 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     internal class MigrationResolver : ContainerLazyManyObjectsResolver<MigrationResolver, IMigration>, IMigrationResolver
     {
-        
+
         public MigrationResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> migrations)
-            : base(container, logger, migrations, ObjectLifetimeScope.Transient)
+            : base(container, logger, migrations, ObjectLifetimeScope.Transient) // do NOT change .Transient, see CreateValues below
         {
         }
 
@@ -32,9 +29,11 @@ namespace Umbraco.Core.Persistence.Migrations
         /// </remarks>
         protected override IEnumerable<IMigration> CreateValues(ObjectLifetimeScope scope)
         {
+            // note: constructor dependencies do NOT work with lifetimes other than transient
+            // see https://github.com/seesharper/LightInject/issues/294
             EnsureTypesRegisterred(scope, container =>
             {
-                // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is 
+                // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
                 // the container, 'info' describes the ctor argument, and 'args' contains the args that
                 // were passed to GetInstance() - use first arg if it is the right type,
                 //
@@ -42,11 +41,8 @@ namespace Umbraco.Core.Persistence.Migrations
                 container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IMigrationContext : null);
             });
 
-            foreach (var type in InstanceTypes)
-            {
-                //create each instance with the provided constructor argument
-                yield return (IMigration)Container.GetInstance(type, new object[] {_migrationContext});                
-            }
+            var arg = new object[] { _migrationContext };
+            return InstanceTypes.Select(x => (IMigration) Container.GetInstance(x, arg));
         }
 
         private IMigrationContext _migrationContext;
@@ -58,7 +54,7 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             //set the current context to use to create the values
             _migrationContext = migrationContext;
-            
+
             return Values;
         }
     }

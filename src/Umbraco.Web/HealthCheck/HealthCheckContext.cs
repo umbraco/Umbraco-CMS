@@ -11,16 +11,16 @@ namespace Umbraco.Web.HealthCheck
     {
         public HealthCheckContext(HttpContextBase httpContext, UmbracoContext umbracoContext)
         {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+
             HttpContext = httpContext;
             UmbracoContext = umbracoContext;
-            ApplicationContext = UmbracoContext.Application;
         }
 
-        public HttpContextBase HttpContext { get; private set; }
-        public UmbracoContext UmbracoContext { get; private set; }
-        public ApplicationContext ApplicationContext { get; private set; }
+        public HttpContextBase HttpContext { get; }
+        public UmbracoContext UmbracoContext { get; }
+        public ApplicationContext ApplicationContext => UmbracoContext.Application;
 
         //TODO: Do we need any more info/service exposed here?
     }

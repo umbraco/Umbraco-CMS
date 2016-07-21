@@ -13,13 +13,14 @@ namespace Umbraco.Web.HealthCheck
     {
         protected HealthCheck(HealthCheckContext healthCheckContext)
         {
+            if (healthCheckContext == null) throw new ArgumentNullException(nameof(healthCheckContext));
             HealthCheckContext = healthCheckContext;
+
             //Fill in the metadata
-            var thisType = this.GetType();
+            var thisType = GetType();
             var meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
             if (meta == null)
-                throw new InvalidOperationException(
-                    string.Format("The health check {0} requires a {1}", thisType, typeof(HealthCheckAttribute)));
+                throw new InvalidOperationException($"The health check {thisType} requires a {typeof (HealthCheckAttribute)}");
             Name = meta.Name;
             Description = meta.Description;
             Group = meta.Group;

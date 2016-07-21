@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -17,11 +16,13 @@ namespace Umbraco.Web.HealthCheck
     internal class HealthCheckResolver : ContainerLazyManyObjectsResolver<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
         public HealthCheckResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> types)
-            : base(container, logger, types, ObjectLifetimeScope.HttpRequest)
+            : base(container, logger, types, ObjectLifetimeScope.Transient) // do NOT change .Transient, see CreateValues below
         { }
 
         protected override IEnumerable<HealthCheck> CreateValues(ObjectLifetimeScope scope)
         {
+            // note: constructor dependencies do NOT work with lifetimes other than transient
+            // see https://github.com/seesharper/LightInject/issues/294
             EnsureTypesRegisterred(scope, container =>
             {
                 // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
@@ -32,7 +33,8 @@ namespace Umbraco.Web.HealthCheck
                 container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as HealthCheckContext : null);
             });
 
-            return InstanceTypes.Select(x => (HealthCheck) Container.GetInstance(x, new object[] { _healthCheckContext }));
+            var arg = new object[] { _healthCheckContext };
+            return InstanceTypes.Select(x => (HealthCheck) Container.GetInstance(x, arg));
         }
 
         private HealthCheckContext _healthCheckContext;
