@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
     <h3>Health Check</h3>
     <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button. <br/>
-    You can add your own health checks, have a look at <a href="https://our.umbraco.org/documentation/Extending/Healthcheck/" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+    You can add your own health checks, have a look at <a href="https://our.umbraco.org/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
 
     <button type="button" class="umb-era-button" ng-click="vm.triggerChecks()" ng-disabled="vm.checksRunning" ng-class="{'-inactive': vm.checksRunning}" ng-hide="vm.viewState === 'details'">Run Checks</button>
 
