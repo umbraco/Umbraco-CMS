@@ -108,6 +108,7 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
             container.Register<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
             container.Register<IDataTypeContainerRepository, DataTypeContainerRepository>();
+            container.Register<IRedirectUrlRepository, RedirectUrlRepository>();
 
             // repositories that depend on a filesystem
             // these have an annotated ctor parameter to pick the right file system
