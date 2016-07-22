@@ -248,7 +248,6 @@ namespace Umbraco.Tests.TestHelpers
             if (PluginManager.Current == null || PluginManagerResetRequired)
             {
                 PluginManager.Current = new PluginManager(
-                    new ActivatorServiceProvider(),
                     CacheHelper.RuntimeCache, ProfilingLogger, false)
                 {
                     AssembliesToScan = new[]

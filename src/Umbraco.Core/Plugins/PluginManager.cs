@@ -18,54 +18,55 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Plugins
 {
-    /// <summary>
-    /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
+    /// <summary>Resolves and caches all plugin types, and instanciates them.
     /// </summary>
     /// <remarks>
-    /// 
-    /// This class should be used to resolve all plugin types, the TypeFinder should not be used directly!
-    /// 
-    /// This class can expose extension methods to resolve custom plugins
-    /// 
-    /// Before this class resolves any plugins it checks if the hash has changed for the DLLs in the /bin folder, if it hasn't
+    /// <para>This class should be used to resolve all plugin types, the TypeFinder should not be used directly!.</para>
+    /// <para>Before this class resolves any plugins it checks if the hash has changed for the DLLs in the /bin folder, if it hasn't
     /// it will use the cached resolved plugins that it has already found which means that no assembly scanning is necessary. This leads
-    /// to much faster startup times.
+    /// to much faster startup times.</para>
     /// </remarks>
     public class PluginManager
     {
-        /// <summary>
-        /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
-        /// file is cached temporarily until app startup completes.
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="detectChanges"></param>
-        /// <param name="serviceProvider"></param>
-        /// <param name="runtimeCache"></param>
-        public PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
-        {
-            if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (runtimeCache == null) throw new ArgumentNullException("runtimeCache");
-            if (logger == null) throw new ArgumentNullException("logger");
+        private const string CacheKey = "umbraco-plugins.list";
+        private static object _instanceLocker = new object();
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+        private static PluginManager _instance;
+        private static bool _hasInstance;
 
-            _serviceProvider = serviceProvider;
+        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly ProfilingLogger _logger;
+        private readonly string _tempFolder;
+        private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
+        private long _cachedAssembliesHash = -1;
+        private long _currentAssembliesHash = -1;
+        private IEnumerable<Assembly> _assemblies;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PluginManager"/> class.
+        /// </summary>
+        /// <param name="runtimeCache">A runtime cache.</param>
+        /// <param name="logger">A logger</param>
+        /// <param name="detectChanges">A value indicating whether to detect changes.</param>
+        public PluginManager(IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
+        {
+            if (runtimeCache == null) throw new ArgumentNullException(nameof(runtimeCache));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             _runtimeCache = runtimeCache;
             _logger = logger;
 
+            // create the temp folder if it doesn't exist
             _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            //create the folder if it doesn't exist
             if (Directory.Exists(_tempFolder) == false)
-            {
                 Directory.CreateDirectory(_tempFolder);
-            }
 
             var pluginListFile = GetPluginListFilePath();
 
-            //this is a check for legacy changes, before we didn't store the TypeResolutionKind in the file which was a mistake,
-            //so we need to detect if the old file is there without this attribute, if it is then we delete it
+            // check for legacy changes: before, we didn't store the TypeResolutionKind in the file, which was a mistake,
+            // so we need to detect if the old file is there without this attribute, if it is then we delete it
             if (DetectLegacyPluginListFile())
-            {
                 File.Delete(pluginListFile);
-            }
 
             if (detectChanges)
             {
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Plugins
                 //if they have changed, we need to write the new file
                 if (RequiresRescanning)
                 {
-                    //if the hash has changed, clear out the persisted list no matter what, this will force
+                    // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all plugin types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
                     File.Delete(pluginListFile);
@@ -85,75 +86,65 @@ namespace Umbraco.Core.Plugins
             }
             else
             {
-
-                //if the hash has changed, clear out the persisted list no matter what, this will force
+                // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all plugin types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
                 File.Delete(pluginListFile);
 
-                //always set to true if we're not detecting (generally only for testing)
+                // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
             }
         }
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly ProfilingLogger _logger;
-        private const string CacheKey = "umbraco-plugins.list";
-        static PluginManager _resolver;
-        private readonly string _tempFolder;
-        private long _cachedAssembliesHash = -1;
-        private long _currentAssembliesHash = -1;
-        private static bool _initialized = false;
-        private static object _singletonLock = new object();
-
         /// <summary>
-        /// We will ensure that no matter what, only one of these is created, this is to ensure that caching always takes place
+        /// Gets the current plugin manager.
         /// </summary>
         /// <remarks>
-        /// The setter is generally only used for unit tests
+        /// <para>Ensures that no matter what, only one plugin manager is created, and thus proper caching always takes place.</para>
+        /// <para>The setter is generally only used for unit tests + when creating the master plugin manager in CoreBootManager.</para>
         /// </remarks>
         public static PluginManager Current
         {
             get
             {
-                return LazyInitializer.EnsureInitialized(ref _resolver, ref _initialized, ref _singletonLock, () =>
+                return LazyInitializer.EnsureInitialized(ref _instance, ref _hasInstance, ref _instanceLocker, () =>
                 {
-                    if (ApplicationContext.Current == null)
+                    var appctx = ApplicationContext.Current;
+                    var cacheProvider = appctx == null 
+                        ? new NullCacheProvider() 
+                        : appctx.ApplicationCache.RuntimeCache;
+                    ProfilingLogger profilingLogger;
+                    if (appctx == null)
                     {
                         var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
                         var profiler = ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger);
-                        return new PluginManager(
-                            new ActivatorServiceProvider(), 
-                            new NullCacheProvider(), 
-                            new ProfilingLogger(logger, profiler));
+                        profilingLogger = new ProfilingLogger(logger, profiler);
                     }
-                    return new PluginManager(
-                        new ActivatorServiceProvider(), 
-                        ApplicationContext.Current.ApplicationCache.RuntimeCache, 
-                        ApplicationContext.Current.ProfilingLogger);
+                    else
+                    {
+                        profilingLogger = appctx.ProfilingLogger;
+                    }
+                    return new PluginManager(cacheProvider, profilingLogger);
                 });
             }
-            set
+            internal set
             {
-                _initialized = true;
-                _resolver = value;
+                _hasInstance = true;
+                _instance = value;
             }
         }
 
         #region Hash checking methods
 
+        /// <summary>
+        /// Gets a value indicating whether the assemblies in the /bin, app_code, global.asax, etc... have changed since they were last hashed.
+        /// </summary>
+        internal bool RequiresRescanning { get; }
 
         /// <summary>
-        /// Returns a bool if the assemblies in the /bin, app_code, global.asax, etc... have changed since they were last hashed.
+        /// Gets the currently cached hash value of the scanned assemblies in the /bin folder.
         /// </summary>
-        internal bool RequiresRescanning { get; private set; }
-
-        /// <summary>
-        /// Returns the currently cached hash value of the scanned assemblies in the /bin folder. Returns 0 
-        /// if no cache is found.
-        /// </summary>
-        /// <value> </value>
+        /// <value>The cached hash value, or 0 if no cache is found.</value>
         internal long CachedAssembliesHash
         {
             get
@@ -162,24 +153,22 @@ namespace Umbraco.Core.Plugins
                     return _cachedAssembliesHash;
 
                 var filePath = GetPluginHashFilePath();
-                if (!File.Exists(filePath))
-                    return 0;
+                if (File.Exists(filePath) == false) return 0;
+
                 var hash = File.ReadAllText(filePath, Encoding.UTF8);
-                Int64 val;
-                if (Int64.TryParse(hash, out val))
-                {
-                    _cachedAssembliesHash = val;
-                    return _cachedAssembliesHash;
-                }
-                //it could not parse for some reason so we'll return 0.
-                return 0;
+
+                long val;
+                if (long.TryParse(hash, out val) == false) return 0;
+
+                _cachedAssembliesHash = val;
+                return _cachedAssembliesHash;
             }
         }
 
         /// <summary>
-        /// Returns the current assemblies hash based on creating a hash from the assemblies in the /bin
+        /// Gets the current assemblies hash based on creating a hash from the assemblies in the /bin folder.
         /// </summary>
-        /// <value> </value>
+        /// <value>The current hash.</value>
         internal long CurrentAssembliesHash
         {
             get
@@ -190,23 +179,23 @@ namespace Umbraco.Core.Plugins
                 _currentAssembliesHash = GetFileHash(
                     new List<Tuple<FileSystemInfo, bool>>
 						{
-							//add the bin folder and everything in it
+							// add the bin folder and everything in it
 							new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)), false),
-							//add the app code folder and everything in it
+							// add the app code folder and everything in it
 							new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
-							//add the global.asax (the app domain also monitors this, if it changes will do a full restart)
+							// add the global.asax (the app domain also monitors this, if it changes will do a full restart)
 							new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
-
-                            //add the trees.config - use the contents to create the has since this gets resaved on every app startup!
+                            // add the trees.config - use the contents to create the has since this gets resaved on every app startup!
                             new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
 						}, _logger
                     );
+
                 return _currentAssembliesHash;
             }
         }
 
         /// <summary>
-        /// Writes the assembly hash file
+        /// Writes the assembly hash file.
         /// </summary>
         private void WriteCachePluginsHash()
         {
@@ -215,38 +204,37 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// Returns a unique hash for the combination of FileInfo objects passed in
+        /// Returns a unique hash for a combination of FileInfo objects.
         /// </summary>
         /// <param name="filesAndFolders">
-        /// A collection of files and whether or not to use their file contents to determine the hash or the file's properties 
+        /// A collection of files and whether or not to use their file contents to determine the hash or the file's properties
         /// (true will make a hash based on it's contents)
         /// </param>
-        /// <returns></returns>
+        /// <param name="logger">A profiling logger.</param>
+        /// <returns>The hash.</returns>
         internal static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
         {
+            var ffA = filesAndFolders.ToArray();
+
             using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
                 var hashCombiner = new HashCodeCombiner();
 
-                //get the file info's to check
-                var fileInfos = filesAndFolders.Where(x => x.Item2 == false).ToArray();
-                var fileContents = filesAndFolders.Except(fileInfos);
-                
-                //add each unique folder/file to the hash
-                foreach (var i in fileInfos.Select(x => x.Item1).DistinctBy(x => x.FullName))
-                {
-                    hashCombiner.AddFileSystemItem(i);
-                }
+                // get the file info's to check
+                var fileInfos = ffA.Where(x => x.Item2 == false).ToArray();
+                var fileContents = ffA.Except(fileInfos);
 
-                //add each unique file's contents to the hash
-                foreach (var i in fileContents.Select(x => x.Item1).DistinctBy(x => x.FullName))
+                // add each unique folder/file to the hash
+                foreach (var i in fileInfos.Select(x => x.Item1).DistinctBy(x => x.FullName))
+                    hashCombiner.AddFileSystemItem(i);
+
+                // add each unique file's contents to the hash
+                foreach (var i in fileContents.Select(x => x.Item1)
+                    .DistinctBy(x => x.FullName)
+                    .Where(x => File.Exists(x.FullName)))
                 {
-                    if (File.Exists(i.FullName))
-                    {
-                        var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
-                        hashCombiner.AddCaseInsensitiveString(content);    
-                    }
-                    
+                    var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+                    hashCombiner.AddCaseInsensitiveString(content);
                 }
 
                 return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
@@ -259,11 +247,10 @@ namespace Umbraco.Core.Plugins
             {
                 var hashCombiner = new HashCodeCombiner();
 
-                //add each unique folder/file to the hash
+                // add each unique folder/file to the hash
                 foreach (var i in filesAndFolders.DistinctBy(x => x.FullName))
-                {
                     hashCombiner.AddFileSystemItem(i);
-                }
+
                 return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
             }
         }
@@ -276,16 +263,12 @@ namespace Umbraco.Core.Plugins
         internal static long ConvertPluginsHashFromHex(string val)
         {
             long outVal;
-            if (Int64.TryParse(val, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out outVal))
-            {
-                return outVal;
-            }
-            return 0;
+            return long.TryParse(val, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out outVal) ? outVal : 0;
         }
 
         /// <summary>
         /// Attempts to resolve the list of plugin + assemblies found in the runtime for the base type 'T' passed in.
-        /// If the cache file doesn't exist, fails to load, is corrupt or the type 'T' element is not found then 
+        /// If the cache file doesn't exist, fails to load, is corrupt or the type 'T' element is not found then
         /// a false attempt is returned.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -293,13 +276,13 @@ namespace Umbraco.Core.Plugins
         internal Attempt<IEnumerable<string>> TryGetCachedPluginsFromFile<T>(TypeResolutionKind resolutionType)
         {
             var filePath = GetPluginListFilePath();
-            if (!File.Exists(filePath))
+            if (File.Exists(filePath) == false)
                 return Attempt<IEnumerable<string>>.Fail();
 
             try
             {
-                //we will load the xml document, if the app context exist, we will load it from the cache (which is only around for 5 minutes)
-                //while the app boots up, this should save some IO time on app startup when the app context is there (which is always unless in unit tests)
+                // we will load the xml document, if the app context exist, we will load it from the cache (which is only around for 5 minutes)
+                // while the app boots up, this should save some IO time on app startup when the app context is there (which is always unless in unit tests)
                 var xml = _runtimeCache.GetCacheItem<XDocument>(CacheKey,
                     () => XDocument.Load(filePath),
                     new TimeSpan(0, 0, 5, 0));
@@ -313,17 +296,17 @@ namespace Umbraco.Core.Plugins
                                      && ((string)x.Attribute("type")) == typeof(T).FullName
                                      && ((string)x.Attribute("resolutionType")) == resolutionType.ToString());
 
-                //return false but specify this exception type so we can detect it
+                // return false but specify this exception type so we can detect it
                 if (typeElement == null)
                     return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFileException());
 
-                //return success
+                // return success
                 return Attempt.Succeed(typeElement.Elements("add")
                         .Select(x => (string)x.Attribute("type")));
             }
             catch (Exception ex)
             {
-                //if the file is corrupted, etc... return false
+                // if the file is corrupted, etc... return false
                 return Attempt<IEnumerable<string>>.Fail(ex);
             }
         }
@@ -345,15 +328,15 @@ namespace Umbraco.Core.Plugins
 
             _runtimeCache.ClearCacheItem(CacheKey);
         }
-        
+
         private string GetPluginListFilePath()
         {
-            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
+            return Path.Combine(_tempFolder, $"umbraco-plugins.{NetworkHelper.FileSafeMachineName}.list");
         }
 
         private string GetPluginHashFilePath()
         {
-            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.hash", NetworkHelper.FileSafeMachineName));
+            return Path.Combine(_tempFolder, $"umbraco-plugins.{NetworkHelper.FileSafeMachineName}.hash");
         }
 
         /// <summary>
@@ -361,30 +344,25 @@ namespace Umbraco.Core.Plugins
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// This method exists purely due to an error in 4.11. We were writing the plugin list file without the 
+        /// This method exists purely due to an error in 4.11. We were writing the plugin list file without the
         /// type resolution kind which will have caused some problems. Now we detect this legacy file and if it is detected
         /// we remove it so it can be recreated properly.
         /// </remarks>
         internal bool DetectLegacyPluginListFile()
         {
             var filePath = GetPluginListFilePath();
-            if (!File.Exists(filePath))
+            if (File.Exists(filePath) == false)
                 return false;
 
             try
             {
                 var xml = XDocument.Load(filePath);
-                if (xml.Root == null)
-                    return false;
 
-                var typeElement = xml.Root.Elements()
+                var typeElement = xml.Root?.Elements()
                     .FirstOrDefault(x => x.Name.LocalName == "baseType");
 
-                if (typeElement == null)
-                    return false;
-
                 //now check if the typeElement is missing the resolutionType attribute
-                return typeElement.Attributes().All(x => x.Name.LocalName != "resolutionType");
+                return typeElement != null && typeElement.Attributes().All(x => x.Name.LocalName != "resolutionType");
             }
             catch (Exception)
             {
@@ -422,17 +400,17 @@ namespace Umbraco.Core.Plugins
             }
             catch
             {
-                //if there's an exception loading then this is somehow corrupt, we'll just replace it.
+                // if there's an exception loading then this is somehow corrupt, we'll just replace it.
                 File.Delete(filePath);
-                //create the document and the root
+                // create the document and the root
                 xml = new XDocument(new XElement("plugins"));
             }
             if (xml.Root == null)
             {
-                //if for some reason there is no root, create it
+                // if for some reason there is no root, create it
                 xml.Add(new XElement("plugins"));
             }
-            //find the type 'T' element to add or update
+            // find the type 'T' element to add or update
             var typeElement = xml.Root.Elements()
                 .SingleOrDefault(x =>
                                  x.Name.LocalName == "baseType"
@@ -441,95 +419,34 @@ namespace Umbraco.Core.Plugins
 
             if (typeElement == null)
             {
-                //create the type element
+                // create the type element
                 typeElement = new XElement("baseType",
                     new XAttribute("type", typeof(T).FullName),
                     new XAttribute("resolutionType", resolutionType.ToString()));
-                //then add it to the root
+                // then add it to the root
                 xml.Root.Add(typeElement);
             }
 
 
-            //now we have the type element, we need to clear any previous types as children and add/update it with new ones
+            // now we have the type element, we need to clear any previous types as children and add/update it with new ones
             typeElement.ReplaceNodes(typesFound.Select(x => new XElement("add", new XAttribute("type", x.AssemblyQualifiedName))));
-            //save the xml file
+            // save the xml file
             xml.Save(filePath);
         }
 
         #endregion
 
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
-        private IEnumerable<Assembly> _assemblies;
-
         /// <summary>
-        /// Returns all found property editors (based on the resolved Iparameter editors - this saves a scan)
-        /// </summary>
-        internal IEnumerable<Type> ResolvePropertyEditors()
-        {
-            //return all proeprty editor types found except for the base property editor type
-            return ResolveTypes<IParameterEditor>()
-                .Where(x => x.IsType<PropertyEditor>())
-                .Except(new[] { typeof(PropertyEditor) });
-        }
-
-        /// <summary>
-        /// Returns all found parameter editors (which includes property editors)
-        /// </summary>
-        internal IEnumerable<Type> ResolveParameterEditors()
-        {
-            //return all paramter editor types found except for the base property editor type
-            return ResolveTypes<IParameterEditor>()
-                .Except(new[] { typeof(ParameterEditor), typeof(PropertyEditor) });
-        } 
-
-        /// <summary>
-        /// Returns all available IApplicationStartupHandler objects
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveApplicationStartupHandlers()
-        {
-            return ResolveTypes<IApplicationEventHandler>();
-        }
-
-        /// <summary>
-        /// Returns all classes of type ICacheRefresher
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveCacheRefreshers()
-        {
-            return ResolveTypes<ICacheRefresher>();
-        }      
-
-        /// <summary>
-        /// Returns all available IPackageAction in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePackageActions()
-        {
-            return ResolveTypes<IPackageAction>();
-        }
-
-        
-
-        /// <summary>
-        /// Returns all mapper types that have a MapperFor attribute defined
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveAssignedMapperTypes()
-        {
-            return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
-        }               
-
-        /// <summary>
-        /// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
+        /// Gets or sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
         /// this will search all assemblies known to have plugins and exclude ones known to not have them.
         /// </summary>
         internal IEnumerable<Assembly> AssembliesToScan
         {
             get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
             set { _assemblies = value; }
-        }     
+        }
+
+        #region Resolve Types
 
         private IEnumerable<Type> ResolveTypes<T>(
             Func<IEnumerable<Type>> finder,
@@ -542,7 +459,7 @@ namespace Umbraco.Core.Plugins
 
                 using (_logger.DebugDuration<PluginManager>(
                     $"Starting resolution types of {typeof(T).FullName}",
-                    $"Completed resolution of types of {typeof(T).FullName}, found {typesFound.Count}",
+                    $"Completed resolution of types of {typeof(T).FullName}", // cannot contain typesFound.Count as it's evaluated before the find!
                     50))
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
@@ -553,7 +470,7 @@ namespace Umbraco.Core.Plugins
                     {
                         _logger.Logger.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
                     }
-                    
+
                     //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
                     if (cacheResult == false || typeList == null)
                     {
@@ -571,7 +488,7 @@ namespace Umbraco.Core.Plugins
                             //here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
                             //in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
                             //so in this instance there will never be a result.
-                            if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFileException)
+                            if (fileCacheResult.Exception is CachedPluginNotFoundInFileException)
                             {
                                 _logger.Logger.Debug<PluginManager>("Tried to find typelist for type {0} and resolution {1} in file cache but the type was not found so loading types by assembly scan ", () => typeof(T), () => resolutionType);
 
@@ -595,7 +512,7 @@ namespace Umbraco.Core.Plugins
                                         }
                                         catch (Exception ex)
                                         {
-                                            //if there are any exceptions loading types, we have to exist, this should never happen so 
+                                            //if there are any exceptions loading types, we have to exist, this should never happen so
                                             //we will need to revert to scanning for types.
                                             successfullyLoadedFromCache = false;
                                             _logger.Logger.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
@@ -640,31 +557,27 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// This method invokes the finder which scans the assemblies for the types and then loads the result into the type finder.
-        /// Once the results are loaded, we update the cached type xml file
+        /// Invokes the finder which scans the assemblies for the types and then loads the result into the type finder,
+        /// then updates the cached type xml file.
         /// </summary>
         /// <param name="typeList"></param>
         /// <param name="resolutionKind"> </param>
         /// <param name="finder"></param>
-        /// <remarks>
-        /// THIS METHODS IS NOT THREAD SAFE
-        /// </remarks>
+        /// <remarks>This method is not thread safe.</remarks>
         private void LoadViaScanningAndUpdateCacheFile<T>(TypeList typeList, TypeResolutionKind resolutionKind, Func<IEnumerable<Type>> finder)
         {
-            //we don't have a cache for this so proceed to look them up by scanning
+            // we don't have a cache for this so proceed to look them up by scanning
             foreach (var t in finder())
-            {
                 typeList.AddType(t);
-            }
+
             UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
         }
 
-        #region Public Methods
         /// <summary>
-        /// Generic method to find the specified type and cache the result
+        /// Resolves specified types.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type to find.</typeparam>
+        /// <returns>The types.</returns>
         public IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
             return ResolveTypes<T>(
@@ -674,11 +587,11 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// Generic method to find the specified type that has an attribute and cache the result
+        /// Resolves specified, attributed types.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TAttribute"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The type to find.</typeparam>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <returns>The corresponding types.</returns>
         public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
@@ -689,10 +602,10 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// Generic method to find any type that has the specified attribute
+        /// Resolves attributed types.
         /// </summary>
-        /// <typeparam name="TAttribute"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
+        /// <returns>The corresopnding types.</returns>
         public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
@@ -700,21 +613,21 @@ namespace Umbraco.Core.Plugins
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
-        } 
+        }
+
         #endregion
 
+        #region Private
+
         /// <summary>
-        /// Used for unit tests
+        /// Gets the list of types.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list of types.</returns>
+        /// <remarks>For unit tests only.</remarks>
         internal HashSet<TypeList> GetTypeLists()
         {
             return _types;
         }
-
-
-
-        #region Private classes/Enums
 
         /// <summary>
         /// The type of resolution being invoked
@@ -746,7 +659,7 @@ namespace Umbraco.Core.Plugins
 
             public override void AddType(Type t)
             {
-                //if the type is an attribute type we won't do the type check because typeof<T> is going to be the 
+                //if the type is an attribute type we won't do the type check because typeof<T> is going to be the
                 //attribute type whereas the 't' type is the object type found with the attribute.
                 if (_resolutionType == TypeResolutionKind.FindAttributedTypes || t.IsType<T>())
                 {
@@ -772,14 +685,68 @@ namespace Umbraco.Core.Plugins
         }
 
         /// <summary>
-        /// This class is used simply to determine that a plugin was not found in the cache plugin list with the specified
+        /// Represents the error that occurs when a plugin was not found in the cache plugin list with the specified
         /// TypeResolutionKind.
         /// </summary>
         internal class CachedPluginNotFoundInFileException : Exception
-        {
-
-        }
+        { }
 
         #endregion
+    }
+
+    internal static class PluginManagerExtensions
+    {
+        /// <summary>
+        /// Resolves property editors (based on the resolved Iparameter editors - this saves a scan).
+        /// </summary>
+        public static IEnumerable<Type> ResolvePropertyEditors(this PluginManager mgr)
+        {
+            //return all proeprty editor types found except for the base property editor type
+            return mgr.ResolveTypes<IParameterEditor>()
+                .Where(x => x.IsType<PropertyEditor>())
+                .Except(new[] { typeof(PropertyEditor) });
+        }
+
+        /// <summary>
+        /// Resolves parameter editors (which includes property editors)
+        /// </summary>
+        internal static IEnumerable<Type> ResolveParameterEditors(this PluginManager mgr)
+        {
+            //return all paramter editor types found except for the base property editor type
+            return mgr.ResolveTypes<IParameterEditor>()
+                .Except(new[] { typeof(ParameterEditor), typeof(PropertyEditor) });
+        }
+
+        /// <summary>
+        /// Resolves IApplicationStartupHandler objects.
+        /// </summary>
+        internal static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IApplicationEventHandler>();
+        }
+
+        /// <summary>
+        /// Resolves ICacheRefresher objects.
+        /// </summary>
+        internal static IEnumerable<Type> ResolveCacheRefreshers(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<ICacheRefresher>();
+        }
+
+        /// <summary>
+        /// Resolves IPackageAction objects.
+        /// </summary>
+        internal static IEnumerable<Type> ResolvePackageActions(this PluginManager mgr)
+        {
+            return mgr.ResolveTypes<IPackageAction>();
+        }
+
+        /// <summary>
+        /// Resolves mapper types that have a MapperFor attribute defined.
+        /// </summary>
+        internal static IEnumerable<Type> ResolveAssignedMapperTypes(this PluginManager mgr)
+        {
+            return mgr.ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
+        }
     }
 }

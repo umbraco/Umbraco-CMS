@@ -3,8 +3,8 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Tests.Resolvers

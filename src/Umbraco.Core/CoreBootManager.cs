@@ -98,7 +98,7 @@ namespace Umbraco.Core
             //create the plugin manager
             //TODO: this is currently a singleton but it would be better if it weren't. Unfortunately the only way to get
             // rid of this singleton would be to put it into IoC and then use the ServiceLocator pattern.
-            PluginManager.Current = PluginManager = new PluginManager(ServiceProvider, ApplicationCache.RuntimeCache, ProfilingLogger, true);
+            PluginManager.Current = PluginManager = new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger, true);
 
             //build up core IoC servoces
             ConfigureCoreServices(Container);

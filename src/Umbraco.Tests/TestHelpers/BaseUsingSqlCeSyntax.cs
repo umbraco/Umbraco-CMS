@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             
-            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
+            PluginManager.Current = new PluginManager(new NullCacheProvider(), 
                 logger,
                 false);
 
