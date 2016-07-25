@@ -87,6 +87,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
+                    .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
