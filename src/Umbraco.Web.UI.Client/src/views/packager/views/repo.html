@@ -312,7 +312,7 @@
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                                 <label for="license-accept" class="umb-package-installer-label">
                                     <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
-                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}">terms of use</a></strong>
+                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">terms of use</a></strong>
                                 </label>
                                 <button type="button"
                                         ng-if="vm.installState.type !== 'error'"
