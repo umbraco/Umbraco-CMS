@@ -43,8 +43,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <returns></returns>
         public SemVersion DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
         {
-            var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
-            var mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
+            SemVersion mostrecent = null;
+
+            if (ValidTables.Any(x => x.InvariantEquals("umbracoMigrations")))
+            {
+                var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
+                 mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
+            }
 
             return mostrecent ?? new SemVersion(new Version(0, 0, 0));
         }
