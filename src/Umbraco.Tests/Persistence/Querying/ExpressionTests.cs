@@ -117,5 +117,19 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual("mydomain\\myuser%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
 
+        [Test]
+        public void Sql_Replace_Mapped()
+        {
+            Expression<Func<IUser, bool>> predicate = user => user.Username.Replace("@world", "@test") == "hello@test.com";
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("replace([umbracoUser].[userLogin], @0, @1", result);
+            Assert.AreEqual("@world", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+            Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+        }
+
     }
 }
