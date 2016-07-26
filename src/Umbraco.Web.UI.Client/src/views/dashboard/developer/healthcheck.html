@@ -83,7 +83,7 @@
                                 <div ng-if="status.description" ng-bind-html="status.description"></div>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-actions">
+                            <div class="umb-healthcheck-group__details-status-actions" ng-if="status.actions">
                                 <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
                                     <span ng-show="action.valueRequired">
                                         Set new value:
