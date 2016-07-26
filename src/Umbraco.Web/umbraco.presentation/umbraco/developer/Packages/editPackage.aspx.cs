@@ -114,16 +114,18 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Stylesheets */
-                    StyleSheet[] sheets = StyleSheet.GetAll();
-                    foreach (StyleSheet st in sheets)
+                    var sheets = Services.FileService.GetStylesheets();
+                    foreach (var st in sheets)
                     {
-                        ListItem li = new ListItem(st.Text, st.Id.ToString());
-                        if (pack.Stylesheets.Contains(st.Id.ToString()))
-                            li.Selected = true;
-
-                        stylesheets.Items.Add(li);
-
+                        if (string.IsNullOrEmpty(st.Name) == false)
+                        {
+                            var li = new ListItem(st.Alias, st.Name);
+                            if (pack.Stylesheets.Contains(st.Name))
+                                li.Selected = true;
+                            stylesheets.Items.Add(li);
+                        }
                     }
+
                     /* MACROS */
                     Macro[] umbMacros = Macro.GetAll();
                     foreach (Macro m in umbMacros)
