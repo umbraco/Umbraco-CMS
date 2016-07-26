@@ -126,9 +126,10 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
 
-            Assert.AreEqual("replace([umbracoUser].[userLogin], @0, @1", result);
-            Assert.AreEqual("@world", modelToSqlExpressionHelper.GetSqlParameters()[0]);
-            Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+            Assert.AreEqual("(replace([umbracoUser].[userLogin], @1, @2) = @0)", result);
+            Assert.AreEqual("hello@test.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+            Assert.AreEqual("@world", modelToSqlExpressionHelper.GetSqlParameters()[1]);
+            Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[2]);
         }
 
     }
