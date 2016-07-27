@@ -23,7 +23,7 @@
                         <umb-load-indicator></umb-load-indicator>
                     </div>
 
-                    <div class="umb-healthcheck-messages" ng-if="!group.loading && group.totalSuccess > 0 || group.totalWarning > 0 || group.totalError > 0 || group.totalInfo > 0">
+                    <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                         <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
                             <i class="icon-check color-green"></i>
