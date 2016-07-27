@@ -16,6 +16,7 @@
 
 		vm.getStatus = getStatus;
 		vm.executeAction = executeAction;
+        vm.checkAllGroups = checkAllGroups;
 		vm.checkAllInGroup = checkAllInGroup;
         vm.openGroup = openGroup;
         vm.setViewState = setViewState;
@@ -23,16 +24,7 @@
 		// Get a (grouped) list of all health checks
 		healthCheckResource.getAllChecks().then(
 			function(response) {
-
-                // set number of checks which has been executed
-                for (var i = 0; i < response.length; i++) {
-                    var group = response[i];
-                    group.checkCounter = 0;
-                    checkAllInGroup(group, group.checks);
-                }
-
 				vm.groups = response;
-
 			}
 		);
 
@@ -85,6 +77,16 @@
                 check.status[index] = response;
 			});
 		}
+
+        function checkAllGroups(groups) {
+            // set number of checks which has been executed
+            for (var i = 0; i < groups.length; i++) {
+                var group = groups[i];
+                console.log(group);
+                checkAllInGroup(group, group.checks);
+            }
+            vm.groups = groups;
+        }
 
 		function checkAllInGroup(group, checks) {
 
