@@ -92,36 +92,38 @@ namespace umbraco.cms.businesslogic.packager {
             return template;
         }
 
-
         /// <summary>
         /// Converts a umbraco stylesheet to a package xml node
         /// </summary>
-        /// <param name="ssId">The ss id.</param>
-        /// <param name="incluceProperties">if set to <c>true</c> [incluce properties].</param>
+        /// <param name="name">The name of the stylesheet.</param>
+        /// <param name="includeProperties">if set to <c>true</c> [incluce properties].</param>
         /// <param name="doc">The doc.</param>
         /// <returns></returns>
-        public static XmlNode Stylesheet(int ssId, bool incluceProperties, XmlDocument doc) {
-
-            StyleSheet sts = new StyleSheet(ssId);
-            XmlNode stylesheet = doc.CreateElement("Stylesheet");
-            stylesheet.AppendChild(_node("Name", sts.Text, doc));
-            stylesheet.AppendChild(_node("FileName", sts.Filename, doc));
+        public static XmlNode Stylesheet(string name, bool includeProperties, XmlDocument doc)
+        {
+            if (ApplicationContext.Current == null)
+                throw new NullReferenceException("ApplicationContext is null");
+            var fileService = ApplicationContext.Current.Services.FileService;
+            
+            var sts = fileService.GetStylesheetByName(name);
+            var stylesheet = doc.CreateElement("Stylesheet");
+            stylesheet.AppendChild(_node("Name", sts.Alias, doc));
+            stylesheet.AppendChild(_node("FileName", sts.Name, doc));
             stylesheet.AppendChild(_node("Content", "<![CDATA[" + sts.Content + "]]>", doc));
-            if (incluceProperties) {
-                XmlNode properties = doc.CreateElement("Properties");
-                foreach (StylesheetProperty ssP in sts.Properties) {
-                    XmlNode property = doc.CreateElement("Property");
-                    property.AppendChild(_node("Name", ssP.Text, doc));
+            if (includeProperties)
+            {
+                var properties = doc.CreateElement("Properties");
+                foreach (var ssP in sts.Properties)
+                {
+                    var property = doc.CreateElement("Property");
+                    property.AppendChild(_node("Name", ssP.Name, doc));
                     property.AppendChild(_node("Alias", ssP.Alias, doc));
-                    property.AppendChild(_node("Value", ssP.value, doc));
-
-                    //xnode += "<Property><Name>" + ssP.Text + "</Name><Alias>" + ssP.Alias + "</Alias><Value>" + ssP.value + "</Value></Property>\n";
+                    property.AppendChild(_node("Value", ssP.Value, doc));
                 }
                 stylesheet.AppendChild(properties);
             }
             return stylesheet;
         }
-
 
         /// <summary>
         /// Converts a macro to a package xml node

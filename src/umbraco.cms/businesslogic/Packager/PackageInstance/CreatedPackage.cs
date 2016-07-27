@@ -246,13 +246,10 @@ namespace umbraco.cms.businesslogic.packager
 
                 //Stylesheets
                 var stylesheets = _packageManifest.CreateElement("Stylesheets");
-                foreach (var ssId in pack.Stylesheets)
+                foreach (var stylesheetName in pack.Stylesheets)
                 {
-                    if (int.TryParse(ssId, out outInt))
-                    {
-                        var s = new StyleSheet(outInt);
-                        stylesheets.AppendChild(s.ToXml(_packageManifest));
-                    }
+                    var stylesheetXmlNode = utill.Stylesheet(stylesheetName, true, _packageManifest);
+                    stylesheets.AppendChild(stylesheetXmlNode);
                 }
                 AppendElement(stylesheets);
 
