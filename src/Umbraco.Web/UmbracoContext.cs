@@ -369,6 +369,7 @@ namespace Umbraco.Web
             Security.DisposeIfDisposable();
 
             // reset - important when running outside of http context
+            // also takes care of the accessor
             Web.Current.SetUmbracoContext(null, true);
 
             // help caches release resources

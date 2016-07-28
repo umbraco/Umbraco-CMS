@@ -1,28 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
 using Examine;
-using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Faceting;
 using Examine.LuceneEngine.Indexing;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
-using Umbraco.Core.Xml;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
@@ -57,19 +51,19 @@ namespace UmbracoExamine
         }
 
         public UmbracoContentIndexer(
-            IEnumerable<FieldDefinition> fieldDefinitions, 
-            Directory luceneDirectory, 
+            IEnumerable<FieldDefinition> fieldDefinitions,
+            Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
-            IContentService contentService, 
-            IMediaService mediaService, 
-            IUserService userService, 
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
+            IContentService contentService,
+            IMediaService mediaService,
+            IUserService userService,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
             IQueryFactory queryFactory,
-            FacetConfiguration facetConfiguration = null, 
-            IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null) 
+            FacetConfiguration facetConfiguration = null,
+            IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
@@ -84,7 +78,7 @@ namespace UmbracoExamine
             SupportUnpublishedContent = options.SupportUnpublishedContent;
             ParentId = options.ParentId;
             //backward compat hack:
-            IndexerData = new IndexCriteria(Enumerable.Empty<IIndexField>(), Enumerable.Empty<IIndexField>(), Enumerable.Empty<string>(), Enumerable.Empty<string>(), 
+            IndexerData = new IndexCriteria(Enumerable.Empty<IIndexField>(), Enumerable.Empty<IIndexField>(), Enumerable.Empty<string>(), Enumerable.Empty<string>(),
                 //hack to set the parent Id for backwards compat, when using this ctor the IndexerData will (should) always be null
                 options.ParentId);
 
@@ -94,10 +88,10 @@ namespace UmbracoExamine
             _urlSegmentProviders = urlSegmentProviders;
             _queryFactory = queryFactory;
         }
-    
+
 
         #endregion
-        
+
         #region Initialize
 
         /// <summary>
@@ -117,7 +111,7 @@ namespace UmbracoExamine
         /// <exception cref="T:System.InvalidOperationException">
         /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
         /// </exception>
-        
+
         public override void Initialize(string name, NameValueCollection config)
         {
 
@@ -174,16 +168,16 @@ namespace UmbracoExamine
 
         #endregion
 
-     
+
         #region Public methods
 
-       
+
 
         /// <summary>
-        /// Deletes a node from the index.                
+        /// Deletes a node from the index.
         /// </summary>
         /// <remarks>
-        /// When a content node is deleted, we also need to delete it's children from the index so we need to perform a 
+        /// When a content node is deleted, we also need to delete it's children from the index so we need to perform a
         /// custom Lucene search to find all decendents and create Delete item queues for them too.
         /// </remarks>
         /// <param name="nodeId">ID of the node to delete</param>
@@ -266,7 +260,7 @@ namespace UmbracoExamine
 
                     } while (content.Length == pageSize);
 
-                    
+
                     break;
                 case IndexTypes.Media:
 
@@ -276,7 +270,7 @@ namespace UmbracoExamine
                         mediaParentId = ParentId.Value;
                     }
                     IMedia[] media;
-                    
+
                     do
                     {
                         long total;
@@ -294,7 +288,7 @@ namespace UmbracoExamine
                         }
 
                         IndexItems(GetValueSets(media));
-                        
+
                         pageIndex++;
                     } while (media.Length == pageSize);
 
@@ -324,7 +318,7 @@ namespace UmbracoExamine
                     {"path", new object[] {c.Path}},
                     {"nodeType", new object[] {c.ContentType.Id}},
                     {"creatorName", new object[] {c.GetCreatorProfile(UserService).Name}},
-                    {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},        
+                    {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},
                     {"writerID", new object[] {c.WriterId}},
                     {"version", new object[] {c.Version}},
                     {"template", new object[] {c.Template == null ? 0 : c.Template.Id}}

@@ -207,7 +207,7 @@
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="CoreBootManager.cs" />
-    <Compile Include="Current.cs" />
+    <Compile Include="DependencyInjection\Current.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />

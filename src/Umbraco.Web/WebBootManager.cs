@@ -322,9 +322,6 @@ namespace Umbraco.Web
         {
             base.ConfigureCoreServices(container);
 
-            // configure the temp. Current
-            Current.Container = container;
-
             // register model mappers
             container.RegisterFrom<WebModelMappersCompositionRoot>();
 

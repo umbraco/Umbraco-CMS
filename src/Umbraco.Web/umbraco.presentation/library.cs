@@ -15,24 +15,17 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Web;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Templates;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.DataLayer;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Language = umbraco.cms.businesslogic.language.Language;
-using Media = umbraco.cms.businesslogic.media.Media;
 using Member = umbraco.cms.businesslogic.member.Member;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
@@ -363,7 +356,7 @@ namespace umbraco
                 ApplicationContext.Current.Services.MediaService,
                 ApplicationContext.Current.Services.DataTypeService,
                 ApplicationContext.Current.Services.UserService,
-                Umbraco.Core.Current.UrlSegmentProviders,
+                Current.UrlSegmentProviders,
                 media,
                 deep);
             return Tuple.Create(serialized, media.Path);
@@ -1263,7 +1256,7 @@ namespace umbraco
             }
             else
             {
-                var facade = Umbraco.Web.Current.Facade
+                var facade = Current.Facade
                     ?? FacadeServiceResolver.Current.Service.CreateFacade(null);
                 contentCache = facade.ContentCache as PublishedContentCache;
             }
@@ -1678,7 +1671,7 @@ namespace umbraco
                             ApplicationContext.Current.Services.ContentService,
                             ApplicationContext.Current.Services.DataTypeService,
                             ApplicationContext.Current.Services.UserService,
-                            Umbraco.Core.Current.UrlSegmentProviders, parent).GetXmlNode(xd);
+                            Current.UrlSegmentProviders, parent).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }
@@ -1691,7 +1684,7 @@ namespace umbraco
                             ApplicationContext.Current.Services.ContentService,
                             ApplicationContext.Current.Services.DataTypeService,
                             ApplicationContext.Current.Services.UserService,
-                            Umbraco.Core.Current.UrlSegmentProviders, child).GetXmlNode(xd);
+                            Current.UrlSegmentProviders, child).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }

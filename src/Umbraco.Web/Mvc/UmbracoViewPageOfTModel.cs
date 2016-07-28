@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -26,11 +25,11 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the current <see cref="UmbracoContext"/>.
         /// </summary>
-        // always try to return the context from the data tokens just in case its a custom context and not 
+        // always try to return the context from the data tokens just in case its a custom context and not
         // using the Current.UmbracoContext. Fallback to that singleton if necessary, the only reason this
         // should ever happen is is someone is rendering a page that inherits from this class and are rendering
         // it outside of the normal Umbraco routing process. Very unlikely.
-        public UmbracoContext UmbracoContext => _umbracoContext ?? 
+        public UmbracoContext UmbracoContext => _umbracoContext ??
             (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace Umbraco.Web.Mvc
             {
                 const string token = Core.Constants.Web.PublishedDocumentRequestDataToken;
 
-                // we should always try to return the object from the data tokens just in case its a custom object and not 
+                // we should always try to return the object from the data tokens just in case its a custom object and not
                 // the one from UmbracoContext. Fallback to UmbracoContext if necessary.
 
                 // try view context
@@ -101,8 +100,8 @@ namespace Umbraco.Web.Mvc
 
             if (ViewContext.IsChildAction) return;
 
-            // this is used purely for partial view macros that contain forms and mostly 
-            // just when rendered within the RTE - this should already be set with the 
+            // this is used purely for partial view macros that contain forms and mostly
+            // just when rendered within the RTE - this should already be set with the
             // EnsurePartialViewMacroViewContextFilterAttribute
             if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
                 ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
@@ -221,7 +220,7 @@ namespace Umbraco.Web.Mvc
         {
             return WebViewPageExtensions.RenderSection(this, name, defaultContents);
         }
-        
+
         public HelperResult RenderSection(string name, IHtmlString defaultContents)
         {
             return WebViewPageExtensions.RenderSection(this, name, defaultContents);

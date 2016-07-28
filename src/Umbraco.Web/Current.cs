@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using LightInject;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
+using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Web
 {
     // must remain internal - this class is here to support the transition from singletons
     // and resolvers to injection - by providing a static access to singleton services - it
     // is initialized once with a service container, in WebBootManager.
-    internal static class Current
+    public static class Current
     {
         private static readonly object Locker = new object();
-
-        public static IServiceContainer Container { get; set; } // ok to set - don't be stupid
 
         private static IUmbracoContextAccessor _umbracoContextAccessor;
         private static IFacadeAccessor _facadeAccessor;
@@ -28,8 +26,7 @@ namespace Umbraco.Web
             get
             {
                 if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
-                if (Container == null) throw new Exception("oops:container");
-                return (_umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>());
+                return (_umbracoContextAccessor = CoreCurrent.Container.GetInstance<IUmbracoContextAccessor>());
             }
             set { _umbracoContextAccessor = value; } // for tests
         }
@@ -39,13 +36,13 @@ namespace Umbraco.Web
             get
             {
                 if (_facadeAccessor != null) return _facadeAccessor;
-                if (Container == null) throw new Exception("oops:container");
-                return (_facadeAccessor = Container.GetInstance<IFacadeAccessor>());
+                return (_facadeAccessor = CoreCurrent.Container.GetInstance<IFacadeAccessor>());
             }
             set { _facadeAccessor = value; } // for tests
         }
 
-        public static UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public static UmbracoContext UmbracoContext 
+            => UmbracoContextAccessor.UmbracoContext;
 
         // have to support set for now, because of 'ensure umbraco context' which can create
         // contexts pretty much at any time and in an uncontrolled way - and when we do not have
@@ -72,9 +69,21 @@ namespace Umbraco.Web
         }
 
         // cannot set - it's set by whatever creates the facade, which should have the accessor injected
-        public static IFacade Facade => FacadeAccessor.Facade;
+        public static IFacade Facade 
+            => FacadeAccessor.Facade;
 
         // cannot set - this is temp
-        public static EventMessages EventMessages => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
+        public static EventMessages EventMessages 
+            => CoreCurrent.Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
+
+        #region Core
+
+        // just repeating Core for convenience
+
+        public static IEnumerable<IUrlSegmentProvider> UrlSegmentProviders
+            => CoreCurrent.Container.GetInstance<UrlSegmentProviderCollection>();
+
+
+        #endregion
     }
 }

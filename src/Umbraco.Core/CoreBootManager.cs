@@ -115,7 +115,7 @@ namespace Umbraco.Core
             // completed at the end of the boot process to allow garbage collection
             _appStartupEvtContainer = Container.Clone();
             _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterBuilderCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());            
+            _appStartupEvtContainer.RegisterBuilderCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
 
             //build up standard IoC services
             ConfigureApplicationServices(Container);
@@ -155,7 +155,7 @@ namespace Umbraco.Core
         internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
             // configure the temp. Current
-            Current.Container = container;
+            Current.CurrentContainer = container;
 
             container.Register<IServiceContainer>(factory => container);
 
@@ -204,14 +204,14 @@ namespace Umbraco.Core
         protected virtual CacheHelper CreateApplicationCache()
         {
             var cacheHelper = new CacheHelper(
-                //we need to have the dep clone runtime cache provider to ensure 
+                //we need to have the dep clone runtime cache provider to ensure
                 //all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
                 new NullCacheProvider(),
                 new IsolatedRuntimeCache(type =>
-                    //we need to have the dep clone runtime cache provider to ensure 
+                    //we need to have the dep clone runtime cache provider to ensure
                     //all entities are cached properly (cloned in and cloned out)
                     new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
@@ -220,7 +220,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// This method initializes all of the model mappers registered in the container
-        /// </summary>        
+        /// </summary>
         protected void InitializeModelMappers()
         {
             Mapper.Initialize(configuration =>
@@ -323,7 +323,7 @@ namespace Umbraco.Core
                 {
                     using (ProfilingLogger.DebugDuration<CoreBootManager>(
                         $"Executing {x.GetType()} in ApplicationStarted",
-                        $"Executed {x.GetType()} in ApplicationStarted", 
+                        $"Executed {x.GetType()} in ApplicationStarted",
                         //only log if more than 150ms
                         150))
                     {
@@ -340,8 +340,8 @@ namespace Umbraco.Core
             //end the current scope which was created to intantiate all of the startup handlers,
             //this will dispose them if they're IDisposable
             _appStartupEvtContainer.EndCurrentScope();
-            //NOTE: DO NOT Dispose this cloned container since it will also dispose of any instances 
-            // resolved from the parent container    
+            //NOTE: DO NOT Dispose this cloned container since it will also dispose of any instances
+            // resolved from the parent container
             _appStartupEvtContainer = null;
 
             if (afterComplete != null)
@@ -457,11 +457,11 @@ namespace Umbraco.Core
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
                 Container, ProfilingLogger.Logger,
                 () => PluginManager.ResolveCacheRefreshers());
-                        
+
             PackageActionsResolver.Current = new PackageActionsResolver(
                 ServiceProvider, ProfilingLogger.Logger,
                 () => PluginManager.ResolvePackageActions());
-            
+
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 Container, ProfilingLogger.Logger,
@@ -483,6 +483,6 @@ namespace Umbraco.Core
             // by default, no factory is activated
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
         }
-        
+
     }
 }
