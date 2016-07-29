@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.Actions;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 
@@ -21,7 +22,7 @@ namespace umbraco.controls.Tree
 					});
             
 			List<IAction> allActions = new List<IAction>();
-			foreach (var a in ActionsResolver.Current.Actions)
+			foreach (var a in Current.Actions)
 			{
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try

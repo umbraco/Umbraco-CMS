@@ -17,12 +17,6 @@ namespace Umbraco.Tests.Resolvers
     [TestFixture]
     public class XsltExtensionsResolverTests : ResolverBaseTest
     {
-        [TearDown]
-        public void TearDown()
-        {
-            ActionsResolver.Reset();
-        }
-
         // NOTE
         // ManyResolverTests ensure that we'll get our actions back and ActionsResolver works,
         // so all we're testing here is that plugin manager _does_ find our actions

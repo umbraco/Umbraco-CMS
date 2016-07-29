@@ -43,7 +43,7 @@ namespace umbraco.dialogs
 
             node = Services.EntityService.Get(int.Parse(Request.GetItemAsString("id")));
 
-            var actionList = ActionsResolver.Current.Actions;
+            var actionList = Current.Actions;
             
             foreach (var a in actionList)
             {

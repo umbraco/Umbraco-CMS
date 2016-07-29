@@ -8,11 +8,6 @@ namespace Umbraco.Web._Legacy.Actions
 	/// </summary>
 	public class ActionAudit : IAction
 	{
-		//create singleton
-#pragma warning disable 612,618
-		private static readonly ActionAudit m_instance = new ActionAudit();
-#pragma warning restore 612,618
-
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
 		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
@@ -21,10 +16,7 @@ namespace Umbraco.Web._Legacy.Actions
 		[Obsolete("Use the singleton instantiation instead of a constructor")]
 		public ActionAudit() { }
 
-		public static ActionAudit Instance
-		{
-			get { return m_instance; }
-		}
+	    public static ActionAudit Instance { get; } = new ActionAudit();
 
 		#region IAction Members
 

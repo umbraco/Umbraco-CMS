@@ -8,9 +8,6 @@ namespace Umbraco.Web._Legacy.Actions
 	/// </summary>
 	public class ActionNew : IAction
 	{
-		//create singleton
-		private static readonly ActionNew InnerInstance = new ActionNew();
-
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
 		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
@@ -19,10 +16,7 @@ namespace Umbraco.Web._Legacy.Actions
 		[Obsolete("Use the singleton instantiation instead of a constructor")]
 		public ActionNew() { }
 
-		public static ActionNew Instance
-		{
-			get { return InnerInstance; }
-		}
+	    public static ActionNew Instance { get; } = new ActionNew();
 
 		#region IAction Members
 

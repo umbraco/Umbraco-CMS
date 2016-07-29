@@ -4,6 +4,7 @@ using System.Web.Script.Serialization;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.controls.Tree
@@ -67,7 +68,7 @@ namespace umbraco.controls.Tree
 			get
 			{
 				List<Type> types = new List<Type>();
-				foreach (var a in ActionsResolver.Current.Actions)
+				foreach (var a in Current.Actions)
 				{
 					types.Add(a.GetType());
 				}

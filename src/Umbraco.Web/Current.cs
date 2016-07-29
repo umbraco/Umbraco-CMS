@@ -6,6 +6,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web._Legacy.Actions;
 using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Web
@@ -117,6 +118,12 @@ namespace Umbraco.Web
 
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
             => Container.GetInstance<HealthCheckCollectionBuilder>();
+
+        public static ActionCollectionBuilder ActionCollectionBuilder
+            => Container.GetInstance<ActionCollectionBuilder>();
+
+        public static ActionCollection Actions
+            => Container.GetInstance<ActionCollection>();
 
         #endregion
 

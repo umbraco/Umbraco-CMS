@@ -48,7 +48,7 @@ namespace umbraco.dialogs
             corner.Style.Add("border", "none");
             names.Cells.Add(corner);
             
-            foreach (var a in ActionsResolver.Current.Actions)
+            foreach (var a in Current.Actions)
             {
                 if (a.CanBePermissionAssigned == false) continue;
 
@@ -77,7 +77,7 @@ namespace umbraco.dialogs
                     hc.Style.Add("border", "none");
                     names.Cells.Add(hc);
 
-                    foreach (var a in ActionsResolver.Current.Actions)
+                    foreach (var a in Current.Actions)
                     {
                         var chk = new CheckBox
                             {

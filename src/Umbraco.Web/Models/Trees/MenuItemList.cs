@@ -122,7 +122,7 @@ namespace Umbraco.Web.Models.Trees
         internal MenuItem CreateMenuItem<T>(string name, bool hasSeparator = false, IDictionary<string, object> additionalData = null)
             where T : IAction
         {
-            var item = ActionsResolver.Current.GetAction<T>();
+            var item = Current.Actions.GetAction<T>();
             if (item != null)
             {
                 var menuItem = new MenuItem(item, name)

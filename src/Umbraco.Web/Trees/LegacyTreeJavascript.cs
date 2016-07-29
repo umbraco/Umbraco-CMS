@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
         public static string GetLegacyIActionJavascript()
         {
             var js = new StringBuilder();
-            foreach (var a in ActionsResolver.Current.Actions.ToList())
+            foreach (var a in Current.Actions)
             {
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try

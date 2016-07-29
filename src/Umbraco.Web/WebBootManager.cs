@@ -476,9 +476,8 @@ namespace Umbraco.Web
                     }));
             }
 
-            ActionsResolver.Current = new ActionsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolveActions());
+            ActionCollectionBuilder.Register(Container)
+                .SetProducer(() => PluginManager.ResolveActions());
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 ServiceProvider, ProfilingLogger.Logger,

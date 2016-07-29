@@ -19,8 +19,8 @@ namespace Umbraco.Web._Legacy.Actions
     ///
     /// The Action class itself has responsibility for registering actions and actionhandlers,
     /// and contains methods which will be invoked whenever a change is made to ex. a document, media or member
-    /// 
-    /// An action/actionhandler will automatically be registered, using reflection 
+    ///
+    /// An action/actionhandler will automatically be registered, using reflection
     /// which is enabling thirdparty developers to extend the core functionality of
     /// umbraco without changing the codebase.
     /// </summary>
@@ -47,20 +47,8 @@ namespace Umbraco.Web._Legacy.Actions
         {
             lock (Lock)
             {
-                // NOTE use the DirtyBackdoor to change the resolution configuration EXCLUSIVELY
-                // ie do NOT do ANYTHING else while holding the backdoor, because while it is open
-                // the whole resolution system is locked => nothing can work properly => deadlocks
-
-                var newResolver = new ActionsResolver(
-                    new ActivatorServiceProvider(), LoggerResolver.Current.Logger,
-                        () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
-
-                using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
-                {
-                    ActionsResolver.Reset(false); // and do NOT reset the whole resolution!
-                    ActionsResolver.Current = newResolver;
-                }
-
+                // this will reset the collection
+                Current.ActionCollectionBuilder.SetProducer(() => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
             }
         }
 
@@ -81,7 +69,7 @@ namespace Umbraco.Web._Legacy.Actions
         /// <returns></returns>
         public static List<string> GetJavaScriptFileReferences()
         {
-            return ActionsResolver.Current.Actions
+            return Current.Actions
                 .Where(x => !string.IsNullOrWhiteSpace(x.JsSource))
                 .Select(x => x.JsSource).ToList();
             //return ActionJsReference;
@@ -90,7 +78,7 @@ namespace Umbraco.Web._Legacy.Actions
         /// <summary>
         /// Javascript menuitems - tree contextmenu
         /// Umbraco console
-        /// 
+        ///
         /// Suggestion: this method should be moved to the presentation layer.
         /// </summary>
         /// <param name="language"></param>
@@ -101,7 +89,7 @@ namespace Umbraco.Web._Legacy.Actions
             {
                 string _actionJsList = "";
 
-                foreach (IAction action in ActionsResolver.Current.Actions)
+                foreach (IAction action in Current.Actions)
                 {
                     // Adding try/catch so this rutine doesn't fail if one of the actions fail
                     // Add to language JsList
@@ -139,7 +127,7 @@ namespace Umbraco.Web._Legacy.Actions
             List<IAction> list = new List<IAction>();
             foreach (var c in entityPermission.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToCharArray()[0]))
             {
-                IAction action = ActionsResolver.Current.Actions.ToList().Find(
+                IAction action = Current.Actions.ToList().Find(
                     delegate (IAction a)
                     {
                         return a.Letter == c;
@@ -162,7 +150,7 @@ namespace Umbraco.Web._Legacy.Actions
             List<IAction> list = new List<IAction>();
             foreach (char c in actions.ToCharArray())
             {
-                IAction action = ActionsResolver.Current.Actions.ToList().Find(
+                IAction action = Current.Actions.ToList().Find(
                     delegate(IAction a)
                     {
                         return a.Letter == c;
@@ -190,7 +178,7 @@ namespace Umbraco.Web._Legacy.Actions
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return ActionsResolver.Current.Actions.ToList().FindAll(
+            return Current.Actions.ToList().FindAll(
                 delegate(IAction a)
                 {
                     return (a.CanBePermissionAssigned);
