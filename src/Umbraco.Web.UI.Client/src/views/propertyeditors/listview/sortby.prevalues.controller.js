@@ -67,6 +67,18 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
                 }
             });
         });
+
+        // Check existing model value is available in list and ensure a value is set
+        var existingValue = findFromSortByFields($scope.model.value);
+        if (existingValue) {
+            // Set the existing value
+            // The old implementation pre Umbraco 7.5 used PascalCase aliases, this uses camelCase, so this ensures that any previous value is set
+            $scope.model.value = existingValue.value;
+        }
+        else {
+            // Existing value not found, set to first value
+            $scope.model.value = $scope.sortByFields[0].value;
+        }
     }
 }
 
