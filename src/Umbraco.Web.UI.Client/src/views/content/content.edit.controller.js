@@ -35,6 +35,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
         });
         $scope.defaultButton = buttons.defaultButton;
         $scope.subButtons = buttons.subButtons;
+        $scope.page.url = $scope.content.published && $scope.content.template != null ? $scope.content.urls.shift() : "";
 
         editorState.set($scope.content);
 
