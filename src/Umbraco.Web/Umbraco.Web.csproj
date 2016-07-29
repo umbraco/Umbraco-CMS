@@ -264,6 +264,8 @@
     <Compile Include="PublishedFragmentExtensions.cs" />
     <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
+    <Compile Include="Routing\UrlProviderCollection.cs" />
+    <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
@@ -969,7 +971,6 @@
     <Compile Include="Routing\IUrlProvider.cs" />
     <Compile Include="Routing\SiteDomainHelper.cs" />
     <Compile Include="Routing\SiteDomainHelperResolver.cs" />
-    <Compile Include="Routing\UrlProviderResolver.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />

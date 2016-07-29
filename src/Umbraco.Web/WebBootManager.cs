@@ -138,7 +138,7 @@ namespace Umbraco.Web
                 FacadeServiceResolver.Current.Service,
                 new WebSecurity(httpContext, ApplicationContext),
                 UmbracoConfig.For.UmbracoSettings(),
-                UrlProviderResolver.Current.Providers,
+                Current.UrlProviders,
                 false);
         }
 
@@ -510,12 +510,11 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-            UrlProviderResolver.Current = new UrlProviderResolver(
-                Container, ProfilingLogger.Logger,
-                    //typeof(AliasUrlProvider), // not enabled by default
-                    typeof(DefaultUrlProvider),
-                    typeof(CustomRouteUrlProvider)
-                );
+            Container.RegisterBuilderCollection<UrlProviderCollectionBuilder, UrlProviderCollection, IUrlProvider>();
+            Container.GetInstance<UrlProviderCollectionBuilder>()
+                //.Append<AliasUrlProvider>() // not enabled by default
+                .Append<DefaultUrlProvider>()
+                .Append<CustomRouteUrlProvider>();
 
             ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(Container);
             Container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();

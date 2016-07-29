@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Web
@@ -75,6 +76,9 @@ namespace Umbraco.Web
         // cannot set - this is temp
         public static EventMessages EventMessages 
             => CoreCurrent.Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
+
+        public static IEnumerable<IUrlProvider> UrlProviders
+            => CoreCurrent.Container.GetInstance<UrlProviderCollection>();
 
         #region Core
 

@@ -57,7 +57,7 @@ namespace Umbraco.Web
                 FacadeServiceResolver.Current.Service,
 		        new WebSecurity(httpContext, ApplicationContext.Current),
 		        UmbracoConfig.For.UmbracoSettings(),
-		        UrlProviderResolver.Current.Providers,
+		        Current.UrlProviders,
 		        true);
 		}
 
