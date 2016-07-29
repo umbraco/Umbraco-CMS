@@ -8,6 +8,33 @@ namespace Umbraco.Core.DependencyInjection
     internal static class LightInjectExtensions
     {
         /// <summary>
+        /// Configure the container for Umbraco Core usage and assign to Current.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <remarks>The container is now the unique application container and is now accessible via Current.Container.</remarks>
+        public static void ConfigureUmbracoCore(this ServiceContainer container)
+        {
+            // supports annotated constructor injections
+            // eg to specify the service name on some services
+            container.EnableAnnotatedConstructorInjection();
+
+            // from the docs: "LightInject considers all read/write properties a dependency, but implements
+            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
+            // in the case of an unresolved property dependency."
+            //
+            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
+            // from the docs, the following line will cause the container to "now only try to inject
+            // dependencies for properties that is annotated with the InjectAttribute."
+            container.EnableAnnotatedPropertyInjection();
+
+            // self-register
+            container.Register<IServiceContainer>(_ => container);
+
+            // configure the current container
+            Current.Container = container;
+        }
+
+        /// <summary>
         /// Registers the TService with the factory that describes the dependencies of the service, as a singleton.
         /// </summary>
         public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory, string serviceName)
@@ -136,7 +163,7 @@ namespace Umbraco.Core.DependencyInjection
         /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
         /// but means that the explicit type is registered, not the implementing type
         /// </remarks>
-        public static void RegisterBuilderCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
             where TLifetime : ILifetime, new()
         {
             foreach (var type in implementationTypes)
@@ -154,50 +181,12 @@ namespace Umbraco.Core.DependencyInjection
         /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
         /// but means that the explicit type is registered, not the implementing type
         /// </remarks>
-        public static void RegisterBuilderCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
         {
             foreach (var type in implementationTypes)
             {
                 container.Register(type);
             }
-        }
-
-        /// <summary>
-        /// Registers an injected collection.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the builder.</typeparam>
-        /// <typeparam name="TCollection">The type of the collection.</typeparam>
-        /// <typeparam name="TItem">The type of the items.</typeparam>
-        /// <param name="container">A container.</param>
-        public static void RegisterBuilderCollection<TBuilder, TCollection, TItem>(this IServiceRegistry container)
-            where TBuilder : ICollectionBuilder<TCollection, TItem>
-            where TCollection : IBuilderCollection<TItem>
-        {
-            // register the builder
-            container.Register<TBuilder>(new PerContainerLifetime());
-
-            // register the collection
-            container.Register(factory => factory.GetInstance<TBuilder>().GetCollection());
-        }
-
-        /// <summary>
-        /// Registers an injected collection.
-        /// </summary>
-        /// <typeparam name="TCollection">The type of the collection.</typeparam>
-        /// <typeparam name="TBuilder">The type of the builder.</typeparam>
-        /// <typeparam name="TLifetime">A lifetime type.</typeparam>
-        /// <typeparam name="TItem">The type of the items.</typeparam>
-        /// <param name="container">A container.</param>
-        public static void RegisterBuilderCollection<TBuilder, TCollection, TItem, TLifetime>(this IServiceRegistry container)
-            where TBuilder : ICollectionBuilder<TCollection, TItem>
-            where TCollection : IBuilderCollection<TItem>
-            where TLifetime : ILifetime, new()
-        {
-            // register the builder
-            container.Register<TBuilder>(new PerContainerLifetime());
-
-            // register the collection
-            container.Register(factory => factory.GetInstance<TBuilder>().GetCollection(), new TLifetime());
         }
     }
 }

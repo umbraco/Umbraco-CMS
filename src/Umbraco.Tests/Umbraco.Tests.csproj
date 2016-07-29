@@ -228,6 +228,7 @@
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="DependencyInjection\TempTests.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Persistence\Migrations\MigrationStartupHandlerTests.cs" />

@@ -9,10 +9,10 @@ namespace Umbraco.Core.DependencyInjection
         where TCollection : IBuilderCollection<TItem>
     {
         /// <summary>
-        /// Gets a collection.
+        /// Creates a collection.
         /// </summary>
         /// <returns>A collection.</returns>
-        /// <remarks>The lifetime of the collection depends on how the builder was registered.</remarks>
-        TCollection GetCollection();
+        /// <remarks>Creates a new collection each time it is invoked.</remarks>
+        TCollection CreateCollection();
     }
 }

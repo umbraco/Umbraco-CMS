@@ -32,24 +32,13 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture, RequiresSTA]
     public class PublishedMediaTests : PublishedContentTestBase
     {
-
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         /// <summary>
         /// sets up resolvers before resolution is frozen
         /// </summary>
         protected override void FreezeResolution()
         {
             var container = new ServiceContainer();
-            container.EnableAnnotatedConstructorInjection();
+            container.ConfigureUmbracoCore();
 
             container.RegisterBuilderCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>();
             container.GetInstance<UrlSegmentProviderCollectionBuilder>().Append<DefaultUrlSegmentProvider>();

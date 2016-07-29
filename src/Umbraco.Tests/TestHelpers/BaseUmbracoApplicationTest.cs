@@ -49,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
             base.Initialize();
 
             var container = new ServiceContainer();
-            container.EnableAnnotatedConstructorInjection();
+            container.ConfigureUmbracoCore();
             Container = container;
 
             TestHelper.InitializeContentDirectories();

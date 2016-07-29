@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var container = new ServiceContainer();
-            container.EnableAnnotatedConstructorInjection();
+            container.ConfigureUmbracoCore();
 
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
@@ -44,10 +44,10 @@ namespace Umbraco.Tests.TestHelpers
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            
-            PluginManager.Current = new PluginManager(new NullCacheProvider(), 
+            var pluginManager = PluginManager.Current = new PluginManager(new NullCacheProvider(),
                 logger,
                 false);
+            container.RegisterInstance(pluginManager);
 
             var mappers = new MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
@@ -66,6 +66,7 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Reset();
             //MappingResolver.Reset();
             PluginManager.Current = null;
+            Current.Reset();
         }
     }
 }

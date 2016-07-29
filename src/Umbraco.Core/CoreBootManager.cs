@@ -53,7 +53,7 @@ namespace Umbraco.Core
             get { return _umbracoApplication; }
         }
 
-        internal ServiceContainer Container
+        protected ServiceContainer Container
         {
             get { return _umbracoApplication.Container; }
         }
@@ -115,7 +115,7 @@ namespace Umbraco.Core
             // completed at the end of the boot process to allow garbage collection
             _appStartupEvtContainer = Container.Clone();
             _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterBuilderCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
+            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
 
             //build up standard IoC services
             ConfigureApplicationServices(Container);
@@ -154,22 +154,17 @@ namespace Umbraco.Core
         /// </summary>
         internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
-            // configure the temp. Current
-            Current.CurrentContainer = container;
-
-            container.Register<IServiceContainer>(factory => container);
-
             //Logging
-            container.RegisterSingleton<ILogger>(factory => _umbracoApplication.Logger);
-            container.RegisterSingleton<IProfiler>(factory => ProfilingLogger.Profiler);
-            container.RegisterSingleton<ProfilingLogger>(factory => ProfilingLogger);
+            container.RegisterInstance(_umbracoApplication.Logger);
+            container.RegisterInstance(ProfilingLogger.Profiler);
+            container.RegisterInstance(ProfilingLogger);
 
             //Config
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
             //Cache
-            container.RegisterSingleton<CacheHelper>(factory => ApplicationCache);
-            container.RegisterSingleton<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache);
+            container.RegisterInstance(ApplicationCache);
+            container.RegisterInstance(ApplicationCache.RuntimeCache);
 
             //Datalayer/Repositories/SQL/Database/etc...
             container.RegisterFrom<RepositoryCompositionRoot>();
@@ -182,7 +177,7 @@ namespace Umbraco.Core
 
             //TODO: Don't think we'll need this when the resolvers are all container resolvers
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
-            container.RegisterSingleton<PluginManager>(factory => PluginManager);
+            container.RegisterInstance(PluginManager);
 
             container.RegisterSingleton<ApplicationContext>();
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());

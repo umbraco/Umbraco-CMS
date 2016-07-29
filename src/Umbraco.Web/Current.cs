@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using LightInject;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
@@ -18,36 +18,70 @@ namespace Umbraco.Web
         private static IUmbracoContextAccessor _umbracoContextAccessor;
         private static IFacadeAccessor _facadeAccessor;
 
-        // in theory with proper injection all accessors should be injected, but during the
-        // transitions there are places where we need them and they are not available, so
-        // use the following properties:
-
-        public static IUmbracoContextAccessor UmbracoContextAccessor
+        static Current()
         {
-            get
+            CoreCurrent.Resetted += (sender, args) =>
             {
-                if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
-                return (_umbracoContextAccessor = CoreCurrent.Container.GetInstance<IUmbracoContextAccessor>());
-            }
-            set { _umbracoContextAccessor = value; } // for tests
+                if (_umbracoContextAccessor != null)
+                    ClearUmbracoContext();
+                _umbracoContextAccessor = null;
+                _facadeAccessor = null;
+            };
         }
+
+        // for UNIT TESTS exclusively!
+        internal static void Reset()
+        {
+            CoreCurrent.Reset();
+        }
+
+        public static ServiceContainer Container
+            => CoreCurrent.Container;
+
+        // Facade
+        //
+        // is managed by the FacadeAccessor
+        //
+        // have to support setting the accessor directly (vs container) for tests
+        // fixme - not sure about this - should tests use a container?
 
         public static IFacadeAccessor FacadeAccessor
         {
             get
             {
                 if (_facadeAccessor != null) return _facadeAccessor;
-                return (_facadeAccessor = CoreCurrent.Container.GetInstance<IFacadeAccessor>());
+                return (_facadeAccessor = Container.GetInstance<IFacadeAccessor>());
             }
             set { _facadeAccessor = value; } // for tests
         }
 
-        public static UmbracoContext UmbracoContext 
-            => UmbracoContextAccessor.UmbracoContext;
-
-        // have to support set for now, because of 'ensure umbraco context' which can create
+        // UmbracoContext
+        //
+        // is managed by the UmbracoContext Acceesor
+        //
+        // have to support setting the accessor directly (vs container) for tests
+        // fixme - note sure about this - should tests use a container?
+        //
+        // have to support setting it for now, because of 'ensure umbraco context' which can create
         // contexts pretty much at any time and in an uncontrolled way - and when we do not have
         // proper access to the accessor.
+        //
+        // have to support clear, because of the weird mixed accessor we're using that can
+        // store things in thread-static var that need to be cleared, else it retains rogue values.
+
+        public static IUmbracoContextAccessor UmbracoContextAccessor
+        {
+            get
+            {
+                if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
+                return (_umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>());
+            }
+            set { _umbracoContextAccessor = value; } // for tests
+        }
+
+        public static UmbracoContext UmbracoContext
+            => UmbracoContextAccessor.UmbracoContext;
+
         public static void SetUmbracoContext(UmbracoContext value, bool canReplace)
         {
             lock (Locker)
@@ -59,7 +93,6 @@ namespace Umbraco.Web
             }
         }
 
-        // this is because of the weird mixed accessor we're using that can store things in thread-static var
         public static void ClearUmbracoContext()
         {
             lock (Locker)
@@ -69,22 +102,24 @@ namespace Umbraco.Web
             }
         }
 
-        // cannot set - it's set by whatever creates the facade, which should have the accessor injected
-        public static IFacade Facade 
+        #region Web Getters
+
+        public static IFacade Facade
             => FacadeAccessor.Facade;
 
-        // cannot set - this is temp
-        public static EventMessages EventMessages 
-            => CoreCurrent.Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
+        public static EventMessages EventMessages
+            => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
 
-        public static IEnumerable<IUrlProvider> UrlProviders
+        public static UrlProviderCollection UrlProviders
             => CoreCurrent.Container.GetInstance<UrlProviderCollection>();
 
-        #region Core
+        #endregion
 
-        // just repeating Core for convenience
+        #region Core Getters
 
-        public static IEnumerable<IUrlSegmentProvider> UrlSegmentProviders
+        // proxy Core for convenience
+
+        public static UrlSegmentProviderCollection UrlSegmentProviders
             => CoreCurrent.Container.GetInstance<UrlSegmentProviderCollection>();
 
 

@@ -29,7 +29,7 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         public IEnumerator<TItem> GetEnumerator()
         {
-            return (IEnumerator<TItem>) _items.GetEnumerator();
+            return ((IEnumerable<TItem>) _items).GetEnumerator();
         }
 
         /// <summary>

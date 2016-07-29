@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Setup()
         {
             var container = new ServiceContainer();
-            container.EnableAnnotatedConstructorInjection();
+            container.ConfigureUmbracoCore();
 
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new TestServerRegistrar());
@@ -125,11 +125,11 @@ namespace Umbraco.Tests.Cache.DistributedCache
         internal class TestServerMessenger : IServerMessenger
         {
             //used for tests
-            public List<int> IntIdsRefreshed = new List<int>(); 
+            public List<int> IntIdsRefreshed = new List<int>();
             public List<Guid> GuidIdsRefreshed = new List<Guid>();
             public List<int> IntIdsRemoved = new List<int>();
             public List<string> PayloadsRemoved = new List<string>();
-            public List<string> PayloadsRefreshed = new List<string>(); 
+            public List<string> PayloadsRefreshed = new List<string>();
             public int CountOfFullRefreshes = 0;
 
             public void PerformRefresh<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload)

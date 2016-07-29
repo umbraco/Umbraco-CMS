@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using log4net;
 using LightInject;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -23,7 +24,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Umbraco application's IoC container
         /// </summary>
-        internal ServiceContainer Container { get; }
+        internal ServiceContainer Container { get; private set; }
 
         private ILogger _logger;
 
@@ -32,18 +33,13 @@ namespace Umbraco.Core
         /// </summary>
         protected UmbracoApplicationBase()
         {
-            // create the container for the application, the boot managers are responsible for registrations
-            Container = new ServiceContainer();
-            Container.EnableAnnotatedConstructorInjection();
-
-            // from the docs: "LightInject considers all read/write properties a dependency, but implements
-            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
-            // in the case of an unresolved property dependency."
+            // beware! this code can run more that once
+            // so it is NOT the right place to initialize global stuff such as the container
             //
-            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
-            // from the docs, the following line will cause the container to "now only try to inject
-            // dependencies for properties that is annotated with the InjectAttribute."
-            Container.EnableAnnotatedPropertyInjection();
+            // however, it is OK to initialize app-local stuff
+
+            if (Current.HasContainer)
+                Container = Current.Container;
         }
 
         public event EventHandler ApplicationStarting;
@@ -65,6 +61,11 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
+            // create the container for the application, and configure.
+            // the boot managers are responsible for registrations
+            Container = new ServiceContainer();
+            Container.ConfigureUmbracoCore();
+
             //take care of unhandled exceptions - there is nothing we can do to
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
@@ -77,6 +78,7 @@ namespace Umbraco.Core
                 if (isTerminating) msg += " (terminating)";
                 LogHelper.Error<UmbracoApplicationBase>(msg, exception);
             };
+
             //boot up the application
             GetBootManager()
                 .Initialize()

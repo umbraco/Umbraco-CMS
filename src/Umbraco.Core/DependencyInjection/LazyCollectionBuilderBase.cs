@@ -11,11 +11,12 @@ namespace Umbraco.Core.DependencyInjection
     /// <typeparam name="TBuilder">The type of the builder.</typeparam>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public abstract class LazyCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TCollection, TItem>
+    public abstract class LazyCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : LazyCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
-        private readonly List<Func<IEnumerable<Type>>> _producers = new List<Func<IEnumerable<Type>>>();
+        private readonly List<Func<IEnumerable<Type>>> _producers1 = new List<Func<IEnumerable<Type>>>();
+        private readonly List<Func<IServiceFactory, IEnumerable<Type>>> _producers2 = new List<Func<IServiceFactory, IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();
 
         protected LazyCollectionBuilderBase(IServiceContainer container)
@@ -65,7 +66,21 @@ namespace Umbraco.Core.DependencyInjection
         {
             Configure(types =>
             {
-                _producers.Add(producer);
+                _producers1.Add(producer);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Adds a types producer to the collection.
+        /// </summary>
+        /// <param name="producer">The types producer.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder AddProducer(Func<IServiceFactory, IEnumerable<Type>> producer)
+        {
+            Configure(types =>
+            {
+                _producers2.Add(producer);
             });
             return This;
         }
@@ -87,7 +102,11 @@ namespace Umbraco.Core.DependencyInjection
 
         protected override IEnumerable<Type> GetTypes(IEnumerable<Type> types)
         {
-            return types.Union(_producers.SelectMany(x => x())).Distinct().Except(_excluded);
+            return types
+                .Union(_producers1.SelectMany(x => x()))
+                .Union(_producers2.SelectMany(x => x(Container)))
+                .Distinct()
+                .Except(_excluded);
         }
     }
 }

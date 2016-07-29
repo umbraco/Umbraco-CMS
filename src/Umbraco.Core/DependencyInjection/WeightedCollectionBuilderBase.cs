@@ -11,7 +11,7 @@ namespace Umbraco.Core.DependencyInjection
     /// <typeparam name="TBuilder">The type of the builder.</typeparam>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TCollection, TItem>
+    public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : WeightedCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
