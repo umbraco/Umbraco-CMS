@@ -129,6 +129,9 @@ namespace Umbraco.Web
         public static MigrationCollectionBuilder MigrationCollectionBuilder
             => Container.GetInstance<MigrationCollectionBuilder>();
 
+        public static ContentFinderCollection ContentFinders
+            => Container.GetInstance<ContentFinderCollection>();
+
         #endregion
 
         #region Core Getters

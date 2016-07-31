@@ -97,7 +97,7 @@ namespace Umbraco.Web.Routing
                 //TODO: The ContentFinderResolver instance should be injected in ctor with DI instead of using singleton!
 
                 // finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>())
+                if (Current.ContentFinders.Any(x => x is ContentFinderByUrlAlias))
                     return true;
 
 

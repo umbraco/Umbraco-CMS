@@ -517,18 +517,16 @@ namespace Umbraco.Web
             ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(Container);
             Container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
-            ContentFinderResolver.Current = new ContentFinderResolver(
-                Container, ProfilingLogger.Logger,
-                // all built-in finders in the correct order, devs can then modify this list
-                // on application startup, via an application event handler.
-                typeof(ContentFinderByPageIdQuery),
-                typeof(ContentFinderByNiceUrl),
-                typeof(ContentFinderByIdPath),
-                typeof(ContentFinderByNiceUrlAndTemplate),
-                typeof(ContentFinderByProfile),
-                typeof(ContentFinderByUrlAlias),
-                typeof(ContentFinderByRedirectUrl)
-            );
+            ContentFinderCollectionBuilder.Register(Container)
+                // all built-in finders in the correct order,
+                // devs can then modify this list on application startup
+                .Append<ContentFinderByPageIdQuery>()
+                .Append<ContentFinderByNiceUrl>()
+                .Append<ContentFinderByIdPath>()
+                .Append<ContentFinderByNiceUrlAndTemplate>()
+                .Append<ContentFinderByProfile>()
+                .Append<ContentFinderByUrlAlias>()
+                .Append<ContentFinderByRedirectUrl>();
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container);
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();

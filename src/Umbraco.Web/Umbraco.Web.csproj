@@ -262,6 +262,8 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedFragmentExtensions.cs" />
+    <Compile Include="Routing\ContentFinderCollection.cs" />
+    <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
@@ -1099,7 +1101,6 @@
     <Compile Include="Routing\ContentFinderByProfile.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
-    <Compile Include="Routing\ContentFinderResolver.cs" />
     <Compile Include="Routing\PublishedContentRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
