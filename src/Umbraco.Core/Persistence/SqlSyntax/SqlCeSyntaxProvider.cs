@@ -18,6 +18,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             
         }
 
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+        }
+
         public override bool SupportsClustered()
         {
             return false;
