@@ -214,7 +214,7 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-    
+
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
@@ -809,7 +809,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageVersion">Package version</key>
     <key alias="packageVersionHistory">Package version history</key>
     <key alias="viewPackageWebsite">View package website</key>
-    <key alias="packageAlreadyInstalled">The package and version chosen is already installed</key>
+    <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of %0%</key>
     <key alias="installStateUninstalling">Uninstalling...</key>
     <key alias="installStateDownloading">Downloading...</key>
