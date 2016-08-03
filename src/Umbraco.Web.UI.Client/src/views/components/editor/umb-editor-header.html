@@ -31,10 +31,10 @@
 
                   <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
 
-                  <umb-generate-alias class="umb-panel-header-alias" 
-                                      ng-if="!hideAlias" 
-                                      alias="$parent.alias" 
-                                      alias-from="$parent.name" 
+                  <umb-generate-alias class="umb-panel-header-alias"
+                                      ng-if="!hideAlias"
+                                      alias="$parent.alias"
+                                      alias-from="$parent.name"
                                       enable-lock="true"
                                       server-validation-field="Alias"></umb-generate-alias>
 
@@ -48,14 +48,26 @@
 
                </div>
 
+                <umb-editor-menu
+                    class="umb-editor-header__actions-menu"
+                    ng-if="menu.currentNode"
+                    current-node="menu.currentNode"
+                    current-section="{{menu.currentSection}}">
+                </umb-editor-menu>
+
             </div>
 
-            <umb-editor-menu ng-if="menu.currentNode" current-node="menu.currentNode" current-section="{{menu.currentSection}}"></umb-editor-menu>
-            <umb-editor-navigation ng-if="navigation" navigation="navigation"></umb-editor-navigation>
+            <umb-editor-navigation
+                ng-if="navigation"
+                navigation="navigation">
+            </umb-editor-navigation>
 
         </div>
 
-        <umb-tabs-nav ng-if="tabs" model="tabs"></umb-tabs-nav>
+        <umb-tabs-nav
+            ng-if="tabs"
+            model="tabs">
+        </umb-tabs-nav>
 
     </div>
 
