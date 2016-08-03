@@ -1,7 +1,17 @@
-function sortByPreValsController($rootScope, $scope, localizationService, editorState) {
+function sortByPreValsController($rootScope, $scope, localizationService, editorState, listViewPrevalueHelper) {
+    //Get the prevalue from the correct place
+    function getPrevalues() {
+        if (editorState.current.preValues) {
+            return editorState.current.preValues;
+        }
+        else {
+            return listViewPrevalueHelper.getPrevalues();
+        }
+    }
+
     //Watch the prevalues
     $scope.$watch(function () {
-        return _.findWhere(editorState.current.preValues, { key: "includeProperties" }).value;
+            return _.findWhere(getPrevalues(), { key: "includeProperties" }).value;
     }, function () {
         populateFields();
     }, true); //Use deep watching, otherwise we won't pick up header changes
@@ -15,7 +25,7 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
         }
 
         // Get list of properties assigned as columns of the list view
-        var propsPreValue = _.findWhere(editorState.current.preValues, { key: "includeProperties" });
+        var propsPreValue = _.findWhere(getPrevalues(), { key: "includeProperties" });
 
         // Populate list of options for the default sort (all the columns plus then node name)
         $scope.sortByFields = [];
