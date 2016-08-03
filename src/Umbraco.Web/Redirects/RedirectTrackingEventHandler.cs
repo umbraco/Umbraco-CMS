@@ -8,6 +8,7 @@ using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 
@@ -30,24 +31,31 @@ namespace Umbraco.Web.Redirects
         /// <inheritdoc />
         protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            // if any of these dlls are loaded we don't want to run our finder
-            var dlls = new[]
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking)
             {
-                "InfoCaster.Umbraco.UrlTracker",
-                "SEOChecker",
-                "Simple301",
-                "Terabyte.Umbraco.Modules.PermanentRedirect",
-                "CMUmbracoTools",
-                "PWUrlRedirect"
-            };
-
-            // assuming all assemblies have been loaded already
-            // check if any of them matches one of the above dlls
-            var found = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(x => x.FullName.Split(',')[0])
-                .Any(x => dlls.Contains(x));
-            if (found)
                 ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
+            }
+            else
+            {
+                // if any of these dlls are loaded we don't want to run our finder
+                var dlls = new[]
+                {
+                    "InfoCaster.Umbraco.UrlTracker",
+                    "SEOChecker",
+                    "Simple301",
+                    "Terabyte.Umbraco.Modules.PermanentRedirect",
+                    "CMUmbracoTools",
+                    "PWUrlRedirect"
+                };
+
+                // assuming all assemblies have been loaded already
+                // check if any of them matches one of the above dlls
+                var found = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(x => x.FullName.Split(',')[0])
+                    .Any(x => dlls.Contains(x));
+                if (found)
+                    ContentFinderResolver.Current.RemoveType<ContentFinderByRedirectUrl>();
+            }
         }
 
         /// <inheritdoc />
