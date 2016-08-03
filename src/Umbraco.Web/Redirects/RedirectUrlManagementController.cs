@@ -1,6 +1,10 @@
-﻿using System.Net.Http;
+﻿using System.IO;
+using System.Net.Http;
 using System.Text;
+using System.Web;
 using System.Web.Http;
+using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Redirects
@@ -9,20 +13,19 @@ namespace Umbraco.Web.Redirects
     {
         //add paging
         [HttpGet]
-        public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0)
+        public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
-
-            int pageSize = 20;
-            var searchResult = new RedirectUrlSearchResult();
+            page = page - 1;
+            var searchResult = new RedirectUrlSearchResult { UrlTrackerDisabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking };
             var redirectUrlService = Services.RedirectUrlService;
             long resultCount = 0L;
             // need endpoint for search functionality
             // by url, by domain ? it's the url that you want to find them by, that's what you see..
 
-            var redirects = redirectUrlService.GetAllRedirectUrls(page, 20, out resultCount);
+            var redirects = redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount);
             searchResult.SearchResults = redirects;
             searchResult.TotalCount = resultCount;
-            searchResult.CurrentPage = page;
+            searchResult.CurrentPage = page + 1;
             //hmm how many results 'could there be ?
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
 
@@ -60,6 +63,29 @@ namespace Umbraco.Web.Redirects
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
         }
 
+        [HttpPost]
+        public HttpResponseMessage ToggleUrlTracker(bool disable)
+        {
+            var configFilePath = HttpContext.Current.Server.MapPath("~/config/umbracoSettings.config");
 
+            if (File.Exists(configFilePath))
+            {
+                var umbracoConfig = new XmlDocument {PreserveWhitespace = true};
+                umbracoConfig.Load(configFilePath);
+
+                var webRoutingElement = umbracoConfig.SelectSingleNode("//web.routing") as XmlElement;
+                if (webRoutingElement != null)
+                {
+                    // note: this adds the attribute if it does not exist
+                    webRoutingElement.SetAttribute("disableRedirectUrlTracking", disable.ToString().ToLowerInvariant());
+                    umbracoConfig.Save(configFilePath);
+                }
+
+
+                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            }
+
+            return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+        }
     }
 }

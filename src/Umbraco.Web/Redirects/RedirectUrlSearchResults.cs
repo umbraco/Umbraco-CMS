@@ -12,5 +12,7 @@ namespace Umbraco.Web.Redirects
         public long TotalCount { get; set; }
         public int PageCount { get; set; }
         public int CurrentPage { get; set; }
+
+        public bool UrlTrackerDisabled { get; set; }
     }
 }
