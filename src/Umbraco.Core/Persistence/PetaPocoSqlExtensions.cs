@@ -77,7 +77,8 @@ namespace Umbraco.Core.Persistence
             var type = typeof(TColumn);
             var tableName = type.GetTableName();
 
-            var syntax = string.Format("{0}.{1} DESC",
+            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            var syntax = string.Format("({0}.{1}) DESC",
                 sqlSyntax.GetQuotedTableName(tableName),
                 sqlSyntax.GetQuotedColumnName(columnName));
 
