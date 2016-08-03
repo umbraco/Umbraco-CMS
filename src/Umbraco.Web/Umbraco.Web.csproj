@@ -343,6 +343,8 @@
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
+    <Compile Include="Models\RelatedLinkBase.cs" />
+    <Compile Include="Models\RelatedLinkData.cs" />
     <Compile Include="Models\RelatedLinks.cs" />
     <Compile Include="Models\RelatedLinkType.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />

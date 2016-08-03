@@ -7,7 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models;
@@ -59,7 +62,58 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            return UmbracoContext.Current != null ? new RelatedLinks(sourceString) : null;
+            var relatedLinksData = JsonConvert.DeserializeObject<IEnumerable<RelatedLinkData>>(sourceString);
+            var relatedLinks = new List<RelatedLink>();
+
+            foreach (var linkData in relatedLinksData)
+            {
+                var relatedLink = new RelatedLink()
+                {
+                    Caption = linkData.Caption,
+                    NewWindow = linkData.NewWindow,
+                    IsInternal = linkData.IsInternal,
+                    Type = linkData.Type,
+                    Id = linkData.Internal,
+                    Link = linkData.Link
+                };
+                relatedLink = CreateLink(relatedLink);
+
+                if (relatedLink.IsDeleted == false)
+                {
+                    relatedLinks.Add(relatedLink);
+                }
+                else
+                {
+                    LogHelper.Warn<RelatedLinks>(
+                        string.Format("Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {0}, Link Caption: \"{1}\")", relatedLink.Link, relatedLink.Caption));
+                }
+            }
+
+            return new RelatedLinks(relatedLinks, sourceString);
+        }
+
+        private RelatedLink CreateLink(RelatedLink link)
+        {
+            if (link.IsInternal && link.Id != null)
+            {
+                if (UmbracoContext.Current == null)
+                {
+                    return null;
+                }
+
+                link.Link = UmbracoContext.Current.UrlProvider.GetUrl((int)link.Id);
+                if (link.Link.Equals("#"))
+                {
+                    link.IsDeleted = true;
+                    link.Link = link.Id.ToString();
+                }
+                else
+                {
+                    link.IsDeleted = false;
+                }
+            }
+
+            return link;
         }
     }
 }

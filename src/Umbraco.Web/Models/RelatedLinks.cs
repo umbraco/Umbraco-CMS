@@ -7,68 +7,30 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core.Logging;
+﻿using System.ComponentModel;
+﻿using System.Linq;
 
 namespace Umbraco.Web.Models
 {
-    /// <summary>
-    /// The related links model
-    /// </summary>
     [TypeConverter(typeof(RelatedLinksTypeConverter))]
     public class RelatedLinks : IEnumerable<RelatedLink>
     {
-        // ReSharper disable InconsistentNaming
-
-        /// <summary>
-        /// The _property data.
-        /// </summary>
         private readonly string _propertyData;
 
-        /// <summary>
-        /// The _related links.
-        /// </summary>
-        private readonly List<RelatedLink> _relatedLinks = new List<RelatedLink>();
+        private readonly List<RelatedLink> _relatedLinks;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RelatedLinks"/> class.
-        /// </summary>
-        /// <param name="propertyData">
-        /// The property data.
-        /// </param>
-        public RelatedLinks(string propertyData)
+        public RelatedLinks(List<RelatedLink> relatedLinks, string propertyData)
         {
-            this._propertyData = propertyData;
-
-            if (!string.IsNullOrEmpty(propertyData))
-            {
-                var relatedLinks = JsonConvert.DeserializeObject<JArray>(propertyData);
-
-                foreach (var item in relatedLinks)
-                {
-                    var relatedLink = new RelatedLink(item);
-                    if (!relatedLink.InternalLinkDeleted)
-                    {
-                        this._relatedLinks.Add(relatedLink);
-                    }
-                    else
-                    {
-                        LogHelper.Warn<RelatedLinks>(
-                            string.Format("Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {0}, Link Caption: \"{1}\")", relatedLink.Link, relatedLink.Caption));
-                    }
-                }
-            }
+            _relatedLinks = relatedLinks;
+            _propertyData = propertyData;
         }
 
         /// <summary>
         /// Gets the property data.
         /// </summary>
-        public string PropertyData
+        internal string PropertyData
         {
             get
             {
@@ -76,45 +38,19 @@ namespace Umbraco.Web.Models
             }
         }
 
-        /// <summary>
-        /// The any.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
         public bool Any()
         {
             return Enumerable.Any(this);
         }
 
-        /// <summary>
-        /// The get enumerator.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IEnumerator"/>.
-        /// </returns>
         public IEnumerator<RelatedLink> GetEnumerator()
         {
-            return this._relatedLinks.GetEnumerator();
+            return _relatedLinks.GetEnumerator();
         }
 
-        /// <summary>
-        /// The get enumerator.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IEnumerator"/>.
-        /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
-        }
-
-        /// <summary>
-        /// Ensure that json is returned if a string conversion is requested
-        /// </summary>
-        public override string ToString()
-        {
-            return _propertyData;
         }
     }
 }

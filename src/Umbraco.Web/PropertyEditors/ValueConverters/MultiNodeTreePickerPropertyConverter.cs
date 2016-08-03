@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -23,6 +24,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     public class MultiNodeTreePickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
+        /// <summary>
+        /// The properties to exclude.
+        /// </summary>
+        private static readonly List<string> PropertiesToExclude = new List<string>()
+        {
+            Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
+            Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
+        };
+
         /// <summary>
         /// Checks if this converter can convert the property editor and registers if it can.
         /// </summary>
@@ -85,38 +95,42 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
-            var nodeIds = (int[])source;
-
-            var multiNodeTreePicker = new List<IPublishedContent>();
-
             if (UmbracoContext.Current != null)
             {
-                var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+                var nodeIds = (int[])source;
 
-                if (nodeIds.Length > 0)
+                if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
                 {
-                    var objectType = UmbracoObjectTypes.Unknown;
+                    var multiNodeTreePicker = new List<IPublishedContent>();
 
-                    foreach (var nodeId in nodeIds)
+                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+
+                    if (nodeIds.Length > 0)
                     {
-                        var multiNodeTreePickerItem = GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                                    ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                                    ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                        var objectType = UmbracoObjectTypes.Unknown;
 
-                        if (multiNodeTreePickerItem != null)
+                        foreach (var nodeId in nodeIds)
                         {
-                            multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                            var multiNodeTreePickerItem = GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
+                                        ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
+                                        ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+
+                            if (multiNodeTreePickerItem != null)
+                            {
+                                multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                            }
                         }
                     }
+                    return multiNodeTreePicker.Yield().Where(x => x != null);
                 }
 
-                var multiNodeTreePickerEnumerable = multiNodeTreePicker.Yield().Where(x => x != null);
-
-                // in v8 should return multiNodeTreePickerEnumerable but for v7 need to return as PublishedContentEnumerable so that string can be returned for legacy compatibility
-                return new PublishedContentEnumerable(multiNodeTreePickerEnumerable);
+                // return the first nodeId as this is one of the excluded properties that expects a single id
+                return nodeIds.FirstOrDefault();
             }
-
-            return null;
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

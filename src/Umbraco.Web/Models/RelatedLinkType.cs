@@ -22,6 +22,6 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// External link type
         /// </summary>
-        External      
+        External
     }
 }
