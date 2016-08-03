@@ -391,6 +391,8 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="Redirects\RedirectTrackingEventHandler.cs" />
+    <Compile Include="Redirects\RedirectUrlManagementController.cs" />
+    <Compile Include="Redirects\RedirectUrlSearchResults.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
