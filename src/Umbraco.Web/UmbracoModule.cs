@@ -330,7 +330,7 @@ namespace Umbraco.Web
                 response.Cache.AppendCacheExtension(cacheExtension);
 
             foreach (var header in pcr.Headers)
-                response.Cache.AppendHeader(string.Format("{0}, {1}", header.Key, header.Value));
+                response.AppendHeader(string.Format("{0}, {1}", header.Key, header.Value));
 
             if (pcr.IsRedirect)
             {
