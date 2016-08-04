@@ -4,11 +4,11 @@
         <button type="button" class="btn" ng-click="toggleUrlTracker()"><span>{{action}} URL Tracker</span></button>
     </div>
 
-    <h2>Redirect Url Search</h2>
+    <h2>Redirect Url Management</h2>
     <p>When you move and rename pages in Umbraco, 301 permanent redirects are automatically created</p>
-    <p>Here is a list of the redirects</p>
+    <p>Here is a list of the redirects you</p>
 
-    <!--<div class="control-group umb-control-group">
+    <div class="control-group umb-control-group">
         <div class="umb-el-wrap">
             <label class="control-label" for="searchTerm">
                 Search Url:
@@ -17,7 +17,7 @@
                 <input name="searchTerm" type="text" ng-model="searchTerm" no-dirty-check class="col-md-12"/> <button class="btn btn-primary" ng-click="search()">Search</button>
             </div>
         </div>
-    </div>-->
+    </div>
 
     <div ng-bind="StatusMessage"></div>
     <table ng-show="hasResults" class="table table-hover">

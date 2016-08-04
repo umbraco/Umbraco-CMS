@@ -23,29 +23,32 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
     $scope.next = function () {
         if ($scope.options.pageNumber < $scope.pageCount) {
             $scope.options.pageNumber++;
+            $scope.currentPage++;
             $scope.load();
         }
     };
 
     $scope.goToPage = function (pageNumber) {
         $scope.options.pageNumber = pageNumber + 1;
+        $scope.currentPage = pageNumber;
         $scope.load();
     };
 
     $scope.prev = function () {
         if ($scope.options.pageNumber > 1) {
             $scope.options.pageNumber--;
+            $scope.currentPage--;
             $scope.load();
         }
     };
 
     $scope.search = function () {
-
-        //do we want to search by url and by domain...
-
         var searchTerm = $scope.searchTerm;
+        if (searchTerm === undefined) {
+            searchTerm = "";
+        }
 
-        $http.get("backoffice/api/RedirectUrlManagement/SearchRedirectUrls/?searchTerm=" + searchTerm + "&page=" + $scope.options.pageNumber + "&pageSize=" + $scope.options.pageSize).then(function (response) {
+        $http.get("backoffice/api/RedirectUrlManagement/SearchRedirectUrls/?searchTerm=" + searchTerm + "&page=" + $scope.currentPage + "&pageSize=" + $scope.options.pageSize).then(function (response) {
             var matchingItems = response.data;   
             $scope.isSearch = true;
             $scope.StatusMessage = matchingItems.StatusMessage;
@@ -62,7 +65,8 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
 
             $scope.pageCount = matchingItems.PageCount;
             $scope.totalCount = matchingItems.TotalCount;
-            $scope.options.pageNumber = matchingItems.CurrentPage;
+            $scope.currentPage = matchingItems.CurrentPage;
+            $scope.options.pageNumber = matchingItems.CurrentPage + 1;
             
             if ($scope.options.pageNumber > $scope.pageCount) {
                 $scope.options.pageNumber = $scope.pageCount;
@@ -78,8 +82,7 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
                         isActive: $scope.options.pageNumber === (i + 1)
                     });
                 }
-            }
-            else {
+            } else {
                 //if there is more than 10 pages, we need to do some fancy bits
 
                 //get the max index to start

@@ -185,7 +185,19 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
         public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
             var sql = GetBaseQuery(false)
-                .Where("umbracoNode.path LIKE @path", new { path = "%," + rootContentId + ",%" })
+                .Where("[umbracoNode].[path] LIKE @path", new { path = "%," + rootContentId + ",%" })
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+            var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
+            total = Convert.ToInt32(result.TotalItems);
+
+            var rules = result.Items.Select(Map);
+            return rules;
+        }
+
+        public IEnumerable<IRedirectUrl> SearchUrls(string searchTerm, long pageIndex, int pageSize, out long total)
+        {
+            var sql = GetBaseQuery(false)
+                .Where("[umbracoRedirectUrl].[Url] LIKE @url", new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" })
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);

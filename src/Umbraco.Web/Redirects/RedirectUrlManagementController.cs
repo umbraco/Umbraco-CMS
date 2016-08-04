@@ -1,11 +1,11 @@
-﻿using System.IO;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Web;
 using System.Web.Http;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
+using File = System.IO.File;
 
 namespace Umbraco.Web.Redirects
 {
@@ -15,17 +15,17 @@ namespace Umbraco.Web.Redirects
         [HttpGet]
         public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
-            page = page - 1;
             var searchResult = new RedirectUrlSearchResult { UrlTrackerDisabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking };
             var redirectUrlService = Services.RedirectUrlService;
-            long resultCount = 0L;
-            // need endpoint for search functionality
-            // by url, by domain ? it's the url that you want to find them by, that's what you see..
+            var resultCount = 0L;
 
-            var redirects = redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount);
+            var redirects = string.IsNullOrWhiteSpace(searchTerm) 
+                ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
+                : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
+
             searchResult.SearchResults = redirects;
             searchResult.TotalCount = resultCount;
-            searchResult.CurrentPage = page + 1;
+            searchResult.CurrentPage = page;
             //hmm how many results 'could there be ?
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
 
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Redirects
 
             if (File.Exists(configFilePath))
             {
-                var umbracoConfig = new XmlDocument {PreserveWhitespace = true};
+                var umbracoConfig = new XmlDocument { PreserveWhitespace = true };
                 umbracoConfig.Load(configFilePath);
 
                 var webRoutingElement = umbracoConfig.SelectSingleNode("//web.routing") as XmlElement;

@@ -112,5 +112,15 @@ namespace Umbraco.Core.Services
                 return rules;
             }
         }
+        public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))
+            {
+                var rules = repo.SearchUrls(searchTerm, pageIndex, pageSize, out total);
+                uow.Commit();
+                return rules;
+            }
+        }
     }
 }
