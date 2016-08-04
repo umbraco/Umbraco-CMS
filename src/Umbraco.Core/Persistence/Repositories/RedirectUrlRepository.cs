@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IRedirectUrl PerformGet(int id)
         {
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Id == id);
-            var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<RedirectUrlDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
