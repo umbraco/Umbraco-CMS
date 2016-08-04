@@ -236,7 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
         {
             Sql filteredSql;
-            
+
             // Apply filter
             if (defaultFilter != null)
             {
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return filteredSql;
         }
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField)
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField, Tuple<string, string> nodeIdSelect)
         {
 
             //copy to var so that the original isn't changed
@@ -286,30 +286,48 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
                 // from most recent content version for the given order by field
                 var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
                 var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
                 var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar");
                 var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
-                var innerJoinTempTable = string.Format(@"INNER JOIN (
-                 	                SELECT CASE
-                 		                WHEN dataInt Is Not Null THEN {0}
-                                        WHEN dataDecimal Is Not Null THEN {1}
-                                        WHEN dataDate Is Not Null THEN {2}
-                                        ELSE {3}
-                 	                END AS CustomPropVal,
-                                    cd.nodeId AS CustomPropValContentId
-                 	                FROM cmsDocument cd
-                                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
-                                    INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
-                			        WHERE cpt.Alias = @{4} AND cd.newest = 1) AS CustomPropData
-                                    ON CustomPropData.CustomPropValContentId = umbracoNode.id
-                ", sortedInt, sortedDecimal, sortedDate, sortedString, sortedSql.Arguments.Length);
+                //these are defaults that will be used in the query - they can be overridden for non-versioned entities or document entities
+                var versionQuery = " AND cpd.versionId = cd.versionId";
+                var newestQuery = string.Empty;
 
-                //insert this just above the LEFT OUTER JOIN
-                var newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);
+                //cmsDocument needs to filter by the 'newest' parameter in the query
+                if (nodeIdSelect.Item1 == "cmsDocument")
+                    newestQuery = " AND cd.newest = 1";
+
+                //members do not use versions so clear the versionQuery string
+                if (nodeIdSelect.Item1 == "cmsMember")
+                    versionQuery = string.Empty;
+
+                //needs to be an outer join since there's no guarantee that any of the nodes have values for this property
+                var outerJoinTempTable = string.Format(@"LEFT OUTER JOIN (
+                                SELECT CASE
+                                    WHEN dataInt Is Not Null THEN {0}
+                                    WHEN dataDecimal Is Not Null THEN {1}
+                                    WHEN dataDate Is Not Null THEN {2}
+                                    ELSE {3}
+                                END AS CustomPropVal,
+                                cd.{4} AS CustomPropValContentId
+                                FROM {5} cd
+                                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.{4}{6}
+                                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
+                                WHERE cpt.Alias = @{7}{8}) AS CustomPropData
+                                ON CustomPropData.CustomPropValContentId = umbracoNode.id
+                ", sortedInt, sortedDecimal, sortedDate, sortedString, nodeIdSelect.Item2, nodeIdSelect.Item1, versionQuery, sortedSql.Arguments.Length, newestQuery);
+
+                //insert this just above the first LEFT OUTER JOIN (for cmsDocument) or the last WHERE (everything else)
+                string newSql;
+                if (nodeIdSelect.Item1 == "cmsDocument")
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), outerJoinTempTable);
+                else
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.LastIndexOf("WHERE"), outerJoinTempTable);
+
                 var newArgs = sortedSql.Arguments.ToList();
                 newArgs.Add(orderBy);
 
@@ -319,11 +337,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (orderDirection == Direction.Descending)
                 {
                     sortedSql.Append(" DESC");
-                }                
+                }
             }
 
             return sortedSql;
-            
+
         }
 
         /// <summary>
@@ -371,7 +389,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
-                orderDirection, orderBy, orderBySystemField);
+                orderDirection, orderBy, orderBySystemField, nodeIdSelect);
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -409,7 +427,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
                     GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),
-                    orderDirection, orderBy, orderBySystemField);
+                    orderDirection, orderBy, orderBySystemField, nodeIdSelect);
                 return processQuery(fullQuery);
             }
             else
