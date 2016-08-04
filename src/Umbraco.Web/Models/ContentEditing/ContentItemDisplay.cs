@@ -20,6 +20,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
+        public ContentItemDisplay()
+        {
+            Preview = true;
+        }
+
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
@@ -34,7 +39,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
-        
+
+        [DataMember( Name = "preview" )]
+        public bool Preview { get; set; }
+
         /// <summary>
         /// The allowed 'actions' based on the user's permissions - Create, Update, Publish, Send to publish
         /// </summary>
