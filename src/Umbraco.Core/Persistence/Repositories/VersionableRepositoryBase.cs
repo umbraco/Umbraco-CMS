@@ -305,7 +305,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (nodeIdSelect.Item1 == "cmsMember")
                     versionQuery = string.Empty;
 
-                var innerJoinTempTable = string.Format(@"INNER JOIN (
+                //needs to be an outer join since there's no guarantee that any of the nodes have values for this property
+                var outerJoinTempTable = string.Format(@"LEFT OUTER JOIN (
                                 SELECT CASE
                                     WHEN dataInt Is Not Null THEN {0}
                                     WHEN dataDecimal Is Not Null THEN {1}
@@ -323,9 +324,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //insert this just above the first LEFT OUTER JOIN (for cmsDocument) or the last WHERE (everything else)
                 string newSql;
                 if (nodeIdSelect.Item1 == "cmsDocument")
-                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), outerJoinTempTable);
                 else
-                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.LastIndexOf("WHERE"), innerJoinTempTable);
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.LastIndexOf("WHERE"), outerJoinTempTable);
 
                 var newArgs = sortedSql.Arguments.ToList();
                 newArgs.Add(orderBy);
