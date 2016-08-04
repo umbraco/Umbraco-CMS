@@ -26,9 +26,8 @@ namespace Umbraco.Core.Security
             MembershipProviderBase membershipProvider)
             : base(store)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            var manager = new BackOfficeUserManager(store);
-            InitUserManager(manager, membershipProvider, options);
+            if (options == null) throw new ArgumentNullException("options");;
+            InitUserManager(this, membershipProvider, options);
         }
 
         #region Static Create methods

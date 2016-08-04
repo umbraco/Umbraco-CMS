@@ -63,9 +63,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .Where<DocumentDto>(x => x.Newest)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
             if (dto == null)
                 return null;

@@ -57,6 +57,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
@@ -88,6 +91,9 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -97,6 +103,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
