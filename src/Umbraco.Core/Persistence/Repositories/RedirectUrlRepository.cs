@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class RedirectUrlRepository : PetaPocoRepositoryBase<int, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
+        public RedirectUrlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         { }
 
@@ -196,10 +196,12 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         private static string HashUrl(string url)
         {
-            var crypto = new MD5CryptoServiceProvider();
-            var inputBytes = Encoding.UTF8.GetBytes(url);
-            var hashedBytes = crypto.ComputeHash(inputBytes);
-            return Encoding.UTF8.GetString(hashedBytes);
+            using (var crypto = new MD5CryptoServiceProvider())
+            {
+                var inputBytes = Encoding.UTF8.GetBytes(url);
+                var hashedBytes = crypto.ComputeHash(inputBytes);
+                return Encoding.UTF8.GetString(hashedBytes);
+            }
         }
     }
 }
