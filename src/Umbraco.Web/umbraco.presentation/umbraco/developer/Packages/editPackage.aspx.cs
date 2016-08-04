@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -253,6 +254,8 @@ namespace umbraco.presentation.developer.packages
             }
         }
 
+        [Obsolete("This is not used")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected void generateXML(object sender, EventArgs e)
         {
         }
@@ -276,7 +279,7 @@ namespace umbraco.presentation.developer.packages
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
-            if (!String.IsNullOrEmpty(cp.Value))
+            if (string.IsNullOrEmpty(cp.Value) == false)
                 pack.ContentNodeId = cp.Value;
             else
                 pack.ContentNodeId = "";

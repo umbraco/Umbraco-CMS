@@ -22,12 +22,6 @@ using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.packager
 {
-    public enum RequirementsType
-    {
-        Strict,
-        Legacy
-    }
-
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     /// 
