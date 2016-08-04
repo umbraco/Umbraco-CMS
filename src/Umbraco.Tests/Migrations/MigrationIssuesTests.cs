@@ -119,10 +119,7 @@ namespace Umbraco.Tests.Migrations
 
                 //pass in explicit migrations
                 new DeleteRedirectUrlTable(SqlSyntax, logger),
-                new AddRedirectUrlTable(SqlSyntax, logger),
-                new AddRedirectUrlTable2(SqlSyntax, logger),
-                new AddRedirectUrlTable3(SqlSyntax, logger),
-                new AddRedirectUrlTable4(SqlSyntax, logger)
+                new AddRedirectUrlTable(SqlSyntax, logger)
             );
 
             var db = new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Logger);
