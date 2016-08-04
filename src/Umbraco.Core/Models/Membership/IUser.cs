@@ -21,6 +21,22 @@ namespace Umbraco.Core.Models.Membership
         /// </summary>
         IUserType UserType { get; set; }
 
+        /// <summary>
+        /// Gets the groups that user is part of
+        /// </summary>
+        IEnumerable<IUserGroup> Groups { get; }
+
+        /// <summary>
+        /// Indicates if the groups for a user have been loaded
+        /// </summary>
+        bool GroupsLoaded { get; }
+
+        void RemoveGroup(IUserGroup group);
+
+        void AddGroup(IUserGroup group);
+
+        void SetGroupsLoaded();
+
         //TODO: This should be a private set 
         /// <summary>
         /// The default permission set for the user
@@ -31,7 +47,9 @@ namespace Umbraco.Core.Models.Membership
         IEnumerable<string> DefaultPermissions { get; set; }
 
         IEnumerable<string> AllowedSections { get; }
+
         void RemoveAllowedSection(string sectionAlias);
+
         void AddAllowedSection(string sectionAlias);
 
         /// <summary>

@@ -6,10 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
 	/// Provides object extension methods.
 	/// </summary>
 	public static class ObjectExtensions
@@ -647,5 +649,19 @@ namespace Umbraco.Core
 				return "[GetPropertyValueException]";
 			}
 		}
-	}
+
+        internal static T DeepClone<T>(this T obj)
+        {
+            T result;
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, obj);
+                stream.Position = 0;
+                result = (T)formatter.Deserialize(stream);
+            }
+
+            return result;
+        }
+    }
 }

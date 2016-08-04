@@ -113,7 +113,7 @@ namespace Umbraco.Core.Services
         /// assigned to an entity with a list of user id & permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
-        void ReplaceContentPermissions(EntityPermissionSet permissionSet);
+        void ReplaceContentPermissions(UserEntityPermissionSet permissionSet);
 
         /// <summary>
         /// Assigns a single permission to the current content item for the specified user ids
@@ -124,11 +124,19 @@ namespace Umbraco.Core.Services
         void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds);
 
         /// <summary>
+        /// Assigns a single permission to the current content item for the specified user group ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="groupIds"></param>
+        void AssignContentPermissionForGroup(IContent entity, char permission, IEnumerable<int> groupIds);
+
+        /// <summary>
         /// Gets the list of permissions for the content item
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content);
+        IEnumerable<UserEntityPermission> GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 

@@ -84,7 +84,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {45, typeof (MigrationDto)},
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
                                                                               {47, typeof (UmbracoDeployDependencyDto)},
-                                                                              {48, typeof (RedirectUrlDto) }
+                                                                              {48, typeof (RedirectUrlDto) },
+
+                                                                              {49, typeof (UserGroupDto) },
+                                                                              {50, typeof (User2UserGroupDto) },
+                                                                              {51, typeof (UserGroup2NodePermissionDto) },
+                                                                              {52, typeof (UserGroup2AppDto) },
                                                                           };
         #endregion
         

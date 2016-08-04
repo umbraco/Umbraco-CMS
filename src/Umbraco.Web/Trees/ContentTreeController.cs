@@ -133,7 +133,7 @@ namespace Umbraco.Web.Trees
                 // we need to get the default permissions as you can't set permissions on the very root node
                 //TODO: Use the new services to get permissions
                 var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
-                    UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
+                    UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString(), true))
                                         .Select(x => new MenuItem(x));
 
                 //these two are the standard items

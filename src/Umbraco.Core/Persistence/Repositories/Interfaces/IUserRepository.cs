@@ -29,6 +29,25 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias);
 
         /// <summary>
+        /// Gets all groups for a given user
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        IEnumerable<IUserGroup> GetGroupsForUser(int userId);
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        IEnumerable<IUser> GetAllInGroup(int groupId);
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects not associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        IEnumerable<IUser> GetAllNotInGroup(int groupId);
+
+        /// <summary>
         /// Gets paged member results
         /// </summary>
         /// <param name="query"></param>
@@ -39,14 +58,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
         
-        
         /// <summary>
         /// Gets the user permissions for the specified entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
+        IEnumerable<UserEntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
 
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities

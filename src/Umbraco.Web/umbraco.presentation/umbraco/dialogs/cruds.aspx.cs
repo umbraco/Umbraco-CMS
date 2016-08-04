@@ -90,7 +90,7 @@ namespace umbraco.dialogs
 
                         if (a.CanBePermissionAssigned == false) continue;
 
-                        if (u.GetPermissions(_node.Path).IndexOf(a.Letter) > -1)
+                        if (u.GetPermissions(_node.Path, true).IndexOf(a.Letter) > -1)
                         {
                             chk.Checked = true;
                         }

@@ -214,7 +214,7 @@ function openContent(id) {
         /// <returns></returns>
         protected List<IAction> GetUserActionsForNode(Document dd)
         {
-            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path));
+            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path, true));
 
             // A user is allowed to delete their own stuff
             if (dd.UserId == CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)
@@ -298,7 +298,7 @@ function openContent(id) {
         /// <returns></returns>
         internal List<IAction> GetUserActionsForNode(UmbracoEntity dd)
         {
-            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path));
+            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path, true));
 
             // A user is allowed to delete their own stuff
             if (dd.CreatorId == CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)
@@ -360,7 +360,7 @@ function openContent(id) {
             }
             else if (!this.IsDialog || (this.DialogMode == TreeDialogModes.id))
             {
-                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString()))
+                if (CurrentUser.GetPermissions(dd.Path, true).Contains(ActionUpdate.Instance.Letter.ToString()))
                 {
                     treeElement.Action = String.Format("javascript:openContent({0});", dd.Id);
                 }
@@ -432,7 +432,7 @@ function openContent(id) {
             }
             else if (this.IsDialog == false || (this.DialogMode == TreeDialogModes.id))
             {
-                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                if (CurrentUser.GetPermissions(dd.Path, true).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
                 {
                     treeElement.Action = String.Format("javascript:openContent({0});", dd.Id);
                 }

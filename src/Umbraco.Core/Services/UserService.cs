@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
@@ -54,7 +53,7 @@ namespace Umbraco.Core.Services
                 {
                     return types.First(x => x.InvariantEquals("writer"));
                 }
-                
+
                 if (types.Length == 1)
                 {
                     return types.First();
@@ -139,7 +138,7 @@ namespace Umbraco.Core.Services
                     Email = email,
                     Language = Configuration.GlobalSettings.DefaultUILanguage,
                     Name = username,
-                    RawPasswordValue = passwordValue,                    
+                    RawPasswordValue = passwordValue,
                     Username = username,
                     StartContentId = -1,
                     StartMediaId = -1,
@@ -171,9 +170,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var user = repository.Get((int)id);
-
-                return user;
+                return repository.Get(id);
             }
         }
 
@@ -203,12 +200,10 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
-                var user = repository.GetByQuery(query).FirstOrDefault();
-
-                return user;
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
-        
+
         /// <summary>
         /// Get an <see cref="IUser"/> by username
         /// </summary>
@@ -219,8 +214,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
-                var user = repository.GetByQuery(query).FirstOrDefault();
-                return user;
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
 
@@ -229,9 +223,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>
         public void Delete(IUser membershipUser)
-        {            
+        {
             //disable
-            membershipUser.IsApproved = false;            
+            membershipUser.IsApproved = false;
             //can't rename if it's going to take up too many chars
             if (membershipUser.Username.Length + 9 <= 125)
             {
@@ -467,13 +461,13 @@ namespace Umbraco.Core.Services
                         return repository.Count(query);
                     case MemberCountType.Online:
                         throw new NotImplementedException();
-                        //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                        //query =
-                        //    Query<IMember>.Builder.Where(
-                        //        x =>
-                        //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
-                        //        ((Member)x).DateTimePropertyValue > fromDate);
-                        //return repository.GetCountByQuery(query);
+                    //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
+                    //query =
+                    //    Query<IMember>.Builder.Where(
+                    //        x =>
+                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
+                    //        ((Member)x).DateTimePropertyValue > fromDate);
+                    //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:
                         query =
                             Query<IUser>.Builder.Where(
@@ -503,6 +497,34 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
+        public IEnumerable<IUser> GetAllInGroup(int groupId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetAllInGroup(groupId);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="IUser"/> objects not associated with a given group
+        /// </summary>
+        /// <param name="groupId">Id of group</param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
+        public IEnumerable<IUser> GetAllNotInGroup(int groupId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetAllNotInGroup(groupId);
             }
         }
 
@@ -562,6 +584,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Replaces the same permission set for a single group to any number of entities
+        /// </summary>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
+        /// <param name="groupId">Id of the group</param>
+        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
+        public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                repository.ReplaceGroupPermissions(groupId, permissions, entityIds);
+            }
+        }
+
+        /// <summary>
         /// Assigns the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId">Id of the user</param>
@@ -577,7 +615,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets all UserTypes or thosed specified as parameters
+        /// Gets all UserTypes or those specified as parameters
         /// </summary>
         /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUserType"/></returns>
@@ -614,7 +652,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Get(id);                
+                return repository.Get(id);
             }
         }
 
@@ -678,6 +716,129 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets all UserGroups or those specified as parameters
+        /// </summary>
+        /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                return repository.GetAll(ids).OrderBy(x => x.Name);
+            }
+        }
+
+        /// <summary>
+        /// Gets all UserGroups for a given user
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
+        public IEnumerable<IUserGroup> GetGroupsForUser(int userId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetGroupsForUser(userId);
+            }
+        }
+
+        /// <summary>
+        /// Gets a UserGroup by its Alias
+        /// </summary>
+        /// <param name="alias">Alias of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        public IUserGroup GetUserGroupByAlias(string alias)
+        {
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(UowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUserGroup>.Builder.Where(x => x.Alias == alias);
+                var contents = repository.GetByQuery(query);
+                return contents.SingleOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Gets a UserGroup by its Id
+        /// </summary>
+        /// <param name="id">Id of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        public IUserGroup GetUserGroupById(int id)
+        {
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        /// <summary>
+        /// Gets a UserGroup by its Name
+        /// </summary>
+        /// <param name="name">Name of the UserGroup to retrieve</param>
+        /// <returns><see cref="IUserGroup"/></returns>
+        public IUserGroup GetUserGroupByName(string name)
+        {
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(UowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUserGroup>.Builder.Where(x => x.Name == name);
+                var contents = repository.GetByQuery(query);
+                return contents.SingleOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Saves a UserGroup
+        /// </summary>
+        /// <param name="userGroup">UserGroup to save</param>
+        /// <param name="updateUsers">Flag for whether to update the list of users in the group</param>
+        /// <param name="userIds">List of user Ids</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        public void SaveUserGroup(IUserGroup userGroup, bool updateUsers = false, int[] userIds = null, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (SavingUserGroup.IsRaisedEventCancelled(new SaveEventArgs<IUserGroup>(userGroup), this))
+                    return;
+            }
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                repository.AddOrUpdate(userGroup);
+                uow.Commit();
+
+                if (updateUsers)
+                {
+                    repository.RemoveAllUsersFromGroup(userGroup.Id);
+                    repository.AddUsersToGroup(userGroup.Id, userIds);
+                }
+            }
+
+            if (raiseEvents)
+                SavedUserGroup.RaiseEvent(new SaveEventArgs<IUserGroup>(userGroup, false), this);
+        }
+
+        /// <summary>
+        /// Deletes a UserGroup
+        /// </summary>
+        /// <param name="userGroup">UserGroup to delete</param>
+        public void DeleteUserGroup(IUserGroup userGroup)
+        {
+            if (DeletingUserGroup.IsRaisedEventCancelled(new DeleteEventArgs<IUserGroup>(userGroup), this))
+                return;
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                repository.Delete(userGroup);
+                uow.Commit();
+            }
+
+            DeletedUserGroup.RaiseEvent(new DeleteEventArgs<IUserGroup>(userGroup, false), this);
+        }
+
+        /// <summary>
         /// Removes a specific section from all users
         /// </summary>
         /// <remarks>This is useful when an entire section is removed from config</remarks>
@@ -697,7 +858,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-        
+
         /// <summary>
         /// Add a specific section to all users or those specified as parameters
         /// </summary>
@@ -726,12 +887,11 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
             }
-        }    
+        }
 
         /// <summary>
         /// Get permissions set for a user and optional node ids
         /// </summary>
-        /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
         /// <param name="user">User to retrieve permissions for</param>
         /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
@@ -740,26 +900,247 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);
+                return GetPermissions(repository, user, true, true, nodeIds);
+            }
+        }
 
-                //if no permissions are assigned to a particular node then we will fill in those permissions with the user's defaults
-                var result = new List<EntityPermission>(explicitPermissions);
+        /// <summary>
+        /// Get permissions set for a user and optional node ids
+        /// </summary>
+        /// <param name="repository">User repository</param>
+        /// <param name="user">User to retrieve permissions for</param>
+        /// <param name="aggregateWithGroupPermissions">Flag indicating whether to aggregate permission for the user with those defined on groups they are a member of</param>
+        /// <param name="useDefaultPermissionsIfNotExplicitlyDefined">Flag indicating whether to fall back to default permissions defined on the user type if none explicitly defined on the provided nodes</param>
+        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        private IEnumerable<EntityPermission> GetPermissions(IUserRepository repository, IUser user, bool aggregateWithGroupPermissions, bool useDefaultPermissionsIfNotExplicitlyDefined, params int[] nodeIds)
+        {
+            // Need to clone the permissions as we'll be amending the result list based on passed parameters and we don't want
+            // these amends polluting the cached values
+            var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds).DeepClone();
+            var result = new List<EntityPermission>(explicitPermissions);
+
+            // Save list of nodes that user has explicit permissions for - these take priority so we don't want
+            // to amend with any settings from groups (we'll take the special "null" action as not being defined
+            // as this is set if someone sets permissions on a user and then removes them)
+            var explicitlyDefinedEntityIds = result
+                .Where(IsNotNullActionPermission)
+                .Select(x => x.EntityId)
+                .ToArray();
+
+            // If no permissions are assigned to a particular node then, if requested, we will fill in those permissions with the user's defaults
+            if (useDefaultPermissionsIfNotExplicitlyDefined)
+            {
                 var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
                 foreach (var id in missingIds)
                 {
                     result.Add(
-                        new EntityPermission(
+                        new UserEntityPermission(
                             user.Id,
                             id,
                             user.DefaultPermissions.ToArray()));
+                }
+            }
+
+            // If groups requested, add or amend the existing permissions based on these
+            if (aggregateWithGroupPermissions)
+            {
+                foreach (var group in user.Groups)
+                {
+                    var groupPermissions = GetPermissions(group, nodeIds).ToList();
+                    foreach (var groupPermission in groupPermissions)
+                    {
+                        // Check if we already have this from explicitly set user permissions, if so, ignore it
+                        if (explicitlyDefinedEntityIds.Contains(groupPermission.EntityId) == false)
+                        {
+                            // Add group permission, ensuring we keep a unique value for the entity Id in the list
+                            AddOrAmendPermission(result, groupPermission);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
+        private void AddOrAmendPermission(IList<EntityPermission> permissions, EntityPermission groupPermission)
+        {
+            var existingPermission = permissions
+                .SingleOrDefault(x => x.EntityId == groupPermission.EntityId);
+            if (existingPermission != null)
+            {
+                existingPermission.AddAdditionalPermissions(groupPermission.AssignedPermissions);
+            }
+            else
+            {
+                permissions.Add(groupPermission);
+            }
+        }
+
+        /// <summary>
+        /// Get permissions set for a group and optional node ids
+        /// </summary>
+        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        public IEnumerable<EntityPermission> GetPermissions(IUserGroup group, params int[] nodeIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserGroupRepository(uow))
+            {
+                var explicitPermissions = repository.GetGroupPermissionsForEntities(group.Id, nodeIds);
+                var result = new List<EntityPermission>(explicitPermissions);
+
+                // If no permissions are assigned to a particular node then we will fill in those permissions with the group's defaults
+                var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
+                foreach (var id in missingIds)
+                {
+                    result.Add(
+                        new GroupEntityPermission(
+                            group.Id,
+                            id,
+                            group.Permissions.ToArray()));
                 }
 
                 return result;
             }
         }
 
+        /// <summary>
+        /// Gets the permissions for the provided user and path
+        /// </summary>
+        /// <param name="user">User to check permissions for</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <param name="strategy">Permission check strategy</param>
+        /// <returns>String indicating permissions for provided user and path</returns>
+        public string GetPermissionsForPath(IUser user, string path, PermissionsFrom strategy)
+        {
+            var nodeId = GetNodeIdFromPath(path);
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                // Check for permissions directly assigned to the node for the user (if we have any, they take priority
+                // over anything defined on groups; we'll take the special "null" action as not being defined
+                // as this is set if someone sets permissions on a user and then removes them)
+                var permissions = GetPermissions(repository, user, false, false, nodeId)
+                    .Where(IsNotNullActionPermission)
+                    .ToList();
+                var gotDirectlyAssignedUserPermissions = permissions.Any();
+
+                // If none found, and checking groups, get permissions from the groups
+                if (strategy == PermissionsFrom.DirectlyAssignedOrViaGroups && gotDirectlyAssignedUserPermissions == false)
+                {
+                    foreach (var group in user.Groups)
+                    {
+                        var groupPermissions = GetPermissions(group, nodeId).ToList();
+                        permissions.AddRange(groupPermissions);
+                    }
+                }
+
+                // If none found directly on the user, get those defined on the user type
+                if (gotDirectlyAssignedUserPermissions == false)
+                {
+                    var typePermissions = GetPermissions(repository, user, false, true, nodeId).ToList();
+                    permissions.AddRange(typePermissions);
+                }
+
+                // Extract the net permissions from the path from the set of permissions found
+                string assignedPermissions;
+                if (TryGetAssignedPermissionsForNode(permissions, nodeId, strategy, out assignedPermissions))
+                {
+                    return assignedPermissions;
+                }
+
+                // Exception to everything. If default cruds is empty and we're on root node; allow browse of root node
+                if (path == "-1")
+                {
+                    return "F";
+                }
+
+                return string.Empty;
+            }
+        }
+
+        private static bool IsNotNullActionPermission(EntityPermission x)
+        {
+            const string NullActionChar = "-";
+            return string.Join(string.Empty, x.AssignedPermissions) != NullActionChar;
+        }
+
+        /// <summary>
+        /// Gets the permissions for the provided group and path
+        /// </summary>
+        /// <param name="group">Group to check permissions for</param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <returns>String indicating permissions for provided user and path</returns>
+        public string GetPermissionsForPath(IUserGroup group, string path)
+        {
+            var nodeId = GetNodeIdFromPath(path);
+
+            var permissions = GetPermissions(group).ToList();
+
+            string assignedPermissions;
+            TryGetAssignedPermissionsForNode(permissions, nodeId, PermissionsFrom.DirectlyAssigned, out assignedPermissions);
+            return assignedPermissions;
+        }
+
+        private static int GetNodeIdFromPath(string path)
+        {
+            return path.Contains(",")
+                ? int.Parse(path.Substring(path.LastIndexOf(",", StringComparison.Ordinal) + 1))
+                : int.Parse(path);
+        }
+
+        /// <summary>
+        /// Checks in a set of permissions associated with a user for those related to a given nodeId
+        /// </summary>
+        /// <param name="permissions">The set of permissions</param>
+        /// <param name="nodeId">The node Id</param>
+        /// <param name="strategy">
+        /// Indicates whether the set of permissions contains just those associated directly with the user or group 
+        /// or has been amalgamated with those from the groups the user is assoicated with
+        /// </param>
+        /// <param name="assignedPermissions">The permissions to return</param>
+        /// <returns>True if permissions for the given path are found</returns>
+        public static bool TryGetAssignedPermissionsForNode(IList<EntityPermission> permissions,
+            int nodeId,
+            PermissionsFrom strategy,
+            out string assignedPermissions)
+        {
+            if (permissions.Any(x => x.EntityId == nodeId))
+            {
+                var found = permissions.First(x => x.EntityId == nodeId);
+                var assignedPermissionsArray = found.AssignedPermissions.ToList();
+
+                if (strategy == PermissionsFrom.DirectlyAssignedOrViaGroups)
+                {
+                    // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
+                    // and we need to get the most permissive set
+                    foreach (var permission in permissions.Where(x => x.EntityId == nodeId).Skip(1))
+                    {
+                        AddAdditionalPermissions(assignedPermissionsArray, permission.AssignedPermissions);
+                    }
+                }
+
+                assignedPermissions = string.Join("", assignedPermissionsArray);
+                return true;
+            }
+
+            assignedPermissions = string.Empty;
+            return false;
+        }
+
+        private static void AddAdditionalPermissions(List<string> assignedPermissions, string[] additionalPermissions)
+        {
+            var permissionsToAdd = additionalPermissions
+                .Where(x => assignedPermissions.Contains(x) == false);
+            assignedPermissions.AddRange(permissionsToAdd);
+        }
+
         #endregion
-        
+
         /// <summary>
         /// Occurs before Save
         /// </summary>
@@ -799,5 +1180,25 @@ namespace Umbraco.Core.Services
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> DeletedUserType;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavingUserGroup;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavedUserGroup;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletingUserGroup;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
     }
 }

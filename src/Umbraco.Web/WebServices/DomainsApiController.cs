@@ -38,7 +38,7 @@ namespace Umbraco.Web.WebServices
                 throw new HttpResponseException(response);
             }
 
-            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
+            if (UmbracoUser.GetPermissions(node.Path, true).Contains(ActionAssignDomain.Instance.Letter) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");

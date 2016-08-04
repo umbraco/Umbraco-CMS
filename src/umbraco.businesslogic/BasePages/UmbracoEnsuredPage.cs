@@ -92,7 +92,7 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public bool ValidateUserNodeTreePermissions(string Path, string Action)
         {
-            string permissions = getUser().GetPermissions(Path);
+            string permissions = getUser().GetPermissions(Path, true);
             if (permissions.IndexOf(Action) > -1 && (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ",")))
                 return true;
 

@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services
         /// assigned to an entity with a list of user id & permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
-        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        public void ReplaceContentPermissions(UserEntityPermissionSet permissionSet)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
@@ -121,11 +121,26 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Assigns a single permission to the current content item for the specified group ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="groupIds"></param>
+        public void AssignContentPermissionForGroup(IContent entity, char permission, IEnumerable<int> groupIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                repository.AssignEntityPermissionForGroup(entity, permission, groupIds);
+            }
+        }
+
+        /// <summary>
         /// Gets the list of permissions for the content item
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        public IEnumerable<UserEntityPermission> GetPermissionsForEntity(IContent content)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))

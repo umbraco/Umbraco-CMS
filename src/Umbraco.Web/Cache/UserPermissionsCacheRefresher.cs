@@ -9,8 +9,8 @@ namespace Umbraco.Web.Cache
     /// Used only to invalidate the user permissions cache
     /// </summary>
     /// <remarks>
-    /// The UserCacheRefresher will also clear a user's permissions cache, this refresher is for invalidating only permissions
-    /// for users/content, not the users themselves.
+    /// The UserCacheRefresher will also clear a user's permissions cache, 
+    /// this refresher is for invalidating only permissions for user and content, not the users themselves.
     /// </remarks>
     public sealed class UserPermissionsCacheRefresher : CacheRefresherBase<UserPermissionsCacheRefresher>
     {
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Cache
 
         private Attempt<IRuntimeCacheProvider> UserPermissionsCache
         {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
+            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<UserEntityPermission>(); }
         }
     }
 }

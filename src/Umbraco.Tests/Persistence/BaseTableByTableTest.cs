@@ -621,10 +621,34 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Can_Create_umbracoUserType_Table()
         {
-            
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<UserTypeDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoUserGroup_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<UserGroupDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoUser2UserGroup_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
+                DatabaseSchemaHelper.CreateTable<UserGroupDto>();
+                DatabaseSchemaHelper.CreateTable<UserDto>();
+                DatabaseSchemaHelper.CreateTable<User2UserGroupDto>();
 
                 //transaction.Complete();
             }
@@ -660,9 +684,34 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
+        public void Can_Create_umbracoGroupUser2app_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<NodeDto>();
+                DatabaseSchemaHelper.CreateTable<UserGroupDto>();
+                DatabaseSchemaHelper.CreateTable<UserGroup2AppDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoUserGroup2NodePermission_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<NodeDto>();
+                DatabaseSchemaHelper.CreateTable<UserGroupDto>();
+                DatabaseSchemaHelper.CreateTable<UserGroup2NodePermissionDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
         public void Can_Create_umbracoUser2NodePermission_Table()
         {
-            
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<NodeDto>();

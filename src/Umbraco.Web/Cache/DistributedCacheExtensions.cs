@@ -98,6 +98,25 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
+        #region User group permissions cache
+
+        public static void RemoveUserGroupPermissionsCache(this DistributedCache dc, int groupId)
+        {
+            dc.Remove(DistributedCache.UserPermissionsCacheRefresherGuid, groupId);
+        }
+
+        public static void RefreshUserGroupPermissionsCache(this DistributedCache dc, int groupId)
+        {
+            dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
+        }
+
+        public static void RefreshAllUserGroupPermissionsCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(DistributedCache.UserGroupPermissionsCacheRefresherGuid);
+        }
+
+        #endregion
+
         #region Template cache
 
         public static void RefreshTemplateCache(this DistributedCache dc, int templateId)

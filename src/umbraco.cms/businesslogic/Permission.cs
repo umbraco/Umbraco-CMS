@@ -67,9 +67,8 @@ namespace umbraco.BusinessLogic
                 {
                     NodeId = entityPermission.EntityId,
                     PermissionId = assignedPermission[0],
-                    UserId = entityPermission.UserId
+                    UserId = user.UserEntity.Id
                 });
-
         }
 
         /// <summary>

@@ -2,9 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
-
 using Umbraco.Core.Persistence.Repositories;
-using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
@@ -32,7 +30,10 @@ namespace Umbraco.Web.Cache
         {
             ClearAllIsolatedCacheByEntityType<IUser>();
             if (UserPermissionsCache)
+            {
                 UserPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
+            }
+
             base.RefreshAll();
         }
 
@@ -49,14 +50,17 @@ namespace Umbraco.Web.Cache
                 userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
 
             if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
-            
+            {
+                var keyStartsWith = string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id);
+                UserPermissionsCache.Result.ClearCacheByKeySearch(keyStartsWith);
+            }
+
             base.Remove(id);
         }
 
         private Attempt<IRuntimeCacheProvider> UserPermissionsCache
         {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
+            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<UserEntityPermission>(); }
         }
 
     }
