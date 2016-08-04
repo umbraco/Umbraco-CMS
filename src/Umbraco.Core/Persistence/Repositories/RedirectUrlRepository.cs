@@ -196,7 +196,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         private static string HashUrl(string url)
         {
-            using (var crypto = new MD5CryptoServiceProvider())
+            using (var crypto = new SHA1CryptoServiceProvider())
             {
                 var inputBytes = Encoding.UTF8.GetBytes(url);
                 var hashedBytes = crypto.ComputeHash(inputBytes);
