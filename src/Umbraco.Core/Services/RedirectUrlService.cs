@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
-                    redir = new RedirectUrl { Url = url, ContentKey = contentKey };
+                    redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
                 repo.AddOrUpdate(redir);
                 uow.Commit();
             }
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             using (var repo = RepositoryFactory.CreateRedirectUrlRepository(uow))

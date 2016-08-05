@@ -453,8 +453,16 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Tuple<string, object[]>> filterCallback = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                sbWhere
+                    .Append("AND (")
+                    .Append(SqlSyntax.GetQuotedTableName("umbracoNode"))
+                    .Append(".")
+                    .Append(SqlSyntax.GetQuotedColumnName("text"))
+                    .Append(" LIKE @")
+                    .Append(args.Count)
+                    .Append(")");
                 args.Add("%" + filter + "%");
+
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
             }
 
