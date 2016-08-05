@@ -82,10 +82,10 @@
                     <div class="umb-healthcheck-group__details-status" ng-repeat="status in check.status">
 
                         <div class="umb-healthcheck-group__details-status-icon-container">
-                            <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType == 0"></i>
-                            <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType == 1"></i>
-                            <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType == 2"></i>
-                            <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType == 3"></i>
+                            <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
+                            <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
+                            <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
+                            <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
                         </div>
 
                         <div class="umb-healthcheck-group__details-status-content">
@@ -101,7 +101,9 @@
                                         <div><label class="bold">Set new value:</label></div>
                                         <input type="text" ng-model="action.providedValue" required/>
                                     </div>
-                                    <button type="button" class="umb-era-button -blue" ng-click="vm.executeAction(check, $index, action);">{{action.name}}</button>
+                                    
+                                    <button type="button" class="umb-era-button -blue" ng-click="vm.executeAction(check, $parent.$index, action);">{{action.name}}</button>                                    
+
                                     <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                 </div>
                             </div>
