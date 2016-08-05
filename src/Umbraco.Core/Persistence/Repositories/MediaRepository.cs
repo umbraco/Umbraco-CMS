@@ -454,7 +454,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (filter.IsNullOrWhiteSpace() == false)
             {
                 sbWhere
-                    .Append("AND (umbracoNode.")
+                    .Append("AND (")
+                    .Append(SqlSyntax.GetQuotedTableName("umbracoNode"))
+                    .Append(".")
                     .Append(SqlSyntax.GetQuotedColumnName("text"))
                     .Append(" LIKE @")
                     .Append(args.Count)
