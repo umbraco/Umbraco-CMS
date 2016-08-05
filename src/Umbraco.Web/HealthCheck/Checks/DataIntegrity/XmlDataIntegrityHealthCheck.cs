@@ -14,7 +14,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     [HealthCheck(
         "D999EB2B-64C2-400F-B50C-334D41F8589A",
         "XML Data Integrity",
-        Description = "Checks the integrity of the XML data in Umbraco",
+        Description = "This checks the data integrity for the xml structures for content, media and members that are stored in the cmsContentXml table. This does not check the data integrity of the xml cache file, only the xml structures stored in the database used to create the xml cache file.",
         Group = "Data Integrity")]
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
@@ -85,7 +85,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
             if (totalXml != total)
                 actions.Add(new HealthCheckAction(CheckMembersXmlTableAction, Id));
             
-            return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMembers", new[] { totalXml.ToString(), total.ToString() }))
+            return new HealthCheckStatus(_textService.Localize("healthcheck/xmlDataIntegrityCheckMembers", new[] { totalXml.ToString(), total.ToString(), (total - totalXml).ToString() }))
             {
                 ResultType = totalXml == total ? StatusResultType.Success : StatusResultType.Error,
                 Actions = actions
@@ -122,7 +122,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
                 .InnerJoin<NodeDto>(_sqlSyntax)
                 .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType)
-                .Where(string.Format("cmsContentXml.{0} NOT LIKE '% key=\"%'", _sqlSyntax.GetQuotedColumnName("xml")));
+                .Where(string.Format("{0}.{1} NOT LIKE '% key=\"%'", _sqlSyntax.GetQuotedTableName("cmsContentXml"), _sqlSyntax.GetQuotedColumnName("xml")));
             var totalNonGuidXml = _database.ExecuteScalar<int>(countNonGuidQuery);
 
             var hasError = false;
@@ -160,7 +160,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
             //count entires
             var countTotalSubQuery = new Sql()
-                .Select("DISTINCT cmsContentXml.nodeId")
+                .Select(string.Format("DISTINCT {0}.{1}", _sqlSyntax.GetQuotedTableName("cmsContentXml"), _sqlSyntax.GetQuotedColumnName("nodeId")))
                 .From<ContentXmlDto>(_sqlSyntax)
                 .InnerJoin<DocumentDto>(_sqlSyntax)
                 .On<DocumentDto, ContentXmlDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId);
@@ -173,7 +173,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
                 .InnerJoin<NodeDto>(_sqlSyntax)
                 .On<ContentXmlDto, NodeDto>(_sqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == documentObjectType)
-                .Where(string.Format("cmsContentXml.{0} NOT LIKE '% key=\"%'", _sqlSyntax.GetQuotedColumnName("xml")));
+                .Where(string.Format("{0}.{1} NOT LIKE '% key=\"%'", _sqlSyntax.GetQuotedTableName("cmsContentXml"), _sqlSyntax.GetQuotedColumnName("xml")));
             var totalNonGuidXml = _database.ExecuteScalar<int>(countNonGuidQuery);
 
             var hasError = false;
