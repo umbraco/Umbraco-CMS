@@ -1,6 +1,6 @@
-<div class="redirecturlsearch" ng-controller="Umbraco.Dashboard.RedirectUrlsController">
+<div class="redirecturlsearch" ng-controller="Umbraco.Dashboard.RedirectUrlsController as vm">
 
-    <umb-load-indicator ng-if="dashboard.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="vm.dashboard.loading"></umb-load-indicator>
 
     <umb-editor-sub-header>
 
@@ -9,18 +9,18 @@
             <umb-editor-sub-header-section>
 
                 <button
-                    ng-if="dashboard.UrlTrackerDisabled === false"
+                    ng-if="vm.dashboard.UrlTrackerDisabled === false"
                     type="button"
                     class="umb-era-button"
-                    ng-click="disableUrlTracker()">
+                    ng-click="vm.disableUrlTracker()">
                     <span>Disable URL Tracker</span>
                 </button>
 
                 <button
-                    ng-if="dashboard.UrlTrackerDisabled === true"
+                    ng-if="vm.dashboard.UrlTrackerDisabled === true"
                     type="button"
                     class="umb-era-button"
-                    ng-click="enableUrlTracker()">
+                    ng-click="vm.enableUrlTracker()">
                     <span>Enable URL Tracker</span>
                 </button>
 
@@ -30,8 +30,8 @@
 
                 <input
                     placeholder="Search for redirect"
-                    ng-model="dashboard.searchTerm"
-                    ng-change="filter()"
+                    ng-model="vm.dashboard.searchTerm"
+                    ng-change="vm.filter()"
                     no-dirty-check>
 
             </umb-editor-sub-header-section>
@@ -55,7 +55,7 @@
 
         <div class="umb-table-body">
 
-            <div class="umb-table-row" ng-repeat="redirectUrl in redirectUrls">
+            <div class="umb-table-row" ng-repeat="redirectUrl in vm.redirectUrls">
 
                 <div class="umb-table-cell">
                     <i class="umb-table-body__icon umb-table-body__fileicon icon-shuffle"></i>
@@ -75,7 +75,7 @@
 
                 <div class="umb-table-cell">
                     <a href="/umbraco/#/content/content/edit/{{redirectUrl.ContentId}}" class="umb-era-button -gray" style="margin-right: 10px;">Edit</a>
-                    <button class="umb-era-button -gray" ng-click="removeRedirect(redirectUrl)">Remove</button>
+                    <button class="umb-era-button -gray" ng-click="vm.removeRedirect(redirectUrl)">Remove</button>
                 </div>
 
             </div>
@@ -86,12 +86,12 @@
 
     <div class="flex justify-center items-center">
         <umb-pagination
-            ng-if="pagination.totalPages > 1 && !dashboard.loading"
-            page-number="pagination.pageNumber"
-            total-pages="pagination.totalPages"
-            on-next="goToPage"
-            on-prev="goToPage"
-            on-go-to-page="goToPage">
+            ng-if="vm.pagination.totalPages > 1 && !vm.dashboard.loading"
+            page-number="vm.pagination.pageNumber"
+            total-pages="vm.pagination.totalPages"
+            on-next="vm.goToPage"
+            on-prev="vm.goToPage"
+            on-go-to-page="vm.goToPage">
         </umb-pagination>
     </div>
 

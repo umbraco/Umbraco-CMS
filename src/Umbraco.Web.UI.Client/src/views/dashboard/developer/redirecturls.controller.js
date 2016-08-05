@@ -1,130 +1,144 @@
-angular.module("umbraco").controller("Umbraco.Dashboard.RedirectUrlsController", function($scope, redirectUrlsResource, notificationsService, $q) {
-    //...todo
-    //search by url or url part
-    //search by domain
-    //display domain in dashboard results?
+(function() {
+    "use strict";
 
-    //used to cancel any request in progress if another one needs to take it's place
-    var canceler = null;
+    function RedirectUrlsController($scope, redirectUrlsResource, notificationsService, $q) {
+        //...todo
+        //search by url or url part
+        //search by domain
+        //display domain in dashboard results?
 
-    $scope.dashboard = {
-        searchTerm: "",
-        loading: false,
-        UrlTrackerDisabled: false
-    };
+        //used to cancel any request in progress if another one needs to take it's place
+        var vm = this;
+        var canceler = null;
 
-    $scope.pagination = {
-        pageIndex: 0,
-        pageNumber: 1,
-        totalPages: 1,
-        pageSize: 20
-    };
+        vm.dashboard = {
+            searchTerm: "",
+            loading: false,
+            UrlTrackerDisabled: false
+        };
 
-    function activate() {
-        $scope.search();
-    }
+        vm.pagination = {
+            pageIndex: 0,
+            pageNumber: 1,
+            totalPages: 1,
+            pageSize: 20
+        };
 
-    $scope.goToPage = function(pageNumber) {
-        $scope.pagination.pageIndex = pageNumber - 1;
-        $scope.pagination.pageNumber = pageNumber;
-        $scope.search();
-    };
+        vm.goToPage = goToPage;
+        vm.search = search;
+        vm.removeRedirect = removeRedirect;
+        vm.disableUrlTracker = disableUrlTracker;
+        vm.enableUrlTracker = enableUrlTracker;
+        vm.filter = filter;
 
-    $scope.search = function() {
-
-        $scope.dashboard.loading = true;
-
-        var searchTerm = $scope.dashboard.searchTerm;
-        if (searchTerm === undefined) {
-            searchTerm = "";
+        function activate() {
+            vm.search();
         }
 
-        redirectUrlsResource.searchRedirectUrls(searchTerm, $scope.pagination.pageIndex, $scope.pagination.pageSize).then(function(response) {
-
-            $scope.redirectUrls = response.SearchResults;
-
-            // update pagination
-            $scope.pagination.pageIndex = response.CurrentPage;
-            $scope.pagination.pageNumber = response.CurrentPage + 1;
-            $scope.pagination.totalPages = response.PageCount;
-
-            // Set enable/disable state for url tracker
-            $scope.dashboard.UrlTrackerDisabled = response.UrlTrackerDisabled;
-
-            angular.forEach($scope.redirectUrls, function(redirect) {
-                redirectUrlsResource.getPublishedUrl(redirect.ContentId).then(function(response) {
-                    redirect.ContentUrl = response;
-                }, function(error) {
-                    notificationsService.error("Redirect Url Error!", "Failed to get published url for " + redirect.Url);
-                });
-            });
-
-            $scope.dashboard.loading = false;
-
-        });
-    };
-
-    $scope.removeRedirect = function(redirectToDelete) {
-
-        redirectUrlsResource.deleteRedirectUrl(redirectToDelete.Id).then(function() {
-
-            var index = $scope.redirectUrls.indexOf(redirectToDelete);
-            $scope.redirectUrls.splice(index, 1);
-            notificationsService.success("Redirect Url Removed!", "Redirect Url " + redirectToDelete.Url + " has been deleted");
-
-        }, function(error) {
-
-            notificationsService.error("Redirect Url Error!", "Redirect Url " + redirectToDelete.Url + " was not deleted");
-
-        });
-
-    };
-
-    $scope.disableUrlTracker = function() {
-        var toggleConfirm = confirm("Are you sure you want to disable the URL tracker?");
-        if (toggleConfirm) {
-
-            redirectUrlsResource.toggleUrlTracker(true).then(function() {
-                activate();
-                notificationsService.success("URL Tracker has now been disabled");
-            }, function(error) {
-                notificationsService.warning("Error disabling the URL Tracker, more information can be found in your log file.");
-            });
-
+        function goToPage(pageNumber) {
+            vm.pagination.pageIndex = pageNumber - 1;
+            vm.pagination.pageNumber = pageNumber;
+            vm.search();
         }
-    };
 
-    $scope.enableUrlTracker = function() {
-        redirectUrlsResource.toggleUrlTracker(false).then(function() {
-            activate();
-            notificationsService.success("URL Tracker has now been enabled");
-        }, function(error) {
-            notificationsService.warning("Error enabling the URL Tracker, more information can be found in your log file.");
-        });
-    };
+        function search() {
 
-    var filterDebounced = _.debounce(function(e) {
+            vm.dashboard.loading = true;
 
-        $scope.$apply(function() {
-
-            //a canceler exists, so perform the cancelation operation and reset
-            if (canceler) {
-                canceler.resolve();
-                canceler = $q.defer();
-            } else {
-                canceler = $q.defer();
+            var searchTerm = vm.dashboard.searchTerm;
+            if (searchTerm === undefined) {
+                searchTerm = "";
             }
 
-            $scope.search();
+            redirectUrlsResource.searchRedirectUrls(searchTerm, vm.pagination.pageIndex, vm.pagination.pageSize).then(function(response) {
 
-        });
+                vm.redirectUrls = response.SearchResults;
 
-    }, 200);
+                // update pagination
+                vm.pagination.pageIndex = response.CurrentPage;
+                vm.pagination.pageNumber = response.CurrentPage + 1;
+                vm.pagination.totalPages = response.PageCount;
 
-    $scope.filter = function() {
-        filterDebounced();
-    };
+                // Set enable/disable state for url tracker
+                vm.dashboard.UrlTrackerDisabled = response.UrlTrackerDisabled;
 
-    activate();
+                angular.forEach(vm.redirectUrls, function(redirect) {
+                    redirectUrlsResource.getPublishedUrl(redirect.ContentId).then(function(response) {
+                        redirect.ContentUrl = response;
+                    }, function(error) {
+                        notificationsService.error("Redirect Url Error!", "Failed to get published url for " + redirect.Url);
+                    });
+                });
 
-});
+                vm.dashboard.loading = false;
+
+            });
+        }
+
+        function removeRedirect(redirectToDelete) {
+
+            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.Id).then(function() {
+
+                var index = vm.redirectUrls.indexOf(redirectToDelete);
+                vm.redirectUrls.splice(index, 1);
+                notificationsService.success("Redirect Url Removed!", "Redirect Url " + redirectToDelete.Url + " has been deleted");
+
+            }, function(error) {
+
+                notificationsService.error("Redirect Url Error!", "Redirect Url " + redirectToDelete.Url + " was not deleted");
+
+            });
+
+        }
+
+        function disableUrlTracker() {
+            var toggleConfirm = confirm("Are you sure you want to disable the URL tracker?");
+            if (toggleConfirm) {
+
+                redirectUrlsResource.toggleUrlTracker(true).then(function() {
+                    activate();
+                    notificationsService.success("URL Tracker has now been disabled");
+                }, function(error) {
+                    notificationsService.warning("Error disabling the URL Tracker, more information can be found in your log file.");
+                });
+
+            }
+        }
+
+        function enableUrlTracker() {
+            redirectUrlsResource.toggleUrlTracker(false).then(function() {
+                activate();
+                notificationsService.success("URL Tracker has now been enabled");
+            }, function(error) {
+                notificationsService.warning("Error enabling the URL Tracker, more information can be found in your log file.");
+            });
+        }
+
+        var filterDebounced = _.debounce(function(e) {
+
+            $scope.$apply(function() {
+
+                //a canceler exists, so perform the cancelation operation and reset
+                if (canceler) {
+                    canceler.resolve();
+                    canceler = $q.defer();
+                } else {
+                    canceler = $q.defer();
+                }
+
+                vm.search();
+
+            });
+
+        }, 200);
+
+        function filter() {
+            filterDebounced();
+        }
+
+        activate();
+
+    }
+
+    angular.module("umbraco").controller("Umbraco.Dashboard.RedirectUrlsController", RedirectUrlsController);
+})();
