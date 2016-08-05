@@ -58,7 +58,7 @@
                </umb-button>
 
                <umb-button
-                  ng-if="!page.isNew"
+                  ng-if="!page.isNew && content.allowPreview"
                   type="button"
                   action="preview(content)"
                   label="Preview page"
