@@ -105,7 +105,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 ContentKey = redirectUrl.ContentKey,
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
-                UrlHash = HashUrl(redirectUrl.Url)
+                UrlHash = redirectUrl.Url.ToSHA1()
             };
         }
 
@@ -132,7 +132,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey)
         {
-            var urlHash = HashUrl(url);
+            var urlHash = url.ToSHA1();
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -155,7 +155,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var urlHash = HashUrl(url);
+            var urlHash = url.ToSHA1();
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
@@ -192,16 +192,6 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
             var rules = result.Items.Select(Map);
             return rules;
-        }
-
-        private static string HashUrl(string url)
-        {
-            using (var crypto = new SHA1CryptoServiceProvider())
-            {
-                var inputBytes = Encoding.UTF8.GetBytes(url);
-                var hashedBytes = crypto.ComputeHash(inputBytes);
-                return Encoding.UTF8.GetString(hashedBytes);
-            }
-        }
+        }     
     }
 }
