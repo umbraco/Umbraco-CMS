@@ -61,6 +61,9 @@ namespace Umbraco.Web.Redirects
         /// <inheritdoc />
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
+            // don't let the event handlers kick in if Redirect Tracking is turned off in the config
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking) return;
+            
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order
             // so it is not reliable. getting the old route in 'publishing' to be sure and storing in http
