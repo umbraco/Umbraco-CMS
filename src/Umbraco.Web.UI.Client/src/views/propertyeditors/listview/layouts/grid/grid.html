@@ -18,7 +18,7 @@
       </umb-empty-state>
 
       <umb-empty-state
-          ng-if="!items && vm.isRecycleBin"
+          ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
           position="center">
           <localize key="general_recycleBinEmpty"></localize>
       </umb-empty-state>
@@ -68,7 +68,7 @@
       </umb-tooltip>
 
       <umb-empty-state
-          ng-if="vm.itemsWithoutFolders.length === 0 && vm.isRecycleBin"
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
           position="center">
           <localize key="general_recycleBinEmpty"></localize>
       </umb-empty-state>
