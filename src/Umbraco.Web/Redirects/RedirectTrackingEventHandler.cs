@@ -93,6 +93,8 @@ namespace Umbraco.Web.Redirects
         {
             get
             {
+                if (UmbracoContext.Current == null)
+                    return null;
                 var oldRoutes = (Dictionary<int, Tuple<Guid, string>>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
                 if (oldRoutes == null)
                     UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<int, Tuple<Guid, string>>();
@@ -165,8 +167,11 @@ namespace Umbraco.Web.Redirects
 
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
         {
-            var removeKeys = new List<int>();
+            if (OldRoutes == null)
+                return;
 
+            var removeKeys = new List<int>();
+            
             foreach (var oldRoute in OldRoutes)
             {
                 // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
