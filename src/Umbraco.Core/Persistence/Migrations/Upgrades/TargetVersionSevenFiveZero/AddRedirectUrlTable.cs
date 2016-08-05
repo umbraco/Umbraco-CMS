@@ -28,9 +28,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             
             if (tables.InvariantContains(umbracoRedirectUrlTableName))
             {
+                var columns = SqlSyntax.GetColumnsInSchema(database).ToArray();
+                if (columns.Any(x => x.TableName.InvariantEquals(umbracoRedirectUrlTableName) && x.ColumnName.InvariantEquals("id") && x.DataType == "uniqueidentifier"))
+                    return null;
                 localContext.Delete.Table(umbracoRedirectUrlTableName);
             }
-            
+
             localContext.Create.Table(umbracoRedirectUrlTableName)
                 .WithColumn("id").AsGuid().NotNullable().PrimaryKey("PK_" + umbracoRedirectUrlTableName)
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()
@@ -50,7 +53,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             localContext.Create.ForeignKey("FK_" + umbracoRedirectUrlTableName)
                 .FromTable(umbracoRedirectUrlTableName).ForeignColumn("contentKey")
                 .ToTable("umbracoNode").PrimaryColumn("uniqueID");
-
 
             return localContext.GetSql();
         }
