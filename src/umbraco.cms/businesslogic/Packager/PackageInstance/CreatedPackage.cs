@@ -248,8 +248,12 @@ namespace umbraco.cms.businesslogic.packager
                 var stylesheets = _packageManifest.CreateElement("Stylesheets");
                 foreach (var stylesheetName in pack.Stylesheets)
                 {
+                    if (stylesheetName.IsNullOrWhiteSpace()) continue;
                     var stylesheetXmlNode = utill.Stylesheet(stylesheetName, true, _packageManifest);
-                    stylesheets.AppendChild(stylesheetXmlNode);
+                    if (stylesheetXmlNode != null)
+                    {
+                        stylesheets.AppendChild(stylesheetXmlNode);
+                    }
                 }
                 AppendElement(stylesheets);
 
