@@ -69,8 +69,8 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box"></i>
-                            <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
+                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
+                            <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 
 
@@ -79,7 +79,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong>Author</strong>
-                                <a href="{{ vm.localPackage.authorLink }}" target="_blank">{{ vm.localPackage.author }}</a>
+                                <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
