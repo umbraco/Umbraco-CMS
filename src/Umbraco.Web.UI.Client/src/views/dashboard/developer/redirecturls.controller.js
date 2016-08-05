@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($scope, $http, angularHelper, notificationsService, entityResource, $routeParams, $q) {
+angular.module("umbraco").controller("Umbraco.Dashboard.RedirectUrlsController", function($scope, $http, angularHelper, notificationsService, entityResource, $routeParams, $q) {
     //...todo
     //search by url or url part
     //search by domain
@@ -30,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
         $scope.search();
     };
 
-    $scope.search = function () {
+    $scope.search = function() {
 
         $scope.dashboard.loading = true;
 
@@ -39,7 +39,7 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
             searchTerm = "";
         }
 
-        $http.get("backoffice/api/RedirectUrlManagement/SearchRedirectUrls/?searchTerm=" + searchTerm + "&page=" + $scope.pagination.pageIndex + "&pageSize=" + $scope.pagination.pageSize).then(function (response) {
+        $http.get("backoffice/api/RedirectUrlManagement/SearchRedirectUrls/?searchTerm=" + searchTerm + "&page=" + $scope.pagination.pageIndex + "&pageSize=" + $scope.pagination.pageSize).then(function(response) {
 
             console.log(response);
 
@@ -53,8 +53,8 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
             // Set enable/disable state for url tracker
             $scope.dashboard.UrlTrackerDisabled = response.data.UrlTrackerDisabled;
 
-            angular.forEach($scope.redirectUrls, function (item) {
-                $http.get("backoffice/api/RedirectUrlManagement/GetPublishedUrl/?id=" + item.ContentId).then(function (response) {
+            angular.forEach($scope.redirectUrls, function(item) {
+                $http.get("backoffice/api/RedirectUrlManagement/GetPublishedUrl/?id=" + item.ContentId).then(function(response) {
                     item.ContentUrl = response.data;
                 });
             });
@@ -64,25 +64,24 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
         });
     };
 
-    $scope.removeRedirect = function (redirectToDelete) {
-        $http.post("backoffice/api/RedirectUrlManagement/DeleteRedirectUrl/" + redirectToDelete.Id).then(function (response) {
+    $scope.removeRedirect = function(redirectToDelete) {
+        $http.post("backoffice/api/RedirectUrlManagement/DeleteRedirectUrl/" + redirectToDelete.Id).then(function(response) {
             if (response.status === 200) {
 
                 var index = $scope.redirectUrls.indexOf(redirectToDelete);
                 $scope.redirectUrls.splice(index, 1);
 
                 notificationsService.success("Redirect Url Removed!", "Redirect Url " + redirectToDelete.Url + " has been deleted");
-            }
-            else {
+            } else {
                 notificationsService.warning("Redirect Url Error!", "Redirect Url " + redirectToDelete.Url + " was not deleted");
             }
         });
     };
 
-    $scope.disableUrlTracker = function () {
+    $scope.disableUrlTracker = function() {
         var toggleConfirm = confirm("Are you sure you want to disable the URL tracker?");
         if (toggleConfirm) {
-            $http.post("backoffice/api/RedirectUrlManagement/ToggleUrlTracker/?disable=true").then(function (response) {
+            $http.post("backoffice/api/RedirectUrlManagement/ToggleUrlTracker/?disable=true").then(function(response) {
                 if (response.status === 200) {
                     notificationsService.success("URL Tracker has now been disabled");
                     activate();
@@ -93,9 +92,9 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
         }
     };
 
-    $scope.enableUrlTracker = function () {
+    $scope.enableUrlTracker = function() {
         if (toggleConfirm) {
-            $http.post("backoffice/api/RedirectUrlManagement/ToggleUrlTracker/?disable=false").then(function (response) {
+            $http.post("backoffice/api/RedirectUrlManagement/ToggleUrlTracker/?disable=false").then(function(response) {
                 if (response.status === 200) {
                     notificationsService.success("URL Tracker has now been enabled");
                     activate();
@@ -108,14 +107,13 @@ angular.module("umbraco").controller("Umbraco.RedirectUrlSearch", function ($sco
 
     var filterDebounced = _.debounce(function(e) {
 
-        $scope.$apply(function () {
+        $scope.$apply(function() {
 
             //a canceler exists, so perform the cancelation operation and reset
             if (canceler) {
                 canceler.resolve();
                 canceler = $q.defer();
-            }
-            else {
+            } else {
                 canceler = $q.defer();
             }
 
