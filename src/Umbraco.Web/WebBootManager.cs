@@ -514,7 +514,6 @@ namespace Umbraco.Web
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(Container);
             Container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
             ContentFinderCollectionBuilder.Register(Container)

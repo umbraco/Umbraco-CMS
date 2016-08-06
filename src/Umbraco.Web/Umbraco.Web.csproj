@@ -1088,7 +1088,6 @@
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentLastChanceFinderResolver.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />

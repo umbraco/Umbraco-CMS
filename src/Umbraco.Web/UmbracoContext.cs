@@ -111,7 +111,7 @@ namespace Umbraco.Web
 
                 //TODO: Until the new cache is done we can't really expose these to override/mock
                 new Lazy<IEnumerable<IContentFinder>>(() => Web.Current.ContentFinders),
-                new Lazy<IContentFinder>(() => ContentLastChanceFinderResolver.Current.Finder),
+                new Lazy<IContentFinder>(() => Web.Current.LastChanceContentFinder),
 
                 // create the nice urls provider
                 // there's one per request because there are some behavior parameters that can be changed

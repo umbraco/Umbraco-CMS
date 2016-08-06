@@ -133,6 +133,9 @@ namespace Umbraco.Web
         public static ContentFinderCollection ContentFinders
             => Container.GetInstance<ContentFinderCollection>();
 
+        public static IContentLastChanceFinder LastChanceContentFinder
+            => Container.GetInstance<IContentLastChanceFinder>();
+
         #endregion
 
         #region Core Getters
