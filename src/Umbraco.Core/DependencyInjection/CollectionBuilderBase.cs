@@ -124,9 +124,16 @@ namespace Umbraco.Core.DependencyInjection
             {
                 if (_registrations != null) return;
 
+                var types = GetTypes(_types).ToArray();
+                foreach (var type in types)
+                {
+                    if (typeof(TItem).IsAssignableFrom(type) == false)
+                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                }
+
                 var prefix = GetType().FullName + "_";
                 var i = 0;
-                foreach (var type in GetTypes(_types))
+                foreach (var type in types)
                 {
                     var name = $"{prefix}{i++:00000}";
                     Container.Register(typeof(TItem), type, name);

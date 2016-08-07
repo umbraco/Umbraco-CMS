@@ -30,10 +30,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	{
         protected override void FreezeResolution()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
-            UrlSegmentProviderCollectionBuilder.Register(container)
+            UrlSegmentProviderCollectionBuilder.Register(Container)
                 .Append<DefaultUrlSegmentProvider>();
 
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

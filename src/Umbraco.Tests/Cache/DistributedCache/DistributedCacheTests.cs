@@ -39,6 +39,8 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             ServerRegistrarResolver.Reset();
             ServerMessengerResolver.Reset();
+
+            Current.Reset();
         }
 
         [Test]

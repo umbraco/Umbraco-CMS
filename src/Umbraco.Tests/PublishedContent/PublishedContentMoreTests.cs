@@ -79,6 +79,8 @@ namespace Umbraco.Tests.PublishedContent
         
         public override void TearDown()
         {
+            base.TearDown();
+
             PluginManager.Current = _pluginManager;
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;

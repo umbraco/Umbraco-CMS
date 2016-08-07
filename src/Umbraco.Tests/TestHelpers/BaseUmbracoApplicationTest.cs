@@ -87,6 +87,8 @@ namespace Umbraco.Tests.TestHelpers
             // reset plugin manager
             ResetPluginManager();
             Container.Dispose();
+
+            Core.DependencyInjection.Current.Reset();
         }
 
         protected virtual void ConfigureContainer()

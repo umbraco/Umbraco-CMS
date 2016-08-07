@@ -31,6 +31,8 @@ namespace Umbraco.Tests.BootManagers
             base.TearDown();
             ResolverCollection.ResetAll();
             TestApplicationEventHandler.Reset();
+
+            Current.Reset();
         }
 
 
