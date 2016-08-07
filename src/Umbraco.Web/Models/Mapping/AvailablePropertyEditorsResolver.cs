@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -12,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         protected override IEnumerable<PropertyEditorBasic> ResolveCore(IDataTypeDefinition source)
         {
-            return PropertyEditorResolver.Current.PropertyEditors
+            return Current.PropertyEditors
                 .OrderBy(x => x.Name)
                 .Select(Mapper.Map<PropertyEditorBasic>);
         }

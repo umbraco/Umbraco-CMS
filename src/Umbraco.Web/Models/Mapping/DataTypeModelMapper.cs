@@ -51,7 +51,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
                 .AfterMap((def, basic) =>
                 {
-                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    var editor = Current.PropertyEditors[def.PropertyEditorAlias];
                     if (editor != null)
                     {
                         basic.Alias = editor.Alias;
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
                 .AfterMap((def, basic) =>
                 {
-                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    var editor = Current.PropertyEditors[def.PropertyEditorAlias];
                     if (editor != null)
                     {
                         basic.Group = editor.Group;

@@ -1,6 +1,7 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.DependencyInjection
@@ -45,6 +46,9 @@ namespace Umbraco.Core.DependencyInjection
 
         public static CacheRefresherCollection CacheRefreshers
             => Container.GetInstance<CacheRefresherCollection>();
+
+        public static PropertyEditorCollection PropertyEditors
+            => Container.GetInstance<PropertyEditorCollection>();
 
         #endregion
     }

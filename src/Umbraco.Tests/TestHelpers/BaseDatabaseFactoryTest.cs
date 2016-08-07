@@ -79,6 +79,14 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Container.Register<IFacadeService>(factory => _facadeService);
+
+            var manifestBuilder = new ManifestBuilder(
+                new NullCacheProvider(),
+                new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider()));
+            Container.Register(_ => manifestBuilder);
+
+            PropertyEditorCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.Current.ResolvePropertyEditors());
         }
 
         private CacheHelper _disabledCacheHelper;
@@ -254,13 +262,6 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected override void FreezeResolution()
         {
-            PropertyEditorResolver.Current = new PropertyEditorResolver(
-                 Container, Logger,
-                 () => PluginManager.Current.ResolvePropertyEditors(),
-                 new ManifestBuilder(
-                     new NullCacheProvider(),
-                     new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider())));
-
             if (PropertyValueConvertersResolver.HasCurrent == false)
                 PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(Container, Logger);
 

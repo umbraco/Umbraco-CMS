@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
             dataType.Alias = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
 
             //Validate that the property editor exists
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(dataType.SelectedEditor);
+            var propertyEditor = Current.PropertyEditors[dataType.SelectedEditor];
             if (propertyEditor == null)
             {
                 var message = string.Format("Property editor with id: {0} was not found", dataType.SelectedEditor);

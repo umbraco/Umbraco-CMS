@@ -446,6 +446,8 @@
     <Compile Include="Persistence\NPocoSqlExtensions.cs" />
     <Compile Include="Persistence\UnitOfWork\UnitOfWorkBase.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueTypes.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
@@ -1041,7 +1043,6 @@
     <Compile Include="PropertyEditors\PreValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorResolver.cs" />
     <Compile Include="PropertyEditors\PropertyValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\RegexValidator.cs" />
     <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />

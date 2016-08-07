@@ -3,6 +3,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
@@ -143,6 +144,9 @@ namespace Umbraco.Web
 
         public static CacheRefresherCollection CacheRefreshers
             => Container.GetInstance<CacheRefresherCollection>();
+
+        public static PropertyEditorCollection PropertyEditors
+            => Container.GetInstance<PropertyEditorCollection>();
 
         #endregion
     }

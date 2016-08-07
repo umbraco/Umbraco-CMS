@@ -13,12 +13,12 @@ namespace Umbraco.Web.Models.Mapping
         where TPropertyType : PropertyTypeDisplay, new()
     {
         private readonly ApplicationContext _applicationContext;
-        private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
+        private readonly PropertyEditorCollection _propertyEditors;
 
-        public PropertyTypeGroupResolver(ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
+        public PropertyTypeGroupResolver(ApplicationContext applicationContext, PropertyEditorCollection propertyEditors)
         {
             _applicationContext = applicationContext;
-            _propertyEditorResolver = propertyEditorResolver;
+            _propertyEditors = propertyEditors;
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Umbraco.Web.Models.Mapping
 
             foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0).OrderBy(x => x.SortOrder))
             {
-                var propertyEditor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
+                var propertyEditor = _propertyEditors[p.PropertyEditorAlias];
                 var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
                 if (propertyEditor == null) 

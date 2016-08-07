@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -439,7 +440,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     foreach (var property in properties)
                     {
                         //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                        var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+                        var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
 
                         var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
                             ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]

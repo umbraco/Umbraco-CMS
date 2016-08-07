@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         protected override DataTypeDatabaseType ResolveCore(DataTypeSave source)
         {
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(source.SelectedEditor);
+            var propertyEditor = Current.PropertyEditors[source.SelectedEditor];
             if (propertyEditor == null)
             {
                 throw new InvalidOperationException("Could not find property editor with id " + source.SelectedEditor);

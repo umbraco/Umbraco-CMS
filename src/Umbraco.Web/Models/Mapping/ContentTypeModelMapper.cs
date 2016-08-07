@@ -18,18 +18,18 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentTypeModelMapper : ModelMapperConfiguration
     {
-        private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
+        private readonly PropertyEditorCollection _propertyEditors;
 
         //default ctor
         public ContentTypeModelMapper()
         {
-            _propertyEditorResolver = new Lazy<PropertyEditorResolver>(() => PropertyEditorResolver.Current);
+            _propertyEditors = Current.PropertyEditors;
         }
 
         //ctor can be used for testing
-        public ContentTypeModelMapper(Lazy<PropertyEditorResolver> propertyEditorResolver)
+        public ContentTypeModelMapper(PropertyEditorCollection propertyEditors)
         {
-            _propertyEditorResolver = propertyEditorResolver;            
+            _propertyEditors = propertyEditors;            
         }
 
         public override void ConfigureMappings(IMapperConfiguration config, ApplicationContext applicationContext)
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditors)
                 .AfterMap((memberType, display) =>
                 {
                     //map the MemberCanEditProperty,MemberCanViewProperty
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditors)
                 .AfterMap((source, dest) =>
                  {
                      //default listview
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditors)
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())

@@ -17,23 +17,18 @@ namespace Umbraco.Tests.Models.Mapping
     [TestFixture]
     public class AutoMapperTests : BaseUmbracoApplicationTest
     {
-        /// <summary>
-        /// Inheritors can override this to setup any resolvers before resolution is frozen
-        /// </summary>
-        protected override void FreezeResolution()
+        protected override void ConfigureContainer()
         {
+            base.ConfigureContainer();
+
+            var manifestBuilder = new ManifestBuilder(
+                CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
+                new ManifestParser(Logger, new DirectoryInfo(TestHelper.CurrentAssemblyDirectory), CacheHelper.CreateDisabledCacheHelper().RuntimeCache));
+            Container.Register(_ => manifestBuilder);
+
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
-            var propertyEditorResolver = new PropertyEditorResolver(
-                Container,
-                Logger,
-                typeListProducerList,
-                new ManifestBuilder(
-                    CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
-                    new ManifestParser(Logger, new DirectoryInfo(TestHelper.CurrentAssemblyDirectory), CacheHelper.CreateDisabledCacheHelper().RuntimeCache)));
-
-            PropertyEditorResolver.Current = propertyEditorResolver;
-
-            base.FreezeResolution();
+            PropertyEditorCollectionBuilder.Register(Container)
+                .AddProducer(typeListProducerList);
         }
 
         [Test]

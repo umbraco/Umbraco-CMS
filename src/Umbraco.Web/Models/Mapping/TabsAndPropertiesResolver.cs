@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : this(localizedTextService)
-        {         
+        {
             if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
             IgnoreProperties = ignoreProperties;
         }
@@ -40,11 +40,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         /// <param name="localizedTextService"></param>
         /// <param name="customProperties">
-        /// Any additional custom properties to assign to the generic properties tab. 
+        /// Any additional custom properties to assign to the generic properties tab.
         /// </param>
         /// <param name="onGenericPropertiesMapped"></param>
         /// <remarks>
-        /// The generic properties tab is mapped during AfterMap and is responsible for 
+        /// The generic properties tab is mapped during AfterMap and is responsible for
         /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
         public static void MapGenericProperties<TPersisted>(
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Models.Mapping
             //store the current props to append to the newly inserted ones
             var currProps = genericProps.Properties.ToArray();
 
-            var labelEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
+            var labelEditor = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View;
 
             var contentProps = new List<ContentPropertyDisplay>
             {
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 case "content":
                     dtdId = Constants.DataTypes.DefaultContentListView;
-                    
+
                     break;
                 case "media":
                     dtdId = Constants.DataTypes.DefaultMediaListView;
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //first try to get the custom one if there is one
-            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
+            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName)
                 ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
 
             if (dt == null)
@@ -156,7 +156,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
 
-            var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
+            var editor = Current.PropertyEditors[dt.PropertyEditorAlias];
             if (editor == null)
             {
                 throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
@@ -187,9 +187,9 @@ namespace Umbraco.Web.Models.Mapping
             SetChildItemsTabPosition(display, listViewConfig, listViewTab);
         }
 
-        private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, 
+        private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display,
                 IDictionary<string, object> listViewConfig,
-                Tab<ContentPropertyDisplay> listViewTab) 
+                Tab<ContentPropertyDisplay> listViewTab)
             where TPersisted : IContentBase
         {
             // Find position of tab from config
@@ -224,13 +224,13 @@ namespace Umbraco.Web.Models.Mapping
 
             // add the tabs, for properties that belong to a tab
             // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
-            // and there might be duplicates (content does not work like contentType and there is no 
+            // and there might be duplicates (content does not work like contentType and there is no
             // content.CompositionPropertyGroups).
             var groupsGroupsByName = content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
                 var properties = new List<ContentPropertyDisplay>();
-                
+
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)
                 {

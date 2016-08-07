@@ -24,11 +24,11 @@ namespace Umbraco.Web.UI.JavaScript
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             var cdfAttributes =
-                PropertyEditorResolver.Current.PropertyEditors
-                                      .SelectMany(x => x.GetType().GetCustomAttributes<PropertyEditorAssetAttribute>(false))
-                                      .Where(x => x.AssetType == cdfType)
-                                      .Select(x => x.DependencyFile)
-                                      .ToList();
+                Current.PropertyEditors
+                    .SelectMany(x => x.GetType().GetCustomAttributes<PropertyEditorAssetAttribute>(false))
+                    .Where(x => x.AssetType == cdfType)
+                    .Select(x => x.DependencyFile)
+                    .ToList();
 
             string jsOut;
             string cssOut;

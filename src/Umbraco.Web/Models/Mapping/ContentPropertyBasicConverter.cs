@@ -30,14 +30,14 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         protected override T ConvertCore(Property property)
         {
-            var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+            var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
                 LogHelper.Error<ContentPropertyBasicConverter<T>>(
                     "No property editor found, converting to a Label",
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
 
-                editor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias);
+                editor = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias];
             }
             var result = new T
                 {

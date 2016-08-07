@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 
@@ -30,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 if (alias != null)
                 {
                     //check that the new property editor exists with that alias
-                    var editor = PropertyEditorResolver.Current.GetByAlias(alias);
+                    var editor = Current.PropertyEditors[alias];
                     if (editor == null)
                     {
                         //We cannot find a map for this property editor so we're going to make it a label. This is because:

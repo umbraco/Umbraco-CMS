@@ -6,6 +6,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
@@ -140,7 +141,7 @@ namespace Umbraco.Core.Services
 
 
             //Get the property editor for thsi property and let it convert it to the xml structure
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+            var propertyEditor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
             if (propertyEditor != null)
             {
                 var xmlValue = propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService);

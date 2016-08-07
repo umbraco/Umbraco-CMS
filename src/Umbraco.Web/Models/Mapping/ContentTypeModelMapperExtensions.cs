@@ -120,7 +120,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
-            this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
+            this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, PropertyEditorCollection propertyEditors)
             where TSource : IContentTypeComposition
             where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
             where TPropertyTypeDisplay : PropertyTypeDisplay, new()
@@ -147,7 +147,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(applicationContext, propertyEditorResolver)));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(applicationContext, propertyEditors)));
         }
 
         /// <summary>

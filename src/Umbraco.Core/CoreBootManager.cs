@@ -401,9 +401,11 @@ namespace Umbraco.Core
             var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), ApplicationCache.RuntimeCache);
             var manifestBuilder = new ManifestBuilder(ApplicationCache.RuntimeCache, manifestParser);
 
-            PropertyEditorResolver.Current = new PropertyEditorResolver(
-                Container, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(),
-                manifestBuilder);
+            Container.Register(_ => manifestBuilder); // will be injected in eg PropertyEditorCollectionBuilder
+
+            PropertyEditorCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolvePropertyEditors());
+
             ParameterEditorResolver.Current = new ParameterEditorResolver(
                 Container, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(),
                 manifestBuilder);

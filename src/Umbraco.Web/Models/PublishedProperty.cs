@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models
             IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
             Func<PublishedPropertyType, object, IPublishedProperty> map)
         {
-            var propertyEditorResolver = PropertyEditorResolver.Current;
+            var propertyEditors = Current.PropertyEditors;
             var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
             return propertyTypes.Select(x =>
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models
                     var v = p == null || p.Value == null ? null : p.Value;
                     if (v != null)
                     {
-                        var e = propertyEditorResolver.GetByAlias(x.PropertyEditorAlias);
+                        var e = propertyEditors[x.PropertyEditorAlias];
 
                         // We are converting to string, even for database values which are integer or
                         // DateTime, which is not optimum. Doing differently would require that we have a way to tell

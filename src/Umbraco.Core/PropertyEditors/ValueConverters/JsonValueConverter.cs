@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -22,7 +23,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// <returns></returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyType.PropertyEditorAlias);
+            var propertyEditor = Current.PropertyEditors[propertyType.PropertyEditorAlias];
             if (propertyEditor == null) return false;
             return propertyEditor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json);
         }

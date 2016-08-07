@@ -104,7 +104,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 if (alias != null)
                 {
                     //check that the new property editor exists with that alias
-                    var editor = PropertyEditorResolver.Current.GetByAlias(alias);
+                    var editor = Current.PropertyEditors[alias];
                     if (editor == null)
                     {
                         errorReport.Add(string.Format("Property Editor with ID '{0}' (assigned to Data Type '{1}') has a valid GUID -> Alias map but no property editor was found. It will be replaced with a Readonly/Label property editor.", item.controlId, item.text));

@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models.Mapping
             PropertyEditor propEd = null;
             if (source.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
-                propEd = PropertyEditorResolver.Current.GetByAlias(source.PropertyEditorAlias);
+                propEd = Current.PropertyEditors[source.PropertyEditorAlias];
                 if (propEd == null)
                 {
                     throw new InvalidOperationException("Could not find property editor with alias " + source.PropertyEditorAlias);

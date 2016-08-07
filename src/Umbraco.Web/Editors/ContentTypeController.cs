@@ -143,7 +143,7 @@ namespace Umbraco.Web.Editors
             }
 
             var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
-            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
+            var editor = Current.PropertyEditors[dataTypeDiff.PropertyEditorAlias];
 
             return new ContentPropertyDisplay()
             {

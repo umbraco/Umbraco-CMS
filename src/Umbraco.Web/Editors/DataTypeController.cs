@@ -131,7 +131,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<PreValueFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
-            var propEd = PropertyEditorResolver.Current.GetByAlias(editorAlias);
+            var propEd = Current.PropertyEditors[editorAlias];
             if (propEd == null)
             {
                 throw new InvalidOperationException("Could not find property editor with alias " + editorAlias);
@@ -302,7 +302,7 @@ namespace Umbraco.Web.Editors
                      .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>)
                      .ToArray();
 
-            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.ToArray();
+            var propertyEditors = Current.PropertyEditors.ToArray();
 
             foreach (var dataType in dataTypes)
             {
@@ -332,7 +332,7 @@ namespace Umbraco.Web.Editors
         {
             var datatypes = new List<DataTypeBasic>();
             
-            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
+            var propertyEditors = Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
@@ -361,7 +361,7 @@ namespace Umbraco.Web.Editors
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
-            return PropertyEditorResolver.Current.PropertyEditors
+            return Current.PropertyEditors
                 .OrderBy(x => x.Name)
                 .Select(Mapper.Map<PropertyEditorBasic>);
         }
