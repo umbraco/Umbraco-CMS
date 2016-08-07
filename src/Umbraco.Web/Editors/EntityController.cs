@@ -673,5 +673,92 @@ namespace Umbraco.Web.Editors
                     return null;
             }
         }
+
+        // fixme - need to implement GetAll for backoffice controllers - dynamics?
+
+        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
+        {
+            return GetResultForAll(type, postFilter, postFilterParams);
+        }
+
+        /// <summary>
+        /// Gets the result for the entity list based on the type
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <param name="postFilter">A string where filter that will filter the results dynamically with linq - optional</param>
+        /// <param name="postFilterParams">the parameters to fill in the string where filter - optional</param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType, string postFilter = null, IDictionary<string, object> postFilterParams = null)
+        {
+            var objectType = ConvertToObjectType(entityType);
+            if (objectType.HasValue)
+            {
+                //TODO: Should we order this by something ?
+                var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
+                return ExecutePostFilter(entities, postFilter, postFilterParams);
+            }
+            //now we need to convert the unknown ones
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.Template:
+                    var templates = Services.FileService.GetTemplates();
+                    var filteredTemplates = ExecutePostFilter(templates, postFilter, postFilterParams);
+                    return filteredTemplates.Select(Mapper.Map<EntityBasic>);
+
+                case UmbracoEntityTypes.Macro:
+                    //Get all macros from the macro service
+                    var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
+                    var filteredMacros = ExecutePostFilter(macros, postFilter, postFilterParams);
+                    return filteredMacros.Select(Mapper.Map<EntityBasic>);
+
+                case UmbracoEntityTypes.PropertyType:
+
+                    //get all document types, then combine all property types into one list
+                    var propertyTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyTypes)
+                                                .DistinctBy(composition => composition.Alias);
+                    var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
+
+                case UmbracoEntityTypes.PropertyGroup:
+
+                    //get all document types, then combine all property types into one list
+                    var propertyGroups = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyGroups)
+                                                .DistinctBy(composition => composition.Name);
+                    var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+
+                case UmbracoEntityTypes.User:
+
+                    long total;
+                    var users = Services.UserService.GetAll(0, int.MaxValue, out total);
+                    var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
+
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
+            }
+        }
+
+        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter, IDictionary<string, object> postFilterParams)
+        {
+            // if a post filter is assigned then try to execute it
+            if (postFilter.IsNullOrWhiteSpace() == false)
+            {
+                // fixme - trouble is, we've killed the dynamic Where thing!
+                throw new NotImplementedException("oops");
+                //return postFilterParams == null
+                //               ? entities.AsQueryable().Where(postFilter).ToArray()
+                //               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
+            }
+            return entities;
+        }
     }
 }
