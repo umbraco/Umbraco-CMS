@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Http;
 using System.Xml;
 using Umbraco.Core.Configuration;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Redirects
         [HttpPost]
         public IHttpActionResult ToggleUrlTracker(bool disable)
         {
-            var configFilePath = HttpContext.Current.Server.MapPath("~/config/umbracoSettings.config");
+            var configFilePath = HostingEnvironment.MapPath("~/config/umbracoSettings.config");
 
             var action = disable ? "disable" : "enable";
 
