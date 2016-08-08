@@ -863,6 +863,7 @@
     <key alias="returnToLogin">Вернуться к форме входа</key>
     <key alias="setPasswordInstruction">Пожалуйста укажите новый пароль</key>
     <key alias="setPasswordConfirmation">Ваш пароль обновлен</key>
+    <key alias="signInWith">Войти с помощью</key>
     <key alias="resetCodeExpired">Ссылка, по которой Вы попали сюда, неверна или устарела</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: сброс пароля</key>
     <key alias="resetPasswordEmailCopyFormat">
