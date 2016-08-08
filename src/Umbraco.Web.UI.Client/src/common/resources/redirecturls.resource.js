@@ -11,8 +11,6 @@
 
     function redirectUrlsResource($http, umbRequestHelper) {
 
-        var redirectBaseUrl = "backoffice/api/RedirectUrlManagement/";
-
         /**
          * @ngdoc function
          * @name umbraco.resources.redirectUrlResource#searchRedirectUrls
@@ -33,10 +31,24 @@
          * @param {Int} pageSize The number of items on a page
          */
         function searchRedirectUrls(searchTerm, pageIndex, pageSize) {
+
             return umbRequestHelper.resourcePromise(
-                $http.get(redirectBaseUrl + "SearchRedirectUrls/?searchTerm=" + searchTerm + "&page=" + pageIndex + "&pageSize=" + pageSize),
-                "Failed to retrieve redirects"
-            );
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "SearchRedirectUrls",
+                        { searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize })),
+                'Failed to retrieve data for searching redirect urls');
+        }
+
+        function isEnabled() {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "IsEnabled")),
+                'Failed to retrieve data to check if the 301 redirect is enabled');
         }
 
         /**
@@ -58,9 +70,11 @@
          */
         function deleteRedirectUrl(id) {
             return umbRequestHelper.resourcePromise(
-                $http.post(redirectBaseUrl + "DeleteRedirectUrl/" + id),
-                "Failed to remove redirect"
-            );
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "DeleteRedirectUrl", { id: id })),
+                'Failed to remove redirect');
         }
 
         /**
@@ -82,40 +96,18 @@
          */
         function toggleUrlTracker(disable) {
             return umbRequestHelper.resourcePromise(
-                $http.post(redirectBaseUrl + "ToggleUrlTracker/?disable=" + disable),
-                "Failed to toggle redirect url tracker"
-            );
-        }
-
-        /**
-         * @ngdoc function
-         * @name umbraco.resources.redirectUrlResource#getPublishedUrl
-         * @methodOf umbraco.resources.redirectUrlResource
-         * @function
-         *
-         * @description
-         * Called to get the published url for a content item
-         * ##usage
-         * <pre>
-         * redirectUrlsResource.getPublishedUrl(1234)
-         *    .then(function() {
-         *
-         *    });
-         * </pre>
-         * @param {Int} contentId The content id of the item to get the published url
-         */
-        function getPublishedUrl(contentId) {
-            return umbRequestHelper.resourcePromise(
-                $http.get(redirectBaseUrl + "GetPublishedUrl/?id=" + contentId),
-                "Failed to get published url"
-            );
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "ToggleUrlTracker", { disable: disable })),
+                'Failed to toggle redirect url tracker');
         }
 
         var resource = {
             searchRedirectUrls: searchRedirectUrls,
             deleteRedirectUrl: deleteRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
-            getPublishedUrl: getPublishedUrl
+            isEnabled: isEnabled
         };
 
         return resource;

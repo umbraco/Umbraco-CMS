@@ -1,31 +1,50 @@
 ﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Web;
 using System.Web.Http;
 using System.Xml;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Editors
 {
+    [PluginController("UmbracoApi")]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
+
+        /// <summary>
+        /// Returns true/false of whether redirect tracking is enabled or not
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool IsEnabled()
+        {
+            return UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+        }
+
         //add paging
         [HttpGet]
         public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
-            var searchResult = new RedirectUrlSearchResult { UrlTrackerDisabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking };
+            var searchResult = new RedirectUrlSearchResult();
             var redirectUrlService = Services.RedirectUrlService;
-            var resultCount = 0L;
+            long resultCount;
 
             var redirects = string.IsNullOrWhiteSpace(searchTerm) 
                 ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
-            searchResult.SearchResults = redirects;
+            searchResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+            //now map the Content/published url
+            foreach (var result in searchResult.SearchResults)
+            {
+                result.DestinationUrl = result.ContentId > 0 ? Umbraco.Url(result.ContentId) : "#";
+            }
+
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
@@ -33,17 +52,6 @@ namespace Umbraco.Web.Redirects
             searchResult.HasSearchResults = resultCount > 0;
             searchResult.HasExactMatch = (resultCount == 1);
             return searchResult;
-
-        }
-
-        [HttpGet]
-        public HttpResponseMessage GetPublishedUrl(int id)
-        {
-            var publishedUrl = "#";
-            if (id > 0)
-                publishedUrl = Umbraco.Url(id);
-
-            return new HttpResponseMessage { Content = new StringContent(publishedUrl, Encoding.UTF8, "text/html") };
 
         }
 
@@ -58,7 +66,9 @@ namespace Umbraco.Web.Redirects
         [HttpPost]
         public IHttpActionResult ToggleUrlTracker(bool disable)
         {
-            var configFilePath = HttpContext.Current.Server.MapPath("~/config/umbracoSettings.config");
+            var httpContext = TryGetHttpContext();
+            if (httpContext.Success == false) throw new InvalidOperationException("Cannot acquire HttpContext");
+            var configFilePath = httpContext.Result.Server.MapPath("~/config/umbracoSettings.config");
 
             var action = disable ? "disable" : "enable";
 

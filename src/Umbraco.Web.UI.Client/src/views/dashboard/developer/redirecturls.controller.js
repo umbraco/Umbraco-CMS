@@ -14,7 +14,7 @@
         vm.dashboard = {
             searchTerm: "",
             loading: false,
-            UrlTrackerDisabled: false
+            urlTrackerDisabled: false
         };
 
         vm.pagination = {
@@ -30,9 +30,20 @@
         vm.disableUrlTracker = disableUrlTracker;
         vm.enableUrlTracker = enableUrlTracker;
         vm.filter = filter;
+        vm.checkEnabled = checkEnabled;
 
-        function activate() {
-            vm.search();
+        function activate() {            
+            vm.checkEnabled().then(function() {
+                vm.search();
+            });
+        }
+
+        function checkEnabled() {
+            vm.dashboard.loading = true;
+            return redirectUrlsResource.isEnabled().then(function (response) {
+                vm.dashboard.urlTrackerDisabled = response !== "true";
+                vm.dashboard.loading = false;
+            });
         }
 
         function goToPage(pageNumber) {
@@ -52,23 +63,12 @@
 
             redirectUrlsResource.searchRedirectUrls(searchTerm, vm.pagination.pageIndex, vm.pagination.pageSize).then(function(response) {
 
-                vm.redirectUrls = response.SearchResults;
+                vm.redirectUrls = response.searchResults;
 
                 // update pagination
-                vm.pagination.pageIndex = response.CurrentPage;
-                vm.pagination.pageNumber = response.CurrentPage + 1;
+                vm.pagination.pageIndex = response.currentPage;
+                vm.pagination.pageNumber = response.currentPage + 1;
                 vm.pagination.totalPages = response.PageCount;
-
-                // Set enable/disable state for url tracker
-                vm.dashboard.UrlTrackerDisabled = response.UrlTrackerDisabled;
-
-                angular.forEach(vm.redirectUrls, function(redirect) {
-                    redirectUrlsResource.getPublishedUrl(redirect.ContentId).then(function(response) {
-                        redirect.ContentUrl = response;
-                    }, function(error) {
-                        notificationsService.error("Redirect Url Error!", "Failed to get published url for " + redirect.Url);
-                    });
-                });
 
                 vm.dashboard.loading = false;
 
@@ -77,7 +77,7 @@
 
         function removeRedirect(redirectToDelete) {
 
-            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.ContentKey).then(function () {
+            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
 
                 var index = vm.redirectUrls.indexOf(redirectToDelete);
                 vm.redirectUrls.splice(index, 1);

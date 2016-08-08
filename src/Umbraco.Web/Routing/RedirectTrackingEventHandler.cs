@@ -1,18 +1,17 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Events;
-using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Implements an Application Event Handler for managing redirect urls tracking.
