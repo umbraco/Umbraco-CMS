@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
-            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("(replace([umbracoUser].[userLogin], @1, @2) = @0)", result);
             Assert.AreEqual("hello@test.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
