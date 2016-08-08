@@ -72,5 +72,15 @@ namespace Umbraco.Core.Services
         /// <param name="total">The total count of redirect urls.</param>
         /// <returns>The redirect urls.</returns>
         IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total);
+        
+        /// <summary>
+        /// Searches for all redirect urls that contain a given search term in their URL property.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="total">The total count of redirect urls.</param>
+        /// <returns>The redirect urls.</returns>
+        IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total);
     }
 }

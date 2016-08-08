@@ -225,6 +225,10 @@ namespace Umbraco.Web.Editors
                             {"serverVarsJs", Url.Action("Application", "BackOffice")},
                             //API URLs
                             {
+                                "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
+                                    controller => controller.IsEnabled())
+                            },
+                            {
                                 "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                     controller => controller.GetEmbed("", 0, 0))
                             },
