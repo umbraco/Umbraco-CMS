@@ -666,31 +666,12 @@ namespace Umbraco.Core
             return compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
         }
 
-        /// <summary>
-        /// Determines if the string is a Guid
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="withHyphens"></param>
-        /// <returns></returns>
+        [Obsolete("Use Guid.TryParse instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool IsGuid(this string str, bool withHyphens)
         {
-            var isGuid = false;
-
-            if (!String.IsNullOrEmpty(str))
-            {
-                Regex guidRegEx;
-                if (withHyphens)
-                {
-                    guidRegEx = new Regex(@"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$");
-                }
-                else
-                {
-                    guidRegEx = new Regex(@"^(\{{0,1}([0-9a-fA-F]){8}([0-9a-fA-F]){4}([0-9a-fA-F]){4}([0-9a-fA-F]){4}([0-9a-fA-F]){12}\}{0,1})$");
-                }
-                isGuid = guidRegEx.IsMatch(str);
-            }
-
-            return isGuid;
+            Guid g;
+            return Guid.TryParse(str, out g);
         }
 
         /// <summary>
@@ -712,7 +693,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static object ParseInto(this string val, Type type)
         {
-            if (!String.IsNullOrEmpty(val))
+            if (string.IsNullOrEmpty(val) == false)
             {
                 TypeConverter tc = TypeDescriptor.GetConverter(type);
                 return tc.ConvertFrom(val);
