@@ -73,9 +73,11 @@
         }
 
         function executeAction(check, index, action) {
+            check.loading = true;
             healthCheckResource.executeAction(action)
                 .then(function(response) {
                     check.status[index] = response;
+                    check.loading = false;
                 });
         }
 

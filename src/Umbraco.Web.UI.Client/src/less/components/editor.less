@@ -2,7 +2,7 @@
 	contains styling for all main editor directives
 */
 
-.umb-editor-wrapper{
+.umb-editor-wrapper {
 	background: white;
 	position: absolute;
 	top: 0;
@@ -11,8 +11,13 @@
 	bottom: 0;
 	display: flex;
 	flex-direction: column;
-}
 
+    > form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+}
 
 .umb-editor-header {
 	background: @grayLighter;

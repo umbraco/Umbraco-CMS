@@ -135,7 +135,7 @@ namespace Umbraco.Core.Models
 
         private static void ThrowTypeException(object value, Type expected, string alias)
         {
-            throw new Exception(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
+            throw new InvalidOperationException(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
                 + " to type \"{2}\" which is expected by property type \"{3}\".",
                 value, value.GetType(), expected, alias));
         }

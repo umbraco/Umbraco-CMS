@@ -33,7 +33,7 @@ namespace Umbraco.Core.Services
         /// Deletes a redirect url.
         /// </summary>
         /// <param name="id">The redirect url identifier.</param>
-        void Delete(int id);
+        void Delete(Guid id);
 
         /// <summary>
         /// Deletes all redirect urls.

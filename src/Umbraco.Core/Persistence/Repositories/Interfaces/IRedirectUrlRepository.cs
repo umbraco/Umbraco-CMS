@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Defines the <see cref="IRedirectUrl"/> repository.
     /// </summary>
-    public interface IRedirectUrlRepository : IRepositoryQueryable<int, IRedirectUrl>
+    public interface IRedirectUrlRepository : IRepositoryQueryable<Guid, IRedirectUrl>
     {
         /// <summary>
         /// Gets a redirect url.
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Deletes a redirect url.
         /// </summary>
         /// <param name="id">The redirect url identifier.</param>
-        void Delete(int id);
+        void Delete(Guid id);
 
         /// <summary>
         /// Deletes all redirect urls.

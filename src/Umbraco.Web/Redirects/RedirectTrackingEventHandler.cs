@@ -61,6 +61,9 @@ namespace Umbraco.Web.Redirects
         /// <inheritdoc />
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
+            // don't let the event handlers kick in if Redirect Tracking is turned off in the config
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking) return;
+            
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order
             // so it is not reliable. getting the old route in 'publishing' to be sure and storing in http
@@ -90,6 +93,8 @@ namespace Umbraco.Web.Redirects
         {
             get
             {
+                if (UmbracoContext.Current == null)
+                    return null;
                 var oldRoutes = (Dictionary<int, Tuple<Guid, string>>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
                 if (oldRoutes == null)
                     UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<int, Tuple<Guid, string>>();
@@ -162,8 +167,11 @@ namespace Umbraco.Web.Redirects
 
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
         {
-            var removeKeys = new List<int>();
+            if (OldRoutes == null)
+                return;
 
+            var removeKeys = new List<int>();
+            
             foreach (var oldRoute in OldRoutes)
             {
                 // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need

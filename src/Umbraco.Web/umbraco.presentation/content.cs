@@ -482,7 +482,7 @@ namespace umbraco
             if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
                 UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
         }
-
+        
         /// <summary>
         /// Load content from database
         /// </summary>
@@ -490,81 +490,13 @@ namespace umbraco
         {
             try
             {
-                // Try to log to the DB
                 LogHelper.Info<content>("Loading content from database...");
-                
-                try
+
+                lock (DbReadSyncLock)
                 {
-                    LogHelper.Debug<content>("Republishing starting");
-
-                    lock (DbReadSyncLock)
-                    {
-                        //TODO: This is what we should do , but converting to use XDocument would be breaking unless we convert
-                        // to XmlDocument at the end of this, but again, this would be bad for memory... though still not nearly as
-                        // bad as what is happening before!
-                        // We'll keep using XmlDocument for now though, but XDocument xml generation is much faster:
-                        // https://blogs.msdn.microsoft.com/codejunkie/2008/10/08/xmldocument-vs-xelement-performance/
-                        // I think we already have code in here to convert XDocument to XmlDocument but in case we don't here
-                        // it is: https://blogs.msdn.microsoft.com/marcelolr/2009/03/13/fast-way-to-convert-xmldocument-into-xdocument/
-
-                        //// Prepare an XmlDocument with an appropriate inline DTD to match
-                        //// the expected content
-                        //var parent = new XElement("root", new XAttribute("id", "-1"));
-                        //var xmlDoc = new XDocument(
-                        //    new XDocumentType("root", null, null, DocumentType.GenerateDtd()),
-                        //    parent);
-
-                        var xmlDoc = new XmlDocument();
-                        var doctype = xmlDoc.CreateDocumentType("root", null, null, 
-                            ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
-                        xmlDoc.AppendChild(doctype);
-                        var parent = xmlDoc.CreateElement("root");
-                        var pIdAtt = xmlDoc.CreateAttribute("id");
-                        pIdAtt.Value = "-1";
-                        parent.Attributes.Append(pIdAtt);
-                        xmlDoc.AppendChild(parent);
-
-                        // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
-                        // CLN - added checks that document xml is for a document that is actually published.
-                        const string sql = @"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.xml, umbracoNode.level from umbracoNode
-inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
-where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
-order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
-
-                        XmlElement last = null;
-
-                        var db = ApplicationContext.Current.DatabaseContext.Database;
-                        //NOTE: Query creates a reader - does not load all into memory
-                        foreach (var row in db.Query<dynamic>(sql, new { type  = new Guid(Constants.ObjectTypes.Document)}))
-                        {
-                            string parentId = ((int)row.parentID).ToInvariantString();
-                            string xml = row.xml;
-                            int sortOrder = row.sortOrder;
-
-                            //if the parentid is changing
-                            if (last != null && last.GetAttribute("parentID") != parentId)
-                            {
-                                parent = xmlDoc.GetElementById(parentId);
-                                if (parent == null) throw new InvalidOperationException("No parent node found in xml doc with id " + parentId);
-                            }
-
-                            var xmlDocFragment = xmlDoc.CreateDocumentFragment();
-                            xmlDocFragment.InnerXml = xml;
-                            
-                            last = (XmlElement)parent.AppendChild(xmlDocFragment);
-
-                            // fix sortOrder - see notes in UpdateSortOrder
-                            last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
-                        }
-
-                        LogHelper.Debug<content>("Done republishing Xml Index");
-
-                        return xmlDoc;
-                    }
-                }                
-                catch (Exception ee)
-                {
-                    LogHelper.Error<content>("Error Republishing", ee);
+                    var xmlDoc = ApplicationContext.Current.Services.ContentService.BuildXmlCache();
+                    LogHelper.Debug<content>("Done republishing Xml Index");
+                    return xmlDoc;
                 }
             }
             catch (Exception ee)
