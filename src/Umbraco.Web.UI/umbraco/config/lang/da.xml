@@ -915,6 +915,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="operationCancelledHeader">Annulleret</key>
     <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
     <key alias="contentPublishedFailedByEvent">Udgivelsen blev standset af et 3. parts modul</key>
+    <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
     <key alias="contentTypePropertyTypeCreated">Egenskabstype oprettet</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Navn: %0% <br /> DataType: %1%]]></key>
