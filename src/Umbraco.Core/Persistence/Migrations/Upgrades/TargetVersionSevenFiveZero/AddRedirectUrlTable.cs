@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()
                 .WithColumn("url").AsString(2048).NotNullable()
                 .WithColumn("contentKey").AsGuid().NotNullable()
-                .WithColumn("urlHash").AsString(20).NotNullable();
+                .WithColumn("urlHash").AsString(40).NotNullable();
 
             localContext.Create.Index("IX_" + umbracoRedirectUrlTableName).OnTable(umbracoRedirectUrlTableName)
                 .OnColumn("urlHash")

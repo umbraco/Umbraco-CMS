@@ -731,6 +731,36 @@ namespace Umbraco.Core
             return stringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Converts the string to SHA1
+        /// </summary>
+        /// <param name="stringToConvert">referrs to itself</param>
+        /// <returns>the md5 hashed string</returns>
+        public static string ToSHA1(this string stringToConvert)
+        {
+            //create an instance of the SHA1CryptoServiceProvider
+            var md5Provider = new SHA1CryptoServiceProvider();
+
+            //convert our string into byte array
+            var byteArray = Encoding.UTF8.GetBytes(stringToConvert);
+
+            //get the hashed values created by our SHA1CryptoServiceProvider
+            var hashedByteArray = md5Provider.ComputeHash(byteArray);
+
+            //create a StringBuilder object
+            var stringBuilder = new StringBuilder();
+
+            //loop to each each byte
+            foreach (var b in hashedByteArray)
+            {
+                //append it to our StringBuilder
+                stringBuilder.Append(b.ToString("x2").ToLower());
+            }
+
+            //return the hashed value
+            return stringBuilder.ToString();
+        }
+
 
         /// <summary>
         /// Decodes a string that was encoded with UrlTokenEncode
