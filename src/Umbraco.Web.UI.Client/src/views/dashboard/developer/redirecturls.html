@@ -19,7 +19,7 @@
                 <button
                     ng-if="vm.dashboard.UrlTrackerDisabled === true"
                     type="button"
-                    class="umb-era-button umb-button--s"
+                    class="umb-era-button umb-button--s -blue"
                     ng-click="vm.enableUrlTracker()">
                     <span>Enable URL Tracker</span>
                 </button>
@@ -41,7 +41,7 @@
     </umb-editor-sub-header>
 
 
-    <div class="umb-table">
+    <div class="umb-table" ng-class="{'umb-table-inactive': vm.dashboard.UrlTrackerDisabled === true}">
 
         <div class="umb-table-head">
             <div class="umb-table-row">
