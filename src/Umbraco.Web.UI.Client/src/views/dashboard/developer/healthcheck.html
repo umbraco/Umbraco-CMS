@@ -97,12 +97,22 @@
 
                             <div class="umb-healthcheck-group__details-status-actions" ng-if="status.actions">
                                 <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
-                                    <div ng-show="action.valueRequired">
-                                        <div><label class="bold">Set new value:</label></div>
-                                        <input type="text" ng-model="action.providedValue" required/>
-                                    </div>
-                                    
-                                    <button type="button" class="umb-era-button -blue" ng-click="vm.executeAction(check, $parent.$index, action);">{{action.name}}</button>                                    
+                                    <ng-form name="healthCheckAction">
+
+                                        <div ng-if="action.valueRequired">
+                                            <div><label class="bold">Set new value:</label></div>
+                                            <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
+                                        </div>
+
+                                        <button
+                                            class="umb-era-button -blue"
+                                            ng-class="{ '-inactive': healthCheckAction.providedValue.$invalid}"
+                                            ng-click="vm.executeAction(check, $parent.$index, action);"
+                                            ng-disabled="healthCheckAction.providedValue.$invalid">
+                                            {{action.name}}
+                                        </button>
+
+                                    </ng-form>
 
                                     <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                 </div>
