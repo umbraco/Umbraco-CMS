@@ -151,13 +151,21 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          layouts: $scope.model.config.layouts,
          activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
       },
-        orderBySystemField: true,
       allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
       allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
       allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
       allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
       allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete
    };
+
+    // Check if selected order by field is actually custom field
+    for (var j = 0; j < $scope.options.includeProperties.length; j++) {
+        var includedProperty = $scope.options.includeProperties[j];
+        if (includedProperty.alias.toLowerCase() === $scope.options.orderBy.toLowerCase()) {
+            $scope.options.orderBySystemField = includedProperty.isSystem === 1;
+            break;
+        }
+    }
 
    //update all of the system includeProperties to enable sorting
    _.each($scope.options.includeProperties, function (e, i) {
@@ -180,12 +188,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         }
 
         if (e.isSystem) {
-         //localize the header
-         var key = getLocalizedKey(e.alias);
-         localizationService.localize(key).then(function (v) {
-            e.header = v;
-         });
-      }
+            //localize the header
+            var key = getLocalizedKey(e.alias);
+            localizationService.localize(key).then(function (v) {
+                e.header = v;
+            });
+        }
    });
 
    $scope.selectLayout = function (selectedLayout) {
