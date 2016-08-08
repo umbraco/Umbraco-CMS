@@ -530,6 +530,7 @@
     <key alias="greeting5">Endelig fredag!</key>
     <key alias="greeting6">Gledelig lørdag</key>
     <key alias="instruction">Logg på nedenfor</key>
+    <key alias="signInWith">Logg på med</key>
     <key alias="timeout">Din sesjon er utløpt</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
