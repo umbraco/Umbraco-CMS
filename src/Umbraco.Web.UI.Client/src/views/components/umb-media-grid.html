@@ -8,12 +8,19 @@
                 <div class="umb-media-grid__item-name">{{item.name}}</div>
             </div>
 
+            <!-- Check backgrund -->
             <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension == 'svg'"></div>
-            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
-            <object class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension == 'svg'" type="image/svg+xml" data="{{item.file}}" alt="{{item.name}}" draggable="false"></object>
 
+            <!-- Image thumbnail -->
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
+
+            <!-- SVG -->
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension == 'svg'" ng-src="{{item.file}}" alt="{{item.name}}" draggable="false" />
+
+            <!-- Transparent image - fallback - used to keep image proportions on wrapper-->
             <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension != 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
 
+            <!-- Icon for files -->
             <i class="umb-media-grid__item-icon {{item.icon}}" ng-if="!item.thumbnail && item.extension != 'svg'"></i>
 
         </div>
