@@ -11,7 +11,7 @@
                 <button
                     ng-if="vm.dashboard.UrlTrackerDisabled === false"
                     type="button"
-                    class="umb-era-button"
+                    class="umb-era-button umb-button--s"
                     ng-click="vm.disableUrlTracker()">
                     <span>Disable URL Tracker</span>
                 </button>
@@ -19,7 +19,7 @@
                 <button
                     ng-if="vm.dashboard.UrlTrackerDisabled === true"
                     type="button"
-                    class="umb-era-button"
+                    class="umb-era-button umb-button--s"
                     ng-click="vm.enableUrlTracker()">
                     <span>Enable URL Tracker</span>
                 </button>
@@ -55,27 +55,27 @@
 
         <div class="umb-table-body">
 
-            <div class="umb-table-row" ng-repeat="redirectUrl in vm.redirectUrls">
+            <div class="umb-table-row -solid" ng-repeat="redirectUrl in vm.redirectUrls">
 
                 <div class="umb-table-cell">
                     <i class="umb-table-body__icon umb-table-body__fileicon icon-shuffle"></i>
                 </div>
 
                 <div class="umb-table-cell">
-                    <a href="{{redirectUrl.Url}}" title="{{redirectUrl.Url}}">{{redirectUrl.Url}}</a>
+                    <a class="umb-table-body__link" href="{{redirectUrl.Url}}" title="{{redirectUrl.Url}}">{{redirectUrl.Url}}</a>
                 </div>
 
                 <div class="umb-table-cell">
-                    <a href="{{redirectUrl.ContentUrl}}" title="{{redirectUrl.ContentUrl}}">{{redirectUrl.ContentUrl}}</a>
+                    <a class="umb-table-body__link" href="{{redirectUrl.ContentUrl}}" title="{{redirectUrl.ContentUrl}}">{{redirectUrl.ContentUrl}}</a>
                 </div>
 
                 <div class="umb-table-cell">
                     {{redirectUrl.CreateDateUtc | date:'medium'}}
                 </div>
 
-                <div class="umb-table-cell">
-                    <a href="/umbraco/#/content/content/edit/{{redirectUrl.ContentId}}" class="umb-era-button -gray" style="margin-right: 10px;">Edit</a>
-                    <button class="umb-era-button -gray" ng-click="vm.removeRedirect(redirectUrl)">Remove</button>
+                <div class="umb-table-cell justify-end">
+                    <a href="/umbraco/#/content/content/edit/{{redirectUrl.ContentId}}" class="umb-era-button -gray umb-button--s" style="margin-right: 10px;">Edit</a>
+                    <button class="umb-era-button -gray umb-button--s" ng-click="vm.removeRedirect(redirectUrl)">Remove</button>
                 </div>
 
             </div>
