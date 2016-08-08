@@ -117,6 +117,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             try
             {
                 url.DisableChangeTracking();
+                url.Key = dto.Id;
                 url.Id = dto.Id.GetHashCode();
                 url.ContentId = dto.ContentId;
                 url.ContentKey = dto.ContentKey;

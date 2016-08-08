@@ -9,13 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         [DataMember(Name = "searchResults")]
         public IEnumerable<ContentRedirectUrl> SearchResults { get; set; }
-
-        [DataMember(Name = "hasSearchResults")]
-        public bool HasSearchResults { get; set; }
-
-        [DataMember(Name = "hasExactMatch")]
-        public bool HasExactMatch { get; set; }
-
+        
         [DataMember(Name = "totalCount")]
         public long TotalCount { get; set; }
 
