@@ -66,6 +66,7 @@
   </area>
   <area alias="buttons">
     <key alias="bold">Полужирный</key>
+    <key alias="clearSelection">Снять выбор</key>
     <key alias="deindent">Уменьшить отступ</key>
     <key alias="formFieldInsert">Вставить поле формы</key>
     <key alias="generateModels">Сгенерировать модели</key>
@@ -91,9 +92,10 @@
     <key alias="saveListView">Сохранить список</key>
     <key alias="select">Выбрать</key>
     <key alias="selectCurrentFolder">Выбрать текущую папку</key>
+    <key alias="selected">выбранные</key>
     <key alias="showPage">Предварительный просмотр</key>
     <key alias="showPageDisabled">Предварительный просмотр запрещен, так как документу не сопоставлен шаблон</key>
-    <key alias="somethingElse">Сделать что-нибудь еще</key>
+    <key alias="somethingElse">Другие действия</key>
     <key alias="styleChoose">Выбрать стиль</key>
     <key alias="styleShow">Показать стили</key>
     <key alias="tableInsert">Вставить таблицу</key>
@@ -185,7 +187,7 @@
     <key alias="compositions">Композиции</key>
     <key alias="noTabs">Вы не добавили ни одной вкладки</key>
     <key alias="addNewTab">Добавить вкладку</key>
-    <key alias="addAnotherTab">Добавитьеще вкладку</key>
+    <key alias="addAnotherTab">Добавить новую вкладку</key>
     <key alias="inheritedFrom">Унаследован от</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="requiredLabel">Обязательная метка</key>
@@ -215,8 +217,10 @@
 
     <key alias="yesDelete">ДА, удалить</key>
 
-    <key alias="movedUnderneath">была перемещена внутрь</key>
+    <key alias="movedUnderneath">перемещены внутрь</key>
+    <key alias="copiedUnderneath">скопированы внутрь</key>
     <key alias="folderToMove">Выбрать папку для перемещения</key>
+    <key alias="folderToCopy">Выбрать папку для копирования</key>
     <key alias="structureBelow">в структуре дерева</key>
 
     <key alias="allDocumentTypes">Все типы документов</key>
@@ -243,7 +247,7 @@
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа документов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы документов"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
     <key alias="updateData">Выберите тип и заголовок</key>
-    <key alias="documentTypeWithoutTemplate">Типу документа не сопоставлен шаблон</key>
+    <key alias="documentTypeWithoutTemplate">Тип документа без сопоставленного шаблона</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Обзор сайта</key>
@@ -362,7 +366,7 @@
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
-    <key alias="innerException">Inner Exception</key>
+    <key alias="innerException">Внутренняя ошибка</key>
 
     <key alias="linkYour">Связать</key>
     <key alias="unLinkYour">Разорвать связь</key>
@@ -759,6 +763,7 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Нажмите, чтобы загрузить</key>
+    <key alias="disallowedFileType">Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки</key>
     <key alias="dropFilesHere">Перетащите файлы сюда...</key>
     <key alias="urls">Ссылка на файл</key>
     <key alias="orClickHereToUpload">или нажмите сюда, чтобы выбрать файлы</key>
@@ -883,6 +888,12 @@
     <key alias="username">Имя пользователя</key>
     <key alias="label">Метка...</key>
     <key alias="enterDescription">Укажите описание...</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Остаться</key>
+    <key alias="discardChanges">Отменить изменения</key>
+    <key alias="unsavedChanges">Есть несохраненные изменения</key>
+    <key alias="unsavedChangesWarning">Вы уверены, что хотите уйти с этой страницы? - на ней имеются несохраненные изменения</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Расширенный: Защита на основе ролей (групп)</key>
@@ -1253,6 +1264,6 @@
     <key alias="validateAsNumber">Валидация числового значения</key>
     <key alias="validateAsUrl">Валидация по формату Url</key>
     <key alias="enterCustomValidation">...или указать свои правила валидации</key>
-    <key alias="fieldIsMandatory">Обязательно к заполению</key>
+    <key alias="fieldIsMandatory">Обязательно к заполнению</key>
   </area>
 </language>
