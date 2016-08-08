@@ -49,9 +49,7 @@ namespace Umbraco.Web.Editors
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
-
-            searchResult.HasSearchResults = resultCount > 0;
-            searchResult.HasExactMatch = (resultCount == 1);
+            
             return searchResult;
 
         }
