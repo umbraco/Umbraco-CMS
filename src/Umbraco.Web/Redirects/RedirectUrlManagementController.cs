@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text;
 using System.Web;
 using System.Web.Http;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 
@@ -46,7 +48,7 @@ namespace Umbraco.Web.Redirects
         }
 
         [HttpPost]
-        public IHttpActionResult DeleteRedirectUrl(int id)
+        public IHttpActionResult DeleteRedirectUrl(Guid id)
         {
             var redirectUrlService = Services.RedirectUrlService;
             redirectUrlService.Delete(id);

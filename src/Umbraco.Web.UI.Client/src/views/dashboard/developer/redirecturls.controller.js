@@ -77,7 +77,7 @@
 
         function removeRedirect(redirectToDelete) {
 
-            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.Id).then(function() {
+            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.ContentKey).then(function () {
 
                 var index = vm.redirectUrls.indexOf(redirectToDelete);
                 vm.redirectUrls.splice(index, 1);
