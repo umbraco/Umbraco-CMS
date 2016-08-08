@@ -26,9 +26,10 @@
 
             </umb-editor-sub-header-section>
 
-            <umb-editor-sub-header-section>
+            <umb-editor-sub-header-section ng-if="vm.dashboard.UrlTrackerDisabled === false">
 
                 <input
+                    class="-full-width-input"
                     placeholder="Search for redirect"
                     ng-model="vm.dashboard.searchTerm"
                     ng-change="vm.filter()"
