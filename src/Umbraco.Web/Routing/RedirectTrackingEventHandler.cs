@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -25,9 +26,10 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class RedirectTrackingEventHandler : ApplicationEventHandler
     {
-        private const string ContextKey1 = "Umbraco.Web.Routing.RedirectTrackingEventHandler.1";
-        private const string ContextKey2 = "Umbraco.Web.Routing.RedirectTrackingEventHandler.2";
-        private const string ContextKey3 = "Umbraco.Web.Routing.RedirectTrackingEventHandler.3";
+        private const string ContextKey1 = "RedirectTrackingEventHandler.1";
+        private const string ContextKey2 = "RedirectTrackingEventHandler.2";
+        //private const string ContextKey3 = "RedirectTrackingEventHandler.3";
+        private const string ContextKey4 = "RedirectTrackingEventHandler.4";
 
         /// <inheritdoc />
         protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
@@ -90,19 +92,79 @@ namespace Umbraco.Web.Routing
             // rolled back items have to be published, so publishing will take care of that
         }
 
+        ///// <summary>
+        ///// Tracks a documents URLs during publishing in the current request
+        ///// </summary>
+        //private static Dictionary<int, Tuple<Guid, string>> OldRoutes
+        //{
+        //    get
+        //    {
+        //        var oldRoutes = RequestCache.GetCacheItem<Dictionary<int, Tuple<Guid, string>>>(
+        //            ContextKey3, 
+        //            () => new Dictionary<int, Tuple<Guid, string>>());
+        //        return oldRoutes;
+        //    }
+        //}
+
+        private class PrePublishedContentContext
+        {
+            public static PrePublishedContentContext Empty
+            {
+                get { return new PrePublishedContentContext(null, null, null, null); }
+            }
+            /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
+            public PrePublishedContentContext(IContent entity, string urlSegment, ContextualPublishedContentCache contentCache, Func<IEnumerable<IPublishedContent>> descendentsDelegate)
+            {
+                if (entity == null) throw new ArgumentNullException("entity");
+                if (contentCache == null) throw new ArgumentNullException("contentCache");
+                if (descendentsDelegate == null) throw new ArgumentNullException("descendentsDelegate");
+                if (string.IsNullOrWhiteSpace(urlSegment)) throw new ArgumentException("Value cannot be null or whitespace.", "urlSegment");
+                Entity = entity;
+                UrlSegment = urlSegment;
+                ContentCache = contentCache;
+                DescendentsDelegate = descendentsDelegate;
+            }
+
+            public IContent Entity { get; set; }
+            public string UrlSegment { get; set; }
+            public Func<IEnumerable<IPublishedContent>> DescendentsDelegate { get; set; }
+            public ContextualPublishedContentCache ContentCache { get; set; }
+        }
+
         /// <summary>
-        /// Tracks a documents URLs during publishing in the current request
+        /// Tracks the current doc's entity, url segment and delegate to retrieve it's old descendents during publishing in the current request
         /// </summary>
-        private static Dictionary<int, Tuple<Guid, string>> OldRoutes
+        private static PrePublishedContentContext PrePublishedContent
         {
             get
             {
-                var oldRoutes = RequestCache.GetCacheItem<Dictionary<int, Tuple<Guid, string>>>(
-                    ContextKey3, 
-                    () => new Dictionary<int, Tuple<Guid, string>>());
-                return oldRoutes;
+                //return the item in the cache - otherwise initialize it to an empty instance
+                return RequestCache.GetCacheItem<PrePublishedContentContext>(ContextKey4, () => PrePublishedContentContext.Empty);
+            }
+            set
+            {
+                //clear it
+                RequestCache.ClearCacheItem(ContextKey4);
+                //force it into the cache
+                RequestCache.GetCacheItem<PrePublishedContentContext>(ContextKey4, () => value);
             }
         }
+
+        //private static Func<IEnumerable<IPublishedContent>> DescendentsOrSelfDelegate
+        //{
+        //    get
+        //    {
+        //        //return the item in the cache - otherwise initialize it to an empty string
+        //        return RequestCache.GetCacheItem<Func<IEnumerable<IPublishedContent>>>(ContextKey4, () => (() => Enumerable.Empty<IPublishedContent>()));
+        //    }
+        //    set
+        //    {
+        //        //clear it
+        //        RequestCache.ClearCacheItem(ContextKey4);
+        //        //force it into the cache
+        //        RequestCache.GetCacheItem<Func<IEnumerable<IPublishedContent>>>(ContextKey4, () => value);
+        //    }
+        //}
 
         private static bool LockedEvents
         {
@@ -155,28 +217,26 @@ namespace Umbraco.Web.Routing
             if (contentCache == null) return;
 
             foreach (var entity in args.PublishedEntities)
-            {
-                //don't continue if this entity hasn't changed with regards to anything 
-                // that might change it's URLs
-                if (entity.IsDirty() == false) continue;
+            {                
+                var entityContent = contentCache.GetById(entity.Id);
+                if (entityContent == null) continue;
 
-                if (entity.IsPropertyDirty("Name") 
-                    || entity.IsPropertyDirty(Constants.Conventions.Content.UrlName)
-                    || entity.IsPropertyDirty(Constants.Conventions.Content.UrlAlias)
-                    || Moving)
-                {
-                    var entityContent = contentCache.GetById(entity.Id);
-                    if (entityContent == null) continue;
-                    foreach (var x in entityContent.DescendantsOrSelf())
-                    {
-                        var route = contentCache.GetRouteById(x.Id);
-                        if (IsNotRoute(route)) continue;
-                        var wk = UnwrapToKey(x);
-                        if (wk == null) continue;
-                        
-                        OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
-                    }
-                }
+                PrePublishedContent = new PrePublishedContentContext(entity, entity.GetUrlSegment(), contentCache, () => entityContent.Descendants());
+
+                //if (Moving)
+                //{
+                //    var entityContent = contentCache.GetById(entity.Id);
+                //    if (entityContent == null) continue;
+                //    foreach (var x in entityContent.Descendants())
+                //    {
+                //        var route = contentCache.GetRouteById(x.Id);
+                //        if (IsNotRoute(route)) continue;
+                //        var wk = UnwrapToKey(x);
+                //        if (wk == null) continue;
+
+                //        OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
+                //    }
+                //}
             }
 
             LockedEvents = true; // we only want to see the "first batch"
@@ -208,23 +268,62 @@ namespace Umbraco.Web.Routing
             var serverRole = ApplicationContext.Current.GetCurrentServerRole();
             if (serverRole == ServerRole.Master || serverRole == ServerRole.Single)
             {
-                if (RequestCache.GetCacheItem(ContextKey3) == null)
-                    return;
+                //copy local
+                var prePublishedContext = PrePublishedContent;
 
+                //cannot continue if this is empty
+                if (prePublishedContext.Entity == null) return;
+
+                //cannot continue if there is no published cache
+                var contentCache = GetPublishedCache();
+                if (contentCache == null) return;
+                
+                //get the entity id out of the event args to compare with the id stored during publishing
+                if (cacheRefresherEventArgs.MessageType != MessageType.RefreshById || cacheRefresherEventArgs.MessageType != MessageType.RefreshByInstance) return;
+
+                var refreshedEntityId = cacheRefresherEventArgs.MessageType == MessageType.RefreshByInstance
+                    ? ((IContent)cacheRefresherEventArgs.MessageObject).Id
+                    : (int) cacheRefresherEventArgs.MessageObject;
+
+                //if it's not the id that we're targeting, don't continue
+                if (refreshedEntityId != prePublishedContext.Entity.Id) return;
+
+                //cannot continue if the entity is not found
+                var entityContent = contentCache.GetById(prePublishedContext.Entity.Id);                
+                if (entityContent == null) return;
+
+                //now we can check if the segment has changed
+                var newSegment = prePublishedContext.Entity.GetUrlSegment();
                 try
                 {
-                    foreach (var oldRoute in OldRoutes)
+                    if (Moving || newSegment != prePublishedContext.UrlSegment)
                     {
+                        //it's changed!
+
                         // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
                         // to set a flag in 'Published' to indicate which entities have been refreshed ok
-                        CreateRedirect(oldRoute.Key, oldRoute.Value.Item1, oldRoute.Value.Item2);
+                        CreateRedirect(prePublishedContext.Entity.Id, prePublishedContext.Entity.Key, prePublishedContext.UrlSegment);
+
+                        //iterate the old descendents and get their old routes
+                        foreach (var x in prePublishedContext.DescendentsDelegate())
+                        {
+                            //get the old route from the old contextual cache
+                            var oldRoute = prePublishedContext.ContentCache.GetRouteById(x.Id);
+                            if (IsNotRoute(oldRoute)) continue;
+                            var wk = UnwrapToKey(x);
+                            if (wk == null) continue;
+
+                            CreateRedirect(wk.Id, wk.Key, oldRoute);
+                        }
                     }
                 }
                 finally
                 {
-                    OldRoutes.Clear();
-                    RequestCache.ClearCacheItem(ContextKey3);
-                }                
+                    //set all refs to null
+                    prePublishedContext.Entity = null;
+                    prePublishedContext.ContentCache = null;
+                    prePublishedContext.DescendentsDelegate = null;
+                }
             }
         }
 
