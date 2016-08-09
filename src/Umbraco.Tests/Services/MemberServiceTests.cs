@@ -482,6 +482,36 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("test1", found.Last().Username);
         }
 
+        /// <summary>
+        /// This test ensures that paged data is sorted correclty, we have an issue with paged sorting
+        /// when ordering by a field that might not be unique (i.e. like 'text')
+        /// </summary>
+        [Test]
+        public void Ensure_Paged_Members_Are_Sorted_Correctly()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            for (int i = 0; i < 100; i++)
+            {
+                //this will create the same member name over and over
+                var member = MockedMember.CreateSimpleMember(memberType, 1);                
+                ServiceContext.MemberService.Save(member);
+            }
+
+            int totalRecs;
+            var found = ServiceContext.MemberService.GetAll(0, 20, out totalRecs);
+            var idOrder = found.Select(x => x.Id).ToList();
+
+            //we're going to test that the same order is returend 20x
+            for (int i = 0; i < 20; i++)
+            {
+                var testFound = ServiceContext.MemberService.GetAll(0, 2, out totalRecs);
+                var testIdOrder = testFound.Select(x => x.Id).ToList();
+
+                Assert.IsTrue(idOrder.SequenceEqual(testIdOrder));
+            }
+        }
+
         [Test]
         public void Find_By_Name_Starts_With()
         {
