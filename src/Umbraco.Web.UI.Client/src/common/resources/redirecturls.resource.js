@@ -37,7 +37,7 @@
                     umbRequestHelper.getApiUrl(
                         "redirectUrlManagementApiBaseUrl",
                         "SearchRedirectUrls",
-                        { searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize })),
+                        { searchTerm: searchTerm, page: pageIndex, pageSize: pageSize })),
                 'Failed to retrieve data for searching redirect urls');
         }
 
