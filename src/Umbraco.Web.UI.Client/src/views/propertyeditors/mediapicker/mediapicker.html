@@ -3,10 +3,16 @@
 	<ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
 		<li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
 
-			<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail">
+			<!-- IMAGE -->
+			<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" />
 
-			<span class="icon-holder" ng-hide="image.thumbnail">
-				<i class="icon {{image.icon}} large" ></i>
+			<!-- SVG -->
+			<img ng-if="image.metaData.umbracoExtension.Value === 'svg'" ng-src="{{image.metaData.umbracoFile.Value}}" alt="" />
+			<img ng-if="image.extension === 'svg'" ng-src="{{image.file}}" alt="" />
+
+			<!-- FILE -->
+			<span class="icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
+				<i class="icon {{image.icon}} large"></i>
 				<small>{{image.name}}</small>
 			</span>
 
