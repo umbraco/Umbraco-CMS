@@ -340,6 +340,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            //no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
+            // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
+            // is empty for many nodes)
+            // see: http://issues.umbraco.org/issue/U4-8831
+            sortedSql.OrderBy("umbracoNode.id");
+
             return sortedSql;
 
         }
