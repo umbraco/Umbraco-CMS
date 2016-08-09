@@ -381,8 +381,6 @@ namespace Umbraco.Core
                     connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
                 }
                 Initialize(providerName, connString);
-
-                DetermineSqlServerVersion();
             }
             else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
@@ -419,8 +417,6 @@ namespace Umbraco.Core
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
                 GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
-
-                DetermineSqlServerVersion();
             }
             else
             {
@@ -465,48 +461,6 @@ namespace Umbraco.Core
             Initialize(providerName);
         }
 
-        /// <summary>
-        /// Set the lazy resolution of determining the SQL server version if that is the db type we're using
-        /// </summary>
-        private void DetermineSqlServerVersion()
-        {
-
-            var sqlServerSyntax = SqlSyntax as SqlServerSyntaxProvider;
-            if (sqlServerSyntax != null)
-            {
-                //this will not execute now, it is lazy so will only execute when we need to actually know
-                // the sql server version.
-                sqlServerSyntax.VersionName = new Lazy<SqlServerVersionName>(() =>
-                {
-                    try
-                    {
-                        var database = this._factory.CreateDatabase();
-
-                        var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
-                        var firstPart = version.Split('.')[0];
-                        switch (firstPart)
-                        {
-                            case "11":
-                                return SqlServerVersionName.V2012;
-                            case "10":
-                                return SqlServerVersionName.V2008;
-                            case "9":
-                                return SqlServerVersionName.V2005;
-                            case "8":
-                                return SqlServerVersionName.V2000;
-                            case "7":
-                                return SqlServerVersionName.V7;
-                            default:
-                                return SqlServerVersionName.Other;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        return SqlServerVersionName.Invalid;
-                    }
-                });
-            }
-        }
 
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {

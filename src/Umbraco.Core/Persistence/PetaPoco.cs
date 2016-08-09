@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence
 			CommonConstruct();
 		}
 
-		enum DBType
+		internal enum DBType
 		{
 			SqlServer,
 			SqlServerCE,
@@ -726,6 +726,42 @@ namespace Umbraco.Core.Persistence
 			return true;
 		}
 
+	    /// <summary>
+	    /// NOTE: This is a custom mod of PetaPoco!! This builds the paging sql for different db providers
+	    /// </summary>
+	    /// <param name="sql"></param>
+	    /// <param name="sqlSelectRemoved"></param>
+	    /// <param name="sqlOrderBy"></param>
+	    /// <param name="args"></param>
+	    /// <param name="sqlPage"></param>
+	    /// <param name="databaseType"></param>
+	    /// <param name="skip"></param>
+	    /// <param name="take"></param>
+	    internal virtual void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
+	    {
+            if (databaseType == DBType.SqlServer || databaseType == DBType.Oracle)
+            {
+                sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
+                if (rxDistinct.IsMatch(sqlSelectRemoved))
+                {
+                    sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
+                }
+                sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
+                                        sqlOrderBy == null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { skip, skip + take }).ToArray();
+            }
+            else if (databaseType == DBType.SqlServerCE)
+            {
+                sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { skip, take }).ToArray();
+            }
+            else
+            {
+                sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { take, skip }).ToArray();
+            }
+        }
+
 		public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
 		{
 			// Add auto select clause
@@ -734,34 +770,12 @@ namespace Umbraco.Core.Persistence
 
 			// Split the SQL into the bits we need
 			string sqlSelectRemoved, sqlOrderBy;
-			if (!SplitSqlForPaging(sql, out sqlCount, out sqlSelectRemoved, out sqlOrderBy))
+			if (SplitSqlForPaging(sql, out sqlCount, out sqlSelectRemoved, out sqlOrderBy) == false)
 				throw new Exception("Unable to parse SQL statement for paged query");
 			if (_dbType == DBType.Oracle && sqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
-
-			// Build the SQL for the actual final result
-			if (_dbType == DBType.SqlServer || _dbType == DBType.Oracle)
-			{
-				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
-				if (rxDistinct.IsMatch(sqlSelectRemoved))
-				{
-					sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
-				}
-				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
-										sqlOrderBy==null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { skip, skip+take }).ToArray();
-			}
-			else if (_dbType == DBType.SqlServerCE)
-			{
-				sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { skip, take }).ToArray();
-			}
-			else
-			{
-				sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { take, skip }).ToArray();
-			}
-
+            
+		    BuildSqlDbSpecificPagingQuery(_dbType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
 		}
 
 		// Fetch a page
@@ -2315,8 +2329,8 @@ namespace Umbraco.Core.Persistence
 
 
 		// Member variables
-		string _connectionString;
-		string _providerName;
+	    readonly string _connectionString;
+	    readonly string _providerName;
 		DbProviderFactory _factory;
 		IDbConnection _sharedConnection;
 		IDbTransaction _transaction;
