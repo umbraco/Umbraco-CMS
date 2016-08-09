@@ -333,10 +333,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 sortedSql = new Sql(newSql, newArgs.ToArray());
 
-                sortedSql.OrderBy("CustomPropData.CustomPropVal");
                 if (orderDirection == Direction.Descending)
                 {
-                    sortedSql.Append(" DESC");
+                    sortedSql.OrderByDescending("CustomPropData.CustomPropVal");
+                }
+                else
+                {
+                    sortedSql.OrderBy("CustomPropData.CustomPropVal");
                 }
             }
 
