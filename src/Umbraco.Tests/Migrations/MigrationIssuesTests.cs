@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Migrations
                 new AddRedirectUrlTable(SqlSyntax, logger)
             );
 
-            var db = new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Logger);
+            var db = new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", Constants.DatabaseProviders.SqlCe, Logger);
 
             var upgraded = migrationRunner.Execute(db, DatabaseProviders.SqlServerCE, true);
             Assert.IsTrue(upgraded);

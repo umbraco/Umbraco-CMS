@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence
 		{
             _dbContext = new DatabaseContext(
                 new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
-                Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
+                Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
 			ApplicationContext.Current = new ApplicationContext(
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence
                 engine.CreateDatabase();
             }
 
-            var dbFactory = new DefaultDatabaseFactory(connString, "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            var dbFactory = new DefaultDatabaseFactory(connString, Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
             //re-map the dbcontext to the new conn string
             _dbContext = new DatabaseContext(
                 dbFactory,

@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence
 				connectionStringName = ConfigurationManager.ConnectionStrings[0].Name;
 
 			// Work out connection string and provider name
-			var providerName = "System.Data.SqlClient";
+			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
 				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
