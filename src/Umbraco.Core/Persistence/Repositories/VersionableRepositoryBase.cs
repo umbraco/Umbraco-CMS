@@ -501,17 +501,6 @@ WHERE EXISTS(
                     var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
                     var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();
 
-                    var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-
-                    foreach (var property in newProperties)
-                    {
-                        var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
-                        int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                        property.Version = def.Version;
-                        property.Id = primaryKey;
-                    }
-
                     foreach (var property in properties)
                     {
                         //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
