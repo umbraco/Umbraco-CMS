@@ -133,6 +133,7 @@
         }, 200);
 
         function filter() {
+            vm.dashboard.loading = true;
             filterDebounced();
         }
 

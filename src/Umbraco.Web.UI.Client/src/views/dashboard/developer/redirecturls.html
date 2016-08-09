@@ -41,8 +41,7 @@
 
     </umb-editor-sub-header>
 
-
-    <div class="umb-table" ng-class="{'umb-table-inactive': vm.dashboard.urlTrackerDisabled === true}">
+    <div class="umb-table" ng-if="vm.redirectUrls.length > 0 && vm.dashboard.loading === false" ng-class="{'umb-table-inactive': vm.dashboard.urlTrackerDisabled === true}">
 
         <div class="umb-table-head">
             <div class="umb-table-row">
@@ -84,6 +83,19 @@
         </div>
 
     </div>
+
+    <umb-empty-state
+        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
+        position="center">
+        <div>No redirects have been made</div>
+        <small class="faded">When a published page gets renamed a redirect will automatically be made to the new page</small>
+    </umb-empty-state>
+
+    <umb-empty-state
+        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading"
+        position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
 
     <div class="flex justify-center items-center">
         <umb-pagination
