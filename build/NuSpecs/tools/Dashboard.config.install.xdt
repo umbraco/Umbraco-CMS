@@ -21,6 +21,9 @@
   </section>
 
   <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
+    <areas xdt:Transform="InsertIfMissing">
+      <area xdt:Transform="InsertIfMissing">developer</area>
+    </areas>  
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Replace">
       <control showOnce="true" addPanel="true" panelCaption="">
         views/dashboard/developer/developerdashboardvideos.html
