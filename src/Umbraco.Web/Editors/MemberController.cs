@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<MemberBasic> GetPagedResults(
             int pageNumber = 1,
             int pageSize = 100,
-            string orderBy = "username",
+            string orderBy = "LoginName",
             Direction orderDirection = Direction.Ascending,
             bool orderBySystemField = true,
             string filter = "",
