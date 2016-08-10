@@ -177,11 +177,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             e.allowSorting = true;
         }
 
-        // Another special case for lasted edited data/update date for media, again this field isn't available on the base table so we can't sort by it
-        if (e.isSystem && $scope.entityType == "media") {
-            e.allowSorting = e.alias != 'updateDate';
-        }
-
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
             e.allowSorting = e.alias == 'username' || e.alias == 'email';
