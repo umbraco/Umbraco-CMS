@@ -1465,7 +1465,18 @@ namespace Umbraco.Web
                                                       HttpUtility.UrlEncode(controllerAction),
                                                       area);
 
-            var additionalRouteValsAsQuery = additionalRouteVals != null ? additionalRouteVals.ToDictionary<object>().ToQueryString() : null;
+            //checking if the additional route values is already a dictionary and convert to querystring
+            string additionalRouteValsAsQuery;
+            if (additionalRouteVals != null)
+            {
+                var additionalRouteValsAsDictionary = additionalRouteVals as Dictionary<string, object>;
+                if (additionalRouteValsAsDictionary != null)
+                    additionalRouteValsAsQuery = additionalRouteValsAsDictionary.ToQueryString();
+                else
+                    additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
+            }
+            else
+                additionalRouteValsAsQuery = null;
 
             if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
                 surfaceRouteParams += "&" + additionalRouteValsAsQuery;
