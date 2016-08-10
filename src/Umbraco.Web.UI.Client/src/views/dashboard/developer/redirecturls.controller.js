@@ -76,19 +76,19 @@
         }
 
         function removeRedirect(redirectToDelete) {
+            var toggleConfirm = confirm('Are you sure you want to remove the redirect from ' + '"' + redirectToDelete.originalUrl + '"' + " to " + '"' + redirectToDelete.destinationUrl + '"' + " ?");
 
-            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
+            if (toggleConfirm) {
+                redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
 
-                var index = vm.redirectUrls.indexOf(redirectToDelete);
-                vm.redirectUrls.splice(index, 1);
-                notificationsService.success("Redirect Url Removed!", "Redirect Url " + redirectToDelete.Url + " has been deleted");
+                    var index = vm.redirectUrls.indexOf(redirectToDelete);
+                    vm.redirectUrls.splice(index, 1);
+                    notificationsService.success("Redirect Url Removed!", "Redirect Url has been deleted");
 
-            }, function(error) {
-
-                notificationsService.error("Redirect Url Error!", "Redirect Url " + redirectToDelete.Url + " was not deleted");
-
-            });
-
+                }, function(error) {
+                    notificationsService.error("Redirect Url Error!", "Redirect Url was not deleted");
+                });
+            }
         }
 
         function disableUrlTracker() {
