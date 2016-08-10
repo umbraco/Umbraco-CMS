@@ -37,13 +37,13 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
                'Failed to query packages');
         },
        
-        search: function (pageIndex, pageSize, category, query, canceler) {
+        search: function (pageIndex, pageSize, orderBy, category, query, canceler) {
 
             var httpConfig = {};
             if (canceler) {
                 httpConfig["timeout"] = canceler;
             }
-
+            
             if (category === undefined) {
                 category = "";
             }
@@ -51,8 +51,11 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
                 query = "";
             }
 
+            //order by score if there is nothing set
+            var order = !orderBy ? "&order=Default" : ("&order=" + orderBy);
+
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query),
+               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order),
                httpConfig,
                'Failed to query packages');
         }
