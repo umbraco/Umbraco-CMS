@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
@@ -98,8 +94,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 var ct = Services.ContentTypeService.GetMediaType(int.Parse(id));
-                IMediaType parent = null;
-                parent = ct == null ? null : Services.ContentTypeService.GetMediaType(ct.ParentId);
+                var parent = ct == null ? null : Services.ContentTypeService.GetMediaType(ct.ParentId);
 
                 if (enableInheritedMediaTypes)
                 {
