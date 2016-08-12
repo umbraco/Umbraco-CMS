@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         {
             SemVersion mostrecent = null;
 
-            if (ValidTables.Any(x => x.InvariantEquals("umbracoMigrations")))
+            if (ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
             {
                 var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
                  mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
