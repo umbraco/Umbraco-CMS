@@ -74,6 +74,8 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
+            
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger<BackOfficeSignInManager>()));
@@ -102,6 +104,8 @@ namespace Umbraco.Web.Security.Identity
                     customUserStore,
                     userMembershipProvider));
 
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
@@ -124,8 +128,11 @@ namespace Umbraco.Web.Security.Identity
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);
 
+            app.SetBackOfficeUserManagerType<TManager, TUser>();
+
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
+            app.CreatePerOwinContext<BackOfficeSignInManager>(
+                (options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
 
         /// <summary>
@@ -208,6 +215,35 @@ namespace Umbraco.Web.Security.Identity
             }
 
             return app;
+        }
+
+        private static bool _markerSet = false;
+
+        /// <summary>
+        /// This registers the exact type of the user manager in owin so we can extract it
+        /// when required in order to extract the user manager instance
+        /// </summary>
+        /// <typeparam name="TManager"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <param name="app"></param>
+        /// <remarks>
+        /// This is required because a developer can specify a custom user manager and due to generic types the key name will registered
+        /// differently in the owin context
+        /// </remarks> 
+        private static void SetBackOfficeUserManagerType<TManager, TUser>(this IAppBuilder app)
+            where TManager : BackOfficeUserManager<TUser>
+            where TUser : BackOfficeIdentityUser
+        {
+            if (_markerSet) throw new InvalidOperationException("The back office user manager marker has already been set, only one back office user manager can be configured");
+
+            //on each request set the user manager getter - 
+            // this is required purely because Microsoft.Owin.IOwinContext is super inflexible with it's Get since it can only be
+            // a generic strongly typed instance
+            app.Use((context, func) =>
+            {
+                context.Set(BackOfficeUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
+                return func();
+            });            
         }
 
         private static void UseUmbracoBackOfficeCookieAuthenticationInternal(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext, PipelineStage stage)

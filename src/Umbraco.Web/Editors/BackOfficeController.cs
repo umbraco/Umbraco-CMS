@@ -39,6 +39,7 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Editors
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
         private const string TokenExternalSignInError = "ExternalSignInError";
@@ -60,12 +61,11 @@ namespace Umbraco.Web.Editors
 
         protected BackOfficeSignInManager SignInManager
         {
-            get { return _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>()); }
+            get { return _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager()); }
         }
-
-        protected BackOfficeUserManager UserManager
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
+            get { return _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager()); }
         }
 
         protected IAuthenticationManager AuthenticationManager

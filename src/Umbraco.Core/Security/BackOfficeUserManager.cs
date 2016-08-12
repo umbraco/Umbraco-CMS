@@ -15,6 +15,8 @@ namespace Umbraco.Core.Security
     /// </summary>
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
+        public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
+
         public BackOfficeUserManager(IUserStore<BackOfficeIdentityUser, int> store)
             : base(store)
         {
