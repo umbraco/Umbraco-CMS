@@ -85,6 +85,18 @@
                     vm.redirectUrls.splice(index, 1);
                     notificationsService.success("Redirect Url Removed!", "Redirect Url has been deleted");
 
+                    // check if new redirects needs to be loaded
+                    if(vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
+
+                        // if we are not on the first page - get records from the previous
+                        if(vm.pagination.pageIndex > 0 ) {
+                            vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
+                            vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
+                        }
+
+                        search();
+                    }
+
                 }, function(error) {
                     notificationsService.error("Redirect Url Error!", "Redirect Url was not deleted");
                 });
