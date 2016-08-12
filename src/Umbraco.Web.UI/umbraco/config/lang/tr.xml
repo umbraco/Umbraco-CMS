@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
   <creator>
-    <name>Umbraco</name>
-    <link>http://umbraco.com</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kültür ve Hostnames</key>
@@ -54,8 +54,8 @@
     <key alias="orEdit">Geçerli domain düzenle</key>
     <key alias="domainHelp">
       <![CDATA[
-    Geçerli alan adları şunlardır : " ugurcelenk.com ", " www.ugurcelenk.com ", " ugurcelenk.com:8080 " ya da
-        " https://www.ugurcelenk.com/ " . <br /> etki /> bir düzey yollar desteklenir <br , örneğin . " ugurcelenk.com/en " . Bununla birlikte,
+    Geçerli alan adları şunlardır : " umbraco.com ", " www.umbraco.com ", " umbraco.com:8080 " ya da
+        " https://www.umbraco.com/ " . <br /> etki /> bir düzey yollar desteklenir <br , örneğin . " umbraco.com/en " . Bununla birlikte,
         kaçınılmalıdır. Daha yukarıdaki kültür ayarını kullanın 
     ]]>
     </key>
@@ -456,7 +456,7 @@
               <p>
               <strong>Tekrar dene</strong>. 
               <br />
-              <a href="http://umbraco.com/documentation" target="_blank">
+              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]>
     </key>
     <key alias="databaseText">
