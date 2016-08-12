@@ -29,7 +29,7 @@ namespace Umbraco.Core.Security
 
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
         {
-            return user.GenerateUserIdentityAsync((BackOfficeUserManager)UserManager);
+            return user.GenerateUserIdentityAsync((BackOfficeUserManager<BackOfficeIdentityUser>)UserManager);
         }
 
         public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, ILogger logger)

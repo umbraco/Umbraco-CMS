@@ -7,7 +7,8 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeClaimsIdentityFactory : ClaimsIdentityFactory<BackOfficeIdentityUser, int>
+    public class BackOfficeClaimsIdentityFactory<T> : ClaimsIdentityFactory<T, int>
+        where T: BackOfficeIdentityUser
     {
         public BackOfficeClaimsIdentityFactory()
         {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="manager"/><param name="user"/><param name="authenticationType"/>
         /// <returns/>
-        public override async Task<ClaimsIdentity> CreateAsync(UserManager<BackOfficeIdentityUser, int> manager, BackOfficeIdentityUser user, string authenticationType)
+        public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
 
@@ -41,5 +42,10 @@ namespace Umbraco.Core.Security
 
             return umbracoIdentity;
         }
+    }
+
+    public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>
+    {       
+
     }
 }
