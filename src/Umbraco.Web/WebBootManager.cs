@@ -510,8 +510,7 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-            Container.RegisterBuilderCollection<UrlProviderCollectionBuilder, UrlProviderCollection, IUrlProvider>();
-            Container.GetInstance<UrlProviderCollectionBuilder>()
+            UrlProviderCollectionBuilder.Register(Container)
                 //.Append<AliasUrlProvider>() // not enabled by default
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();

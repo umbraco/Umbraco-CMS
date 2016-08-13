@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LightInject;
+﻿using LightInject;
 using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Web.Routing
@@ -11,10 +10,5 @@ namespace Umbraco.Web.Routing
         { }
 
         protected override UrlProviderCollectionBuilder This => this;
-
-        protected override UrlProviderCollection CreateCollection(IEnumerable<IUrlProvider> items)
-        {
-            return new UrlProviderCollection(items);
-        }
     }
 }

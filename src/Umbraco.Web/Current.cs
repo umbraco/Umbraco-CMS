@@ -112,7 +112,7 @@ namespace Umbraco.Web
             => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
 
         public static UrlProviderCollection UrlProviders
-            => CoreCurrent.Container.GetInstance<UrlProviderCollection>();
+            => Container.GetInstance<UrlProviderCollection>();
 
         #endregion
 
