@@ -23,8 +23,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         /// <summary>Regular expression that finds multiline block comments.</summary>
         private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
-        internal MigrationResolver MigrationResolver { get; private set; }
-
         [SetUp]
         public virtual void Initialize()
         {
@@ -60,7 +58,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
                 configuredVersion,

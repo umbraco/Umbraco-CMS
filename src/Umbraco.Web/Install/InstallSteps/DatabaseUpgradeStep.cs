@@ -33,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
                 var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData(
                     _applicationContext.Services.MigrationEntryService,
-                    MigrationResolver.Current);
+                    Current.MigrationCollectionBuilder);
 
                 if (result.Success == false)
                 {

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
-        private readonly IMigrationResolver _resolver;
+        private readonly IMigrationCollectionBuilder _builder;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
         private readonly SemVersion _currentVersion;
@@ -30,16 +30,16 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly string _productName;
         private readonly IMigration[] _migrations;
 
-        public MigrationRunner(IMigrationResolver resolver, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
+        public MigrationRunner(IMigrationCollectionBuilder builder, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
         {
-            if (resolver == null) throw new ArgumentNullException("resolver");
+            if (builder == null) throw new ArgumentNullException("builder");
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
             if (logger == null) throw new ArgumentNullException("logger");
             if (currentVersion == null) throw new ArgumentNullException("currentVersion");
             if (targetVersion == null) throw new ArgumentNullException("targetVersion");
             Mandate.ParameterNotNullOrEmpty(productName, "productName");
 
-            _resolver = resolver;
+            _builder = builder;
             _migrationEntryService = migrationEntryService;
             _logger = logger;
             _currentVersion = currentVersion;
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Persistence.Migrations
         protected IMigration[] FindMigrations(IMigrationContext context)
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return _migrations ?? _resolver.GetMigrations(context).ToArray();
+            return _migrations ?? _builder.CreateCollection(context).ToArray();
         }
 
         internal void InitializeMigrations(

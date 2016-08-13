@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //Setup the MigrationRunner
             var migrationContext = new MigrationContext(db, Mock.Of<ILogger>());
             var migrationRunner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
 

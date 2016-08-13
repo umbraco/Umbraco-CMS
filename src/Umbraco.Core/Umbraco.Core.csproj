@@ -271,6 +271,9 @@
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
+    <Compile Include="Persistence\Migrations\IMigrationCollectionBuilder.cs" />
+    <Compile Include="Persistence\Migrations\MigrationCollection.cs" />
+    <Compile Include="Persistence\Migrations\MigrationCollectionBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Persistence\ThreadStaticUmbracoDatabaseAccessor.cs" />
@@ -327,7 +330,6 @@
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
-    <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
     <Compile Include="Persistence\Querying\IQueryFactory.cs" />
     <Compile Include="Persistence\Querying\QueryFactory.cs" />
@@ -823,7 +825,6 @@
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />
     <Compile Include="Persistence\Migrations\MigrationExpressionBase.cs" />
-    <Compile Include="Persistence\Migrations\MigrationResolver.cs" />
     <Compile Include="Persistence\Migrations\MigrationRunner.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\AlterSyntaxBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\AlterColumnBuilder.cs" />

@@ -26,24 +26,19 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Can_Find_Migrations_With_Target_Version_Six()
         {
-            var migrationResolver = new MigrationResolver(
-               Container,
-               Logger,
-               () => new List<Type>
-               {
-                    typeof (AlterUserTableMigrationStub),
-                    typeof(Dummy),
-                    typeof (SixZeroMigration1),
-                    typeof (SixZeroMigration2),
-                    typeof (FourElevenMigration),
-                    typeof (FiveZeroMigration)
-               });
+            var builder = new MigrationCollectionBuilder(Container)
+                .Add<AlterUserTableMigrationStub>()
+                .Add<Dummy>()
+                .Add<SixZeroMigration1>()
+                .Add<SixZeroMigration2>()
+                .Add<FourElevenMigration>()
+                .Add<FiveZeroMigration>();
 
             var database = TestObjects.GetUmbracoSqlServerDatabase(Mock.Of<ILogger>());
 
             var context = new MigrationContext(database, Logger);
 
-            var foundMigrations = migrationResolver.GetMigrations(context);
+            var foundMigrations = builder.CreateCollection(context);
             var targetVersion = new Version("6.0.0");
             var list = new List<IMigration>();
 

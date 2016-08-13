@@ -2,6 +2,7 @@
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Strings;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
@@ -124,6 +125,9 @@ namespace Umbraco.Web
 
         public static ActionCollection Actions
             => Container.GetInstance<ActionCollection>();
+
+        public static MigrationCollectionBuilder MigrationCollectionBuilder
+            => Container.GetInstance<MigrationCollectionBuilder>();
 
         #endregion
 

@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Only_One_Migration_For_Spanning_Multiple_Targets()
         {
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(6 /*, 0, 0*/), "Test");
 
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_1()
         {
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(5 /*, 0, 0*/), "Test");
 
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(5, 0, 1), new SemVersion(6 /*, 0, 0*/), "Test");
 

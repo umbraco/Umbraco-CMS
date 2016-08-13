@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Migrations
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
+                Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
                 new SemVersion(7, 5, 0),

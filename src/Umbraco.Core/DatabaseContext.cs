@@ -428,7 +428,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, IMigrationResolver migrationResolver)
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, MigrationCollectionBuilder builder)
         {
             try
             {
@@ -487,7 +487,7 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(migrationResolver, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
 
                 var migrationContext = new MigrationContext(database, _logger);
                 var upgraded = runner.Execute(migrationContext /*, true*/);

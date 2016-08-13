@@ -457,10 +457,8 @@ namespace Umbraco.Core
                 () => PluginManager.ResolvePackageActions());
 
             //the database migration objects
-            MigrationResolver.Current = new MigrationResolver(
-                Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveTypes<IMigration>());
-
+            MigrationCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolveTypes<IMigration>());
 
             // need to filter out the ones we dont want!!
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
