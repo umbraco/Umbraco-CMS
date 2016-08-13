@@ -3,6 +3,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
@@ -113,6 +114,9 @@ namespace Umbraco.Web
 
         public static UrlProviderCollection UrlProviders
             => Container.GetInstance<UrlProviderCollection>();
+
+        public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
+            => Container.GetInstance<HealthCheckCollectionBuilder>();
 
         #endregion
 

@@ -545,12 +545,10 @@ namespace Umbraco.Web
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container);
             Container.Register<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
-            HealthCheckResolver.Current = new HealthCheckResolver(Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
-
-            // fixme - remove for NuCache else it fails
+            HealthCheckCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolveTypes<HealthCheck.HealthCheck>())
+                .Exclude<XmlDataIntegrityHealthCheck>(); // fixme must remove else NuCache dies!
             // but we should also have one for NuCache AND NuCache should be a component that does all this
-            HealthCheckResolver.Current.RemoveType<XmlDataIntegrityHealthCheck>();
         }
 
         /// <summary>

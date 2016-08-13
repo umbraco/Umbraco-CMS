@@ -161,6 +161,8 @@
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Current.cs" />
+    <Compile Include="HealthCheck\HealthCheckCollection.cs" />
+    <Compile Include="HealthCheck\HeathCheckCollectionBuilder.cs" />
     <Compile Include="HybridAccessorBase.cs" />
     <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
@@ -201,12 +203,10 @@
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\UserControlMacroEngine.cs" />
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
-    <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="Macros\XsltMacroEngine.cs" />
-    <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
