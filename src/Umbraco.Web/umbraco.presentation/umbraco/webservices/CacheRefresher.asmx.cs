@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
+using Umbraco.Web;
 
 namespace umbraco.presentation.webservices
 {
@@ -41,7 +42,7 @@ namespace umbraco.presentation.webservices
 
         private static ICacheRefresher GetRefresher(Guid id)
         {
-            var refresher = CacheRefreshersResolver.Current.GetById(id);
+            var refresher = Current.CacheRefreshers[id];
             if (refresher == null)
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
             return refresher;
@@ -179,7 +180,7 @@ namespace umbraco.presentation.webservices
 
 			var xd = new XmlDocument();
 			xd.LoadXml("<cacheRefreshers/>");
-			foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
+			foreach (var cr in Current.CacheRefreshers) 
 			{
 				var n = XmlHelper.AddTextNode(xd, "cacheRefresher", cr.Name);
 				n.Attributes.Append(XmlHelper.AddAttribute(xd, "uniqueIdentifier", cr.RefresherUniqueId.ToString()));

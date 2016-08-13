@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Sync;
@@ -28,8 +29,8 @@ namespace Umbraco.Tests.Cache.DistributedCache
                 new TestServerRegistrar());
             ServerMessengerResolver.Current = new ServerMessengerResolver(
                 container, factory => new TestServerMessenger());
-            CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                container, Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
+            CacheRefresherCollectionBuilder.Register(container)
+                .Add<TestCacheRefresher>();
             Resolution.Freeze();
         }
 
@@ -38,7 +39,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             ServerRegistrarResolver.Reset();
             ServerMessengerResolver.Reset();
-            CacheRefreshersResolver.Reset();
         }
 
         [Test]

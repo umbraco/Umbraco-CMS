@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -53,13 +54,10 @@ namespace Umbraco.Tests.Integration
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(new DistributedCacheTests.TestServerRegistrar()); // localhost-only
             ServerMessengerResolver.Current = new ServerMessengerResolver(Container);
             Container.Register<IServerMessenger, WebServiceServerMessenger>();
-            CacheRefreshersResolver.Current = new CacheRefreshersResolver(Container, Mock.Of<ILogger>(), () => new[]
-            {
-                typeof(ContentTypeCacheRefresher),
-                typeof(ContentCacheRefresher),
-                typeof(MacroCacheRefresher)
-            });
-
+            CacheRefresherCollectionBuilder.Register(Container)
+                .Add<ContentTypeCacheRefresher>()
+                .Add<ContentCacheRefresher>()
+                .Add<MacroCacheRefresher>();
         }
 
         public override void TearDown()

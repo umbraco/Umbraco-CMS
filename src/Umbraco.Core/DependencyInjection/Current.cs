@@ -1,5 +1,6 @@
 ﻿using System;
 using LightInject;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.DependencyInjection
@@ -41,6 +42,9 @@ namespace Umbraco.Core.DependencyInjection
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();
+
+        public static CacheRefresherCollection CacheRefreshers
+            => Container.GetInstance<CacheRefresherCollection>();
 
         #endregion
     }

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -440,7 +441,7 @@ namespace Umbraco.Core.Sync
 
         private static ICacheRefresher GetRefresher(Guid id)
         {
-            var refresher = CacheRefreshersResolver.Current.GetById(id);
+            var refresher = Current.CacheRefreshers[id];
             if (refresher == null)
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
             return refresher;

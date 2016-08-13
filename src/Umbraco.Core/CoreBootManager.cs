@@ -449,9 +449,8 @@ namespace Umbraco.Core
             //RepositoryResolver.Current = new RepositoryResolver(
             //    new RepositoryFactory(ApplicationCache));
 
-            CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveCacheRefreshers());
+            CacheRefresherCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolveCacheRefreshers());
 
             PackageActionsResolver.Current = new PackageActionsResolver(
                 ServiceProvider, ProfilingLogger.Logger,

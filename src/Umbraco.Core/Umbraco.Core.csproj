@@ -74,6 +74,8 @@
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
+    <Compile Include="Cache\CacheRefresherCollection.cs" />
+    <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryCacheProvider.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
@@ -1116,7 +1118,6 @@
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
-    <Compile Include="Cache\CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="DisposableObject.cs" />

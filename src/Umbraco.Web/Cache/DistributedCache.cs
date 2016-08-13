@@ -205,7 +205,7 @@ namespace Umbraco.Web.Cache
         // helper method to get an ICacheRefresher by its unique identifier
         private static ICacheRefresher GetRefresherById(Guid refresherGuid)
         {
-            return CacheRefreshersResolver.Current.GetById(refresherGuid);
+            return Current.CacheRefreshers[refresherGuid];
         }
     }
 }
