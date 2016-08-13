@@ -121,7 +121,7 @@ namespace Umbraco.Web
         // proxy Core for convenience
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
-            => CoreCurrent.Container.GetInstance<UrlSegmentProviderCollection>();
+            => Container.GetInstance<UrlSegmentProviderCollection>();
 
         public static CacheRefresherCollection CacheRefreshers
             => Container.GetInstance<CacheRefresherCollection>();

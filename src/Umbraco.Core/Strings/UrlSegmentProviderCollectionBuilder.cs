@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LightInject;
+﻿using LightInject;
 using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Strings
@@ -11,10 +10,5 @@ namespace Umbraco.Core.Strings
         { }
 
         protected override UrlSegmentProviderCollectionBuilder This => this;
-
-        protected override UrlSegmentProviderCollection CreateCollection(IEnumerable<IUrlSegmentProvider> items)
-        {
-            return new UrlSegmentProviderCollection(items);
-        }
     }
 }

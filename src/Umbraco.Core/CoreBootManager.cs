@@ -471,8 +471,8 @@ namespace Umbraco.Core
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(Container,
                 factory => new DefaultShortStringHelper(factory.GetInstance<IUmbracoSettingsSection>()).WithDefaultConfig());
 
-            Container.RegisterBuilderCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider, PerContainerLifetime>();
-            Container.GetInstance<UrlSegmentProviderCollectionBuilder>().Append<DefaultUrlSegmentProvider>();
+            UrlSegmentProviderCollectionBuilder.Register(Container)
+                .Append<DefaultUrlSegmentProvider>();
 
             // by default, no factory is activated
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
