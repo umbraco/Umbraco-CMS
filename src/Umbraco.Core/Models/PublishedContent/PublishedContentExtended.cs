@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-
+    [TypeConverter(typeof(PublishedContentTypeConverter))]
     public class PublishedContentExtended : PublishedContentWrapped, IPublishedContentExtended
     {
         #region Constructor
@@ -186,6 +187,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
     }
 
 }
