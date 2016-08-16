@@ -66,10 +66,11 @@
        xdt:Transform="InsertIfMissing"  />
   
   <!-- Before 7.4 this tree had the alias 'dataType', without the 's' on the end, this is here to rename it  -->
-  <add alias="dataTypes" application="developer" type="Umbraco.Web.Trees.DataTypeTreeController, umbraco"
+  <add sortOrder="1" alias="dataTypes" application="developer" type="Umbraco.Web.Trees.DataTypeTreeController, umbraco"
        xdt:Locator="Match(application,type)" 
-       xdt:Transform="SetAttributes(alias)" />
+       xdt:Transform="SetAttributes(alias,sortOrder)" />
 	   
+  <!-- Yes, set the sortOrder again, like above because.. sometimes apparently we already have a dataTypes node and we can't remove more than one.. if they're equal though (same alias,application and sortOrder) it doesn't throw an error -->   
   <add sortOrder="1" alias="dataTypes" application="developer"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes(sortOrder)" />
