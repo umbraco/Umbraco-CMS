@@ -162,6 +162,36 @@ namespace Umbraco.Core.DependencyInjection
             }
         }
 
-       
+        /// <summary>
+        /// Registers an injected collection.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <typeparam name="TCollection">The type of the collection.</typeparam>
+        /// <typeparam name="TItem">The type of the items.</typeparam>
+        /// <param name="container">A container.</param>
+        public static void RegisterCollection<TBuilder, TCollection, TItem>(this IServiceRegistry container)
+            where TCollection : IInjectCollection<TItem>
+            where TBuilder : IInjectCollectionBuilder<TCollection, TItem>
+        {
+            container.Register<TBuilder>(new PerContainerLifetime());
+            container.Register(factory => factory.GetInstance<TBuilder>().GetCollection());
+        }
+
+        /// <summary>
+        /// Registers an injected collection.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <typeparam name="TCollection">The type of the collection.</typeparam>
+        /// <typeparam name="TItem">The type of the items.</typeparam>
+        /// <typeparam name="TLifetime">A lifetime type.</typeparam>
+        /// <param name="container">A container.</param>
+        public static void RegisterCollection<TBuilder, TCollection, TItem, TLifetime>(this IServiceRegistry container)
+            where TCollection : IInjectCollection<TItem>
+            where TBuilder : IInjectCollectionBuilder<TCollection, TItem>
+            where TLifetime : ILifetime, new()
+        {
+            container.Register<TBuilder>(new PerContainerLifetime());
+            container.Register(factory => factory.GetInstance<TBuilder>().GetCollection(), new TLifetime());
+        }
     }
 }

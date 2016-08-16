@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using LightInject;
 using Umbraco.Core.Events;
+using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -32,7 +34,6 @@ namespace Umbraco.Web
             set { _umbracoContextAccessor = value; } // for tests
         }
 
-
         public static IFacadeAccessor FacadeAccessor
         {
             get
@@ -43,7 +44,6 @@ namespace Umbraco.Web
             }
             set { _facadeAccessor = value; } // for tests
         }
-
 
         public static UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 

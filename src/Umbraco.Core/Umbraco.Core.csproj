@@ -215,8 +215,15 @@
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
     <Compile Include="DependencyInjection\CoreModelMappersCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\IInjectCollection.cs" />
+    <Compile Include="DependencyInjection\IInjectCollectionBuilder.cs" />
+    <Compile Include="DependencyInjection\InjectCollectionBase.cs" />
+    <Compile Include="DependencyInjection\InjectCollectionBuilderBase.cs" />
+    <Compile Include="DependencyInjection\InjectLazyCollectionBuilderBase.cs" />
+    <Compile Include="DependencyInjection\InjectWeightedCollectionBuilderBase.cs" />
     <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />
     <Compile Include="DependencyInjection\ServicesCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\WeightAttribute.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
@@ -1328,7 +1335,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveZero\" />
     <Folder Include="PublishedCache\" />
   </ItemGroup>
   <ItemGroup />
