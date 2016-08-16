@@ -64,7 +64,12 @@
   <add initialize="true" sortOrder="0" alias="packager" application="developer" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.PackagesTreeController, umbraco" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="InsertIfMissing"  />
-	
+  
+  <!-- Before 7.4 this tree had the alias 'dataType', without the 's' on the end, this is here to rename it  -->
+  <add alias="dataTypes" application="developer" type="Umbraco.Web.Trees.DataTypeTreeController, umbraco"
+       xdt:Locator="Match(application,type)" 
+       xdt:Transform="SetAttributes(alias)" />
+	   
   <add sortOrder="1" alias="dataTypes" application="developer"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes(sortOrder)" />
