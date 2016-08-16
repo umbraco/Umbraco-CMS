@@ -15,7 +15,7 @@ for /f "delims=" %%A in ('dir %nuGetFolder%npm.js.* /b') do set "npmPath=%nuGetF
 
 ECHO Adding Npm and Node to path 
 REM SETLOCAL is on, so changes to the path not persist to the actual user's path
-PATH=%npmPath%;%nodePath%;%PATH%
+PATH=%npmPath%;%nodePath%
 
 SET buildFolder=%CD%
 
