@@ -155,7 +155,7 @@ namespace Umbraco.Web.Routing
             var contentCache = GetPublishedCache();
             if (contentCache == null) return;
 
-            // prepare entities
+            // prepare entities - remove chances of duplicates
             var entities = PrepareEntities(args.PublishedEntities);
 
             foreach (var entity in entities)
@@ -206,12 +206,8 @@ namespace Umbraco.Web.Routing
 
         private static IEnumerable<IContent> PrepareEntities(IEnumerable<IContent> eventEntities)
         {
-            // prepare entities
-            // - exclude entities without an identity (new entities)
-            // - exclude duplicates (in case publishing a parent and its children)
-
             var entities = new List<IContent>();
-            foreach (var e in eventEntities.Where(x => x.HasIdentity).OrderBy(x => x.Level))
+            foreach (var e in eventEntities.OrderBy(x => x.Level))
             {
                 var pathIds = e.Path.Split(',').Select(int.Parse);
                 if (entities.Any(x => pathIds.Contains(x.Id))) continue;

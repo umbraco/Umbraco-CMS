@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Xml.XPath;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
@@ -198,18 +197,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			{
 				try
 				{
-                    // first check in Examine as this is WAY faster
-                    //
-                    // the filter will create a query like this:
-                    // +(+__NodeId:3113 -__Path:-1,-21,*) +__IndexType:media
-                    //
-                    // note that since the use of the wildcard, it automatically escapes it in Lucene.
+					//first check in Examine as this is WAY faster
+					var criteria = searchProvider.CreateSearchCriteria("media");
 
-                    var criteria = searchProvider.CreateSearchCriteria("media");
                     var filter = criteria.Id(id).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
+                    //+(+__NodeId:3113 -__Path:-1,-21,*) +__IndexType:media
 
-                    var result = searchProvider.Search(filter.Compile()).FirstOrDefault();
-                    if (result != null) return ConvertFromSearchResult(result);
+					var results = searchProvider.Search(filter.Compile());
+					if (results.Any())
+					{
+						return ConvertFromSearchResult(results.First());
+					}
 				}
 				catch (FileNotFoundException ex)
 				{
@@ -221,22 +220,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 			}
 
-            // this is annoying as it can flood the log in case of eg a media picker referencing a media
-            // that has been deleted, hence is not in the Examine index anymore (for a good reason) - yet
-            // it can also indicate that the Examine index is corrupted and would need to be rebuilt.
             LogHelper.Warn<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
-            var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
-            if (miss <= ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                LogHelper.Warn<PublishedMediaCache>("bam");
+
+			//var media = global::umbraco.library.GetMedia(id, false);
+		    //return ConvertFromXPathNodeIterator(media, id);
 
             var media = ApplicationContext.Current.Services.MediaService.GetById(id);
             return media == null ? null : ConvertFromIMedia(media);
         }
-
-	    private const int ExamineIndexMissMax = 10;
-	    private int _examineIndexMiss;
 
         internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
 	    {
