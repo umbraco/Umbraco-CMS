@@ -20,6 +20,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
@@ -32,7 +33,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var container = new ServiceContainer();
             container.EnableAnnotatedConstructorInjection();
 
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
+            container.RegisterCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>();
+            container.GetInstance<UrlSegmentProviderCollectionBuilder>().Add<DefaultUrlSegmentProvider>();
+
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
         }

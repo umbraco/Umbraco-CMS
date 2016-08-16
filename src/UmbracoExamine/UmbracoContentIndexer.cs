@@ -52,7 +52,7 @@ namespace UmbracoExamine
             ContentService = ApplicationContext.Current.Services.ContentService;
             MediaService = ApplicationContext.Current.Services.MediaService;
             UserService = ApplicationContext.Current.Services.UserService;
-            _urlSegmentProviders = UrlSegmentProviderResolver.Current.Providers;
+            _urlSegmentProviders = Current.UrlSegmentProviders;
             _queryFactory = ApplicationContext.Current.DatabaseContext.QueryFactory;
         }
 

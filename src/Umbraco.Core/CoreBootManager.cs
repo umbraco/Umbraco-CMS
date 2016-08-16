@@ -477,9 +477,9 @@ namespace Umbraco.Core
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(Container,
                 factory => new DefaultShortStringHelper(factory.GetInstance<IUmbracoSettingsSection>()).WithDefaultConfig());
 
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
-                Container, ProfilingLogger.Logger,
-                typeof(DefaultUrlSegmentProvider));
+            // fixme - could register collection with initial values?
+            Container.RegisterCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider, PerContainerLifetime>();
+            Container.GetInstance<UrlSegmentProviderCollectionBuilder>().Add<DefaultUrlSegmentProvider>();
 
             // by default, no factory is activated
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);

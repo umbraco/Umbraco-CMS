@@ -363,7 +363,7 @@ namespace umbraco
                 ApplicationContext.Current.Services.MediaService,
                 ApplicationContext.Current.Services.DataTypeService,
                 ApplicationContext.Current.Services.UserService,
-                UrlSegmentProviderResolver.Current.Providers,
+                Umbraco.Core.Current.UrlSegmentProviders,
                 media,
                 deep);
             return Tuple.Create(serialized, media.Path);
@@ -1678,7 +1678,7 @@ namespace umbraco
                             ApplicationContext.Current.Services.ContentService,
                             ApplicationContext.Current.Services.DataTypeService,
                             ApplicationContext.Current.Services.UserService,
-                            UrlSegmentProviderResolver.Current.Providers, parent).GetXmlNode(xd);
+                            Umbraco.Core.Current.UrlSegmentProviders, parent).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }
@@ -1691,7 +1691,7 @@ namespace umbraco
                             ApplicationContext.Current.Services.ContentService,
                             ApplicationContext.Current.Services.DataTypeService,
                             ApplicationContext.Current.Services.UserService,
-                            UrlSegmentProviderResolver.Current.Providers, child).GetXmlNode(xd);
+                            Umbraco.Core.Current.UrlSegmentProviders, child).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }

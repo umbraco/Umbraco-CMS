@@ -1124,6 +1124,8 @@
     <Compile Include="IBootManager.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
+    <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
+    <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
     <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
     <Compile Include="_Legacy\PackageActions\PackageActionsResolver.cs" />
@@ -1230,7 +1232,6 @@
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
-    <Compile Include="Strings\UrlSegmentProviderResolver.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
     <Compile Include="Sync\WebServiceServerMessenger.cs" />
     <Compile Include="Cache\ICacheRefresher.cs" />

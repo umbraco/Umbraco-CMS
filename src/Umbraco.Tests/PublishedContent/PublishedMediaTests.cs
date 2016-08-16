@@ -17,6 +17,7 @@ using System.Xml;
 using Examine.Session;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
@@ -50,7 +51,8 @@ namespace Umbraco.Tests.PublishedContent
             var container = new ServiceContainer();
             container.EnableAnnotatedConstructorInjection();
 
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
+            container.RegisterCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>();
+            container.GetInstance<UrlSegmentProviderCollectionBuilder>().Add<DefaultUrlSegmentProvider>();
 
             base.FreezeResolution();
         }

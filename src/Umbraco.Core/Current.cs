@@ -10,5 +10,8 @@ namespace Umbraco.Core
     internal class Current
     {
         public static IServiceContainer Container { get; set; } // ok to set - don't be stupid
+
+        // cannot set - this is temp
+        public static IEnumerable<IUrlSegmentProvider> UrlSegmentProviders => Container.GetInstance<UrlSegmentProviderCollection>().Items;
     }
 }
