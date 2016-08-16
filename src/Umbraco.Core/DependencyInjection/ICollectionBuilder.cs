@@ -1,12 +1,12 @@
 namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
-    /// Represents an injected collection builder.
+    /// Represents a collection builder.
     /// </summary>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public interface IInjectCollectionBuilder<out TCollection, TItem>
-        where TCollection : IInjectCollection<TItem>
+    public interface ICollectionBuilder<out TCollection, TItem>
+        where TCollection : IBuilderCollection<TItem>
     {
         /// <summary>
         /// Gets a collection.

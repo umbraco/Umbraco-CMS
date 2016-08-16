@@ -25,7 +25,7 @@ namespace Umbraco.Core.DependencyInjection
         /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="container"></param>
-        public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container) 
+        public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container)
             where TImplementation : TService
         {
             var registration = container.GetAvailableService<TService>();
@@ -136,12 +136,12 @@ namespace Umbraco.Core.DependencyInjection
         /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
         /// but means that the explicit type is registered, not the implementing type
         /// </remarks>
-        public static void RegisterCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterBuilderCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
             where TLifetime : ILifetime, new()
         {
             foreach (var type in implementationTypes)
             {
-                container.Register(type, new TLifetime());                
+                container.Register(type, new TLifetime());
             }
         }
 
@@ -154,43 +154,49 @@ namespace Umbraco.Core.DependencyInjection
         /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
         /// but means that the explicit type is registered, not the implementing type
         /// </remarks>
-        public static void RegisterCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterBuilderCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
         {
             foreach (var type in implementationTypes)
-            {                
-                container.Register(type);                
+            {
+                container.Register(type);
             }
         }
 
         /// <summary>
         /// Registers an injected collection.
         /// </summary>
-        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <typeparam name="TBuilder">The type of the builder.</typeparam>
         /// <typeparam name="TCollection">The type of the collection.</typeparam>
         /// <typeparam name="TItem">The type of the items.</typeparam>
         /// <param name="container">A container.</param>
-        public static void RegisterCollection<TBuilder, TCollection, TItem>(this IServiceRegistry container)
-            where TCollection : IInjectCollection<TItem>
-            where TBuilder : IInjectCollectionBuilder<TCollection, TItem>
+        public static void RegisterBuilderCollection<TBuilder, TCollection, TItem>(this IServiceRegistry container)
+            where TBuilder : ICollectionBuilder<TCollection, TItem>
+            where TCollection : IBuilderCollection<TItem>
         {
+            // register the builder
             container.Register<TBuilder>(new PerContainerLifetime());
+
+            // register the collection
             container.Register(factory => factory.GetInstance<TBuilder>().GetCollection());
         }
 
         /// <summary>
         /// Registers an injected collection.
         /// </summary>
-        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
         /// <typeparam name="TCollection">The type of the collection.</typeparam>
-        /// <typeparam name="TItem">The type of the items.</typeparam>
+        /// <typeparam name="TBuilder">The type of the builder.</typeparam>
         /// <typeparam name="TLifetime">A lifetime type.</typeparam>
+        /// <typeparam name="TItem">The type of the items.</typeparam>
         /// <param name="container">A container.</param>
-        public static void RegisterCollection<TBuilder, TCollection, TItem, TLifetime>(this IServiceRegistry container)
-            where TCollection : IInjectCollection<TItem>
-            where TBuilder : IInjectCollectionBuilder<TCollection, TItem>
+        public static void RegisterBuilderCollection<TBuilder, TCollection, TItem, TLifetime>(this IServiceRegistry container)
+            where TBuilder : ICollectionBuilder<TCollection, TItem>
+            where TCollection : IBuilderCollection<TItem>
             where TLifetime : ILifetime, new()
         {
+            // register the builder
             container.Register<TBuilder>(new PerContainerLifetime());
+
+            // register the collection
             container.Register(factory => factory.GetInstance<TBuilder>().GetCollection(), new TLifetime());
         }
     }

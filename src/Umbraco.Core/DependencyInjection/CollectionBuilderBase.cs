@@ -6,12 +6,12 @@ using LightInject;
 namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
-    /// Provides a base class for injected collection builders.
+    /// Provides a base class for collection builders.
     /// </summary>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public abstract class InjectCollectionBuilderBase<TCollection, TItem> : IInjectCollectionBuilder<TCollection, TItem>
-        where TCollection : IInjectCollection<TItem>
+    public abstract class CollectionBuilderBase<TCollection, TItem> : ICollectionBuilder<TCollection, TItem>
+        where TCollection : IBuilderCollection<TItem>
     {
         private readonly IServiceContainer _container;
         private readonly List<Type> _types = new List<Type>();
@@ -19,39 +19,35 @@ namespace Umbraco.Core.DependencyInjection
         private bool _typesRegistered;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InjectCollectionBuilderBase{TCollection, TItem}"/>
+        /// Initializes a new instance of the <see cref="CollectionBuilderBase{TCollection,TItem}"/>
         /// class with a service container.
         /// </summary>
         /// <param name="container">A service container.</param>
-        protected InjectCollectionBuilderBase(IServiceContainer container)
+        protected CollectionBuilderBase(IServiceContainer container)
         {
             _container = container;
         }
 
-        // everything could be implemented, add, insert, remove, replace, order, whatever...
-        // and we could also have 'lazy' collections by supplying a types factory
-
-        protected void Configure(Action action)
+        /// <summary>
+        /// Configures the internal list of types.
+        /// </summary>
+        /// <param name="action">The action to execute.</param>
+        /// <remarks>Throws if the types have already been registered.</remarks>
+        protected void Configure(Action<List<Type>> action)
         {
             lock (_locker)
             {
                 if (_typesRegistered) throw new InvalidOperationException();
-                action();
+                action(_types);
             }
         }
 
-        public void Add<T>()
-            where T : TItem
-        {
-            Configure(() =>
-            {
-                var type = typeof(T);
-                if (!_types.Contains(type))
-                    _types.Add(type);
-            });
-        }
-
-        protected virtual IEnumerable<Type> PrepareTypes(IEnumerable<Type> types)
+        /// <summary>
+        /// Gets the types.
+        /// </summary>
+        /// <param name="types">The internal list of types.</param>
+        /// <returns>The list of types to register.</returns>
+        protected virtual IEnumerable<Type> GetTypes(IEnumerable<Type> types)
         {
             return types;
         }
@@ -64,7 +60,7 @@ namespace Umbraco.Core.DependencyInjection
 
                 var prefix = GetType().FullName + "_";
                 var i = 0;
-                foreach (var type in PrepareTypes(_types))
+                foreach (var type in GetTypes(_types))
                 {
                     var name = $"{prefix}{i++:00000}";
                     _container.Register(typeof(TItem), type, name);
@@ -82,7 +78,7 @@ namespace Umbraco.Core.DependencyInjection
         /// <para>Creates a new collection each time it is invoked, but only registers types once.</para>
         /// <para>Explicitely implemented in order to hide it to users.</para>
         /// </remarks>
-        TCollection IInjectCollectionBuilder<TCollection, TItem>.GetCollection()
+        TCollection ICollectionBuilder<TCollection, TItem>.GetCollection()
         {
             RegisterTypes(); // will do it only once
 

@@ -3,14 +3,14 @@
 namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
-    /// Represents an injected collection, ie an immutable enumeration of items.
+    /// Represents a builder collection, ie an immutable enumeration of items.
     /// </summary>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public interface IInjectCollection<out TItem>
+    public interface IBuilderCollection<out TItem> : IEnumerable<TItem>
     {
         /// <summary>
-        /// Gets the items in the collection.
+        /// Gets the number of items in the collection.
         /// </summary>
-        IEnumerable<TItem> Items { get; }
+        int Count { get; }
     }
 }

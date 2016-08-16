@@ -115,7 +115,7 @@ namespace Umbraco.Core
             // completed at the end of the boot process to allow garbage collection
             _appStartupEvtContainer = Container.Clone();
             _appStartupEvtContainer.BeginScope();
-            _appStartupEvtContainer.RegisterCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());            
+            _appStartupEvtContainer.RegisterBuilderCollection<PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());            
 
             //build up standard IoC services
             ConfigureApplicationServices(Container);
