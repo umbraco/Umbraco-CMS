@@ -155,38 +155,65 @@ namespace Umbraco.Web.Routing
             var contentCache = GetPublishedCache();
             if (contentCache == null) return;
 
-            foreach (var entity in args.PublishedEntities)
+            // prepare entities - remove chances of duplicates
+            var entities = PrepareEntities(args.PublishedEntities);
+
+            foreach (var entity in entities)
             {
-                //TODO: This is horrible - we need to check if the url segment for this entity is changing in 
-                // order to determine if we need to make redirects for itself and all of it's descendents.
-                // The way this works right now (7.5.0) is that we re-lookup the entity that is currently being published which
-                // returns it's existing data in the db which we use to extract it's current segment. Then we compare that with
-                // the segment value returned from the current entity.
-                // In the future this will certainly cause some problems, to fix this we'd need to change the IUrlSegmentProvider
-                // to support being able to determine if a segment is going to change for an entity. See notes in IUrlSegmentProvider.
-                var oldEntity = ApplicationContext.Current.Services.ContentService.GetById(entity.Id);
-                if (oldEntity == null) continue;
-                var oldSegmentName = oldEntity.GetUrlSegment();
-                
-                //if the segment has changed or we are moving, then process all descendent
-                // Urls and schedule them for creating a rewrite when publishing is done.
-                if (oldSegmentName != entity.GetUrlSegment() || Moving)
+                // for each entity, we want to save the 'old route' of any impacted entity.
+                //
+                // previously, we'd save the routes of all descendants - super safe but has an
+                // impact on perfs - assuming that the descendant routes will NOT change if the
+                // entity's segment does not change (else... outside of the scope of the simple,
+                // built -in, tracker) then we can compare the entity's old and new segments
+                // and avoid processing the descendants
+
+                var process = true;
+                if (Moving == false) // always process descendants when moving
                 {
-                    var entityContent = contentCache.GetById(entity.Id);
-                    if (entityContent == null) continue;
-                    foreach (var x in entityContent.DescendantsOrSelf())
-                    {
-                        var route = contentCache.GetRouteById(x.Id);
-                        if (IsNotRoute(route)) continue;
-                        var wk = UnwrapToKey(x);
-                        if (wk == null) continue;
+                    // SD: in 7.5.0 we re-lookup the entity that is published, which gets its
+                    // current state in the DB, which we use to get the 'old' segment. In the
+                    // future this will certainly cause some problems, to fix this we'd need to
+                    // change the IUrlSegmentProvider to support being able to determine if a
+                    // segment is going to change for an entity. See notes in IUrlSegmentProvider.
+
+                    var oldEntity = ApplicationContext.Current.Services.ContentService.GetById(entity.Id);
+                    if (oldEntity == null) continue;
+                    var oldSegment = oldEntity.GetUrlSegment();
+                    var newSegment = entity.GetUrlSegment();
+                    process = oldSegment != newSegment;
+                }
+
+                // skip if no segment change
+                if (process == false) continue;
+
+                // else save routes for all descendants
+                var entityContent = contentCache.GetById(entity.Id);
+                if (entityContent == null) continue;
+                foreach (var x in entityContent.DescendantsOrSelf())
+                {
+                    var route = contentCache.GetRouteById(x.Id);
+                    if (IsNotRoute(route)) continue;
+                    var wk = UnwrapToKey(x);
+                    if (wk == null) continue;
                         
-                        OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
-                    }
+                    OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
                 }
             }
 
             LockedEvents = true; // we only want to see the "first batch"
+        }
+
+        private static IEnumerable<IContent> PrepareEntities(IEnumerable<IContent> eventEntities)
+        {
+            var entities = new List<IContent>();
+            foreach (var e in eventEntities.OrderBy(x => x.Level))
+            {
+                var pathIds = e.Path.Split(',').Select(int.Parse);
+                if (entities.Any(x => pathIds.Contains(x.Id))) continue;
+                entities.Add(e);
+            }
+            return entities;
         }
 
         private static IPublishedContentWithKey UnwrapToKey(IPublishedContent content)
@@ -210,30 +237,26 @@ namespace Umbraco.Web.Routing
         /// <param name="cacheRefresherEventArgs"></param>
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
         {
-            //This should only ever occur on the Master server when in load balancing since this will fire on all
-            // servers taking part in load balancing
-            var serverRole = ApplicationContext.Current.GetCurrentServerRole();
-            if (serverRole == ServerRole.Master || serverRole == ServerRole.Single)
-            {
-                //if the Old routes is empty do not continue
-                if (OldRoutes.Count == 0)
-                    return;
+            // only on master / single, not on slaves!
+            if (IsSlaveServer) return;
 
-                try
+            // simply getting OldRoutes will register it in the request cache,
+            // so whatever we do with it, try/finally it to ensure it's cleared
+
+            try
+            {
+                foreach (var oldRoute in OldRoutes)
                 {
-                    foreach (var oldRoute in OldRoutes)
-                    {
-                        // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
-                        // to set a flag in 'Published' to indicate which entities have been refreshed ok
-                        CreateRedirect(oldRoute.Key, oldRoute.Value.Item1, oldRoute.Value.Item2);
-                    }
+                    // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
+                    // to set a flag in 'Published' to indicate which entities have been refreshed ok
+                    CreateRedirect(oldRoute.Key, oldRoute.Value.Item1, oldRoute.Value.Item2);
                 }
-                finally
-                {
-                    OldRoutes.Clear();
-                    RequestCache.ClearCacheItem(ContextKey3);
-                }                
             }
+            finally
+            {
+                OldRoutes.Clear();
+                RequestCache.ClearCacheItem(ContextKey3);
+            }                
         }
 
         private static void ContentService_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
@@ -270,6 +293,16 @@ namespace Umbraco.Web.Routing
             // null if content not found
             // err/- if collision or anomaly or ...
             return route == null || route.StartsWith("err/");
+        }
+
+        // gets a value indicating whether server is 'slave'
+        private static bool IsSlaveServer
+        {
+            get
+            {
+                var serverRole = ApplicationContext.Current.GetCurrentServerRole();
+                return serverRole != ServerRole.Master && serverRole != ServerRole.Single;
+            }
         }
 
         /// <summary>
