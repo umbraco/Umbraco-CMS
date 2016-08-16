@@ -86,12 +86,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             {'ß',"ss"},
                             {'Ä',"ae"},
                             {'Ö',"oe"},
+                            {'Ü',"ue"},
                             {'|',"-"},
                             {'<',""},
                             {'>',""}
                         };
 
-            //const string chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
+            //const string chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,Ü,|,<,>";
 
             var collection = new CharCollection();
             foreach (var c in dictionary)
