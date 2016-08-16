@@ -130,7 +130,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 try
                 {
                     //by default use the InternalSearcher
-                    var indexer = eMgr.IndexProviderCollection["InternalIndexer"];
+                    var indexer = eMgr.IndexProviderCollection[Constants.Examine.InternalIndexer];
                     if (indexer.IndexerData.IncludeNodeTypes.Any() || indexer.IndexerData.ExcludeNodeTypes.Any())
                     {
                         LogHelper.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
@@ -157,7 +157,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			    try
 			    {
 			        //by default use the InternalSearcher
-			        return eMgr.SearchProviderCollection["InternalSearcher"];
+			        return eMgr.SearchProviderCollection[Constants.Examine.InternalSearcher];
 			    }
 			    catch (FileNotFoundException)
 			    {
