@@ -65,7 +65,7 @@ namespace Umbraco.Web.Routing
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
             if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking) return;
-            
+
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order
             // so it is not reliable. getting the old route in 'publishing' to be sure and storing in http
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Routing
             get
             {
                 var oldRoutes = RequestCache.GetCacheItem<Dictionary<int, Tuple<Guid, string>>>(
-                    ContextKey3, 
+                    ContextKey3,
                     () => new Dictionary<int, Tuple<Guid, string>>());
                 return oldRoutes;
             }
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Routing
             var contentCache = GetPublishedCache();
             if (contentCache == null) return;
 
-            // prepare entities - remove chances of duplicates
+            // prepare entities
             var entities = PrepareEntities(args.PublishedEntities);
 
             foreach (var entity in entities)
@@ -196,7 +196,7 @@ namespace Umbraco.Web.Routing
                     if (IsNotRoute(route)) continue;
                     var wk = UnwrapToKey(x);
                     if (wk == null) continue;
-                        
+
                     OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
                 }
             }
@@ -206,8 +206,12 @@ namespace Umbraco.Web.Routing
 
         private static IEnumerable<IContent> PrepareEntities(IEnumerable<IContent> eventEntities)
         {
+            // prepare entities
+            // - exclude entities without an identity (new entities)
+            // - exclude duplicates (in case publishing a parent and its children)
+
             var entities = new List<IContent>();
-            foreach (var e in eventEntities.OrderBy(x => x.Level))
+            foreach (var e in eventEntities.Where(x => x.HasIdentity).OrderBy(x => x.Level))
             {
                 var pathIds = e.Path.Split(',').Select(int.Parse);
                 if (entities.Any(x => pathIds.Contains(x.Id))) continue;
@@ -256,7 +260,7 @@ namespace Umbraco.Web.Routing
             {
                 OldRoutes.Clear();
                 RequestCache.ClearCacheItem(ContextKey3);
-            }                
+            }
         }
 
         private static void ContentService_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
