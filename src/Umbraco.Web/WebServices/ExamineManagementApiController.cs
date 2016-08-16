@@ -29,9 +29,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MemberService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
+            var criteria = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalMemberSearcher]
                 .CreateSearchCriteria().RawQuery("__IndexType:member");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"].Search(criteria);
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalMemberSearcher].Search(criteria);
 
             return total == totalIndexed.TotalItemCount;
         }
@@ -45,9 +45,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MediaService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+            var criteria = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher]
                 .CreateSearchCriteria().RawQuery("__IndexType:media");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher].Search(criteria);
 
             return total == totalIndexed.TotalItemCount;
         }
@@ -61,9 +61,9 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.ContentService.Count();
 
-            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+            var criteria = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher]
                 .CreateSearchCriteria().RawQuery("__IndexType:content");
-            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher].Search(criteria);
 
             return total == totalIndexed.TotalItemCount;
         }
