@@ -33,8 +33,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var container = new ServiceContainer();
             container.EnableAnnotatedConstructorInjection();
 
-            container.RegisterCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>();
-            container.GetInstance<UrlSegmentProviderCollectionBuilder>().Add<DefaultUrlSegmentProvider>();
+            container.RegisterBuilderCollection<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>();
+            container.GetInstance<UrlSegmentProviderCollectionBuilder>().Append<DefaultUrlSegmentProvider>();
 
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();

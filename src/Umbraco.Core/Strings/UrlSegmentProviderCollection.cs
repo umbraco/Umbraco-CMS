@@ -3,7 +3,7 @@ using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Strings
 {
-    public class UrlSegmentProviderCollection : InjectCollectionBase<IUrlSegmentProvider>
+    public class UrlSegmentProviderCollection : BuilderCollectionBase<IUrlSegmentProvider>
     {
         public UrlSegmentProviderCollection(IEnumerable<IUrlSegmentProvider> items)
             : base(items)
