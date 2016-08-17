@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LightInject;
 
 namespace Umbraco.Core.DependencyInjection
@@ -11,7 +12,11 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory, string serviceName)
         {
-            container.Register(factory, serviceName, new PerContainerLifetime());
+            var registration = container.GetAvailableService<TService>(serviceName);
+            if (registration == null)
+                container.Register(factory, serviceName, new PerContainerLifetime());
+            else
+                container.UpdateRegistration(registration, null, factory);
         }
 
         /// <summary>
@@ -23,7 +28,12 @@ namespace Umbraco.Core.DependencyInjection
         public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container) 
             where TImplementation : TService
         {
-            container.Register<TService, TImplementation>(new PerContainerLifetime());
+            var registration = container.GetAvailableService<TService>();
+
+            if (registration == null)
+                container.Register<TService, TImplementation>(new PerContainerLifetime());
+            else
+                container.UpdateRegistration(registration, typeof(TImplementation), null);
         }
 
         /// <summary>
@@ -33,7 +43,11 @@ namespace Umbraco.Core.DependencyInjection
         /// <param name="container"></param>
         public static void RegisterSingleton<TImplementation>(this IServiceRegistry container)
         {
-            container.Register<TImplementation>(new PerContainerLifetime());
+            var registration = container.GetAvailableService<TImplementation>();
+            if (registration == null)
+                container.Register<TImplementation>(new PerContainerLifetime());
+            else
+                container.UpdateRegistration(registration, typeof(TImplementation), null);
         }
 
         /// <summary>
@@ -44,7 +58,72 @@ namespace Umbraco.Core.DependencyInjection
         /// <param name="factory"></param>
         public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory)
         {
-            container.Register(factory, new PerContainerLifetime());
+            var registration = container.GetAvailableService<TService>();
+            if (registration == null)
+                container.Register(factory, new PerContainerLifetime());
+            else
+                container.UpdateRegistration(registration, null, factory);
+        }
+
+        // fixme - what's below ALSO applies to non-singleton ie transient services
+        //
+        // see https://github.com/seesharper/LightInject/issues/133
+        //
+        // note: we *could* use tracking lifetimes for singletons to ensure they have not been resolved
+        // already but that would not work for transient as the transient lifetime is null (and that is
+        // optimized in LightInject)
+        //
+        // also, RegisterSingleton above is dangerous because ppl could still use Register with a
+        // PerContainerLifetime and it will not work + the default Register would not work either for other
+        // lifetimes
+        //
+        // all in all, not sure we want to let ppl have direct access to the container
+        // we might instead want to expose some methods in UmbracoComponentBase or whatever?
+
+        private static void UpdateRegistration(this IServiceRegistry container, ServiceRegistration registration, Type implementingType, Delegate factoryExpression)
+        {
+            // if the container has compiled already then the registrations have been captured,
+            // and re-registering - although updating available services - does not modify the
+            // output of GetInstance
+            //
+            // so we have to rely on different methods
+            //
+            // assuming the service has NOT been resolved, both methods below work, but the first
+            // one looks simpler. it would be good to check whether the service HAS been resolved
+            // but I am not sure how to do it right now, depending on the lifetime
+            //
+            // if the service HAS been resolved then updating is probably a bad idea
+
+            // not sure which is best? that one works, though, and looks simpler
+            registration.ImplementingType = implementingType;
+            registration.FactoryExpression = factoryExpression;
+
+            //container.Override(
+            //    r => r.ServiceType == typeof (TService) && (registration.ServiceName == null || r.ServiceName == registration.ServiceName),
+            //    (f, r) =>
+            //    {
+            //        r.ImplementingType = implementingType;
+            //        r.FactoryExpression = factoryExpression;
+            //        return r;
+            //    });
+        }
+
+        public static IEnumerable<ServiceRegistration> GetAvailableServices<TService>(this IServiceRegistry container)
+        {
+            var typeofTService = typeof(TService);
+            return container.AvailableServices.Where(x => x.ServiceType == typeofTService);
+        }
+
+        public static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container)
+        {
+            var typeofTService = typeof(TService);
+            return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService);
+        }
+
+        public static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container, string name)
+        {
+            var typeofTService = typeof(TService);
+            return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService && x.ServiceName == name);
         }
 
         /// <summary>
