@@ -7,7 +7,7 @@ The easiest way to get started is to run `build/build.bat` which will build both
  
 If you're interested in making changes to Belle without running Visual Studio make sure to read the [Belle ReadMe file](src/Umbraco.Web.UI.Client/README.md). 
 
-Note that you can always [download a nightly build](https://ci.appveyor.com/project/Umbraco/umbraco-cms-hs8dx/history/branch/dev-v7) so you don't have to build the code yourself.
+Note that you can always [download a nightly build](https://ci.appveyor.com/project/Umbraco/umbraco-cms-hs8dx/build/artifacts) so you don't have to build the code yourself.
 
 ## Watch a introduction video ##
 
