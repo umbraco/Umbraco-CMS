@@ -174,7 +174,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-            
+
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
@@ -214,7 +214,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("template/template"),
-                    Value = content.ContentType.DefaultTemplate.Alias,
+                    Value = content.ContentType.DefaultTemplate == null ? "" : content.ContentType.DefaultTemplate.Alias,
                     View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
                     Config = new Dictionary<string, object>
                     {
