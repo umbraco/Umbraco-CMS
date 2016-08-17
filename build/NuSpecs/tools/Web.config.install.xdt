@@ -292,6 +292,8 @@
       <mimeMap fileExtension=".svg" mimeType="image/svg+xml" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
       <remove fileExtension=".woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
       <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+      <remove fileExtension=".woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+      <mimeMap fileExtension=".woff2" mimeType="application/x-font-woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
       <remove fileExtension=".less" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
       <mimeMap fileExtension=".less" mimeType="text/css" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
     </staticContent>

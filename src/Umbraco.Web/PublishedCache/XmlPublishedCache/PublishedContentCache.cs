@@ -277,15 +277,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private static IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
 		{
-		    return xmlNode == null
-                ? null
-                : (new XmlPublishedContent(xmlNode, isPreviewing)).CreateModel();
+		    return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing);
 		}
 
         private static IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => (new XmlPublishedContent(xmlNode, isPreviewing)).CreateModel());
+                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing));
         }
 
         #endregion
@@ -411,7 +409,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
         {
-            return GetXmlDelegate(umbracoContext, preview);
+            var xml = GetXmlDelegate(umbracoContext, preview);
+            if (xml == null)
+                throw new Exception("The Xml cache is corrupt. Use the Health Check data integrity dashboard to fix it.");
+            return xml;
         }
 
         #endregion

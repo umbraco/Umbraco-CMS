@@ -23,6 +23,7 @@ ECHO Change directory to %CD%\..\src\Umbraco.Web.UI.Client\
 CD %CD%\..\src\Umbraco.Web.UI.Client\
 
 ECHO Do npm install and the grunt build of Belle
+call npm cache clean --quiet
 call npm install --quiet
 call npm install -g grunt-cli --quiet
 call npm install -g bower --quiet

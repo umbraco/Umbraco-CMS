@@ -18,8 +18,8 @@ ul.sections li {
 	transition: all .3s linear;
 }
 
-ul.sections li [class^="icon-"]:before, 
-ul.sections li [class*=" icon-"]:before,
+ul.sections li [class^="icon-"], 
+ul.sections li [class*=" icon-"],
 ul.sections li img.icon-section {
 	font-size: 30px;
     line-height: 20px; /* set line-height to ensure all icons use same line-height */
@@ -31,8 +31,8 @@ ul.sections li img.icon-section {
 	transition: all .3s linear;
 }
 
-ul.sections:hover li [class^="icon-"]:before, 
-ul.sections:hover li [class*=" icon-"]:before,
+ul.sections:hover li [class^="icon-"], 
+ul.sections:hover li [class*=" icon-"],
 ul.sections:hover li img.icon-section {
 	opacity: 1
 }
@@ -111,32 +111,43 @@ ul.sections li.help {
 	bottom: 0;
 	left: 0;
 	display: block;
-	width: 100%;
+	width: ~"(calc(~'100%' - ~'5px'))"; //subtract 4px orange border + 1px border-right for sections
 }
 
 ul.sections li.help a {
 	border-bottom: none;
 }
 
+@media (max-width: 500px) {
+    ul.sections li [class^="icon-"],
+    ul.sections li [class*=" icon-"] {
+        font-size: 25px;
+    }
+    ul.sections li:not(.avatar) a {
+        padding-top: 12px;
+        padding-bottom: 6px;
+
+        .icon, .icon-section {
+            display: inline-block;
+            padding-left: 2px;
+        }
+    }
+    ul.sections a span {
+        display:none;
+    }
+}
+
 // Section slide-out tray for additional apps
 // -------------------------
-li.expand a, li.expand{border: none !Important;}
+li.expand a, li.expand{border: none !important;}
 
 li.expand {
+    > a > i.icon {
+        transition: all .3s linear;
+    }
 
     &.open > a > i.icon {
-        -webkit-transition: all 1s !important;
-        -o-transition: all 1s !important;
-        -moz-transition: all 1s !important;
-        transition: all 1s !important;
-        
-        &:before {
-            -ms-transform: rotate(180deg) !important; /* IE 9 */
-            -webkit-transform: rotate(180deg) !important; /* Chrome, Safari, Opera */
-            -o-transform: rotate(180deg) !important;
-            -moz-transform: rotate(180deg) !important;
-            transform: rotate(180deg) !important;
-        }
+        transform: rotate(180deg);
     }
 }
 

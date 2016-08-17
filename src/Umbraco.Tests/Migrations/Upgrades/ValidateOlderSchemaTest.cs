@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -70,8 +71,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Resolution.Freeze();
 
             //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString);
-            engine.CreateDatabase();
+            using (var engine = new SqlCeEngine(settings.ConnectionString))
+            {
+                engine.CreateDatabase();
+            }
 
             SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
         }
@@ -101,7 +104,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
         }
 
         public string GetDatabaseSpecificSqlScript()

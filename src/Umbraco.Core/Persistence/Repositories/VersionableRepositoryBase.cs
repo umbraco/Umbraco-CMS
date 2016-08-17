@@ -235,18 +235,34 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
         {
-            //copy to var so that the original isn't changed
-            var filteredSql = new Sql(sql.SQL, sql.Arguments);
+            Sql filteredSql;
+
             // Apply filter
             if (defaultFilter != null)
             {
                 var filterResult = defaultFilter();
-                filteredSql.Append(filterResult.Item1, filterResult.Item2);
+
+                //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
+                // instance a couple of times to get the parameter order correct, for some reason the first
+                // time the arguments don't show up correctly but the SQL argument parameter names are actually updated
+                // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
+
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+                var args = filteredSql.Arguments.Concat(filterResult.Item2).ToArray();
+                filteredSql = new Sql(
+                    string.Format("{0} {1}", filteredSql.SQL, filterResult.Item1),
+                    args);
+                filteredSql = new Sql(filteredSql.SQL, args);
+            }
+            else
+            {
+                //copy to var so that the original isn't changed
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
             }
             return filteredSql;
         }
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField)
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField, Tuple<string, string> nodeIdSelect)
         {
 
             //copy to var so that the original isn't changed
@@ -270,44 +286,71 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
                 // from most recent content version for the given order by field
                 var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
                 var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
                 var sortedString = string.Format("COALESCE({0},'')", "dataNvarchar");
                 var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
-                var innerJoinTempTable = string.Format(@"INNER JOIN (
-                 	                SELECT CASE
-                 		                WHEN dataInt Is Not Null THEN {0}
-                                        WHEN dataDecimal Is Not Null THEN {1}
-                                        WHEN dataDate Is Not Null THEN {2}
-                                        ELSE {3}
-                 	                END AS CustomPropVal,
-                                    cd.nodeId AS CustomPropValContentId
-                 	                FROM cmsDocument cd
-                                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.nodeId AND cpd.versionId = cd.versionId                    
-                                    INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
-                			        WHERE cpt.Alias = @{4} AND cd.newest = 1) AS CustomPropData
-                                    ON CustomPropData.CustomPropValContentId = umbracoNode.id
-                ", sortedInt, sortedDecimal, sortedDate, sortedString, sortedSql.Arguments.Length);
+                //these are defaults that will be used in the query - they can be overridden for non-versioned entities or document entities
+                var versionQuery = " AND cpd.versionId = cd.versionId";
+                var newestQuery = string.Empty;
 
-                //insert this just above the LEFT OUTER JOIN
-                var newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), innerJoinTempTable);
+                //cmsDocument needs to filter by the 'newest' parameter in the query
+                if (nodeIdSelect.Item1 == "cmsDocument")
+                    newestQuery = " AND cd.newest = 1";
+
+                //members do not use versions so clear the versionQuery string
+                if (nodeIdSelect.Item1 == "cmsMember")
+                    versionQuery = string.Empty;
+
+                //needs to be an outer join since there's no guarantee that any of the nodes have values for this property
+                var outerJoinTempTable = string.Format(@"LEFT OUTER JOIN (
+                                SELECT CASE
+                                    WHEN dataInt Is Not Null THEN {0}
+                                    WHEN dataDecimal Is Not Null THEN {1}
+                                    WHEN dataDate Is Not Null THEN {2}
+                                    ELSE {3}
+                                END AS CustomPropVal,
+                                cd.{4} AS CustomPropValContentId
+                                FROM {5} cd
+                                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.{4}{6}
+                                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
+                                WHERE cpt.Alias = @{7}{8}) AS CustomPropData
+                                ON CustomPropData.CustomPropValContentId = umbracoNode.id
+                ", sortedInt, sortedDecimal, sortedDate, sortedString, nodeIdSelect.Item2, nodeIdSelect.Item1, versionQuery, sortedSql.Arguments.Length, newestQuery);
+
+                //insert this just above the first LEFT OUTER JOIN (for cmsDocument) or the last WHERE (everything else)
+                string newSql;
+                if (nodeIdSelect.Item1 == "cmsDocument")
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.IndexOf("LEFT OUTER JOIN"), outerJoinTempTable);
+                else
+                    newSql = sortedSql.SQL.Insert(sortedSql.SQL.LastIndexOf("WHERE"), outerJoinTempTable);
+
                 var newArgs = sortedSql.Arguments.ToList();
                 newArgs.Add(orderBy);
 
                 sortedSql = new Sql(newSql, newArgs.ToArray());
 
-                sortedSql.OrderBy("CustomPropData.CustomPropVal");
                 if (orderDirection == Direction.Descending)
                 {
-                    sortedSql.Append(" DESC");
-                }                
+                    sortedSql.OrderByDescending("CustomPropData.CustomPropVal");
+                }
+                else
+                {
+                    sortedSql.OrderBy("CustomPropData.CustomPropVal");
+                }
             }
 
+            //no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
+            // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
+            // is empty for many nodes)
+            // see: http://issues.umbraco.org/issue/U4-8831
+            sortedSql.OrderBy("umbracoNode.id");
+
             return sortedSql;
-            
+
         }
 
         /// <summary>
@@ -355,7 +398,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
-                orderDirection, orderBy, orderBySystemField);
+                orderDirection, orderBy, orderBySystemField, nodeIdSelect);
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -393,7 +436,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
                     GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),
-                    orderDirection, orderBy, orderBySystemField);
+                    orderDirection, orderBy, orderBySystemField, nodeIdSelect);
                 return processQuery(fullQuery);
             }
             else
@@ -466,17 +509,6 @@ WHERE EXISTS(
 
                     var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
                     var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();
-
-                    var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-
-                    foreach (var property in newProperties)
-                    {
-                        var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
-                        int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                        property.Version = def.Version;
-                        property.Id = primaryKey;
-                    }
 
                     foreach (var property in properties)
                     {

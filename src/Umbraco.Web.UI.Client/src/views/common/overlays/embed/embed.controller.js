@@ -53,7 +53,7 @@
                         break;
                      case 1:
                         //error
-                        $scope.model.embed.info = "Computer says no";
+                        $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
                         break;
                      case 2:
                         $scope.model.embed.preview = data.Markup;
@@ -65,7 +65,7 @@
                .error(function() {
                   $scope.model.embed.supportsDimensions = false;
                   $scope.model.embed.preview = "";
-                  $scope.model.embed.info = "Computer says no";
+                  $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
                });
          } else {
             $scope.model.embed.supportsDimensions = false;

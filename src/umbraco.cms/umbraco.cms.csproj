@@ -106,8 +106,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.9.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.1\lib\net45\ClientDependency.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -259,6 +259,7 @@
     <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
+    <Compile Include="businesslogic\Packager\RequirementsType.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\ProviderBase.cs" />

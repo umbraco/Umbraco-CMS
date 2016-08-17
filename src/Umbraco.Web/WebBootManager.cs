@@ -47,6 +47,8 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Profiling;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -185,7 +187,9 @@ namespace Umbraco.Web
         {
             base.InitializeProfilerResolver();
             //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            var profiler = new WebProfiler();
+            ProfilerResolver.Current.SetProfiler(profiler);
+            profiler.Start();
         }
 
         /// <summary>
@@ -514,6 +518,10 @@ namespace Umbraco.Web
                 //typeof (ContentFinderByProfile),
                 //typeof (ContentFinderByUrlAlias),
 
+                // note: that one should run *after* NiceUrlAndTemplate, UrlAlias... but at the moment
+                // it cannot be done - just make sure to do it properly in v8!
+                typeof(ContentFinderByRedirectUrl),
+
                 // implement INotFoundHandler support... remove once we get rid of it
                 typeof(ContentFinderByNotFoundHandlers)
             );
@@ -533,6 +541,9 @@ namespace Umbraco.Web
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
+
+            HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
         }
 
         /// <summary>

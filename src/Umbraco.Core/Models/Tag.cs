@@ -27,35 +27,27 @@ namespace Umbraco.Core.Models
             NodeCount = nodeCount;            
         }
 
-        private static readonly PropertyInfo TextSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
-        private static readonly PropertyInfo GroupSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo TextSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
+            public readonly PropertyInfo GroupSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
+        }
+
         private string _text;
         private string _group;
 
         public string Text
         {
             get { return _text; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _text = value;
-                    return _text;
-                }, _text, TextSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _text, Ps.Value.TextSelector); }
         }
 
         public string Group
         {
             get { return _group; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _group = value;
-                    return _group;
-                }, _group, GroupSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _group, Ps.Value.GroupSelector); }
         }
 
         public int NodeCount { get; internal set; }
