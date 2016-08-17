@@ -19,12 +19,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private DomainRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
-            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
-            languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, Mappers);
+            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
+            languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger, Mappers);
             return domainRepository;
         }
 

@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         { }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();

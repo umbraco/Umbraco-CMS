@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+                var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, Mappers);
                 repo.AddOrUpdate(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
                 unitOfWork.Complete();
             }

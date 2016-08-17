@@ -7,8 +7,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     class MediaTypeContainerRepository : EntityContainerRepository, IMediaTypeContainerRepository
     {
-        public MediaTypeContainerRepository(IDatabaseUnitOfWork uow, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(uow, cache, logger, mappingResolver, Constants.ObjectTypes.MediaTypeContainerGuid)
+        public MediaTypeContainerRepository(IDatabaseUnitOfWork uow, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(uow, cache, logger, mappers, Constants.ObjectTypes.MediaTypeContainerGuid)
         { }
     }
 }

@@ -1,7 +1,7 @@
+using System;
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
@@ -40,13 +40,6 @@ namespace Umbraco.Core.DependencyInjection
             // register IUnitOfWork providers
             container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
             container.RegisterSingleton<IDatabaseUnitOfWorkProvider, NPocoUnitOfWorkProvider>();
-
-            // register mapping resover
-            // using a factory because... no time to clean it up at the moment
-            container.RegisterSingleton<IMappingResolver>(factory => new MappingResolver(
-                factory.GetInstance<IServiceContainer>(),
-                factory.GetInstance<ILogger>(),
-                () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()));
 
             // register repository factory
             container.RegisterSingleton<RepositoryFactory>();
@@ -116,6 +109,17 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<IPartialViewRepository, PartialViewRepository>();
             container.Register<IPartialViewMacroRepository, PartialViewMacroRepository>();
             container.Register<IStylesheetRepository, StylesheetRepository>();
+
+            // collection builders require a full IServiceContainer because they need to
+            // be able to both register stuff, and get stuff - but ICompositionRoot gives
+            // us an IServiceRegistry - which *is* a full container - so, casting - bit
+            // awkward but it works
+            var serviceContainer = container as IServiceContainer;
+            if (serviceContainer == null) throw new Exception("Container is not IServiceContainer.");
+
+            // register persistence mappers
+            MapperCollectionBuilder.Register(serviceContainer)
+                .AddProducer(f => f.GetInstance<PluginManager>().ResolveAssignedMapperTypes());
         }
     }
 }

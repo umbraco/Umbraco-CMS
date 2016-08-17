@@ -24,8 +24,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class RelationTypeRepository : NPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
 
-        public RelationTypeRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        public RelationTypeRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         {
         }
 

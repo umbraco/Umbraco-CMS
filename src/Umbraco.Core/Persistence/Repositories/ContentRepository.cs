@@ -31,8 +31,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cacheHelper, logger, contentSection, mappingResolver)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
+            : base(work, cacheHelper, logger, contentSection, mappers)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException(nameof(contentTypeRepository));
             if (templateRepository == null) throw new ArgumentNullException(nameof(templateRepository));

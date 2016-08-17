@@ -29,8 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, contentSection, mappingResolver)
+        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
+            : base(work, cache, logger, contentSection, mappers)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException(nameof(mediaTypeRepository));
             if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));

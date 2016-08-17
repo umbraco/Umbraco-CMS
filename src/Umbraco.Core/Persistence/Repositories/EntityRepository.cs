@@ -23,10 +23,10 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly QueryFactory _queryFactory;
 
-        public EntityRepository(IDatabaseUnitOfWork work, IMappingResolver mappingResolver)
+        public EntityRepository(IDatabaseUnitOfWork work, IMapperCollection mappers)
         {
             UnitOfWork = work;
-            _queryFactory = new QueryFactory(work.Database.SqlSyntax, mappingResolver);
+            _queryFactory = new QueryFactory(work.Database.SqlSyntax, mappers);
         }
 
         /// <summary>

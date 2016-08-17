@@ -18,9 +18,7 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUsingSqlCeSyntax
     {
-        private MappingResolver _mappingResolver;
-
-        protected IMappingResolver MappingResolver => _mappingResolver;
+        protected IMapperCollection Mappers { get; private set; }
 
         protected SqlContext SqlContext { get; private set; }
 
@@ -40,16 +38,17 @@ namespace Umbraco.Tests.TestHelpers
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
-            _mappingResolver = new MappingResolver(container, Mock.Of<ILogger>(),
-                () => PluginManager.Current.ResolveAssignedMapperTypes());
-
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var pluginManager = PluginManager.Current = new PluginManager(new NullCacheProvider(),
                 logger,
                 false);
             container.RegisterInstance(pluginManager);
 
-            var mappers = new MapperCollection { new PocoMapper() };
+            MapperCollectionBuilder.Register(container)
+                .AddProducer(() => PluginManager.Current.ResolveAssignedMapperTypes());
+            Mappers = container.GetInstance<IMapperCollection>();
+            
+            var mappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
             SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe);
 

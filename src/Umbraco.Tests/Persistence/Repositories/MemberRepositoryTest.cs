@@ -38,10 +38,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), Mappers);
             return repository;
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = new Query<IMember>(SqlSyntax, MappingResolver).Where(x => x.Key == key);
+                var query = new Query<IMember>(SqlSyntax, Mappers).Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var query = new Query<IMember>(SqlSyntax, MappingResolver).Where(x =>
+            var query = new Query<IMember>(SqlSyntax, Mappers).Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 

@@ -132,10 +132,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private static readonly object Locker = new object();
 
-        protected IMappingResolver MappingResolver
-        {
-            get { return Container.GetInstance<IMappingResolver>(); }
-        }
+        protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
 
         private static void InitializeLegacyMappingsForCoreEditors()
         {
@@ -218,7 +215,7 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                 Logger, new TestUmbracoDatabaseAccessor(),
-                Mock.Of<IMappingResolver>());
+                Mock.Of<IMapperCollection>());
             dbFactory.ResetForTests();
             var applicationContext = new ApplicationContext(
                 // assign the db context

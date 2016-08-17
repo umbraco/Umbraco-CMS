@@ -28,8 +28,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMappingResolver mappingResolver)
-            : base(work, cacheHelper, logger, mappingResolver)
+        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mappers)
+            : base(work, cacheHelper, logger, mappers)
         {
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
-            var mapper = QueryFactory.MappingResolver.ResolveMapperByType(typeof(IUser));
+            var mapper = QueryFactory.Mappers[typeof(IUser)];
             var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
             if (mappedField.IsNullOrWhiteSpace())
             {

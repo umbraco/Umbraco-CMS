@@ -44,29 +44,29 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository, Mappers);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
             return repository;
         }
 
         private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository, MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
+            var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository, Mappers);
             return contentTypeRepository;
         }
 
         private MediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+            var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
             return contentTypeRepository;
         }
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork, Guid containerEntityType)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver, containerEntityType);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers, containerEntityType);
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+                var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
                 var repository = CreateRepository(unitOfWork);
                 var templates = new[]
                 {

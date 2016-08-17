@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);            
+            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);            
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
                 var id = userType.Id;
 
-                var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+                var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
                 repository2.Delete(userType);
                 unitOfWork.Flush();
 
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUserType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "testUserType1");
+                var query = new Query<IUserType>(SqlSyntax, Mappers).Where(x => x.Alias == "testUserType1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUserType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
+                var query = new Query<IUserType>(SqlSyntax, Mappers).Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
                 var result = repository.Count(query);
 
                 // Assert

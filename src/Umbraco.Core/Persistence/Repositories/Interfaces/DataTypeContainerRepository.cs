@@ -7,8 +7,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
     {
-        public DataTypeContainerRepository(IDatabaseUnitOfWork uow, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(uow, cache, logger, mappingResolver, Constants.ObjectTypes.DataTypeContainerGuid)
+        public DataTypeContainerRepository(IDatabaseUnitOfWork uow, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(uow, cache, logger, mappers, Constants.ObjectTypes.DataTypeContainerGuid)
         { }
     }
 }

@@ -29,8 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, contentSection, mappingResolver)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection, IMapperCollection mappers)
+            : base(work, cache, logger, contentSection, mappers)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException(nameof(memberTypeRepository));
             if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));

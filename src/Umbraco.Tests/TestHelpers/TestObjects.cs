@@ -203,8 +203,8 @@ namespace Umbraco.Tests.TestHelpers
         public static IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger)
         {
             var adapter = new TestUmbracoDatabaseAccessor();
-            var mappingResolver = Mock.Of<IMappingResolver>();
-            var databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, adapter, mappingResolver);
+            var mappers = Mock.Of<IMapperCollection>();
+            var databaseFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, adapter, mappers);
             var repositoryFactory = new RepositoryFactory(Mock.Of<IServiceContainer>());
             return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
         }

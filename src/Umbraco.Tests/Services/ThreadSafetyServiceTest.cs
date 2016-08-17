@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Services
             //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
             //threading environment, or a single apartment threading environment will not work for this test because
             //it is multi-threaded.
-            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMappingResolver>());
+            _dbFactory = new PerThreadSqlCeDatabaseFactory(Logger, Mock.Of<IMapperCollection>());
             var repositoryFactory = new RepositoryFactory(Container);
             _uowProvider = new NPocoUnitOfWorkProvider(_dbFactory, repositoryFactory);
 
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Services
             // them all in one call
 
 		    private readonly ILogger _logger;
-		    private readonly IMappingResolver _mappingResolver;
+		    private readonly IMapperCollection _mappers;
             private IQueryFactory _queryFactory;
 
             private readonly DbProviderFactory _dbProviderFactory =
@@ -249,14 +249,14 @@ namespace Umbraco.Tests.Services
 
 		    public ISqlSyntaxProvider SqlSyntax { get; } = new SqlCeSyntaxProvider();
 
-		    public IQueryFactory QueryFactory => _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappingResolver));
+		    public IQueryFactory QueryFactory => _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
 
 		    public DatabaseType DatabaseType => DatabaseType.SQLCe;
 
-            public PerThreadSqlCeDatabaseFactory(ILogger logger, IMappingResolver mappingResolver)
+            public PerThreadSqlCeDatabaseFactory(ILogger logger, IMapperCollection mappers)
             {
                 _logger = logger;
-                _mappingResolver = mappingResolver;
+                _mappers = mappers;
             }
 
 		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>();

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Querying
 {
     public interface IQueryFactory
     {
-        IMappingResolver MappingResolver { get; }
+        IMapperCollection Mappers { get; }
         ISqlSyntaxProvider SqlSyntax { get; }
         IQuery<T> Create<T>();
     }

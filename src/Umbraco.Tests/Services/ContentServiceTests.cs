@@ -1385,7 +1385,7 @@ namespace Umbraco.Tests.Services
                 TestObjects.GetDefaultSqlSyntaxProviders(Logger),
                 Logger,
                 new TestUmbracoDatabaseAccessor(),
-                MappingResolver);
+                Mappers);
             var repositoryFactory = MockRepositoryFactory();
             var provider = new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
@@ -1661,10 +1661,10 @@ namespace Umbraco.Tests.Services
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
+            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, Mappers);
+            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
             return repository;
         }
 
@@ -1676,19 +1676,19 @@ namespace Umbraco.Tests.Services
             mock
                 .Setup(x => x.CreateRepository<ITemplateRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver));
+                    new TemplateRepository(uow, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers));
             mock
                 .Setup(x => x.CreateRepository<ITagRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new TagRepository(uow, DisabledCache, Logger, MappingResolver));
+                    new TagRepository(uow, DisabledCache, Logger, Mappers));
             mock
                 .Setup(x => x.CreateRepository<IContentTypeRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), MappingResolver));
+                    new ContentTypeRepository(uow, DisabledCache, Logger, factory.CreateRepository<ITemplateRepository>(uow), Mappers));
             mock
                 .Setup(x => x.CreateRepository<IContentRepository>(It.IsAny<IDatabaseUnitOfWork>(), It.IsAny<string>()))
                 .Returns((IDatabaseUnitOfWork uow, string name) =>
-                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), MappingResolver));
+                    new ContentRepository(uow, DisabledCache, Logger, factory.CreateRepository<IContentTypeRepository>(uow), factory.CreateRepository<ITemplateRepository>(uow), factory.CreateRepository<ITagRepository>(uow), Mock.Of<IContentSection>(), Mappers));
 
             return factory = mock.Object;
         }

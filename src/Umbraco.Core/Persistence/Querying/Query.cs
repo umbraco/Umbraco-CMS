@@ -16,13 +16,13 @@ namespace Umbraco.Core.Persistence.Querying
     public class Query<T> : IQuery<T>
     {
         private readonly ISqlSyntaxProvider _sqlSyntax;
-        private readonly IMappingResolver _mappingResolver;
+        private readonly IMapperCollection _mappers;
         private readonly List<Tuple<string, object[]>> _wheres = new List<Tuple<string, object[]>>();
 
-        public Query(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        public Query(ISqlSyntaxProvider sqlSyntax, IMapperCollection mappers)
         {
             _sqlSyntax = sqlSyntax;
-            _mappingResolver = mappingResolver;
+            _mappers = mappers;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (predicate != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappingResolver);
+                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappers);
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (fieldSelector != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappingResolver);
+                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappers);
                 string whereExpression = expressionHelper.Visit(fieldSelector);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { @values = values } }));

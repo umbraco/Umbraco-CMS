@@ -25,11 +25,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="work">A database unit of work.</param>
         /// <param name="cache">A cache helper.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="mappingResolver">A mapping resolver.</param>
-        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+        /// <param name="mappers">A mappers collection.</param>
+        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
             : base(work, cache, logger)
         {
-            QueryFactory = new QueryFactory(SqlSyntax, mappingResolver);
+            QueryFactory = new QueryFactory(SqlSyntax, mappers);
         }
 
         /// <summary>

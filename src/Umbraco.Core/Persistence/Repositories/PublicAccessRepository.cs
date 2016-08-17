@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<PublicAccessEntry, Guid> _cachePolicy;
 
-        public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         {            
         }
 

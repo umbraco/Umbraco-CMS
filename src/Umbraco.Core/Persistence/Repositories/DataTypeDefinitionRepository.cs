@@ -32,11 +32,11 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly DataTypePreValueRepository _preValRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger,
-            IContentTypeRepository contentTypeRepository, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+            IContentTypeRepository contentTypeRepository, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappers);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -534,8 +534,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-                : base(work, cache, logger, mappingResolver)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+                : base(work, cache, logger, mappers)
             {
             }
 

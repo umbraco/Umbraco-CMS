@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ServerRegistrationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new ServerRegistrationRepository(unitOfWork, _cacheHelper, Logger, MappingResolver);
+            return new ServerRegistrationRepository(unitOfWork, _cacheHelper, Logger, Mappers);
         }
 
         [Test]

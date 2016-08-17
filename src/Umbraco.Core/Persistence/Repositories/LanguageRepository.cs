@@ -23,8 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<ILanguage, int> _cachePolicy;
 
-        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         {
         }
 

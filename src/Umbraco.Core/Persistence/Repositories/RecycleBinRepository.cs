@@ -14,8 +14,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IUmbracoEntity
         where TRepository :  class, IRepository
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, contentSection, mappingResolver)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMapperCollection mappers)
+            : base(work, cache, logger, contentSection, mappers)
         {
         }
 

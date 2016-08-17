@@ -119,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             else
             {
-                var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestUmbracoDatabaseAccessor(), MappingResolver);
+                var f = new DefaultDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, Logger, new TestUmbracoDatabaseAccessor(), Mappers);
                 f.ResetForTests();
                 databaseFactory = f;
             }

@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private ITemplateRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
         {
             return new TemplateRepository(unitOfWork, DisabledCache, Logger, _masterPageFileSystem, _viewsFileSystem,
-                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc), MappingResolver);
+                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc), Mappers);
         }
 
         [SetUp]
@@ -407,9 +407,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var templateRepository = CreateRepository(unitOfWork);
 
-                var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, MappingResolver);
-                var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, MappingResolver);
-                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+                var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger, Mappers);
+                var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository, Mappers);
+                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 var textpage = MockedContent.CreateSimpleContent(contentType);

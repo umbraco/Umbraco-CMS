@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Templates
             var db = TestObjects.GetUmbracoSqlCeDatabase(logger);
             unitOfWorkMock.Setup(x => x.Database).Returns(db);
 
-            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
+            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMapperCollection>());
 
         }
 

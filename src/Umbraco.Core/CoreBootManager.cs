@@ -15,7 +15,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
@@ -181,7 +180,6 @@ namespace Umbraco.Core
 
             container.RegisterSingleton<ApplicationContext>();
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
-
         }
 
         /// <summary>
@@ -442,11 +440,6 @@ namespace Umbraco.Core
             ServerMessengerResolver.Current = new ServerMessengerResolver(
                 Container,
                 factory => new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
-
-            MappingResolver.Current = new MappingResolver(
-                Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveAssignedMapperTypes());
-
 
             //RepositoryResolver.Current = new RepositoryResolver(
             //    new RepositoryFactory(ApplicationCache));

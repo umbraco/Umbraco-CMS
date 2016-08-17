@@ -19,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IMediaType, int> _cachePolicy;
 
-        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         { }
 
         protected override IRepositoryCachePolicy<IMediaType, int> CachePolicy

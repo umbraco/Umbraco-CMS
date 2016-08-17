@@ -271,6 +271,9 @@
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
+    <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
+    <Compile Include="Persistence\Mappers\MapperCollection.cs" />
+    <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
     <Compile Include="Persistence\Migrations\IMigrationCollectionBuilder.cs" />
     <Compile Include="Persistence\Migrations\MigrationCollection.cs" />
     <Compile Include="Persistence\Migrations\MigrationCollectionBuilder.cs" />
@@ -329,7 +332,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockTable.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
-    <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
     <Compile Include="Persistence\Querying\IQueryFactory.cs" />
     <Compile Include="Persistence\Querying\QueryFactory.cs" />
@@ -804,7 +806,6 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
-    <Compile Include="Persistence\Mappers\MappingResolver.cs" />
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />
     <Compile Include="Persistence\Mappers\MediaTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />

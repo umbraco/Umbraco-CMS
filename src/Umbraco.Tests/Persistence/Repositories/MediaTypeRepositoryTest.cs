@@ -28,12 +28,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger, MappingResolver);            
+            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger, Mappers);            
         }
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, MappingResolver, Constants.ObjectTypes.MediaTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, Mappers, Constants.ObjectTypes.MediaTypeContainerGuid);
 
         }
 

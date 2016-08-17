@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, MappingResolver);
+            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, Mappers);
             return repository;
         }
 
@@ -178,8 +178,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
                 var id = user.Id;
 
-                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
-                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver);
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
+                var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mappers);
 
                 repository2.Delete(user);
                 unitOfWork.Flush();
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax, MappingResolver).Where(x => x.Username == "TestUser1");
+                var query = new Query<IUser>(SqlSyntax, Mappers).Where(x => x.Username == "TestUser1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax, MappingResolver).Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = new Query<IUser>(SqlSyntax, Mappers).Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -496,8 +496,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
-                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, MappingResolver);
+                var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
+                var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo, Mappers);
 
                 // Act
                 var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
@@ -547,7 +547,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver);
+                var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers);
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);
                 unitOfWork.Complete();

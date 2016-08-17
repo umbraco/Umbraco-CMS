@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, MappingResolver);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, Mappers);
             return ctRepository;
         }
 
@@ -59,10 +59,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, MappingResolver);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), MappingResolver);
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), Mappers);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, Mappers);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository, Mappers);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>(), Mappers);
             return repository;
         }
 
@@ -618,7 +618,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 
                 long totalRecords;
 
-                var filterQuery = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Name.Contains("Page 2"));
+                var filterQuery = new Query<IContent>(SqlSyntax, Mappers).Where(x => x.Name.Contains("Page 2"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
@@ -642,7 +642,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 long totalRecords;
 
-                var filterQuery = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Name.Contains("text"));
+                var filterQuery = new Query<IContent>(SqlSyntax, Mappers).Where(x => x.Name.Contains("text"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert

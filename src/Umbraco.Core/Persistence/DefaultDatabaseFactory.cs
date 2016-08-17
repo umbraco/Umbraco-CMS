@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
     {
-        private readonly IMappingResolver _mappingResolver;
+        private readonly IMapperCollection _mappers;
         private readonly IUmbracoDatabaseAccessor _umbracoDatabaseAccessor;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly ILogger _logger;
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence
             get
             {
                 EnsureConfigured();
-                return _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappingResolver));
+                return _queryFactory ?? (_queryFactory = new QueryFactory(SqlSyntax, _mappers));
             }
         }
 
@@ -69,10 +69,10 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="mappingResolver"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used by LightInject.</remarks>
-        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappingResolver)
+        public DefaultDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
+            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers)
         {
             if (Configured == false)
                 DatabaseContext.GiveLegacyAChance(this, logger);
@@ -85,17 +85,17 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="mappingResolver"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
+        public DefaultDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value cannot be null nor empty.", nameof(connectionStringName));
-            if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
+            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
-            _mappingResolver = mappingResolver;
+            _mappers = mappers;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
@@ -124,16 +124,16 @@ namespace Umbraco.Core.Persistence
         /// <param name="sqlSyntaxProviders">The collection of available sql syntax providers.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="umbracoDatabaseAccessor"></param>
-        /// <param name="mappingResolver"></param>
+        /// <param name="mappers"></param>
         /// <remarks>Used in tests.</remarks>
-        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMappingResolver mappingResolver)
+        public DefaultDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IUmbracoDatabaseAccessor umbracoDatabaseAccessor, IMapperCollection mappers)
         {
             if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (umbracoDatabaseAccessor == null) throw new ArgumentNullException(nameof(umbracoDatabaseAccessor));
-            if (mappingResolver == null) throw new ArgumentNullException(nameof(mappingResolver));
+            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
-            _mappingResolver = mappingResolver;
+            _mappers = mappers;
             _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
             _logger = logger;
             _umbracoDatabaseAccessor = umbracoDatabaseAccessor;
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Persistence
 
                 // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
                 // so that everything NPoco is properly cached for the lifetime of the application
-                var mappers = new MapperCollection { new PocoMapper() };
+                var mappers = new NPoco.MapperCollection { new PocoMapper() };
                 var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
                 _pocoDataFactory = factory;
                 var config = new FluentConfig(xmappers => factory);

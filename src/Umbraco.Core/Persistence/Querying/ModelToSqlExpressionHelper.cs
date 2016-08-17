@@ -22,15 +22,10 @@ namespace Umbraco.Core.Persistence.Querying
             _mapper = mapper;
         }
 
-        public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+        public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax, IMapperCollection mappers)
             : base(sqlSyntax)
         {
-            _mapper = mappingResolver.ResolveMapperByType(typeof(T));
-
-            if (_mapper == null)
-            {
-                throw new InvalidOperationException("Could not resolve a mapper for type " + typeof (T));
-            }
+            _mapper = mappers[typeof(T)]; // throws if not found
         }
 
         protected override string VisitMemberAccess(MemberExpression m)

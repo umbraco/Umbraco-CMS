@@ -52,8 +52,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, mappingResolver)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentSection contentSection, IMapperCollection mappers)
+            : base(work, cache, logger, mappers)
         {
             _contentSection = contentSection;
         }

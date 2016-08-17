@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
                 repository.AddOrUpdate(macro);
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = repository.Get(1);
                 macro.Alias = "test2";
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var macro = repository.Get(1);
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var macros = repository.GetAll();
@@ -131,10 +131,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
-                var query = new Query<IMacro>(SqlSyntax, MappingResolver).Where(x => x.Alias.ToUpper() == "TEST1");
+                var query = new Query<IMacro>(SqlSyntax, Mappers).Where(x => x.Alias.ToUpper() == "TEST1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -149,10 +149,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
-                var query = new Query<IMacro>(SqlSyntax, MappingResolver).Where(x => x.Name.StartsWith("Test"));
+                var query = new Query<IMacro>(SqlSyntax, Mappers).Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var macro = repository.Get(2);
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var macro = repository.Get(3);
@@ -253,7 +253,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 // Act
                 var exists = repository.Exists(3);
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
@@ -326,7 +326,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
@@ -352,7 +352,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
@@ -384,7 +384,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
@@ -413,7 +413,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
@@ -443,7 +443,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mappers);
 
                 repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
                 repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
