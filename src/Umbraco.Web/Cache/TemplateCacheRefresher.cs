@@ -16,6 +16,10 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
+        public TemplateCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         protected override TemplateCacheRefresher Instance
         {
             get { return this; }
@@ -59,9 +63,9 @@ namespace Umbraco.Web.Cache
 
         private void RemoveFromCache(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheItem(
                 string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
             //need to clear the runtime cache for templates

@@ -2,7 +2,7 @@
 using System.Web.Mvc;
 using umbraco;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.WebServices
@@ -27,8 +27,7 @@ namespace Umbraco.Web.WebServices
                 // DO not run publishing if content is re-loading
                 if (content.Instance.isInitializing == false)
                 {
-                    var publisher = new ScheduledPublisher(Services.ContentService);
-                    publisher.CheckPendingAndProcess();
+                    Services.ContentService.WithResult().PerformScheduledPublish();
                 }
 
                 return Json(new

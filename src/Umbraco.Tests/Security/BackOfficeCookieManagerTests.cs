@@ -6,6 +6,7 @@ using Microsoft.Owin;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -28,19 +29,19 @@ namespace Umbraco.Tests.Security
             //should force app ctx to show not-configured
             ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(false);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock(false);
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, Mock.Of<ILogger>());
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
-                MockHelper.GetMockedServiceContext(),
+                TestObjects.GetServiceContextMock(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            
+
             var umbCtx = UmbracoContext.CreateContext(
-                Mock.Of<HttpContextBase>(), 
-                appCtx, 
-                new WebSecurity(Mock.Of<HttpContextBase>(), appCtx), 
+                Mock.Of<HttpContextBase>(),
+                appCtx,
+                new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(), new List<IUrlProvider>(), false);
 
             var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.Value == umbCtx));
@@ -53,12 +54,12 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, Mock.Of<ILogger>());
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
-                MockHelper.GetMockedServiceContext(),
+                TestObjects.GetServiceContextMock(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Security
             request.Setup(owinRequest => owinRequest.Uri).Returns(new Uri("http://localhost/umbraco"));
 
             var result = mgr.ShouldAuthenticateRequest(
-                Mock.Of<IOwinContext>(context => context.Request == request.Object), 
+                Mock.Of<IOwinContext>(context => context.Request == request.Object),
                 new Uri("http://localhost/umbraco"));
 
             Assert.IsTrue(result);

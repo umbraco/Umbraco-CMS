@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -10,14 +11,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    [SqlSyntaxProviderAttribute("System.Data.SqlServerCe.4.0")]
+    [SqlSyntaxProvider(Constants.DbProviderNames.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public SqlCeSyntaxProvider()
-        {
-            
-        }
-
         public override bool SupportsClustered()
         {
             return false;
@@ -63,7 +59,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }   
         }
 
-        
+        public override string GetConcat(params string[] args)
+        {
+            return "(" + string.Join("+", args) + ")";
+        }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
@@ -208,7 +207,6 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-
         
     }
 }

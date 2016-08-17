@@ -15,12 +15,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add_Audit_Entry()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
                 repo.AddOrUpdate(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
-                unitOfWork.Commit();
+                unitOfWork.Complete();
             }
 
             var dtos = DatabaseContext.Database.Fetch<LogDto>("WHERE id > -1");

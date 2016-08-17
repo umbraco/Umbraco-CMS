@@ -20,24 +20,17 @@ namespace Umbraco.Core.Services
         private readonly static string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
                                                             + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
 
-        private static readonly int[] LockingRepositoryIds = { Constants.System.ServersLock };
         private ServerRole _currentServerRole = ServerRole.Unknown;
-        private readonly LockingRepository<IServerRegistrationRepository> _lrepo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
         /// <param name="uowProvider">A UnitOfWork provider.</param>
-        /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
-        {
-            _lrepo = new LockingRepository<IServerRegistrationRepository>(UowProvider,
-                x => RepositoryFactory.CreateServerRegistrationRepository(x),
-                LockingRepositoryIds, LockingRepositoryIds);
-        }
+        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(uowProvider, logger, eventMessagesFactory)
+        { }
 
         /// <summary>
         /// Touches a server to mark it as active; deactivate stale servers.
@@ -47,11 +40,14 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout)
         {
-            _lrepo.WithWriteLocked(xr =>
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                ((ServerRegistrationRepository) xr.Repository).ReloadCache(); // ensure we have up-to-date cache
+                uow.WriteLock(Constants.Locks.Servers);
+                var repo = uow.CreateRepository<IServerRegistrationRepository>();
 
-                var regs = xr.Repository.GetAll().ToArray();
+                ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
+
+                var regs = repo.GetAll().ToArray();
                 var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
                 var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
 
@@ -69,19 +65,21 @@ namespace Umbraco.Core.Services
                 if (hasMaster == false)
                     server.IsMaster = true;
 
-                xr.Repository.AddOrUpdate(server);
-                xr.UnitOfWork.Commit(); // triggers a cache reload
-                xr.Repository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
+                repo.AddOrUpdate(server);
+                uow.Flush(); // triggers a cache reload
+                repo.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
-                regs = xr.Repository.GetAll().ToArray();
+                regs = repo.GetAll().ToArray();
 
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is master or slave
                 _currentServerRole = regs.Count(x => x.IsActive) > 1
-                    ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
-                    : ServerRole.Single;
-            });
+                        ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
+                        : ServerRole.Single;
+
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -103,15 +101,20 @@ namespace Umbraco.Core.Services
 
             // because the repository caches "all" and has queries disabled...
 
-            _lrepo.WithWriteLocked(xr =>
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                ((ServerRegistrationRepository)xr.Repository).ReloadCache(); // ensure we have up-to-date cache
+                uow.WriteLock(Constants.Locks.Servers);
+                var repo = uow.CreateRepository<IServerRegistrationRepository>();
 
-                var server = xr.Repository.GetAll().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                ((ServerRegistrationRepository) repo).ReloadCache(); // ensure we have up-to-date cache
+
+                var server = repo.GetAll().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
                 server.IsActive = server.IsMaster = false;
-                xr.Repository.AddOrUpdate(server); // will trigger a cache reload
-            });
+                repo.AddOrUpdate(server); // will trigger a cache reload
+
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -120,7 +123,13 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            _lrepo.WithWriteLocked(xr => xr.Repository.DeactiveStaleServers(staleTimeout));
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.WriteLock(Constants.Locks.Servers);
+                var repo = uow.CreateRepository<IServerRegistrationRepository>();
+                repo.DeactiveStaleServers(staleTimeout);
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -129,6 +138,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IServerRegistration> GetActiveServers()
         {
+            // fixme - this needs to be refactored entirely now that we have repeatable read everywhere
+
             //return _lrepo.WithReadLocked(xr =>
             //{
             //    var query = Query<IServerRegistration>.Builder.Where(x => x.IsActive);
@@ -152,15 +163,20 @@ namespace Umbraco.Core.Services
             // this raises a good number of questions, including whether caching anything in
             // repositories works at all in a LB environment - TODO: figure it out
 
-            var uow = UowProvider.GetUnitOfWork();
-            var repo = RepositoryFactory.CreateServerRegistrationRepository(uow);
-            return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.ReadLock(Constants.Locks.Servers);
+                var repo = uow.CreateRepository<IServerRegistrationRepository>();
+                var servers = repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+                uow.Complete();
+                return servers;
+            }
         }
 
         /// <summary>
         /// Gets the local server identity.
         /// </summary>
-        public string CurrentServerIdentity { get { return CurrentServerIdentityValue; } }
+        public string CurrentServerIdentity => CurrentServerIdentityValue;
 
         /// <summary>
         /// Gets the role of the current server.

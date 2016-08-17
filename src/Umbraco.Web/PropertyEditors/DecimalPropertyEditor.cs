@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DecimalAlias, "Decimal", "decimal", "decimal", IsParameterEditor = true)]
+    [PropertyEditor(Constants.PropertyEditors.DecimalAlias, "Decimal", PropertyEditorValueTypes.Decimal, "decimal", IsParameterEditor = true)]
     public class DecimalPropertyEditor : PropertyEditor
     {
         /// <summary>

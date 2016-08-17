@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -42,24 +41,22 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             var configuredVersion = new SemVersion(4, 7, 0);
             var targetVersion = new SemVersion(6, 0, 0);
-            var provider = GetDatabaseProvider();
             var db = GetConfiguredDatabase();
 
             //Create db schema and data from old Total.sql file for Sql Ce
-            string statements = GetDatabaseSpecificSqlScript();
+            var statements = GetDatabaseSpecificSqlScript();
             // replace block comments by whitespace
             statements = FindComments.Replace(statements, " ");
             // execute all non-empty statements
-            foreach (string statement in statements.Split(";".ToCharArray()))
+            foreach (var statement in statements.Split(";".ToCharArray()))
             {
-                string rawStatement = statement.Replace("GO", "").Trim();
+                var rawStatement = statement.Replace("GO", "").Trim();
                 if (rawStatement.Length > 0)
                     db.Execute(new Sql(rawStatement));
             }
 
             var logger = Mock.Of<ILogger>();
-            var sqlHelper = Mock.Of<ISqlSyntaxProvider>();
-            var sql = GetSyntaxProvider();
+            var context = new MigrationContext(db, logger);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
@@ -70,28 +67,28 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 targetVersion,
                 GlobalSettings.UmbracoMigrationName,
                 //pass in explicit migrations
-                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(sql, logger),
-                new DeleteAppTables(sql, logger),
-                new EnsureAppsTreesUpdated(sql, logger),
-                new MoveMasterContentTypeData(sql, logger),
-                new NewCmsContentType2ContentTypeTable(sql, logger),
-                new RemoveMasterContentTypeColumn(sql, logger),
-                new RenameCmsTabTable(sql, logger),
-                new RenameTabIdColumn(sql, logger),
-                new UpdateCmsContentTypeAllowedContentTypeTable(sql, logger),
-                new UpdateCmsContentTypeTable(sql, logger),
-                new UpdateCmsContentVersionTable(sql, logger),
-                new UpdateCmsPropertyTypeGroupTable(sql, logger));
+                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(context),
+                new DeleteAppTables(context),
+                new EnsureAppsTreesUpdated(context),
+                new MoveMasterContentTypeData(context),
+                new NewCmsContentType2ContentTypeTable(context),
+                new RemoveMasterContentTypeColumn(context),
+                new RenameCmsTabTable(context),
+                new RenameTabIdColumn(context),
+                new UpdateCmsContentTypeAllowedContentTypeTable(context),
+                new UpdateCmsContentTypeTable(context),
+                new UpdateCmsContentVersionTable(context),
+                new UpdateCmsPropertyTypeGroupTable(context));
 
-            bool upgraded = migrationRunner.Execute(db, provider, sqlHelper, true);
+            var upgraded = migrationRunner.Execute(context /*, true*/);
 
             Assert.That(upgraded, Is.True);
 
-            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sqlHelper);
+            var schemaHelper = new DatabaseSchemaHelper(db, logger);
 
-            bool hasTabTable = schemaHelper.TableExist("cmsTab");
-            bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
-            bool hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
+            var hasTabTable = schemaHelper.TableExist("cmsTab");
+            var hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
+            var hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
 
             Assert.That(hasTabTable, Is.False);
             Assert.That(hasPropertyTypeGroupTable, Is.True);
@@ -114,9 +111,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public string Path { get; set; }
         public abstract void DatabaseSpecificSetUp();
         public abstract void DatabaseSpecificTearDown();
-        public abstract ISqlSyntaxProvider GetSyntaxProvider();
         public abstract UmbracoDatabase GetConfiguredDatabase();
-        public abstract DatabaseProviders GetDatabaseProvider();
         public abstract string GetDatabaseSpecificSqlScript();
     }
 }

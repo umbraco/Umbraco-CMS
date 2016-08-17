@@ -201,6 +201,15 @@ ul.color-picker li a  {
     margin: 5px;
     background: white;
     border: 1px solid #f8f8f8;
+
+    max-width: 100%;
+}
+
+
+.umb-mediapicker .umb-sortable-thumbnails li {
+    flex-direction: column;
+    margin: 0;
+    padding: 5px;
 }
 
 
@@ -289,7 +298,7 @@ ul.color-picker li a  {
  }
 
  .umb-cropper img {
-     max-width: initial;
+     max-width: none;
  }
 
  .umb-cropper .overlay, .umb-cropper-gravity .overlay {
@@ -384,6 +393,7 @@ ul.color-picker li a  {
 }
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
+        max-width: 100%;
     }
 
     .umb-cropper-imageholder {
@@ -714,7 +724,45 @@ ul.color-picker li a  {
 }
 
 //
-// tags
+// Related links
+// --------------------------------------------------
+.umb-relatedlinks table > tr > td { word-wrap:break-word; word-break: break-all; border-bottom: 1px solid transparent; }
+.umb-relatedlinks .handle { cursor:move; }
+.umb-relatedlinks table > tbody > tr.unsortable .handle { cursor:default; }
+
+.umb-relatedlinks table td.col-sort { width: 20px; }
+.umb-relatedlinks table td.col-caption { min-width: 200px; }
+.umb-relatedlinks table td.col-link { min-width: 200px;  }
+.umb-relatedlinks table td.col-actions { min-width: 120px; }
+
+.umb-relatedlinks table td.col-caption .control-wrapper,
+.umb-relatedlinks table td.col-link .control-wrapper { display: flex; }
+
+.umb-relatedlinks table td.col-caption .control-wrapper input[type="text"],
+.umb-relatedlinks table td.col-link .control-wrapper input[type="text"] { width: auto; flex: 1; }
+
+/* sortable placeholder */
+.umb-relatedlinks .sortable-placeholder {
+    background-color: @tableBackgroundAccent;
+    display: table-row;
+}
+.umb-relatedlinks .sortable-placeholder > td {
+    display: table-cell;
+    padding: 8px;
+}
+.umb-relatedlinks .ui-sortable-helper {
+    display: table-row;
+    background-color: @white;
+    opacity: 0.7;
+}
+.umb-relatedlinks .ui-sortable-helper > td {
+    display: table-cell;
+    border-bottom: 1px solid @tableBorder;
+}
+
+
+//
+// Tags
 // --------------------------------------------------
 .umb-tags{border: @grayLighter solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
 .umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @blue}

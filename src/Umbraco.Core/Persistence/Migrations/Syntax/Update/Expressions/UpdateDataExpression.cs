@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Persistence.SqlSyntax;
+using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
-        public UpdateDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(sqlSyntax, current, databaseProviders)
-        {
-        }
+        public UpdateDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+            : base(context, supportedDatabaseTypes)
+        { }
 
         public string SchemaName { get; set; }
         public string TableName { get; set; }

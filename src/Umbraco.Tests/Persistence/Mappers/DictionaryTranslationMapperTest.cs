@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryTranslationMapper(new SqlCeSyntaxProvider()).Map("Key");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[UniqueId]"));
@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryTranslationMapper(new SqlCeSyntaxProvider()).Map("Language");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Language");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[languageId]"));
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryTranslationMapper(new SqlCeSyntaxProvider()).Map("Value");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Value");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[value]"));

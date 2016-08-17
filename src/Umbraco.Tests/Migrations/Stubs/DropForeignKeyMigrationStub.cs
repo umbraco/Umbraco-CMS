@@ -7,10 +7,9 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("1.0.0", 0, "Test")]
     public class DropForeignKeyMigrationStub : MigrationBase
     {
-        public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public DropForeignKeyMigrationStub(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Data;
 using System.Linq;
 using LightInject;
@@ -38,7 +39,11 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)
                });
 
-            var foundMigrations = migrationResolver.Migrations;
+            var database = TestObjects.GetUmbracoSqlServerDatabase(Mock.Of<ILogger>());
+
+            var context = new MigrationContext(database, Logger);
+
+            var foundMigrations = migrationResolver.GetMigrations(context);
             var targetVersion = new Version("6.0.0");
             var list = new List<IMigration>();
 
@@ -56,11 +61,11 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database, Logger, SqlSyntax);
+            
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;
-                migration.GetUpExpressions(context);
+                migration.Up();
             }
 
             Assert.That(context.Expressions.Any(), Is.True);
@@ -68,7 +73,7 @@ namespace Umbraco.Tests.Migrations
             //Console output
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
         }
     }

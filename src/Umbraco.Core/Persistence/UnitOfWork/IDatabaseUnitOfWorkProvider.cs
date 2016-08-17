@@ -1,10 +1,14 @@
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-	/// <summary>
-	/// Defines a Unit of Work Provider for working with an IDatabaseUnitOfWork
-	/// </summary>
-	public interface IDatabaseUnitOfWorkProvider
+    /// <summary>
+    /// Represents a provider that can create units of work to work on databases.
+    /// </summary>
+    public interface IDatabaseUnitOfWorkProvider
 	{
-		IDatabaseUnitOfWork GetUnitOfWork();
+        /// <summary>
+        /// Creates a unit of work.
+        /// </summary>
+        /// <returns>A new unit of work.</returns>
+		IDatabaseUnitOfWork CreateUnitOfWork();
 	}
 }

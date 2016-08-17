@@ -125,6 +125,12 @@
     <key alias="visit">Visitar</key>
     <key alias="welcome">Bem Vindo(a)</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nome</key>
     <key alias="assignDomain">Gerenciar hostnames</key>
@@ -830,7 +836,9 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Modelos</key>
     <key alias="xslt">Arquivos XSLT</key>
+    <key alias="userPermissions">Permissões de usuário</key>
     <key alias="userTypes">Tipos de Usuários</key>
+    <key alias="users">Usuários</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nova atualização pronta</key>

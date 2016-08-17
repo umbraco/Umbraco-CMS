@@ -5,6 +5,7 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;

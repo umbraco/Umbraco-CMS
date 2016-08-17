@@ -4,11 +4,8 @@ using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
-using umbraco;
-using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.WebServices
 {
@@ -56,7 +53,7 @@ namespace Umbraco.Web.WebServices
         private string GetMessageForStatuses(IEnumerable<PublishStatus> statuses, IContent doc)
         {
             //if all are successful then just say it was successful
-            if (statuses.All(x => ((int) x.StatusType) < 10))
+            if (statuses.All(x => x.StatusType.IsSuccess()))
             {
                 return Services.TextService.Localize("publish/nodePublishAll", new[] { doc.Name});
             }

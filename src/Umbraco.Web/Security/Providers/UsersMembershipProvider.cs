@@ -18,15 +18,17 @@ namespace Umbraco.Web.Security.Providers
     {
 
         public UsersMembershipProvider()
-            : this(ApplicationContext.Current.Services.UserService)
+            : this(ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.MemberTypeService)
         {
         }
 
-        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService)
             : base(memberService)
         {
+            _memberTypeService = memberTypeService;
         }
 
+        private readonly IMemberTypeService _memberTypeService;
         private string _defaultMemberTypeAlias = "writer";
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
@@ -68,7 +70,7 @@ namespace Umbraco.Web.Security.Providers
                     {
                         if (_hasDefaultMember == false)
                         {
-                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                            _defaultMemberTypeAlias = _memberTypeService.GetDefault();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
                                 throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");

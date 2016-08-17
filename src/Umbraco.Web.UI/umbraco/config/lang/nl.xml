@@ -188,6 +188,12 @@
     <key alias="visit">Bezoek</key>
     <key alias="welcome">Welkom</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
@@ -951,7 +957,9 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Sjablonen</key>
     <key alias="xslt">XSLT Bestanden</key>
+    <key alias="userPermissions">Gebruikersrechten</key>
     <key alias="userTypes">Gebruiker Types</key>
+    <key alias="users">Gebruikers</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>

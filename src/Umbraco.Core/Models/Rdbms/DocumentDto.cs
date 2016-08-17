@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -6,7 +7,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsDocument")]
-    [PrimaryKey("versionId", autoIncrement = false)]
+    [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentDto
     {
@@ -46,16 +47,18 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
         public int? TemplateId { get; set; }
-        
+
         [Column("newest")]
         [Constraint(Default = "0")]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_newest")]
         public bool Newest { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public ContentVersionDto ContentVersionDto { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public DocumentPublishedReadOnlyDto DocumentPublishedReadOnlyDto { get; set; }
     }
 }

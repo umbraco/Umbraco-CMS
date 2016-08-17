@@ -513,6 +513,7 @@ namespace umbraco
                 _inner = inner;
                 _id = _inner.Id;
 
+                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 _creatorName = _inner.GetCreatorProfile().Name;
                 _writerName = _inner.GetWriterProfile().Name;
 

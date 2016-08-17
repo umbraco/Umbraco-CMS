@@ -416,11 +416,10 @@ namespace umbraco.cms.businesslogic
                     var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
                     {
-                        if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
+                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_description.Substring(1, _description.Length - 1)))                        
                         {
-                            var di =
-                                new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
-                            return di.Value(lang.id);
+                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_description.Substring(1, _description.Length - 1));
+                            return di.GetTranslatedValue(lang.id);
                         }
                     }
 
@@ -495,10 +494,11 @@ namespace umbraco.cms.businesslogic
                 var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                 if (lang != null)
                 {
-                    if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
+
+                    if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(tempText.Substring(1, tempText.Length - 1)))
                     {
-                        var di = new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
-                        return di.Value(lang.id);
+                        var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(tempText.Substring(1, tempText.Length - 1));
+                        return di.GetTranslatedValue(lang.id);
                     }
                 }
 
@@ -1165,11 +1165,11 @@ namespace umbraco.cms.businesslogic
             {
                 if (nodeObjectType == new Guid(Constants.ObjectTypes.DocumentType))
                 {
-                    return ApplicationContext.Current.Services.ContentTypeService.GetContentType;
+                    return ApplicationContext.Current.Services.ContentTypeService.Get;
                 }
                 if (nodeObjectType == new Guid(Constants.ObjectTypes.MediaType))
                 {
-                    return ApplicationContext.Current.Services.ContentTypeService.GetMediaType;
+                    return ApplicationContext.Current.Services.MediaTypeService.Get;
                 }
                 if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
                 {
@@ -1177,7 +1177,8 @@ namespace umbraco.cms.businesslogic
                 }
 
                 //default to content
-                return ApplicationContext.Current.Services.ContentTypeService.GetContentType;
+                // should throw!
+                return ApplicationContext.Current.Services.ContentTypeService.Get;
             }
         }
 
@@ -1467,7 +1468,11 @@ namespace umbraco.cms.businesslogic
                     var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
                     {
-                        return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
+                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(tempCaption.Substring(1, tempCaption.Length - 1)))
+                        {
+                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(tempCaption.Substring(1, tempCaption.Length - 1));
+                            return di.GetTranslatedValue(lang.id);
+                        }
                     }
                     return "[" + tempCaption + "]";
                 }
@@ -1624,10 +1629,10 @@ namespace umbraco.cms.businesslogic
                     var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
                     {
-                        if (Dictionary.DictionaryItem.hasKey(_caption.Substring(1, _caption.Length - 1)))
+                        if (ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(_caption.Substring(1, _caption.Length - 1)))
                         {
-                            var di = new Dictionary.DictionaryItem(_caption.Substring(1, _caption.Length - 1));
-                            return di.Value(lang.id);
+                            var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(_caption.Substring(1, _caption.Length - 1));
+                            return di.GetTranslatedValue(lang.id);                            
                         }
                     }
 

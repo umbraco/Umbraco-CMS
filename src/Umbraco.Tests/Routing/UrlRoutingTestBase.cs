@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Routing
         protected ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)
         {
             //get the mocked service context to get the mocked domain service
-            var svcCtx = MockHelper.GetMockedServiceContext();
+            var svcCtx = TestObjects.GetServiceContextMock();
 
             var domainService = Mock.Get(svcCtx.DomainService);
             //setup mock domain service
@@ -57,11 +57,12 @@ namespace Umbraco.Tests.Routing
         public const int LangNlId = 337;
         public const int LangDkId = 338;
 
-        protected override void SetupApplicationContext()
+        protected override ApplicationContext CreateApplicationContext()
         {
             var settings = SettingsForTests.GetDefault();
-            ApplicationContext.Current = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            return new ApplicationContext(
+                new DatabaseContext(databaseFactory, Logger),
                 GetServiceContext(settings, Logger),
                 CacheHelper,
                 ProfilingLogger)

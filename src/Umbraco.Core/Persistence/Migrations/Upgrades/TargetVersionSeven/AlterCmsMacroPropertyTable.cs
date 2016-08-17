@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.DefaultConstraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions;
@@ -14,15 +13,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
     /// <summary>
     /// We are removing the cmsMacroPropertyType which the cmsMacroProperty references and the cmsMacroProperty.macroPropertyType column
-    /// needs to be changed to editorAlias, we'll do this by removing the constraint,changing the macroPropertyType to the new 
+    /// needs to be changed to editorAlias, we'll do this by removing the constraint,changing the macroPropertyType to the new
     /// editorAlias column (and maintaing data so we can reference it)
     /// </summary>
     [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class AlterCmsMacroPropertyTable : MigrationBase
     {
-        public AlterCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AlterCmsMacroPropertyTable(IMigrationContext context)
+            : base(context)
+        { }
 
 
         public override void Up()
@@ -33,7 +32,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //var cpt = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerTable(Context.Database);
             //var di = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database);
 
-            if (Context.CurrentDatabaseProvider != DatabaseProviders.SqlServer)
+            if (DatabaseType.IsSqlServer() == false)
             {
                 Delete.DefaultConstraint().OnTable("cmsMacroProperty").OnColumn("macroPropertyHidden");
             }
@@ -42,10 +41,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 //If we are on SQLServer, we need to delete default constraints by name, older versions of umbraco did not name these default constraints
                 // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
                 // http://issues.umbraco.org/issue/U4-4133
-                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider();
+                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null));
                 var defaultConstraints = sqlServerSyntaxProvider.GetDefaultConstraintsPerColumn(Context.Database).Distinct();
 
-                //lookup the constraint we want to delete, normally would be called "DF_cmsMacroProperty_macroPropertyHidden" but 
+                //lookup the constraint we want to delete, normally would be called "DF_cmsMacroProperty_macroPropertyHidden" but
                 // we cannot be sure with really old versions
                 var constraint = defaultConstraints
                     .SingleOrDefault(x => x.Item1 == "cmsMacroProperty" && x.Item2 == "macroPropertyHidden");
@@ -57,7 +56,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
             Delete.Column("macroPropertyHidden").FromTable("cmsMacroProperty");
 
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 Delete.ForeignKey().FromTable("cmsMacroProperty").ForeignColumn("macroPropertyType").ToTable("cmsMacroPropertyType").PrimaryColumn("id");
             }
@@ -83,7 +82,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             {
 
                 var alias = item.macroPropertyTypeAlias;
-                //check if there's a map created 
+                //check if there's a map created
                 var newAlias = (string)LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(alias);
                 if (newAlias.IsNullOrWhiteSpace() == false)
                 {

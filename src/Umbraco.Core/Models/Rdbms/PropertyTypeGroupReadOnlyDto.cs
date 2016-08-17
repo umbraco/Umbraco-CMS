@@ -1,9 +1,11 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System;
+using NPoco;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsPropertyTypeGroup")]
-    [PrimaryKey("id", autoIncrement = true)]
+    [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class PropertyTypeGroupReadOnlyDto
     {
@@ -18,5 +20,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("contenttypeNodeId")]
         public int ContentTypeNodeId { get; set; }
+
+        [Column("PropertyGroupUniqueID")]
+        public Guid UniqueId { get; set; }
     }
 }

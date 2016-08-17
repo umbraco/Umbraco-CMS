@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -13,13 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
-    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : PetaPocoRepositoryBase<TId, TEntity>
+    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : NPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
         where TDto: class
     {
 
-        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -56,11 +58,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<TEntity> PerformGetAll(params TId[] ids)
         {
-            var sql = new Sql().From<TEntity>(SqlSyntax);
+            var sql = Sql().From<TEntity>();
 
             if (ids.Any())
             {
-                sql.Where(GetWhereInClauseForGetAll(), new { ids = ids });
+                sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
             }
             
             return Database.Fetch<TDto>(sql).Select(ConvertToEntity);

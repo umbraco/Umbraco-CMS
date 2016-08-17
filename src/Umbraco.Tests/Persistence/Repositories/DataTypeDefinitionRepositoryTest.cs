@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,6 +16,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,6 +35,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
         }
 
+        protected override CacheHelper CreateCacheHelper()
+        {
+            // hackish, but it works
+            var testName = TestContext.CurrentContext.Test.Name;
+            if (testName == "Can_Get_Pre_Value_As_String_With_Cache"
+                || testName == "Can_Get_Pre_Value_Collection_With_Cache")
+            {
+                return new CacheHelper(
+                    new ObjectCacheRuntimeCacheProvider(),
+                    new StaticCacheProvider(),
+                    new StaticCacheProvider(),
+                    new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider())); // default would be NullCacheProvider
+            }
+
+            return base.CreateCacheHelper();
+        }
+
         private IDataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
             return Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
@@ -39,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IMappingResolver>(), Constants.ObjectTypes.DataTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, MappingResolver, Constants.ObjectTypes.DataTypeContainerGuid);
         }
 
         [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
@@ -62,36 +82,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Move()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
                 var container1 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
-                var dataType = (IDataTypeDefinition) new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType = (IDataTypeDefinition)new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt1"
                 };
                 repository.AddOrUpdate(dataType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
-                //create a 
+                //create a
                 var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt2"
                 };
                 repository.AddOrUpdate(dataType2);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var result = repository.Move(dataType, container1).ToArray();
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(2, result.Count());
 
@@ -109,18 +129,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();                
+                unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
@@ -129,23 +146,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+                unitOfWork.Flush();
+
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            {
+                unitOfWork.Flush();
+
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
             }
@@ -154,18 +166,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Data_Types()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var dataTypeDefinition = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
             }
@@ -174,27 +186,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Data_Types()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
-            IDataTypeDefinition dataType;
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork);
+                var repository = CreateRepository(unitOfWork);
+                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
-                dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                IDataTypeDefinition dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataType);
-                unitOfWork.Commit();                
-            }
-            using (var containerRepository = CreateContainerRepository(unitOfWork))
-            using (var repository = CreateRepository(unitOfWork))
-            {
+                unitOfWork.Flush();
+
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -208,23 +215,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            int id;
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
+                var repository = CreateRepository(unitOfWork);
+                IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
 
                 repository.AddOrUpdate(dataTypeDefinition);
 
-                unitOfWork.Commit();
-                id = dataTypeDefinition.Id;
+                unitOfWork.Flush();
+                var id = dataTypeDefinition.Id;
                 Assert.That(id, Is.GreaterThan(0));
-            }
-            using (var repository = CreateRepository(unitOfWork))
-            {
+
                 // Act
-                var dataTypeDefinition = repository.Get(id);
+                dataTypeDefinition = repository.Get(id);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);
@@ -237,29 +241,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 // Act
                 var dataTypeDefinition = repository.Get(-42);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
-                Assert.That(dataTypeDefinition.Name, Is.EqualTo("Dropdown"));    
+                Assert.That(dataTypeDefinition.Name, Is.EqualTo("Dropdown"));
             }
-            
         }
 
         [Test]
         public void Can_Perform_GetAll_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dataTypeDefinitions = repository.GetAll();
@@ -276,10 +279,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var dataTypeDefinitions = repository.GetAll(-40, -41, -42);
@@ -296,10 +299,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDataTypeDefinition>(SqlSyntax, MappingResolver).Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
@@ -316,10 +319,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<IDataTypeDefinition>(SqlSyntax, MappingResolver).Where(x => x.Name.StartsWith("D"));
@@ -334,26 +337,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var exists = repository.Exists(dataTypeDefinition.Id);
+
+                var fetched = repository.Get(dataTypeDefinition.Id);
 
                 // Assert
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
                 Assert.That(exists, Is.True);
+
+                TestHelper.AssertAllPropertyValuesAreEquals(dataTypeDefinition, fetched, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
@@ -361,33 +367,32 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.blah")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.blah")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-            definition.PropertyEditorAlias = "Test.TestEditor"; //change
+                definition.PropertyEditorAlias = "Test.TestEditor"; //change
                 repository.AddOrUpdate(definition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
 
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-            Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
+                Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
             }
         }
 
@@ -395,25 +400,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-
-            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
-                    {
-                        DatabaseType = DataTypeDatabaseType.Integer,
-                        Name = "AgeDataType",
-                        CreatorId = 0
-                    };
+                var repository = CreateRepository(unitOfWork);
+                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                {
+                    DatabaseType = DataTypeDatabaseType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
+                };
 
                 // Act
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
                 var existsBefore = repository.Exists(dataTypeDefinition.Id);
 
                 repository.Delete(dataTypeDefinition);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var existsAfter = repository.Exists(dataTypeDefinition.Id);
 
@@ -427,10 +431,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(1034); //Content picker
@@ -445,23 +449,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            int dtid;
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
-                dtid = dataTypeDefinition.Id;
-            }
+                unitOfWork.Flush();
+                var dtid = dataTypeDefinition.Id;
 
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
-            using (var repository = CreateRepository(unitOfWork))
-            {
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtid);
                 Assert.AreEqual(2, collection.PreValuesAsArray.Count());
             }
@@ -470,23 +469,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            int dtid;
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
-                dtid = dataTypeDefinition.Id;
-            }
+                unitOfWork.Flush();
+                var dtid = dataTypeDefinition.Id;
 
-            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                var id = unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
-            using (var repository = CreateRepository(unitOfWork))
-            {
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);
             }
@@ -495,33 +489,26 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection_With_Cache()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            var cache = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(), 
-                new StaticCacheProvider(), 
-                new StaticCacheProvider(),
-                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
-            
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                    dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
-                unitOfWork.Commit();                
-            }
+                unitOfWork.Flush();
 
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
-            //this will cache the result
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
-            {
+                //this will cache the result
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
             }
 
-            var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
+            // note: see CreateCacheHelper, this test uses a special cache
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+            Assert.IsTrue(cache);
+            var cached = cache.Result
                 .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
 
             Assert.IsNotNull(cached);
@@ -532,41 +519,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String_With_Cache()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            var cache = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(), 
-                new StaticCacheProvider(), 
-                new StaticCacheProvider(),
-                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
-            
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            object id;
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
-                unitOfWork.Commit();
-            }
+                unitOfWork.Flush();
 
-            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                id = unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
-            //this will cache the result
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
-            {
+                //this will cache the result
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
             }
 
-            var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
+            // note: see CreateCacheHelper, this test uses a special cache
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+            Assert.IsTrue(cache);
+            var cached = cache.Result
                 .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());
             Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
 
-            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);

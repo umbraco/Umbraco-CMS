@@ -1,8 +1,13 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
 {
@@ -10,13 +15,14 @@ namespace Umbraco.Tests.Persistence.FaultHandling
     public class ConnectionRetryTest
     {
         [Test]
-        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_With_Invalid_User()
+        public void Cant_Connect_To_SqlDatabase_With_Invalid_User()
         {
             // Arrange
-            const string providerName = "System.Data.SqlClient";
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
-            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
-            var database = factory.CreateDatabase();
+            const string providerName = Constants.DbProviderNames.SqlServer;
+            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)) };
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), new TestScopeContextAdapter(), Mock.Of<IMappingResolver>());
+            var database = factory.GetDatabase();
 
             //Act
             Assert.Throws<SqlException>(
@@ -24,13 +30,14 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         }
 
         [Test]
-        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_Because_Of_Network()
+        public void Cant_Connect_To_SqlDatabase_Because_Of_Network()
         {
             // Arrange
-            const string providerName = "System.Data.SqlClient";
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
-            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
-            var database = factory.CreateDatabase();
+            const string providerName = Constants.DbProviderNames.SqlServer;
+            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IDatabaseFactory>(() => null)) };
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), new TestScopeContextAdapter(), Mock.Of<IMappingResolver>());
+            var database = factory.GetDatabase();
 
             //Act
             Assert.Throws<SqlException>(

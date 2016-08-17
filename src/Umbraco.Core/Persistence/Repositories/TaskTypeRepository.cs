@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
+using NPoco;
+using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -12,10 +16,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class TaskTypeRepository : PetaPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
+    internal class TaskTypeRepository : NPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
     {
-        public TaskTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public TaskTypeRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -58,11 +62,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select("*").From<TaskTypeDto>(SqlSyntax);
-            return sql;
+            return Sql().SelectAll().From<TaskTypeDto>();
         }
 
         protected override string GetBaseWhereClause()

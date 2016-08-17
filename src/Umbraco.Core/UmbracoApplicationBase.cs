@@ -36,8 +36,9 @@ namespace Umbraco.Core
         /// </summary>
         protected UmbracoApplicationBase()
         {
-            //create the container for the application, the boot managers are responsible for registrations
-            Container = new ServiceContainer();         
+            // create the container for the application, the boot managers are responsible for registrations
+            Container = new ServiceContainer();
+            Container.EnableAnnotatedConstructorInjection();
         }
 
         public event EventHandler ApplicationStarting;
@@ -92,6 +93,11 @@ namespace Umbraco.Core
         /// <summary>
         /// Override init and raise the event
         /// </summary>
+        /// <remarks>
+        /// DID YOU KNOW? The Global.asax Init call is the thing that initializes all of the httpmodules, ties up a bunch of stuff with IIS, etc...
+        /// Therefore, since OWIN is an HttpModule when running in IIS/ASP.Net the OWIN startup is not executed until this method fires and by that
+        /// time, Umbraco has performed it's bootup sequence.
+        /// </remarks>
         public override void Init()
         {
             base.Init();

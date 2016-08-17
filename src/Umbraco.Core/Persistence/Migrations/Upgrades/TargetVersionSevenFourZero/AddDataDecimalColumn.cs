@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZero
@@ -8,10 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AddDataDecimalColumn : MigrationBase
     {
-        public AddDataDecimalColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public AddDataDecimalColumn(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {

@@ -10,6 +10,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
 

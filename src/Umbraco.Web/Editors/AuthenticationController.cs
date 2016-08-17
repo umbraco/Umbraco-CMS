@@ -4,26 +4,29 @@ using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Core.Security;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Identity;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Microsoft.AspNet.Identity.Owin;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Security.Identity;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
-
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
@@ -97,7 +100,7 @@ namespace Umbraco.Web.Editors
         /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [System.Web.Http.HttpGet]
         public bool IsAuthenticated()
         {
             var attempt = UmbracoContext.Security.AuthorizeRequest();
@@ -149,9 +152,7 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
-            var http = this.TryGetHttpContext();
-            if (http.Success == false)
-                throw new InvalidOperationException("This method requires that an HttpContext be active");
+            var http = EnsureHttpContext();
 
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
@@ -217,6 +218,91 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        /// <summary>
+        /// Processes a password reset request.  Looks for a match on the provided email address
+        /// and if found sends an email with a link to reset it
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens]
+        public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
+        {
+            // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
+            // So this is just a server-side secondary check.
+            if (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+            var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);
+            if (identityUser != null)
+            {
+                var user = Services.UserService.GetByEmail(model.Email);
+                if (user != null && user.IsLockedOut == false)
+                {
+                    var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
+                    var callbackUrl = ConstuctCallbackUrl(identityUser.Id, code);
+
+                    var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
+                        //Ensure the culture of the found user is used for the email!
+                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService),
+                        new[] {identityUser.UserName, callbackUrl});
+
+                    await UserManager.SendEmailAsync(identityUser.Id,
+                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                            //Ensure the culture of the found user is used for the email!
+                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
+                        message);
+                }
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        private string ConstuctCallbackUrl(int userId, string code)
+        {
+            //get an mvc helper to get the url
+            var http = EnsureHttpContext();
+            var urlHelper = new UrlHelper(http.Request.RequestContext);
+
+            var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice", 
+                new
+                {
+                    area = GlobalSettings.UmbracoMvcArea,
+                    u = userId,
+                    r = code
+                });
+
+            //TODO: Virtual path?
+
+            return string.Format("{0}://{1}{2}",
+                http.Request.Url.Scheme,
+                http.Request.Url.Host + (http.Request.Url.Port == 80 ? string.Empty : ":" + http.Request.Url.Port),
+                action);
+        }      
+     
+        /// <summary>
+        /// Processes a set password request.  Validates the request and sets a new password.
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens]
+        public async Task<HttpResponseMessage> PostSetPassword(SetPasswordModel model)
+        {
+            var result = await UserManager.ResetPasswordAsync(model.UserId, model.ResetCode, model.Password);
+            if (result.Succeeded)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            return Request.CreateValidationErrorResponse(
+                result.Errors.Any() ? result.Errors.First() : "Set password failed");
+        }
+
+        private HttpContextBase EnsureHttpContext()
+        {
+            var attempt = this.TryGetHttpContext();
+            if (attempt.Success == false)
+                throw new InvalidOperationException("This method requires that an HttpContext be active");
+            return attempt.Result;
+        }
 
         /// <summary>
         /// Logs the current user out

@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, MemberBasic>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -149,13 +149,23 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMember, ContentItemDto<IMember>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IMember>(applicationContext.Services.UserService)))
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
+
+            //FROM IMemberGroup TO MemberGroupDisplay
+            config.CreateMap<IMemberGroup, MemberGroupDisplay>()
+                .ForMember(x => x.Path, expression => expression.MapFrom(group => "-1," + group.Id))
+                .ForMember(x => x.Notifications, expression => expression.Ignore())
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.ParentId, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Path, expression => expression.Ignore());
         }
 
         /// <summary>

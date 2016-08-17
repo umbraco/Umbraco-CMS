@@ -1,8 +1,8 @@
 using System;
 using System.Data;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -12,10 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 14, GlobalSettings.UmbracoMigrationName)]
     public class AddForeignKeysForLanguageAndDictionaryTables : MigrationBase
     {
-        public AddForeignKeysForLanguageAndDictionaryTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public AddForeignKeysForLanguageAndDictionaryTables(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {
@@ -45,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                         .WithColumn("languageISOCode").AsString(10).Nullable()
                         .WithColumn("languageCultureName").AsString(50).Nullable();
                 
-                    var currentData = this.Context.Database.Fetch<LanguageDto>(new Sql().Select("*").From<LanguageDto>(SqlSyntax));
+                    var currentData = Context.Database.Fetch<LanguageDto>(Sql().SelectAll().From<LanguageDto>());
                     foreach (var languageDto in currentData)
                     {
                         Insert.IntoTable("umbracoLanguage_TEMP")

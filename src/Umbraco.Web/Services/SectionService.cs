@@ -10,6 +10,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using File = System.IO.File;
@@ -213,9 +214,12 @@ namespace Umbraco.Web.Services
             lock (Locker)
             {
                 //delete the assigned applications
-                _uowProvider.GetUnitOfWork().Database.Execute(
-                    "delete from umbracoUser2App where app = @appAlias",
-                    new { appAlias = section.Alias });
+                using (var uow = _uowProvider.CreateUnitOfWork())
+                {
+                    uow.Database.Execute("delete from umbracoUser2App where app = @appAlias",
+                        new { appAlias = section.Alias });
+                    uow.Complete();
+                }
 
                 //delete the assigned trees
                 var trees = _applicationTreeService.GetApplicationTrees(section.Alias);

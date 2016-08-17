@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -14,11 +16,11 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Internal class to handle content/published xml insert/update based on standard principles and units of work with transactions
     /// </summary>
-    internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
+    internal class ContentXmlRepository<TContent> : NPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -38,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotImplementedException();
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             throw new NotImplementedException();
         }

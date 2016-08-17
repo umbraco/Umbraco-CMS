@@ -1,24 +1,29 @@
-using System.Linq;
-using Umbraco.Core.Collections;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// A caching policy that ignores all caches for GetAll - it will only cache calls for individual items
+    /// Represents a special policy that does not cache the result of GetAll.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <typeparam name="TId">The type of the identifier.</typeparam>
+    /// <remarks>
+    /// <para>Overrides the default repository cache policy and does not writes the result of GetAll
+    /// to cache, but only the result of individual Gets. It does read the cache for GetAll, though.</para>
+    /// <para>Used by DictionaryRepository.</para>
+    /// </remarks>
     internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options) : base(cache, options)
+        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options) 
+            : base(cache, options)
+        { }
+
+        protected override void InsertEntities(TId[] ids, TEntity[] entities)
         {
-        }
-        
-        protected override void SetCacheAction(TId[] ids, TEntity[] entityCollection)
-        {            
-            //no-op
+            // nop
         }
     }
 }

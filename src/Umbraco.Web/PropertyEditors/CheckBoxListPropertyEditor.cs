@@ -1,6 +1,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -15,11 +16,14 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.CheckBoxListAlias, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
     public class CheckBoxListPropertyEditor : PropertyEditor
     {
+        private readonly ILocalizedTextService _textService;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILogger logger) : base(logger)
+        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger)
         {
+            _textService = textService;
         }
 
         /// <summary>
@@ -31,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new ValueListPreValueEditor();
+            return new ValueListPreValueEditor(_textService);
         }
 
         /// <summary>

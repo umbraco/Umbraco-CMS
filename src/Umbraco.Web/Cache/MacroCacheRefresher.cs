@@ -19,6 +19,10 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
     {
+        public MacroCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         #region Static helpers
         
         internal static string[] GetAllMacroCacheKeys()
@@ -170,10 +174,10 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            CacheHelper.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
             GetAllMacroCacheKeys().ForEach(
                     prefix =>
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(prefix));
+                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(prefix));
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
 
@@ -188,9 +192,9 @@ namespace Umbraco.Web.Cache
             {
                 GetCacheKeysForAlias(payload.Alias).ForEach(
                     alias =>
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(alias));
+                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(alias));
 
-                var macroRepoCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMacro>();
+                var macroRepoCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMacro>();
                 if (macroRepoCache)
                 {
                     macroRepoCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMacro>(payload.Id));

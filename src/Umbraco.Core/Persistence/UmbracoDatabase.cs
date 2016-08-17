@@ -1,34 +1,41 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
+using System.Text;
+using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
     /// <summary>
-    /// Represents the Umbraco implementation of the PetaPoco Database object
+    /// Extends NPoco Database for Umbraco.
     /// </summary>
     /// <remarks>
-    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we
-    /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
-    /// this object instead of the base PetaPoco database object.
+    /// <para>Is used everywhere in place of the original NPoco Database object, and provides additional features
+    /// such as profiling, retry policies, logging, etc.</para>
+    /// <para>Is never created directly but obtained from the <see cref="DefaultDatabaseFactory"/>.</para>
+    /// <para>It implements IDisposeOnRequestEnd which means it will be disposed when the request ends, which
+    /// automatically closes the connection - as implemented by NPoco Database.Dispose().</para>
     /// </remarks>
-    public class UmbracoDatabase : Database, IDisposeOnRequestEnd
+    public class UmbracoDatabase : Database, IDisposeOnRequestEnd, IUmbracoDatabaseConfig
     {
+        // Umbraco's default isolation level is RepeatableRead
+        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
+
         private readonly ILogger _logger;
-        private readonly Guid _instanceId = Guid.NewGuid();
+        private readonly RetryPolicy _connectionRetryPolicy;
+        private readonly RetryPolicy _commandRetryPolicy;
         private bool _enableCount;
 
         /// <summary>
         /// Used for testing
         /// </summary>
-        internal Guid InstanceId
-        {
-            get { return _instanceId; }
-        }
+        internal Guid InstanceId { get; } = Guid.NewGuid();
+
+        public ISqlSyntaxProvider SqlSyntax { get; }
 
         /// <summary>
         /// Generally used for testing, will output all SQL statements executed to the logger
@@ -57,62 +64,90 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal int SqlCount { get; private set; }
 
-        public UmbracoDatabase(IDbConnection connection, ILogger logger)
-            : base(connection)
+        // used by DefaultDatabaseFactory
+        // creates one instance per request
+        // also used by DatabaseContext for creating DBs and upgrading
+        public UmbracoDatabase(string connectionString,
+            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, DbProviderFactory provider,
+            ILogger logger,
+            RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+            : base(connectionString, databaseType, provider, DefaultIsolationLevel)
         {
+            SqlSyntax = sqlSyntax;
+            _logger = logger;
+            _connectionRetryPolicy = connectionRetryPolicy;
+            _commandRetryPolicy = commandRetryPolicy;
+            EnableSqlTrace = false;
+        }
+
+        // INTERNAL FOR UNIT TESTS
+        internal UmbracoDatabase(DbConnection connection,
+            ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, DbProviderFactory provider,
+            ILogger logger)
+            : base(connection, databaseType, provider, DefaultIsolationLevel)
+        {
+            SqlSyntax = sqlSyntax;
             _logger = logger;
             EnableSqlTrace = false;
         }
 
-        public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
-            : base(connectionString, providerName)
+        // fixme: these two could be an extension method of IUmbracoDatabaseConfig
+        public Sql<SqlContext> Sql()
         {
-            _logger = logger;
-            EnableSqlTrace = false;
+            return NPoco.Sql.BuilderFor(new SqlContext(this));
         }
 
-        public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
-            : base(connectionString, provider)
+        public Sql<SqlContext> Sql(string sql, params object[] args)
         {
-            _logger = logger;
-            EnableSqlTrace = false;
+            return NPoco.Sql.BuilderFor(new SqlContext(this)).Append(sql, args);
         }
 
-        public UmbracoDatabase(string connectionStringName, ILogger logger)
-            : base(connectionStringName)
+        protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
-            _logger = logger;
-            EnableSqlTrace = false;
-        }
-
-        public override IDbConnection OnConnectionOpened(IDbConnection connection)
-        {
-            // propagate timeout if none yet
+            if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             // wrap the connection with a profiling connection that tracks timings
-            return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
+            connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
+
+            // wrap the connection with a retrying connection
+            if (_connectionRetryPolicy != null || _commandRetryPolicy != null)
+                connection = new RetryDbConnection(connection, _connectionRetryPolicy, _commandRetryPolicy);
+
+            return connection;
         }
 
-        public override void OnException(Exception x)
+        protected override void OnException(Exception x)
         {
             _logger.Error<UmbracoDatabase>("Database exception occurred", x);
             base.OnException(x);
         }
 
-        public override void OnExecutingCommand(IDbCommand cmd)
+        // fixme.poco - has new interceptors?
+
+        protected override void OnExecutingCommand(DbCommand cmd)
         {
             // if no timeout is specified, and the connection has a longer timeout, use it
             if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
+
+            if (EnableSqlTrace)
+            {
+                var sb = new StringBuilder();
+                sb.Append(cmd.CommandText);
+                foreach (DbParameter p in cmd.Parameters)
+                {
+                    sb.Append(" - ");
+                    sb.Append(p.Value);
+                }
+                
+                _logger.Debug<UmbracoDatabase>(sb.ToString());
+            }
+
             base.OnExecutingCommand(cmd);
         }
 
-        public override void OnExecutedCommand(IDbCommand cmd)
+        protected override void OnExecutedCommand(DbCommand cmd)
         {
-            if (EnableSqlTrace)
-            {
-                _logger.Debug<UmbracoDatabase>(cmd.CommandText);
-            }
             if (_enableCount)
             {
                 SqlCount++;

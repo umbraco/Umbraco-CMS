@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
@@ -8,10 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class RemoveLanguageLocaleColumn : MigrationBase
     {
-        public RemoveLanguageLocaleColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public RemoveLanguageLocaleColumn(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {

@@ -1,12 +1,13 @@
-using System;
-
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
 	/// <summary>
-	/// Defines a unit of work when working with a database object
+	/// Represents a persistence unit of work for working with a database.
 	/// </summary>
-	public interface IDatabaseUnitOfWork : IUnitOfWork, IDisposable
+	public interface IDatabaseUnitOfWork : IUnitOfWork
 	{
 		UmbracoDatabase Database { get; }
-	}
+
+	    void ReadLock(params int[] lockIds);
+	    void WriteLock(params int[] lockIds);
+    }
 }

@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -14,15 +13,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 18, GlobalSettings.UmbracoMigrationName)]
     public class CleanUpCorruptedPublishedFlags : MigrationBase
     {
-        public CleanUpCorruptedPublishedFlags(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
-        
+        public CleanUpCorruptedPublishedFlags(IMigrationContext context)
+            : base(context)
+        { }
+
         public override void Up()
         {
             //Get all cmsDocument items that have more than one published date set
-            var sql = @"SELECT * FROM cmsDocument WHERE nodeId IN 
+            var sql = @"SELECT * FROM cmsDocument WHERE nodeId IN
 (SELECT nodeId
 FROM cmsDocument
 GROUP BY nodeId

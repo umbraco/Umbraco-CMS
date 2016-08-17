@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class EnsureContentTypeUniqueIdsAreConsistent : MigrationBase
     {
-        public EnsureContentTypeUniqueIdsAreConsistent(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public EnsureContentTypeUniqueIdsAreConsistent(IMigrationContext context)
+            : base(context)
         { }
         
         public override void Up()
@@ -28,12 +28,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 Constants.ObjectTypes.MemberTypeGuid,
             };
 
-            var sql = new Sql()
+            var sql = Context.Database.Sql()
                 .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentTypeDto>(SqlSyntax)
-                .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                .WhereIn<NodeDto>(SqlSyntax, x => x.NodeObjectType, objectTypes);
+                .From<NodeDto>()
+                .InnerJoin<ContentTypeDto>()
+                .On<NodeDto, ContentTypeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
             var rows = Context.Database.Fetch<dynamic>(sql);
 

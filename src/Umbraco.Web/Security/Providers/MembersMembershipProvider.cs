@@ -21,11 +21,11 @@ namespace Umbraco.Web.Security.Providers
     public class MembersMembershipProvider : UmbracoMembershipProvider<IMembershipMemberService, IMember>, IUmbracoMemberTypeMembershipProvider
     {
         public MembersMembershipProvider()
-            : this(ApplicationContext.Current.Services.MemberService)
+            : this(ApplicationContext.Current.Services.MemberService, ApplicationContext.Current.Services.MemberTypeService)
         {
         }
 
-        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService)
+        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService, IMemberTypeService memberTypeService)
             : base(memberService)
         {
             LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
@@ -37,8 +37,10 @@ namespace Umbraco.Web.Security.Providers
             LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
             PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
             PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
+            _memberTypeService = memberTypeService;
         }
 
+        private readonly IMemberTypeService _memberTypeService;
         private string _defaultMemberTypeAlias = "Member";
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
@@ -99,7 +101,7 @@ namespace Umbraco.Web.Security.Providers
                     {
                         if (_hasDefaultMember == false)
                         {
-                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                            _defaultMemberTypeAlias = _memberTypeService.GetDefault();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
                                 throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");

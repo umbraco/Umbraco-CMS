@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetWildcardPlaceholder();
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
+        string GetConcat(params string[] args);
 
         [Obsolete("Use the overload with the parameter index instead")]
         string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
@@ -69,6 +71,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         bool SupportsClustered();
         bool SupportsIdentityInsert();
         bool? SupportsCaseInsensitiveQueries(Database db);
+        
+        string ConvertIntegerToOrderableString { get; }
+        string ConvertDateToOrderableString { get; }
+        string ConvertDecimalToOrderableString { get; }
 
         IEnumerable<string> GetTablesInSchema(Database db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);

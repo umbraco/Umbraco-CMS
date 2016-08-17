@@ -65,7 +65,7 @@ namespace umbraco.cms.presentation.settings.scripts
             if (IsPostBack == false)
             {
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadScripts>().Tree.Alias)
+                    .SetActiveTreeType(Constants.Trees.Scripts)
                     .SyncTree(ScriptTreeSyncPath, false);
             }
         }

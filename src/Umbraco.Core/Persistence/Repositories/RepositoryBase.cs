@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -12,58 +10,38 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RepositoryBase : DisposableObject
+    internal abstract class RepositoryBase
     {
-        private readonly IUnitOfWork _work;
-        private readonly CacheHelper _cache;
-
         protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
         {
-            if (work == null) throw new ArgumentNullException("work");
-            if (cache == null) throw new ArgumentNullException("cache");
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (work == null) throw new ArgumentNullException(nameof(work));
+            if (cache == null) throw new ArgumentNullException(nameof(cache));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             Logger = logger;
-            _work = work;
-            _cache = cache;
+            UnitOfWork = work;
+            RepositoryCache = cache;
         }
 
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-        protected internal IUnitOfWork UnitOfWork
-        {
-            get { return _work; }
-        }
+        protected internal IUnitOfWork UnitOfWork { get; }
 
-        /// <summary>
-        /// Internal for testing purposes
-        /// </summary>
-        internal Guid UnitKey
-        {
-            get { return (Guid)_work.Key; }
-        }
-
-        protected CacheHelper RepositoryCache
-        {
-            get { return _cache; }
-        }
+        protected CacheHelper RepositoryCache { get; }
 
         /// <summary>
         /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
         /// </summary>
-        protected virtual IRuntimeCacheProvider RuntimeCache
-        {
-            get { return _cache.RuntimeCache; }
-        }
+        protected virtual IRuntimeCacheProvider RuntimeCache => RepositoryCache.RuntimeCache;
 
         public static string GetCacheIdKey<T>(object id)
         {
-            return string.Format("{0}{1}", GetCacheTypeKey<T>(), id);
+            return $"{GetCacheTypeKey<T>()}{id}";
         }
 
         public static string GetCacheTypeKey<T>()
         {
-            return string.Format("uRepo_{0}_", typeof(T).Name);
+            return $"uRepo_{typeof (T).Name}_";
         }
 
         protected ILogger Logger { get; private set; }
@@ -86,12 +64,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Used to create a new query instance
         /// </summary>
         /// <returns></returns>
-        public abstract Query<TEntity> Query { get; }
+        public abstract IQuery<TEntity> Query { get; }
 
         /// <summary>
         /// Returns a query factory instance
         /// </summary>
-        public abstract QueryFactory QueryFactory { get; }
+        public abstract IQueryFactory QueryFactory { get; }
 
         protected virtual TId GetEntityId(TEntity entity)
         {
@@ -101,30 +79,26 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// The runtime cache used for this repo by default is the isolated cache for this type
         /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
-        {
-            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
-        }
+        protected override IRuntimeCacheProvider RuntimeCache => RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
 
-        private IRepositoryCachePolicyFactory<TEntity, TId> _cachePolicyFactory;
-        /// <summary>
-        /// Returns the Cache Policy for the repository
-        /// </summary>
-        /// <remarks>
-        /// The Cache Policy determines how each entity or entity collection is cached
-        /// </remarks>
-        protected virtual IRepositoryCachePolicyFactory<TEntity, TId> CachePolicyFactory
+        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
+
+        protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {
             get
             {
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new DefaultRepositoryCachePolicyFactory<TEntity, TId>(
-                    RuntimeCache,
-                    new RepositoryCachePolicyOptions(() =>
-                    {
-                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                        var query = Query.Where(x => x.Id != 0);
-                        return PerformCount(query);
-                    })));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                var options = new RepositoryCachePolicyOptions(() =>
+                {
+                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                    var query = Query.Where(x => x.Id != 0);
+                    return PerformCount(query);
+                });
+
+                _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);
+
+                return _cachePolicy;
             }
         }
 
@@ -137,11 +111,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (entity.HasIdentity == false)
             {
-                UnitOfWork.RegisterAdded(entity, this);
+                UnitOfWork.RegisterCreated(entity, this);
             }
             else
             {
-                UnitOfWork.RegisterChanged(entity, this);
+                UnitOfWork.RegisterUpdated(entity, this);
             }
         }
 
@@ -151,10 +125,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            if (UnitOfWork != null)
-            {
-                UnitOfWork.RegisterRemoved(entity, this);
-            }
+            UnitOfWork?.RegisterDeleted(entity, this);
         }
 
         protected abstract TEntity PerformGet(TId id);
@@ -165,10 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Get(id, PerformGet);
-            }
+            return CachePolicy.Get(id, PerformGet, PerformGetAll);
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -191,11 +159,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
             }
 
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                var result = p.GetAll(ids, PerformGetAll);
-                return result;
-            }          
+            return CachePolicy.GetAll(ids, PerformGetAll);
         }
         
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
@@ -219,10 +183,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                return p.Exists(id, PerformExists);
-            }
+            return CachePolicy.Exists(id, PerformExists, PerformGetAll);
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);
@@ -242,12 +203,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistNewItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistNewItem);
-            }
+            CachePolicy.Create((TEntity) entity, PersistNewItem);
         }
 
         /// <summary>
@@ -256,12 +212,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistUpdatedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.CreateOrUpdate(casted, PersistUpdatedItem);
-            }
+            CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
         }
 
         /// <summary>
@@ -270,29 +221,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistDeletedItem(IEntity entity)
         {
-            var casted = (TEntity)entity;
-
-            using (var p = CachePolicyFactory.CreatePolicy())
-            {
-                p.Remove(casted, PersistDeletedItem);
-            }            
+            CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
         }
         
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
-
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            UnitOfWork.DisposeIfDisposable();
-        }
     }
 }

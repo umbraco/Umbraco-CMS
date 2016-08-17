@@ -211,7 +211,9 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            long totalRecords2;
+            var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = Convert.ToInt32(totalRecords2);
             
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -233,7 +235,9 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            long totalRecords2;
+            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = Convert.ToInt32(totalRecords2);
 
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -256,7 +260,9 @@ namespace Umbraco.Web.Security.Providers
         {
             var membersList = new MembershipUserCollection();
 
-            var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords);
+            long totalRecords2;
+            var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords2);
+            totalRecords = Convert.ToInt32(totalRecords2);
             
             foreach (var m in pagedMembers)
             {
@@ -483,7 +489,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
             {
-                int totalRecs;
+                long totalRecs;
                 var byEmail = MemberService.FindByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
                 if (byEmail.Count(x => x.Id != m.Id) > 0)
                 {

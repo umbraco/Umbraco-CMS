@@ -1,6 +1,7 @@
 using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -69,8 +70,8 @@ namespace umbraco.presentation.developer.packages
                 if (Page.IsPostBack == false)
                 {
                     ClientTools
-                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
-                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, false);
+                        .SetActiveTreeType(Constants.Trees.Packages)
+                        .SyncTree("-1,created," + createdPackage.Data.Id, false);
 
                     packageAuthorName.Text = pack.Author;
                     packageAuthorUrl.Text = pack.AuthorUrl;
@@ -80,6 +81,8 @@ namespace umbraco.presentation.developer.packages
                     packageReadme.Text = pack.Readme;
                     packageVersion.Text = pack.Version;
                     packageUrl.Text = pack.Url;
+                    iconUrl.Text = pack.IconUrl;
+                    umbracoVersion.Text = pack.UmbracoVersion != null ? pack.UmbracoVersion.ToString(3) : string.Empty;
 
                     /*ACTIONS XML*/
                     tb_actions.Text = pack.Actions;
@@ -148,17 +151,18 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Dictionary Items*/
-                    Dictionary.DictionaryItem[] umbDictionary = Dictionary.getTopMostItems;
-                    foreach (Dictionary.DictionaryItem d in umbDictionary)
+                    var umbDictionary = Services.LocalizationService.GetRootDictionaryItems();
+                    foreach (var d in umbDictionary)
                     {
 
-                        string liName = d.key;
-                        if (d.hasChildren)
+                        string liName = d.ItemKey;
+                        var children = Services.LocalizationService.GetDictionaryItemChildren(d.Key);
+                        if (children.Any())
                             liName += " <small>(Including all child items)</small>";
 
-                        ListItem li = new ListItem(liName, d.id.ToString());
+                        var li = new ListItem(liName, d.Id.ToString());
 
-                        if (pack.DictionaryItems.Contains(d.id.ToString()))
+                        if (pack.DictionaryItems.Contains(d.Id.ToString()))
                             li.Selected = true;
 
                         dictionary.Items.Add(li);
@@ -188,8 +192,8 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     ClientTools
-                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
-                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, true);
+                        .SetActiveTreeType(Constants.Trees.Packages)
+                        .SyncTree("-1,created," + createdPackage.Data.Id, true);
                 }
             }
         }
@@ -258,6 +262,8 @@ namespace umbraco.presentation.developer.packages
             pack.Name = packageName.Text;
             pack.Url = packageUrl.Text;
             pack.Version = packageVersion.Text;
+            pack.IconUrl = iconUrl.Text;
+            pack.UmbracoVersion = Version.Parse(umbracoVersion.Text);
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
@@ -379,9 +385,11 @@ namespace umbraco.presentation.developer.packages
             // Tab setup
             packageInfo = TabView1.NewTabPage("Package Properties");
             packageInfo.Controls.Add(Pane1);
+            packageInfo.Controls.Add(Pane5);
             packageInfo.Controls.Add(Pane1_1);
             packageInfo.Controls.Add(Pane1_2);
             packageInfo.Controls.Add(Pane1_3);
+            
 
             packageContents = TabView1.NewTabPage("Package Contents");
             packageContents.Controls.Add(Pane2);

@@ -14,8 +14,8 @@ namespace Umbraco.Core.Services
     public class MemberGroupService : RepositoryService, IMemberGroupService
     {
 
-        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
             //Proxy events!
             MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;
@@ -39,25 +39,34 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                return repository.GetAll();
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
+                var groups = repository.GetAll();
+                uow.Complete();
+                return groups;
             }
         }
 
         public IMemberGroup GetById(int id)
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                return repository.Get(id);
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
+                var group = repository.Get(id);
+                uow.Complete();
+                return group;
             }
         }
 
         public IMemberGroup GetByName(string name)
         {
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                return repository.GetByName(name);
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
+                var group = repository.GetByName(name);
+                uow.Complete();
+                return group;
             }
         }
 
@@ -71,11 +80,11 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.AddOrUpdate(memberGroup);
-                uow.Commit();
+                uow.Complete();
             }
 
             if (raiseEvents)
@@ -87,11 +96,11 @@ namespace Umbraco.Core.Services
             if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
                 return;
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
+                var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.Delete(memberGroup);
-                uow.Commit();
+                uow.Complete();
             }
 
             Deleted.RaiseEvent(new DeleteEventArgs<IMemberGroup>(memberGroup, false), this);

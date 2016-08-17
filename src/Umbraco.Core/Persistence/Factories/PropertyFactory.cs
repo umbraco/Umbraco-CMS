@@ -42,12 +42,22 @@ namespace Umbraco.Core.Persistence.Factories
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
-                //on initial construction we don't want to have dirty properties tracked
-                property.CreateDate = _createDate;
-                property.UpdateDate = _updateDate;
-                // http://issues.umbraco.org/issue/U4-1946
-                property.ResetDirtyProperties(false);
-                properties.Add(property);
+                try
+                {
+                    //on initial construction we don't want to have dirty properties tracked
+                    property.DisableChangeTracking();
+
+                    property.CreateDate = _createDate;
+                    property.UpdateDate = _updateDate;
+                    // http://issues.umbraco.org/issue/U4-1946
+                    property.ResetDirtyProperties(false);
+                    properties.Add(property);
+                }
+                finally
+                {
+                    property.EnableChangeTracking();
+                }
+                
             }
 
             return properties;
@@ -89,7 +99,7 @@ namespace Umbraco.Core.Persistence.Factories
                     decimal val;
                     if (decimal.TryParse(property.Value.ToString(), out val))
                     {
-                        dto.Decimal = val;
+                        dto.Decimal = val; // property value should be normalized already
                     }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)

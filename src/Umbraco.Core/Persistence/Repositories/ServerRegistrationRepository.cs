@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,19 +15,19 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
+    internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         private readonly ICacheProvider _staticCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver)
         {
-            _staticCache = staticCache;
+            _staticCache = cacheHelper.StaticCache;
         }
 
         protected override int PerformCount(IQuery<IServerRegistration> query)
         {
-            throw new NotSupportedException("This repository does not support this method");
+            throw new NotSupportedException("This repository does not support this method.");
         }
 
         protected override bool PerformExists(int id)
@@ -56,14 +57,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {
-            throw new NotSupportedException("This repository does not support this method");
+            throw new NotSupportedException("This repository does not support this method.");
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ServerRegistrationDto>(SqlSyntax);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<ServerRegistrationDto>();
+
+            sql
+               .From<ServerRegistrationDto>();
+
             return sql;
         }
 

@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("Id");
+            string column = new DataTypeDefinitionMapper().Map(new SqlCeSyntaxProvider(), "Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("Key");
+            string column = new DataTypeDefinitionMapper().Map(new SqlCeSyntaxProvider(), "Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueID]"));
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("DatabaseType");
+            string column = new DataTypeDefinitionMapper().Map(new SqlCeSyntaxProvider(), "DatabaseType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[dbType]"));
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("PropertyEditorAlias");
+            string column = new DataTypeDefinitionMapper().Map(new SqlCeSyntaxProvider(), "PropertyEditorAlias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[propertyEditorAlias]"));

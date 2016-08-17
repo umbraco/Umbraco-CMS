@@ -73,6 +73,11 @@
             /// </summary>
 			public const string DataTypes = "dataTypes";
 
+            /// <summary>
+            /// alias for the packages tree
+            /// </summary>
+            public const string Packages = "packager";
+
 			/// <summary>
 			/// alias for the dictionary tree.
 			/// </summary>
@@ -90,11 +95,15 @@
             /// </summary>
             public const string MediaTypes = "mediaTypes";
 
-
             /// <summary>
             /// alias for the member type tree.
             /// </summary>
             public const string MemberTypes = "memberTypes";
+
+            /// <summary>
+            /// alias for the member group tree.
+            /// </summary>
+            public const string MemberGroups = "memberGroups";
 
             /// <summary>
             /// alias for the template tree.
@@ -106,13 +115,31 @@
             public const string Xslt = "xslt";
 
             public const string Languages = "languages";
+            
+            public const string Macros = "macros";
 
             /// <summary>
             /// alias for the user types tree.
             /// </summary>
             public const string UserTypes = "userTypes";
 
-            //TODO: Fill in the rest!
+            /// <summary>
+            /// alias for the user permissions tree.
+            /// </summary>
+            public const string UserPermissions = "userPermissions";
+
+            /// <summary>
+            /// alias for the users tree.
+            /// </summary>
+            public const string Users = "users";
+
+            public const string Scripts = "scripts";
+
+            public const string PartialViews = "partialViews";
+
+            public const string PartialViewMacros = "partialViewMacros";
+
+            //TODO: Fill in the rest! 
         }
 	}
 

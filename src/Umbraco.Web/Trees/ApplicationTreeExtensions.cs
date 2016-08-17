@@ -18,6 +18,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core.Plugins;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using IAuthorizationFilter = System.Web.Http.Filters.IAuthorizationFilter;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;

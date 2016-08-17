@@ -166,10 +166,10 @@ namespace Umbraco.Core.Models.PublishedContent
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias);
+                    contentType = ApplicationContext.Current.Services.ContentTypeService.Get(alias);
                     break;
                 case PublishedItemType.Media:
-                    contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
+                    contentType = ApplicationContext.Current.Services.MediaTypeService.Get(alias);
                     break;
                 case PublishedItemType.Member:
                     contentType = ApplicationContext.Current.Services.MemberTypeService.Get(alias);

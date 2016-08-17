@@ -4,36 +4,26 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using System.Web.Http.ModelBinding.Binders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
-using Umbraco.Core.Models;
-using Umbraco.Core.Dynamics;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.UI;
+using Umbraco.Core.Persistence.Querying;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -47,13 +37,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
     public class ContentController : ContentControllerBase
-    {        
+    {
         /// <summary>
         /// Constructor
         /// </summary>
         public ContentController()
-            : this(UmbracoContext.Current)
-        {            
+                : this(UmbracoContext.Current)
+        {
         }
 
         /// <summary>
@@ -61,8 +51,8 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="umbracoContext"></param>
         public ContentController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {            
+                : base(umbracoContext)
+        {
         }
 
         /// <summary>
@@ -109,15 +99,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));            
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
             }
-            
+
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
             return content;
-       }
+        }
 
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetWithTreeDefinition(int id)
@@ -144,7 +134,7 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
-            var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
+            var contentType = Services.ContentTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -155,7 +145,7 @@ namespace Umbraco.Web.Editors
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-            mapped.Tabs = mapped.Tabs.Except(new[] {containerTab});
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
             return mapped;
         }
 
@@ -168,7 +158,7 @@ namespace Umbraco.Web.Editors
         {
             var url = Umbraco.NiceUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(url, Encoding.UTF8, "application/json");        
+            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
             return response;
         }
 
@@ -178,18 +168,32 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>        
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
-            int id, 
-            int pageNumber = 0,  //TODO: This should be '1' as it's not the index
-            int pageSize = 0, 
-            string orderBy = "SortOrder", 
-            Direction orderDirection = Direction.Ascending, 
-            string filter = "")
-        {
+                int id,
+                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageSize = 0,
+                string orderBy = "SortOrder",
+                Direction orderDirection = Direction.Ascending,
+                bool orderBySystemField = true,
+                string filter = "")
+        {            
             long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                children = Services.ContentService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
+                IQuery<IContent> queryFilter = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    //add the default text filter                    
+                    queryFilter = DatabaseContext.QueryFactory.Create<IContent>()
+                        .Where(x => x.Name.Contains(filter));
+                }
+                
+                children = Services.ContentService
+                    .GetPagedChildren(
+                        id, (pageNumber - 1), pageSize, 
+                        out totalChildren, 
+                        orderBy, orderDirection, orderBySystemField,
+                        queryFilter).ToArray();
             }
             else
             {
@@ -204,7 +208,7 @@ namespace Umbraco.Web.Editors
 
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children
-                .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
+                    .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
 
             return pagedResult;
         }
@@ -212,7 +216,7 @@ namespace Umbraco.Web.Editors
         [Obsolete("Dont use this, it is incorrectly named, use HasPermission instead")]
         public bool GetHasPermission(string permissionToCheck, int nodeId)
         {
-           return HasPermission(permissionToCheck, nodeId);
+            return HasPermission(permissionToCheck, nodeId);
         }
 
         /// <summary>
@@ -224,8 +228,8 @@ namespace Umbraco.Web.Editors
         public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
         {
             return Services.UserService
-                .GetPermissions(Security.CurrentUser, nodeIds)
-                .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
+                    .GetPermissions(Security.CurrentUser, nodeIds)
+                    .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
         }
 
         [HttpGet]
@@ -239,7 +243,7 @@ namespace Umbraco.Web.Editors
 
             return false;
         }
-        
+
         /// <summary>
         /// Saves content
         /// </summary>
@@ -247,16 +251,16 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter]
         [ContentPostValidate]
         public ContentItemDisplay PostSave(
-            [ModelBinder(typeof(ContentItemBinder))]
-                ContentItemSave contentItem)
-        {            
+                [ModelBinder(typeof(ContentItemBinder))]
+                                ContentItemSave contentItem)
+        {
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-          
+
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -274,7 +278,7 @@ namespace Umbraco.Web.Editors
                     var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-                    
+
                 }
 
                 //if the model state is not valid we cannot publish so change it to save
@@ -291,7 +295,7 @@ namespace Umbraco.Web.Editors
 
             //initialize this to successful
             var publishStatus = Attempt<PublishStatus>.Succeed();
-            var wasCancelled = false;            
+            var wasCancelled = false;
 
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
@@ -326,8 +330,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"), 
-                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                                Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                                Services.TextService.Localize("speechBubbles/editContentSavedText"));
                     }
                     else
                     {
@@ -339,8 +343,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/editContentSendToPublish"), 
-                            Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
+                                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
+                                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                     }
                     else
                     {
@@ -365,7 +369,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>
@@ -391,7 +395,7 @@ namespace Umbraco.Web.Editors
             {
                 var notificationModel = new SimpleNotificationModel();
                 ShowMessageForPublishStatus(publishResult.Result, notificationModel);
-                return Request.CreateValidationErrorResponse(notificationModel);               
+                return Request.CreateValidationErrorResponse(notificationModel);
             }
 
             //return ok
@@ -439,7 +443,7 @@ namespace Umbraco.Web.Editors
                     //returning an object of INotificationModel will ensure that any pending 
                     // notification messages are added to the response.
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
-                } 
+                }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -456,9 +460,10 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
         public HttpResponseMessage EmptyRecycleBin()
-        {            
+        {
             Services.ContentService.EmptyRecycleBin();
-            return Request.CreateResponse(HttpStatusCode.OK);
+
+            return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -515,7 +520,7 @@ namespace Umbraco.Web.Editors
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            return response;            
+            return response;
         }
 
         /// <summary>
@@ -547,7 +552,7 @@ namespace Umbraco.Web.Editors
 
             if (foundContent == null)
                 HandleContentNotFound(id);
-            
+
             var unpublishResult = Services.ContentService.WithResult().UnPublish(foundContent, Security.CurrentUser.Id);
 
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
@@ -558,7 +563,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
             }
             else
-            {                
+            {
                 content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
                 return content;
             }
@@ -596,8 +601,8 @@ namespace Umbraco.Web.Editors
             contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
             //only set the template if it didn't change
             var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
+                                                        || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
+                                                        || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
             if (templateChanged)
             {
                 var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
@@ -640,8 +645,8 @@ namespace Umbraco.Web.Editors
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
+                            Request.CreateNotificationValidationErrorResponse(
+                                    Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
                 }
             }
             else
@@ -654,19 +659,19 @@ namespace Umbraco.Web.Editors
 
                 //check if the item is allowed under this one
                 if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
-                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+                        .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
+                            Request.CreateNotificationValidationErrorResponse(
+                                    Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
-                {                    
+                {
                     throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
+                            Request.CreateNotificationValidationErrorResponse(
+                                    Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
                 }
             }
 
@@ -680,52 +685,52 @@ namespace Umbraco.Web.Editors
                 case PublishStatusType.Success:
                 case PublishStatusType.SuccessAlreadyPublished:
                     display.AddSuccessNotification(
-                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                        Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
                     break;
                 case PublishStatusType.FailedPathNotPublished:
                     display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                            new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
+                            Services.TextService.Localize("publish"),
+                            Services.TextService.Localize("publish/contentPublishedFailedByParent",
+                                    new[] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) }).Trim());
                     break;
                 case PublishStatusType.FailedCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
-                    break;                
+                    break;
                 case PublishStatusType.FailedAwaitingRelease:
                     display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
-                            new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
+                            Services.TextService.Localize("publish"),
+                            Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
+                                    new[] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) }).Trim());
                     break;
                 case PublishStatusType.FailedHasExpired:
                     display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        Services.TextService.Localize("publish/contentPublishedFailedExpired",
-                            new[]
-                            {
-                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
-                            }).Trim());
+                            Services.TextService.Localize("publish"),
+                            Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                                    new[]
+                                    {
+                                                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                    }).Trim());
                     break;
                 case PublishStatusType.FailedIsTrashed:
                     //TODO: We should add proper error messaging for this!
                     break;
                 case PublishStatusType.FailedContentInvalid:
                     display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                            new[]
-                            {
-                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
-                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                            }).Trim());
+                            Services.TextService.Localize("publish"),
+                            Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                    new[]
+                                    {
+                                                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                    }).Trim());
                     break;
                 default:
                     throw new IndexOutOfRangeException();
             }
         }
 
-        
+
 
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
@@ -740,15 +745,15 @@ namespace Umbraco.Web.Editors
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
-            IDictionary<string, object> storage,
-            IUser user,
-            IUserService userService,
-            IContentService contentService,
-            int nodeId,
-            char[] permissionsToCheck = null,
-            IContent contentItem = null)
+                IDictionary<string, object> storage,
+                IUser user,
+                IUserService userService,
+                IContentService contentService,
+                int nodeId,
+                char[] permissionsToCheck = null,
+                IContent contentItem = null)
         {
-           
+
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 contentItem = contentService.GetById(nodeId);
@@ -763,16 +768,16 @@ namespace Umbraco.Web.Editors
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                    ? UserExtensions.HasPathAccess(
-                                        Constants.System.Root.ToInvariantString(),
-                                        user.StartContentId,
-                                        Constants.System.RecycleBinContent)
-                                    : (nodeId == Constants.System.RecycleBinContent)
-                                          ? UserExtensions.HasPathAccess(
-                                              Constants.System.RecycleBinContent.ToInvariantString(),
-                                              user.StartContentId,
-                                              Constants.System.RecycleBinContent)
-                                          : user.HasPathAccess(contentItem);
+                                                            ? UserExtensions.HasPathAccess(
+                                                                    Constants.System.Root.ToInvariantString(),
+                                                                    user.StartContentId,
+                                                                    Constants.System.RecycleBinContent)
+                                                            : (nodeId == Constants.System.RecycleBinContent)
+                                                                        ? UserExtensions.HasPathAccess(
+                                                                                Constants.System.RecycleBinContent.ToInvariantString(),
+                                                                                user.StartContentId,
+                                                                                Constants.System.RecycleBinContent)
+                                                                        : user.HasPathAccess(contentItem);
 
             if (hasPathAccess == false)
             {

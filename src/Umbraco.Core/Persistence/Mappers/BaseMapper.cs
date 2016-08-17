@@ -2,17 +2,15 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
+using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-
-        protected BaseMapper(ISqlSyntaxProvider sqlSyntax)
+        protected BaseMapper()
         {
-            _sqlSyntax = sqlSyntax;
             Build();
         }
 
@@ -25,21 +23,17 @@ namespace Umbraco.Core.Persistence.Mappers
 
         protected abstract void BuildMap();
 
-        internal string Map(string propertyName, bool throws = false)
+        internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
         {
             DtoMapModel dtoTypeProperty;
+
             if (PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty))
-            {
-                return GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-            }
-            else
-            {
-                if (throws)
-                {
-                    throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
-                }
-                return string.Empty;
-            }
+                return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
+
+            if (throws)
+                throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
+
+            return string.Empty;
         }
 
         internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
@@ -61,17 +55,15 @@ namespace Umbraco.Core.Persistence.Mappers
             return new DtoMapModel(typeof(TDestination), destination, source.Name);
         }
 
-        internal virtual string GetColumnName(Type dtoType, PropertyInfo dtoProperty)
+        internal virtual string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
         {
             var tableNameAttribute = dtoType.FirstAttribute<TableNameAttribute>();
-            string tableName = tableNameAttribute.Value;
+            var tableName = tableNameAttribute.Value;
 
             var columnAttribute = dtoProperty.FirstAttribute<ColumnAttribute>();
-            string columnName = columnAttribute.Name;
+            var columnName = columnAttribute.Name;
 
-            string columnMap = string.Format("{0}.{1}",
-                                             _sqlSyntax.GetQuotedTableName(tableName),
-                                             _sqlSyntax.GetQuotedColumnName(columnName));
+            var columnMap = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
             return columnMap;
         }
     }

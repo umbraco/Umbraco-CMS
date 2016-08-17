@@ -1,5 +1,6 @@
 ﻿using LightInject;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -9,28 +10,33 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Tests.TestHelpers
 {
     [TestFixture]
     public abstract class BaseUsingSqlCeSyntax
     {
-        protected virtual SqlCeSyntaxProvider SqlSyntax
-        {
-            get { return new SqlCeSyntaxProvider(); }
-        }
-
         private MappingResolver _mappingResolver;
-        protected IMappingResolver MappingResolver
+
+        protected IMappingResolver MappingResolver => _mappingResolver;
+
+        protected SqlContext SqlContext { get; private set; }
+
+        protected Sql<SqlContext> Sql()
         {
-            get { return _mappingResolver; }
+            return NPoco.Sql.BuilderFor(SqlContext);
         }
 
         [SetUp]
         public virtual void Initialize()
         {
+            var sqlSyntax = new SqlCeSyntaxProvider();
+
             var container = new ServiceContainer();
-            container.RegisterSingleton<ISqlSyntaxProvider>(factory => SqlSyntax);
+            container.EnableAnnotatedConstructorInjection();
+
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
@@ -42,6 +48,10 @@ namespace Umbraco.Tests.TestHelpers
             PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
                 logger,
                 false);
+
+            var mappers = new MapperCollection { new PocoMapper() };
+            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+            SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe);
 
             Resolution.Freeze();
             SetUp();

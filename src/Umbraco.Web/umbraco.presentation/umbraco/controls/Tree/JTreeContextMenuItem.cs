@@ -5,7 +5,6 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web._Legacy.Actions;
-using Umbraco.Web._Legacy.Utils;
 
 namespace umbraco.controls.Tree
 {
@@ -55,12 +54,6 @@ namespace umbraco.controls.Tree
 			{
 				data.Add("icon", a.Icon);
 			}
-
-			//required by jsTree
-			data.Add("visible", JSONSerializer.ToJSONObject("function() {return true;}"));
-			
-            //The action handler is what is assigned to the IAction, but for flexibility, we'll call our onContextMenuSelect method which will need to return true if the function is to execute.
-			data.Add("action", JSONSerializer.ToJSONObject("function(N,T){" + a.JsFunctionName + ";}"));
 
 			return data;
 

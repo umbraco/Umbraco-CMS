@@ -106,13 +106,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.0-beta4\lib\net45\ClientDependency.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -121,6 +121,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPoco, Version=3.3.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.3.4\lib\net45\NPoco.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System">
@@ -134,6 +138,8 @@
       <Name>System.Data</Name>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security">
       <Name>System.Security</Name>
     </Reference>
@@ -188,9 +194,6 @@
     <Compile Include="businesslogic\ContentType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\Dictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -225,9 +228,6 @@
     <Compile Include="businesslogic\member\Member.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\member\MemberGroup.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\member\MemberType.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -238,12 +238,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\propertytype\propertytype.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\relation\Relation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\relation\RelationType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\task\Task.cs" />
@@ -303,5 +297,4 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

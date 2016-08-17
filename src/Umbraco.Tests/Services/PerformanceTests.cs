@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Services
 
         protected override string GetDbProviderName()
         {
-            return "System.Data.SqlClient";
+            return Constants.DbProviderNames.SqlServer;
         }
 
 
@@ -286,8 +287,8 @@ namespace Umbraco.Tests.Services
             DatabaseContext.Database.BulkInsertRecords(SqlSyntax, nodes);
 
             //re-get the nodes with ids
-            var sql = new Sql();
-            sql.Select("*").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == customObjectType);
+            var sql = DatabaseContext.Database.Sql();
+            sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
             nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
 
             //create the cmsContent data, each with a new content type id (so we can query on it later if needed)

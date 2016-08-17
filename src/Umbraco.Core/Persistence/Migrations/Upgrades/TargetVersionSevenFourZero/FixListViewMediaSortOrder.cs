@@ -1,6 +1,6 @@
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -9,15 +9,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class FixListViewMediaSortOrder : MigrationBase
     {
-        public FixListViewMediaSortOrder(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public FixListViewMediaSortOrder(IMigrationContext context)
+            : base(context)
         {
         }
 
         public override void Up()
         {
             var mediaListviewIncludeProperties = Context.Database.Fetch<DataTypePreValueDto>(
-                new Sql().Select("*").From<DataTypePreValueDto>(SqlSyntax).Where<DataTypePreValueDto>(SqlSyntax, x => x.Id == -9)).FirstOrDefault();
+                Sql().SelectAll().From<DataTypePreValueDto>().Where<DataTypePreValueDto>(x => x.Id == -9)).FirstOrDefault();
             if (mediaListviewIncludeProperties != null)
             {
                 if (mediaListviewIncludeProperties.Value.Contains("\"alias\":\"sort\""))

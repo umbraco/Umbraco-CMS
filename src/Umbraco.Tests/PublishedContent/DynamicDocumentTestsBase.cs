@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 

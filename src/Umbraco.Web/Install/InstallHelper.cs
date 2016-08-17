@@ -14,6 +14,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Install
         {
             return new List<InstallSetupStep>
             {
-                new NewInstallStep(_umbContext.Application),
+                new NewInstallStep(_umbContext.HttpContext, _umbContext.Application),
                 new UpgradeStep(),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),
@@ -120,7 +121,11 @@ namespace Umbraco.Web.Install
                 
                 string dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
-                    dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                {
+                    // we don't have DatabaseProvider anymore... doing it differently
+                    //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                    dbProvider = GetDbProviderString(ApplicationContext.Current.DatabaseContext);
+                }
 
                 org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
                 check.Install(installId,
@@ -139,6 +144,25 @@ namespace Umbraco.Web.Install
             {
                 LogHelper.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
             }
+        }
+
+        internal static string GetDbProviderString(DatabaseContext context)
+        {
+            var dbProvider = string.Empty;
+
+            // we don't have DatabaseProvider anymore...
+            //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+            //
+            // doing it differently
+            var syntax = context.Database.SqlSyntax;
+            if (syntax is SqlCeSyntaxProvider)
+                dbProvider = "SqlServerCE";
+            else if (syntax is MySqlSyntaxProvider)
+                dbProvider = "MySql";
+            else if (syntax is SqlServerSyntaxProvider)
+                dbProvider = (syntax as SqlServerSyntaxProvider).ServerVersion.IsAzure ? "SqlAzure" : "SqlServer";
+
+            return dbProvider;
         }
 
         /// <summary>

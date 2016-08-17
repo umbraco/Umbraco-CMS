@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -70,7 +71,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
 
-        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
         protected DbTypes DbTypeMap = new DbTypes();
         protected void InitColumnTypeMap()
@@ -121,7 +122,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public virtual string EscapeString(string val)
         {
-            return PetaPocoExtensions.EscapeAtSymbols(val.Replace("'", "''"));
+            return NPocoDatabaseExtensions.EscapeAtSymbols(val.Replace("'", "''"));
         }
 
         public virtual string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType)
@@ -169,6 +170,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
             return string.Format("upper({0}) LIKE '{1}'", column, value.ToUpper());
+        }
+
+        public virtual string GetConcat(params string[] args)
+        {
+            return "concat(" + string.Join(",", args) + ")";
         }
 
         public virtual string GetQuotedTableName(string tableName)
@@ -322,7 +328,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  GetQuotedColumnName(foreignKey.ForeignColumns.First()),
                                  GetQuotedTableName(foreignKey.PrimaryTable),
                                  GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
-                                 FormatCascade("DELETE", foreignKey.OnDelete), 
+                                 FormatCascade("DELETE", foreignKey.OnDelete),
                                  FormatCascade("UPDATE", foreignKey.OnUpdate));
         }
 
@@ -331,7 +337,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var sb = new StringBuilder();
             foreach (var column in columns)
             {
-                sb.Append(Format(column) +",\n");
+                sb.Append(Format(column) + ",\n");
             }
             return sb.ToString().TrimEnd(",\n");
         }
@@ -431,11 +437,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return GetSpecialDbType(column.DbType);
             }
 
-            Type type = column.Type.HasValue 
+            Type type = column.Type.HasValue
                 ? DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key
                 : column.PropertyType;
 
-            if (type == typeof (string))
+            if (type == typeof(string))
             {
                 var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
                 return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
@@ -536,5 +542,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
         public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+
+        public virtual string ConvertIntegerToOrderableString { get { return "REPLACE(STR({0}, 8), SPACE(1), '0')"; } }
+        public virtual string ConvertDateToOrderableString { get { return "CONVERT(nvarchar, {0}, 102)"; } }
+        public virtual string ConvertDecimalToOrderableString { get { return "REPLACE(STR({0}, 20, 9), SPACE(1), '0')"; } }
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using log4net;
+using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -45,29 +46,27 @@ namespace Umbraco.Core.Persistence.Migrations
             _targetVersion = targetVersion;
             _productName = productName;
             //ensure this is null if there aren't any
-            _migrations = migrations.Length == 0 ? null : migrations;
+            _migrations = migrations == null || migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>
         /// Executes the migrations against the database.
         /// </summary>
-        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
-        /// <param name="databaseProvider"></param>
-        /// <param name="sqlSyntaxProvider"></param>
+        /// <param name="migrationContext">The migration context to execute migrations with</param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, ISqlSyntaxProvider sqlSyntaxProvider, bool isUpgrade = true)
+        public bool Execute(IMigrationContext migrationContext, bool isUpgrade = true)
         {
             _logger.Info<MigrationRunner>("Initializing database migrations");
-
-            var foundMigrations = FindMigrations();
+            
+            var foundMigrations = FindMigrations(migrationContext);
 
             //filter all non-schema migrations
             var migrations = isUpgrade
                                  ? OrderedUpgradeMigrations(foundMigrations).ToList()
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
-            
+
             if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, _productName, true), this))
             {
                 _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
@@ -75,18 +74,18 @@ namespace Umbraco.Core.Persistence.Migrations
             }
 
             //Loop through migrations to generate sql
-            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, sqlSyntaxProvider, isUpgrade);
+            InitializeMigrations(migrations, isUpgrade);
 
             try
             {
-                ExecuteMigrations(migrationContext, database);
+                ExecuteMigrations(migrationContext);
             }
             catch (Exception ex)
             {
                 //if this fails then the transaction will be rolled back, BUT if we are using MySql this is not the case,
                 //since it does not support schema changes in a transaction, see: http://dev.mysql.com/doc/refman/5.0/en/implicit-commit.html
                 //so in that case we have to downgrade
-                if (databaseProvider == DatabaseProviders.MySql)
+                if (migrationContext.Database.DatabaseType is NPoco.DatabaseTypes.MySqlDatabaseType)
                 {
                     throw new DataLossException(
                             "An error occurred running a schema migration but the changes could not be rolled back. Error: " + ex.Message + ". In some cases, it may be required that the database be restored to it's original state before running this upgrade process again.",
@@ -157,66 +156,41 @@ namespace Umbraco.Core.Persistence.Migrations
         /// Find all migrations that are available through the <see cref="MigrationResolver"/>
         /// </summary>
         /// <returns>An array of <see cref="IMigration"/></returns>
-        protected virtual IMigration[] FindMigrations()
+        protected IMigration[] FindMigrations(IMigrationContext context)
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return _migrations ?? _resolver.Migrations.ToArray();
+            return _migrations ?? _resolver.GetMigrations(context).ToArray();
         }
 
-        internal MigrationContext InitializeMigrations(
-            List<IMigration> migrations, 
-            Database database, 
-            DatabaseProviders databaseProvider, 
-            ISqlSyntaxProvider sqlSyntax,
+        internal void InitializeMigrations(
+            List<IMigration> migrations,
             bool isUpgrade = true)
         {
-            //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider, database, _logger, sqlSyntax);
-
             foreach (var migration in migrations)
             {
-                var baseMigration = migration as MigrationBase;
-                if (baseMigration != null)
+                if (isUpgrade)
                 {
-                    if (isUpgrade)
-                    {
-                        baseMigration.GetUpExpressions(context);
-                        _logger.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", baseMigration.GetType().Name));
-                    }
-                    else
-                    {
-                        baseMigration.GetDownExpressions(context);
-                        _logger.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", baseMigration.GetType().Name));
-                    }
+                    migration.Up();
+                    _logger.Info<MigrationRunner>($"Added UPGRADE migration '{migration.GetType().Name}' to context");
                 }
                 else
                 {
-                    //this is just a normal migration so we can only call Up/Down
-                    if (isUpgrade)
-                    {
-                        migration.Up();
-                        _logger.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", migration.GetType().Name));
-                    }
-                    else
-                    {
-                        migration.Down();
-                        _logger.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", migration.GetType().Name));
-                    }
+                    migration.Down();
+                    _logger.Info<MigrationRunner>($"Added DOWNGRADE migration '{migration.GetType().Name}' to context");
                 }
             }
-
-            return context;
+            
         }
 
-        private void ExecuteMigrations(IMigrationContext context, Database database)
+        private void ExecuteMigrations(IMigrationContext context)
         {
             //Transactional execution of the sql that was generated from the found migrations
-            using (var transaction = database.GetTransaction())
+            using (var transaction = context.Database.GetTransaction())
             {
                 int i = 1;
                 foreach (var expression in context.Expressions)
                 {
-                    var sql = expression.Process(database);
+                    var sql = expression.Process(context.Database);
                     if (string.IsNullOrEmpty(sql))
                     {
                         i++;
@@ -241,8 +215,8 @@ namespace Umbraco.Core.Persistence.Migrations
                                 //Execute the SQL up to the point of a GO statement
                                 var exeSql = sb.ToString();
                                 _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
-                                database.Execute(exeSql);
-                                
+                                context.Database.Execute(exeSql);
+
                                 //restart the string builder
                                 sb.Remove(0, sb.Length);
                             }
@@ -256,10 +230,10 @@ namespace Umbraco.Core.Persistence.Migrations
                         {
                             var exeSql = sb.ToString();
                             _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
-                            database.Execute(exeSql);
+                            context.Database.Execute(exeSql);
                         }
                     }
-                    
+
                     i++;
                 }
 
@@ -273,9 +247,9 @@ namespace Umbraco.Core.Persistence.Migrations
                 var exists = _migrationEntryService.FindEntry(_productName, _targetVersion);
                 if (exists == null)
                 {
-                    _migrationEntryService.CreateEntry(_productName, _targetVersion);    
+                    _migrationEntryService.CreateEntry(_productName, _targetVersion);
                 }
-               
+
             }
         }
 

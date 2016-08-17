@@ -1,31 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using System.Web.Security;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using System.Web.Http;
-using System.Net;
-using Umbraco.Core.PropertyEditors;
-using System;
-using System.Net.Http;
-using ContentType = System.Net.Mime.ContentType;
 
 namespace Umbraco.Web.Editors
 {
     
     /// <summary>
-    /// An API controller used for dealing with content types
+    /// An API controller used for dealing with member types
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]    
-    public class MemberTypeController : ContentTypeControllerBase
+    public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         /// <summary>
         /// Constructor
@@ -131,7 +127,7 @@ namespace Umbraco.Web.Editors
 
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
                 saveContentType:            type => Services.MemberTypeService.Save(type));

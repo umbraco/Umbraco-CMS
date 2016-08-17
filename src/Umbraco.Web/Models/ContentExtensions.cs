@@ -48,6 +48,8 @@ namespace Umbraco.Web.Models
                 ? null // for tests only
                 : umbracoContext.ContentCache.GetRouteById(contentId); // cached
 
+            if (route != null && route.StartsWith("err/")) route = null;
+
             var domainHelper = new DomainHelper(domainService);
             IDomain domain;
 
@@ -63,7 +65,7 @@ namespace Umbraco.Web.Models
                 var hasDomain = domainHelper.NodeHasDomains(content.Id);
                 while (hasDomain == false && content != null)
                 {
-                    content = content.Parent();
+                    content = content.Parent(contentService);
                     hasDomain = content != null && domainHelper.NodeHasDomains(content.Id);
                 }
 

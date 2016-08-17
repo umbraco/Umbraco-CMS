@@ -34,13 +34,7 @@ namespace UmbracoExamine.LocalStorage
         /// If initialization fails, it will be disabled and then this will just wrap the 'real directory'
         /// </summary>
         internal bool Enabled { get; set; }
-
-        [Obsolete("this is deprecated")]
-        public override string[] List()
-        {
-            return _realDirectory.List();
-        }
-
+        
         public override string[] ListAll()
         {
             //always from the real dir
@@ -85,18 +79,7 @@ namespace UmbracoExamine.LocalStorage
                 _tempStorageDir.DeleteFile(name);
             }
         }
-    
-        [Obsolete("This is deprecated")]
-        public override void RenameFile(string @from, string to)
-        {
-            _realDirectory.RenameFile(@from, to);
-
-            //perform on both dirs
-            if (Enabled)
-            {
-                _tempStorageDir.RenameFile(@from, to);
-            }
-        }
+          
 
         /// <summary>Returns the length of a file in the directory. </summary>
         public override long FileLength(string name)
@@ -160,16 +143,7 @@ namespace UmbracoExamine.LocalStorage
             _realDirectory.Sync(name);
             _tempStorageDir.Sync(name);
             base.Sync(name);
-        }
-
-        public override void Close()
-        {
-            if (Enabled)
-            {
-                _tempStorageDir.Close();
-            }
-            _realDirectory.Close();
-        }
+        }        
 
         public override Lock MakeLock(string name)
         {
@@ -185,15 +159,19 @@ namespace UmbracoExamine.LocalStorage
         ///             "scopes" to the right index.
         /// 
         /// </summary>
-        public override string GetLockID()
+        public override string GetLockId()
         {
-            return string.Concat(_realDirectory.GetLockID(), _tempStorageDir.GetLockID());
+            return string.Concat(_realDirectory.GetLockId(), _tempStorageDir.GetLockId());
         }
-
-        public override LockFactory GetLockFactory()
+        
+        public override LockFactory LockFactory
         {
-            return _lockFactory;
-            //return _realDirectory.GetLockFactory();
+            get
+            {
+                return _lockFactory;
+                //return _realDirectory.GetLockFactory();    
+            }
+
         }
 
         public override void ClearLock(string name)
@@ -208,20 +186,21 @@ namespace UmbracoExamine.LocalStorage
             //}
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (Enabled)
+            {
+                _tempStorageDir.Dispose();
+            }
+            _realDirectory.Dispose();
+        }
+
         public override void SetLockFactory(LockFactory lf)
         {
             _lockFactory = lf;
             //_realDirectory.SetLockFactory(lf);
         }
-
-        public override void Dispose()
-        {
-            if (Enabled)
-            {
-                _tempStorageDir.Dispose();    
-            }
-            _realDirectory.Dispose();
-        }
+        
 
 
     }

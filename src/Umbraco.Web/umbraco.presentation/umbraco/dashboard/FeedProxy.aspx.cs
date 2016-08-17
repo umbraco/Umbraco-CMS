@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using Umbraco.Core.IO;
+using Umbraco.Core.Xml;
 
 namespace dashboardUtilities
 {

@@ -70,7 +70,7 @@ namespace umbraco.presentation.dialogs
                     includeSubpages.Enabled = false;
 
                 // Translators
-                int totalUsers;
+                long totalUsers;
                 foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
                     if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
@@ -95,22 +95,33 @@ namespace umbraco.presentation.dialogs
 
         protected void doTranslation_Click(object sender, EventArgs e)
         {
-            // testing translate
-            MakeNew(
-                _currentPage,
-                Security.CurrentUser,
-                Services.UserService.GetUserById(int.Parse(translator.SelectedValue)),
-                new Language(int.Parse(language.SelectedValue)),
-                comment.Text, includeSubpages.Checked,
-                true);
+            int languageId;
+            if (int.TryParse(language.SelectedValue, out languageId))
+            {
+                // testing translate
+                MakeNew(
+                    _currentPage,
+                    Security.CurrentUser,
+                    Services.UserService.GetUserById(int.Parse(translator.SelectedValue)),
+                    new Language(int.Parse(language.SelectedValue)),
+                    comment.Text, includeSubpages.Checked,
+                    true);
 
-            pane_form.Visible = false;
-            pl_buttons.Visible = false;
+                pane_form.Visible = false;
+                pl_buttons.Visible = false;
 
-            feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", new[] { _currentPage.Text}) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
-            feedback.type = Feedback.feedbacktype.success;
+                feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", _currentPage.Text) +
+                    "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" +
+                    Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
+                feedback.type = Feedback.feedbacktype.success;
+            }
+            else
+            {
+                feedback.Text = Services.TextService.Localize("translation/noLanguageSelected");
+                feedback.type = Feedback.feedbacktype.error;
+            }
         }
-
+        
         public void MakeNew(CMSNode Node, IUser User, IUser Translator, Language Language, string Comment,
             bool IncludeSubpages, bool SendEmail)
         {
@@ -152,21 +163,25 @@ namespace umbraco.presentation.dialogs
                     Translator.Email.Contains("@"))
                 {
                     // create the mail message 
-                    MailMessage mail = new MailMessage(User.Email, Translator.Email);
-
-                    // populate the message
-                    mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService), subjectVars);
-                    mail.IsBodyHtml = false;
-                    mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService), bodyVars);
-                    try
+                    using (MailMessage mail = new MailMessage(User.Email, Translator.Email))
                     {
-                        SmtpClient sender = new SmtpClient();
-                        sender.Send(mail);
+                        // populate the message
+                        mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService), subjectVars);
+                        mail.IsBodyHtml = false;
+                        mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService), bodyVars);
+                        try
+                        {
+                            using (SmtpClient sender = new SmtpClient())
+                            {
+                                sender.Send(mail);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<sendToTranslation>("Error sending translation e-mail", ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error<sendToTranslation>("Error sending translation e-mail", ex);
-                    }
+                        
                 }
                 else
                 {

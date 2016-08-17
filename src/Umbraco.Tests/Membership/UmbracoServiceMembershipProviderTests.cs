@@ -18,20 +18,20 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Sets_Default_Member_Type_From_Service_On_Init()
         {
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Blah");
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection());
-            
+
             Assert.AreEqual("Blah", provider.DefaultMemberTypeAlias);
         }
 
         [Test]
         public void Sets_Default_Member_Type_From_Config_On_Init()
         {
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Blah");
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "defaultMemberTypeAlias", "Hello" } });
 
             Assert.AreEqual("Hello", provider.DefaultMemberTypeAlias);
@@ -40,11 +40,12 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Create_User_Already_Exists()
         {
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(true);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
+            var membershipServiceMock = new Mock<IMembershipMemberService>();
+            membershipServiceMock.Setup(service => service.Exists("test")).Returns(true);
 
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection());
 
             MembershipCreateStatus status;
@@ -56,11 +57,12 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Create_User_Requires_Unique_Email()
         {
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => new Member("test", MockedContentTypes.CreateSimpleMemberType()));
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
+            var membershipServiceMock = new Mock<IMembershipMemberService>();
+            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => new Member("test", MockedContentTypes.CreateSimpleMemberType()));
 
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "requiresUniqueEmail", "true" } });
 
             MembershipCreateStatus status;
@@ -78,20 +80,21 @@ namespace Umbraco.Tests.Membership
             {
                 memberType.AddPropertyType(p.Value);
             }
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
-            mServiceMock.Setup(
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
+            var membershipServiceMock = new Mock<IMembershipMemberService>();
+            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
+            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+            membershipServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                         .Callback((string u, string e, string p, string m) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
                         .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(mServiceMock.Object);            
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection());
-            
+
 
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
@@ -109,11 +112,12 @@ namespace Umbraco.Tests.Membership
             {
                 memberType.AddPropertyType(p.Value);
             }
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
-            mServiceMock.Setup(
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
+            var membershipServiceMock = new Mock<IMembershipMemberService>();
+            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
+            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+            membershipServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                         .Callback((string u, string e, string p, string m) =>
                             {
@@ -121,9 +125,9 @@ namespace Umbraco.Tests.Membership
                             })
                         .Returns(() => createdMember);
 
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-            
+
 
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
@@ -142,11 +146,12 @@ namespace Umbraco.Tests.Membership
             {
                 memberType.AddPropertyType(p.Value);
             }
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
-            mServiceMock.Setup(
+            var memberTypeServiceMock = new Mock<IMemberTypeService>();
+            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
+            var membershipServiceMock = new Mock<IMembershipMemberService>();
+            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
+            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+            membershipServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                         .Callback((string u, string e, string p, string m) =>
                         {
@@ -154,20 +159,20 @@ namespace Umbraco.Tests.Membership
                         })
                         .Returns(() => createdMember);
 
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-            
+
 
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.AreNotEqual("test", createdMember.RawPasswordValue);
-            
+
             string salt;
             var storedPassword = provider.StoredPassword(createdMember.RawPasswordValue, out salt);
             var hashedPassword = provider.EncryptOrHashPassword("testtest$1", salt);
             Assert.AreEqual(hashedPassword, storedPassword);
         }
-        
+
     }
 }

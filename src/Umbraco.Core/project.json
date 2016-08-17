@@ -1,0 +1,28 @@
+﻿{
+  "dependencies": {
+    "AutoMapper": "4.2.*",
+    "HtmlAgilityPack": "1.4.9.5",
+    "ImageProcessor": "2.4.*",
+    "LightInject": "4.0.9",
+    "LightInject.Annotation": "1.0.0.4",
+    "log4net": "2.0.*",
+    "Microsoft.AspNet.Identity.Core": "2.2.*",
+    "Microsoft.AspNet.Identity.Owin": "2.2.*",
+    "Microsoft.Owin.Security.Cookies": "3.0.*",
+    "Microsoft.Owin.Security.OAuth": "3.0.*",
+    "MiniProfiler": "3.2.*",
+    "MySql.Data": "6.9.8",
+    "Newtonsoft.Json": "8.0.*",
+    "NPoco": "3.3.4",
+    "semver": "1.*",
+    "SharpZipLib": "0.86.0",
+    "SqlServerCE": "4.*"
+  },
+  "frameworks": {
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {},
+    "win-anycpu": {}
+  }
+}

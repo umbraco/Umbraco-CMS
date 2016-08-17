@@ -7,6 +7,7 @@ using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Core.Xml;
 
 
 namespace umbraco.cms.businesslogic.macro

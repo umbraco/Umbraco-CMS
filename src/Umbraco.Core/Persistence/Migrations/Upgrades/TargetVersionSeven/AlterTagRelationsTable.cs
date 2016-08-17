@@ -12,9 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
-        public AlterTagRelationsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AlterTagRelationsTable(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             Alter.Table("cmsTagRelationship").AddColumn("propertyTypeId").AsInt32().Nullable();
 
             //drop the foreign key on umbracoNode.  Must drop foreign key first before primary key can be removed in MySql.
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
                 //check for another strange really old one that might have existed
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //we need to drop the primary key, this is sql specific since MySQL has never had primary keys on this table
             // at least since 6.0 and the new installation way but perhaps it had them way back in 4.x so we need to check
             // it exists before trying to drop it.
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 //this will let us know if this pk exists on this table
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) > 0)

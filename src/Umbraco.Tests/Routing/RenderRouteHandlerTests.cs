@@ -13,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Routing
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             base.FreezeResolution();
         }

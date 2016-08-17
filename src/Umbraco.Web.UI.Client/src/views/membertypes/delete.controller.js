@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DocumentType.DeleteController
+ * @name Umbraco.Editors.MemberTypes.DeleteController
  * @function
  *
  * @description

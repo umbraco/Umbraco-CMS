@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -9,7 +8,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IDeleteMediaFilesRepository
+    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>
     {
         /// <summary>
         /// Get the count of published items
@@ -18,7 +17,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
         /// </remarks>
-        int CountPublished();
+        int CountPublished(string contentTypeAlias = null);
+
+        bool IsPathPublished(IContent content);
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Clears the published flag for a content.
         /// </summary>
         /// <param name="content"></param>
-        void ClearPublished(IContent content);
+        void ClearPublishedFlag(IContent content);
 
         /// <summary>
         /// Gets all published Content by the specified query
@@ -84,10 +85,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null);
 
         /// <summary>
         /// Returns the persisted content's preview XML structure

@@ -125,6 +125,12 @@
     <key alias="visit">방문</key>
     <key alias="welcome">환영합니다</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">이름</key>
     <key alias="assignDomain">호스트네임 관리</key>
@@ -846,7 +852,9 @@
     <key alias="stylesheets">스타일시트</key>
     <key alias="templates">템플릿</key>
     <key alias="xslt">XSLT 파일</key>
+    <key alias="userPermissions">사용자권한</key>
     <key alias="userTypes">사용자 유형</key>
+    <key alias="users">사용자</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">새 업데이트가 준비되었습니다.</key>

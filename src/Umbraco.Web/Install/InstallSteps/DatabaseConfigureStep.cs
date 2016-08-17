@@ -35,7 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var dbHelper = new DatabaseHelper();
 
-            if (dbHelper.CheckConnection(database, _applicationContext) == false)
+            if (dbHelper.CheckConnection(_applicationContext.DatabaseContext, database) == false)
             {
                 throw new InstallException("Could not connect to the database");
             }
@@ -61,8 +61,11 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else
             {
+                var password = string.Format("'{0}'", database.Password);
+                password = password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
+
                 dbContext.ConfigureDatabaseConnection(
-                    database.Server, database.DatabaseName, database.Login, database.Password,
+                    database.Server, database.DatabaseName, database.Login, password,
                     database.DatabaseType.ToString());
             }
         }

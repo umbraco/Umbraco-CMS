@@ -32,8 +32,10 @@ namespace umbraco.cms.businesslogic.packager
 
         public static CreatedPackage MakeNew(string name)
         {
-            var pack = new CreatedPackage();
-            pack.Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings));
+            var pack = new CreatedPackage
+            {
+                Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings))
+            };
 
 
             return pack;
@@ -250,8 +252,10 @@ namespace umbraco.cms.businesslogic.packager
             {
                 if (int.TryParse(dictionaryId, out outInt))
                 {
-                    var di = new Dictionary.DictionaryItem(outInt);
-                    dictionaryItems.AppendChild(di.ToXml(_packageManifest));
+                    var di = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(outInt);
+                    var entitySerializer = new EntityXmlSerializer();
+                    var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);                    
+                    dictionaryItems.AppendChild(xmlNode);
                 }
             }
             AppendElement(dictionaryItems);

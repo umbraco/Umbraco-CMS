@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -11,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
@@ -26,15 +28,15 @@ namespace Umbraco.Tests
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns(Mock.Of<IMigrationEntry>());
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
-            dbCtx.Setup(x => x.CanConnect).Returns(true);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
-                new ServiceContext(migrationEntryService:migrationEntryService.Object), 
+                new ServiceContext(migrationEntryService:migrationEntryService.Object),
                 CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
             Assert.IsTrue(appCtx.IsConfigured);
         }
@@ -48,15 +50,15 @@ namespace Umbraco.Tests
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns((IMigrationEntry)null);
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
-            dbCtx.Setup(x => x.CanConnect).Returns(true);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
                 new ServiceContext(migrationEntryService: migrationEntryService.Object),
                 CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
             Assert.IsFalse(appCtx.IsConfigured);
         }
@@ -68,15 +70,15 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
-            dbCtx.Setup(x => x.CanConnect).Returns(true);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
                 new ServiceContext(migrationEntryService: migrationEntryService.Object),
                 CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
 
             Assert.IsFalse(appCtx.IsConfigured);
         }
@@ -88,9 +90,9 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(false);
-            dbCtx.Setup(x => x.CanConnect).Returns(true);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock(false);
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,
@@ -108,9 +110,9 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
-            dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
-            dbCtx.Setup(x => x.CanConnect).Returns(false);
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock(true, false);
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new Mock<DatabaseContext>(databaseFactory, logger);
 
             var appCtx = new ApplicationContext(
                 dbCtx.Object,

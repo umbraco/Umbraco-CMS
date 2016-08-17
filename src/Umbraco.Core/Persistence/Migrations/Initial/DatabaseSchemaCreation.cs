@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -14,26 +15,25 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// </summary>
     internal class DatabaseSchemaCreation
     {
+        private readonly DatabaseSchemaHelper _schemaHelper;
+        private readonly UmbracoDatabase _database;
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="database"></param>
         /// <param name="logger"></param>
-        /// <param name="sqlSyntaxProvider"></param>
-        public DatabaseSchemaCreation(Database database, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
+        public DatabaseSchemaCreation(UmbracoDatabase database, ILogger logger)
         {
             _database = database;
             _logger = logger;
-            _sqlSyntaxProvider = sqlSyntaxProvider;
-             _schemaHelper = new DatabaseSchemaHelper(database, logger, sqlSyntaxProvider);
+            _schemaHelper = new DatabaseSchemaHelper(database, logger);
         }
 
-        #region Private Members
+        private ISqlSyntaxProvider SqlSyntax => _database.SqlSyntax;
 
-        private readonly DatabaseSchemaHelper _schemaHelper;
-        private readonly Database _database;
-        private readonly ILogger _logger;
-        private readonly ISqlSyntaxProvider _sqlSyntaxProvider;
+        #region All Ordered Tables
 
         private static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
                                                                           {
@@ -43,7 +43,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {3, typeof (ContentDto)},
                                                                               {4, typeof (ContentVersionDto)},
                                                                               {5, typeof (DocumentDto)},
-                                                                              
                                                                               {6, typeof (ContentTypeTemplateDto)},
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},
@@ -64,8 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {23, typeof (PropertyDataDto)},
                                                                               {24, typeof (RelationTypeDto)},
                                                                               {25, typeof (RelationDto)},
-                                                                              {26, typeof (StylesheetDto)},
-                                                                              {27, typeof (StylesheetPropertyDto)},
+                                                                              
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
                                                                               {31, typeof (UserTypeDto)},
@@ -80,16 +78,18 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {40, typeof (ServerRegistrationDto)},
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
-                                                                              {43, typeof(CacheInstructionDto)},
+                                                                              {43, typeof (CacheInstructionDto)},
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
                                                                               {46, typeof (UmbracoDeployChecksumDto)},
-                                                                              {47, typeof (UmbracoDeployDependencyDto)}
+                                                                              {47, typeof (UmbracoDeployDependencyDto)},
+                                                                              {48, typeof (RedirectUrlDto) },
+                                                                              {49, typeof (LockDto) }
                                                                           };
         #endregion
-        
+
         /// <summary>
-        /// Drops all Umbraco tables in the db
+        /// Drops all Umbraco tables in the db.
         /// </summary>
         internal void UninstallDatabaseSchema()
         {
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 var tableNameAttribute = item.Value.FirstAttribute<TableNameAttribute>();
 
-                string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
+                var tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
 
                 _logger.Info<DatabaseSchemaCreation>("Uninstall" + tableName);
 
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 {
                     if (_schemaHelper.TableExist(tableName))
                     {
-                        _schemaHelper.DropTable(tableName);    
+                        _schemaHelper.DropTable(tableName);
                     }
                 }
                 catch (Exception ex)
@@ -119,17 +119,15 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             }
         }
 
-       
-
         /// <summary>
-        /// Initialize the database by creating the umbraco db schema
+        /// Initializes the database by creating the umbraco db schema.
         /// </summary>
         public void InitializeDatabaseSchema()
         {
             var e = new DatabaseCreationEventArgs();
             FireBeforeCreation(e);
 
-            if (!e.Cancel)
+            if (e.Cancel == false)
             {
                 foreach (var item in OrderedTables.OrderBy(x => x.Key))
                 {
@@ -141,15 +139,15 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         }
 
         /// <summary>
-        /// Validates the schema of the current database
+        /// Validates the schema of the current database.
         /// </summary>
         public DatabaseSchemaResult ValidateSchema()
         {
-            var result = new DatabaseSchemaResult(_sqlSyntaxProvider);
+            var result = new DatabaseSchemaResult(SqlSyntax);
 
             //get the db index defs
-            result.DbIndexDefinitions = _sqlSyntaxProvider.GetDefinedIndexes(_database)
-                .Select(x => new DbIndexDefinition()
+            result.DbIndexDefinitions = SqlSyntax.GetDefinedIndexes(_database)
+                .Select(x => new DbIndexDefinition
                 {
                     TableName = x.Item1,
                     IndexName = x.Item2,
@@ -157,18 +155,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     IsUnique = x.Item4
                 }).ToArray();
 
-            foreach (var item in OrderedTables.OrderBy(x => x.Key))
-            {
-                var tableDefinition = DefinitionFactory.GetTableDefinition(item.Value, _sqlSyntaxProvider);
-                result.TableDefinitions.Add(tableDefinition);
-            }
+            result.TableDefinitions.AddRange(OrderedTables
+                .OrderBy(x => x.Key)
+                .Select(x => DefinitionFactory.GetTableDefinition(x.Value, SqlSyntax)));
 
             ValidateDbTables(result);
-
             ValidateDbColumns(result);
-
             ValidateDbIndexes(result);
-
             ValidateDbConstraints(result);
 
             return result;
@@ -179,11 +172,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
             //TODO: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
             // ALso note that to get the constraints for MySql we have to open a connection which we currently have not.
-            if (_sqlSyntaxProvider is MySqlSyntaxProvider)
+            if (SqlSyntax is MySqlSyntaxProvider)
                 return;
 
             //Check constraints in configured database against constraints in schema
-            var constraintsInDatabase = _sqlSyntaxProvider.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
             var indexesInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("IX_")).Select(x => x.Item3).ToList();
@@ -266,7 +259,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void ValidateDbColumns(DatabaseSchemaResult result)
         {
             //Check columns in configured database against columns in schema
-            var columnsInDatabase = _sqlSyntaxProvider.GetColumnsInSchema(_database);
+            var columnsInDatabase = SqlSyntax.GetColumnsInSchema(_database);
             var columnsPerTableInDatabase = columnsInDatabase.Select(x => string.Concat(x.TableName, ",", x.ColumnName)).ToList();
             var columnsPerTableInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => string.Concat(y.TableName, ",", y.Name))).ToList();
             //Add valid and invalid column differences to the result object
@@ -288,7 +281,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void ValidateDbTables(DatabaseSchemaResult result)
         {
             //Check tables in configured database against tables in schema
-            var tablesInDatabase = _sqlSyntaxProvider.GetTablesInSchema(_database).ToList();
+            var tablesInDatabase = SqlSyntax.GetTablesInSchema(_database).ToList();
             var tablesInSchema = result.TableDefinitions.Select(x => x.Name).ToList();
             //Add valid and invalid table differences to the result object
             var validTableDifferences = tablesInDatabase.Intersect(tablesInSchema, StringComparer.InvariantCultureIgnoreCase);

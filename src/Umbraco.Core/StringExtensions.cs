@@ -457,7 +457,7 @@ namespace Umbraco.Core
         /// <returns>The is null or white space.</returns>
         public static bool IsNullOrWhiteSpace(this string str)
         {
-            return (str == null) || (str.Trim().Length == 0);
+            return string.IsNullOrWhiteSpace(str);
         }
 
         public static string IfNullOrWhiteSpace(this string str, string defaultValue)
@@ -627,6 +627,11 @@ namespace Umbraco.Core
         /// <param name="str"></param>
         /// <returns></returns>
         public static string ToInvariantString(this int str)
+        {
+            return str.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static string ToInvariantString(this long str)
         {
             return str.ToString(CultureInfo.InvariantCulture);
         }
@@ -1284,6 +1289,30 @@ namespace Umbraco.Core
                 return writer.ToString().Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
             }
             */
+        }
+
+        public static string EscapeRegexSpecialCharacters(this string text)
+        {
+            var regexSpecialCharacters = new Dictionary<string, string>
+            {
+                {".", @"\."},
+                {"(", @"\("},
+                {")", @"\)"},
+                {"]", @"\]"},
+                {"[", @"\["},
+                {"{", @"\{"},
+                {"}", @"\}"},
+                {"?", @"\?"},
+                {"!", @"\!"},
+                {"$", @"\$"},
+                {"^", @"\^"},
+                {"+", @"\+"},
+                {"*", @"\*"},
+                {"|", @"\|"},
+                {"<", @"\<"},
+                {">", @"\>"}
+            };
+            return ReplaceMany(text, regexSpecialCharacters);
         }
 
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)

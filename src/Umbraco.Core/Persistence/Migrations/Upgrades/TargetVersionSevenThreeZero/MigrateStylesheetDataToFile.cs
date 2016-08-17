@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.SqlSyntax;
 using File = System.IO.File;
@@ -23,10 +22,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class MigrateStylesheetDataToFile : MigrationBase
     {
-        public MigrateStylesheetDataToFile(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public MigrateStylesheetDataToFile(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {

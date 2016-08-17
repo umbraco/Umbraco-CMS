@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Identity;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
@@ -14,10 +16,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class ExternalLoginRepository : PetaPocoRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
+    internal class ExternalLoginRepository : NPocoRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
     {
-        public ExternalLoginRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public ExternalLoginRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -122,17 +124,14 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
+            var sql = Sql();
             if (isCount)
-            {
-                sql.Select("COUNT(*)").From<ExternalLoginDto>(SqlSyntax);
-            }
+                sql.SelectCount();
             else
-            {
-                sql.Select("*").From<ExternalLoginDto>(SqlSyntax);
-            }
+                sql.SelectAll();
+            sql.From<ExternalLoginDto>();
             return sql;
         }
 

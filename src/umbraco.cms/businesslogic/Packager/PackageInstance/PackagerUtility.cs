@@ -18,6 +18,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using ICSharpCode.SharpZipLib.Zip;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager {
@@ -41,17 +42,19 @@ namespace umbraco.cms.businesslogic.packager {
             XmlNode package = doc.CreateElement("package");
             package.AppendChild(_node("name", pack.Name, doc));
             package.AppendChild(_node("version", pack.Version, doc));
-            
+            package.AppendChild(_node("iconUrl", pack.IconUrl, doc));
+
             XmlNode license = _node("license", pack.License, doc);
             license.Attributes.Append(_attribute("url", pack.LicenseUrl, doc));
             package.AppendChild(license);
             
             package.AppendChild(_node("url", pack.Url, doc));
-            
+
             XmlNode Requirements = doc.CreateElement("requirements");
-            Requirements.AppendChild(_node("major", "3", doc));
-            Requirements.AppendChild(_node("minor", "0", doc));
-            Requirements.AppendChild(_node("patch", "0", doc));
+            //NOTE: The defaults are 3.0.0 - I'm just leaving that here since that's the way it's been //SD
+            Requirements.AppendChild(_node("major", pack.UmbracoVersion == null ? "3" : pack.UmbracoVersion.Major.ToInvariantString(), doc));
+            Requirements.AppendChild(_node("minor", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Minor.ToInvariantString(), doc));
+            Requirements.AppendChild(_node("patch", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Build.ToInvariantString(), doc));
             package.AppendChild(Requirements);
             info.AppendChild(package);
 

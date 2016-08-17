@@ -15,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -30,10 +31,10 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing<CreatorResolver>())
+                    expression => expression.ResolveUsing(new CreatorResolver(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -70,16 +71,16 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
-                    applicationContext.Services.ContentTypeService));
+                    applicationContext.Services.ContentTypeService, applicationContext.Services.ContentService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Updater,
-                    expression => expression.ResolveUsing<CreatorResolver>())
+                    expression => expression.ResolveUsing(new CreatorResolver(applicationContext.Services.UserService)))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContent, ContentItemDto<IContent>>()
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                    expression => expression.ResolveUsing(new OwnerResolver<IContent>(applicationContext.Services.UserService)))
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -112,20 +113,21 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="dataTypeService"></param>
         /// <param name="localizedText"></param>
         /// <param name="contentTypeService"></param>
+        /// <param name="contentService"></param>
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, 
-            ILocalizedTextService localizedText, IContentTypeService contentTypeService)
+            ILocalizedTextService localizedText, IContentTypeService contentTypeService, IContentService contentService)
         {
             //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
             if (content.HasIdentity)
             {
-                var ancesctorListView = content.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
+                var ancesctorListView = content.Ancestors(contentService).FirstOrDefault(x => x.ContentType.IsContainer);
                 display.IsChildOfListView = ancesctorListView != null;
             }
             else
             {
                 //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
-                var parent = content.Parent();
+                var parent = content.Parent(contentService);
                 if (parent == null)
                 {
                     display.IsChildOfListView = false;
@@ -172,19 +174,31 @@ namespace Umbraco.Web.Models.Mapping
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 },
-                new ContentPropertyDisplay
+                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                },
+                    //Not editible for people without publish permission (U4-287)
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
+                    //TODO: Fix up hard coded datepicker
+                } ,
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    //Not editible for people without publish permission (U4-287)
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
+                    //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay
                 {
@@ -215,8 +229,8 @@ namespace Umbraco.Web.Models.Mapping
                     if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
-                        var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+                        var currentDocumentType = contentTypeService.Get(display.ContentTypeAlias);
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good

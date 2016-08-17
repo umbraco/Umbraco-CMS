@@ -1,6 +1,6 @@
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -12,13 +12,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeOn
     [Migration("7.3.1", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUserLanguagesToIsoCode : MigrationBase
     {
-        public UpdateUserLanguagesToIsoCode(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public UpdateUserLanguagesToIsoCode(IMigrationContext context) 
+            : base(context)
+        { }
 
         public override void Up()
         {
-            var userData = Context.Database.Fetch<UserDto>(new Sql().Select("*").From<UserDto>(SqlSyntax));
+            var userData = Context.Database.Fetch<UserDto>(Sql().SelectAll().From<UserDto>());
             foreach (var user in userData.Where(x => x.UserLanguage.Contains("_")))
             {
                 var languageParts = user.UserLanguage.Split('_');

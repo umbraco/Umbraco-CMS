@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Examine;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -13,9 +14,11 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.BootManagers
 {
@@ -68,8 +71,8 @@ namespace Umbraco.Tests.BootManagers
                 container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
                 container.Register<DatabaseContext>(factory => new DatabaseContext(
                     factory.GetInstance<IDatabaseFactory>(),
-                    factory.GetInstance<ILogger>(),
-                    factory.GetInstance<SqlSyntaxProviders>()), new PerContainerLifetime());
+                    factory.GetInstance<ILogger>()), new PerContainerLifetime());
+                container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
             }
         }
         

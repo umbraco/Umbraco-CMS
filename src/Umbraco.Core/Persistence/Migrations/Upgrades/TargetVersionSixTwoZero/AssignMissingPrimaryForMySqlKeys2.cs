@@ -11,14 +11,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.0.0", "6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys2 : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys2(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AssignMissingPrimaryForMySqlKeys2(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
         {
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 

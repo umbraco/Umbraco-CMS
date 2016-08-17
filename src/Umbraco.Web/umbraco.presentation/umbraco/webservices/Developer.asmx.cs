@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Web.WebServices;
 using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
+using Umbraco.Core.Xml;
 
 namespace umbraco.webservices
 {

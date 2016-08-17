@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("contentNodeId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_1")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyData_1", ForColumns = "contentNodeId,versionId,propertytypeid")]
         public int NodeId { get; set; }
 
         [Column("versionId")]
@@ -33,9 +34,23 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? Integer { get; set; }
 
+        private decimal? _decimalValue;
+
         [Column("dataDecimal")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public decimal? Decimal { get; set; }
+        public decimal? Decimal
+        {
+            get
+            {
+                return _decimalValue;
+            }
+            set
+            {
+                // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                // because the underlying database probably has messed with the scaling factor.
+                _decimalValue = value.HasValue ? (decimal?) value.Value.Normalize() : null;
+            }
+        }
 
         [Column("dataDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -52,6 +67,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Text { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ColumnName = "PropertyTypeId")]
         public PropertyTypeDto PropertyTypeDto { get; set; }
 
         [Ignore]
@@ -68,12 +84,12 @@ namespace Umbraco.Core.Models.Rdbms
                 {
                     return Decimal.Value;
                 }
-                
+
                 if (Date.HasValue)
                 {
                     return Date.Value;
                 }
-                
+
                 if (string.IsNullOrEmpty(VarChar) == false)
                 {
                     return VarChar;

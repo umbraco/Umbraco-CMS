@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Plugins;
 
 namespace umbraco.cms.presentation.Trees
 {

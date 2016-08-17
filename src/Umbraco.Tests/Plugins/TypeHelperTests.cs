@@ -10,11 +10,11 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Plugins;
 using Umbraco.Tests.DynamicsAndReflection;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Models;
 using Umbraco.Web.Scheduling;
-using UmbracoExamine.DataServices;
 
 namespace Umbraco.Tests.Plugins
 {
@@ -254,6 +254,14 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual("IDictionary`2", t.Name);
             Assert.IsNull(t.FullName); // see note above
             Assert.AreEqual("System.Collections.Generic.IDictionary`2[System.Int32,TValue]", t.ToString());
+        }
+
+        /// <summary>
+        /// USED ONLY FOR TESTS ABOVE
+        /// </summary>
+        public class PropertyAliasDto
+        {
+            public string Alias { get; set; }
         }
     }
 }

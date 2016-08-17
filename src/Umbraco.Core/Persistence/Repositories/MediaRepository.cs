@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -20,7 +18,6 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -34,19 +31,19 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, contentSection, mappingResolver)
+        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, contentSection, mappingResolver)
         {
-            if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
+            if (mediaTypeRepository == null) throw new ArgumentNullException(nameof(mediaTypeRepository));
+            if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger, mappingResolver);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
-        public bool EnsureUniqueNaming { get; private set; }
+        public bool EnsureUniqueNaming { get; }
 
         #region Overrides of RepositoryBase<int,IMedia>
 
@@ -54,14 +51,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, dto.VersionId, sql);
+            var content = CreateMediaFromDto(dto, dto.VersionId);
 
             return content;
         }
@@ -71,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
+                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
             }
 
             return ProcessQuery(sql);
@@ -82,25 +79,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                                .OrderBy<NodeDto>(x => x.SortOrder);
 
             return ProcessQuery(sql);
         }
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,IMedia>
+        #region Overrides of NPocoRepositoryBase<int,IMedia>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<ContentVersionDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<ContentVersionDto>(r =>
+                        r.Select<ContentDto>(rr =>
+                            rr.Select<NodeDto>()));
+
+            sql
+                .From<ContentVersionDto>()
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
@@ -130,10 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.Media); }
-        }
+        protected override Guid NodeObjectTypeId => new Guid(Constants.ObjectTypes.Media);
 
         #endregion
 
@@ -143,9 +145,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -155,7 +157,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType) });
+            var properties = GetPropertyCollection(new[] { new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType) });
 
             media.Properties = properties[dto.NodeId];
 
@@ -165,94 +167,11 @@ namespace Umbraco.Core.Persistence.Repositories
             return media;
         }
 
-        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
-        {
-
-            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-            using (var tr = Database.GetTransaction())
-            {
-                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
-                if (contentTypeIds == null)
-                {
-                    var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                    var subQuery = new Sql()
-                        .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>(SqlSyntax)
-                        .InnerJoin<NodeDto>(SqlSyntax)
-                        .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == mediaObjectType);
-
-                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                    Database.Execute(deleteSql);
-                }
-                else
-                {
-                    foreach (var id in contentTypeIds)
-                    {
-                        var id1 = id;
-                        var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>(SqlSyntax)
-                            .InnerJoin<NodeDto>(SqlSyntax)
-                            .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>(SqlSyntax)
-                            .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == mediaObjectType)
-                            .Where<ContentDto>(SqlSyntax, dto => dto.ContentTypeId == id1);
-
-                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        Database.Execute(deleteSql);
-                    }
-                }
-
-                //now insert the data, again if something fails here, the whole transaction is reversed
-                if (contentTypeIds == null)
-                {
-                    RebuildXmlStructuresProcessQuery(serializer, Query, tr, groupSize);
-                }
-                else
-                {
-                    foreach (var contentTypeId in contentTypeIds)
-                    {
-                        //copy local
-                        var id = contentTypeId;
-                        var query = Query.Where(x => x.ContentTypeId == id && x.Trashed == false);
-                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }
-                }
-
-                tr.Complete();
-            }
-        }
-
-        private void RebuildXmlStructuresProcessQuery(Func<IMedia, XElement> serializer, IQuery<IMedia> query, Transaction tr, int pageSize)
-        {
-            var pageIndex = 0;
-            var total = long.MinValue;
-            var processed = 0;
-            do
-            {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
-
-                var xmlItems = (from descendant in descendants
-                                let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
-
-                //bulk insert it into the database
-                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
-
-                processed += xmlItems.Length;
-
-                pageIndex++;
-            } while (processed < total);
-        }
-
         public IMedia GetMediaByPath(string mediaPath)
         {
             var umbracoFileValue = mediaPath;
-            const string Pattern = ".*[_][0-9]+[x][0-9]+[.].*";
-            var isResized = Regex.IsMatch(mediaPath, Pattern);
+            const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
+            var isResized = Regex.IsMatch(mediaPath, pattern);
 
             // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
             if (isResized)
@@ -262,36 +181,29 @@ namespace Umbraco.Core.Persistence.Repositories
                 umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
             }
 
-            Func<string, Sql> createSql = url => new Sql().Select("*")
-                                                  .From<PropertyDataDto>(SqlSyntax)
-                                                  .InnerJoin<PropertyTypeDto>(SqlSyntax)
-                                                  .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
-                                                  .Where<PropertyTypeDto>(SqlSyntax, x => x.Alias == "umbracoFile")
-                                                  .Where<PropertyDataDto>(SqlSyntax, x => x.VarChar == url);
-
-            var sql = createSql(umbracoFileValue);
-
-            var propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
-
-            // If the stripped-down url returns null, we try again with the original url. 
+            // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
-            if (propertyDataDto == null)
-            {
-                sql = createSql(mediaPath);
-                propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
-            }
+            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar== umbracoFileValue));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar == mediaPath));
 
-            return propertyDataDto == null ? null : Get(propertyDataDto.NodeId);
+            // If no result so far, try getting from a json value stored in the ntext / nvarchar column
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNtext LIKE @0", "%" + umbracoFileValue + "%"));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNvarchar LIKE @0", "%" + umbracoFileValue + "%"));
+
+            return nodeId < 0 ? null : Get(nodeId);
         }
 
-        public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
+        private int GetMediaNodeIdByPath(Sql query)
         {
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
-        }
+            var sql = Sql().SelectAll()
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                .Append(query);
 
-        public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
-        {
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(content, xml));
+            var dto = Database.Fetch<PropertyDataDto>(sql).FirstOrDefault();
+            return dto?.NodeId ?? -1;
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
@@ -320,10 +232,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
             //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
             var level = parent.Level + 1;
             var maxSortOrder = Database.ExecuteScalar<int>(
-                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentId = @ParentId AND nodeObjectType = @NodeObjectType",
                 new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
             var sortOrder = maxSortOrder + 1;
 
@@ -372,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             entity.ResetDirtyProperties();
         }
@@ -391,19 +303,19 @@ namespace Umbraco.Core.Persistence.Repositories
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
                 var maxSortOrder =
                     Database.ExecuteScalar<int>(
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                        new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;
             }
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
-            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { /*Id =*/ entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
             var dto = factory.BuildDto(entity);
 
@@ -420,7 +332,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //In order to update the ContentVersion we need to retrieve its primary key id
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
             dto.Id = contentVerDto.Id;
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
@@ -454,7 +366,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            UpdatePropertyTags(entity, _tagRepository);
+            UpdateEntityTags(entity, _tagRepository);
 
             entity.ResetDirtyProperties();
         }
@@ -463,10 +375,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region IRecycleBinRepository members
 
-        protected override int RecycleBinId
-        {
-            get { return Constants.System.RecycleBinMedia; }
-        }
+        protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
         #endregion
 
@@ -479,33 +388,35 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null)
         {
-            var args = new List<object>();
-            var sbWhere = new StringBuilder();
-            Func<Tuple<string, object[]>> filterCallback = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            Sql<SqlContext> filterSql = null;
+            if (filter != null)
             {
-                sbWhere.Append("AND (umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
-                args.Add("%" + filter + "%");
-                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql = Sql().Append($"AND ({filterClaus.Item1})", filterClaus.Item2);
+                }
             }
 
-            return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsContentVersion", "contentId"),
-                ProcessQuery, orderBy, orderDirection,
-                filterCallback);
-
+            return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
+                MapQueryDtos, orderBy, orderDirection, orderBySystemField,
+                filterSql);
         }
 
         private IEnumerable<IMedia> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            
+            var dtos = Database.Fetch<ContentVersionDto>(sql);
+            return MapQueryDtos(dtos);
+        }
+
+        private IEnumerable<IMedia> MapQueryDtos(List<ContentVersionDto> dtos)
+        {
             var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types
@@ -527,7 +438,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 d.contentType))
                 .ToArray();
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(docDefs);
 
             return dtosWithContentTypes.Select(d => CreateMediaFromDto(
                 d.dto,
@@ -538,7 +449,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="contentType"></param>
         /// <param name="propCollection"></param>
         /// <returns></returns>
@@ -560,11 +471,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
-        /// <param name="docSql"></param>
         /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId, Sql docSql)
+        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId)
         {
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
 
@@ -573,7 +483,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, new[] { docDef });
+            var properties = GetPropertyCollection(new[] { docDef });
 
             media.Properties = properties[dto.NodeId];
 
@@ -588,10 +498,10 @@ namespace Umbraco.Core.Persistence.Repositories
             if (EnsureUniqueNaming == false)
                 return nodeName;
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
@@ -606,7 +516,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
                     {
-                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        currentName = $"{nodeName} ({uniqueNumber})";
                         uniqueNumber++;
                     }
                 }
@@ -615,18 +525,102 @@ namespace Umbraco.Core.Persistence.Repositories
             return currentName;
         }
 
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
+        #region Xml - Should Move!
+
+        public void RebuildXmlStructures(Func<IMedia, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
-            _mediaTypeRepository.Dispose();
-            _tagRepository.Dispose();
-            _contentXmlRepository.Dispose();
-            _contentPreviewRepository.Dispose();
+
+            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+            using (var tr = Database.GetTransaction())
+            {
+                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
+                if (contentTypeIds == null)
+                {
+                    var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+                    var subQuery = Sql()
+                        .Select("DISTINCT cmsContentXml.nodeId")
+                        .From<ContentXmlDto>()
+                        .InnerJoin<NodeDto>()
+                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                        .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
+                }
+                else
+                {
+                    foreach (var id in contentTypeIds)
+                    {
+                        var id1 = id;
+                        var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+                        var subQuery = Sql()
+                            .Select("DISTINCT cmsContentXml.nodeId")
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .InnerJoin<ContentDto>()
+                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType)
+                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+
+                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        Database.Execute(deleteSql);
+                    }
+                }
+
+                //now insert the data, again if something fails here, the whole transaction is reversed
+                if (contentTypeIds == null)
+                {
+                    RebuildXmlStructuresProcessQuery(serializer, Query, tr, groupSize);
+                }
+                else
+                {
+                    foreach (var contentTypeId in contentTypeIds)
+                    {
+                        //copy local
+                        var id = contentTypeId;
+                        var query = Query.Where(x => x.ContentTypeId == id && x.Trashed == false);
+                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                    }
+                }
+
+                tr.Complete();
+            }
         }
+
+        private void RebuildXmlStructuresProcessQuery(Func<IMedia, XElement> serializer, IQuery<IMedia> query, ITransaction tr, int pageSize)
+        {
+            var pageIndex = 0;
+            long total;
+            var processed = 0;
+            do
+            {
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
+
+                var xmlItems = (from descendant in descendants
+                                let xml = serializer(descendant)
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
+
+                //bulk insert it into the database
+                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
+
+                processed += xmlItems.Length;
+
+                pageIndex++;
+            } while (processed < total);
+        }
+
+
+        public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
+        }
+
+        public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(content, xml));
+        }
+
+        #endregion
     }
 }

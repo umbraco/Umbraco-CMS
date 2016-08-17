@@ -52,7 +52,7 @@ namespace umbraco.cms.presentation.user
 			if (!IsPostBack)
 			{	
 				ClientTools cTools = new ClientTools(this);
-				cTools.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<Trees.UserPermissions>().Tree.Alias)
+				cTools.SetActiveTreeType(Constants.Trees.UserPermissions)
 					.SyncTree(Request.QueryString["id"], false);
 			}
         }

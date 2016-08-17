@@ -127,6 +127,12 @@
     <key alias="visit">Visita</key>
     <key alias="welcome">Benvenuto</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nome</key>
     <key alias="assignDomain">Gestione alias Hostnames</key>
@@ -842,7 +848,9 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="stylesheets">Fogli di stile</key>
     <key alias="templates">Templates</key>
     <key alias="xslt">Files XSLT</key>
+    <key alias="userPermissions">Permessi Utente</key>
     <key alias="userTypes">Tipi di Utente</key>
+    <key alias="users">Utenti</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable"><![CDATA[Nuovo aggiornamento pronto]]></key>

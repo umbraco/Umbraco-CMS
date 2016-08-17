@@ -7,10 +7,9 @@ namespace Umbraco.Tests.Migrations.Stubs
     [MigrationAttribute("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
-
-        public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AlterUserTableMigrationStub(IMigrationContext context) 
+            : base(context)
+        { }
 
         public override void Up()
         {
@@ -21,7 +20,6 @@ namespace Umbraco.Tests.Migrations.Stubs
         }
 
         public override void Down()
-        {
-        }
+        { }
     }
 }

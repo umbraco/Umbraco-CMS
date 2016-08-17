@@ -7,9 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class UpdateCmsContentVersionTable : MigrationBase
     {
-        public UpdateCmsContentVersionTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public UpdateCmsContentVersionTable(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()

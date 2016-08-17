@@ -16,15 +16,8 @@ namespace Umbraco.Web.Strategies.Migrations
     ///
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHander
+    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHandler
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-
-        public ClearMediaXmlCacheForDeletedItemsAfterUpgrade(ISqlSyntaxProvider sqlSyntax)
-        {
-            _sqlSyntax = sqlSyntax;
-        }
-
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
@@ -36,10 +29,12 @@ namespace Umbraco.Web.Strategies.Migrations
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876
 
+                var syntax = e.MigrationContext.Database.SqlSyntax;
+
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
     (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
     INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + _sqlSyntax.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
+    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + syntax.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
                 var count = e.MigrationContext.Database.Execute(sql);
 

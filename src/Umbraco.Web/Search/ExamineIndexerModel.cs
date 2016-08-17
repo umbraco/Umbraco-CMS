@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Examine;
 
@@ -8,8 +9,8 @@ namespace Umbraco.Web.Search
     [DataContract(Name = "indexer", Namespace = "")]
     public class ExamineIndexerModel : ExamineSearcherModel
     {
-        [DataMember(Name = "indexCriteria")]
-        public IIndexCriteria IndexCriteria { get; set; }
+        [DataMember(Name = "fieldDefinitions")]
+        public IEnumerable<FieldDefinition> FieldDefinitions { get; set; }
         
         /// <summary>
         /// The number of docs in the index

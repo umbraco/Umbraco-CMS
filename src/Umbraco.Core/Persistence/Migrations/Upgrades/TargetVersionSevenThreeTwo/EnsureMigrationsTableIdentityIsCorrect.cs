@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -13,9 +13,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
     [Migration("7.3.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class EnsureMigrationsTableIdentityIsCorrect : MigrationBase
     {
-        public EnsureMigrationsTableIdentityIsCorrect(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public EnsureMigrationsTableIdentityIsCorrect(IMigrationContext context) 
+            : base(context)
+        { }
 
         public override void Up()
         {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
             List<MigrationDto> migrations = null;
             Execute.Code(db =>
             {
-                migrations = Context.Database.Fetch<MigrationDto>(new Sql().Select("*").From<MigrationDto>(SqlSyntax));
+                migrations = Context.Database.Fetch<MigrationDto>(Sql().SelectAll().From<MigrationDto>());
                 return string.Empty;
             });
             Delete.FromTable("umbracoMigration").AllRows();

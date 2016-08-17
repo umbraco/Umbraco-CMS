@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
@@ -8,18 +9,123 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
-    [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
+    [SqlSyntaxProvider(Constants.DbProviderNames.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        public SqlServerSyntaxProvider()
+        // IDatabaseFactory to be lazily injected
+        public SqlServerSyntaxProvider(Lazy<IDatabaseFactory> lazyFactory)
         {
-            
+            _serverVersion = new Lazy<ServerVersionInfo>(() =>
+            {
+                var factory = lazyFactory.Value;
+                if (factory == null)
+                    throw new InvalidOperationException("Failed to determine Sql Server version (no database factory).");
+                return DetermineVersion(factory);
+            });
         }
 
-        /// <summary>
-        /// Gets/sets the version of the current SQL server instance
-        /// </summary>
-        internal Lazy<SqlServerVersionName> VersionName { get; set; }
+        private readonly Lazy<ServerVersionInfo> _serverVersion;
+
+        internal ServerVersionInfo ServerVersion => _serverVersion.Value;
+
+        internal enum VersionName
+        {
+            Invalid = -1,
+            Unknown = 0,
+            V7 = 1,
+            V2000 = 2,
+            V2005 = 3,
+            V2008 = 4,
+            V2012 = 5,
+            V2014 = 6,
+            Other = 99
+        }
+
+        internal enum EngineEdition
+        {
+            Unknown = 0,
+            Desktop = 1,
+            Standard = 2,
+            Enterprise = 3,
+            Express = 4,
+            Azure = 5
+        }
+
+        internal class ServerVersionInfo
+        {
+            public string Edition { get; set; }
+            public string InstanceName { get; set; }
+            public string ProductVersion { get; set; }
+            public VersionName ProductVersionName { get; private set; }
+            public EngineEdition EngineEdition { get; set; }
+            public bool IsAzure => EngineEdition == EngineEdition.Azure;
+            public string MachineName { get; set; }
+            public string ProductLevel { get; set; }
+
+            public void Initialize()
+            {
+                var firstPart = string.IsNullOrWhiteSpace(ProductVersion) ? "??" : ProductVersion.Split('.')[0];
+                switch (firstPart)
+                {
+                    case "??":
+                        ProductVersionName = VersionName.Invalid;
+                        break;
+                    case "12":
+                        ProductVersionName = VersionName.V2014;
+                        break;
+                    case "11":
+                        ProductVersionName = VersionName.V2012;
+                        break;
+                    case "10":
+                        ProductVersionName = VersionName.V2008;
+                        break;
+                    case "9":
+                        ProductVersionName = VersionName.V2005;
+                        break;
+                    case "8":
+                        ProductVersionName = VersionName.V2000;
+                        break;
+                    case "7":
+                        ProductVersionName = VersionName.V7;
+                        break;
+                    default:
+                        ProductVersionName = VersionName.Other;
+                        break;
+                }
+            }
+        }
+
+        private static ServerVersionInfo DetermineVersion(IDatabaseFactory factory)
+        {
+            // Edition: "Express Edition", "Windows Azure SQL Database..."
+            // EngineEdition: 1/Desktop 2/Standard 3/Enterprise 4/Express 5/Azure
+            // ProductLevel: RTM, SPx, CTP...
+
+            const string sql = @"select 
+	SERVERPROPERTY('Edition') Edition,
+	SERVERPROPERTY('EditionID') EditionId,
+	SERVERPROPERTY('InstanceName') InstanceName,
+	SERVERPROPERTY('ProductVersion') ProductVersion,
+	SERVERPROPERTY('BuildClrVersion') BuildClrVersion,
+	SERVERPROPERTY('EngineEdition') EngineEdition,
+	SERVERPROPERTY('IsClustered') IsClustered,
+	SERVERPROPERTY('MachineName') MachineName,
+	SERVERPROPERTY('ResourceLastUpdateDateTime') ResourceLastUpdateDateTime,
+	SERVERPROPERTY('ProductLevel') ProductLevel;";
+
+            try
+            {
+                var database = factory.GetDatabase();
+                var version = database.Fetch<ServerVersionInfo>(sql).First();
+                version.Initialize();
+                return version;
+            }
+            catch (Exception e)
+            {
+                // can't ignore, really
+                throw new Exception("Failed to determine Sql Server version (see inner exception).", e);
+            }
+        }
 
         /// <summary>
         /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
@@ -126,16 +232,11 @@ order by T.name, I.name");
             return null;
         }
 
-        public override string DeleteDefaultConstraint
-        {
-            get { return "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]"; }
-        }
+        public override string DeleteDefaultConstraint => "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]";
 
-        
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
-        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
+        public override string DropIndex => "DROP INDEX {0} ON {1}";
 
-        
+        public override string RenameColumn => "sp_rename '{0}.{1}', '{2}', 'COLUMN'";
     }
 }

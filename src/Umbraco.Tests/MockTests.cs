@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Moq;
+using Umbraco.Core.Cache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -39,25 +40,30 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Service_Context()
         {
-            var svcCtx = MockHelper.GetMockedServiceContext();
+            var svcCtx = TestObjects.GetServiceContextMock();
             Assert.Pass();
         }
 
         [Test]
         public void Can_Create_Db_Context()
         {
-            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var logger = Mock.Of<ILogger>();
+            var dbCtx = new DatabaseContext(databaseFactory, logger);
             Assert.Pass();
         }
 
         [Test]
         public void Can_Create_App_Context_With_Services()
         {
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
+            var logger = Mock.Of<ILogger>();
+
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
-                MockHelper.GetMockedServiceContext(),
+                new DatabaseContext(databaseFactory, logger),
+                TestObjects.GetServiceContextMock(),
                 CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
             
             Assert.Pass();
         }

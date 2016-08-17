@@ -104,9 +104,6 @@
     <Compile Include="ISqlHelper.cs" />
     <Compile Include="IParameterContainer.cs" />
     <Compile Include="SqlHelperException.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlInstaller.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlParser.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlUtility.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerTableUtility.cs" />
     <Compile Include="SqlParser.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerInstaller.cs" />
@@ -127,9 +124,6 @@
     <Compile Include="Utility\Table\ITableUtility.cs" />
     <Compile Include="Utility\Installer\IInstallerUtility.cs" />
     <Compile Include="Utility\IUtilitySet.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlDataReader.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlHelper.cs" />
-    <Compile Include="SqlHelpers\MySql\MySqlParameter.cs" />
     <Compile Include="SqlParameterAdapter.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -169,7 +163,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

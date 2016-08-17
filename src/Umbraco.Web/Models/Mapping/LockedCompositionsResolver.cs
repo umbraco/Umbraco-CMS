@@ -21,12 +21,12 @@ namespace Umbraco.Web.Models.Mapping
             // get ancestor ids from path of parent if not root
             if (source.ParentId != Constants.System.Root)
             {
-                var parent = _applicationContext.Services.ContentTypeService.GetContentType(source.ParentId);
+                var parent = _applicationContext.Services.ContentTypeService.Get(source.ParentId);
                 if (parent != null)
                 {
                     var ancestorIds = parent.Path.Split(',').Select(int.Parse);
                     // loop through all content types and return ordered aliases of ancestors
-                    var allContentTypes = _applicationContext.Services.ContentTypeService.GetAllContentTypes().ToArray();
+                    var allContentTypes = _applicationContext.Services.ContentTypeService.GetAll().ToArray();
                     foreach (var ancestorId in ancestorIds)
                     {
                         var ancestor = allContentTypes.FirstOrDefault(x => x.Id == ancestorId);

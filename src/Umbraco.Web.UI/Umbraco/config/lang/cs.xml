@@ -179,6 +179,12 @@
     <key alias="visit">Navštívit</key>
     <key alias="welcome">Vítejte</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Název</key>
     <key alias="assignDomain">Spravovat názvy hostitelů</key>
@@ -963,7 +969,9 @@
     <key alias="stylesheets">Stylopisy</key>
     <key alias="templates">Šablony</key>
     <key alias="xslt">XSLT soubory</key>
+    <key alias="userPermissions">Oprávnění Uživatele</key>
     <key alias="userTypes">Typy Uživatelů</key>
+    <key alias="users">Uživatelé</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nová aktualizace je připrvena</key>

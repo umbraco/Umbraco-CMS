@@ -4,45 +4,44 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {
-    internal abstract class RepositoryCachePolicyBase<TEntity, TId> : DisposableObject, IRepositoryCachePolicy<TEntity, TId>
+    /// <summary>
+    /// A base class for repository cache policies.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <typeparam name="TId">The type of the identifier.</typeparam>
+    internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        private Action _action;
-
         protected RepositoryCachePolicyBase(IRuntimeCacheProvider cache)
         {
-            if (cache == null) throw new ArgumentNullException("cache");
-            
+            if (cache == null) throw new ArgumentNullException(nameof(cache));
             Cache = cache;
-        }
+        } 
 
-        protected IRuntimeCacheProvider Cache { get; private set; }
+        protected IRuntimeCacheProvider Cache { get; }
 
-        /// <summary>
-        /// The disposal performs the caching
-        /// </summary>
-        protected override void DisposeResources()
-        {
-            if (_action != null)
-            {
-                _action();
-            }
-        }
+        /// <inheritdoc />
+        public abstract TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
 
-        /// <summary>
-        /// Sets the action to execute on disposal
-        /// </summary>
-        /// <param name="action"></param>
-        protected void SetCacheAction(Action action)
-        {
-            _action = action;
-        }
+        /// <inheritdoc />
+        public abstract TEntity GetCached(TId id);
 
-        public abstract TEntity Get(TId id, Func<TId, TEntity> getFromRepo);
-        public abstract TEntity Get(TId id);
-        public abstract bool Exists(TId id, Func<TId, bool> getFromRepo);
-        public abstract void CreateOrUpdate(TEntity entity, Action<TEntity> persistMethod);
-        public abstract void Remove(TEntity entity, Action<TEntity> persistMethod);
-        public abstract TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> getFromRepo);
+        /// <inheritdoc />
+        public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll);
+
+        /// <inheritdoc />
+        public abstract void Create(TEntity entity, Action<TEntity> persistNew);
+
+        /// <inheritdoc />
+        public abstract void Update(TEntity entity, Action<TEntity> persistUpdated);
+
+        /// <inheritdoc />
+        public abstract void Delete(TEntity entity, Action<TEntity> persistDeleted);
+
+        /// <inheritdoc />
+        public abstract TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll);
+
+        /// <inheritdoc />
+        public abstract void ClearAll();
     }
 }

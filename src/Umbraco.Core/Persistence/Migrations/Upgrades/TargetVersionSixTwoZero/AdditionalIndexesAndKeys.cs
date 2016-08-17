@@ -12,9 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
-        public AdditionalIndexesAndKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AdditionalIndexesAndKeys(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
@@ -48,43 +48,34 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
             }
 
-            //We need to do this for SQL Azure V2 since it does not let you drop any clustered indexes
-            // Issue: http://issues.umbraco.org/issue/U4-5673            
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer || Context.CurrentDatabaseProvider == DatabaseProviders.SqlAzure)
+            // drop the umbracoUserLogins_Index index since it is named incorrectly
+            // and then re-create it so it follows the standard naming convention
+            var sqlServerSyntax = SqlSyntax as SqlServerSyntaxProvider;
+            if (sqlServerSyntax != null // if running sql server
+                && sqlServerSyntax.ServerVersion.IsAzure // on Azure
+                && sqlServerSyntax.ServerVersion.ProductVersion.StartsWith("11.")) // version 11.x
             {
-                var version = Context.Database.ExecuteScalar<string>("SELECT @@@@VERSION");
-                if (version.Contains("Microsoft SQL Azure"))
+                // SQL Azure v2 does not support dropping clustered indexes on a table
+                // see http://issues.umbraco.org/issue/U4-5673            
+                // and so we have to use a special method to do some manual work
+                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
                 {
-                    var parts = version.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
-                    if (parts.Length > 1)
-                    {
-                        if (parts[1].StartsWith("11."))
-                        {
-
-                            //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
-                            // it follows the standard naming convention
-                            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
-                            {
-                                //It's the old version that doesn't support dropping a clustered index on a table, so we need to do some manual work.
-                                ExecuteSqlAzureSqlForChangingIndex();
-                            }
-
-                            return;
-                        }
-                    }   
-                }                
+                    //It's the old version that doesn't support dropping a clustered index on a table, so we need to do some manual work.
+                    ExecuteSqlAzureSqlForChangingIndex();
+                }
             }
-           
+            else
+            {
+                // any other db can delete and recreate
 
-            //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
-            // it follows the standard naming convention
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
-            {
-                Delete.Index("umbracoUserLogins_Index").OnTable("umbracoUserLogins");
-            }
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoUserLogins_Index")) == false)
-            {
-                Create.Index("IX_umbracoUserLogins_Index").OnTable("umbracoUserLogins").OnColumn("contextID").Ascending().WithOptions().Clustered();
+                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
+                {
+                    Delete.Index("umbracoUserLogins_Index").OnTable("umbracoUserLogins");
+                }
+                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoUserLogins_Index")) == false)
+                {
+                    Create.Index("IX_umbracoUserLogins_Index").OnTable("umbracoUserLogins").OnColumn("contextID").Ascending().WithOptions().Clustered();
+                }
             }
         }
 

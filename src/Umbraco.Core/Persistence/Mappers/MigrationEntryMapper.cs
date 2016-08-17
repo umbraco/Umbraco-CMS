@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -11,16 +10,7 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        public MigrationEntryMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
         protected override void BuildMap()
         {
@@ -30,9 +20,5 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<MigrationEntry, MigrationDto>(src => src.Version, dto => dto.Version);
             CacheMap<MigrationEntry, MigrationDto>(src => src.MigrationName, dto => dto.Name);
         }
-
-        #endregion
-
-        
     }
 }

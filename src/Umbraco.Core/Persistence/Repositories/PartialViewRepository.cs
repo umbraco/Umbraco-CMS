@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -11,12 +12,10 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {      
+        public PartialViewRepository(IUnitOfWork work, [Inject("PartialViewFileSystem")] IFileSystem fileSystem) : base(work, fileSystem)
+        { }
 
-        public PartialViewRepository(IUnitOfWork work, IFileSystem fileSystem) : base(work, fileSystem)
-        {
-        }
-
-        protected virtual PartialViewType ViewType { get { return PartialViewType.PartialView; } }
+        protected virtual PartialViewType ViewType => PartialViewType.PartialView;
 
         public override IPartialView Get(string id)
         {

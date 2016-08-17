@@ -506,12 +506,7 @@ order by level,sortOrder";
         /// </summary>
         public virtual void delete()
         {
-            // remove relations
-            var rels = Relations;
-            foreach (relation.Relation rel in rels)
-            {
-                rel.Delete();
-            }
+           
 
             //removes tasks
             foreach (Task t in Tasks)
@@ -737,16 +732,6 @@ order by level,sortOrder";
         public Guid nodeObjectType
         {
             get { return _nodeObjectType; }
-        }
-
-        /// <summary>
-        /// Besides the hierarchy it's possible to relate one CMSNode to another, use this for alternative
-        /// non-strict hierarchy
-        /// </summary>
-        /// <value>The relations.</value>
-        public relation.Relation[] Relations
-        {
-            get { return relation.Relation.GetRelations(this.Id); }
         }
 
         /// <summary>

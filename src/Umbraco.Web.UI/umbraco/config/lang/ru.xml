@@ -189,10 +189,10 @@
     <key alias="inheritedFrom">Унаследован от</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="requiredLabel">Обязательная метка</key>
-    
+
     <key alias="enableListViewHeading">Представление в формате списка</key>
     <key alias="enableListViewDescription">Устанавливает представление документа данного типа в виде сортируемого списка дочерних документов с функцией поиска, в отличие от обычного представления дочерних документов в виде дерева</key>
-    
+
     <key alias="allowedTemplatesHeading">Допустимые шаблоны</key>
     <key alias="allowedTemplatesDescription">Выберите перечень допустимых шаблонов для сопоставления документам данного типа</key>
     <key alias="allowAsRootHeading">Разрешить в качестве корневого</key>
@@ -206,31 +206,31 @@
     <key alias="compositionsDescription">Унаследовать вкладки и свойства из уже существующего типа документов. Вкладки будут либо добавлены в создаваемый тип, либо в случае совпадения названий вкладок будут добавлены наследуемые свойства.</key>
     <key alias="compositionInUse">Этот тип документов уже участвует в композиции другого типа, поэтому сам не может быть композицией.</key>
     <key alias="noAvailableCompositions">В настоящее время нет типов документов, допустимых для построения композиции.</key>
-    
+
     <key alias="availableEditors">Доступные редакторы</key>
     <key alias="reuse">Переиспользовать</key>
     <key alias="editorSettings">Установки редактора</key>
-    
+
     <key alias="configuration">Конфигурирование</key>
-    
+
     <key alias="yesDelete">ДА, удалить</key>
-    
+
     <key alias="movedUnderneath">была перемещена внутрь</key>
     <key alias="folderToMove">Выбрать папку для перемещения</key>
     <key alias="structureBelow">в структуре дерева</key>
-    
+
     <key alias="allDocumentTypes">Все типы документов</key>
     <key alias="allDocuments">Все документы</key>
     <key alias="allMediaItems">Все медиа-элементы</key>
-    
+
     <key alias="usingThisDocument">, использующие этот тип документов, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
     <key alias="usingThisMedia">, использующие этот тип медиа, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
     <key alias="usingThisMember">, использующие этот тип участников, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
-    
+
     <key alias="andAllDocuments">и все документы, использующие данный тип</key>
     <key alias="andAllMediaItems">и все медиа-элементы, использующие данный тип</key>
     <key alias="andAllMembers">и все участники, использующие данный тип</key>
-    
+
     <key alias="thisEditorUpdateSettings">, использующие этот редактор, будут обновлены с применением этих установок</key>
 
     <key alias="memberCanEdit">Участник может изменить</key>
@@ -253,6 +253,12 @@
     <key alias="restart">Перезапустить</key>
     <key alias="visit">Посетить</key>
     <key alias="welcome">Рады приветствовать</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Название</key>
@@ -302,18 +308,18 @@
     <key alias="treepicker">Выберите элемент</key>
     <key alias="viewCacheItem">Просмотр элемента кэша</key>
     <key alias="createFolder">Создать папку...</key>
-    
+
     <key alias="relateToOriginalLabel">Связать с оригиналом</key>
     <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
-    
+
     <key alias="linkToPage">Ссылка на страницу</key>
-    
+
     <key alias="openInNewWindow">Открывает документ по ссылке в новом окне или вкладке браузера</key>
     <key alias="openInFullBody">Открывает документ по ссылке в полноэкранном режиме</key>
     <key alias="openInParentFrame">Открывает документ по ссылке в родительском фрейме</key>
-    
+
     <key alias="linkToMedia">Ссылка на медиа-файл</key>
-    
+
     <key alias="selectMedia">Выбрать медиа</key>
     <key alias="selectIcon">Выбрать значок</key>
     <key alias="selectItem">Выбрать элемент</key>
@@ -322,23 +328,24 @@
     <key alias="selectContent">Выбрать содержимое</key>
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
-    
+
     <key alias="noMacroParams">Это макрос без параметров</key>
-    
+
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
-    <key alias="stracktrace">Трассировка стека</key>
-    
+    <key alias="stacktrace">Трассировка стека</key>
+    <key alias="innerException">Inner Exception</key>
+
     <key alias="linkYour">Связать</key>
     <key alias="unLinkYour">Разорвать связь</key>
-    
+
     <key alias="account">учетную запись</key>
-    
+
     <key alias="selectEditor">Выбрать редактор</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-		Ниже Вы можете указать различные переводы данной статьи словаря '<em>%0%</em>'<br/>Добавить другие языки можно, воспользовавшись пунктом 'Языки' в меню слева 
+		Ниже Вы можете указать различные переводы данной статьи словаря '<em>%0%</em>'<br/>Добавить другие языки можно, воспользовавшись пунктом 'Языки' в меню слева
 		]]></key>
     <key alias="displayName">Название языка (культуры)</key>
   </area>
@@ -397,7 +404,7 @@
     <key alias="macroErrorLoadingCustomControl">Ошибка загрузки внешнего типа (сборка: %0%, тип: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Ошибка загрузки макроса (файл: %0%)</key>
     <key alias="macroErrorParsingXSLTFile">"Ошибка разбора кода XSLT в файле: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Ошибка чтения XSLT-файла: %0%</key>    
+    <key alias="macroErrorReadingXSLTFile">"Ошибка чтения XSLT-файла: %0%</key>
     <key alias="missingPropertyEditorErrorMessage">Ошибка в конфигурации типа данных, используемого для свойства, проверьте тип данных</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>
@@ -876,7 +883,7 @@
 		]]></key>
 	<key alias="contentPublishedFailedExpired"><![CDATA[
       Документ %0% не может быть опубликован, так как текущая информация в нем устарела.
-    ]]></key>  
+    ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       Документ %0% не может быть опубликован, так как не опубликован его родительский документ.
     ]]></key>
@@ -959,14 +966,14 @@
     <key alias="addTemplate">Добавить шаблон</key>
     <key alias="addChildNode">Добавить дочерний узел</key>
     <key alias="addChild">Добавить дочерний</key>
-    
+
     <key alias="editDataType">Изменить тип данных</key>
-    
+
     <key alias="navigateSections">Навигация по разделам</key>
-    
+
     <key alias="shortcut">Ярлыки</key>
     <key alias="showShortcuts">показать ярлыки</key>
-    
+
     <key alias="toggleListView">В формате списка</key>
     <key alias="toggleAllowAsRoot">Разрешить в качестве корневого</key>
   </area>
@@ -1108,7 +1115,7 @@
 		http://%3%.
 
 		Удачи!
-		
+
 		Генератор уведомлений Umbraco.
 		]]></key>
     <key alias="mailSubject">[%0%] Задание по переводу %1%</key>
@@ -1161,7 +1168,9 @@
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
     <key alias="xslt">Файлы XSLT</key>
+    <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="userTypes">Типы пользователей</key>
+    <key alias="users">пользователи</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Доступны обновления</key>

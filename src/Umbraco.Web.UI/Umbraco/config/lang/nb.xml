@@ -186,6 +186,12 @@
     <key alias="visit">Besøk</key>
     <key alias="welcome">Velkommen</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Navn på lokal link</key>
     <key alias="assignDomain">Rediger domener</key>
@@ -928,7 +934,9 @@ Vennlig hilsen Umbraco roboten
     <key alias="templates">Maler</key>
     <key alias="xslt">XSLT Filer</key>
     <key alias="analytics">Analytics</key>
+    <key alias="userPermissions">Brukertillatelser</key>
     <key alias="userTypes">Brukertyper typer</key>
+    <key alias="users">Brukere</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny oppdatering er klar</key>

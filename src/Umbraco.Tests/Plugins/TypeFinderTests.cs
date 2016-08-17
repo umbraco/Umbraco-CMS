@@ -19,16 +19,18 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
+using Umbraco.Core.Plugins;
+using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Plugins
 {
-    
+
     /// <summary>
 	/// Tests for typefinder
 	/// </summary>
-	[TestFixture]	
+	[TestFixture]
 	public class TypeFinderTests
 	{
 		/// <summary>
@@ -41,7 +43,7 @@ namespace Umbraco.Tests.Plugins
 		{
 		    _assemblies = new[]
 			    {
-			        this.GetType().Assembly, 
+			        this.GetType().Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -73,17 +75,29 @@ namespace Umbraco.Tests.Plugins
             var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
-            Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(9, typesFound.Count());
-            Assert.AreEqual(9, originalTypesFound.Count());
+            foreach (var type in typesFound)
+                Console.WriteLine(type);
+            Console.WriteLine();
+            foreach (var type in originalTypesFound)
+                Console.WriteLine(type);
+
+            // 6 classes in _assemblies implement IApplicationEventHandler
+            Assert.AreEqual(6, typesFound.Count());
+
+            // however,
+            // Umbraco.Core.Profiling.WebProfiler is internal and is not returned by TypeFinderOriginal,
+            // that's a known issue of the legacy type finder, so we have to tweak the count here.
+            Assert.AreEqual(5, originalTypesFound.Count());
         }
 
         [Test]
         public void Find_Classes_With_Attribute()
         {
             var typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
-            //TODO: Fix this with the correct count
-            Assert.AreEqual(1, typesFound.Count());
+            Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
+
+            typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (UmbracoContext).Assembly });
+            Assert.AreEqual(22, typesFound.Count()); // 22 classes in Umbraco.Web are marked with [Tree]
         }
 
         [Ignore]
@@ -114,7 +128,7 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
+
         }
 
         [Ignore]
@@ -145,7 +159,7 @@ namespace Umbraco.Tests.Plugins
                     }
                 }
             }
-            
+
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -187,7 +201,7 @@ namespace Umbraco.Tests.Plugins
             /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
             /// </summary>
             /// <remarks>
-            /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been 
+            /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
             /// loaded in the CLR, not all assemblies.
             /// See these threads:
             /// http://issues.umbraco.org/issue/U5-198
@@ -313,8 +327,8 @@ namespace Umbraco.Tests.Plugins
                             }
                             catch (SecurityException)
                             {
-                                //we will just ignore this because this will fail 
-                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+                                //we will just ignore this because this will fail
+                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to
                                 //an assembly that is ok.
                             }
                         }
@@ -331,9 +345,9 @@ namespace Umbraco.Tests.Plugins
                             }
                             catch (SecurityException)
                             {
-                                //we will just ignore this because if we are trying to do a call to: 
+                                //we will just ignore this because if we are trying to do a call to:
                                 // AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName)))
-                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+                                //in medium trust for system assemblies, we get an exception but we just want to continue until we get to
                                 //an assembly that is ok.
                             }
                         }
@@ -345,7 +359,7 @@ namespace Umbraco.Tests.Plugins
             }
 
             /// <summary>
-            /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan 
+            /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan
             /// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
             /// cached for perforance reasons.
             /// </summary>
@@ -413,7 +427,7 @@ namespace Umbraco.Tests.Plugins
                     "RouteDebugger,",
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
-                    "umbraco.interfaces,",										
+                    "umbraco.interfaces,",
 					"umbraco.providers,",
 					"Umbraco.Web.UI,",
                     "umbraco.webservices",
@@ -615,5 +629,5 @@ namespace Umbraco.Tests.Plugins
         }
 	}
 
-    
+
 }

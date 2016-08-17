@@ -4,6 +4,8 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +27,10 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Security;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
@@ -34,6 +39,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
+using Umbraco.Core.Services;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
@@ -47,12 +53,16 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
-    [UmbracoUseHttps]
+    [UmbracoRequireHttps]
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
         private BackOfficeUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
+
+        private const string TokenExternalSignInError = "ExternalSignInError";
+        private const string TokenPasswordResetCode = "PasswordResetCode";
+        private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
         protected BackOfficeSignInManager SignInManager
         {
@@ -287,6 +297,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetEntityLog(0))
                             },
                             {
+                                "gravatarApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<GravatarController>(
+                                    controller => controller.GetCurrentUserGravatarUrl())
+                            },
+                            {
                                 "memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>(
                                     controller => controller.GetByKey(Guid.Empty))
                             },
@@ -309,6 +323,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "memberTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                     controller => controller.GetAllTypes())
+                            },
+                            {
+                                "memberGroupApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
+                                    controller => controller.GetAllGroups())
                             },
                             {
                                 "updateCheckApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
@@ -341,6 +359,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
                                     controller => controller.CheckContentXmlTable())
+                            },
+                            {
+                                "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
+                                    controller => controller.GetAllHealthChecks())
                             }
                         }
                     },
@@ -364,6 +386,7 @@ namespace Umbraco.Web.Editors
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
+                            {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                         }
                     },
                     {
@@ -433,7 +456,25 @@ namespace Umbraco.Web.Editors
                 User.Identity.GetUserId());
         }
 
+        [HttpGet]
+        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        {
+            var user = UserManager.FindById(userId);
+            if (user != null)
+            {
+                var result = await UserManager.UserTokenProvider.ValidateAsync("ResetPassword", resetCode, UserManager, user);
+                if (result)
+                {
+                    //Add a flag and redirect for it to be displayed
+                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel {UserId = userId, ResetCode = resetCode};
+                    return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                }
+            }
 
+            //Add error and redirect for it to be displayed
+            TempData[TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
 
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
@@ -445,7 +486,7 @@ namespace Umbraco.Web.Editors
             if (loginInfo == null)
             {
                 //Add error and redirect for it to be displayed
-                TempData["ExternalSignInError"] = new[] { "An error occurred, could not get external login info" };
+                TempData[TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
                 return RedirectToLocal(Url.Action("Default", "BackOffice"));
             }
 
@@ -456,7 +497,7 @@ namespace Umbraco.Web.Editors
             }
 
             //Add errors and redirect for it to be displayed
-            TempData["ExternalSignInError"] = result.Errors;
+            TempData[TokenExternalSignInError] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
@@ -468,22 +509,27 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, otherwise
-        /// process the external login info.
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, 
+        /// otherwise process the external login info.
         /// </summary>
-        /// <returns></returns>
-        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(Func<ActionResult> defaultResponse, Func<ActionResult> externalSignInResponse)
+        /// <returns></returns>       
+        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
+            Func<ActionResult> defaultResponse, 
+            Func<ActionResult> externalSignInResponse)
         {
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
             ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
 
-            //check if there's errors in the TempData, assign to view bag and render the view
-            if (TempData["ExternalSignInError"] != null)
-            {
-                ViewBag.ExternalSignInError = TempData["ExternalSignInError"];
-                return defaultResponse();
+            //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
+            foreach (var tempDataTokenName in TempDataTokenNames)
+            {                
+                if (TempData[tempDataTokenName] != null)
+                {
+                    ViewData[tempDataTokenName] = TempData[tempDataTokenName];
+                    return defaultResponse();
+                }
             }
 
             //First check if there's external login info, if there's not proceed as normal
@@ -521,7 +567,7 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo) == false)
                 {
-                    ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -556,7 +602,7 @@ namespace Umbraco.Web.Editors
                     //we are allowing auto-linking/creating of local accounts
                     if (loginInfo.Email.IsNullOrWhiteSpace())
                     {
-                        ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                        ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
                     }
                     else
                     {
@@ -565,7 +611,7 @@ namespace Umbraco.Web.Editors
                         var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
                         if (foundByEmail != null)
                         {
-                            ViewBag.ExternalSignInError = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                            ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
                         }
                         else
                         {
@@ -573,7 +619,7 @@ namespace Umbraco.Web.Editors
                             var userType = Services.UserService.GetUserTypeByAlias(defaultUserType);
                             if (userType == null)
                             {
-                                ViewBag.ExternalSignInError = new[] { "Could not auto-link this account, the specified User Type does not exist: " + defaultUserType };
+                                ViewData[TokenExternalSignInError] = new[] { "Could not auto-link this account, the specified User Type does not exist: " + defaultUserType };
                             }
                             else
                             {
@@ -601,21 +647,21 @@ namespace Umbraco.Web.Editors
 
                                 if (userCreationResult.Succeeded == false)
                                 {
-                                    ViewBag.ExternalSignInError = userCreationResult.Errors;
+                                    ViewData[TokenExternalSignInError] = userCreationResult.Errors;
                                 }
                                 else
                                 {
                                     var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
                                     if (linkResult.Succeeded == false)
                                     {
-                                        ViewBag.ExternalSignInError = linkResult.Errors;
+                                        ViewData[TokenExternalSignInError] = linkResult.Errors;
 
                                         //If this fails, we should really delete the user since it will be in an inconsistent state!
                                         var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                                         if (deleteResult.Succeeded == false)
                                         {
                                             //DOH! ... this isn't good, combine all errors to be shown
-                                            ViewBag.ExternalSignInError = linkResult.Errors.Concat(deleteResult.Errors);
+                                            ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
                                         }
                                     }
                                     else
@@ -655,6 +701,10 @@ namespace Umbraco.Web.Editors
             app.Add("cdf", ClientDependencySettings.Instance.Version);
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+
+            //add the server's GMT time offset in minutes
+            app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
+
             return app;
         }
         

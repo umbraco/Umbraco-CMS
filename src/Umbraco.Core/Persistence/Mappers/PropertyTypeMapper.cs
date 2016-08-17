@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -16,35 +13,23 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        #region Overrides of BaseMapper
-
-        public PropertyTypeMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
         protected override void BuildMap()
         {
-            if(PropertyInfoCache.IsEmpty)
-            {
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Key, dto => dto.UniqueId);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Alias, dto => dto.Alias);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeDefinitionId, dto => dto.DataTypeId);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Description, dto => dto.Description);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Mandatory, dto => dto.Mandatory);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
-                CacheMap<PropertyType, DataTypeDto>(src => src.PropertyEditorAlias, dto => dto.PropertyEditorAlias);
-                CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeDatabaseType, dto => dto.DbType);
-            }
-        }
+            if (PropertyInfoCache.IsEmpty == false) return;
 
-        #endregion
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Key, dto => dto.UniqueId);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Alias, dto => dto.Alias);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeDefinitionId, dto => dto.DataTypeId);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Description, dto => dto.Description);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Mandatory, dto => dto.Mandatory);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
+            CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
+            CacheMap<PropertyType, DataTypeDto>(src => src.PropertyEditorAlias, dto => dto.PropertyEditorAlias);
+            CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeDatabaseType, dto => dto.DbType);
+        }
     }
 }

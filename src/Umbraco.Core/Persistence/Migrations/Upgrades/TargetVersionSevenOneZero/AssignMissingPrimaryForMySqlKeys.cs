@@ -1,6 +1,5 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
@@ -14,14 +13,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
     [Migration("7.0.0", "7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public AssignMissingPrimaryForMySqlKeys(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
         {
-            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 

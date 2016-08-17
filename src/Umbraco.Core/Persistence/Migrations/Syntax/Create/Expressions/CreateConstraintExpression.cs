@@ -1,13 +1,13 @@
 ﻿using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
     public class CreateConstraintExpression : MigrationExpressionBase
     {
-        public CreateConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ConstraintType constraint) 
-            : base(sqlSyntax, current, databaseProviders)
+        public CreateConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ConstraintType constraint) 
+            : base(context, supportedDatabaseTypes)
         {
             Constraint = new ConstraintDefinition(constraint);
         }
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 
             var columns = new string[Constraint.Columns.Count];
 
-            for (int i = 0; i < Constraint.Columns.Count; i++)
+            for (var i = 0; i < Constraint.Columns.Count; i++)
             {
                 columns[i] = SqlSyntax.GetQuotedColumnName(Constraint.Columns.ElementAt(i));
             }

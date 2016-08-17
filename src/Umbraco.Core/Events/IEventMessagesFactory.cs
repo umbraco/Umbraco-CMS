@@ -8,5 +8,7 @@ namespace Umbraco.Core.Events
     public interface IEventMessagesFactory
     {
         EventMessages Get();
+
+        EventMessages GetOrDefault();
     }
 }

@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
 
             if (content.HasPublishedVersion == false)
             {
-                urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/itemNotPublished"));
+                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/itemNotPublished"));
                 return urls;
             }
 
@@ -41,14 +41,38 @@ namespace Umbraco.Web.Routing
                 var parent = content;
                 do
                 {
-                    parent = parent.ParentId > 0 ? parent.Parent() : null;
+                    parent = parent.ParentId > 0 ? parent.Parent(umbracoContext.Application.Services.ContentService) : null;
                 }
                 while (parent != null && parent.Published);
 
                 if (parent == null) // oops - internal error
-                    urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/parentNotPublishedAnomaly"));
+                    urls.Add(umbracoContext.Application.Services.TextService.Localize("content/parentNotPublishedAnomaly"));
                 else
-                    urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
+                    urls.Add(umbracoContext.Application.Services.TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
+            }
+            else if (url.StartsWith("#err-"))
+            {
+                // route error, report
+                var id = int.Parse(url.Substring(5));
+                var o = umbracoContext.ContentCache.GetById(id);
+                string s;
+                if (o == null)
+                {
+                    s = "(unknown)";
+                }
+                else
+                {
+                    var l = new List<string>();
+                    while (o != null)
+                    {
+                        l.Add(o.Name);
+                        o = o.Parent;
+                    }
+                    l.Reverse();
+                    s = "/" + string.Join("/", l) + " (id=" + id + ")";
+
+                }
+                urls.Add(umbracoContext.Application.Services.TextService.Localize("content/routeError", s));
             }
             else
             {

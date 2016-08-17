@@ -25,20 +25,17 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
-        private readonly RepositoryFactory _repositoryFactory;
         private readonly ILogger _logger;
 
-        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, RepositoryFactory repositoryFactory,  ILogger logger)
+        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
         {
-            if (provider == null) throw new ArgumentNullException("provider");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
+            if (userService == null) throw new ArgumentNullException(nameof(userService));
+            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             _uowProvider = provider;
             _userService = userService;
             _contentService = contentService;
-            _repositoryFactory = repositoryFactory;
             _logger = logger;
         }
 
@@ -60,37 +57,86 @@ namespace Umbraco.Core.Services
             Func<IUser, string[], string> createBody)
         {
             if ((entity is IContent) == false)
-            {
                 throw new NotSupportedException();
-            }
-            var content = (IContent) entity;
-            //we'll lazily get these if we need to send notifications
-            IEnumerable<IContent> allVersions = null;
 
-            int totalUsers;
+            var content = (IContent) entity;
+
+            // lazily get versions - into a list to ensure we can enumerate multiple times
+            List<IContent> allVersions = null;
+
+            long totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers)
+            foreach (var u in allUsers.Where(x => x.IsApproved))
             {
-                if (u.IsApproved == false) continue;
-                var userNotifications = GetUserNotifications(u, content.Path).ToArray();
+                var userNotifications = GetUserNotifications(u, content.Path);
                 var notificationForAction = userNotifications.FirstOrDefault(x => x.Action == action);
-                if (notificationForAction != null)
+                if (notificationForAction == null) continue;
+
+                if (allVersions == null) // lazy load
+                    allVersions = _contentService.GetVersions(entity.Id).ToList();
+
+                try
                 {
-                    //lazy load versions if notifications are required
-                    if (allVersions == null)
-                    {
-                        allVersions = _contentService.GetVersions(entity.Id);
-                    }
+                    SendNotification(operatingUser, u, content, allVersions, 
+                        actionName, http, createSubject, createBody);
+
+                    _logger.Debug<NotificationService>($"Notification type: {action} sent to {u.Name} ({u.Email})");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends the notifications for the specified user regarding the specified node and action.
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="operatingUser"></param>
+        /// <param name="action"></param>
+        /// <param name="actionName"></param>
+        /// <param name="http"></param>
+        /// <param name="createSubject"></param>
+        /// <param name="createBody"></param>
+        /// <remarks>
+        /// Currently this will only work for Content entities!
+        /// </remarks>
+        public void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, HttpContextBase http,
+            Func<IUser, string[], string> createSubject,
+            Func<IUser, string[], string> createBody)
+        {
+            if ((entities is IEnumerable<IContent>) == false)
+                throw new NotSupportedException();
+
+            // ensure we can enumerate multiple times
+            var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
+
+            // lazily get versions - into lists to ensure we can enumerate multiple times
+            var allVersionsDictionary = new Dictionary<int, List<IContent>>();
+
+            long totalUsers;
+            var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
+            foreach (var u in allUsers.Where(x => x.IsApproved))
+            {
+                var userNotifications = GetUserNotifications(u).ToArray();
+
+                foreach (var content in entitiesL)
+                {
+                    var userNotificationsByPath = FilterUserNotificationsByPath(userNotifications, content.Path);
+                    var notificationForAction = userNotificationsByPath.FirstOrDefault(x => x.Action == action);
+                    if (notificationForAction == null) continue;
+
+                    var allVersions = allVersionsDictionary.ContainsKey(content.Id) // lazy load
+                        ? allVersionsDictionary[content.Id]
+                        : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
 
                     try
                     {
-                        SendNotification(
-                            operatingUser, u, content,                            
-                            allVersions, 
+                        SendNotification(operatingUser, u, content, allVersions, 
                             actionName, http, createSubject, createBody);
 
-
-                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
+                        _logger.Debug<NotificationService>($"Notification type: {action} sent to {u.Name} ({u.Email})");
                     }
                     catch (Exception ex)
                     {
@@ -107,9 +153,13 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            return repository.GetUserNotifications(user);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                var notifications = repository.GetUserNotifications(user);
+                uow.Complete();
+                return notifications;
+            }
         }
 
         /// <summary>
@@ -123,10 +173,20 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public IEnumerable<Notification> GetUserNotifications(IUser user, string path)
         {
-            var userNotifications = GetUserNotifications(user).ToArray();
+            var userNotifications = GetUserNotifications(user);
+            return FilterUserNotificationsByPath(userNotifications, path);
+        }
+
+        /// <summary>
+        /// Filters a userNotifications collection by a path
+        /// </summary>
+        /// <param name="userNotifications"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
+        {
             var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            var result = userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
-            return result;
+            return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
         }
 
         /// <summary>
@@ -135,9 +195,13 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            return repository.GetEntityNotifications(entity);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                var notifications = repository.GetEntityNotifications(entity);
+                uow.Complete();
+                return notifications;
+            }
         }
 
         /// <summary>
@@ -146,9 +210,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            repository.DeleteNotifications(entity);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                repository.DeleteNotifications(entity);
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -157,9 +224,12 @@ namespace Umbraco.Core.Services
         /// <param name="user"></param>
         public void DeleteNotifications(IUser user)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            repository.DeleteNotifications(user);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                repository.DeleteNotifications(user);
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -169,9 +239,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IUser user, IEntity entity)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            repository.DeleteNotifications(user, entity);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                repository.DeleteNotifications(user, entity);
+                uow.Complete();
+            }
         }
 
         /// <summary>
@@ -185,9 +258,13 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            return repository.SetNotifications(user, entity, actions);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                var notifications = repository.SetNotifications(user, entity, actions);
+                uow.Complete();
+                return notifications;
+            }
         }
 
         /// <summary>
@@ -199,9 +276,13 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var repository = _repositoryFactory.CreateNotificationsRepository(uow);
-            return repository.CreateNotification(user, entity, action);
+            using (var uow = _uowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<INotificationsRepository>();
+                var notification = repository.CreateNotification(user, entity, action);
+                uow.Complete();
+                return notification;
+            }
         }
 
         #region private methods
@@ -410,9 +491,9 @@ namespace Umbraco.Core.Services
             var diffs = Diff.DiffText1(oldText, newText);
 
             int pos = 0;
-            for (int n = 0; n < diffs.Length; n++)
+            for (var n = 0; n < diffs.Length; n++)
             {
-                Diff.Item it = diffs[n];
+                var it = diffs[n];
 
                 // write unchanged chars
                 while ((pos < it.StartB) && (pos < newText.Length))
@@ -425,7 +506,7 @@ namespace Umbraco.Core.Services
                 if (displayDeletedText && it.DeletedA > 0)
                 {
                     sb.Append(deletedStyle);
-                    for (int m = 0; m < it.DeletedA; m++)
+                    for (var m = 0; m < it.DeletedA; m++)
                     {
                         sb.Append(oldText[it.StartA + m]);
                     } // for

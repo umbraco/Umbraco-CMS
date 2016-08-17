@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,9 +15,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
@@ -43,182 +38,199 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Determines if the item should be persisted at all
+        /// Determines whether the content should be persisted.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// In one particular case, a content item shouldn't be persisted:
-        /// * The item exists and is published
-        /// * A call to ContentService.Save is made
-        /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
-        /// In this case, there is no reason to make any database changes at all
-        /// </remarks>
+        /// <param name="entity">The content.</param>
+        /// <returns>True is the content should be persisted, otherwise false.</returns>
+        /// <remarks>See remarks in overload.</remarks>
         internal static bool RequiresSaving(this IContent entity)
         {
-            var publishedState = ((Content)entity).PublishedState;
-            return RequiresSaving(entity, publishedState);
+            return RequiresSaving(entity, ((Content) entity).PublishedState);
         }
 
         /// <summary>
-        /// Determines if the item should be persisted at all
+        /// Determines whether the content should be persisted.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="publishedState"></param>
-        /// <returns></returns>
+        /// <param name="entity">The content.</param>
+        /// <param name="publishedState">The published state of the content.</param>
+        /// <returns>True is the content should be persisted, otherwise false.</returns>
         /// <remarks>
-        /// In one particular case, a content item shouldn't be persisted:
-        /// * The item exists and is published
-        /// * A call to ContentService.Save is made
-        /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
-        /// In this case, there is no reason to make any database changes at all
+        /// This is called by the repository when persisting an existing content, to
+        /// figure out whether it needs to persist the content at all.
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity, PublishedState publishedState)
         {
-            var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
-            //check if any user prop has changed
-            var propertyValueChanged = entity.IsAnyUserPropertyDirty();
-            
-            //We need to know if any other property apart from Published was changed here
-            //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
-            if (publishedChanged && entity.Published == false && propertyValueChanged == false)
+            // note: publishedState is always the entity's PublishedState except for tests
+
+            var content = (Content) entity;
+            var userPropertyChanged = content.IsAnyUserPropertyDirty();
+            var dirtyProps = content.GetDirtyProperties();
+            //var contentPropertyChanged = content.IsEntityDirty();
+            var contentPropertyChangedExceptPublished = dirtyProps.Any(x => x != "Published");
+
+            // we don't want to save (write to DB) if we are "saving" either a published content
+            // (.Saving) or an unpublished content (.Unpublished) and strictly nothing has changed
+
+            var noSave = (publishedState == PublishedState.Saving || publishedState == PublishedState.Unpublished)
+                && userPropertyChanged == false
+                && contentPropertyChangedExceptPublished == false;
+
+            return noSave == false;
+        }
+
+        /// <summary>
+        /// Determines whether a new version of the content should be created.
+        /// </summary>
+        /// <param name="entity">The content.</param>
+        /// <returns>True if a new version should be created, otherwise false.</returns>
+        /// <remarks>See remarks in overload.</remarks>
+        internal static bool RequiresNewVersion(this IContent entity)
+        {
+            return RequiresNewVersion(entity, ((Content) entity).PublishedState);
+        }
+
+        /// <summary>
+        /// Determines whether a new version of the content should be created.
+        /// </summary>
+        /// <param name="entity">The content.</param>
+        /// <param name="publishedState">The published state of the content.</param>
+        /// <returns>True if a new version should be created, otherwise false.</returns>
+        /// <remarks>
+        /// This is called by the repository when persisting an existing content, to
+        /// figure out whether it needs to create a new version for that content.
+        /// A new version needs to be created when:
+        /// * The publish status is changed
+        /// * The language is changed
+        /// * A content property is changed (? why ?)
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// </remarks>
+        internal static bool RequiresNewVersion(this IContent entity, PublishedState publishedState)
+        {
+            // note: publishedState is always the entity's PublishedState except for tests
+
+            // read
+            // http://issues.umbraco.org/issue/U4-2589 (save & publish & creating new versions)
+            // http://issues.umbraco.org/issue/U4-3404 (pressing preview does save then preview)
+            // http://issues.umbraco.org/issue/U4-5510 (previewing & creating new versions)
+            //
+            // slightly modifying the rules to make more sense (marked with CHANGE)
+            // but should respect the result of the discussions in those issues
+
+            // figure out whether .Language has changed
+            // this language stuff was an old POC and should be removed
+            var hasLanguageChanged = entity.IsPropertyDirty("Language");
+            if (hasLanguageChanged)
+                return true; // language change => new version
+
+            var content = (Content) entity;
+            //var contentPropertyChanged = content2.IsEntityDirty();
+            var userPropertyChanged = content.IsAnyUserPropertyDirty();
+            var dirtyProps = content.GetDirtyProperties();
+            var contentPropertyChangedExceptPublished = dirtyProps.Any(x => x != "Published");
+            var wasPublished = content.PublishedOriginal;
+
+            switch (publishedState)
             {
-                //at this point we need to check if any non property value has changed that wasn't the published state
-                var changedProps = ((TracksChangesEntityBase)entity).GetDirtyProperties();
-                if (changedProps.Any(x => x != "Published") == false)
-                {
+                case PublishedState.Publishing:
+                    // changed state, publishing either a published or an unpublished version:
+                    // DO create a new (published) version IF it was published already AND
+                    // anything has changed, else can reuse the current version
+                    return (contentPropertyChangedExceptPublished || userPropertyChanged) && wasPublished;
+
+                case PublishedState.Unpublishing:
+                    // changed state, unpublishing a published version:
+                    // DO create a new (draft) version and preserve the (formerly) published
+                    // version for rollback purposes IF the version that's being saved is the
+                    // published version, else it's a draft that we can reuse
+                    return wasPublished;
+
+                case PublishedState.Saving:
+                    // changed state, saving a published version:
+                    // DO create a new (draft) version and preserve the published version IF
+                    // anything has changed, else do NOT create a new version (pointless)
+                    return contentPropertyChangedExceptPublished || userPropertyChanged;
+
+                case PublishedState.Published:
+                    // unchanged state, saving a published version:
+                    // (can happen eg when moving content, never otherwise)
+                    // do NOT create a new version as we're just saving after operations (eg
+                    // move) that cannot be rolled back anyway - ensure that's really it
+                    if (userPropertyChanged)
+                        throw new InvalidOperationException("Invalid PublishedState \"Published\" with user property changes.");
                     return false;
-                }
+
+                case PublishedState.Unpublished:
+                    // unchanged state, saving an unpublished version:
+                    // do NOT create a new version for user property changes,
+                    // BUT create a new version in case of content property changes, for
+                    // rollback purposes
+                    return contentPropertyChangedExceptPublished;
+
+                default:
+                    throw new NotSupportedException();
             }
-
-            return true;
         }
 
         /// <summary>
-        /// Determines if a new version should be created
+        /// Determines whether the database published flag should be cleared for versions
+        /// other than this content version.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
+        /// <param name="entity">The content.</param>
+        /// <returns>True if the published flag should be cleared, otherwise false.</returns>
+        /// <returns>See remarks in overload.</returns>
+        internal static bool RequiresClearPublishedFlag(this IContent entity)
+        {
+            var publishedState = ((Content) entity).PublishedState;
+            var requiresNewVersion = entity.RequiresNewVersion(publishedState);
+            return entity.RequiresClearPublishedFlag(publishedState, requiresNewVersion);
+        }
+
+        /// <summary>
+        /// Determines whether the database published flag should be cleared for versions
+        /// other than this content version.
+        /// </summary>
+        /// <param name="entity">The content.</param>
+        /// <param name="publishedState">The published state of the content.</param>
+        /// <param name="isNewVersion">Indicates whether the content is a new version.</param>
+        /// <returns>True if the published flag should be cleared, otherwise false.</returns>
         /// <remarks>
-        /// A new version needs to be created when:
-        /// * The publish status is changed
-        /// * The language is changed
-        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// This is called by the repository when persisting an existing content, to
+        /// figure out whether it needs to clear the published flag for other versions.
         /// </remarks>
-        internal static bool ShouldCreateNewVersion(this IContent entity)
+        internal static bool RequiresClearPublishedFlag(this IContent entity, PublishedState publishedState, bool isNewVersion)
         {
-            var publishedState = ((Content)entity).PublishedState;
-            return ShouldCreateNewVersion(entity, publishedState);
-        }
+            // note: publishedState is always the entity's PublishedState except for tests
 
-        /// <summary>
-        /// Returns a list of all dirty user defined properties
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<string> GetDirtyUserProperties(this IContentBase entity)
-        {
-            return entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
-        }
-
-        public static bool IsAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.IsDirty());
-        }
-
-        public static bool WasAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.WasDirty());
-        }
-
-        /// <summary>
-        /// Determines if a new version should be created
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="publishedState"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// A new version needs to be created when:
-        /// * The publish status is changed
-        /// * The language is changed
-        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
-        /// </remarks>
-        internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
-        {
-            //check if the published state has changed or the language
-            var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
-            var langChanged = entity.IsPropertyDirty("Language");
-            var contentChanged = publishedChanged || langChanged;
-
-            //check if any user prop has changed
-            var propertyValueChanged = entity.IsAnyUserPropertyDirty();
-
-            //return true if published or language has changed
-            if (contentChanged)
-            {
+            // new, published version => everything else must be cleared
+            if (isNewVersion && entity.Published)
                 return true;
-            }
 
-            //check if any content prop has changed
-            var contentDataChanged = ((Content)entity).IsEntityDirty();
+            // if that entity was published then that entity has the flag and
+            // it does not need to be cleared for other versions
+            // NOT TRUE when unpublishing we create a NEW version
+            //var wasPublished = ((Content)entity).PublishedOriginal;
+            //if (wasPublished)
+            //    return false;
 
-            //return true if the item is published and a property has changed or if any content property has changed
-            return (propertyValueChanged && publishedState == PublishedState.Published) || contentDataChanged;
-        }
-
-        /// <summary>
-        /// Determines if the published db flag should be set to true for the current entity version and all other db
-        /// versions should have their flag set to false.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is determined by:
-        /// * If a new version is being created and the entity is published
-        /// * If the published state has changed and the entity is published OR the entity has been un-published.
-        /// </remarks>
-        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity)
-        {
-            var publishedState = ((Content)entity).PublishedState;
-            return entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, entity.ShouldCreateNewVersion(publishedState));
-        }
-
-        /// <summary>
-        /// Determines if the published db flag should be set to true for the current entity version and all other db
-        /// versions should have their flag set to false.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="publishedState"></param>
-        /// <param name="isCreatingNewVersion"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is determined by:
-        /// * If a new version is being created and the entity is published
-        /// * If the published state has changed and the entity is published OR the entity has been un-published.
-        /// </remarks>
-        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity, PublishedState publishedState, bool isCreatingNewVersion)
-        {
-            if (isCreatingNewVersion && entity.Published)
-            {
-                return true;
-            }
-
-            //If Published state has changed then previous versions should have their publish state reset.
-            //If state has been changed to unpublished the previous versions publish state should also be reset.
-            if (entity.IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
-            {
-                return true;
-            }
-
-            return false;
+            // clear whenever we are publishing or unpublishing
+            //  publishing: because there might be a previously published version, which needs to be cleared
+            //  unpublishing: same - we might be a saved version, not the published one, which needs to be cleared
+            return publishedState == PublishedState.Publishing || publishedState == PublishedState.Unpublishing;
         }
 
         /// <summary>
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Ancestors(this IContent content, IContentService contentService)
+        {
+            return contentService.GetAncestors(content);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Ancestors(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetAncestors(content);
@@ -228,7 +240,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current contents children.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Children(this IContent content, IContentService contentService)
+        {
+            return contentService.GetChildren(content.Id);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Children(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetChildren(content.Id);
@@ -238,7 +258,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current contents descendants, not including the content itself.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Descendants(this IContent content, IContentService contentService)
+        {
+            return contentService.GetDescendants(content);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IContent> Descendants(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetDescendants(content);
@@ -248,7 +276,15 @@ namespace Umbraco.Core.Models
         /// Returns the parent of the current content.
         /// </summary>
         /// <param name="content">Current content</param>
+        /// <param name="contentService"></param>
         /// <returns>An <see cref="IContent"/> object</returns>
+        public static IContent Parent(this IContent content, IContentService contentService)
+        {
+            return contentService.GetById(content.ParentId);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IContent Parent(this IContent content)
         {
             return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
@@ -256,11 +292,20 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region IMedia
+
         /// <summary>
         /// Returns a list of the current medias ancestors, not including the media itself.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Ancestors(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetAncestors(media);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Ancestors(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetAncestors(media);
@@ -270,7 +315,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current medias children.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Children(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetChildren(media.Id);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Children(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetChildren(media.Id);
@@ -280,7 +333,15 @@ namespace Umbraco.Core.Models
         /// Returns a list of the current medias descendants, not including the media itself.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Descendants(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetDescendants(media);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<IMedia> Descendants(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetDescendants(media);
@@ -290,7 +351,15 @@ namespace Umbraco.Core.Models
         /// Returns the parent of the current media.
         /// </summary>
         /// <param name="media">Current media</param>
+        /// <param name="mediaService"></param>
         /// <returns>An <see cref="IMedia"/> object</returns>
+        public static IMedia Parent(this IMedia media, IMediaService mediaService)
+        {
+            return mediaService.GetById(media.ParentId);
+        }
+
+        [Obsolete("Use the overload with the service reference instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IMedia Parent(this IMedia media)
         {
             return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
@@ -312,9 +381,9 @@ namespace Umbraco.Core.Models
             return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                           .Contains(recycleBinId.ToInvariantString());
         }
-        
+
         /// <summary>
-        /// Removes characters that are not valide XML characters from all entity properties 
+        /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
         /// </summary>
         /// <returns></returns>
@@ -452,9 +521,10 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value, IDataTypeService dataTypeService)
         {
-            // Ensure we get the filename without the path in IE in intranet mode 
+            // Ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
             var fileName = value.FileName;
             if (fileName.LastIndexOf(@"\") > 0)
@@ -467,7 +537,14 @@ namespace Umbraco.Core.Models
                             .ToLower());
 
             if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
+                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream, dataTypeService);
+        }
+
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
+        {
+            content.SetValue(propertyTypeAlias, value, ApplicationContext.Current.Services.DataTypeService);
         }
 
         /// <summary>
@@ -476,6 +553,14 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value, IDataTypeService dataTypeService)
+        {
+            SetValue(content, propertyTypeAlias, new HttpPostedFileWrapper(value), dataTypeService);
+        }
+
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
             SetValue(content, propertyTypeAlias, (HttpPostedFileBase)new HttpPostedFileWrapper(value));
@@ -488,6 +573,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
         [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
             SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
@@ -500,15 +586,23 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="fileName">Name of the file</param>
         /// <param name="fileStream"><see cref="Stream"/> to save to disk</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
+        /// <param name="dataTypeService"></param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream, IDataTypeService dataTypeService)
         {
             var name = IOHelper.SafeFileName(fileName);
 
             if (string.IsNullOrEmpty(name) == false && fileStream != null)
-                SetFileOnContent(content, propertyTypeAlias, name, fileStream);
+                SetFileOnContent(content, propertyTypeAlias, name, fileStream, dataTypeService);
         }
 
-        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream)
+        [Obsolete("Use the overload with the IDataTypeService parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
+        {
+            content.SetValue(propertyTypeAlias, fileName, fileStream, ApplicationContext.Current.Services.DataTypeService);
+        }
+
+        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream, IDataTypeService dataTypeService)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
             if (property == null)
@@ -555,7 +649,7 @@ namespace Umbraco.Core.Models
                     if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                     {
                         //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                        var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+                        var values = dataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
                         var thumbnailSizes = values.FirstOrDefault();
                         //Additional thumbnails configured as prevalues on the DataType
                         if (thumbnailSizes != null)
@@ -597,11 +691,10 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region User/Profile methods
+
         
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
-        /// </summary>
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IMedia media)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
@@ -614,11 +707,9 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(media.CreatorId);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content item.
-        /// </summary>
+        
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.CreatorId);
@@ -631,11 +722,9 @@ namespace Umbraco.Core.Models
         {
             return userService.GetProfileById(content.CreatorId);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Writer of this content.
-        /// </summary>
+        
         [Obsolete("Use the overload that declares the IUserService to use")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IProfile GetWriterProfile(this IContent content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
@@ -664,20 +753,7 @@ namespace Umbraco.Core.Models
 
         #region Tag methods
 
-        ///// <summary>
-        ///// Returns the tags for the given property
-        ///// </summary>
-        ///// <param name="content"></param>
-        ///// <param name="propertyTypeAlias"></param>
-        ///// <param name="tagGroup"></param>
-        ///// <returns></returns>
-        ///// <remarks>
-        ///// The tags returned are only relavent for published content & saved media or members 
-        ///// </remarks>
-        //public static IEnumerable<ITag> GetTags(this IContentBase content, string propertyTypeAlias, string tagGroup = "default")
-        //{
-
-        //}
+       
 
         /// <summary>
         /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
@@ -804,11 +880,7 @@ namespace Umbraco.Core.Models
             return packagingService.Export(content, true, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+     
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content)
         {
@@ -826,11 +898,6 @@ namespace Umbraco.Core.Models
             return packagingService.Export(content, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMedia media)
         {
@@ -859,12 +926,6 @@ namespace Umbraco.Core.Models
             return packagingService.Export(media, true, raiseEvents: false);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content, bool isPreview)
         {
@@ -887,11 +948,6 @@ namespace Umbraco.Core.Models
             return content.ToXml(packagingService);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IMember"/> object
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMember member)
         {
@@ -908,6 +964,25 @@ namespace Umbraco.Core.Models
         {
             return ((PackagingService)(packagingService)).Export(member);
         }
+        #endregion
+
+        #region Dirty
+
+        public static IEnumerable<string> GetDirtyUserProperties(this IContentBase entity)
+        {
+            return entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+        }
+
+        public static bool IsAnyUserPropertyDirty(this IContentBase entity)
+        {
+            return entity.Properties.Any(x => x.IsDirty());
+        }
+
+        public static bool WasAnyUserPropertyDirty(this IContentBase entity)
+        {
+            return entity.Properties.Any(x => x.WasDirty());
+        }
+
         #endregion
     }
 }

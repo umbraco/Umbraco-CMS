@@ -9,10 +9,16 @@ namespace Umbraco.Core.Cache
     /// <remarks>Ensures that the correct events are raised when cache refreshing occurs.</remarks>
     public abstract class JsonCacheRefresherBase<TInstance> : CacheRefresherBase<TInstance>, IJsonCacheRefresher
         where TInstance : ICacheRefresher
-    {        
+    {
+        protected JsonCacheRefresherBase(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
+
         public virtual void Refresh(string json)
         {            
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(json, MessageType.RefreshByJson));
         }
+
+        
     }
 }

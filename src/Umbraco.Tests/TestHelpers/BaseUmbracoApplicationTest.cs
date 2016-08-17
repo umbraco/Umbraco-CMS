@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,34 +14,28 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
-using Umbraco.Web.Models.Mapping;
-using umbraco.BusinessLogic;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
-using ObjectExtensions = Umbraco.Core.ObjectExtensions;
+using UmbracoExamine;
 
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-    /// A base test class used for umbraco tests whcih sets up the logging, plugin manager any base resolvers, etc... and
-    /// ensures everything is torn down properly.
+    /// Provides a base class for Umbraco application tests.
     /// </summary>
+    /// <remarks>Sets logging, pluging manager, application context, base resolvers...</remarks>
     [TestFixture]
     public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
-
         [TestFixtureSetUp]
         public void InitializeFixture()
         {
@@ -56,7 +48,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            Container = new ServiceContainer();
+            var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+            Container = container;
 
             TestHelper.InitializeContentDirectories();
 
@@ -70,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
 
             SetupApplicationContext();
 
-            InitializeMappers();            
+            InitializeMappers();
 
             FreezeResolution();
 
@@ -80,26 +74,28 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-            
-            //reset settings
+
+            // reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
-            //reset the app context, this should reset most things that require resetting like ALL resolvers
+
+            // reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
+
+            // reset plugin manager
             ResetPluginManager();
-
             Container.Dispose();
-
         }
 
         protected virtual void ConfigureContainer()
         {
+            // oh no! should not use a container in unit tests?
             var settings = SettingsForTests.GetDefault();
 
-            //register mappers            
+            //register mappers
             Container.RegisterFrom<CoreModelMappersCompositionRoot>();
             Container.RegisterFrom<WebModelMappersCompositionRoot>();
 
@@ -109,7 +105,7 @@ namespace Umbraco.Tests.TestHelpers
             //Default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
 
-            //register basic stuff that might need to be there for some container resolvers to work,  we can 
+            //register basic stuff that might need to be there for some container resolvers to work,  we can
             // add more to this in base classes in resolution freezing
             Container.RegisterSingleton<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
@@ -120,15 +116,19 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 
             //replace some stuff
-            Container.Register<ISqlSyntaxProvider>(factory => SqlSyntax);
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
+
+            // need real file systems here as templates content is on-disk only
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
+            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
         }
 
         private static readonly object Locker = new object();
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
                 {
-                    //Create the legacy prop-eds mapping
+                    // create the legacy prop-eds mapping
                     LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
                 }
             }
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </remarks>
         private void InitializeMappers()
         {
-            if (this.GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
             {
                 Mapper.Initialize(configuration =>
                 {
@@ -173,9 +173,9 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
+        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
-        /// to be set to true if the  SetupPluginManager has been overridden.
+        /// to be set to true if the SetupPluginManager has been overridden.
         /// </summary>
         protected virtual bool PluginManagerResetRequired
         {
@@ -193,36 +193,52 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual void SetupCacheHelper()
+        private void SetupCacheHelper()
         {
-            CacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            CacheHelper = CreateCacheHelper();
+        }
+
+        protected virtual CacheHelper CreateCacheHelper()
+        {
+            return CacheHelper.CreateDisabledCacheHelper();
+        }
+        
+        private void SetupApplicationContext()
+        {
+            var applicationContext = CreateApplicationContext();
+            ApplicationContext.Current = applicationContext;
         }
 
         /// <summary>
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
-        protected virtual void SetupApplicationContext()
-        {            
-            var evtMsgs = new TransientMessagesFactory();
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
-                    Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
-                //assign the service context
-                new ServiceContext(
-                    Container.GetInstance<RepositoryFactory>(), 
-                    new PetaPocoUnitOfWorkProvider(Logger), 
+        protected virtual ApplicationContext CreateApplicationContext()
+        {
+            var evtMsgs = new TransientEventMessagesFactory();
+            var dbFactory = new DefaultDatabaseFactory(
+                Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                TestObjects.GetDefaultSqlSyntaxProviders(Logger),
+                Logger, new TestScopeContextAdapter(),
+                Mock.Of<IMappingResolver>());
+            dbFactory.ResetForTests();
+            var applicationContext = new ApplicationContext(
+                // assign the db context
+                new DatabaseContext(dbFactory, Logger),
+                // assign the service context
+                TestObjects.GetServiceContext(
+                    Container.GetInstance<RepositoryFactory>(),
+                    TestObjects.GetDatabaseUnitOfWorkProvider(Logger),
                     new FileUnitOfWorkProvider(),
-                    new PublishingStrategy(evtMsgs, Logger), 
-                    CacheHelper, 
-                    Logger, 
-                    evtMsgs, 
+                    CacheHelper,
+                    Logger,
+                    evtMsgs,
                     Enumerable.Empty<IUrlSegmentProvider>()),
                 CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true
             };
+            return applicationContext;
         }
 
         /// <summary>
@@ -241,7 +257,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("Umbraco.Core"),
                         Assembly.Load("umbraco"),
                         Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("businesslogic"),
                         Assembly.Load("cms"),
                         Assembly.Load("controls"),
                     }
@@ -257,25 +272,18 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
         }
 
-        protected ApplicationContext ApplicationContext
-        {
-            get { return ApplicationContext.Current; }
-        }
+        protected ApplicationContext ApplicationContext => ApplicationContext.Current;
 
-        protected ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
+        protected ILogger Logger => ProfilingLogger.Logger;
+
         protected ProfilingLogger ProfilingLogger { get; private set; }
+
         protected CacheHelper CacheHelper { get; private set; }
 
-        //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests 
+        //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests
         // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
         internal IServiceContainer Container { get; private set; }
 
-        protected virtual ISqlSyntaxProvider SqlSyntax
-        {
-            get { return new SqlCeSyntaxProvider(); }
-        }
+        protected virtual ISqlSyntaxProvider SqlSyntax => new SqlCeSyntaxProvider();
     }
 }

@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Mvc
 {

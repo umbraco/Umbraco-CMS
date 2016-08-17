@@ -7,9 +7,9 @@ namespace Umbraco.Tests.Migrations.Stubs
     [MigrationAttribute("6.0.0", 1, "Test")]
     public class SixZeroMigration1 : MigrationBase
     {
-        public SixZeroMigration1(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public SixZeroMigration1(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
@@ -21,7 +21,5 @@ namespace Umbraco.Tests.Migrations.Stubs
         {
             Alter.Table("umbracoUser").AlterColumn("passwordTip").AsString(100);
         }
-
-        
     }
 }

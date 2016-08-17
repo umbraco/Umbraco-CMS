@@ -1,0 +1,18 @@
+apiRules:
+  - include:
+      uidRegex: ^Umbraco\.Core
+  - exclude:
+      uidRegex: ^umbraco\.Web\.org
+  - include:
+      uidRegex: ^Umbraco\.Web
+  - exclude:
+      hasAttribute:
+      uid: System.ComponentModel.EditorBrowsableAttribute
+      ctorArguments:
+        - System.ComponentModel.EditorBrowsableState.Never
+  - exclude:
+      uidRegex: ^umbraco\.
+  - exclude:
+      uidRegex: ^CookComputing\.	  
+  - exclude:
+      uidRegex: ^.*$

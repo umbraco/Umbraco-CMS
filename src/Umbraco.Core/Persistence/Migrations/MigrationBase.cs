@@ -1,4 +1,5 @@
 ﻿using System;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
@@ -14,70 +15,44 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationBase : IMigration
     {
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
-        public ILogger Logger { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax => Context.Database.SqlSyntax;
 
-        protected MigrationBase(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        public DatabaseType DatabaseType => Context.Database.DatabaseType;
+
+        public ILogger Logger { get; }
+        protected IMigrationContext Context { get; }
+
+        protected MigrationBase(IMigrationContext context)
         {
-            SqlSyntax = sqlSyntax;
-            Logger = logger;
+            Logger = context.Logger;
+            Context = context;
         }
-
-        internal IMigrationContext Context;
 
         public abstract void Up();
-        public abstract void Down();
+        public abstract void Down();        
 
-        public virtual void GetUpExpressions(IMigrationContext context)
+        public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(Context);
+
+        public ICreateBuilder Create => new CreateBuilder(Context);
+
+        public IDeleteBuilder Delete => new DeleteBuilder(Context);
+
+        public IExecuteBuilder Execute => new ExecuteBuilder(Context);
+
+        public IInsertBuilder Insert => new InsertBuilder(Context);
+
+        public IRenameBuilder Rename => new RenameBuilder(Context);
+
+        public IUpdateBuilder Update => new UpdateBuilder(Context);
+
+        public IIfDatabaseBuilder IfDatabase(params DatabaseType[] supportedDatabaseTypes)
         {
-            Context = context;
-            Up();
+            return new IfDatabaseBuilder(Context, supportedDatabaseTypes);
         }
 
-        public virtual void GetDownExpressions(IMigrationContext context)
+        protected Sql<SqlContext> Sql()
         {
-            Context = context;
-            Down();
-        }
-
-        public IAlterSyntaxBuilder Alter
-        {
-            get { return new AlterSyntaxBuilder(Context, SqlSyntax); }
-        }
-
-        public ICreateBuilder Create
-        {
-            get { return new CreateBuilder(Context); }
-        }
-
-        public IDeleteBuilder Delete
-        {
-            get { return new DeleteBuilder(Context); }
-        }
-
-        public IExecuteBuilder Execute
-        {
-            get { return new ExecuteBuilder(Context, SqlSyntax); }
-        }
-
-        public IInsertBuilder Insert
-        {
-            get { return new InsertBuilder(Context, SqlSyntax); }
-        }
-
-        public IRenameBuilder Rename
-        {
-            get { return new RenameBuilder(Context, SqlSyntax); }
-        }
-
-        public IUpdateBuilder Update
-        {
-            get { return new UpdateBuilder(Context, SqlSyntax); }
-        }
-
-        public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
-        {
-            return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
+            return Context.Database.Sql();
         }
     }
 }

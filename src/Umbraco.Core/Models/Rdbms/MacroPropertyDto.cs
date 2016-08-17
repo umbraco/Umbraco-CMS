@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -11,8 +12,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
-        
-        [Column("editorAlias")]        
+
+        [Column("editorAlias")]
         public string EditorAlias { get; set; }
 
         [Column("macro")]

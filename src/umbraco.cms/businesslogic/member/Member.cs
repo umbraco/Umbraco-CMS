@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
+using Umbraco.Core.Xml;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -55,7 +56,7 @@ namespace umbraco.cms.businesslogic.member
 
         #region Private members
 
-        private Hashtable _groups = null;
+        private Dictionary<int, IMemberGroup> _groups = null;
         protected internal IMember MemberItem;
 
         #endregion
@@ -108,7 +109,7 @@ namespace umbraco.cms.businesslogic.member
 
         public static IEnumerable<Member> GetAllAsList()
         {
-            int totalRecs;
+            long totalRecs;
             return ApplicationContext.Current.Services.MemberService.GetAll(0, int.MaxValue, out totalRecs)
                 .Select(x => new Member(x))
                 .ToArray();
@@ -153,7 +154,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns></returns>
         public static Member[] getMemberFromFirstLetter(char letter)
         {
-            int totalRecs;
+            long totalRecs;
 
             return ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
                 letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
@@ -163,7 +164,7 @@ namespace umbraco.cms.businesslogic.member
 
         public static Member[] GetMemberByName(string usernameToMatch, bool matchByNameInsteadOfLogin)
         {
-            int totalRecs;
+            long totalRecs;
             if (matchByNameInsteadOfLogin)
             {
                 var found = ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
@@ -288,7 +289,7 @@ namespace umbraco.cms.businesslogic.member
             if (string.IsNullOrEmpty(email))
                 return null;
 
-            int totalRecs;
+            long totalRecs;
             var found = ApplicationContext.Current.Services.MemberService.FindByEmail(
                 email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
 
@@ -509,7 +510,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// A list of groups the member are member of
         /// </summary>
-        public Hashtable Groups
+        public Dictionary<int, IMemberGroup> Groups
         {
             get
             {
@@ -670,14 +671,20 @@ namespace umbraco.cms.businesslogic.member
 
         private void PopulateGroups()
         {
-            var temp = new Hashtable();
+            var temp = new Dictionary<int, IMemberGroup>();
             using (var dr = SqlHelper.ExecuteReader(
                 "select memberGroup from cmsMember2MemberGroup where member = @id",
                 SqlHelper.CreateParameter("@id", Id)))
             {
                 while (dr.Read())
-                    temp.Add(dr.GetInt("memberGroup"),
-                        new MemberGroup(dr.GetInt("memberGroup")));
+                {
+                    var group = ApplicationContext.Current.Services.MemberGroupService.GetById(dr.GetInt("memberGroup"));
+                    if (group != null)
+                    {
+                        temp.Add(dr.GetInt("memberGroup"), group);
+                    }                    
+                }
+                    
             }
             _groups = temp;
         }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -13,10 +14,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class MovePublicAccessXmlDataToDb : MigrationBase
     {
-        public MovePublicAccessXmlDataToDb(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public MovePublicAccessXmlDataToDb(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             if (tables.InvariantContains("umbracoAccess"))
             {
                 //don't run if data is already there.
-                var dataExists = Context.Database.Fetch<AccessDto>(new Sql().Select("*").From<AccessDto>(SqlSyntax));
+                var dataExists = Context.Database.Fetch<AccessDto>(Sql().SelectAll().From<AccessDto>());
                 if (dataExists.Any()) return;
             }
 

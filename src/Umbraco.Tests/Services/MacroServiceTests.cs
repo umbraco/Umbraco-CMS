@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -22,17 +23,18 @@ namespace Umbraco.Tests.Services
         }
 
         public override void CreateTestData()
-        {            
+        {
             base.CreateTestData();
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);
+
                 repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
                 repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
                 repository.AddOrUpdate(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
-                unitOfWork.Commit();
+                unitOfWork.Complete();
             }
         }
 
@@ -47,7 +49,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            
+
             // Act
             var macro = macroService.GetByAlias("test1");
 
@@ -188,7 +190,7 @@ namespace Umbraco.Tests.Services
         {
             var macroService = ServiceContext.MacroService;
             var macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
-            
+
             //adds some properties
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
             macro.Properties.Add(new MacroProperty("blah2", "Blah2", 0, "blah2"));

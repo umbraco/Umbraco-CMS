@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -20,8 +19,8 @@ namespace Umbraco.Core.Services
     public class MacroService : RepositoryService, IMacroService
     {
 
-        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        public MacroService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, logger, eventMessagesFactory)
         {
         }
 
@@ -52,10 +51,13 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var q = repository.Query.Where(macro => macro.Alias == alias);
-                return repository.GetByQuery(q).FirstOrDefault();
+                var repository = uow.CreateRepository<IMacroRepository>();
+                var q = repository.Query.Where(x => x.Alias == alias);
+                var macro = repository.GetByQuery(q).FirstOrDefault();
+                uow.Complete();
+                return macro;
             }
         }
 
@@ -79,17 +81,23 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
-            using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                return repository.GetAll(ids);
+                var repository = uow.CreateRepository<IMacroRepository>();
+                var macros = repository.GetAll(ids);
+                uow.Complete();
+                return macros;
             }
         }
 
         public IMacro GetById(int id)
         {
-            using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                return repository.Get(id);
+                var repository = uow.CreateRepository<IMacroRepository>();
+                var macro = repository.Get(id);
+                uow.Complete();
+                return macro;
             }
         }
 
@@ -113,16 +121,15 @@ namespace Umbraco.Core.Services
 			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this))
 				return;
 
-			var uow = UowProvider.GetUnitOfWork();
-			using (var repository = RepositoryFactory.CreateMacroRepository(uow))
-			{
-				repository.Delete(macro);
-				uow.Commit();
-
-				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IMacroRepository>();
+                repository.Delete(macro);
+				uow.Complete();
 			}
 
-			Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
+            Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+            Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
         }
 
         /// <summary>
@@ -134,17 +141,16 @@ namespace Umbraco.Core.Services
         {
 	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
 				return;
-	        
-			var uow = UowProvider.GetUnitOfWork();
-	        using (var repository = RepositoryFactory.CreateMacroRepository(uow))
-	        {
-		        repository.AddOrUpdate(macro);
-		        uow.Commit();
 
-		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var repository = uow.CreateRepository<IMacroRepository>();
+                repository.AddOrUpdate(macro);
+		        uow.Complete();
 	        }
 
-	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
+            Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+            Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }
 
         ///// <summary>
@@ -168,11 +174,11 @@ namespace Umbraco.Core.Services
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var uow = UowProvider.GetUnitOfWork();
-            using (var auditRepo = RepositoryFactory.CreateAuditRepository(uow))
+            using (var uow = UowProvider.CreateUnitOfWork())
             {
-                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
-                uow.Commit();
+                var repo = uow.CreateRepository<IAuditRepository>();
+                repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Complete();
             }
         }
 

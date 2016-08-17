@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
@@ -9,9 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
     [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
-        public RemoveUmbracoAppConstraints(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public RemoveUmbracoAppConstraints(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
             //This will work on mysql and should work on mssql however the old keys were not named consistently with how the keys are 
             // structured now. So we need to do a check and manually remove them based on their old aliases.
 
-            if (this.Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("app").ToTable("umbracoApp").PrimaryColumn("appAlias");
                 Delete.ForeignKey().FromTable("umbracoAppTree").ForeignColumn("appAlias").ToTable("umbracoApp").PrimaryColumn("appAlias");

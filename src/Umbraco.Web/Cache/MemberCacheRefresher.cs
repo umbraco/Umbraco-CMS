@@ -17,6 +17,9 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
+        public MemberCacheRefresher(CacheHelper cacheHelper) : base(cacheHelper)
+        {
+        }
 
         protected override MemberCacheRefresher Instance
         {
@@ -59,16 +62,16 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            CacheHelper.ClearPartialViewCache();
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.
+            CacheHelper.RuntimeCache.
                 ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberLibraryCacheKey, id));
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.
+            CacheHelper.RuntimeCache.
                 ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id));
 
-            var memberCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMember>();
+            var memberCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMember>();
             if (memberCache)
                 memberCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMember>(id));
         }

@@ -9,7 +9,6 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using System.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
@@ -67,10 +66,10 @@ namespace Umbraco.Web.Cache
 
             //Bind to content type events
 
-            ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
-            ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
-            ContentTypeService.DeletedContentType += ContentTypeServiceDeletedContentType;
-            ContentTypeService.DeletedMediaType += ContentTypeServiceDeletedMediaType;
+            ContentTypeService.Saved += ContentTypeServiceSavedContentType;
+            MediaTypeService.Saved += ContentTypeServiceSavedMediaType;
+            ContentTypeService.Deleted += ContentTypeServiceDeletedContentType;
+            MediaTypeService.Deleted += ContentTypeServiceDeletedMediaType;
             MemberTypeService.Saved += MemberTypeServiceSaved;
             MemberTypeService.Deleted += MemberTypeServiceDeleted;
 
@@ -113,8 +112,8 @@ namespace Umbraco.Web.Cache
             ContentService.Trashed += ContentServiceTrashed;
             ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
 
-            PublishingStrategy.Published += PublishingStrategy_Published;
-            PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
+            ContentService.Published += ContentService_Published;
+            ContentService.UnPublished += ContentService_UnPublished;
 
             //public access events
             PublicAccessService.Saved += PublicAccessService_Saved;
@@ -123,7 +122,7 @@ namespace Umbraco.Web.Cache
         
         #region Publishing
 
-        void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())
             {
@@ -150,7 +149,7 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RemovePageCache(content);
         }
 
-        void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())
             {
@@ -439,7 +438,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, DeleteEventArgs<IMediaType> e)
+        static void ContentTypeServiceDeletedMediaType(IMediaTypeService sender, DeleteEventArgs<IMediaType> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveMediaTypeCache(x));
         }
@@ -469,7 +468,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, SaveEventArgs<IMediaType> e)
+        static void ContentTypeServiceSavedMediaType(IMediaTypeService sender, SaveEventArgs<IMediaType> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMediaTypeCache(x));
         }

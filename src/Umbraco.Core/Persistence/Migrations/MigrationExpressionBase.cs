@@ -1,40 +1,44 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Logging;
+using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
+        private readonly IMigrationContext _context;
 
-        //protected MigrationExpressionBase(ISqlSyntaxProvider sqlSyntax)
-        //{
-        //    SqlSyntax = sqlSyntax;
-        //}
-
-        protected MigrationExpressionBase(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+        protected MigrationExpressionBase(IMigrationContext context, DatabaseType[] supportedDatabaseTypes = null)
         {
-            SupportedDatabaseProviders = supportedDatabaseProviders;
-            SqlSyntax = sqlSyntax;
-            CurrentDatabaseProvider = currentDatabaseProvider;
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            _context = context;
+            SupportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public virtual DatabaseProviders[] SupportedDatabaseProviders { get; private set; }
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
-        public virtual DatabaseProviders CurrentDatabaseProvider { get; private set; }
+        public virtual DatabaseType[] SupportedDatabaseTypes { get; }
+
+        public ISqlSyntaxProvider SqlSyntax => _context.Database.SqlSyntax;
+
+        public virtual DatabaseType CurrentDatabaseType => _context.Database.DatabaseType;
 
         public bool IsExpressionSupported()
         {
-            if (SupportedDatabaseProviders == null || SupportedDatabaseProviders.Any() == false)
-                return true;
-
-            return SupportedDatabaseProviders.Any(x => x == CurrentDatabaseProvider);
+            return SupportedDatabaseTypes == null
+                || SupportedDatabaseTypes.Length == 0
+                // beware!
+                // DatabaseType.SqlServer2005 = DatabaseTypes.SqlServerDatabaseType
+                // DatabaseType.SqlServer2012 = DatabaseTypes.SqlServer2012DatabaseType
+                // with cascading inheritance, so if SqlServer2005 is "supported" we
+                // need to accept SqlServer2012 too => cannot simply test with "Contains"
+                // and have to test the types.
+                //|| SupportedDatabaseTypes.Contains(CurrentDatabaseType);
+                || SupportedDatabaseTypes.Any(x => CurrentDatabaseType.GetType().Inherits(x.GetType()));
         }
 
-        public virtual string Process(Database database)
+        public virtual string Process(UmbracoDatabase database)
         {
-            return this.ToString();
+            return ToString();
         }
 
         /// <summary>

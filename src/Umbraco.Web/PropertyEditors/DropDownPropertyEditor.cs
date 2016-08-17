@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
 using ClientDependency.Core;
+using Umbraco.Core.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors
@@ -17,13 +18,13 @@ namespace Umbraco.Web.PropertyEditors
     /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the string value is published
     /// in cache and not the int ID.
     /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.DropDownListAlias, "Dropdown list", "dropdown", ValueType = "STRING", Group = "lists", Icon = "icon-indent")]
+    [PropertyEditor(Constants.PropertyEditors.DropDownListAlias, "Dropdown list", "dropdown", ValueType = PropertyEditorValueTypes.String, Group = "lists", Icon = "icon-indent")]
     public class DropDownPropertyEditor : DropDownWithKeysPropertyEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownPropertyEditor(ILogger logger) : base(logger)
+        public DropDownPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
         {
         }
 

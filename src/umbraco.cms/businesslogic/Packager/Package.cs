@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -7,6 +8,8 @@ using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.packager
 {
+    [Obsolete("This class is not used and will be removed in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class Package
     {
         protected static ISqlHelper SqlHelper

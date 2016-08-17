@@ -1,8 +1,8 @@
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- 
+  <!--
  ****************************************************
- INCLUDES 
+ INCLUDES
  *****************************************************
  -->
 
@@ -35,9 +35,9 @@
                         {
                             using (var cryptoProvider = new SHA1CryptoServiceProvider())
                             {
-                                
+
                                 var fileHash = cryptoProvider.ComputeHash(stream);
-                                
+
                                 using (TextWriter w = new StreamWriter(OutputFile, false))
                                 {
                                     w.WriteLine(string.Join("", fileHash.Select(b => b.ToString("x2"))));
@@ -52,9 +52,9 @@
   </UsingTask>
 
 
-  <!-- 
+  <!--
  ****************************************************
- VARIABLES 
+ VARIABLES
  *****************************************************
  -->
 
@@ -102,9 +102,9 @@
     <SystemFolders Include="$(WebAppFolder)Views" />
   </ItemGroup>
 
-  <!-- 
+  <!--
  ****************************************************
- TARGETS 
+ TARGETS
  *****************************************************
  -->
 
@@ -155,7 +155,7 @@
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
-  
+
   <Target Name="CreateSystemFolders" DependsOnTargets="CopyBelleBuild" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
     <MakeDir Directories="@(SystemFolders)" />
   </Target>
@@ -231,7 +231,7 @@
       DestinationFiles="@(CustomLanguageFiles->'$(ConfigsFolder)Lang\%(RecursiveDir)%(Filename)%(Extension)')"
       OverwriteReadOnlyFiles="true"
       SkipUnchangedFiles="false" />
-	  
+
     <Copy SourceFiles="@(WebConfigTransformFile)"
       DestinationFiles="$(ConfigsFolder)Web.config.transform"
       OverwriteReadOnlyFiles="true"
@@ -264,14 +264,14 @@
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
     <!-- Build the Umbraco.Web.UI project -->
-    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath);Verbosity=minimal" Targets="Clean;Rebuild;">
     </MSBuild>
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
   </Target>
 
-    
+
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <PropertyGroup>
       <NewVersion>$(BUILD_RELEASE)</NewVersion>
@@ -287,18 +287,18 @@
       ReplacementText="$(BUILD_RELEASE)"/>
 
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
+      Regex="CurrentComment => &quot;(.+)?&quot;"
+      ReplacementText="CurrentComment => &quot;$(BUILD_COMMENT)&quot;"/>
 
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
 	  Condition="'$(BUILD_NIGHTLY)'!=''"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_NIGHTLY)&quot;"/>
-	  
+      Regex="CurrentComment => &quot;(.+)?&quot;"
+      ReplacementText="CurrentComment => &quot;$(BUILD_NIGHTLY)&quot;"/>
+
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
 	  Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
-      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
-      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;"/>
+      Regex="CurrentComment => &quot;(.+)?&quot;"
+      ReplacementText="CurrentComment => &quot;$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;"/>
 
     <!--This updates the AssemblyFileVersion for the solution to the umbraco version-->
     <FileUpdate
@@ -307,34 +307,34 @@
       ReplacementText="AssemblyFileVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
 
     <!--This updates the AssemblyInformationalVersion for the solution to the umbraco version and comment-->
-    <FileUpdate 
+    <FileUpdate
       Condition="'$(BUILD_COMMENT)'!=''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_COMMENT)&quot;)"/>
-    <FileUpdate 
+    <FileUpdate
       Condition="'$(BUILD_COMMENT)'==''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
-    <FileUpdate 
+    <FileUpdate
       Condition="'$(BUILD_NIGHTLY)'!=''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_NIGHTLY)&quot;)"/>
-	<FileUpdate 
+	<FileUpdate
       Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;)"/>
-    <FileUpdate 
+    <FileUpdate
       Condition="'$(BUILD_COMMENT)'=='' AND '$(BUILD_NIGHTLY)'==''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
-    
+
     <!--This updates the copyright year-->
-    <FileUpdate 
+    <FileUpdate
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyCopyright\(&quot;Copyright © Umbraco (\d{4})&quot;\)"
       ReplacementText="AssemblyCopyright(&quot;Copyright © Umbraco $([System.DateTime]::Now.ToString(`yyyy`))&quot;)"/>

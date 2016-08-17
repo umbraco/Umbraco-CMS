@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using Examine;
 using LightInject;
+using Lucene.Net.Documents;
 using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
@@ -28,6 +29,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
         protected override void FreezeResolution()
         {
             var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
+
             UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
@@ -138,17 +141,16 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			Assert.AreEqual(222333, dicDoc.Children.ElementAt(0).Id);
 			Assert.AreEqual(444555, dicDoc.Children.ElementAt(1).Id);
 		}
-
-		[TestCase(true)]
-        [TestCase(false)]
-        public void Convert_From_Search_Result(bool withKey)
+        
+        [Test]
+        public void Convert_From_Search_Result()
 		{
             var ctx = GetUmbracoContext("/test", 1234);
 		    var key = Guid.NewGuid();
 
 			var result = new SearchResult()
 				{
-					Id = 1234,
+					LongId = 1234,
 					Score = 1
 				};
 			result.Fields.Add("__IndexType", "media");
@@ -157,35 +159,40 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			result.Fields.Add("__Path", "-1,1234");
 			result.Fields.Add("__nodeName", "Test");
 			result.Fields.Add("id", "1234");
-            if (withKey) result.Fields.Add("key", key.ToString());
-			result.Fields.Add("nodeName", "Test");
+            result.Fields.Add("key", key.ToString());
+            result.Fields.Add("urlName", "/media/test.jpg");
+            result.Fields.Add("nodeType", "0");
+            result.Fields.Add("sortOrder", "0");
+            result.Fields.Add("level", "2");
+            result.Fields.Add("nodeName", "Test");
 			result.Fields.Add("nodeTypeAlias", Constants.Conventions.MediaTypes.Image);
 			result.Fields.Add("parentID", "-1");
 			result.Fields.Add("path", "-1,1234");
-			result.Fields.Add("updateDate", "2012-07-16T10:34:09");
-			result.Fields.Add("writerName", "Shannon");
+			result.Fields.Add("updateDate", DateTime.Parse("2012-07-16T10:34:09").Ticks.ToString());
+            result.Fields.Add("createDate", DateTime.Parse("2012-07-17T10:34:09").Ticks.ToString());
+            result.Fields.Add("creatorID", "0");
+            result.Fields.Add("creatorName", "Shannon");
 
             var store = new PublishedMediaCache(ctx.Application);
 			var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
-			DoAssert(doc, 1234, withKey ? key : default(Guid), 0, 0, "", "Image", 0, "Shannon", "", 0, 0, "-1,1234", default(DateTime), DateTime.Parse("2012-07-16T10:34:09"), 2);
+			DoAssert(doc, 1234, key, 0, 0, "/media/test.jpg", "Image", 0, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
 			Assert.AreEqual(null, doc.Parent);
 		}
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Convert_From_XPath_Navigator(bool withKey)
+        [Test]
+        public void Convert_From_XPath_Navigator()
 		{
             var ctx = GetUmbracoContext("/test", 1234);
             var key = Guid.NewGuid();
 
 			var xmlDoc = GetMediaXml();
-            if (withKey) ((XmlElement)xmlDoc.DocumentElement.FirstChild).SetAttribute("key", key.ToString());
-			var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
+            ((XmlElement)xmlDoc.DocumentElement.FirstChild).SetAttribute("key", key.ToString());
+            var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
             var cache = new PublishedMediaCache(ctx.Application);
 			var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
-			DoAssert(doc, 2000, withKey ? key : default(Guid), 0, 2, "image1", "Image", 2044, "Shannon", "Shannon2", 22, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
+			DoAssert(doc, 2000, key, 0, 2, "image1", "Image", 2044, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
 			Assert.AreEqual(null, doc.Parent);
 			Assert.AreEqual(2, doc.Children.Count());
 			Assert.AreEqual(2001, doc.Children.ElementAt(0).Id);
@@ -202,12 +209,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 <!ATTLIST CustomDocument id ID #REQUIRED>
 ]>
 <root id=""-1"">
-	<Image id=""2000"" parentID=""-1"" level=""1"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000"" isDoc="""">
+	<Image id=""2000"" parentID=""-1"" level=""1"" writerID=""33"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon"" path=""-1,2000"" isDoc="""">
 		<file><![CDATA[/media/1234/image1.png]]></file>		
-		<Image id=""2001"" parentID=""2000"" level=""2"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000,2001"" isDoc="""">
+		<Image id=""2001"" parentID=""2000"" level=""2"" writerID=""33"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon"" path=""-1,2000,2001"" isDoc="""">
 			<file><![CDATA[/media/1234/image1.png]]></file>		
 		</Image>
-		<Image id=""2002"" parentID=""2000"" level=""2"" writerID=""22"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon2"" path=""-1,2000,2002"" isDoc="""">
+		<Image id=""2002"" parentID=""2000"" level=""2"" writerID=""33"" creatorID=""33"" nodeType=""2044"" template=""0"" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Image1"" urlName=""image1"" writerName=""Shannon"" creatorName=""Shannon"" path=""-1,2000,2002"" isDoc="""">
 			<file><![CDATA[/media/1234/image1.png]]></file>		
 		</Image>
 	</Image>
@@ -232,19 +239,19 @@ namespace Umbraco.Tests.Cache.PublishedCache
 				{
 					{idKey, id.ToString()},
                     {"key", key.ToString()},
-					{templateKey, "333"},
+					{templateKey, "0"},
 					{"sortOrder", "44"},
 					{nodeNameKey, "Testing"},
 					{"urlName", "testing"},
 					{nodeTypeAliasKey, "myType"},
 					{"nodeType", "22"},
 					{"writerName", "Shannon"},
-					{"creatorName", "Shannon2"},
+					{"creatorName", "Shannon"},
 					{"writerID", "33"},
-					{"creatorID", "44"},
+					{"creatorID", "33"},
 					{pathKey, "1,2,3,4,5"},
 					{"createDate", "2012-01-02"},
-					{"updateDate", "2012-01-03"},
+					{"updateDate", "2012-01-02"},
 					{"level", "3"},
 					{"parentID", parentId.ToString()}
 				};
@@ -288,15 +295,15 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			PublishedMediaCache.DictionaryPublishedContent dicDoc,
 			int idVal = 1234,
             Guid keyVal = default(Guid),
-			int templateIdVal = 333,
+			int templateIdVal = 0,
 			int sortOrderVal = 44,
 			string urlNameVal = "testing",
 			string nodeTypeAliasVal = "myType",
 			int nodeTypeIdVal = 22,
 			string writerNameVal = "Shannon",
-			string creatorNameVal = "Shannon2",
+			string creatorNameVal = "Shannon",
 			int writerIdVal = 33,
-			int creatorIdVal = 44,
+			int creatorIdVal = 33,
 			string pathVal = "1,2,3,4,5",
 			DateTime? createDateVal = null,
 			DateTime? updateDateVal = null,
@@ -306,7 +313,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			if (!createDateVal.HasValue)
 				createDateVal = DateTime.Parse("2012-01-02");
 			if (!updateDateVal.HasValue)
-				updateDateVal = DateTime.Parse("2012-01-03");
+				updateDateVal = DateTime.Parse("2012-01-02");
 
 			DoAssert((IPublishedContent)dicDoc, idVal, keyVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
 				creatorNameVal, writerIdVal, creatorIdVal, pathVal, createDateVal, updateDateVal, levelVal);
@@ -319,15 +326,15 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			IPublishedContent doc,
 			int idVal = 1234,
             Guid keyVal = default(Guid),
-            int templateIdVal = 333,
+            int templateIdVal = 0,
 			int sortOrderVal = 44,
 			string urlNameVal = "testing",
 			string nodeTypeAliasVal = "myType",
 			int nodeTypeIdVal = 22,
 			string writerNameVal = "Shannon",
-			string creatorNameVal = "Shannon2",
+			string creatorNameVal = "Shannon",
 			int writerIdVal = 33,
-			int creatorIdVal = 44,
+			int creatorIdVal = 33,
 			string pathVal = "1,2,3,4,5",
 			DateTime? createDateVal = null,
 			DateTime? updateDateVal = null,
@@ -336,7 +343,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			if (!createDateVal.HasValue)
 				createDateVal = DateTime.Parse("2012-01-02");
 			if (!updateDateVal.HasValue)
-				updateDateVal = DateTime.Parse("2012-01-03");
+				updateDateVal = DateTime.Parse("2012-01-02");
 
 			Assert.AreEqual(idVal, doc.Id);
             Assert.AreEqual(keyVal, doc.GetKey());

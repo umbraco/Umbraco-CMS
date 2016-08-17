@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -28,6 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Key { get; set; }
 
         [ResultColumn]
+        [Reference(ReferenceType.Many, ColumnName = "UniqueId", ReferenceMemberName = "UniqueId")]
         public List<LanguageTextDto> LanguageTextDtos { get; set; }
     }
 }

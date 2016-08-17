@@ -194,6 +194,12 @@
     <key alias="visit">訪れる</key>
     <key alias="welcome">ようこそ</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">名前</key>
     <key alias="assignDomain">ドメインの割り当て</key>
@@ -242,7 +248,7 @@
     <key alias="treepicker">項目の選択</key>
     <key alias="viewCacheItem">キャッシュされている項目の表示</key>
 	<key alias="createFolder">フォルダーの作成...</key>
-	
+
     <key alias="relateToOriginalLabel">オリジナルに関連付ける</key>
     <key alias="theFriendliestCommunity">フレンドリーなコミュニティ</key>
 
@@ -267,7 +273,8 @@
 
     <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
     <key alias="exceptionDetail">例外の詳細</key>
-    <key alias="stracktrace">スタックトレース</key>
+    <key alias="stacktrace">スタックトレース</key>
+    <key alias="innerException">Inner Exception</key>
 
     <key alias="linkYour">次をリンク:</key>
     <key alias="unLinkYour">次をリンク解除:</key>
@@ -475,7 +482,7 @@
     <key alias="move">移動</key>
     <key alias="embed">埋め込み</key>
   </area>
-  
+
   <area alias="colors">
     <key alias="black">ブラック</key>
     <key alias="green">グリーン</key>
@@ -484,7 +491,7 @@
     <key alias="blue">ブルー</key>
     <key alias="red">レッド</key>
   </area>
-  
+
   <area alias="shortcuts">
       <key alias="addTab">タブの追加</key>
       <key alias="addProperty">プロパティの追加</key>
@@ -503,7 +510,7 @@
       <key alias="toggleListView">リスト ビューの切り替え</key>
       <key alias="toggleAllowAsRoot">ルートとして許可に切り替え</key>
   </area>
-  
+
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
     <key alias="bold">太字</key>
@@ -537,7 +544,7 @@
       <strong>アップグレード</strong>ボタンを押すとUmbraco %0% 用にデータベースをアップグレードします。</p>
       <p>
       心配ありません。 - コンテントが消える事はありませんし、後で続けることもできます。
-      </p>    
+      </p>
       ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[データベースはバージョン %0% 用にアップグレードされました。<br /><strong>次へ</strong>
       を押して続行してください。]]></key>
@@ -583,7 +590,7 @@
     ]]></key>
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。 
+        ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。
         (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
@@ -597,8 +604,8 @@
     <key alias="runwaySimpleSite">簡単なウェブサイトから始めたい</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway"(≈滑走路)は幾つかの基本的なテンプレートから簡単なウェブサイトを用意します。このインストーラーは自動的にRnwayをセットアップできますが、 
-        これを編集したり、拡張したり、削除する事も簡単にできます。もしUmbracoを完璧に使いこなせるならばこれは不要です。とはいえ、 
+      "Runway"(≈滑走路)は幾つかの基本的なテンプレートから簡単なウェブサイトを用意します。このインストーラーは自動的にRnwayをセットアップできますが、
+        これを編集したり、拡張したり、削除する事も簡単にできます。もしUmbracoを完璧に使いこなせるならばこれは不要です。とはいえ、
         Runwayを使う事は、手間なく簡単にUmbracoを始める為には良い選択肢です。
         Runwayをインストールすれば、必要に応じてRunwayによる基本的な構成のページをRunwayのモジュールから選択できます。
         </p>
@@ -692,7 +699,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
 			<div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -704,7 +711,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 
@@ -1064,7 +1071,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
     <key alias="thisEditorUpdateSettings">このエディターを使用すると新しい設定で更新されます</key>
   </area>
-  
+
   <area alias="templateEditor">
     <key alias="alternativeField">代替フィールド</key>
     <key alias="alternativeText">代替テキスト</key>
@@ -1159,7 +1166,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="memberRoles">役割</key>
     <key alias="memberTypes">メンバーの種類</key>
     <key alias="documentTypes">ドキュメントタイプ</key>
-	<key alias="relationTypes">関連タイプ</key>
+	  <key alias="relationTypes">関連タイプ</key>
     <key alias="packager">パッケージ</key>
     <key alias="packages">パッケージ</key>
     <key alias="python">Python ファイル</key>
@@ -1172,7 +1179,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="templates">テンプレート</key>
     <key alias="xslt">XSLT ファイル</key>
     <key alias="analytics">アナリティクス</key>
+    <key alias="userPermissions">ユーザーの権限</key>
     <key alias="userTypes">ユーザータイプ</key>
+    <key alias="users">ユーザー</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>

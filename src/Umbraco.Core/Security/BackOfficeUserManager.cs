@@ -32,25 +32,29 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
+        /// <param name="memberTypeService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
+            IMemberTypeService memberTypeService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
+            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, memberTypeService, externalLoginService, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, options);
             return manager;
         }
@@ -118,6 +122,8 @@ namespace Umbraco.Core.Security
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
 
+            manager.EmailService = new EmailService();
+            
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
@@ -132,7 +138,6 @@ namespace Umbraco.Core.Security
             //    BodyFormat = "Your security code is: {0}"
             //});
 
-            //manager.EmailService = new EmailService();
             //manager.SmsService = new SmsService();            
         }
 
@@ -199,7 +204,7 @@ namespace Umbraco.Core.Security
         /// We've allowed this check to be overridden with a simple callback so that developers don't actually
         /// have to implement/override this class.
         /// </remarks>
-        public async override Task<bool> CheckPasswordAsync(T user, string password)
+        public override async Task<bool> CheckPasswordAsync(T user, string password)
         {
             if (BackOfficeUserPasswordChecker != null)
             {

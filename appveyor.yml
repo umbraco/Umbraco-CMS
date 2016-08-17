@@ -1,0 +1,57 @@
+version: '{build}'
+shallow_clone: true
+build_script:
+- cmd: >-
+    SET SLN=%CD%
+    
+    SET SRC=%SLN%\src
+    
+    SET PACKAGES=%SRC%\packages
+
+    CD build
+
+    SET "release="
+    
+    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+    
+    ECHO "Restoring NuGet into %PACKAGES%"
+    
+    %SRC%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Core\project.json -OutputDirectory %PACKAGES% -Verbosity quiet
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.datalayer\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Web\project.json -OutputDirectory %PACKAGES% -Verbosity quiet
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Web.UI\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet  
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\Umbraco.Tests\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet    
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.controls\packages.config -OutputDirectory %PACKAGES% -Verbosity quiet
+
+    ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
+    
+    SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+    
+    SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+
+    XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
+    
+    %MSBUILD% "%SLN%/src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%PACKAGES%
+    
+    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%PACKAGES%
+    
+test:
+  assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
+artifacts:
+- path: build\UmbracoCms.*
+- path: build\msbuild.log
+notifications:
+- provider: Slack
+  auth_token:
+    secure: v2csJi2V5ghR0rPdODK8GJdOGNCA+XaK84iQ9MdPOClqB+VU+40ybdKp6gPirGSH
+  channel: '#build-umbraco-core'
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false

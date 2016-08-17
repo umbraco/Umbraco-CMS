@@ -16,4 +16,12 @@
         </h5>
         <pre style="white-space: pre-wrap; overflow-x: auto;">{{model.error.data.StackTrace}}</pre>
     </div>
+
+    <div class="umb-control-group" ng-repeat="e in model.error.data.InnerExceptions">
+        <h5>
+            <localize key="defaultdialogs_innerException">Inner Exception:</localize>
+        </h5>
+        <div>{{e.ExceptionType}}: {{e.ExceptionMessage}}</div>
+        <pre style="white-space: pre-wrap; overflow-x: auto;">{{e.StackTrace}}</pre>
+    </div>
 </div>

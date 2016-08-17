@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {

@@ -35,6 +35,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // as xml in the database, it's always been new line delimited. Will ask Stephen about this.
             // In the meantime, we'll do this xml check, see if it parses and if not just continue with 
             // splitting by newline
+            //
+            //   RS: SD/Stephan Please consider post before deciding to remove 
+            //// https://our.umbraco.org/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
             var values = new List<string>();
             var pos = sourceString.IndexOf("<value>", StringComparison.Ordinal);
             while (pos >= 0)

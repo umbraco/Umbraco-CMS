@@ -170,16 +170,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     }
                     
                 }
-                else {
 
-                    //return an error object including the error message for UI
-                    deferred.reject({
-                        errorMsg: result.errorMsg,
-                        data: result.data,
-                        status: result.status
-                    });
+                //return an error object including the error message for UI
+                deferred.reject({
+                    errorMsg: result.errorMsg,
+                    data: result.data,
+                    status: result.status
+                });
 
-                }
 
             });
 
@@ -266,15 +264,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         }
                         
                     }
-                    else {
-
-                        //return an error object including the error message for UI
-                        deferred.reject({
-                            errorMsg: 'An error occurred',
-                            data: data,
-                            status: status
-                        });
-                    }
+                    
+                    //return an error object including the error message for UI
+                    deferred.reject({
+                        errorMsg: 'An error occurred',
+                        data: data,
+                        status: status
+                    });
+                   
 
                 });
 

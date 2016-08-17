@@ -8,9 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class UpdateCmsPropertyTypeGroupTable : MigrationBase
     {
-        public UpdateCmsPropertyTypeGroupTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public UpdateCmsPropertyTypeGroupTable(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()

@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -8,9 +7,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class RemoveCmsMacroPropertyTypeTable : MigrationBase
     {
-        public RemoveCmsMacroPropertyTypeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public RemoveCmsMacroPropertyTypeTable(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()

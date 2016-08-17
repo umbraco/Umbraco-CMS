@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.IO;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using SQLCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -17,13 +20,13 @@ namespace Umbraco.Tests.Migrations.Upgrades
     {
         public override void DatabaseSpecificSetUp()
         {
-            string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
+            string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
 
             if (!File.Exists(filePath))
             {
                 try
                 {
-                    //Delete database file before continueing                    
+                    //Delete database file before continueing
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
@@ -40,14 +43,16 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 //Create the Sql CE database
                 //Get the connectionstring settings from config
                 var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                var engine = new SqlCeEngine(settings.ConnectionString);
-                engine.CreateDatabase();
+                using (var engine = new SqlCeEngine(settings.ConnectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
             else
             {
                 TestHelper.ClearDatabase();
             }
-            
+
         }
 
         public override void DatabaseSpecificTearDown()
@@ -58,19 +63,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
             TestHelper.ClearDatabase();
         }
 
-        public override ISqlSyntaxProvider GetSyntaxProvider()
-        {
-            return new SqlCeSyntaxProvider();
-        }
-
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
-        }
-
-        public override DatabaseProviders GetDatabaseProvider()
-        {
-            return DatabaseProviders.SqlServerCE;
+            var databaseType = DatabaseType.SQLCe;
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", sqlSyntax, databaseType, dbProviderFactory, Mock.Of<ILogger>());
         }
 
         public override string GetDatabaseSpecificSqlScript()

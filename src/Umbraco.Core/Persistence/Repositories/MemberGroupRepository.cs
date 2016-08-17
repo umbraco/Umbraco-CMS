@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -19,10 +20,10 @@ namespace Umbraco.Core.Persistence.Repositories
 {
 
 
-    internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
+    internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -40,24 +41,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IMemberGroup> PerformGetAll(params int[] ids)
         {
+            var sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+
             if (ids.Any())
-            {
-                var sql = new Sql()
-                    .Select("*")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId)
-                    .Where("umbracoNode.id in (@ids)", new { ids = ids });
-                return Database.Fetch<NodeDto>(sql)
-                    .Select(x => _modelFactory.BuildEntity(x));
-            }
-            else
-            {
-                var sql = new Sql()
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId);
-                return Database.Fetch<NodeDto>(sql)
-                    .Select(x => _modelFactory.BuildEntity(x));
-            }
+                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
+
+            return Database.Fetch<NodeDto>(sql).Select(x => _modelFactory.BuildEntity(x));
         }
 
         protected override IEnumerable<IMemberGroup> PerformGetByQuery(IQuery<IMemberGroup> query)
@@ -66,16 +58,21 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMemberGroup>(sqlClause, query);
             var sql = translator.Translate();
 
-            return Database.Fetch<NodeDto>(sql)
-                .Select(x => _modelFactory.BuildEntity(x));
+            return Database.Fetch<NodeDto>(sql).Select(x => _modelFactory.BuildEntity(x));
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<NodeDto>(SqlSyntax)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<NodeDto>();
+
+            sql
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 
@@ -110,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var group = (MemberGroup)entity;
             group.AddingEntity();
             var dto = _modelFactory.BuildDto(group);
-            var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
+            var o = Database.IsNew<NodeDto>(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
             group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
             
             //Update with new correct path and id            
@@ -176,13 +173,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IMemberGroup> GetMemberGroupsForMember(int memberId)
         {
-            var sql = new Sql();
-            sql.Select("umbracoNode.*")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<Member2MemberGroupDto>(SqlSyntax)
-                .On<NodeDto, Member2MemberGroupDto>(SqlSyntax, dto => dto.NodeId, dto => dto.MemberGroup)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<Member2MemberGroupDto>(SqlSyntax, x => x.Member == memberId);
+            var sql = Sql()
+                .Select("umbracoNode.*")
+                .From<NodeDto>()
+                .InnerJoin<Member2MemberGroupDto>()
+                .On<NodeDto, Member2MemberGroupDto>( dto => dto.NodeId, dto => dto.MemberGroup)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<Member2MemberGroupDto>(x => x.Member == memberId);
 
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)
@@ -192,28 +189,28 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username)
         {
             //find the member by username
-            var memberSql = new Sql();
             var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-            
-            memberSql.Select("umbracoNode.id")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<MemberDto>(SqlSyntax)
-                .On<NodeDto, MemberDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == memberObjectType)
-                .Where<MemberDto>(SqlSyntax, x => x.LoginName == username);
+
+            var memberSql = Sql()
+                .Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>( x => x.NodeObjectType == memberObjectType)
+                .Where<MemberDto>(x => x.LoginName == username);
             var memberIdUsername = Database.Fetch<int?>(memberSql).FirstOrDefault();
             if (memberIdUsername.HasValue == false)
             {
                 return Enumerable.Empty<IMemberGroup>();
             }
 
-            var sql = new Sql();
-            sql.Select("umbracoNode.*")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<Member2MemberGroupDto>(SqlSyntax)
-                .On<NodeDto, Member2MemberGroupDto>(SqlSyntax, dto => dto.NodeId, dto => dto.MemberGroup)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<Member2MemberGroupDto>(SqlSyntax, x => x.Member == memberIdUsername.Value);
+            var sql = Sql()
+                .Select("umbracoNode.*")
+                .From<NodeDto>()
+                .InnerJoin<Member2MemberGroupDto>()
+                .On<NodeDto, Member2MemberGroupDto>( dto => dto.NodeId, dto => dto.MemberGroup)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<Member2MemberGroupDto>(x => x.Member == memberIdUsername.Value);
 
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)
@@ -225,14 +222,15 @@ namespace Umbraco.Core.Persistence.Repositories
             using (var transaction = Database.GetTransaction())
             {
                 //first get the member ids based on the usernames
-                var memberSql = new Sql();
                 var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-                memberSql.Select("umbracoNode.id")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<MemberDto>(SqlSyntax)
-                    .On<NodeDto, MemberDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == memberObjectType)
-                    .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
+
+                var memberSql = Sql()
+                    .Select("umbracoNode.id")
+                    .From<NodeDto>()
+                    .InnerJoin<MemberDto>()
+                    .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                    .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
                 var memberIds = Database.Fetch<int>(memberSql).ToArray();
 
                 AssignRolesInternal(memberIds, roleNames);
@@ -245,14 +243,15 @@ namespace Umbraco.Core.Persistence.Repositories
             using (var transaction = Database.GetTransaction())
             {
                 //first get the member ids based on the usernames
-                var memberSql = new Sql();
                 var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-                memberSql.Select("umbracoNode.id")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<MemberDto>(SqlSyntax)
-                    .On<NodeDto, MemberDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == memberObjectType)
-                    .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
+
+                var memberSql = Sql()
+                    .Select("umbracoNode.id")
+                    .From<NodeDto>()
+                    .InnerJoin<MemberDto>()
+                    .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                    .Where<NodeDto>( x => x.NodeObjectType == memberObjectType)
+                    .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
                 var memberIds = Database.Fetch<int>(memberSql).ToArray();
 
                 DissociateRolesInternal(memberIds, roleNames);
@@ -276,10 +275,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //create the missing roles first
 
-            var existingSql = new Sql()
-               .Select("*")
-               .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId)
+            var existingSql = Sql()
+               .SelectAll()
+               .From<NodeDto>()
+               .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
             var missingRoles = roleNames.Except(existingRoles);
@@ -300,16 +299,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //get the groups that are currently assigned to any of these members
 
-            var assignedSql = new Sql();
-            assignedSql.Select(string.Format(
+            var assignedSql = Sql()
+                .Select(string.Format(
                     "{0},{1},{2}",
                     SqlSyntax.GetQuotedColumnName("text"),
                     SqlSyntax.GetQuotedColumnName("Member"),
                     SqlSyntax.GetQuotedColumnName("MemberGroup")))
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<Member2MemberGroupDto>(SqlSyntax)
-                .On<NodeDto, Member2MemberGroupDto>(SqlSyntax, dto => dto.NodeId, dto => dto.MemberGroup)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
+                .From<NodeDto>()
+                .InnerJoin<Member2MemberGroupDto>()
+                .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                 .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
 
             var currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
@@ -343,15 +342,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void DissociateRolesInternal(int[] memberIds, string[] roleNames)
         {
-            var existingSql = new Sql()
-                    .Select("*")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId)
+            var existingSql = Sql()
+                    .SelectAll()
+                    .From<NodeDto>()
+                    .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                     .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
 
             Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",
-                new { memberIds = memberIds, memberGroups = existingRolesIds });
+                new { /*memberIds =*/ memberIds, memberGroups = existingRolesIds });
         }
 
         private class AssignedRolesDto

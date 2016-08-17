@@ -3,6 +3,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);            
+            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), MappingResolver);            
         }
 
      
@@ -37,10 +38,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                unitOfWork.Database.EnableSqlTrace = true;
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var language = repository.Get(1);
 
@@ -55,17 +58,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
                 {
                     CultureName = au.DisplayName
                 };
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 language = repository.GetByIsoCode(au.Name);
@@ -81,17 +85,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
                 {
                     CultureName = au.DisplayName
                 };
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 //re-get 
                 language = repository.GetByCultureName(au.DisplayName);
@@ -108,10 +113,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_WhenIdDoesntExist_ReturnsNull()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
+
                 // Act
                 var language = repository.Get(0);
 
@@ -124,10 +130,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languages = repository.GetAll();
@@ -144,10 +150,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
         { 
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languages = repository.GetAll(1, 2);
@@ -164,10 +170,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<ILanguage>(SqlSyntax, MappingResolver).Where(x => x.IsoCode == "da-DK");
@@ -184,10 +190,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var query = new Query<ILanguage>(SqlSyntax, MappingResolver).Where(x => x.IsoCode.StartsWith("D"));
@@ -202,15 +208,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
                 repository.AddOrUpdate(languageBR);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -222,10 +228,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var language = repository.Get(5);
@@ -233,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 language.CultureName = "pt-BR";
 
                 repository.AddOrUpdate(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var languageUpdated = repository.Get(5);
 
@@ -248,15 +254,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var language = repository.Get(3);
                 repository.Delete(language);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 
@@ -269,10 +275,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var repository = CreateRepository(unitOfWork);
 
                 // Act
                 var exists = repository.Exists(3);

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -10,30 +10,32 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence
 {
-
     public class DatabaseSchemaHelper
     {
-        private readonly Database _db;
+        private readonly UmbracoDatabase _database;
         private readonly ILogger _logger;
-        private readonly ISqlSyntaxProvider _syntaxProvider;
         private readonly BaseDataCreation _baseDataCreation;
 
-        public DatabaseSchemaHelper(Database db, ILogger logger, ISqlSyntaxProvider syntaxProvider)
+        public DatabaseSchemaHelper(UmbracoDatabase database, ILogger logger)
         {
-            _db = db;
+            _database = database;
             _logger = logger;
-            _syntaxProvider = syntaxProvider;
-            _baseDataCreation = new BaseDataCreation(db, logger);
+            _baseDataCreation = new BaseDataCreation(database, logger);
         }
+
+        private ISqlSyntaxProvider SqlSyntax => _database.SqlSyntax;
 
         public bool TableExist(string tableName)
         {
-            return _syntaxProvider.DoesTableExist(_db, tableName);
+            return SqlSyntax.DoesTableExist(_database, tableName);
         }
 
         internal void UninstallDatabaseSchema()
         {
-            var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);
+            // fixme
+            // weird to create a DatabaseSchemaCreation here, since it creates
+            // a circular dependency with DatabaseSchemaHelper?
+            var creation = new DatabaseSchemaCreation(_database, _logger);
             creation.UninstallDatabaseSchema();
         }
 
@@ -44,7 +46,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         public void CreateDatabaseSchema(ApplicationContext applicationContext)
         {
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
             CreateDatabaseSchema(true, applicationContext);
         }
 
@@ -57,7 +59,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="applicationContext"></param>
         public void CreateDatabaseSchema(bool guardConfiguration, ApplicationContext applicationContext)
         {
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (applicationContext == null) throw new ArgumentNullException(nameof(applicationContext));
 
             if (guardConfiguration && applicationContext.IsConfigured)
                 throw new Exception("Umbraco is already configured!");
@@ -77,7 +79,10 @@ namespace Umbraco.Core.Persistence
         {
             _logger.Info<Database>("Initializing database schema creation");
 
-            var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);
+            // fixme
+            // weird to create a DatabaseSchemaCreation here, since it creates
+            // a circular dependency with DatabaseSchemaHelper?
+            var creation = new DatabaseSchemaCreation(_database, _logger);
             creation.InitializeDatabaseSchema();
 
             _logger.Info<Database>("Finalized database schema creation");
@@ -86,26 +91,26 @@ namespace Umbraco.Core.Persistence
         public void CreateTable<T>(bool overwrite)
            where T : new()
         {
-            var tableType = typeof(T);
+            var tableType = typeof (T);
             CreateTable(overwrite, tableType);
         }
 
         public void CreateTable<T>()
           where T : new()
         {
-            var tableType = typeof(T);           
+            var tableType = typeof (T);
             CreateTable(false, tableType);
         }
 
         public void CreateTable(bool overwrite, Type modelType)
         {
-            var tableDefinition = DefinitionFactory.GetTableDefinition(modelType, _syntaxProvider);
+            var tableDefinition = DefinitionFactory.GetTableDefinition(modelType, SqlSyntax);
             var tableName = tableDefinition.Name;
 
-            string createSql = _syntaxProvider.Format(tableDefinition);
-            string createPrimaryKeySql = _syntaxProvider.FormatPrimaryKey(tableDefinition);
-            var foreignSql = _syntaxProvider.Format(tableDefinition.ForeignKeys);
-            var indexSql = _syntaxProvider.Format(tableDefinition.Indexes);
+            var createSql = SqlSyntax.Format(tableDefinition);
+            var createPrimaryKeySql = SqlSyntax.FormatPrimaryKey(tableDefinition);
+            var foreignSql = SqlSyntax.Format(tableDefinition.ForeignKeys);
+            var indexSql = SqlSyntax.Format(tableDefinition.Indexes);
 
             var tableExist = TableExist(tableName);
             if (overwrite && tableExist)
@@ -116,22 +121,22 @@ namespace Umbraco.Core.Persistence
 
             if (tableExist == false)
             {
-                using (var transaction = _db.GetTransaction())
+                using (var transaction = _database.GetTransaction())
                 {
                     //Execute the Create Table sql
-                    int created = _db.Execute(new Sql(createSql));
-                    _logger.Info<Database>(string.Format("Create Table sql {0}:\n {1}", created, createSql));
+                    var created = _database.Execute(new Sql(createSql));
+                    _logger.Info<Database>($"Create Table sql {created}:\n {createSql}");
 
                     //If any statements exists for the primary key execute them here
-                    if (!string.IsNullOrEmpty(createPrimaryKeySql))
+                    if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
                     {
-                        int createdPk = _db.Execute(new Sql(createPrimaryKeySql));
-                        _logger.Info<Database>(string.Format("Primary Key sql {0}:\n {1}", createdPk, createPrimaryKeySql));
+                        var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
+                        _logger.Info<Database>($"Primary Key sql {createdPk}:\n {createPrimaryKeySql}");
                     }
 
                     //Turn on identity insert if db provider is not mysql
-                    if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                        _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _syntaxProvider.GetQuotedTableName(tableName))));
+                    if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
 
                     //Call the NewTable-event to trigger the insert of base/default data
                     //OnNewTable(tableName, _db, e, _logger);
@@ -139,59 +144,55 @@ namespace Umbraco.Core.Persistence
                     _baseDataCreation.InitializeBaseData(tableName);
 
                     //Turn off identity insert if db provider is not mysql
-                    if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                        _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _syntaxProvider.GetQuotedTableName(tableName))));
+                    if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
 
                     //Special case for MySql
-                    if (_syntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
+                    if (SqlSyntax is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
                     {
-                        _db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
+                        _database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                     }
 
                     //Loop through index statements and execute sql
                     foreach (var sql in indexSql)
                     {
-                        int createdIndex = _db.Execute(new Sql(sql));
-                        _logger.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
+                        var createdIndex = _database.Execute(new Sql(sql));
+                        _logger.Info<Database>($"Create Index sql {createdIndex}:\n {sql}");
                     }
 
                     //Loop through foreignkey statements and execute sql
                     foreach (var sql in foreignSql)
                     {
-                        int createdFk = _db.Execute(new Sql(sql));
-                        _logger.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
+                        var createdFk = _database.Execute(new Sql(sql));
+                        _logger.Info<Database>($"Create Foreign Key sql {createdFk}:\n {sql}");
                     }
-
-                    
 
                     transaction.Complete();
                 }
             }
 
-            _logger.Info<Database>(string.Format("New table '{0}' was created", tableName));
+            _logger.Info<Database>($"New table '{tableName}' was created");
         }
 
         public void DropTable<T>()
             where T : new()
         {
-            Type type = typeof(T);
+            var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             if (tableNameAttribute == null)
-                throw new Exception(
-                    string.Format(
-                        "The Type '{0}' does not contain a TableNameAttribute, which is used to find the name of the table to drop. The operation could not be completed.",
-                        type.Name));
+                throw new Exception($"The Type '{type.Name}' does not contain a TableNameAttribute, which is used"
+                    + " to find the name of the table to drop. The operation could not be completed.");
 
-            string tableName = tableNameAttribute.Value;
+            var tableName = tableNameAttribute.Value;
             DropTable(tableName);
         }
 
         public void DropTable(string tableName)
         {
             var sql = new Sql(string.Format(
-                _syntaxProvider.DropTable,
-                _syntaxProvider.GetQuotedTableName(tableName)));
-            _db.Execute(sql);
+                SqlSyntax.DropTable,
+                SqlSyntax.GetQuotedTableName(tableName)));
+            _database.Execute(sql);
         }
     }
 }

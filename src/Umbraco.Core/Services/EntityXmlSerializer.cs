@@ -446,7 +446,7 @@ namespace Umbraco.Core.Services
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get url encoded folder names
-                var folders = contentTypeService.GetContentTypeContainers(contentType)
+                var folders = contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
 

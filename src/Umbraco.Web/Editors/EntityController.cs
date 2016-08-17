@@ -246,14 +246,14 @@ namespace Umbraco.Web.Editors
             var sb = new StringBuilder();
 
             string type;
-            var searcher = Constants.Examine.InternalSearcher;            
+                     
             var fields = new[] { "id", "__NodeId" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
+                    
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName"};
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -299,7 +299,7 @@ namespace Umbraco.Web.Editors
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.GetSearcher(Constants.Examine.InternalIndexer);
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -314,7 +314,7 @@ namespace Umbraco.Web.Editors
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim(new[] { '\"', '\'' });
+                query = query.Trim('\"', '\'');
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                if (query.Trim('\"', '\'').IsNullOrWhiteSpace())
                 {
                     return new List<EntityBasic>();
                 }
@@ -390,10 +390,11 @@ namespace Umbraco.Web.Editors
             sb.Append(type);
 
             
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString())
+                //limit results to 200 to avoid huge over processing (CPU)
+                .MaxCount(200);
             
-            //limit results to 200 to avoid huge over processing (CPU)
-            var result = internalSearcher.Search(raw, 200);
+            var result = internalSearcher.Find(raw);
 
             switch (entityType)
             {
@@ -413,7 +414,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> MemberFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> MemberFromSearchResults(ILuceneSearchResults results)
         {
             var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
@@ -425,10 +426,10 @@ namespace Umbraco.Web.Editors
                     m.Icon = "icon-user";
                 }
 
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                var searchResult = results.First(x => x.LongId.ToInvariantString() == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
+                    m.AdditionalData["Email"] = results.First(x => x.LongId.ToInvariantString() == m.Id.ToString()).Fields["email"];    
                 }
                 if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
                 {
@@ -447,7 +448,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> MediaFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> MediaFromSearchResults(ILuceneSearchResults results)
         {
             var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
@@ -467,9 +468,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> ContentFromSearchResults(ISearchResults results)
+        private IEnumerable<EntityBasic> ContentFromSearchResults(ILuceneSearchResults results)
         {
-            var mapped = Mapper.Map<ISearchResults, IEnumerable<EntityBasic>>(results).ToArray();
+            var mapped = Mapper.Map<ILuceneSearchResults, IEnumerable<EntityBasic>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
@@ -566,8 +567,8 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.PropertyType:
 
                     //get all document types, then combine all property types into one list
-                    var propertyTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
-                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                    var propertyTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
@@ -577,8 +578,8 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.PropertyGroup:
 
                     //get all document types, then combine all property types into one list
-                    var propertyGroups = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
-                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                    var propertyGroups = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>()
+                                                .Concat(Services.MediaTypeService.GetAll())
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);
@@ -587,7 +588,7 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    int total;
+                    long total;
                     var users = Services.UserService.GetAll(0, int.MaxValue, out total);
                     var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);

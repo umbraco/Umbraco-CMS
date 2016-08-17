@@ -9,6 +9,7 @@ using System.Text;
 using System.Web.Services.Description;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Dynamics
 {

@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Configuration;
 using Umbraco.Web;
+using Umbraco.Web.Install;
 
 
 namespace umbraco.presentation.webservices
@@ -72,7 +73,7 @@ namespace umbraco.presentation.webservices
 
             string dbProvider = string.Empty;
             if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)
-            dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+            dbProvider = InstallHelper.GetDbProviderString(ApplicationContext.Current.DatabaseContext);
 
             var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
             check.Install(installId,

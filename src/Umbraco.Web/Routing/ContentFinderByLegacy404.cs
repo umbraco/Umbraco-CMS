@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -35,13 +37,37 @@ namespace Umbraco.Web.Routing
 		{
 			_logger.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 
+            // try to find a culture as best as we can
+		    var errorCulture = CultureInfo.CurrentUICulture;
+		    if (pcr.HasDomain)
+		    {
+		        errorCulture = CultureInfo.GetCultureInfo(pcr.UmbracoDomain.LanguageIsoCode);
+		    }
+		    else
+		    {
+		        var route = pcr.Uri.GetAbsolutePathDecoded();
+		        var pos = route.LastIndexOf('/');
+		        IPublishedContent node = null;
+		        while (pos > 1)
+		        {
+		            route = route.Substring(0, pos);
+                    node = pcr.RoutingContext.UmbracoContext.ContentCache.GetByRoute(route);
+		            if (node != null) break;
+                    pos = route.LastIndexOf('/');
+                }
+		        if (node != null)
+		        {
+		            var d = DomainHelper.FindWildcardDomainInPath(pcr.RoutingContext.UmbracoContext.Application.Services.DomainService.GetAll(true), node.Path, null);
+		            if (d != null && string.IsNullOrWhiteSpace(d.LanguageIsoCode) == false)
+		                errorCulture = CultureInfo.GetCultureInfo(d.LanguageIsoCode);
+		        }
+            }
+
 		    var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentConfigSection.Error404Collection.ToArray(),
-                //TODO: Is there a better way to extract this value? at least we're not relying on singletons here though
-		        pcr.RoutingContext.UmbracoContext.HttpContext.Request.ServerVariables["SERVER_NAME"],
                 pcr.RoutingContext.UmbracoContext.Application.Services.EntityService,
                 new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache),
-                pcr.RoutingContext.UmbracoContext.Application.Services.DomainService);
+                errorCulture);
 
 			IPublishedContent content = null;
 

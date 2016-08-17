@@ -7,9 +7,9 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("4.11.0", 0, "Test")]
     public class FourElevenMigration : MigrationBase
     {
-        public FourElevenMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public FourElevenMigration(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()

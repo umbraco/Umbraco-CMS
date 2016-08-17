@@ -186,6 +186,12 @@
     <key alias="visit">Besuchen</key>
     <key alias="welcome">Willkommen</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Hostnamen verwalten</key>
@@ -946,7 +952,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="templates">Vorlagen</key>
     <key alias="xslt">XSLT-Dateien</key>
     <key alias="analytics">Auswertungen</key>
+    <key alias="userPermissions">Berechtigungen</key>
     <key alias="userTypes">Benutzertypen</key>
+    <key alias="users">Benutzer</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>

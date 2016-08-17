@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Querying
                 m.Expression.NodeType == ExpressionType.Parameter
                 && m.Expression.Type == typeof(T))
             {
-                var field = _mapper.Map(m.Member.Name, true);
+                var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
                 if (field.IsNullOrWhiteSpace())
                     throw new InvalidOperationException("The mapper returned an empty field for the member name: " + m.Member.Name);
                 return field;
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
             {
-                var field = _mapper.Map(m.Member.Name, true);
+                var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
                 if (field.IsNullOrWhiteSpace())
                     throw new InvalidOperationException("The mapper returned an empty field for the member name: " + m.Member.Name);
                 return field;

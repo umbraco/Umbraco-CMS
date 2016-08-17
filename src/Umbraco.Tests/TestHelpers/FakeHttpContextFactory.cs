@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security;
 using System.Security.Principal;
@@ -12,10 +11,10 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.TestHelpers
 {
-	/// <summary>
-	/// Creates a mock http context with supporting other contexts to test against
-	/// </summary>
-	public class FakeHttpContextFactory
+    /// <summary>
+    /// Creates a mock http context with supporting other contexts to test against
+    /// </summary>
+    public class FakeHttpContextFactory
 	{
 
 		[SecuritySafeCritical]

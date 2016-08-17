@@ -22,13 +22,14 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Setup()
         {
             var container = new ServiceContainer();
+            container.EnableAnnotatedConstructorInjection();
 
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new TestServerRegistrar());
             ServerMessengerResolver.Current = new ServerMessengerResolver(
                 container, factory => new TestServerMessenger());
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
+                container, Mock.Of<ILogger>(), () => new[] { typeof(TestCacheRefresher) });
             Resolution.Freeze();
         }
 

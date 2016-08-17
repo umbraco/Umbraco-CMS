@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -18,21 +19,24 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Language"/>
     /// </summary>
-    internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
+    internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
-        {           
+        private IRepositoryCachePolicy<ILanguage, int> _cachePolicy;
+
+        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
+        {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<ILanguage, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<ILanguage, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<ILanguage, int> CachePolicy
         {
             get
             {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ILanguage, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
+                if (_cachePolicy != null) return _cachePolicy;
+
+                _cachePolicy = new FullDataSetRepositoryCachePolicy<ILanguage, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
+
+                return _cachePolicy;
             }
         }
 
@@ -54,9 +58,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //this needs to be sorted since that is the way legacy worked - default language is the first one!!
             //even though legacy didn't sort, it should be by id
-            sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
+            sql.OrderBy<LanguageDto>(dto => dto.Id);
 
-            
+
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
         }
 
@@ -70,13 +74,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Overrides of PetaPocoRepositoryBase<int,Language>
+        #region Overrides of NPocoRepositoryBase<int,Language>
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<LanguageDto>(SqlSyntax);
+            var sql = Sql();
+
+            sql = isCount
+                ? sql.SelectCount()
+                : sql.Select<LanguageDto>();
+
+            sql
+               .From<LanguageDto>();
             return sql;
         }
 
@@ -166,6 +175,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 
-   
+
     }
 }

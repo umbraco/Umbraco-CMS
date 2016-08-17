@@ -16,7 +16,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = "JSON", HideLabel = false, Group="media", Icon="icon-crop")]
+    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -27,6 +27,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
             if (contentSettings == null) throw new ArgumentNullException("contentSettings");
+
+            _applicationStartup = new FileUploadPropertyEditorApplicationStartup(this);
+
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings;
 
@@ -34,9 +37,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     {"focalPoint", "{left: 0.5, top: 0.5}"},
                     {"src", ""}
-                };
-            MemberService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                };            
         }
 
         /// <summary>
@@ -253,35 +254,58 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         #region Application event handler, used to bind to events on startup
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
 
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
+        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup;
 
         /// <summary>
-        /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-        /// if we find any attached to the current media item.
+        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
         /// </summary>
-        /// <remarks>
-        /// I think this kind of logic belongs on this property editor, I guess it could exist elsewhere but it all has to do with the cropper.
-        /// </remarks>
+        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
+        {
+            private readonly ImageCropperPropertyEditor _imageCropperPropertyEditor;
+
+            public FileUploadPropertyEditorApplicationStartup(ImageCropperPropertyEditor imageCropperPropertyEditor)
+            {
+                _imageCropperPropertyEditor = imageCropperPropertyEditor;
+            }
+
+            /// <summary>
+            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
+            /// if we find any attached to the current media item.
+            /// </summary>
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            {
+                MediaService.Saving += _imageCropperPropertyEditor.MediaServiceSaving;
+                MediaService.Created += _imageCropperPropertyEditor.MediaServiceCreated;
+                ContentService.Copied += _imageCropperPropertyEditor.ContentServiceCopied;
+
+                MediaService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                MediaService.EmptiedRecycleBin += (sender, args) =>
+                    args.Files.AddRange(_imageCropperPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
+                ContentService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                ContentService.EmptiedRecycleBin += (sender, args) =>
+                    args.Files.AddRange(_imageCropperPropertyEditor.ServiceEmptiedRecycleBin(args.AllPropertyData));
+                MemberService.Deleted += (sender, args) =>
+                    args.MediaFilesToDelete.AddRange(_imageCropperPropertyEditor.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            }
+        }
+
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+        }
         public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            MediaService.Saving += MediaServiceSaving;
-            MediaService.Created += MediaServiceCreated;
-            ContentService.Copied += ContentServiceCopied;
-
-            MediaService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
-            ContentService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+            //wrap
+            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
         }
         #endregion
     }

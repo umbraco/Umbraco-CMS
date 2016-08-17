@@ -1,5 +1,11 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using System.IO;
+using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using UmbracoExamine;
@@ -7,29 +13,28 @@ using UmbracoExamine;
 namespace Umbraco.Tests.UmbracoExamine
 {
     [TestFixture]
-    public abstract class ExamineBaseTest : BaseUmbracoConfigurationTest
+    public abstract class ExamineBaseTest : BaseDatabaseFactoryTest
     {
-
-        [SetUp]
-        public virtual void TestSetup()
+        [TestFixtureSetUp]
+        public void InitializeFixture()
         {
-            UmbracoExamineSearcher.DisableInitializationCheck = true;
-            BaseUmbracoIndexer.DisableInitializationCheck = true;
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            ProfilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
+        }
+
+        protected ProfilingLogger ProfilingLogger { get; private set; }
+
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
+        {
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
-            Resolution.Freeze();
+            base.FreezeResolution();
         }
 
-        [TearDown]
-        public virtual void TestTearDown()
-        {
-            UmbracoExamineSearcher.DisableInitializationCheck = null;
-            BaseUmbracoIndexer.DisableInitializationCheck = null;
 
-            //reset all resolvers
-            ResolverCollection.ResetAll();
-            //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
-            Resolution.Reset();
-        }
+
     }
 }

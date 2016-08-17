@@ -4,7 +4,6 @@ using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Web._Legacy.Actions;
-using Umbraco.Web._Legacy.Utils;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.controls.Tree
@@ -14,7 +13,7 @@ namespace umbraco.controls.Tree
 		public string RenderJSONMenu()
 		{
 
-			JSONSerializer jSSerializer = new JSONSerializer();
+			JavaScriptSerializer jSSerializer = new JavaScriptSerializer();
 
 			jSSerializer.RegisterConverters(new List<JavaScriptConverter>() 
 					{ 	

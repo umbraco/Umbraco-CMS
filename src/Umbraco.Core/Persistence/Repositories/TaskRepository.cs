@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using LightInject;
+using NPoco;
+using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -14,10 +18,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class TaskRepository : PetaPocoRepositoryBase<int, Task>, ITaskRepository
+    internal class TaskRepository : NPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public TaskRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -26,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.Fetch<TaskDto, TaskTypeDto>(sql).FirstOrDefault();
+            var taskDto = Database.Fetch<TaskDto>(sql).FirstOrDefault();
             if (taskDto == null)
                 return null;
 
@@ -45,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new TaskFactory();
-            var dtos = Database.Fetch<TaskDto, TaskTypeDto>(sql);
+            var dtos = Database.Fetch<TaskDto>(sql);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -56,34 +60,24 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new TaskFactory();
-            var dtos = Database.Fetch<TaskDto, TaskTypeDto>(sql);
+            var dtos = Database.Fetch<TaskDto>(sql);
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            if (isCount)
-            {
-                sql.Select("COUNT(*)").From<TaskDto>(SqlSyntax);
-            }
-            else
-            {
-                return GetBaseQuery();
-            }
-            return sql;
+            return isCount ? Sql().SelectCount().From<TaskDto>() : GetBaseQuery();
         }
 
-        private Sql GetBaseQuery()
+        private Sql<SqlContext> GetBaseQuery()
         {
-            var sql = new Sql();
-            sql.Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
-                .From<TaskDto>(SqlSyntax)
-                .InnerJoin<TaskTypeDto>(SqlSyntax)
-                .On<TaskDto, TaskTypeDto>(SqlSyntax, left => left.TaskTypeId, right => right.Id)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<TaskDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
-            return sql;
+            return Sql()
+                .Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
+                .From<TaskDto>()
+                .InnerJoin<TaskTypeDto>()
+                .On<TaskDto, TaskTypeDto>(left => left.TaskTypeId, right => right.Id)
+                .InnerJoin<NodeDto>()
+                .On<TaskDto, NodeDto>(left => left.NodeId, right => right.NodeId);
         }
 
         protected override string GetBaseWhereClause()
@@ -95,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM cmsTask WHERE id = @Id"                           
+                    "DELETE FROM cmsTask WHERE id = @Id"
                 };
             return list;
         }
@@ -147,21 +141,21 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetGetTasksQuery(assignedUser, ownerUser, taskTypeAlias, includeClosed);
             if (itemId.HasValue)
             {
-                sql.Where<NodeDto>(SqlSyntax, dto => dto.NodeId == itemId.Value);
+                sql.Where<NodeDto>(dto => dto.NodeId == itemId.Value);
             }
 
-            var dtos = Database.Fetch<TaskDto, TaskTypeDto>(sql);
+            var dtos = Database.Fetch<TaskDto>(sql);
             var factory = new TaskFactory();
             return dtos.Select(factory.BuildEntity);
         }
 
-        private Sql GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
+        private Sql<SqlContext> GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
             var sql = GetBaseQuery(false);
 
             if (includeClosed == false)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.Closed == false);
+                sql.Where<TaskDto>(dto => dto.Closed == false);
             }
             if (taskTypeAlias.IsNullOrWhiteSpace() == false)
             {
@@ -169,11 +163,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             if (ownerUser.HasValue)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.ParentUserId == ownerUser.Value);
+                sql.Where<TaskDto>(dto => dto.ParentUserId == ownerUser.Value);
             }
             if (assignedUser.HasValue)
             {
-                sql.Where<TaskDto>(SqlSyntax, dto => dto.UserId == assignedUser.Value);
+                sql.Where<TaskDto>(dto => dto.UserId == assignedUser.Value);
             }
             return sql;
         }

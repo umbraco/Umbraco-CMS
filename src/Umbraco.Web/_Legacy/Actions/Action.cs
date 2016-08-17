@@ -5,8 +5,9 @@ using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
-using TypeFinder = Umbraco.Core.TypeFinder;
+using TypeFinder = Umbraco.Core.Plugins.TypeFinder;
 
 namespace Umbraco.Web._Legacy.Actions
 {

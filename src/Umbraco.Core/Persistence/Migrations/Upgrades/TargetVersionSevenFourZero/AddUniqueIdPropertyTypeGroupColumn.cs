@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     [Migration("7.4.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeGroupColumn : MigrationBase
     {
-        public AddUniqueIdPropertyTypeGroupColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddUniqueIdPropertyTypeGroupColumn(IMigrationContext context)
+            : base(context)
         { }
 
         public override void Up()

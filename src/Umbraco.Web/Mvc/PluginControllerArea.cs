@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Plugins;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc

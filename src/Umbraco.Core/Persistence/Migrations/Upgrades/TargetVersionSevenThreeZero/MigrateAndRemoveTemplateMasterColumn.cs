@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -15,10 +16,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
 
-        public MigrateAndRemoveTemplateMasterColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
-        {
-        }
+        public MigrateAndRemoveTemplateMasterColumn(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Up()
         {
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             Execute.Code(database =>
             {
                 //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
-                var templates = database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>(SqlSyntax));
+                var templates = database.Fetch<dynamic>(Sql().SelectAll().From<TemplateDto>());
                 foreach (var template in templates)
                 {
                     var sql = string.Format(SqlSyntax.UpdateData,
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             
 
             //now remove the master column and key
-            if (this.Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (DatabaseType.IsMySql())
             {
                 //Because MySQL doesn't name keys with what you want, we need to query for the one that is associated
                 // this is required for this specific case because there are 2 foreign keys on the cmsTemplate table

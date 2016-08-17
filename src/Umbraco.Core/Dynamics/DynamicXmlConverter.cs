@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Dynamics
 {

@@ -15,12 +15,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            var taskType = new TaskType("asdfasdf");
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
-            using (var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
+            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
             {
+                var taskType = new TaskType("asdfasdf");
+                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+                var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, MappingResolver);
+
                 var created = DateTime.Now;
                 var task = new Task(taskType)
                 {
@@ -31,12 +32,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     OwnerUserId = 0
                 };
                 repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 var alltasktypes = taskTypeRepo.GetAll();
 
                 taskTypeRepo.Delete(taskType);
-                unitOfWork.Commit();
+                unitOfWork.Flush();
 
                 Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetAll().Count());
                 Assert.AreEqual(0, repo.GetAll().Count());

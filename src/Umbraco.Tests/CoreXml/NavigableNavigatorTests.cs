@@ -726,8 +726,8 @@ namespace Umbraco.Tests.CoreXml
             // but was NOT working (changing the order of nodes) with macro nav, debug
             // was due to an issue with macro nav IsSamePosition, fixed
 
-            //Console.WriteLine("--------");
-            //Console.WriteLine(writer.ToString());
+            //Debug.Print("--------");
+            //Debug.Print(writer.ToString());
             Assert.AreEqual(expected.Lf(), writer.ToString().Lf());
         }
 

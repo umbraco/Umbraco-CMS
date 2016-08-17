@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -8,27 +9,24 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     internal class MigrationContext : IMigrationContext
     {
-        public MigrationContext(DatabaseProviders databaseProvider, Database database, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MigrationContext(UmbracoDatabase database, ILogger logger)
         {
-            if (database == null) throw new ArgumentNullException("database");
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
+            if (database == null) throw new ArgumentNullException(nameof(database));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             Expressions = new Collection<IMigrationExpression>();
-            CurrentDatabaseProvider = databaseProvider;
             Database = database;
             Logger = logger;
-            SqlSyntax = sqlSyntax;
         }
 
         public ICollection<IMigrationExpression> Expressions { get; set; }
 
-        public DatabaseProviders CurrentDatabaseProvider { get; private set; }
+        public UmbracoDatabase Database { get; }
 
-        public Database Database { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
 
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+        public DatabaseType DatabaseType => Database.DatabaseType;
 
-        public ILogger Logger { get; private set; }
+        public ILogger Logger { get; }
     }
 }

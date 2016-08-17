@@ -7,9 +7,9 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("5.0.0", 0, "Test")]
     public class FiveZeroMigration : MigrationBase
     {
-        public FiveZeroMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public FiveZeroMigration(IMigrationContext context) 
+            : base(context)
+        { }
 
 
         public override void Up()

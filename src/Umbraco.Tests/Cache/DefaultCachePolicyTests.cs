@@ -24,10 +24,8 @@ namespace Umbraco.Tests.Cache
                 });
 
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.Get(1, o => new AuditItem(1, "blah", AuditType.Copy, 123));
-            }
+
+            var found = defaultPolicy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), o => null);
             Assert.IsTrue(isCached);
         }
 
@@ -38,11 +36,9 @@ namespace Umbraco.Tests.Cache
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem(1, "blah", AuditType.Copy, 123));
 
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.Get(1, o => (AuditItem) null);
-                Assert.IsNotNull(found);
-            }
+
+            var found = defaultPolicy.Get(1, id => null, ids => null);
+            Assert.IsNotNull(found);
         }
 
         [Test]
@@ -59,14 +55,12 @@ namespace Umbraco.Tests.Cache
             cache.Setup(x => x.GetCacheItemsByKeySearch(It.IsAny<string>())).Returns(new AuditItem[] {});
 
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] {}, o => new[]
-                {
-                    new AuditItem(1, "blah", AuditType.Copy, 123),
-                    new AuditItem(2, "blah2", AuditType.Copy, 123)
-                });
-            }
+
+            var found = defaultPolicy.GetAll(new object[] {}, ids => new[]
+                    {
+                        new AuditItem(1, "blah", AuditType.Copy, 123),
+                        new AuditItem(2, "blah2", AuditType.Copy, 123)
+                    });
 
             Assert.AreEqual(2, cached.Count);
         }
@@ -82,11 +76,9 @@ namespace Umbraco.Tests.Cache
             });
 
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
-            using (defaultPolicy)
-            {
-                var found = defaultPolicy.GetAll(new object[] {}, o => new[] {(AuditItem) null});
-                Assert.AreEqual(2, found.Length);
-            }
+
+            var found = defaultPolicy.GetAll(new object[] {}, ids => new[] { (AuditItem)null });
+            Assert.AreEqual(2, found.Length);
         }
 
         [Test]
@@ -103,13 +95,7 @@ namespace Umbraco.Tests.Cache
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
             try
             {
-                using (defaultPolicy)
-                {
-                    defaultPolicy.CreateOrUpdate(new AuditItem(1, "blah", AuditType.Copy, 123), item =>
-                    {
-                        throw new Exception("blah!");
-                    });
-                }
+                defaultPolicy.Update(new AuditItem(1, "blah", AuditType.Copy, 123), item => { throw new Exception("blah!"); });
             }
             catch
             {
@@ -135,13 +121,7 @@ namespace Umbraco.Tests.Cache
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
             try
             {
-                using (defaultPolicy)
-                {
-                    defaultPolicy.Remove(new AuditItem(1, "blah", AuditType.Copy, 123), item =>
-                    {
-                        throw new Exception("blah!");
-                    });
-                }
+                defaultPolicy.Delete(new AuditItem(1, "blah", AuditType.Copy, 123), item => { throw new Exception("blah!"); });
             }
             catch
             {

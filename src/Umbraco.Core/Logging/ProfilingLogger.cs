@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Core.Profiling;
 
 namespace Umbraco.Core.Logging
 {
@@ -8,8 +7,8 @@ namespace Umbraco.Core.Logging
     /// </summary>
     public sealed class ProfilingLogger
     {
-        public ILogger Logger { get; private set; }
-        public IProfiler Profiler { get; private set; }
+        public ILogger Logger { get; }
+        public IProfiler Profiler { get; }
 
         public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
@@ -39,6 +38,11 @@ namespace Umbraco.Core.Logging
             return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, completeMessage);
         }
 
+        public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, int minimumMsThreshold)
+        {
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, completeMessage, minimumMsThreshold);
+        }
+
         public DisposableTimer DebugDuration<T>(string startMessage)
         {
             return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, "Complete");
@@ -47,6 +51,11 @@ namespace Umbraco.Core.Logging
         public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
         {
             return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, loggerType, startMessage, completeMessage);
+        }
+
+        public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage, int minimumMsThreshold)
+        {
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, loggerType, startMessage, completeMessage, minimumMsThreshold);
         }
     }
 }

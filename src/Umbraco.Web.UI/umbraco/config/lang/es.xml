@@ -185,6 +185,12 @@
     <key alias="visit">Visita</key>
     <key alias="welcome">Bienvenido</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
@@ -850,7 +856,9 @@
     <key alias="stylesheets">Hojas de estilo</key>
     <key alias="templates">Plantillas</key>
     <key alias="xslt">Archivos XSLT</key>
+    <key alias="userPermissions">Permisos de Usuarios</key>
     <key alias="userTypes">Tipos de Usuarios</key>
+    <key alias="users">Usuarios</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Existe una nueva actualización</key>

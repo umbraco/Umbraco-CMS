@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -9,17 +11,16 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MacroRepository : PetaPocoRepositoryBase<int, IMacro>, IMacroRepository
+    internal class MacroRepository : NPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
 
-        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMappingResolver mappingResolver)
+            : base(work, cache, logger, mappingResolver)
         {
         }
 
@@ -28,7 +29,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
+            var macroDto = Database
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+                .FirstOrDefault();
+
             if (macroDto == null)
                 return null;
 
@@ -51,8 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
-                .ToArray();// we don't want to re-iterate again!
+            return Database
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+                .Transform(ConvertFromDtos)
+                .ToArray(); // do it now and once
         }
 
         private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
@@ -83,36 +89,23 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql);
-
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.Id);
-            }
+            return Database
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+                .Select(x => Get(x.Id));
         }
 
-        protected override Sql GetBaseQuery(bool isCount)
+        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
-            if (isCount)
-            {
-                sql.Select("COUNT(*)").From<MacroDto>(SqlSyntax);
-            }
-            else
-            {
-                return GetBaseQuery();
-            }
-            return sql;
+            return isCount ? Sql().SelectCount().From<MacroDto>() : GetBaseQuery();
         }
 
-        private Sql GetBaseQuery()
+        private Sql<SqlContext> GetBaseQuery()
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<MacroDto>(SqlSyntax)
-               .LeftJoin<MacroPropertyDto>(SqlSyntax)
-               .On<MacroDto, MacroPropertyDto>(SqlSyntax, left => left.Id, right => right.Macro);
-            return sql;
+            return Sql()
+                .SelectAll()
+                .From<MacroDto>()
+                .LeftJoin<MacroPropertyDto>()
+                .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
         }
 
         protected override string GetBaseWhereClause()
@@ -125,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                 {
                     "DELETE FROM cmsMacroProperty WHERE macro = @Id",
-                    "DELETE FROM cmsMacro WHERE id = @Id"                           
+                    "DELETE FROM cmsMacro WHERE id = @Id"
                 };
             return list;
         }
@@ -208,7 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                
+
             }
 
             entity.ResetDirtyProperties();
@@ -230,7 +223,7 @@ namespace Umbraco.Core.Persistence.Repositories
         //    {
         //        return GetAll(new int[] {});
         //    }
-            
+
         //}
     }
 }

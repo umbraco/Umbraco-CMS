@@ -131,6 +131,12 @@
     <key alias="visit">בקר</key>
     <key alias="welcome">ברוכים הבאים</key>
   </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">שם</key>
     <key alias="assignDomain">ניהול שם מתחם</key>
@@ -869,7 +875,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="stylesheets">גיליונות סגנון</key>
     <key alias="templates">תבניות</key>
     <key alias="xslt">קבצי XSLT</key>
+    <key alias="userPermissions">הרשאות משתמש</key>
     <key alias="userTypes">משתמש מקליד</key>
+    <key alias="users">משתמש</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">עידכון חדש זמין</key>

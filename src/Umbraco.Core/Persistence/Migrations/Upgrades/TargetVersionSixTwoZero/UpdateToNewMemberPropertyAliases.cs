@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -11,10 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
-        public UpdateToNewMemberPropertyAliases(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
+        public UpdateToNewMemberPropertyAliases(IMigrationContext context) 
+            : base(context)
+        { }
 
         public override void Up()
         {

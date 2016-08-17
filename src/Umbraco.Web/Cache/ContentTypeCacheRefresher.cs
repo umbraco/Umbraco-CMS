@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
@@ -24,6 +19,12 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class ContentTypeCacheRefresher : JsonCacheRefresherBase<ContentTypeCacheRefresher>
     {
+        private readonly ApplicationContext _applicationContext;
+
+        public ContentTypeCacheRefresher(ApplicationContext applicationContext) : base(applicationContext.ApplicationCache)
+        {
+            _applicationContext = applicationContext;
+        }
 
         #region Static helpers
 
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Cache
         /// <param name="contentType"></param>
         /// <param name="isDeleted">if the item was deleted</param>
         /// <returns></returns>
-        private static JsonPayload FromContentType(IContentTypeBase contentType, bool isDeleted = false)
+        private JsonPayload FromContentType(IContentTypeBase contentType, bool isDeleted = false)
         {
             var payload = new JsonPayload
                 {
@@ -57,10 +58,30 @@ namespace Umbraco.Web.Cache
                         ? typeof(IContentType).Name 
                         : (contentType is IMediaType)
                         ? typeof(IMediaType).Name
-                        : typeof(IMemberType).Name,
-                    DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
+                        : typeof(IMemberType).Name,                    
                     WasDeleted = isDeleted
                 };
+
+            if (contentType is IContentType)
+            {
+                payload.DescendantPayloads = ((IContentType)contentType)
+                    .Descendants(_applicationContext.Services.ContentTypeService)
+                    .Select(x => FromContentType(x)).ToArray();
+            }
+            else if (contentType is IMediaType)
+            {
+                payload.DescendantPayloads = ((IMediaType)contentType)
+                    .Descendants(_applicationContext.Services.MediaTypeService)
+                    .Select(x => FromContentType(x)).ToArray();
+            }
+            else if (contentType is IMemberType)
+            {
+                payload.DescendantPayloads = ((IMemberType)contentType)
+                    .Descendants(_applicationContext.Services.MemberTypeService)
+                    .Select(x => FromContentType(x)).ToArray();
+            }
+            
+
             //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
             var dirty = contentType as IRememberBeingDirty;
             if (dirty != null)
@@ -78,7 +99,7 @@ namespace Umbraco.Web.Cache
         /// <param name="isDeleted">specify false if this is an update, otherwise true if it is a deletion</param>
         /// <param name="contentTypes"></param>
         /// <returns></returns>
-        internal static string SerializeToJsonPayload(bool isDeleted, params IContentTypeBase[] contentTypes)
+        internal string SerializeToJsonPayload(bool isDeleted, params IContentTypeBase[] contentTypes)
         {
             var serializer = new JavaScriptSerializer();
             var items = contentTypes.Select(x => FromContentType(x, isDeleted)).ToArray();
@@ -134,11 +155,11 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMemberType>();
 
             //all property type cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             //all content type property cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);     
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);     
             //all content type cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
 
@@ -187,8 +208,8 @@ namespace Umbraco.Web.Cache
         {
             var needsContentRefresh = false;
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             payloads.ForEach(payload =>
                 {
@@ -265,18 +286,18 @@ namespace Umbraco.Web.Cache
         /// <returns>
         /// Return true if the alias of the content type changed
         /// </returns>
-        private static void ClearContentTypeCache(JsonPayload payload)
+        private void ClearContentTypeCache(JsonPayload payload)
         {
             //clears the cache for each property type associated with the content type
             foreach (var pid in payload.PropertyTypeIds)
             {
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
+                _applicationContext.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
             }
 
             //clears the cache associated with the Content type itself
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
             //clears the cache associated with the content type properties collection
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
+            _applicationContext.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
 
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
@@ -300,7 +321,7 @@ namespace Umbraco.Web.Cache
             ClearContentTypeCache(
                 ids.Select(
                     x =>
-                    ApplicationContext.Current.Services.ContentTypeService.GetContentType(x) as IContentTypeBase)
+                    _applicationContext.Services.ContentTypeService.Get(x) as IContentTypeBase)
                    .WhereNotNull()
                    .Select(x => FromContentType(x, isDeleted))
                    .ToArray());

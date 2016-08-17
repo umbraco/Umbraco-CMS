@@ -155,6 +155,11 @@
 	display: flex;
 }
 
+.umb-tree li > div:hover a:not(.umb-options) {
+	overflow: hidden;
+    margin-right: 6px;
+}
+
 .umb-tree .icon {
 	vertical-align: middle;
 	margin: 0 13px 0 0;
@@ -203,7 +208,9 @@
 	content: "\e165";
 }
 
-.umb-tree .umb-tree-node-checked i {
+.umb-tree .umb-tree-node-checked i[class^="icon-"],
+.umb-tree .umb-tree-node-checked i[class*=" icon-"] {
+    font-family: 'icomoon' !important;
     color:@blue !important;
 }
 .umb-tree .umb-tree-node-checked i:before {
@@ -418,9 +425,9 @@ div.locked:before{
 	padding-left: 10px;
 }
 .umb-actions-child li .menu-label {
-	font-size: 12px;
+	font-size: 14px;
 	color: #000;
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 .umb-actions-child li .menu-label small {
@@ -436,6 +443,9 @@ div.locked:before{
 }
 .umb-actions-child i {
 	font-size: 32px;
+    min-width: 32px;
+    text-align: center;
+    line-height: 24px; /* set line-height to ensure all icons use same line-height */
 }
 
 .umb-actions-child li.add {
@@ -477,7 +487,6 @@ div.locked:before{
 	width:100%;
 	height:1px;
 	overflow:hidden;
-
 	position: absolute;
 	left: 0;
 	bottom: 0;
@@ -495,15 +504,18 @@ div.locked:before{
 
 /*body.touch .umb-tree .icon{font-size: 19px;}*/
 body.touch .umb-tree ins{font-size: 14px; visibility: visible; padding: 7px;}
-body.touch .umb-tree li div {
+body.touch .umb-tree li > div {
 	padding-top: 8px;
 	padding-bottom: 8px;
 	font-size: 110%;
 }
 
-body.touch .umb-actions a{
+// change height of this if touch devices should have a different height of preloader.
+body.touch .umb-tree li div.l div {
+	padding: 0;
+}
+
+body.touch .umb-actions a {
 	padding: 7px 25px 7px 20px;
 	font-size: 110%;
 }
-
-body.touch a.umb-options i {margin-top: 20px;}

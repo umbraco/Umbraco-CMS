@@ -175,9 +175,10 @@ namespace umbraco.presentation.developer.packages
                         {
                             try
                             {
-                                var di = new cms.businesslogic.Dictionary.DictionaryItem(tId);
+                                var di = Services.LocalizationService.GetDictionaryItemById(tId);
+                                if (di == null) continue;
 
-                                var li = new ListItem(di.key, di.id.ToString());
+                                var li = new ListItem(di.ItemKey, di.Id.ToString());
                                 li.Selected = true;
 
                                 dictionaryItems.Items.Add(li);
@@ -431,7 +432,7 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        var contentType = contentTypeService.GetContentType(nId);
+                        var contentType = contentTypeService.Get(nId);
                         if (contentType != null)
                         {
                             contentTypes.Add(contentType);
@@ -464,8 +465,11 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        var di = new cms.businesslogic.Dictionary.DictionaryItem(nId);
-                        di.delete();
+                        var di = Services.LocalizationService.GetDictionaryItemById(nId);
+                        if (di != null)
+                        {
+                            Services.LocalizationService.Delete(di);
+                        }
                         _pack.Data.DictionaryItems.Remove(nId.ToString());
                     }
                 }

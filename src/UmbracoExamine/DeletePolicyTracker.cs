@@ -16,7 +16,7 @@ namespace UmbracoExamine
 
         public IndexDeletionPolicy GetPolicy(Lucene.Net.Store.Directory directory)
         {
-            var resolved = _directories.GetOrAdd(directory.GetLockID(), s => new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy()));
+            var resolved = _directories.GetOrAdd(directory.GetLockId(), s => new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy()));
             return resolved;
         }
     }

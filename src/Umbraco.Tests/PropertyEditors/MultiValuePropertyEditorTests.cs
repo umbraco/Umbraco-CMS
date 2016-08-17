@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -88,6 +94,22 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownPreValueEditor_Format_Data_For_Editor()
         {
+            // editor wants ApplicationContext.Current.Services.TextService
+            // (that should be fixed with proper injection)
+            var logger = Mock.Of<ILogger>();
+            var textService = new Mock<ILocalizedTextService>();
+            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
+            var appContext = new ApplicationContext(
+                new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger),
+                new ServiceContext(
+                    localizedTextService: textService.Object
+                ),
+                Mock.Of<CacheHelper>(),
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()))
+            {
+                IsReady = true
+            };
+            ApplicationContext.Current = appContext;
 
             var defaultVals = new Dictionary<string, object>();
             var persisted = new PreValueCollection(new Dictionary<string, PreValue>
@@ -97,7 +119,7 @@ namespace Umbraco.Tests.PropertyEditors
                     {"item3", new PreValue(3, "Item 3")}
                 });
 
-            var editor = new ValueListPreValueEditor();
+            var editor = new ValueListPreValueEditor(Mock.Of<ILocalizedTextService>());
 
             var result = editor.ConvertDbToEditor(defaultVals, persisted);
 

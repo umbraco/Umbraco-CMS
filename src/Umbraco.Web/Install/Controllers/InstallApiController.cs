@@ -52,7 +52,7 @@ namespace Umbraco.Web.Install.Controllers
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
             var dbHelper = new DatabaseHelper();
-            var canConnect = dbHelper.CheckConnection(model, ApplicationContext);
+            var canConnect = dbHelper.CheckConnection(ApplicationContext.DatabaseContext, model);
             return canConnect;
         }
 

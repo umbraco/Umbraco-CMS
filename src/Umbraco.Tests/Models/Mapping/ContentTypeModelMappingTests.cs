@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AutoMapper;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using umbraco;
 using umbraco.cms.presentation;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -37,10 +41,13 @@ namespace Umbraco.Tests.Models.Mapping
         public void Setup()
         {
             var nullCacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            var logger = Mock.Of<ILogger>();
+
+            var databaseFactory = TestObjects.GetIDatabaseFactoryMock();
 
             //Create an app context using mocks
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(databaseFactory, logger),
                 
                 //Create service context using mocks
                 new ServiceContext(
@@ -52,13 +59,14 @@ namespace Umbraco.Tests.Models.Mapping
                     fileService: _fileService.Object),                    
 
                 nullCacheHelper,
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()));
             
             //create a fake property editor resolver to return fake property editors
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
             _propertyEditorResolver = new Mock<PropertyEditorResolver>(
                 //ctor args
-                Mock.Of<IServiceProvider>(), Mock.Of<ILogger>(), typeListProducerList, nullCacheHelper.RuntimeCache);
+                Mock.Of<IServiceContainer>(), logger, typeListProducerList, 
+                    new ManifestBuilder(nullCacheHelper.RuntimeCache, new ManifestParser(logger, new DirectoryInfo(TestHelper.CurrentAssemblyDirectory), Mock.Of<IRuntimeCacheProvider>())));
             
             Mapper.Initialize(configuration =>
             {
