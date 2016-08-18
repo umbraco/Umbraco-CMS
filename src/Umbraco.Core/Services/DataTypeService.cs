@@ -504,6 +504,10 @@ namespace Umbraco.Core.Services
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
                 return;
 
+            // if preValues contain the data type, override the data type definition accordingly
+            if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
+                dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
@@ -522,7 +526,6 @@ namespace Umbraco.Core.Services
             
             Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
-
 
         /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>

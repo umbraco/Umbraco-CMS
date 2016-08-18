@@ -43,7 +43,6 @@ function treeSearchBox(localizationService, searchService, $q) {
 
                     //a canceler exists, so perform the cancelation operation and reset
                     if (canceler) {
-                        console.log("CANCELED!");
                         canceler.resolve();
                         canceler = $q.defer();
                     }

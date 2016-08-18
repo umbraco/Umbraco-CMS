@@ -77,8 +77,33 @@ if ($project) {
 	{
 		$packageWebConfigSource = Join-Path $installPath "UmbracoFiles\Web.config"
 		Copy-Item $packageWebConfigSource $destinationWebConfig -Force
-	} 
 
+		# Copy files that don't get automatically copied for Website projects
+		# We do this here, when copyWebconfig is true because we only want to do it for new installs
+		# If this is an upgrade then the files should already be there
+		$splashesSource = Join-Path $installPath "UmbracoFiles\Config\splashes\*.*"
+		$splashesDestination = Join-Path $projectPath "Config\splashes\"
+		New-Item $splashesDestination -Type directory
+		Copy-Item $splashesSource $splashesDestination -Force
+
+		$sqlCe64Source = Join-Path $installPath "UmbracoFiles\bin\amd64\*"
+		$sqlCe64Destination = Join-Path $projectPath "bin\amd64\"
+		Copy-Item $sqlCe64Source $sqlCe64Destination -Force
+		
+		$sqlCex86Source = Join-Path $installPath "UmbracoFiles\bin\x86\*"
+		$sqlCex86Destination = Join-Path $projectPath "bin\x86\"
+		Copy-Item $sqlCex86source $sqlCex86Destination -Force
+
+		$umbracoUIXMLSource = Join-Path $installPath "UmbracoFiles\Umbraco\Config\Create\UI.xml"
+		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
+		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
+	} else {
+		$upgradeViewSource = Join-Path $umbracoFolderSource "Views\install\*"
+		$upgradeView = Join-Path $umbracoFolder "Views\install\"
+		Write-Host "Copying2 ${upgradeViewSource} to ${upgradeView}"
+		Copy-Item $upgradeViewSource $upgradeView -Force
+	}
+	
 	$installFolder = Join-Path $projectPath "Install"
 	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false

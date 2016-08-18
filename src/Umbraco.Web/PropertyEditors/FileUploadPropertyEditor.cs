@@ -14,52 +14,8 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
-    public class FileUploadPropertyEditor : PropertyEditor
+    public class FileUploadPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
-        // The FileUploadPropertyEditor properties own files and as such must manage these files,
-        // so we are binding to events in order to make sure that
-        // - files are deleted when the owning content/media is
-        // - files are copied when the owning content is
-        // - populate the auto-fill properties when the owning content/media is saved
-        //
-        // NOTE:
-        //  although some code fragments seem to want to support uploading multiple files,
-        //  this is NOT a feature of the FileUploadPropertyEditor and is NOT supported
-        //
-        //  auto-fill properties are recalculated EVERYTIME the content/media is saved,
-        //  even if the property has NOT been modified (it could be the same filename but
-        //  a different file) - this is accepted (auto-fill props should die)
-        //
-        // FIXME
-        //  for some weird backward compatibility reasons,
-        //  - media copy is not supported
-        //  - auto-fill properties are not supported for content items
-        //  - auto-fill runs on MediaService.Created which makes no sense (no properties yet)
-
-        static FileUploadPropertyEditor()
-        {
-            MediaService.Created += MediaServiceCreated; // see above - makes no sense
-            MediaService.Saving += MediaServiceSaving;
-            //MediaService.Copied += MediaServiceCopied; // see above - missing
-            
-            ContentService.Copied += ContentServiceCopied;
-            //ContentService.Saving += ContentServiceSaving; // see above - missing
-            
-            MediaService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-
-            MediaService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
-                GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
-
-            ContentService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-
-            ContentService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
-                GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
-
-            MemberService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-        }
 
         /// <summary>
         /// Creates the corresponding property value editor.
@@ -282,5 +238,82 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
         }
+        #region Application event handler, used to bind to events on startup
+
+        // fixme - er?
+
+        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup = new FileUploadPropertyEditorApplicationStartup();
+
+        // The FileUploadPropertyEditor properties own files and as such must manage these files,
+        // so we are binding to events in order to make sure that
+        // - files are deleted when the owning content/media is
+        // - files are copied when the owning content is
+        // - populate the auto-fill properties when the owning content/media is saved
+        //
+        // NOTE:
+        //  although some code fragments seem to want to support uploading multiple files,
+        //  this is NOT a feature of the FileUploadPropertyEditor and is NOT supported
+        //
+        //  auto-fill properties are recalculated EVERYTIME the content/media is saved,
+        //  even if the property has NOT been modified (it could be the same filename but
+        //  a different file) - this is accepted (auto-fill props should die)
+        //
+        // FIXME
+        //  for some weird backward compatibility reasons,
+        //  - media copy is not supported
+        //  - auto-fill properties are not supported for content items
+        //  - auto-fill runs on MediaService.Created which makes no sense (no properties yet)
+
+        /// <summary>
+        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
+        /// </summary>
+        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
+        {
+            /// <summary>
+            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
+            /// if we find any attached to the current media item.
+            /// </summary>
+            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            {
+                MediaService.Created += MediaServiceCreated; // see above - makes no sense
+                MediaService.Saving += MediaServiceSaving;
+                //MediaService.Copied += MediaServiceCopied; // see above - missing
+            
+                ContentService.Copied += ContentServiceCopied;
+                //ContentService.Saving += ContentServiceSaving; // see above - missing
+                MediaService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
+
+                MediaService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
+                    GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
+
+                ContentService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
+
+                ContentService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
+                    GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
+
+                MemberService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
+            }
+        }
+
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+        }
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            //wrap
+            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
+        }
+        #endregion
+
     }
 }

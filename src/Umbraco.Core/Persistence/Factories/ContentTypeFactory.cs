@@ -21,13 +21,22 @@ namespace Umbraco.Core.Persistence.Factories
         public IContentType BuildContentTypeEntity(ContentTypeDto dto)
         {
             var contentType = new ContentType(dto.NodeDto.ParentId);
-            BuildCommonEntity(contentType, dto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            contentType.ResetDirtyProperties(false);
+            try
+            {
+                contentType.DisableChangeTracking();
 
-            return contentType;
+                BuildCommonEntity(contentType, dto);
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                contentType.ResetDirtyProperties(false);
+                return contentType;
+            }
+            finally
+            {
+                contentType.EnableChangeTracking();
+            }
         }
 
         #endregion
@@ -37,11 +46,20 @@ namespace Umbraco.Core.Persistence.Factories
         public IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
         {
             var contentType = new MediaType(dto.NodeDto.ParentId);
-            BuildCommonEntity(contentType, dto);
+            try
+            {
+                contentType.DisableChangeTracking();
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            contentType.ResetDirtyProperties(false);
+                BuildCommonEntity(contentType, dto);
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                contentType.ResetDirtyProperties(false);
+            }
+            finally
+            {
+                contentType.EnableChangeTracking();
+            }
 
             return contentType;
         }

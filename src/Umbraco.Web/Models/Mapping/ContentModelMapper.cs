@@ -57,12 +57,16 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
+                .ForMember(display => display.AllowPreview, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
@@ -88,6 +92,9 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
+                .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -97,6 +104,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                .ForMember(
+                    dto => dto.HasPublishedVersion,
+                    expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
@@ -179,7 +189,11 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View =  display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
                     //TODO: Fix up hard coded datepicker
                 } ,
                 new ContentPropertyDisplay
@@ -188,7 +202,11 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains('P') ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        {"offsetTime", "1"}
+                    }
                     //TODO: Fix up hard coded datepicker
                 },
                 new ContentPropertyDisplay
@@ -221,7 +239,7 @@ namespace Umbraco.Web.Models.Mapping
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good

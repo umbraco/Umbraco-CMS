@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
-using System.Linq;
 using System.Web.Routing;
 using System.Xml;
-using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -27,7 +21,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
@@ -35,9 +28,10 @@ using Umbraco.Core.Events;
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-    /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
-    /// The PetaPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
+    /// Provides a base class for Umbraco application tests that require a database.
     /// </summary>
+    /// <remarks>Can provide a SqlCE database populated with the Umbraco schema. The database should be accessed
+    /// through the <see cref="DefaultDatabaseFactory"/>.</remarks>
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
     {
@@ -48,15 +42,16 @@ namespace Umbraco.Tests.TestHelpers
         private bool _firstTestInFixture = true;
 
         //Used to flag if its the first test in the current session
-        private bool _isFirstRunInTestSession = false;
+        private bool _isFirstRunInTestSession;
         //Used to flag if its the first test in the current fixture
-        private bool _isFirstTestInFixture = false;
+        private bool _isFirstTestInFixture;
 
         private ApplicationContext _appContext;
 
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
-        private static Byte[] _dbBytes;
+        private static byte[] _dbBytes;
+        private DefaultDatabaseFactory _dbFactory;
 
         [SetUp]
         public override void Initialize()
@@ -66,27 +61,11 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
-            var dbFactory = new DefaultDatabaseFactory(
+            _dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
-
-            var evtMsgs = new TransientMessagesFactory();
-            _appContext = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
-                //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
-                cacheHelper,
-                ProfilingLogger)
-            {
-                IsReady = true
-            };
+            _dbFactory.ResetForTests();
 
             base.Initialize();
 
@@ -94,7 +73,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                DatabaseContext.Initialize(_dbFactory.ProviderName, _dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
@@ -103,14 +82,27 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual ISqlSyntaxProvider SqlSyntax
+        protected override ApplicationContext CreateApplicationContext()
         {
-            get { return new SqlCeSyntaxProvider(); }
+            var repositoryFactory = new RepositoryFactory(CacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
+
+            var evtMsgs = new TransientMessagesFactory();
+            _appContext = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(_dbFactory, Logger, SqlSyntax, GetDbProviderName()),
+                //assign the service context
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                CacheHelper,
+                ProfilingLogger)
+            {
+                IsReady = true
+            };
+            return _appContext;
         }
 
-        protected override void SetupApplicationContext()
+        protected virtual ISqlSyntaxProvider SqlSyntax
         {
-            ApplicationContext.Current = _appContext;
+            get { return GetSyntaxProvider(); }
         }
 
         /// <summary>
@@ -120,9 +112,14 @@ namespace Umbraco.Tests.TestHelpers
         {
             get
             {
-                var att = this.GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
+                var att = GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
                 return att != null ? att.Behavior : DatabaseBehavior.NoDatabasePerFixture;
             }
+        }
+
+        protected virtual ISqlSyntaxProvider GetSyntaxProvider()
+        {
+            return new SqlCeSyntaxProvider();
         }
 
         protected virtual string GetDbProviderName()
@@ -167,7 +164,7 @@ namespace Umbraco.Tests.TestHelpers
                 || (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
-                
+
                 using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
                 {
                     RemoveDatabaseFile(ex =>
@@ -188,8 +185,10 @@ namespace Umbraco.Tests.TestHelpers
                     }
                     else
                     {
-                        var engine = new SqlCeEngine(settings.ConnectionString);
-                        engine.CreateDatabase();
+                        using (var engine = new SqlCeEngine(settings.ConnectionString))
+                        {
+                            engine.CreateDatabase();
+                        }
                     }
                 }
 
@@ -247,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(false, ApplicationContext);
 
-                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
+                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the
                 // damn db for each test
                 CloseDbConnections();
 
@@ -283,7 +282,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private void CloseDbConnections()
         {
-            //Ensure that any database connections from a previous test is disposed. 
+            //Ensure that any database connections from a previous test is disposed.
             //This is really just double safety as its also done in the TearDown.
             if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
                 DatabaseContext.Database.Dispose();
@@ -305,23 +304,21 @@ namespace Umbraco.Tests.TestHelpers
                     }
                 }
             }
-            if (_firstTestInFixture)
+            if (_firstTestInFixture == false) return;
+
+            lock (Locker)
             {
-                lock (Locker)
-                {
-                    if (_firstTestInFixture)
-                    {
-                        _isFirstTestInFixture = true; //set the flag
-                        _firstTestInFixture = false;
-                    }
-                }
+                if (_firstTestInFixture == false) return;
+
+                _isFirstTestInFixture = true; //set the flag
+                _firstTestInFixture = false;
             }
         }
 
         private void RemoveDatabaseFile(Action<Exception> onFail = null)
         {
             CloseDbConnections();
-            string path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.CurrentAssemblyDirectory;
             try
             {
                 string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
@@ -336,9 +333,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
                 if (onFail != null)
-                {
                     onFail(ex);
-                }
             }
         }
 
@@ -396,7 +391,7 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -409,7 +404,7 @@ namespace Umbraco.Tests.TestHelpers
 		<umbracoNaviHide>1</umbracoNaviHide>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>

@@ -26,22 +26,28 @@ namespace Umbraco.Core.Models
         private bool _hasPendingChanges;
         private string _contentTypeAlias;
         private Guid _nodeObjectTypeId;
+        
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.Level);
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Name);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.ParentId);
-        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Path);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.SortOrder);
-        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Trashed);
-        private static readonly PropertyInfo HasChildrenSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasChildren);
-        private static readonly PropertyInfo IsPublishedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsPublished);
-        private static readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
-        private static readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
-        private static readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
-        private static readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
-        private static readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
-        private static readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
+            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.Level);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Name);
+            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.ParentId);
+            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Path);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.SortOrder);
+            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Trashed);
+            public readonly PropertyInfo HasChildrenSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasChildren);
+            public readonly PropertyInfo IsPublishedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsPublished);
+            public readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
+            public readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
+            public readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
+            public readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
+            public readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
+            public readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
+        }
+
         private string _contentTypeIcon;
         private string _contentTypeThumbnail;
 
@@ -66,92 +72,43 @@ namespace Umbraco.Core.Models
         public int CreatorId
         {
             get { return _creatorId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _creatorId = value;
-                    return _creatorId;
-                }, _creatorId, CreatorIdSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
 
         public int Level
         {
             get { return _level; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _level = value;
-                    return _level;
-                }, _level, LevelSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
         }
 
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         public int ParentId
         {
             get { return _parentId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentId = value;
-                    return _parentId;
-                }, _parentId, ParentIdSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
         }
 
         public string Path
         {
             get { return _path; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _path = value;
-                    return _path;
-                }, _path, PathSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
         }
 
         public int SortOrder
         {
             get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);  
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         public bool Trashed
         {
             get { return _trashed; }
-            private set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _trashed = value;
-                    return _trashed;
-                }, _trashed, TrashedSelector);  
-            }
+            private set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
         public IDictionary<string, object> AdditionalData { get; private set; }
@@ -162,12 +119,7 @@ namespace Umbraco.Core.Models
             get { return _hasChildren; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _hasChildren = value;
-                    return _hasChildren;
-                }, _hasChildren, HasChildrenSelector);  
-
+                SetPropertyValueAndDetectChanges(value, ref _hasChildren, Ps.Value.HasChildrenSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["HasChildren"] = value;
             }
@@ -178,12 +130,7 @@ namespace Umbraco.Core.Models
             get { return _isPublished; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isPublished = value;
-                    return _isPublished;
-                }, _isPublished, IsPublishedSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _isPublished, Ps.Value.IsPublishedSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["IsPublished"] = value;
             }
@@ -194,12 +141,7 @@ namespace Umbraco.Core.Models
             get { return _isDraft; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _isDraft = value;
-                    return _isDraft;
-                }, _isDraft, IsDraftSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _isDraft, Ps.Value.IsDraftSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["IsDraft"] = value;
             }
@@ -210,12 +152,7 @@ namespace Umbraco.Core.Models
             get { return _hasPendingChanges; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _hasPendingChanges = value;
-                    return _hasPendingChanges;
-                }, _hasPendingChanges, HasPendingChangesSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _hasPendingChanges, Ps.Value.HasPendingChangesSelector);                
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["HasPendingChanges"] = value;
             }
@@ -226,12 +163,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeAlias; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeAlias = value;
-                    return _contentTypeAlias;
-                }, _contentTypeAlias, ContentTypeAliasSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeAlias, Ps.Value.ContentTypeAliasSelector);                
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeAlias"] = value;
             }
@@ -242,12 +174,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeIcon; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeIcon = value;
-                    return _contentTypeIcon;
-                }, _contentTypeIcon, ContentTypeIconSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeIcon, Ps.Value.ContentTypeIconSelector);                
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeIcon"] = value;
             }
@@ -258,12 +185,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeThumbnail; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeThumbnail = value;
-                    return _contentTypeThumbnail;
-                }, _contentTypeThumbnail, ContentTypeThumbnailSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeThumbnail, Ps.Value.ContentTypeThumbnailSelector);                
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeThumbnail"] = value;
             }
@@ -274,12 +196,7 @@ namespace Umbraco.Core.Models
             get { return _nodeObjectTypeId; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _nodeObjectTypeId = value;
-                    return _nodeObjectTypeId;
-                }, _nodeObjectTypeId, NodeObjectTypeIdSelector);
-
+                SetPropertyValueAndDetectChanges(value, ref _nodeObjectTypeId, Ps.Value.NodeObjectTypeIdSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["NodeObjectTypeId"] = value;
             }

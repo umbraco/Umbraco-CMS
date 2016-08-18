@@ -17,7 +17,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 	//add to umbraco installer facts here
 	var facts = ['Umbraco helped millions of people watch a man jump from the edge of space',
-					'Over 300 000 websites are currently powered by Umbraco',
+					'Over 370 000 websites are currently powered by Umbraco',
 					"At least 2 people have named their cat 'Umbraco'",
 					'On an average day, more than 1000 people download Umbraco',
 					'<a target="_blank" href="http://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
@@ -56,7 +56,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 	    return (found) ? found.description : null;
 	}
 
-	//calculates the offset of the progressbar on the installaer
+	//calculates the offset of the progressbar on the installer
 	function calculateProgress(steps, next) {
 		var sorted = _.sortBy(steps, "serverOrder");
 

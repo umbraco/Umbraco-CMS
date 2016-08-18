@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
@@ -41,6 +42,11 @@ namespace umbraco
 						System.IO.Directory.CreateDirectory(basePath);
 					}
 				}
+
+			    var abFileFolder = Path.GetDirectoryName(abFileName);
+                if (string.IsNullOrWhiteSpace(abFileFolder) == false)
+			        if (Directory.Exists(abFileFolder) == false)
+			            Directory.CreateDirectory(abFileFolder);
 
 				var scriptWriter = System.IO.File.CreateText(abFileName);
 				scriptWriter.Write(scriptContent);

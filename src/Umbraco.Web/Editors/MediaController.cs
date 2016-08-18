@@ -365,7 +365,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.MediaService.EmptyRecycleBin();
-            return Request.CreateResponse(HttpStatusCode.OK);
+
+            return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -594,25 +595,7 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
         }
-
-        /// <summary>
-        /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the 
-        /// temporary files that were created.
-        /// </summary>
-        [DataContract]
-        private class PostedFiles : IHaveUploadedFiles, INotificationModel
-        {
-            public PostedFiles()
-            {
-                UploadedFiles = new List<ContentItemFile>();
-                Notifications = new List<Notification>();
-            }
-            public List<ContentItemFile> UploadedFiles { get; private set; }
-
-            [DataMember(Name = "notifications")]
-            public List<Notification> Notifications { get; private set; }
-        }
-
+        
         /// <summary>
         /// Ensures the item can be moved/copied to the new location
         /// </summary>

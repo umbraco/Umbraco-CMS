@@ -79,7 +79,7 @@
         }
 
         $scope.loginSubmit = function (login, password) {
-
+            
             //if the login and password are not empty we need to automatically 
             // validate them - this is because if there are validation errors on the server
             // then the user has to change both username & password to resubmit which isn't ideal,
@@ -121,12 +121,17 @@
 
         $scope.requestPasswordResetSubmit = function (email) {
 
-            $scope.errorMsg = "";
+            if (email && email.length > 0) {
+                $scope.requestPasswordResetForm.email.$setValidity('auth', true);
+            }
+            
             $scope.showEmailResetConfirmation = false;
 
             if ($scope.requestPasswordResetForm.$invalid) {
                 return;
             }
+
+            $scope.errorMsg = "";
 
             authResource.performRequestPasswordReset(email)
                 .then(function () {

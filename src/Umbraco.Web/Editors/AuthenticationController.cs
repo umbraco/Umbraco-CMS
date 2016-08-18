@@ -15,6 +15,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -38,41 +39,15 @@ namespace Umbraco.Web.Editors
     public class AuthenticationController : UmbracoApiController
     {
 
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-
-        protected BackOfficeUserManager UserManager
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get
-            {
-                if (_userManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
-                    }
-                    _userManager = mgr;
-                }
-                return _userManager;
-            }
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
         }
-
         protected BackOfficeSignInManager SignInManager
         {
-            get
-            {
-                if (_signInManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.Get<BackOfficeSignInManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
-                    }
-                    _signInManager = mgr;
-                }
-                return _signInManager;
-            }
+            get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
         }
 
         

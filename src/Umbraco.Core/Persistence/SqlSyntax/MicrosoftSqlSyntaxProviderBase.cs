@@ -29,7 +29,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override string GetQuotedTableName(string tableName)
         {
-            return string.Format("[{0}]", tableName);
+            if (tableName.Contains(".") == false)
+                return string.Format("[{0}]", tableName);
+
+            var tableNameParts = tableName.Split(new[] { '.' }, 2);
+            return string.Format("[{0}].[{1}]", tableNameParts[0], tableNameParts[1]);
         }
 
         public override string GetQuotedColumnName(string columnName)

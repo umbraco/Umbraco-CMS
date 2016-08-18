@@ -107,10 +107,10 @@ namespace Umbraco.Core.Persistence
             var foreignSql = _syntaxProvider.Format(tableDefinition.ForeignKeys);
             var indexSql = _syntaxProvider.Format(tableDefinition.Indexes);
 
-            var tableExist = _db.TableExist(tableName);
+            var tableExist = TableExist(tableName);
             if (overwrite && tableExist)
             {
-                _db.DropTable(tableName);
+                DropTable(tableName);
                 tableExist = false;
             }
 

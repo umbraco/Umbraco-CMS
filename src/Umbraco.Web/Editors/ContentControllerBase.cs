@@ -97,13 +97,14 @@ namespace Umbraco.Web.Editors
                 var d = new Dictionary<string, object>();
                 //add the files if any
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == p.Alias).ToArray();
-                if (files.Any())
+                if (files.Length > 0)
                 {
                     d.Add("files", files);
                     // add extra things needed to figure out where to put the files
                     d.Add("cuid", contentItem.PersistedContent.Key);
                     d.Add("puid", dboProperty.PropertyType.Key);
                 }
+                
                 var data = new ContentPropertyData(p.Value, p.PreValues, d);
 
                 //get the deserialized value from the property editor
@@ -116,7 +117,7 @@ namespace Umbraco.Web.Editors
                     var valueEditor = p.PropertyEditor.ValueEditor;
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
-                    {
+                    {                        
                         var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
                         var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
                         if (supportTagsAttribute != null)

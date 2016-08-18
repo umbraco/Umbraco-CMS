@@ -25,7 +25,7 @@
                                     id="{{login.authType}}" name="provider" value="{{login.authType}}"
                                     title="Log in using your {{login.caption}} account">
                                 <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                                Sign in with {{login.caption}}
+                                <localize key="login_signInWith">Sign in with</localize> {{login.caption}}
                             </button>
 
                         </div>
@@ -33,7 +33,7 @@
 
                     <div id="hrOr">
                         <hr />
-                        <div>Or</div>
+                        <div><localize key="general_or">or</localize></div>
                     </div>
 
                 </div>
