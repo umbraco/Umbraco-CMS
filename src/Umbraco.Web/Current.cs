@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -135,6 +136,9 @@ namespace Umbraco.Web
 
         public static IContentLastChanceFinder LastChanceContentFinder
             => Container.GetInstance<IContentLastChanceFinder>();
+
+        internal static EditorValidatorCollection EditorValidators
+            => Container.GetInstance<EditorValidatorCollection>();
 
         #endregion
 

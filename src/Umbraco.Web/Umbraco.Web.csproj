@@ -161,6 +161,8 @@
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Current.cs" />
+    <Compile Include="Editors\EditorValidatorCollection.cs" />
+    <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HeathCheckCollectionBuilder.cs" />
     <Compile Include="HybridAccessorBase.cs" />
@@ -175,7 +177,6 @@
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="IUmbracoComponentRendererWithField.cs" />
     <Compile Include="LightInjectExtensions.cs" />
-    <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />
     <Compile Include="Editors\GravatarController.cs" />

@@ -13,7 +13,7 @@ namespace Umbraco.Web.Editors
     {
         internal static void ValidateEditorModelWithResolver(ModelStateDictionary modelState, object model)
         {
-            var validationResult = EditorValidationResolver.Current.Validate(model);
+            var validationResult = Current.EditorValidators.Validate(model);
             foreach (var vr in validationResult
                 .WhereNotNull()
                 .Where(x => x.ErrorMessage.IsNullOrWhiteSpace() == false)

@@ -404,7 +404,8 @@ namespace Umbraco.Web
 
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveXsltExtensions());
 
-            EditorValidationResolver.Current= new EditorValidationResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveTypes<IEditorValidator>());
+            EditorValidatorCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolveTypes<IEditorValidator>());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
