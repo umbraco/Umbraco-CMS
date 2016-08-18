@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -16,9 +15,9 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
-
         // preValues
         private IDictionary<string, object> _internalPreValues;
+
         public override IDictionary<string, object> DefaultPreValues
         {
             get { return _internalPreValues; }
@@ -233,10 +232,6 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Application event handler, used to bind to events on startup
 
-        // fixme - er?
-
-        private readonly FileUploadPropertyEditorApplicationStartup _applicationStartup = new FileUploadPropertyEditorApplicationStartup();
-
         // The ImageCropperPropertyEditor properties own files and as such must manage these files,
         // so we are binding to events in order to make sure that
         // - files are deleted when the owning content/media is
@@ -257,56 +252,46 @@ namespace Umbraco.Web.PropertyEditors
         //  - auto-fill properties are not supported for content items
         //  - auto-fill runs on MediaService.Created which makes no sense (no properties yet)
 
-        /// <summary>
-        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
-        /// </summary>
-        private class FileUploadPropertyEditorApplicationStartup : ApplicationEventHandler
-        {
-            /// <summary>
-            /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-            /// if we find any attached to the current media item.
-            /// </summary>
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-            {
-                MediaService.Created += MediaServiceCreated; // see above - makes no sense
-                MediaService.Saving += MediaServiceSaving;
-                //MediaService.Copied += MediaServiceCopied; // see above - missing
-
-                ContentService.Copied += ContentServiceCopied;
-                //ContentService.Saving += ContentServiceSaving; // see above - missing
-
-                MediaService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-
-                MediaService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
-                    GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
-
-                ContentService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-
-                ContentService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
-                    GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
-
-                MemberService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
-                    GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
-            }
-        }
-
         public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
+            // nothing
         }
+
         public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
+            // nothing
         }
+
         public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);
+            // only if the app is configured
+            // see ApplicationEventHandler.ShouldExecute
+            if (applicationContext.IsConfigured == false || applicationContext.DatabaseContext.IsDatabaseConfigured == false)
+                return;
+
+            MediaService.Created += MediaServiceCreated; // see above - makes no sense
+            MediaService.Saving += MediaServiceSaving;
+            //MediaService.Copied += MediaServiceCopied; // see above - missing
+
+            ContentService.Copied += ContentServiceCopied;
+            //ContentService.Saving += ContentServiceSaving; // see above - missing
+
+            MediaService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
+
+            MediaService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
+                GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
+
+            ContentService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
+
+            ContentService.EmptiedRecycleBin += (sender, args) => args.Files.AddRange(
+                GetFilesToDelete(args.AllPropertyData.SelectMany(x => x.Value)));
+
+            MemberService.Deleted += (sender, args) => args.MediaFilesToDelete.AddRange(
+                GetFilesToDelete(args.DeletedEntities.SelectMany(x => x.Properties)));
         }
+
         #endregion
     }
 }
