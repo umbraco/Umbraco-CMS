@@ -287,11 +287,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             });
 
             // Listen for drag events
-            $(".umbFolderBrowser").live('dragenter dragover', function (e) {
+            $(".umbFolderBrowser").on('dragenter dragover', function (e) {
                 $(".upload-overlay").show();
             });
 
-            $(".upload-overlay").live('dragleave dragexit', function (e) {
+            $(".upload-overlay").on('dragleave dragexit', function (e) {
                 $(this).hide();
             }).click(function () {
                 $(this).hide();
