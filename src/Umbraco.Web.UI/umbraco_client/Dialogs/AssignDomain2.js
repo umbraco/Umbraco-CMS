@@ -86,7 +86,7 @@
                 onkeyup: false
             });
 
-            $('form input.domain').live('focus', function(event) {
+            $('form input.domain').on('focus', function(event) {
                 if (event.type != 'focusin') return;
                 $(this).nextAll('input').val("");
             });

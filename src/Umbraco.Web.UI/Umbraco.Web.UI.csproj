@@ -603,6 +603,7 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
@@ -746,7 +747,6 @@
     <Content Include="Umbraco\Images\Umbraco\settingView.gif" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
     <Content Include="Umbraco_Client\Application\Extensions.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
@@ -1560,7 +1560,6 @@
     <Content Include="Umbraco_Client\Installer\Images\ui-icons_ffd27a_256x240.png" />
     <Content Include="Umbraco_Client\Installer\Images\ui-icons_ffffff_256x240.png" />
     <Content Include="Umbraco_Client\Installer\Js\ie-png.js" />
-    <Content Include="Umbraco_Client\Installer\Js\jquery.1.4.4.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.main.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.ui.selectmenu.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
