@@ -266,6 +266,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
+    <Compile Include="Macros\XsltExtensionCollection.cs" />
+    <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
@@ -531,7 +533,6 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
     <Compile Include="Macros\XsltExtensionAttribute.cs" />
-    <Compile Include="Macros\XsltExtensionsResolver.cs" />
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />

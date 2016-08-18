@@ -1,4 +1,5 @@
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -25,13 +26,11 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void Find_All_Extensions()
         {
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(
-                new ActivatorServiceProvider(),ProfilingLogger.Logger,
-                () => PluginManager.ResolveXsltExtensions());
+            var container = new ServiceContainer();
+            var builder = new XsltExtensionCollectionBuilder(container);
+            builder.AddExtensionObjectProducer(() => PluginManager.ResolveXsltExtensions());
+            var extensions = builder.CreateCollection();
 
-            Resolution.Freeze();
-
-            var extensions = XsltExtensionsResolver.Current.XsltExtensions;
             Assert.AreEqual(3, extensions.Count());
 
             Assert.IsTrue(extensions.Select(x => x.ExtensionObject.GetType()).Contains(typeof (XsltEx1)));

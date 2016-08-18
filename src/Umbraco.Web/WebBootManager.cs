@@ -402,7 +402,8 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveXsltExtensions());
+            XsltExtensionCollectionBuilder.Register(Container)
+                .AddExtensionObjectProducer(() => PluginManager.ResolveXsltExtensions());
 
             EditorValidatorCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolveTypes<IEditorValidator>());

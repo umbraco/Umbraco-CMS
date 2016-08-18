@@ -616,7 +616,7 @@ namespace Umbraco.Web.Macros
         // ie predefined, configured in the config file, and marked with the attribute
         public static Dictionary<string, object> GetXsltExtensions()
         {
-            return XsltExtensionsResolver.Current.XsltExtensions
+            return Current.XsltExtensions
                 .ToDictionary(x => x.Namespace, x => x.ExtensionObject);
 
             /*

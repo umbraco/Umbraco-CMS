@@ -2,6 +2,7 @@
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
+using Umbraco.Core.Macros;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -139,6 +140,9 @@ namespace Umbraco.Web
 
         internal static EditorValidatorCollection EditorValidators
             => Container.GetInstance<EditorValidatorCollection>();
+
+        internal static XsltExtensionCollection XsltExtensions
+            => Container.GetInstance<XsltExtensionCollection>();
 
         #endregion
 
