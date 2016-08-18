@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
@@ -39,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 if (_validatorInstance == null)
                 {
-                    var val = ValidatorsResolver.Current.GetValidator(Type);
+                    var val = Current.Validators[Type];
                     if (val == null)
                     {
                         throw new InvalidOperationException("No " + typeof(ManifestValueValidator) +  " could be found for the type name of " + Type);

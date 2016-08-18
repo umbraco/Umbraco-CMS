@@ -407,17 +407,14 @@ namespace Umbraco.Core
             ParameterEditorCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolveParameterEditors());
 
-            //setup the validators resolver with our predefined validators
-            ValidatorsResolver.Current = new ValidatorsResolver(
-                ServiceProvider, ProfilingLogger.Logger, new[]
-                {
-                    new Lazy<Type>(() => typeof (RequiredManifestValueValidator)),
-                    new Lazy<Type>(() => typeof (RegexValidator)),
-                    new Lazy<Type>(() => typeof (DelimitedManifestValueValidator)),
-                    new Lazy<Type>(() => typeof (EmailValidator)),
-                    new Lazy<Type>(() => typeof (IntegerValidator)),
-                    new Lazy<Type>(() => typeof (DecimalValidator)),
-                });
+            // setup validators with our predefined validators
+            ValidatorCollectionBuilder.Register(Container)
+                .Add<RequiredManifestValueValidator>()
+                .Add<RegexValidator>()
+                .Add<DelimitedManifestValueValidator>()
+                .Add<EmailValidator>()
+                .Add<IntegerValidator>()
+                .Add<DecimalValidator>();
 
             //by default we'll use the db server registrar unless the developer has the legacy
             // dist calls enabled, in which case we'll use the config server registrar

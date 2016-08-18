@@ -158,6 +158,9 @@ namespace Umbraco.Web
         public static ParameterEditorCollection ParameterEditors
             => Container.GetInstance<ParameterEditorCollection>();
 
+        internal static ValidatorCollection Validators
+            => Container.GetInstance<ValidatorCollection>();
+
         #endregion
     }
 }

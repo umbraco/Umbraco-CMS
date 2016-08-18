@@ -53,6 +53,9 @@ namespace Umbraco.Core.DependencyInjection
         public static ParameterEditorCollection ParameterEditors
             => Container.GetInstance<ParameterEditorCollection>();
 
+        internal static ValidatorCollection Validators
+            => Container.GetInstance<ValidatorCollection>();
+
         #endregion
     }
 }
