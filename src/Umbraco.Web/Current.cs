@@ -151,6 +151,9 @@ namespace Umbraco.Web
         public static PropertyEditorCollection PropertyEditors
             => Container.GetInstance<PropertyEditorCollection>();
 
+        public static ParameterEditorCollection ParameterEditors
+            => Container.GetInstance<ParameterEditorCollection>();
+
         #endregion
     }
 }

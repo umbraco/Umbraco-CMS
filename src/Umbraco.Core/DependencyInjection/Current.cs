@@ -50,6 +50,9 @@ namespace Umbraco.Core.DependencyInjection
         public static PropertyEditorCollection PropertyEditors
             => Container.GetInstance<PropertyEditorCollection>();
 
+        public static ParameterEditorCollection ParameterEditors
+            => Container.GetInstance<ParameterEditorCollection>();
+
         #endregion
     }
 }

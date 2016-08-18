@@ -16,6 +16,7 @@ using System.Linq;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -183,7 +184,7 @@ namespace umbraco.cms.presentation.developer
 
         protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
         {
-            return ParameterEditorResolver.Current.ParameterEditors;
+            return Current.ParameterEditors;
         }
 
 		public void macroPropertyCreate(object sender, EventArgs e)

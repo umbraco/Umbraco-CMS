@@ -404,9 +404,8 @@ namespace Umbraco.Core
             PropertyEditorCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolvePropertyEditors());
 
-            ParameterEditorResolver.Current = new ParameterEditorResolver(
-                Container, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(),
-                manifestBuilder);
+            ParameterEditorCollectionBuilder.Register(Container)
+                .AddProducer(() => PluginManager.ResolveParameterEditors());
 
             //setup the validators resolver with our predefined validators
             ValidatorsResolver.Current = new ValidatorsResolver(
