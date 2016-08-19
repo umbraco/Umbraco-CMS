@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[WeightedPlugin(1000)]
+	[Weight(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
     {
 	    private readonly MediaFileSystem _mediaFileSystem;

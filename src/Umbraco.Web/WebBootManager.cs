@@ -532,9 +532,8 @@ namespace Umbraco.Web
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container);
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
 
-            ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
-                Container, ProfilingLogger.Logger,
-                PluginManager.ResolveThumbnailProviders());
+            ThumbnailProviderCollectionBuilder.Register(Container)
+                .Add(PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
                 ServiceProvider, ProfilingLogger.Logger,

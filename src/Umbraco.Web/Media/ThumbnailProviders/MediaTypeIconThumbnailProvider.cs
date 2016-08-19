@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[WeightedPlugin(3000)]
+	[Weight(3000)]
     public class MediaTypeIconThumbnailProvider : AbstractThumbnailProvider
     {
         

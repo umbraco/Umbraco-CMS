@@ -210,6 +210,8 @@
     <Compile Include="Macros\XsltMacroEngine.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
+    <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollectionBuilder.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
@@ -1094,7 +1096,6 @@
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\ThumbnailProvidersResolver.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
