@@ -169,6 +169,9 @@ namespace Umbraco.Web
         internal static PackageActionCollection PackageActions
             => Container.GetInstance<PackageActionCollection>();
 
+        internal static PropertyValueConverterCollection PropertyValueConverters
+            => Container.GetInstance<PropertyValueConverterCollection>();
+
         #endregion
     }
 }

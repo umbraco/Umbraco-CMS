@@ -48,8 +48,7 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void FreezeResolution()
         {
-            PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver(Container, Logger);
+            PropertyValueConverterCollectionBuilder.Register(Container);
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             PublishedContentModelFactoryResolver.Current =
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));

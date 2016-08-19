@@ -31,15 +31,12 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void FreezeResolution()
         {
-            if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                    Container, Logger,
-                    new[]
-                        {
-                            typeof(DatePickerValueConverter),
-                            typeof(TinyMceValueConverter),
-                            typeof(YesNoValueConverter)
-                        });    
+            // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
+            // can we risk double - registering and then, what happens?
+            PropertyValueConverterCollectionBuilder.Register(Container)
+                .Append<DatePickerValueConverter>()
+                .Append<TinyMceValueConverter>()
+                .Append<YesNoValueConverter>();
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

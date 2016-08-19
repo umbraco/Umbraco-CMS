@@ -262,8 +262,8 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected override void FreezeResolution()
         {
-            if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(Container, Logger);
+            // fixme - what about if (PropertyValueConvertersResolver.HasCurrent == false) ??
+            PropertyValueConverterCollectionBuilder.Register(Container);
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

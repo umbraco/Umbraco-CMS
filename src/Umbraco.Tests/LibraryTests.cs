@@ -56,9 +56,7 @@ namespace Umbraco.Tests
 	    protected override void FreezeResolution()
 	    {
             // required so we can access property.Value
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                Container,
-                Logger);
+	        PropertyValueConverterCollectionBuilder.Register(Container);
 
 	        base.FreezeResolution();
 	    }

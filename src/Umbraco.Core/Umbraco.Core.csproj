@@ -454,6 +454,8 @@
     <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueTypes.cs" />
+    <Compile Include="PropertyEditors\PropertyValueConverterCollection.cs" />
+    <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValidatorCollection.cs" />
     <Compile Include="PropertyEditors\ValidatorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
@@ -1046,7 +1048,6 @@
     <Compile Include="PropertyEditors\PreValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
-    <Compile Include="PropertyEditors\PropertyValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\RegexValidator.cs" />
     <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValidator.cs" />

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Xml;
 
@@ -164,8 +165,8 @@ namespace Umbraco.Core.Models.PublishedContent
             //TODO: Look at optimizing this method, it gets run for every property type for the document being rendered at startup,
             // every precious second counts!
 
-            var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
-            var defaultConvertersWithAttributes = PropertyValueConvertersResolver.Current.DefaultConverters;
+            var converters = Current.PropertyValueConverters.ToArray();
+            var defaultConvertersWithAttributes = Current.PropertyValueConverters.DefaultConverters;
 
             _converter = null;
 

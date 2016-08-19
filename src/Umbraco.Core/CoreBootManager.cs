@@ -451,9 +451,8 @@ namespace Umbraco.Core
                 .AddProducer(() => PluginManager.ResolveTypes<IMigration>());
 
             // need to filter out the ones we dont want!!
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                Container, ProfilingLogger.Logger,
-                PluginManager.ResolveTypes<IPropertyValueConverter>());
+            PropertyValueConverterCollectionBuilder.Register(Container)
+                .Append(PluginManager.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(Container,

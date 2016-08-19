@@ -493,12 +493,12 @@ namespace Umbraco.Web
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
-            // (the limited one, defined in Core, is there for tests)
-            PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
-            // same for other converters
-            PropertyValueConvertersResolver.Current.RemoveType<TextStringValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<MarkdownEditorValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<ImageCropperValueConverter>();
+            // (the limited one, defined in Core, is there for tests) - same for others
+            Container.GetInstance<PropertyValueConverterCollectionBuilder>()
+                .Remove<TinyMceValueConverter>()
+                .Remove<TextStringValueConverter>()
+                .Remove<MarkdownEditorValueConverter>()
+                .Remove<ImageCropperValueConverter>();
 
             FacadeServiceResolver.Current = new FacadeServiceResolver(Container);
 
