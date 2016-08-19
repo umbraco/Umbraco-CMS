@@ -306,7 +306,6 @@
     <Compile Include="Models\ContentTypeAvailableCompositionsResults.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\Rdbms\LockDto.cs" />
-    <Compile Include="ObjectResolution\ContainerLazyManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -1012,7 +1011,6 @@
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
-    <Compile Include="ObjectResolution\LazyManyObjectsResolverBase.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
