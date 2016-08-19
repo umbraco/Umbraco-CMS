@@ -23,7 +23,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
-
 		public override void Initialize()
 		{                       
 			base.Initialize();
@@ -44,9 +43,10 @@ namespace Umbraco.Tests.Routing
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
-            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
-                new ActivatorServiceProvider(), Logger,
-                PluginManager.Current.ResolveUmbracoApiControllers());
+
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.Current.ResolveUmbracoApiControllers());
+            Container.RegisterInstance(umbracoApiControllerTypes);
+
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             base.FreezeResolution();

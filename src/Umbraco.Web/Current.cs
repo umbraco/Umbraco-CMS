@@ -11,6 +11,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
@@ -144,6 +145,9 @@ namespace Umbraco.Web
 
         internal static XsltExtensionCollection XsltExtensions
             => Container.GetInstance<XsltExtensionCollection>();
+
+        internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
+            => Container.GetInstance<UmbracoApiControllerTypeCollection>();
 
         #endregion
 

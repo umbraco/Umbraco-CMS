@@ -96,7 +96,7 @@ namespace Umbraco.Web
 
             var area = "";
 
-            var apiController = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
+            var apiController = Current.UmbracoApiControllerTypes
                 .SingleOrDefault(x => x == apiControllerType);
             if (apiController == null)
                 throw new InvalidOperationException("Could not find the umbraco api controller of type " + apiControllerType.FullName);

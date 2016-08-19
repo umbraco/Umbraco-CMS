@@ -31,9 +31,9 @@ namespace Umbraco.Web.Trees
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
         {
             //get reference to all TreeApiControllers
-            var controllerTrees = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
-                                                              .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
-                                                              .ToArray();
+            var controllerTrees = Current.UmbracoApiControllerTypes
+                .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
+                .ToArray();
 
             //find the one we're looking for
             var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());

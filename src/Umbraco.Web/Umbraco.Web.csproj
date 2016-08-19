@@ -288,6 +288,7 @@
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebServices\FacadeStatusController.cs" />
     <Compile Include="WebServices\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
@@ -916,7 +917,6 @@
     <Compile Include="WebApi\PrefixlessBodyModelValidatorAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
-    <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />

@@ -250,7 +250,7 @@ namespace Umbraco.Web
             //we need to find the plugin controllers and route them
             var pluginControllers =
                 SurfaceControllerResolver.Current.RegisteredSurfaceControllers.Concat(
-                    UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers).ToArray();
+                    Current.UmbracoApiControllerTypes).ToArray();
 
             //local controllers do not contain the attribute
             var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
@@ -485,9 +485,8 @@ namespace Umbraco.Web
                 ServiceProvider, ProfilingLogger.Logger,
                 PluginManager.ResolveSurfaceControllers());
 
-            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                PluginManager.ResolveUmbracoApiControllers());
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.ResolveUmbracoApiControllers());
+            Container.RegisterInstance(umbracoApiControllerTypes);
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
