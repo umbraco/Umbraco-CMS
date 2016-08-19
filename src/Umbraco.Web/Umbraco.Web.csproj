@@ -216,6 +216,7 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
     <Compile Include="PublishedCache\PublishedFragment.cs" />
     <Compile Include="PublishedCache\PublishedFragmentProperty.cs" />
@@ -968,7 +969,6 @@
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\DefaultUrlProvider.cs" />

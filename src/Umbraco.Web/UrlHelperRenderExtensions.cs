@@ -291,8 +291,7 @@ namespace Umbraco.Web
 
             var area = "";
 
-            var surfaceController = SurfaceControllerResolver.Current.RegisteredSurfaceControllers
-                                                             .SingleOrDefault(x => x == surfaceType);
+            var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
                 throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
             var metaData = PluginController.GetMetadata(surfaceController);

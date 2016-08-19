@@ -40,9 +40,8 @@ namespace Umbraco.Tests.Routing
         {
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                new ActivatorServiceProvider(), Logger,
-                PluginManager.Current.ResolveSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(PluginManager.Current.ResolveSurfaceControllers());
+            Container.RegisterInstance(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.Current.ResolveUmbracoApiControllers());
             Container.RegisterInstance(umbracoApiControllerTypes);

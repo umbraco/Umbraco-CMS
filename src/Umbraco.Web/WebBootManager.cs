@@ -248,9 +248,9 @@ namespace Umbraco.Web
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
             //we need to find the plugin controllers and route them
-            var pluginControllers =
-                SurfaceControllerResolver.Current.RegisteredSurfaceControllers.Concat(
-                    Current.UmbracoApiControllerTypes).ToArray();
+            var pluginControllers = Current.SurfaceControllerTypes
+                .Concat(Current.UmbracoApiControllerTypes)
+                .ToArray();
 
             //local controllers do not contain the attribute
             var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
@@ -481,9 +481,8 @@ namespace Umbraco.Web
             ActionCollectionBuilder.Register(Container)
                 .SetProducer(() => PluginManager.ResolveActions());
 
-            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                PluginManager.ResolveSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(PluginManager.ResolveSurfaceControllers());
+            Container.RegisterInstance(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.ResolveUmbracoApiControllers());
             Container.RegisterInstance(umbracoApiControllerTypes);
