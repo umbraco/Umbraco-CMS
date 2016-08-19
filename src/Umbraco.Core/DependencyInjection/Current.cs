@@ -3,6 +3,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.DependencyInjection
 {
@@ -55,6 +56,9 @@ namespace Umbraco.Core.DependencyInjection
 
         internal static ValidatorCollection Validators
             => Container.GetInstance<ValidatorCollection>();
+
+        internal static PackageActionCollection PackageActions
+            => Container.GetInstance<PackageActionCollection>();
 
         #endregion
     }

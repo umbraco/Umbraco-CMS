@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 
@@ -23,7 +24,7 @@ namespace umbraco.cms.businesslogic.packager
 		public static void RunPackageAction(string packageName, string actionAlias, XmlNode actionXml)
 		{
 
-			foreach (var ipa in PackageActionsResolver.Current.PackageActions)
+			foreach (var ipa in Current.PackageActions)
 			{
 				try
 				{
@@ -49,7 +50,7 @@ namespace umbraco.cms.businesslogic.packager
 		public static void UndoPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
 		{
 
-			foreach (IPackageAction ipa in PackageActionsResolver.Current.PackageActions)
+			foreach (IPackageAction ipa in Current.PackageActions)
 			{
 				try
 				{

@@ -443,9 +443,8 @@ namespace Umbraco.Core
             CacheRefresherCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolveCacheRefreshers());
 
-            PackageActionsResolver.Current = new PackageActionsResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                () => PluginManager.ResolvePackageActions());
+            PackageActionCollectionBuilder.Register(Container)
+                .AddProducer(f => f.GetInstance<PluginManager>().ResolvePackageActions());
 
             //the database migration objects
             MigrationCollectionBuilder.Register(Container)

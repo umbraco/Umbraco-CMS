@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Plugins;
@@ -20,9 +21,6 @@ namespace Umbraco.Tests.Resolvers
         [SetUp]
         public void Initialize()
         {
-
-            PackageActionsResolver.Reset();
-
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
             PluginManager = new PluginManager(new NullCacheProvider(),
@@ -37,6 +35,7 @@ namespace Umbraco.Tests.Resolvers
         public void TearDown()
         {
             Resolution.Reset();
+            Current.Reset();
         }
 
         protected virtual IEnumerable<Assembly> AssembliesToScan

@@ -6,6 +6,7 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.PublishedCache;
@@ -164,6 +165,9 @@ namespace Umbraco.Web
 
         internal static ValidatorCollection Validators
             => Container.GetInstance<ValidatorCollection>();
+
+        internal static PackageActionCollection PackageActions
+            => Container.GetInstance<PackageActionCollection>();
 
         #endregion
     }

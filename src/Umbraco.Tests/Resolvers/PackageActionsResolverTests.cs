@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using System.Xml;
+using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core._Legacy.PackageActions;
@@ -12,13 +14,6 @@ namespace Umbraco.Tests.Resolvers
     [TestFixture]
     public class PackageActionsResolverTests : ResolverBaseTest
 	{		
-
-		[TearDown]
-		public void TearDown()
-		{
-            PackageActionsResolver.Reset();
-        }
-        
         // NOTE
         // ManyResolverTests ensure that we'll get our actions back and PackageActionResolver works,
         // so all we're testing here is that plugin manager _does_ find our package actions
@@ -26,13 +21,13 @@ namespace Umbraco.Tests.Resolvers
         [Test]
 		public void FindAllPackageActions()
 		{
-            PackageActionsResolver.Current = new PackageActionsResolver(
-                new ActivatorServiceProvider(), ProfilingLogger.Logger,
-                () => PluginManager.ResolvePackageActions());
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
 
-            Resolution.Freeze();
+            PackageActionCollectionBuilder.Register(container)
+                .AddProducer(() => PluginManager.ResolvePackageActions());
 
-			var actions = PackageActionsResolver.Current.PackageActions;
+			var actions = Current.PackageActions;
 			Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there
