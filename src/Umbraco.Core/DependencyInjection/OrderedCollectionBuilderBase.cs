@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LightInject;
 
 namespace Umbraco.Core.DependencyInjection
@@ -32,6 +33,24 @@ namespace Umbraco.Core.DependencyInjection
                 var type = typeof (T);
                 if (types.Contains(type)) types.Remove(type);
                 types.Add(type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        ///  Appends types to the collections.
+        /// </summary>
+        /// <param name="types">The types to append.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Append(IEnumerable<Type> types)
+        {
+            Configure(list =>
+            {
+                foreach (var type in types)
+                {
+                    if (list.Contains(type)) list.Remove(type);
+                    list.Add(type);
+                }
             });
             return This;
         }

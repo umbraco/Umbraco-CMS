@@ -38,6 +38,26 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
+        /// Adds types to the collection.
+        /// </summary>
+        /// <param name="types">The types to add.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Add(IEnumerable<Type> types)
+        {
+            Configure(list =>
+            {
+                foreach (var type in types)
+                {
+                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
+                    if (typeof(TItem).IsAssignableFrom(type) == false)
+                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                    if (list.Contains(type) == false) list.Add(type);
+                }
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Removes a type from the collection.
         /// </summary>
         /// <typeparam name="T">The type to remove.</typeparam>
