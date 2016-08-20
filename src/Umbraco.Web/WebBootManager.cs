@@ -500,14 +500,10 @@ namespace Umbraco.Web
 
             FacadeServiceResolver.Current = new FacadeServiceResolver(Container);
 
-            FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                // add all known factories, devs can then modify this list on application
-                // startup either by binding to events or in their own global.asax
-                new[]
-					{
-						typeof (RenderControllerFactory)
-					});
+            // add all known factories, devs can then modify this list on application
+            // startup either by binding to events or in their own global.asax
+            FilteredControllerFactoryCollectionBuilder.Register(Container)
+                .Append<RenderControllerFactory>();
 
             UrlProviderCollectionBuilder.Register(Container)
                 //.Append<AliasUrlProvider>() // not enabled by default
@@ -554,13 +550,12 @@ namespace Umbraco.Web
             //don't output the MVC version header (security)
             MvcHandler.DisableMvcResponseHeader = true;
 
-            //set master controller factory
-            ControllerBuilder.Current.SetControllerFactory(
-                new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
+            // set master controller factory
+            var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
+            ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
-            //set the render view engine
+            // set the render & plugin view engines
             ViewEngines.Engines.Add(new RenderViewEngine());
-            //set the plugin view engine
             ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder

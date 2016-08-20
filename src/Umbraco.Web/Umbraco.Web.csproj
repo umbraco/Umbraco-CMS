@@ -216,6 +216,8 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
+    <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
     <Compile Include="PublishedCache\PublishedFragment.cs" />
@@ -1071,7 +1073,6 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
-    <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
     <Compile Include="Mvc\MasterControllerFactory.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />

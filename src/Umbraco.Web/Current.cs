@@ -153,6 +153,9 @@ namespace Umbraco.Web
         internal static SurfaceControllerTypeCollection SurfaceControllerTypes
             => Container.GetInstance<SurfaceControllerTypeCollection>();
 
+        public static FilteredControllerFactoryCollection FilteredControllerFactories
+            => Container.GetInstance<FilteredControllerFactoryCollection>();
+
         #endregion
 
         #region Core Getters

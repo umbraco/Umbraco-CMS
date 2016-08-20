@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
@@ -17,12 +13,30 @@ namespace Umbraco.Web.Mvc
 	/// <remarks></remarks>
 	internal class MasterControllerFactory : DefaultControllerFactory
 	{
-		private readonly FilteredControllerFactoriesResolver _slaveFactories;
+        private readonly Func<FilteredControllerFactoryCollection> _factoriesAccessor;
+        private FilteredControllerFactoryCollection _factories;
 
-		public MasterControllerFactory(FilteredControllerFactoriesResolver factoryResolver)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MasterControllerFactory"/> with a factories accessor.
+        /// </summary>
+        /// <param name="factoriesAccessor">The factories accessor.</param>
+        public MasterControllerFactory(Func<FilteredControllerFactoryCollection> factoriesAccessor)
 		{
-			_slaveFactories = factoryResolver;
+            // note
+            // because the MasterControllerFactory needs to be ctored to be assigned to 
+            // ControllerBuilder.Current when setting up Mvc and WebApi, it cannot be ctored by
+            // the IoC container - and yet we don't want that ctor to resolve the factories
+            // as that happen before everything is configured - so, passing a factories
+            // accessor func.
+
+			_factoriesAccessor = factoriesAccessor;
 		}
+
+        private IFilteredControllerFactory FactoryForRequest(RequestContext context)
+        {
+            if (_factories == null) _factories = _factoriesAccessor();
+            return _factories.FirstOrDefault(x => x.CanHandle(context));
+        }
 
 		/// <summary>
 		/// Creates the specified controller by using the specified request context.
@@ -36,7 +50,7 @@ namespace Umbraco.Web.Mvc
 		/// <remarks></remarks>
 		public override IController CreateController(RequestContext requestContext, string controllerName)
 		{
-			var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+			var factory = FactoryForRequest(requestContext);
 			return factory != null
 			       	? factory.CreateController(requestContext, controllerName)
 			       	: base.CreateController(requestContext, controllerName);
@@ -53,7 +67,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="controllerName">The name of the controller.</param>
         internal Type GetControllerTypeInternal(RequestContext requestContext, string controllerName)
         {
-            var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+            var factory = FactoryForRequest(requestContext);
             if (factory != null)
             {
                 //check to see if the factory is of type UmbracoControllerFactory which exposes the GetControllerType method so we don't have to create
@@ -67,35 +81,33 @@ namespace Umbraco.Web.Mvc
                 }
                 //we have no choice but to instantiate the controller
                 var instance = factory.CreateController(requestContext, controllerName);
-                if (instance != null)
-                {
-                    return instance.GetType();    
-                }
-                return null;
+                return instance?.GetType();
             }
 
-            return base.GetControllerType(requestContext, controllerName);
+            return GetControllerType(requestContext, controllerName);
         }
 
 		/// <summary>
 		/// Releases the specified controller.
 		/// </summary>
-		/// <param name="controller">The controller to release.</param>
+		/// <param name="icontroller">The controller to release.</param>
 		/// <remarks></remarks>
-		public override void ReleaseController(IController controller)
+		public override void ReleaseController(IController icontroller)
 		{
-			bool released = false;
-				if (controller is Controller)
+			var released = false;
+		    var controller = icontroller as Controller;
+		    if (controller != null)
+			{
+				var requestContext = controller.ControllerContext.RequestContext;
+				var factory = FactoryForRequest(requestContext);
+				if (factory != null)
 				{
-					var requestContext = ((Controller)controller).ControllerContext.RequestContext;
-					var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
-					if (factory != null)
-					{
-						factory.ReleaseController(controller);
-						released = true;
-					}
+					factory.ReleaseController(controller);
+					released = true;
 				}
-				if (!released) base.ReleaseController(controller);
+			}
+			if (released == false)
+                base.ReleaseController(icontroller);
 		}
 	}
 }
