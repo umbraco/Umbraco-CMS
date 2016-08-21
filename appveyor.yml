@@ -35,9 +35,9 @@ test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
 artifacts:
 - path: build\UmbracoCms.*
-- name: UmbracoFiles
+  name: UmbracoFiles
 - path: build\msbuild.log
-- name: BuildLog
+  name: BuildLog
 deploy:
 - provider: AzureBlob
   storage_account_name: umbraconightlies
