@@ -48,6 +48,9 @@ namespace Umbraco.Core.DependencyInjection
             {
                 foreach (var type in types)
                 {
+                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
+                    if (typeof(TItem).IsAssignableFrom(type) == false)
+                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
                     if (list.Contains(type)) list.Remove(type);
                     list.Add(type);
                 }
@@ -86,15 +89,17 @@ namespace Umbraco.Core.DependencyInjection
         /// Inserts a type into the collection.
         /// </summary>
         /// <typeparam name="T">The type to insert.</typeparam>
+        /// <param name="index">The optional index.</param>
         /// <returns>The builder.</returns>
-        public TBuilder Insert<T>()
+        /// <remarks>Throws if the index is out of range.</remarks>
+        public TBuilder Insert<T>(int index = 0)
             where T : TItem
         {
             Configure(types =>
             {
                 var type = typeof (T);
                 if (types.Contains(type)) types.Remove(type);
-                types.Insert(0, type);
+                types.Insert(index, type);
             });
             return This;
         }
@@ -167,6 +172,27 @@ namespace Umbraco.Core.DependencyInjection
                 types.Insert(index, type);
                 types.Remove(typeReplaced);
             });
+            return This;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the collection contains a type.
+        /// </summary>
+        /// <typeparam name="T">The type to look for.</typeparam>
+        /// <returns>A value indicating whether the collection contains the type.</returns>
+        public bool Has<T>()
+            where T : TItem
+        {
+            return HasBase<T>();
+        }
+
+        /// <summary>
+        /// Clears all types in the collection.
+        /// </summary>
+        /// <returns>The buidler.</returns>
+        public TBuilder Clear()
+        {
+            Configure(types => types.Clear());
             return This;
         }
     }

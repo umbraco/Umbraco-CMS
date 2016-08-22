@@ -498,7 +498,7 @@
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Resolvers\LazyCollectionBuilderTests.cs" />
-    <Compile Include="Resolvers\ManyResolverTests.cs" />
+    <Compile Include="Resolvers\CollectionBuildersTests.cs" />
     <Compile Include="Resolvers\SingleResolverTests.cs" />
     <Compile Include="Resolvers\ResolutionTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />

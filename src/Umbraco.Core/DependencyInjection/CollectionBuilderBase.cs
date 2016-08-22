@@ -171,5 +171,18 @@ namespace Umbraco.Core.DependencyInjection
             if (_collectionCtor == null) throw new InvalidOperationException("Collection auto-creation is not possible.");
             return _collectionCtor(CreateItems());
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the collection contains a type.
+        /// </summary>
+        /// <typeparam name="T">The type to look for.</typeparam>
+        /// <returns>A value indicating whether the collection contains the type.</returns>
+        /// <remarks>Some builder implementations may use this to expose a public Has{T}() method,
+        /// when it makes sense. Probably does not make sense for lazy builders, for example.</remarks>
+        protected bool HasBase<T>()
+            where T : TItem
+        {
+            return _types.Contains(typeof (T));
+        }
     }
 }

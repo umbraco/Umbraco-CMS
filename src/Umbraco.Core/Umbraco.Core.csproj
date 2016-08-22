@@ -306,7 +306,6 @@
     <Compile Include="Models\ContentTypeAvailableCompositionsResults.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\Rdbms\LockDto.cs" />
-    <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
@@ -1119,7 +1118,6 @@
     <Compile Include="Models\Rdbms\UserDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
-    <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
@@ -1141,7 +1139,6 @@
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
     <Compile Include="ObjectResolution\Resolution.cs" />
     <Compile Include="ObjectResolution\ResolverBase.cs" />
