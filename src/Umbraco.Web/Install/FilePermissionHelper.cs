@@ -103,7 +103,7 @@ namespace Umbraco.Web.Install
 
         public static bool TestFacade(out IEnumerable<string> errors)
         {
-            var facadeService = FacadeServiceResolver.Current.Service;
+            var facadeService = Current.FacadeService;
             return facadeService.EnsureEnvironment(out errors);
         }
 

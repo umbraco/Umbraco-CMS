@@ -135,7 +135,7 @@ namespace Umbraco.Web
             var httpContext = new HttpContextWrapper(UmbracoApplication.Context);
             UmbracoContext.EnsureContext(
                 httpContext, ApplicationContext,
-                FacadeServiceResolver.Current.Service,
+                Current.FacadeService,
                 new WebSecurity(httpContext, ApplicationContext),
                 UmbracoConfig.For.UmbracoSettings(),
                 Current.UrlProviders,
@@ -464,7 +464,7 @@ namespace Umbraco.Web
                                 // this is equivalent to DistributedCache RefreshAllFacade but local only
                                 // (we really should have a way to reuse RefreshAllFacade... locally)
                                 // note: refresh all content & media caches does refresh content types too
-    					        IFacadeService svc = FacadeServiceResolver.Current.Service;
+    					        IFacadeService svc = Current.FacadeService;
                                 bool ignored1, ignored2;
                                 svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
                                 svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
@@ -497,8 +497,6 @@ namespace Umbraco.Web
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>()
                 .Remove<ImageCropperValueConverter>();
-
-            FacadeServiceResolver.Current = new FacadeServiceResolver(Container);
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax

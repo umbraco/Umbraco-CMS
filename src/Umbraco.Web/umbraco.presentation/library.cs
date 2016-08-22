@@ -1257,7 +1257,7 @@ namespace umbraco
             else
             {
                 var facade = Current.Facade
-                    ?? FacadeServiceResolver.Current.Service.CreateFacade(null);
+                    ?? Current.FacadeService.CreateFacade(null);
                 contentCache = facade.ContentCache as PublishedContentCache;
             }
 

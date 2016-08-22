@@ -160,6 +160,9 @@ namespace Umbraco.Web
         internal static ImageUrlProviderCollection ImageUrlProviders
             => Container.GetInstance<ImageUrlProviderCollection>();
 
+        internal static IFacadeService FacadeService
+            => Container.GetInstance<IFacadeService>();
+
         #endregion
 
         #region Core Getters

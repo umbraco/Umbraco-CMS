@@ -18,7 +18,7 @@ namespace umbraco.presentation.dialogs
             var user = UmbracoContext.Security.CurrentUser;
             var contentId = Request.GetItemAs<int>("id");
 
-            var facadeService = FacadeServiceResolver.Current.Service;
+            var facadeService = Current.FacadeService;
             var previewToken = facadeService.EnterPreview(user, contentId);
 
             UmbracoContext.HttpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));

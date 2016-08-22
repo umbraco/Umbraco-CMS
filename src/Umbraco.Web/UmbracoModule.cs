@@ -54,7 +54,7 @@ namespace Umbraco.Web
             // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
 		    UmbracoContext.EnsureContext(
 		        httpContext, ApplicationContext.Current,
-                FacadeServiceResolver.Current.Service,
+                Current.FacadeService,
 		        new WebSecurity(httpContext, ApplicationContext.Current),
 		        UmbracoConfig.For.UmbracoSettings(),
 		        Current.UrlProviders,

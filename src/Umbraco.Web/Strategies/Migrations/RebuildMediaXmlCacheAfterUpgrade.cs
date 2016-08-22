@@ -32,7 +32,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 // maintain - for backward compatibility?
                 //var mediasvc = (MediaService)ApplicationContext.Current.Services.MediaService;
                 //mediasvc.RebuildMediaXml();
-                var svc = FacadeServiceResolver.Current.Service as FacadeService;
+                var svc = Current.FacadeService as FacadeService;
                 svc?.RebuildMediaXml();
             }
         }

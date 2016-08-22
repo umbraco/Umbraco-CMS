@@ -14,7 +14,7 @@ namespace umbraco.presentation
             var request = (new HttpRequestWrapper(Request));
 
             var previewToken = request.GetPreviewCookieValue();
-            var service = FacadeServiceResolver.Current.Service;
+            var service = Current.FacadeService;
             service.ExitPreview(previewToken);
 
             HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);

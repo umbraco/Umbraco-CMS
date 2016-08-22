@@ -228,7 +228,6 @@
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\FacadeServiceBase.cs" />
-    <Compile Include="PublishedCache\FacadeServiceResolver.cs" />
     <Compile Include="PublishedCache\IDomainCache.cs" />
     <Compile Include="PublishedCache\IFacade.cs" />
     <Compile Include="PublishedCache\IFacadeAccessor.cs" />

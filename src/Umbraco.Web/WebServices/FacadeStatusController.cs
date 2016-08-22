@@ -7,17 +7,23 @@ namespace Umbraco.Web.WebServices
 {
     public class FacadeStatusController : UmbracoAuthorizedApiController
     {
+        private readonly IFacadeService _facadeService;
+
+        public FacadeStatusController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
         [HttpGet]
         public string GetFacadeStatusUrl()
         {
-            var service = FacadeServiceResolver.Current.Service;
-            if (service is Umbraco.Web.PublishedCache.XmlPublishedCache.FacadeService)
+            if (_facadeService is Umbraco.Web.PublishedCache.XmlPublishedCache.FacadeService)
                 return "views/dashboard/developer/xmldataintegrityreport.html";
             //if (service is PublishedCache.PublishedNoCache.FacadeService)
             //    return "views/dashboard/developer/nocache.html";
-            if (service is PublishedCache.NuCache.FacadeService)
+            if (_facadeService is PublishedCache.NuCache.FacadeService)
                 return "views/dashboard/developer/nucache.html";
-            throw new NotSupportedException("Not supported: " + service.GetType().FullName);
+            throw new NotSupportedException("Not supported: " + _facadeService.GetType().FullName);
         }
     }
 }

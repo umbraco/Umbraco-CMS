@@ -9,11 +9,18 @@ namespace Umbraco.Web.WebServices
 {
     public class NuCacheStatusController : UmbracoAuthorizedApiController
     {
-        private static FacadeService FacadeService
+        private readonly IFacadeService _facadeService;
+
+        public NuCacheStatusController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
+        private FacadeService FacadeService
         {
             get
             {
-                var svc = FacadeServiceResolver.Current.Service as FacadeService;
+                var svc = _facadeService as FacadeService;
                 if (svc == null)
                     throw new NotSupportedException("Not running NuCache.");
                 return svc;
