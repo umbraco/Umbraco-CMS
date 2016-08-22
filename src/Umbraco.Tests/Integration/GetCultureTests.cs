@@ -21,9 +21,7 @@ namespace Umbraco.Tests.Integration
     {
         protected override void FreezeResolution()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
-
-            base.FreezeResolution();
+            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         [Test]

@@ -163,6 +163,9 @@ namespace Umbraco.Web
         internal static IFacadeService FacadeService
             => Container.GetInstance<IFacadeService>();
 
+        public static ISiteDomainHelper SiteDomainHelper
+            => Container.GetInstance<ISiteDomainHelper>();
+
         #endregion
 
         #region Core Getters

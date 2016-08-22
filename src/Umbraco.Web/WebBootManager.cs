@@ -521,7 +521,6 @@ namespace Umbraco.Web
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container);
             Container.Register<ISiteDomainHelper, SiteDomainHelper>();
 
             ThumbnailProviderCollectionBuilder.Register(Container)

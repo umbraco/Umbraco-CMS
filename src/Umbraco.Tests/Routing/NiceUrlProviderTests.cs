@@ -16,11 +16,11 @@ namespace Umbraco.Tests.Routing
 	{
         protected override void FreezeResolution()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
+            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
-	    private IUmbracoSettingsSection _umbracoSettings;
+        private IUmbracoSettingsSection _umbracoSettings;
 
         public override void Initialize()
         {

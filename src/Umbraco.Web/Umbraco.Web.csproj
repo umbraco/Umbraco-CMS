@@ -977,7 +977,6 @@
     <Compile Include="Routing\DomainAndUri.cs" />
     <Compile Include="Routing\IUrlProvider.cs" />
     <Compile Include="Routing\SiteDomainHelper.cs" />
-    <Compile Include="Routing\SiteDomainHelperResolver.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />

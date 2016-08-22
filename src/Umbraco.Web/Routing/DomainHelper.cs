@@ -42,7 +42,7 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // else filter
-            var helper = SiteDomainHelperResolver.Current.Helper;
+            var helper = Current.SiteDomainHelper;
             var domainAndUri = DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
 
             if (domainAndUri == null)
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Routing
             var domainAndUris = DomainsForUri(domains, current).ToArray();
 
             // filter
-            var helper = SiteDomainHelperResolver.Current.Helper;
+            var helper = Current.SiteDomainHelper;
             return helper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
         }
 

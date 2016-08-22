@@ -73,11 +73,11 @@ namespace Umbraco.Tests.Routing
 
         protected override void FreezeResolution()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
+            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
-		void SetDomains1()
+        void SetDomains1()
 		{
             SetupDomainServiceMock(new[]
             {
