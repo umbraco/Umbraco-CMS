@@ -210,6 +210,8 @@
     <Compile Include="Macros\XsltMacroEngine.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="Media\ImageUrlProviderCollection.cs" />
+    <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollectionBuilder.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
@@ -825,7 +827,6 @@
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Media\ImageUrl.cs" />
-    <Compile Include="Media\ImageUrlProviderResolver.cs" />
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />

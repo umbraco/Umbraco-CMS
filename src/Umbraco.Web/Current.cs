@@ -9,6 +9,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -155,6 +156,9 @@ namespace Umbraco.Web
 
         public static FilteredControllerFactoryCollection FilteredControllerFactories
             => Container.GetInstance<FilteredControllerFactoryCollection>();
+
+        internal static ImageUrlProviderCollection ImageUrlProviders
+            => Container.GetInstance<ImageUrlProviderCollection>();
 
         #endregion
 

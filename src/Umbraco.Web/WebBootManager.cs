@@ -529,9 +529,8 @@ namespace Umbraco.Web
             ThumbnailProviderCollectionBuilder.Register(Container)
                 .Add(PluginManager.ResolveThumbnailProviders());
 
-            ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
-                ServiceProvider, ProfilingLogger.Logger,
-                PluginManager.ResolveImageUrlProviders());
+            ImageUrlProviderCollectionBuilder.Register(Container)
+                .Append(PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container);
             Container.Register<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();

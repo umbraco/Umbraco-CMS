@@ -82,7 +82,7 @@ namespace Umbraco.Web.Media
 
         private static IImageUrlProvider GetProvider(string provider)
         {
-            return ImageUrlProviderResolver.Current.GetProvider(provider);
+            return Current.ImageUrlProviders[provider];
         }
 
         private static object GetContentFromCache(int nodeIdInt, string field)
