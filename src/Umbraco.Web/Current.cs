@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
@@ -220,6 +221,9 @@ namespace Umbraco.Web
 
         internal static IPublishedContentModelFactory PublishedContentModelFactory
             => Container.GetInstance<IPublishedContentModelFactory>();
+
+        public static IServerMessenger ServerMessenger
+            => Container.GetInstance<IServerMessenger>();
 
         #endregion
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -52,8 +53,9 @@ namespace Umbraco.Tests.Integration
             base.ConfigureContainer();
 
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(new DistributedCacheTests.TestServerRegistrar()); // localhost-only
-            ServerMessengerResolver.Current = new ServerMessengerResolver(Container);
-            Container.Register<IServerMessenger, WebServiceServerMessenger>();
+
+            Container.Register<IServerMessenger, WebServiceServerMessenger>(new PerContainerLifetime());
+
             CacheRefresherCollectionBuilder.Register(Container)
                 .Add<ContentTypeCacheRefresher>()
                 .Add<ContentCacheRefresher>()

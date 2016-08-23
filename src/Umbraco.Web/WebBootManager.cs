@@ -417,7 +417,7 @@ namespace Umbraco.Web
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
                 //set the legacy one by default - this maintains backwards compat
-                ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
+                Container.Register<IServerMessenger>(_ => new BatchedWebServiceServerMessenger(() =>
                 {
                     //we should not proceed to change this if the app/database is not configured since there will
                     // be no user, plus we don't need to have server messages sent if this is the case.
@@ -436,18 +436,18 @@ namespace Umbraco.Web
                         }
                         catch (Exception e)
                         {
-                        ProfilingLogger.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                            ProfilingLogger.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                             return null;
                         }
                     }
-                ProfilingLogger.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                    ProfilingLogger.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                     return null;
-                }));
+                }), new PerContainerLifetime());
             }
             else
             {
 
-                ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
+                Container.Register<IServerMessenger>(_ => new BatchedDatabaseServerMessenger(
                     ApplicationContext,
                     true,
                     //Default options for web including the required callbacks to build caches
@@ -475,7 +475,7 @@ namespace Umbraco.Web
                             // indexes then they can adjust this logic themselves.
                             () => RebuildIndexes(false)
                         }
-                    }));
+                    }), new PerContainerLifetime());
             }
 
             ActionCollectionBuilder.Register(Container)

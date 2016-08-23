@@ -433,9 +433,11 @@ namespace Umbraco.Core
 
             //by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden in the web startup
-            ServerMessengerResolver.Current = new ServerMessengerResolver(
-                Container,
-                factory => new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
+            // fixme - painful, have to take care of lifetime! - we CANNOT ask users to remember!
+            // fixme - same issue with PublishedContentModelFactory and many more, I guess!
+            Container.Register<IServerMessenger>(
+                _ => new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()),
+                new PerContainerLifetime());
 
             //RepositoryResolver.Current = new RepositoryResolver(
             //    new RepositoryFactory(ApplicationCache));

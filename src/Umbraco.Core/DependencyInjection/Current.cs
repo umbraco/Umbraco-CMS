@@ -4,6 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.DependencyInjection
@@ -66,6 +67,9 @@ namespace Umbraco.Core.DependencyInjection
 
         internal static IPublishedContentModelFactory PublishedContentModelFactory
             => Container.GetInstance<IPublishedContentModelFactory>();
+
+        public static IServerMessenger ServerMessenger
+            => Container.GetInstance<IServerMessenger>();
 
         #endregion
     }

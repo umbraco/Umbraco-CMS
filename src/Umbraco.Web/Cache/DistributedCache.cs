@@ -63,7 +63,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 getNumericId,
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == Guid.Empty) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
@@ -106,7 +106,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payload == null) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 payload);
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payloads == null) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+            Current.ServerMessenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 jsonPayload);
@@ -147,7 +147,7 @@ namespace Umbraco.Web.Cache
         //{
         //    if (refresherId == Guid.Empty || payload == null) return;
 
-        //    ServerMessengerResolver.Current.Messenger.Notify(
+        //    Current.ServerMessenger.Notify(
         //        ServerRegistrarResolver.Current.Registrar.Registrations,
         //        GetRefresherById(refresherId),
         //        json);
@@ -161,7 +161,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
+            Current.ServerMessenger.PerformRefreshAll(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid));
         }
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRemove(
+            Current.ServerMessenger.PerformRemove(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Cache
         /// </remarks>
         public void Remove<T>(Guid refresherGuid, Func<T, int> getNumericId, params T[] instances)
         {
-            ServerMessengerResolver.Current.Messenger.PerformRemove(
+            Current.ServerMessenger.PerformRemove(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(refresherGuid),
                 getNumericId,

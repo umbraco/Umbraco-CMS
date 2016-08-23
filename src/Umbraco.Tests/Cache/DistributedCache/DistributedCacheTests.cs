@@ -25,12 +25,13 @@ namespace Umbraco.Tests.Cache.DistributedCache
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-                new TestServerRegistrar());
-            ServerMessengerResolver.Current = new ServerMessengerResolver(
-                container, factory => new TestServerMessenger());
+            ServerRegistrarResolver.Current = new ServerRegistrarResolver(new TestServerRegistrar());
+
+            container.Register<IServerMessenger>(_ => new TestServerMessenger(), new PerContainerLifetime());
+
             CacheRefresherCollectionBuilder.Register(container)
                 .Add<TestCacheRefresher>();
+
             Resolution.Freeze();
         }
 
@@ -38,7 +39,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Teardown()
         {
             ServerRegistrarResolver.Reset();
-            ServerMessengerResolver.Reset();
 
             Current.Reset();
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 global::Umbraco.Web.Cache.DistributedCache.Instance.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
-            Assert.AreEqual(10, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).IntIdsRefreshed.Count);
+            Assert.AreEqual(10, ((TestServerMessenger)Current.ServerMessenger).IntIdsRefreshed.Count);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
                     x => x.Id,
                     new TestObjectWithId{Id = i});
             }
-            Assert.AreEqual(10, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).IntIdsRefreshed.Count);
+            Assert.AreEqual(10, ((TestServerMessenger)Current.ServerMessenger).IntIdsRefreshed.Count);
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 global::Umbraco.Web.Cache.DistributedCache.Instance.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
             }
-            Assert.AreEqual(11, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).GuidIdsRefreshed.Count);
+            Assert.AreEqual(11, ((TestServerMessenger)Current.ServerMessenger).GuidIdsRefreshed.Count);
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 global::Umbraco.Web.Cache.DistributedCache.Instance.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
-            Assert.AreEqual(12, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).IntIdsRemoved.Count);
+            Assert.AreEqual(12, ((TestServerMessenger)Current.ServerMessenger).IntIdsRemoved.Count);
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 global::Umbraco.Web.Cache.DistributedCache.Instance.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
             }
-            Assert.AreEqual(13, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).CountOfFullRefreshes);
+            Assert.AreEqual(13, ((TestServerMessenger)Current.ServerMessenger).CountOfFullRefreshes);
         }
 
         #region internal test classes
