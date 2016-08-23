@@ -830,7 +830,6 @@
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />

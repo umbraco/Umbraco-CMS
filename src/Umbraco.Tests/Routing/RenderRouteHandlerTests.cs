@@ -38,7 +38,8 @@ namespace Umbraco.Tests.Routing
 
         protected override void FreezeResolution()
         {
-            DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
+            // set the default RenderMvcController
+            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(PluginManager.Current.ResolveSurfaceControllers());
             Container.RegisterInstance(surfaceControllerTypes);

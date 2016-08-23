@@ -1,5 +1,6 @@
 ﻿using System;
 using LightInject;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Macros;
@@ -165,6 +166,29 @@ namespace Umbraco.Web
 
         public static ISiteDomainHelper SiteDomainHelper
             => Container.GetInstance<ISiteDomainHelper>();
+
+        #endregion
+
+        #region Web Constants
+
+        // these are different - not 'resolving' anything, and nothing that could be managed
+        // by the container - just registering some sort of application-wide constants or
+        // settings - but they fit in Current nicely too
+
+        private static Type _defaultRenderMvcControllerType;
+
+        public static Type DefaultRenderMvcControllerType
+        {
+            get { return _defaultRenderMvcControllerType; }
+            set
+            {
+                if (value.Implements<IRenderController>() == false)
+                    throw new ArgumentException($"Type {value.FullName} does not implement {typeof (IRenderController).FullName}.", nameof(value));
+
+                // fixme - must lock + ensure we're not frozen?
+                _defaultRenderMvcControllerType = value;
+            }
+        }
 
         #endregion
 

@@ -282,7 +282,7 @@ namespace Umbraco.Web.Mvc
             if (requestContext == null) throw new ArgumentNullException("requestContext");
             if (publishedContentRequest == null) throw new ArgumentNullException("publishedContentRequest");
 
-            var defaultControllerType = DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType();
+            var defaultControllerType = Current.DefaultRenderMvcControllerType;
             var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
             //creates the default route definition which maps to the 'UmbracoController' controller
             var def = new RouteDefinition

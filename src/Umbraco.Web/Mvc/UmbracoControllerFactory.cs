@@ -30,10 +30,9 @@ namespace Umbraco.Web.Mvc
         public virtual IController CreateController(RequestContext requestContext, string controllerName)
         {
             var controllerType = GetControllerType(requestContext, controllerName) ??
-                                 _innerFactory.GetControllerType(
-                                     requestContext,
-                                     ControllerExtensions.GetControllerName(
-                                         DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType()));
+                _innerFactory.GetControllerType(
+                    requestContext,
+                    ControllerExtensions.GetControllerName(Current.DefaultRenderMvcControllerType));
 
             return _innerFactory.GetControllerInstance(requestContext, controllerType);
         }

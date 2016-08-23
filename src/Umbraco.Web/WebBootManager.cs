@@ -408,8 +408,8 @@ namespace Umbraco.Web
             EditorValidatorCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolveTypes<IEditorValidator>());
 
-            //set the default RenderMvcController
-            DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
+            // set the default RenderMvcController
+            Current.DefaultRenderMvcControllerType = typeof (RenderMvcController); // fixme WRONG!
 
             //Override the default server messenger, we need to check if the legacy dist calls is enabled, if that is the
             // case, then we'll set the default messenger to be the old one, otherwise we'll set it to the db messenger
