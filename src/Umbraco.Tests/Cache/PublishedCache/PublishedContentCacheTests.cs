@@ -80,13 +80,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		    _cache = _umbracoContext.ContentCache;
         }
 
-	    protected override void FreezeResolution()
-	    {
-            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
-	        base.FreezeResolution();
-	    }
-		
-
 		[Test]
 		public void Has_Content()
 		{

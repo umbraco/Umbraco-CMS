@@ -265,9 +265,6 @@ namespace Umbraco.Tests.TestHelpers
             // fixme - what about if (PropertyValueConvertersResolver.HasCurrent == false) ??
             PropertyValueConverterCollectionBuilder.Register(Container);
 
-            if (PublishedContentModelFactoryResolver.HasCurrent == false)
-                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
-
             // ensure we have a FacadeService
             if (_facadeService == null)
             {

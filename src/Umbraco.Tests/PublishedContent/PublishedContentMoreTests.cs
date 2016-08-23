@@ -5,19 +5,15 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
-using Umbraco.Tests.TestHelpers;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -49,9 +45,9 @@ namespace Umbraco.Tests.PublishedContent
         protected override void FreezeResolution()
         {
             PropertyValueConverterCollectionBuilder.Register(Container);
+
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
-            PublishedContentModelFactoryResolver.Current =
-                new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));
+            Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
 
             base.FreezeResolution();
         }
@@ -75,7 +71,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Umbraco.Web.Current.SetUmbracoContext(ctx, true);
         }
-        
+
         public override void TearDown()
         {
             base.TearDown();
@@ -202,7 +198,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var props = new[]
                     {
-                        new PublishedPropertyType("prop1", 1, "?"), 
+                        new PublishedPropertyType("prop1", 1, "?"),
                     };
 
             var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);

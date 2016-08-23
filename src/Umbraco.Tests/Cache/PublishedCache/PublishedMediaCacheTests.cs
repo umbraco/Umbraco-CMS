@@ -33,7 +33,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
             UrlSegmentProviderCollectionBuilder.Register(Container)
                 .Append<DefaultUrlSegmentProvider>();
 
-            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
         }
 

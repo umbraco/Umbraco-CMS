@@ -38,9 +38,6 @@ namespace Umbraco.Tests.PublishedContent
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
 
-            if (PublishedContentModelFactoryResolver.HasCurrent == false)
-                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
-
             base.FreezeResolution();
         }
     }

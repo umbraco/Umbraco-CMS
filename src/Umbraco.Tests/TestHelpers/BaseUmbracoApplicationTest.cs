@@ -23,6 +23,7 @@ using Umbraco.Web;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.DependencyInjection;
 using UmbracoExamine;
@@ -130,6 +131,9 @@ namespace Umbraco.Tests.TestHelpers
             //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
+
+            // no factory (noop)
+            Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
 
         private static readonly object Locker = new object();

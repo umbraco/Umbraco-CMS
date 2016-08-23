@@ -1,6 +1,7 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core._Legacy.PackageActions;
@@ -62,6 +63,9 @@ namespace Umbraco.Core.DependencyInjection
 
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Container.GetInstance<PropertyValueConverterCollection>();
+
+        internal static IPublishedContentModelFactory PublishedContentModelFactory
+            => Container.GetInstance<IPublishedContentModelFactory>();
 
         #endregion
     }

@@ -9,6 +9,7 @@ using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -65,9 +66,9 @@ namespace Umbraco.Tests.PublishedContent
 	    protected override void FreezeResolution()
 	    {
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
-            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
-                new PublishedContentModelFactory(types));
-	        base.FreezeResolution();
+            Container.RegisterSingleton<IPublishedContentModelFactory>(_ => new PublishedContentModelFactory(types));
+
+            base.FreezeResolution();
 	    }
 
 	    protected override string GetXmlContent(int templateId)

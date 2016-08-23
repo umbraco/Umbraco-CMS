@@ -461,9 +461,8 @@ namespace Umbraco.Core
             UrlSegmentProviderCollectionBuilder.Register(Container)
                 .Append<DefaultUrlSegmentProvider>();
 
-            // by default, no factory is activated
-            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
+            // by default, no factory (ie, noop) is activated
+            Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
-
     }
 }

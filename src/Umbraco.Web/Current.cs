@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -216,6 +217,9 @@ namespace Umbraco.Web
 
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Container.GetInstance<PropertyValueConverterCollection>();
+
+        internal static IPublishedContentModelFactory PublishedContentModelFactory
+            => Container.GetInstance<IPublishedContentModelFactory>();
 
         #endregion
     }

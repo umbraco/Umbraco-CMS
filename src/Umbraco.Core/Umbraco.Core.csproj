@@ -270,6 +270,7 @@
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
+    <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseAccessor.cs" />
@@ -576,7 +577,6 @@
     <Compile Include="Models\PublishedContent\PublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\Rdbms\CacheInstructionDto.cs" />
     <Compile Include="Models\TagCacheStorageType.cs" />

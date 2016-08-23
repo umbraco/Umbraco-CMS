@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -17,13 +18,9 @@ namespace Umbraco.Core.Models.PublishedContent
             if (content == null)
                 return null;
 
-            if (PublishedContentModelFactoryResolver.Current.HasValue == false)
-                return content;
-
             // get model
             // if factory returns nothing, throw
-            // if factory just returns what it got, return
-            var model = PublishedContentModelFactoryResolver.Current.Factory.CreateModel(content);
+            var model = Current.PublishedContentModelFactory.CreateModel(content);
             if (model == null)
                 throw new Exception("IPublishedContentFactory returned null.");
 
