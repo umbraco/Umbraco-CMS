@@ -38,3 +38,6 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// temp while we develop Deploy
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]

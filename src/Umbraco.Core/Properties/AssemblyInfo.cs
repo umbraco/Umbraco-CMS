@@ -45,3 +45,6 @@ using System.Security.Permissions;
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// temp while we develop Deploy
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]
