@@ -232,6 +232,9 @@ namespace Umbraco.Web
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Container.GetInstance<ICultureDictionaryFactory>();
 
+        public static IShortStringHelper ShortStringHelper
+            => Container.GetInstance<IShortStringHelper>();
+
         #endregion
     }
 }

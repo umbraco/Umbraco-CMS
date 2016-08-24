@@ -10,12 +10,6 @@ namespace Umbraco.Core.Strings
     public interface IShortStringHelper
     {
         /// <summary>
-        /// Freezes the helper so it can prevents its configuration from being modified.
-        /// </summary>
-        /// <remarks>Will be called by <c>ShortStringHelperResolver</c> when resolution freezes.</remarks>
-        void Freeze();
-
-        /// <summary>
         /// Gets the JavaScript code defining client-side short string services.
         /// </summary>
         string GetShortStringServicesJavaScript(string controllerPath);

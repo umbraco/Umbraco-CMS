@@ -457,8 +457,8 @@ namespace Umbraco.Core
                 .Append(PluginManager.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(Container,
-                factory => new DefaultShortStringHelper(factory.GetInstance<IUmbracoSettingsSection>()).WithDefaultConfig());
+            Container.RegisterSingleton<IShortStringHelper>(factory 
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
             UrlSegmentProviderCollectionBuilder.Register(Container)
                 .Append<DefaultUrlSegmentProvider>();

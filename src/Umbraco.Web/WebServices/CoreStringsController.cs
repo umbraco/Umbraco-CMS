@@ -25,7 +25,7 @@ namespace Umbraco.Web.WebServices
         public JavaScriptResult ServicesJavaScript()
         {
             var controllerPath = Url.GetCoreStringsControllerPath();
-            var js = ShortStringHelperResolver.Current.Helper.GetShortStringServicesJavaScript(controllerPath);
+            var js = Current.ShortStringHelper.GetShortStringServicesJavaScript(controllerPath);
             return JavaScript(js);
         }
     }

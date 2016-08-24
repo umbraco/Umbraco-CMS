@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -20,15 +22,17 @@ namespace Umbraco.Tests.PropertyEditors
         {
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
-            Resolution.Freeze();
+
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+            container.Register<IShortStringHelper>(_ 
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefault())));
         }
 
         [TearDown]
         public virtual void TestTearDown()
         {
-            ResolverCollection.ResetAll();
-            Resolution.Reset();
+            Current.Reset();
         }
 
         [TestCase("{prop1: 'val1', prop2: 'val2'}", true)]

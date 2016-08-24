@@ -1128,6 +1128,7 @@
     <Compile Include="IBootManager.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
+    <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
@@ -1250,7 +1251,6 @@
     <Compile Include="Sync\ConfigServerRegistrar.cs" />
     <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
-    <Compile Include="Strings\ShortStringHelperResolver.cs" />
     <Compile Include="Strings\IShortStringHelper.cs" />
     <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />

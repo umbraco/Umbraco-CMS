@@ -1,9 +1,11 @@
 ﻿using System;
+using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests
 {
@@ -14,14 +16,15 @@ namespace Umbraco.Tests
         public void SetUp()
         {
             var settings = SettingsForTests.GetDefault();
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(settings).WithDefaultConfig());
-            Resolution.Freeze();
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+            container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
         }
 
         [TearDown]
         public void TearDown()
         {
-            ShortStringHelperResolver.Reset();
+            Current.Reset();
         }
 
         [Test]

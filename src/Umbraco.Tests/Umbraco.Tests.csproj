@@ -406,7 +406,6 @@
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
-    <Compile Include="Strings\ShortStringHelperResolverTest.cs" />
     <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
     <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Macros\MacroTests.cs" />

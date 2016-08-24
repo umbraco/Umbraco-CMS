@@ -1,6 +1,8 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -38,6 +40,7 @@ namespace Umbraco.Core.DependencyInjection
         internal static void Reset()
         {
             _container = null;
+            _shortStringHelper = null;
             Resetted?.Invoke(null, EventArgs.Empty);
         }
 
@@ -77,6 +80,26 @@ namespace Umbraco.Core.DependencyInjection
 
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Container.GetInstance<ICultureDictionaryFactory>();
+
+        private static IShortStringHelper _shortStringHelper;
+
+        public static IShortStringHelper ShortStringHelper
+        {
+            get
+            {
+                // fixme - refactor
+                // we don't want Umbraco to die because the resolver hasn't been initialized
+                // as the ShortStringHelper is too important, so as long as it's not there
+                // already, we use a default one. That should never happen, but... in can, in
+                // some tests - we should really cleanup our tests and get rid of this!
+
+                if (_shortStringHelper != null) return _shortStringHelper;
+                var reg = HasContainer ? Container.GetAvailableService<IShortStringHelper>() : null;
+                return _shortStringHelper = reg == null
+                    ? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings()))
+                    : Container.GetInstance<IShortStringHelper>();
+            }
+        }
 
         #endregion
     }

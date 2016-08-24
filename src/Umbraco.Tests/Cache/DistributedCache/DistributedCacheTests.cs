@@ -30,8 +30,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
             CacheRefresherCollectionBuilder.Register(container)
                 .Add<TestCacheRefresher>();
-
-            Resolution.Freeze();
         }
 
         [TearDown]

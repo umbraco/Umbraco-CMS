@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 
@@ -14,15 +16,22 @@ namespace Umbraco.Tests.Strings
 	    [SetUp]
 	    public void Setup()
 	    {
-            ShortStringHelperResolver.Reset();
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new MockShortStringHelper());
-	        Resolution.Freeze();
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+            container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
 	    }
 
         [TearDown]
         public void TearDown()
         {
-            ShortStringHelperResolver.Reset();
+            Current.Reset();
+        }
+
+        [Test]
+        public void CurrentHelper()
+        {
+            var helper = Current.ShortStringHelper;
+            Assert.IsInstanceOf<MockShortStringHelper>(helper);
         }
 
         [TestCase("hello", "world", false)]

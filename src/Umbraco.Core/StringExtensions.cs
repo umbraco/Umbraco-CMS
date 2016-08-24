@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration;
 using System.Web.Security;
 using Umbraco.Core.Strings;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -999,32 +1000,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Gets the short string helper.
-        /// </summary>
-        /// <remarks>This is so that unit tests that do not initialize the resolver do not
-        /// fail and fall back to defaults. When running the whole Umbraco, CoreBootManager
-        /// does initialise the resolver.</remarks>
-        private static IShortStringHelper ShortStringHelper
-        {
-            get
-            {
-                if (ShortStringHelperResolver.HasCurrent)
-                    return ShortStringHelperResolver.Current.Helper;
-                if (_helper != null)
-                    return _helper;
-
-                // we don't want Umbraco to die because the resolver hasn't been initialized
-                // as the ShortStringHelper is too important, so as long as it's not there
-                // already, we use a default one. That should never happen, but...
-                Logging.LogHelper.Warn<IShortStringHelper>("ShortStringHelperResolver.HasCurrent == false, fallback to default.");
-                _helper = new DefaultShortStringHelper(UmbracoConfig.For.UmbracoSettings()).WithDefaultConfig();
-                _helper.Freeze();
-                return _helper;
-            }
-        }
-        private static IShortStringHelper _helper;
-
-        /// <summary>
         /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
         /// </summary>
         /// <param name="text">The string to filter.</param>
@@ -1032,7 +1007,7 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, IDictionary<string, string> replacements)
         {
-            return ShortStringHelper.ReplaceMany(text, replacements);
+            return Current.ShortStringHelper.ReplaceMany(text, replacements);
         }
 
         /// <summary>
@@ -1044,7 +1019,7 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, char[] chars, char replacement)
         {
-            return ShortStringHelper.ReplaceMany(text, chars, replacement);
+            return Current.ShortStringHelper.ReplaceMany(text, chars, replacement);
         }
 
         // FORMAT STRINGS
@@ -1056,7 +1031,7 @@ namespace Umbraco.Core
         /// <returns>The safe alias.</returns>
         public static string ToSafeAlias(this string alias)
         {
-            return ShortStringHelper.CleanStringForSafeAlias(alias);
+            return Current.ShortStringHelper.CleanStringForSafeAlias(alias);
         }
 
         /// <summary>
@@ -1067,7 +1042,7 @@ namespace Umbraco.Core
         /// <returns>The safe alias.</returns>
         public static string ToSafeAlias(this string alias, bool camel)
         {
-            var a = ShortStringHelper.CleanStringForSafeAlias(alias);
+            var a = Current.ShortStringHelper.CleanStringForSafeAlias(alias);
             if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
             return char.ToLowerInvariant(a[0]) + a.Substring(1);
         }
@@ -1080,7 +1055,7 @@ namespace Umbraco.Core
         /// <returns>The safe alias.</returns>
         public static string ToSafeAlias(this string alias, CultureInfo culture)
         {
-            return ShortStringHelper.CleanStringForSafeAlias(alias, culture);
+            return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
         /// <summary>
@@ -1115,7 +1090,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            return ShortStringHelper.CleanStringForUrlSegment(text);
+            return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
         /// <summary>
@@ -1126,7 +1101,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, CultureInfo culture)
         {
-            return ShortStringHelper.CleanStringForUrlSegment(text, culture);
+            return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
         // the new methods to clean a string (to alias, url segment...)
@@ -1138,10 +1113,10 @@ namespace Umbraco.Core
         /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
-        /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
+        /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
         public static string ToCleanString(this string text, CleanStringType stringType)
         {
-            return ShortStringHelper.CleanString(text, stringType);
+            return Current.ShortStringHelper.CleanString(text, stringType);
         }
 
         /// <summary>
@@ -1152,10 +1127,10 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
-        /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
+        /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
         public static string ToCleanString(this string text, CleanStringType stringType, char separator)
         {
-            return ShortStringHelper.CleanString(text, stringType, separator);
+            return Current.ShortStringHelper.CleanString(text, stringType, separator);
         }
 
         /// <summary>
@@ -1168,7 +1143,7 @@ namespace Umbraco.Core
         /// <returns>The clean string.</returns>
         public static string ToCleanString(this string text, CleanStringType stringType, CultureInfo culture)
         {
-            return ShortStringHelper.CleanString(text, stringType, culture);
+            return Current.ShortStringHelper.CleanString(text, stringType, culture);
         }
 
         /// <summary>
@@ -1182,11 +1157,11 @@ namespace Umbraco.Core
         /// <returns>The clean string.</returns>
         public static string ToCleanString(this string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
-            return ShortStringHelper.CleanString(text, stringType, separator, culture);
+            return Current.ShortStringHelper.CleanString(text, stringType, separator, culture);
         }
 
-        // note: LegacyShortStringHelper will produce 100% backward-compatible output for SplitPascalCasing.
-        // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
+        // note: LegacyCurrent.ShortStringHelper will produce 100% backward-compatible output for SplitPascalCasing.
+        // other helpers may not. DefaultCurrent.ShortStringHelper produces better, but non-compatible, results.
 
         /// <summary>
         /// Splits a Pascal cased string into a phrase separated by spaces.
@@ -1195,7 +1170,7 @@ namespace Umbraco.Core
         /// <returns>The splitted text.</returns>
         public static string SplitPascalCasing(this string phrase)
         {
-            return ShortStringHelper.SplitPascalCasing(phrase, ' ');
+            return Current.ShortStringHelper.SplitPascalCasing(phrase, ' ');
         }
 
         //NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
@@ -1216,7 +1191,7 @@ namespace Umbraco.Core
         /// <returns>The safe filename.</returns>
         public static string ToSafeFileName(this string text)
         {
-            return ShortStringHelper.CleanStringForSafeFileName(text);
+            return Current.ShortStringHelper.CleanStringForSafeFileName(text);
         }
 
         /// <summary>
@@ -1228,7 +1203,7 @@ namespace Umbraco.Core
         /// <returns>The safe filename.</returns>
         public static string ToSafeFileName(this string text, CultureInfo culture)
         {
-            return ShortStringHelper.CleanStringForSafeFileName(text, culture);
+            return Current.ShortStringHelper.CleanStringForSafeFileName(text, culture);
         }
 
         /// <summary>

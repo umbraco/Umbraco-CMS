@@ -1,7 +1,9 @@
 ﻿using Moq;
 using System.IO;
+using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;
@@ -29,12 +31,9 @@ namespace Umbraco.Tests.UmbracoExamine
         /// </summary>
         protected override void FreezeResolution()
         {
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
+            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             base.FreezeResolution();
         }
-
-
-
     }
 }
