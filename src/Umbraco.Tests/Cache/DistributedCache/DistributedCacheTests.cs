@@ -25,8 +25,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(new TestServerRegistrar());
-
+            container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
             container.Register<IServerMessenger>(_ => new TestServerMessenger(), new PerContainerLifetime());
 
             CacheRefresherCollectionBuilder.Register(container)
@@ -38,8 +37,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [TearDown]
         public void Teardown()
         {
-            ServerRegistrarResolver.Reset();
-
             Current.Reset();
         }
 

@@ -34,7 +34,7 @@ namespace Umbraco.Web.Strategies
         // bind to events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            _registrar = ServerRegistrarResolver.Current.Registrar as DatabaseServerRegistrar;
+            _registrar = Current.ServerRegistrar as DatabaseServerRegistrar;
             
             // only for the DatabaseServerRegistrar
             if (_registrar == null) return;

@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 
@@ -114,8 +115,7 @@ namespace Umbraco.Core.Sync
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
             // eg "http://www.mysite.com/umbraco"
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            url = registrar.GetCurrentServerUmbracoApplicationUrl();
+            url = Current.ServerRegistrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
                 appContext._umbracoApplicationUrl = url.TrimEnd('/');

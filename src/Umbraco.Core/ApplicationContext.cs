@@ -323,8 +323,7 @@ namespace Umbraco.Core
         /// <returns></returns>
 	    internal ServerRole GetCurrentServerRole()
 	    {
-	        var registrar = ServerRegistrarResolver.Current.Registrar;
-            return registrar.GetCurrentServerRole();
+            return DependencyInjection.Current.ServerRegistrar.GetCurrentServerRole();
 	    }
 
         /// <summary>

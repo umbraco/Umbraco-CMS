@@ -71,6 +71,9 @@ namespace Umbraco.Core.DependencyInjection
         public static IServerMessenger ServerMessenger
             => Container.GetInstance<IServerMessenger>();
 
+        public static IServerRegistrar ServerRegistrar
+            => Container.GetInstance<IServerRegistrar>();
+
         #endregion
     }
 }

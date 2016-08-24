@@ -1,6 +1,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,6 +12,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests
 {
@@ -18,6 +20,7 @@ namespace Umbraco.Tests
     public class ApplicationUrlHelperTests
     {
         private ILogger _logger;
+        private IServerRegistrar _registrar;
 
         // note: in tests, read appContext._umbracoApplicationUrl and not the property,
         // because reading the property does run some code, as long as the field is null.
@@ -28,16 +31,18 @@ namespace Umbraco.Tests
             _logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
         }
 
-        private static void Initialize(IUmbracoSettingsSection settings)
+        private void Initialize(IUmbracoSettingsSection settings)
         {
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar(settings.DistributedCall));
-            Resolution.Freeze();
+            _registrar = new ConfigServerRegistrar(settings.DistributedCall);
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+            container.Register<IServerRegistrar>(_ => _registrar);
         }
 
         [TearDown]
         public void Reset()
         {
-            ServerRegistrarResolver.Reset();
+            Current.Reset();
         }
 
         [Test]
@@ -121,8 +126,7 @@ namespace Umbraco.Tests
 
             Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Master, role);
         }
 
@@ -152,8 +156,7 @@ namespace Umbraco.Tests
 
             Assert.AreEqual("http://server1.com:80/umbraco", appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Slave, role);
         }
 
@@ -183,8 +186,7 @@ namespace Umbraco.Tests
 
             Assert.IsNull(appCtx._umbracoApplicationUrl);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Single, role);
         }
 
@@ -200,8 +202,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Single, role);
         }
 
@@ -217,8 +218,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Unknown, role);
         }
 
@@ -237,8 +237,7 @@ namespace Umbraco.Tests
 
             Initialize(settings);
 
-            var registrar = ServerRegistrarResolver.Current.Registrar;
-            var role = registrar.GetCurrentServerRole();
+            var role = _registrar.GetCurrentServerRole();
             Assert.AreEqual(ServerRole.Slave, role);
         }
 

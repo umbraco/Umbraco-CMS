@@ -420,11 +420,11 @@ namespace Umbraco.Core
             // dist calls enabled, in which case we'll use the config server registrar
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
-                ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings()));
+                Container.RegisterSingleton<IServerRegistrar>(_ => new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings()));
             }
             else
             {
-                ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                Container.RegisterSingleton<IServerRegistrar>(_ =>
                     new DatabaseServerRegistrar(
                         new Lazy<IServerRegistrationService>(() => ApplicationContext.Services.ServerRegistrationService),
                         new DatabaseServerRegistrarOptions()));

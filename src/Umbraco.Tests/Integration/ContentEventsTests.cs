@@ -52,8 +52,7 @@ namespace Umbraco.Tests.Integration
         {
             base.ConfigureContainer();
 
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(new DistributedCacheTests.TestServerRegistrar()); // localhost-only
-
+            Container.Register<IServerRegistrar>(_ => new DistributedCacheTests.TestServerRegistrar()); // localhost-only
             Container.Register<IServerMessenger, WebServiceServerMessenger>(new PerContainerLifetime());
 
             CacheRefresherCollectionBuilder.Register(Container)
