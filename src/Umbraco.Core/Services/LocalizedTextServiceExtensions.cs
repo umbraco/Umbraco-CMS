@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services
@@ -97,13 +98,7 @@ namespace Umbraco.Core.Services
             return cultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        private static ICultureDictionary CultureDictionary
-        {
-            get
-            {
-                return _cultureDictionary
-                    ?? (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
-            }
-        }
+        private static ICultureDictionary CultureDictionary 
+            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
     }
 }

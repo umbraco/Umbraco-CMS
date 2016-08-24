@@ -262,8 +262,7 @@ namespace Umbraco.Web
             {
                 if (_cultureDictionary == null)
                 {
-                    var factory = CultureDictionaryFactoryResolver.Current.Factory;
-                    _cultureDictionary = factory.CreateDictionary();
+                    _cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary();
                 }
                 return _cultureDictionary;
             }

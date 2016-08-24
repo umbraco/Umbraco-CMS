@@ -228,7 +228,6 @@
     <Compile Include="DependencyInjection\ServicesCompositionRoot.cs" />
     <Compile Include="DependencyInjection\WeightAttribute.cs" />
     <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />

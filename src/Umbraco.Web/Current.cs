@@ -2,6 +2,7 @@
 using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
@@ -227,6 +228,9 @@ namespace Umbraco.Web
 
         public static IServerRegistrar ServerRegistrar
             => Container.GetInstance<IServerRegistrar>();
+
+        public static ICultureDictionaryFactory CultureDictionaryFactory
+            => Container.GetInstance<ICultureDictionaryFactory>();
 
         #endregion
     }

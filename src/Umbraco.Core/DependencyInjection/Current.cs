@@ -1,6 +1,7 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -73,6 +74,9 @@ namespace Umbraco.Core.DependencyInjection
 
         public static IServerRegistrar ServerRegistrar
             => Container.GetInstance<IServerRegistrar>();
+
+        public static ICultureDictionaryFactory CultureDictionaryFactory
+            => Container.GetInstance<ICultureDictionaryFactory>();
 
         #endregion
     }

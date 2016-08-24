@@ -529,8 +529,7 @@ namespace Umbraco.Web
             ImageUrlProviderCollectionBuilder.Register(Container)
                 .Append(PluginManager.ResolveImageUrlProviders());
 
-            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container);
-            Container.Register<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
+            Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             HealthCheckCollectionBuilder.Register(Container)
                 .AddProducer(() => PluginManager.ResolveTypes<HealthCheck.HealthCheck>())
