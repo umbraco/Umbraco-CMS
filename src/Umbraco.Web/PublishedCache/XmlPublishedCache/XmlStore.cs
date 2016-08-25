@@ -135,7 +135,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             if (SyncToXmlFile == false) return;
 
-            var logger = LoggerResolver.Current.Logger;
+            var logger = Current.Logger;
 
             // there's always be one task keeping a ref to the runner
             // so it's safe to just create it as a local var here

@@ -27,13 +27,13 @@ namespace Umbraco.Tests.Web.Mvc
         [SetUp]
         public void SetUp()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = null;
+            Current.Reset();
         }
 
         private MethodInfo GetRenderMvcControllerIndexMethodFromCurrentType(Type currType)

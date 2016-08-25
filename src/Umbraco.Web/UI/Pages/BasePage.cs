@@ -54,7 +54,7 @@ namespace Umbraco.Web.UI.Pages
         /// </summary>
         public ProfilingLogger ProfilingLogger
         {
-            get { return _logger ?? (_logger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)); }
+            get { return _logger ?? (_logger = new ProfilingLogger(Current.Logger, Current.Profiler)); }
         }
 
         private ProfilingLogger _logger;

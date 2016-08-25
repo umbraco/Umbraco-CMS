@@ -23,6 +23,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests
 {
@@ -32,13 +33,13 @@ namespace Umbraco.Tests
         [SetUp]
         public void Setup()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = null;
+            Current.Reset();
         }
 
         [Test]
@@ -77,10 +78,10 @@ namespace Umbraco.Tests
                 TestObjects.GetServiceContextMock(),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(logger, Mock.Of<IProfiler>()));
-            
+
             Assert.Pass();
         }
-        
+
         [Test]
         public void Can_Assign_App_Context_Singleton()
         {
@@ -96,7 +97,7 @@ namespace Umbraco.Tests
         {
             ApplicationContext.EnsureContext(
                 new ApplicationContext(
-                    CacheHelper.CreateDisabledCacheHelper(), 
+                    CacheHelper.CreateDisabledCacheHelper(),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())), true);
 
             var appCtx = new ApplicationContext(
@@ -120,7 +121,7 @@ namespace Umbraco.Tests
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
                 true);
-            
+
             Assert.AreEqual(umbCtx, UmbracoContext.Current);
         }
 

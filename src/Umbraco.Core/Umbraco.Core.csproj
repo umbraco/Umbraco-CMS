@@ -489,7 +489,6 @@
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
-    <Compile Include="Logging\LoggerResolver.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\CreateCacheInstructionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
@@ -1032,7 +1031,6 @@
     <Compile Include="Logging\IProfiler.cs" />
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\ProfilerExtensions.cs" />
-    <Compile Include="Logging\ProfilerResolver.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IntegerValidator.cs" />

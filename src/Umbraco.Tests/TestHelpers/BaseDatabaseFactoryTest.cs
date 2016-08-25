@@ -272,18 +272,6 @@ namespace Umbraco.Tests.TestHelpers
                 var cache = new NullCacheProvider();
 
                 var enableRepositoryEvents = behavior != null && behavior.EnableRepositoryEvents;
-                if (enableRepositoryEvents && LoggerResolver.HasCurrent == false)
-                {
-                    // XmlStore wants one if handling events
-                    LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
-                    {
-                        CanResolveBeforeFrozen = true
-                    };
-                    ProfilerResolver.Current = new ProfilerResolver(new LogProfiler(Mock.Of<ILogger>()))
-                    {
-                        CanResolveBeforeFrozen = true
-                    };
-                }
 
                 ContentTypesCache = new PublishedContentTypeCache(
                         ApplicationContext.Services.ContentTypeService,

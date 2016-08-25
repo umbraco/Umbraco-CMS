@@ -1,6 +1,7 @@
 using System.IO;
 using System.Web.Mvc;
 using Umbraco.Core.Logging;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Profiling
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Profiling
 
 		public void Render(ViewContext viewContext, TextWriter writer)
 		{
-			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.Render: {1}", _name, _viewPath)))
+			using (Current.Profiler.Step(string.Format("{0}.Render: {1}", _name, _viewPath)))
 			{
 				_inner.Render(viewContext, writer);
 			}

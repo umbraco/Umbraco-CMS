@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core.DependencyInjection;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -14,14 +16,14 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             SettingsForTests.Reset();
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
             SettingsForTests.Reset();
-            Umbraco.Web.Current.UmbracoContextAccessor = null;
+            Current.Reset();
         }
     }
 }

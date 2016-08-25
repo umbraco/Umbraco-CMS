@@ -40,22 +40,16 @@ namespace Umbraco.Core
         protected PluginManager PluginManager { get; private set; }
 
         private IServiceContainer _appStartupEvtContainer;
-        private bool _isInitialized = false;
-        private bool _isStarted = false;
-        private bool _isComplete = false;
+        private bool _isInitialized;
+        private bool _isStarted;
+        private bool _isComplete;
         private readonly UmbracoApplicationBase _umbracoApplication;
         protected ApplicationContext ApplicationContext { get; private set; }
         protected CacheHelper ApplicationCache { get; private set; }
 
-        protected UmbracoApplicationBase UmbracoApplication
-        {
-            get { return _umbracoApplication; }
-        }
+        protected UmbracoApplicationBase UmbracoApplication => _umbracoApplication;
 
-        protected ServiceContainer Container
-        {
-            get { return _umbracoApplication.Container; }
-        }
+        protected ServiceContainer Container => Current.Container; // fixme kill
 
         protected IServiceProvider ServiceProvider { get; private set; }
 
@@ -78,13 +72,16 @@ namespace Umbraco.Core
             if (_isInitialized)
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
+            // the logger has been created by UmbracoApplicationBase
+            // fixme why not the profiling logger etc?! OR have them all created by the boot manager?
             //Create logger/profiler, and their resolvers, these are special resolvers that can be resolved before frozen so we can start logging
-            LoggerResolver.Current = new LoggerResolver(_umbracoApplication.Logger) { CanResolveBeforeFrozen = true };
-            var profiler = CreateProfiler();
-            ProfilerResolver.Current = new ProfilerResolver(profiler) { CanResolveBeforeFrozen = true };
-            ProfilingLogger = new ProfilingLogger(_umbracoApplication.Logger, profiler);
+            var logger = Current.Logger;
 
-            ProfilingLogger = ProfilingLogger?? new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
+            var profiler = CreateProfiler();
+            Container.RegisterInstance(profiler); // fixme - re-registered?!
+            //ProfilerResolver.Current = new ProfilerResolver(profiler) { CanResolveBeforeFrozen = true };
+
+            ProfilingLogger = new ProfilingLogger(logger, profiler);
 
             ApplicationCache = CreateApplicationCache();
 
@@ -154,7 +151,6 @@ namespace Umbraco.Core
         internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
             //Logging
-            container.RegisterInstance(_umbracoApplication.Logger);
             container.RegisterInstance(ProfilingLogger.Profiler);
             container.RegisterInstance(ProfilingLogger);
 
@@ -457,7 +453,7 @@ namespace Umbraco.Core
                 .Append(PluginManager.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper
-            Container.RegisterSingleton<IShortStringHelper>(factory 
+            Container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
             UrlSegmentProviderCollectionBuilder.Register(Container)

@@ -2,8 +2,8 @@
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -40,7 +40,11 @@ namespace Umbraco.Core.DependencyInjection
         internal static void Reset()
         {
             _container = null;
+
             _shortStringHelper = null;
+            _logger = null;
+            _profiler = null;
+
             Resetted?.Invoke(null, EventArgs.Empty);
         }
 
@@ -81,25 +85,28 @@ namespace Umbraco.Core.DependencyInjection
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Container.GetInstance<ICultureDictionaryFactory>();
 
+        // fixme - refactor
+        // we don't want Umbraco to die because the container has not been properly initialized,
+        // for some too-important things such as IShortStringHelper or loggers, so if it's not
+        // registered we setup a default one. We should really refactor our tests so that it does
+        // not happen, but hey...
+
         private static IShortStringHelper _shortStringHelper;
 
         public static IShortStringHelper ShortStringHelper
-        {
-            get
-            {
-                // fixme - refactor
-                // we don't want Umbraco to die because the resolver hasn't been initialized
-                // as the ShortStringHelper is too important, so as long as it's not there
-                // already, we use a default one. That should never happen, but... in can, in
-                // some tests - we should really cleanup our tests and get rid of this!
+            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>() 
+                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
 
-                if (_shortStringHelper != null) return _shortStringHelper;
-                var reg = HasContainer ? Container.GetAvailableService<IShortStringHelper>() : null;
-                return _shortStringHelper = reg == null
-                    ? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings()))
-                    : Container.GetInstance<IShortStringHelper>();
-            }
-        }
+        private static ILogger _logger;
+        private static IProfiler _profiler;
+
+        public static ILogger Logger
+            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>() 
+                ?? new DebugDiagnosticsLogger());
+
+        public static IProfiler Profiler
+            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>() 
+                ?? new LogProfiler(Logger));
 
         #endregion
     }

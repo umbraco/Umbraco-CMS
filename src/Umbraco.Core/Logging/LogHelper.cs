@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using log4net;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Logging
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Logging
 	/// Used for logging, ILogger should be used instead but this is available for static access to logging
 	///</summary>
 	/// <remarks>
-    /// this wraps ILogger 
+    /// this wraps ILogger
 	/// </remarks>
 	public static class LogHelper
 	{
@@ -23,24 +24,21 @@ namespace Umbraco.Core.Logging
 		/// <param name="exception"></param>
 		public static void Error<T>(string message, Exception exception)
 		{
-		    if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-		    LoggerResolver.Current.Logger.Error<T>(message, exception);
+		    Current.Logger.Error<T>(message, exception);
 		}
 
 		public static void Error(Type callingType, string message, Exception exception)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Error(callingType, message, exception);
+            Current.Logger.Error(callingType, message, exception);
 		}
 
 		#endregion
 
-		#region Warn		
+		#region Warn
 
 		public static void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Warn(callingType, message, formatItems);
+            Current.Logger.Warn(callingType, message, formatItems);
 		}
 
         [Obsolete("Warnings with http trace should not be used. This method will be removed in future versions")]
@@ -54,8 +52,7 @@ namespace Umbraco.Core.Logging
 				HttpContext.Current.Trace.Warn(callingType.Name, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
 			}
 
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Warn(callingType, message, formatItems);
+            Current.Logger.Warn(callingType, message, formatItems);
 
 		}
 
@@ -75,13 +72,12 @@ namespace Umbraco.Core.Logging
 			{
 				HttpContext.Current.Trace.Warn(
 					callingType.Name,
-					string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()), 
+					string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()),
 					e);
 			}
 
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.WarnWithException(callingType, message, e, formatItems);
-		} 
+            Current.Logger.WarnWithException(callingType, message, e, formatItems);
+		}
 
 		/// <summary>
 		/// Adds a warn log
@@ -109,7 +105,7 @@ namespace Umbraco.Core.Logging
 		public static void WarnWithException<T>(string message, bool showHttpTrace, Exception e, params Func<object>[] formatItems)
 		{
 			WarnWithException(typeof(T), message, showHttpTrace, e, formatItems);
-		} 
+		}
 
 		#endregion
 
@@ -132,8 +128,7 @@ namespace Umbraco.Core.Logging
 		/// <param name="generateMessage"></param>
 		public static void Info(Type callingType, Func<string> generateMessage)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Info(callingType, generateMessage);
+            Current.Logger.Info(callingType, generateMessage);
 		}
 
 		/// <summary>
@@ -144,8 +139,7 @@ namespace Umbraco.Core.Logging
 		/// <param name="formatItems">The format items.</param>
 		public static void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Info(type, generateMessageFormat, formatItems);
+            Current.Logger.Info(type, generateMessageFormat, formatItems);
 		}
 
 		/// <summary>
@@ -158,10 +152,12 @@ namespace Umbraco.Core.Logging
 		public static void Info<T>(string generateMessageFormat, params Func<object>[] formatItems)
 		{
 			Info(typeof(T), generateMessageFormat, formatItems);
-		} 
+		}
+
 		#endregion
 
 		#region Debug
+
 		/// <summary>
 		/// Debugs a message, only generating the message if tracing is actually enabled. Use this method to avoid calling any long-running methods such as "ToDebugString" if logging is disabled.
 		/// </summary>
@@ -180,8 +176,7 @@ namespace Umbraco.Core.Logging
 		/// <param name="generateMessage"></param>
 		public static void Debug(Type callingType, Func<string> generateMessage)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Debug(callingType, generateMessage);
+            Current.Logger.Debug(callingType, generateMessage);
 		}
 
 		/// <summary>
@@ -192,8 +187,7 @@ namespace Umbraco.Core.Logging
 		/// <param name="formatItems">The format items.</param>
 		public static void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
 		{
-            if (LoggerResolver.HasCurrent == false || LoggerResolver.Current.HasValue == false) return;
-            LoggerResolver.Current.Logger.Debug(type, generateMessageFormat, formatItems);
+            Current.Logger.Debug(type, generateMessageFormat, formatItems);
 		}
 
 		/// <summary>
@@ -223,12 +217,11 @@ namespace Umbraco.Core.Logging
 			{
 				HttpContext.Current.Trace.Write(
 					typeof(T).Name,
-					string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));	
-			}			
+					string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));
+			}
 			Debug(typeof(T), generateMessageFormat, formatItems);
 		}
 
 		#endregion
-		
 	}
 }

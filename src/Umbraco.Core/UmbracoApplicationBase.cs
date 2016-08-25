@@ -20,27 +20,56 @@ namespace Umbraco.Core
     /// </remarks>
     public abstract class UmbracoApplicationBase : HttpApplication
     {
+        /// <summary>
+        /// Gets a boot manager.
+        /// </summary>
+        protected abstract IBootManager GetBootManager();
 
         /// <summary>
-        /// Umbraco application's IoC container
+        /// Gets a logger.
         /// </summary>
-        internal ServiceContainer Container { get; private set; }
-
-        private ILogger _logger;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        protected UmbracoApplicationBase()
+        protected virtual ILogger GetLogger()
         {
-            // beware! this code can run more that once
-            // so it is NOT the right place to initialize global stuff such as the container
-            //
-            // however, it is OK to initialize app-local stuff
-
-            if (Current.HasContainer)
-                Container = Current.Container;
+            return Logger.CreateWithDefaultLog4NetConfiguration();
         }
+
+        /// <summary>
+        /// Boots up the Umbraco application.
+        /// </summary>
+        internal void StartApplication(object sender, EventArgs e)
+        {
+            // create the container for the application, and configure.
+            // the boot manager is responsible for registrations
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore(); // also sets Current.Container
+
+            // register the essential stuff,
+            // ie the global application logger
+            // (profiler etc depend on boot manager)
+            var logger = GetLogger();
+            container.RegisterInstance(logger);
+
+            // take care of unhandled exceptions - there is nothing we can do to
+            // prevent the entire w3wp process to go down but at least we can try
+            // and log the exception
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                logger.Error<UmbracoApplicationBase>(msg, exception);
+            };
+
+            // boot
+            GetBootManager()
+                .Initialize()
+                .Startup(appContext => OnApplicationStarting(sender, e))
+                .Complete(appContext => OnApplicationStarted(sender, e));
+        }
+
+        #region Events
 
         public event EventHandler ApplicationStarting;
         public event EventHandler ApplicationStarted;
@@ -49,42 +78,12 @@ namespace Umbraco.Core
         /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
         /// </summary>
         /// <remarks>
-        /// Needs to be static otherwise null refs occur - though I don't know why
+        /// Needs to be static otherwise null refs occur - though I don't know why FIXME wtf?
         /// </remarks>
         public static event EventHandler ApplicationInit;
         public static event EventHandler ApplicationError;
         public static event EventHandler ApplicationEnd;
 
-
-        /// <summary>
-        /// Boots up the Umbraco application
-        /// </summary>
-        internal void StartApplication(object sender, EventArgs e)
-        {
-            // create the container for the application, and configure.
-            // the boot managers are responsible for registrations
-            Container = new ServiceContainer();
-            Container.ConfigureUmbracoCore();
-
-            //take care of unhandled exceptions - there is nothing we can do to
-            // prevent the entire w3wp process to go down but at least we can try
-            // and log the exception
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
-            {
-                var exception = (Exception) args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
-
-                var msg = "Unhandled exception in AppDomain";
-                if (isTerminating) msg += " (terminating)";
-                LogHelper.Error<UmbracoApplicationBase>(msg, exception);
-            };
-
-            //boot up the application
-            GetBootManager()
-                .Initialize()
-                .Startup(appContext => OnApplicationStarting(sender, e))
-                .Complete(appContext => OnApplicationStarted(sender, e));
-        }
 
         /// <summary>
         /// Initializes the Umbraco application
@@ -118,19 +117,15 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationStarting(object sender, EventArgs e)
         {
-            if (ApplicationStarting != null)
+            try
             {
-                try
-                {
-                    ApplicationStarting(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarting event handler", ex);
-                    throw;
-                }
+                ApplicationStarting?.Invoke(sender, e);
             }
-
+            catch (Exception ex)
+            {
+                LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarting event handler", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -140,17 +135,14 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationStarted(object sender, EventArgs e)
         {
-            if (ApplicationStarted != null)
+            try
             {
-                try
-                {
-                    ApplicationStarted(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarted event handler", ex);
-                    throw;
-                }
+                ApplicationStarted?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarted event handler", ex);
+                throw;
             }
         }
 
@@ -161,17 +153,14 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         private void OnApplicationInit(object sender, EventArgs e)
         {
-            if (ApplicationInit != null)
+            try
             {
-                try
-                {
-                    ApplicationInit(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationInit event handler", ex);
-                    throw;
-                }
+                ApplicationInit?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationInit event handler", ex);
+                throw;
             }
         }
 
@@ -182,8 +171,7 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationError(object sender, EventArgs e)
         {
-            var handler = ApplicationError;
-            if (handler != null) handler(this, EventArgs.Empty);
+            ApplicationError?.Invoke(this, EventArgs.Empty);
         }
 
         protected void Application_Error(object sender, EventArgs e)
@@ -199,7 +187,7 @@ namespace Umbraco.Core
                 return;
             }
 
-            Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
+            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
 
             OnApplicationError(sender, e);
         }
@@ -211,8 +199,7 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationEnd(object sender, EventArgs e)
         {
-            var handler = ApplicationEnd;
-            if (handler != null) handler(this, EventArgs.Empty);
+            ApplicationEnd?.Invoke(this, EventArgs.Empty);
         }
 
         protected void Application_End(object sender, EventArgs e)
@@ -248,34 +235,22 @@ namespace Umbraco.Core
                         runtime,
                         null);
 
-                    var shutdownMsg = string.Format("{0}\r\n\r\n_shutDownMessage={1}\r\n\r\n_shutDownStack={2}",
-                        HostingEnvironment.ShutdownReason,
-                        shutDownMessage,
-                        shutDownStack);
+                    var shutdownMsg = $"{HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
 
-                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: " + shutdownMsg);
+                    Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: " + shutdownMsg);
                 }
                 catch (Exception)
                 {
                     //if for some reason that fails, then log the normal output
-                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                    Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
                 }
             }
             OnApplicationEnd(sender, e);
 
-            //Last thing to do is shutdown log4net
+            // last thing to do is shutdown log4net
             LogManager.Shutdown();
         }
 
-        protected abstract IBootManager GetBootManager();
-
-        /// <summary>
-        /// Returns the logger instance for the application - this will be used throughout the entire app
-        /// </summary>
-        public virtual ILogger Logger
-        {
-            get { return _logger ?? (_logger = Logging.Logger.CreateWithDefaultLog4NetConfiguration()); }
-        }
-
+        #endregion
     }
 }

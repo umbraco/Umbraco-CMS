@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Migrations;
@@ -65,7 +66,7 @@ namespace Umbraco.Web
             get
             {
                 if (_facadeAccessor != null) return _facadeAccessor;
-                return (_facadeAccessor = Container.GetInstance<IFacadeAccessor>());
+                return _facadeAccessor = Container.GetInstance<IFacadeAccessor>();
             }
             set { _facadeAccessor = value; } // for tests
         }
@@ -89,7 +90,7 @@ namespace Umbraco.Web
             get
             {
                 if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
-                return (_umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>());
+                return _umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>();
             }
             set { _umbracoContextAccessor = value; } // for tests
         }
@@ -199,41 +200,33 @@ namespace Umbraco.Web
 
         // proxy Core for convenience
 
-        public static UrlSegmentProviderCollection UrlSegmentProviders
-            => Container.GetInstance<UrlSegmentProviderCollection>();
+        public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 
-        public static CacheRefresherCollection CacheRefreshers
-            => Container.GetInstance<CacheRefresherCollection>();
+        public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
 
-        public static PropertyEditorCollection PropertyEditors
-            => Container.GetInstance<PropertyEditorCollection>();
+        public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
 
-        public static ParameterEditorCollection ParameterEditors
-            => Container.GetInstance<ParameterEditorCollection>();
+        public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
 
-        internal static ValidatorCollection Validators
-            => Container.GetInstance<ValidatorCollection>();
+        internal static ValidatorCollection Validators => CoreCurrent.Validators;
 
-        internal static PackageActionCollection PackageActions
-            => Container.GetInstance<PackageActionCollection>();
+        internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 
-        internal static PropertyValueConverterCollection PropertyValueConverters
-            => Container.GetInstance<PropertyValueConverterCollection>();
+        internal static PropertyValueConverterCollection PropertyValueConverters => CoreCurrent.PropertyValueConverters;
 
-        internal static IPublishedContentModelFactory PublishedContentModelFactory
-            => Container.GetInstance<IPublishedContentModelFactory>();
+        internal static IPublishedContentModelFactory PublishedContentModelFactory => CoreCurrent.PublishedContentModelFactory;
 
-        public static IServerMessenger ServerMessenger
-            => Container.GetInstance<IServerMessenger>();
+        public static IServerMessenger ServerMessenger => CoreCurrent.ServerMessenger;
 
-        public static IServerRegistrar ServerRegistrar
-            => Container.GetInstance<IServerRegistrar>();
+        public static IServerRegistrar ServerRegistrar => CoreCurrent.ServerRegistrar;
 
-        public static ICultureDictionaryFactory CultureDictionaryFactory
-            => Container.GetInstance<ICultureDictionaryFactory>();
+        public static ICultureDictionaryFactory CultureDictionaryFactory => CoreCurrent.CultureDictionaryFactory;
 
-        public static IShortStringHelper ShortStringHelper
-            => Container.GetInstance<IShortStringHelper>();
+        public static IShortStringHelper ShortStringHelper => CoreCurrent.ShortStringHelper;
+
+        public static ILogger Logger => CoreCurrent.Logger;
+
+        public static IProfiler Profiler => CoreCurrent.Profiler;
 
         #endregion
     }

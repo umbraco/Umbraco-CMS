@@ -1,58 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Web.Routing;
-
 
 namespace Umbraco.Web
 {
 	/// <summary>
-	/// The Umbraco global.asax class
+	/// Represents the Umbraco global.asax class.
 	/// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
 	{
+        // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
+        // package.manifest chances and restarts the application on any change
 	    private ManifestWatcher _mw;
 
 	    protected override void OnApplicationStarted(object sender, EventArgs e)
 	    {
 	        base.OnApplicationStarted(sender, e);
 
-	        if (ApplicationContext.Current.IsConfigured && GlobalSettings.DebugMode)
-	        {                   
-	            var appPluginFolder = IOHelper.MapPath("~/App_Plugins/");
-	            if (Directory.Exists(appPluginFolder))
-	            {
-                    _mw = new ManifestWatcher(LoggerResolver.Current.Logger);
-                    _mw.Start(Directory.GetDirectories(IOHelper.MapPath("~/App_Plugins/")));
-                }
-	        }
+	        if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
+                return;
+
+	        var appPlugins = IOHelper.MapPath("~/App_Plugins/");
+	        if (Directory.Exists(appPlugins) == false) return;
+
+	        _mw = new ManifestWatcher(Current.Logger);
+	        _mw.Start(Directory.GetDirectories(appPlugins));
 	    }
 
 	    protected override void OnApplicationEnd(object sender, EventArgs e)
 	    {
 	        base.OnApplicationEnd(sender, e);
-
-	        if (_mw != null)
-	        {
-                _mw.Dispose();    
-	        }
+	        _mw?.Dispose();
 	    }
 
 	    protected override IBootManager GetBootManager()
 	    {
-            return new WebBootManager(this);	        
+            return new WebBootManager(this);
 	    }
 	}
 }

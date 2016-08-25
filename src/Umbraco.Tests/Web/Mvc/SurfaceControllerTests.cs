@@ -23,6 +23,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Web.Mvc
 {
@@ -32,13 +33,13 @@ namespace Umbraco.Tests.Web.Mvc
         [SetUp]
         public void SetUp()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Umbraco.Web.Current.UmbracoContextAccessor = null;
+            Current.Reset();
         }
 
         [Test]

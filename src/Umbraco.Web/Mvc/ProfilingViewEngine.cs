@@ -1,5 +1,6 @@
 using System.Web.Mvc;
 using Umbraco.Core.Logging;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Profiling
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Profiling
 
 		public ViewEngineResult FindPartialView(ControllerContext controllerContext, string partialViewName, bool useCache)
 		{
-			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.FindPartialView, {1}, {2}", _name, partialViewName, useCache)))
+			using (Current.Profiler.Step(string.Format("{0}.FindPartialView, {1}, {2}", _name, partialViewName, useCache)))
 			{
 				return WrapResult(Inner.FindPartialView(controllerContext, partialViewName, useCache));
 			}
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Profiling
 
 		public ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
 		{
-			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.FindView, {1}, {2}, {3}", _name, viewName, masterName, useCache)))
+			using (Current.Profiler.Step(string.Format("{0}.FindView, {1}, {2}, {3}", _name, viewName, masterName, useCache)))
 			{
 				return WrapResult(Inner.FindView(controllerContext, viewName, masterName, useCache));
 			}
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Profiling
 
 		public void ReleaseView(ControllerContext controllerContext, IView view)
 		{
-			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.ReleaseView, {1}", _name, view.GetType().Name)))
+			using (Current.Profiler.Step(string.Format("{0}.ReleaseView, {1}", _name, view.GetType().Name)))
 			{
 				Inner.ReleaseView(controllerContext, view);
 			}

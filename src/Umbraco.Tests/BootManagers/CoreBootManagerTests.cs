@@ -29,8 +29,10 @@ namespace Umbraco.Tests.BootManagers
         public override void TearDown()
         {
             base.TearDown();
+
             ResolverCollection.ResetAll();
             TestApplicationEventHandler.Reset();
+            Resolution.Reset();
 
             Current.Reset();
         }
@@ -41,19 +43,16 @@ namespace Umbraco.Tests.BootManagers
         /// </summary>
         public class TestApp : UmbracoApplicationBase
         {
+            private readonly ILogger _logger = Mock.Of<ILogger>();
+
             protected override IBootManager GetBootManager()
             {
-                return new TestBootManager(this, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                return new TestBootManager(this, new ProfilingLogger(_logger, Mock.Of<IProfiler>()));
             }
 
-            private ILogger _logger;
-
-            /// <summary>
-            /// Returns the logger instance for the application - this will be used throughout the entire app
-            /// </summary>
-            public override ILogger Logger
+            protected override ILogger GetLogger()
             {
-                get { return _logger ?? (_logger = Mock.Of<ILogger>()); }
+                return _logger;
             }
         }
 
@@ -64,12 +63,12 @@ namespace Umbraco.Tests.BootManagers
         {
             public TestBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
                 : base(umbracoApplication, logger)
-            {
-            }
+            { }
 
             internal override void ConfigureCoreServices(ServiceContainer container)
             {
                 base.ConfigureCoreServices(container);
+
                 container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
                 container.Register<DatabaseContext>(factory => new DatabaseContext(
                     factory.GetInstance<IDatabaseFactory>(),

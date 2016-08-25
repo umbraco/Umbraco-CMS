@@ -10,12 +10,10 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Current = Umbraco.Web.Current;
 
 namespace Umbraco.Tests.Services
 {
@@ -32,9 +30,14 @@ namespace Umbraco.Tests.Services
 
         protected override void FreezeResolution()
         {
-            ProfilerResolver.Current = new ProfilerResolver(new TestProfiler());
-
+            Container.Register<IProfiler, TestProfiler>();
             base.FreezeResolution();
+        }
+
+        [Test]
+        public void Profiler()
+        {
+            Assert.IsInstanceOf<TestProfiler>(Current.Profiler);
         }
 
         [Test]

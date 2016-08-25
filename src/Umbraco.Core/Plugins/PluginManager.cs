@@ -110,15 +110,14 @@ namespace Umbraco.Core.Plugins
                 return LazyInitializer.EnsureInitialized(ref _instance, ref _hasInstance, ref _instanceLocker, () =>
                 {
                     var appctx = ApplicationContext.Current;
-                    var cacheProvider = appctx == null 
+                    var cacheProvider = appctx == null // fixme - should Current have an ApplicationCache?
                         ? new NullCacheProvider() 
                         : appctx.ApplicationCache.RuntimeCache;
                     ProfilingLogger profilingLogger;
                     if (appctx == null)
                     {
-                        var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
-                        var profiler = ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger);
-                        profilingLogger = new ProfilingLogger(logger, profiler);
+                        // fixme - should Current have a ProfilingLogger?
+                        profilingLogger = new ProfilingLogger(DependencyInjection.Current.Logger, DependencyInjection.Current.Profiler);
                     }
                     else
                     {

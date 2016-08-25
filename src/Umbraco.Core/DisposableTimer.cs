@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Web;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -113,9 +114,9 @@ namespace Umbraco.Core
         public static DisposableTimer TraceDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
         {
             return new DisposableTimer(
-                LoggerResolver.Current.Logger, 
+                Current.Logger, 
                 LogType.Info, 
-                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                Current.Profiler,
                 loggerType, 
                 startMessage(), 
                 completeMessage());
@@ -157,9 +158,9 @@ namespace Umbraco.Core
         public static DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage)
         {
             return new DisposableTimer(
-                LoggerResolver.Current.Logger,
+                Current.Logger,
                 LogType.Info, 
-                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                Current.Profiler,
                 loggerType,
                 startMessage,
                 completeMessage);
@@ -212,9 +213,9 @@ namespace Umbraco.Core
         public static DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
         {
             return new DisposableTimer(
-                LoggerResolver.Current.Logger,
+                Current.Logger,
                 LogType.Debug,
-                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                Current.Profiler,
                 loggerType,
                 startMessage,
                 completeMessage);
@@ -225,9 +226,9 @@ namespace Umbraco.Core
         public static DisposableTimer DebugDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
         {
             return new DisposableTimer(
-                LoggerResolver.Current.Logger,
+                Current.Logger,
                 LogType.Debug,
-                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                Current.Profiler,
                 loggerType,
                 startMessage(),
                 completeMessage());

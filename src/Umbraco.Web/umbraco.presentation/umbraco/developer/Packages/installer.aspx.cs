@@ -347,7 +347,7 @@ namespace umbraco.presentation.developer.packages
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(LoggerResolver.Current.Logger);
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Current.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
             
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
