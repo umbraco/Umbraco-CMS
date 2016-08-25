@@ -210,6 +210,7 @@
     <Compile Include="Macros\XsltMacroEngine.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="ManifestWatcherComponent.cs" />
     <Compile Include="Media\ImageUrlProviderCollection.cs" />
     <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
@@ -1087,7 +1088,7 @@
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
-    <Compile Include="WebBootManager.cs" />
+    <Compile Include="WebRuntime.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />

@@ -227,6 +227,7 @@
   <ItemGroup>
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
+    <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="DependencyInjection\TempTests.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
@@ -270,7 +271,7 @@
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
-    <Compile Include="Resolvers\ResolverBaseTest.cs" />
+    <Compile Include="DependencyInjection\ResolverBaseTest.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\BackOfficeCookieManagerTests.cs" />
@@ -316,8 +317,8 @@
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
-    <Compile Include="BootManagers\CoreBootManagerTests.cs" />
-    <Compile Include="BootManagers\WebBootManagerTests.cs" />
+    <Compile Include="Runtimes\CoreRuntimeTests.cs" />
+    <Compile Include="Runtimes\WebRuntimeTests.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
     <Compile Include="Cache\CacheProviderTests.cs" />
     <Compile Include="Cache\HttpRequestCacheProviderTests.cs" />
@@ -389,7 +390,7 @@
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
-    <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
+    <Compile Include="DependencyInjection\XsltExtensionsResolverTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
@@ -478,7 +479,7 @@
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
-    <Compile Include="Resolvers\ActionCollectionTests.cs" />
+    <Compile Include="DependencyInjection\ActionCollectionTests.cs" />
     <Compile Include="Logging\RingBufferTest.cs" />
     <Compile Include="TestHelpers\BaseUmbracoConfigurationTest.cs" />
     <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
@@ -496,10 +497,8 @@
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
-    <Compile Include="Resolvers\LazyCollectionBuilderTests.cs" />
-    <Compile Include="Resolvers\CollectionBuildersTests.cs" />
-    <Compile Include="Resolvers\SingleResolverTests.cs" />
-    <Compile Include="Resolvers\ResolutionTests.cs" />
+    <Compile Include="DependencyInjection\LazyCollectionBuilderTests.cs" />
+    <Compile Include="DependencyInjection\CollectionBuildersTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
@@ -561,7 +560,7 @@
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="UriExtensionsTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
-    <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
+    <Compile Include="DependencyInjection\PackageActionCollectionTests.cs" />
     <Compile Include="Plugins\PluginManagerExtensions.cs" />
     <Compile Include="Plugins\PluginManagerTests.cs" />
     <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />

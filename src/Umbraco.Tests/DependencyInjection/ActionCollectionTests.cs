@@ -1,15 +1,10 @@
 using System.Linq;
-using LightInject;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 
-namespace Umbraco.Tests.Resolvers
+namespace Umbraco.Tests.DependencyInjection
 {
     [TestFixture]
     public class ActionCollectionTests : ResolverBaseTest

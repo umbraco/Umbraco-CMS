@@ -153,6 +153,8 @@ namespace Umbraco.Core.DependencyInjection
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService && x.ServiceName == name);
         }
 
+        // FIXME or just use names?!
+
         /// <summary>
         /// In order for LightInject to deal with enumerables of the same type, each one needs to be registered as their explicit types
         /// </summary>
@@ -167,9 +169,14 @@ namespace Umbraco.Core.DependencyInjection
             where TLifetime : ILifetime, new()
         {
             foreach (var type in implementationTypes)
-            {
                 container.Register(type, new TLifetime());
-            }
+        }
+
+        public static void RegisterCollection<TLifetime>(this IServiceContainer container, Func<IServiceFactory, IEnumerable<Type>> implementationTypes)
+            where TLifetime : ILifetime, new()
+        {
+            foreach (var type in implementationTypes(container))
+                container.Register(type, new TLifetime());
         }
 
         /// <summary>
@@ -187,6 +194,12 @@ namespace Umbraco.Core.DependencyInjection
             {
                 container.Register(type);
             }
+        }
+
+        public static void RegisterCollection(this IServiceContainer container, Func<IServiceFactory, IEnumerable<Type>> implementationTypes)
+        {
+            foreach (var type in implementationTypes(container))
+                container.Register(type);
         }
     }
 }

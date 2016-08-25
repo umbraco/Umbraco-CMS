@@ -74,6 +74,5 @@ namespace Umbraco.Web.Strategies
                                                   content, ActionUnPublish.Instance, applicationContext));
 
         }
-
     }
 }

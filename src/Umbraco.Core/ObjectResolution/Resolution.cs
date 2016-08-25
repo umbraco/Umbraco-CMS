@@ -1,10 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.ObjectResolution
 {
+    // fixme
+    // this is the last bit that needs to go
+    // however, if it goes, we're missing Resolution.Frozen even which is used here and there
+    // => how can we do it?
+
 	/// <summary>
 	/// Represents the status of objects resolution.
 	/// </summary>

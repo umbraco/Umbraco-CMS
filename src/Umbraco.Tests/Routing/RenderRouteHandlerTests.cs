@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
             
-			var webBoot = new WebBootManager(new UmbracoApplication(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),  true);
+			var webBoot = new WebRuntime(new UmbracoApplication(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),  true);
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
 			//webBoot.Complete(null);

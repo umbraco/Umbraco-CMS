@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 
-namespace Umbraco.Tests.Resolvers
+namespace Umbraco.Tests.DependencyInjection
 {
 	[TestFixture]
 	public class LazyCollectionBuilderTests

@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -15,19 +16,20 @@ namespace Umbraco.Core.DependencyInjection
     // this class is here to support the transition from singletons and resolvers to injection,
     // by providing a static access to singleton services - it is initialized once with a service
     // container, in CoreBootManager.
-    // ideally, it should not exist. practically, time will tell.
+    // obviously, this is some sort of service locator anti-pattern. ideally, it should not exist.
+    // practically... time will tell.
     public static class Current
     {
         private static ServiceContainer _container;
 
-        public static ServiceContainer Container
+        internal static ServiceContainer Container
         {
             get
             {
                 if (_container == null) throw new Exception("No container has been set.");
                 return _container;
             }
-            internal set // ok to set - don't be stupid
+            set // ok to set - don't be stupid
             {
                 if (_container != null) throw new Exception("A container has already been set.");
                 _container = value;
@@ -44,6 +46,7 @@ namespace Umbraco.Core.DependencyInjection
             _shortStringHelper = null;
             _logger = null;
             _profiler = null;
+            _profilingLogger = null;
 
             Resetted?.Invoke(null, EventArgs.Empty);
         }
@@ -51,6 +54,9 @@ namespace Umbraco.Core.DependencyInjection
         internal static event EventHandler Resetted;
 
         #region Getters
+
+        public static PluginManager PluginManager
+            => Container.GetInstance<PluginManager>();
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();
@@ -99,6 +105,7 @@ namespace Umbraco.Core.DependencyInjection
 
         private static ILogger _logger;
         private static IProfiler _profiler;
+        private static ProfilingLogger _profilingLogger;
 
         public static ILogger Logger
             => _logger ?? (_logger = _container?.TryGetInstance<ILogger>() 
@@ -107,6 +114,10 @@ namespace Umbraco.Core.DependencyInjection
         public static IProfiler Profiler
             => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>() 
                 ?? new LogProfiler(Logger));
+
+        public static ProfilingLogger ProfilingLogger
+            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
+               ?? new ProfilingLogger(Logger, Profiler);
 
         #endregion
     }

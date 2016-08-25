@@ -2,18 +2,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Plugins;
-using Umbraco.Core.Profiling;
-using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Tests.Resolvers
+namespace Umbraco.Tests.DependencyInjection
 {
-    public abstract class ResolverBaseTest
+    public abstract class ResolverBaseTest // fixme rename, do something!
     {
         protected PluginManager PluginManager { get; private set; }
         protected ProfilingLogger ProfilingLogger { get; private set; }
@@ -38,15 +35,10 @@ namespace Umbraco.Tests.Resolvers
             Current.Reset();
         }
 
-        protected virtual IEnumerable<Assembly> AssembliesToScan
-        {
-            get
+        protected virtual IEnumerable<Assembly> AssembliesToScan 
+            => new[] 
             {
-                return new[]
-                {
-                    this.GetType().Assembly // this assembly only
-                };
-            }
-        }
+                GetType().Assembly // this assembly only
+            };
     }
 }

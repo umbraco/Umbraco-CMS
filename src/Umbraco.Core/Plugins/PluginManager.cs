@@ -96,6 +96,8 @@ namespace Umbraco.Core.Plugins
             }
         }
 
+        // fixme - somehow we NEED to get rid of this Current accessor
+
         /// <summary>
         /// Gets the current plugin manager.
         /// </summary>
@@ -111,7 +113,7 @@ namespace Umbraco.Core.Plugins
                 {
                     var appctx = ApplicationContext.Current;
                     var cacheProvider = appctx == null // fixme - should Current have an ApplicationCache?
-                        ? new NullCacheProvider() 
+                        ? new NullCacheProvider()
                         : appctx.ApplicationCache.RuntimeCache;
                     ProfilingLogger profilingLogger;
                     if (appctx == null)

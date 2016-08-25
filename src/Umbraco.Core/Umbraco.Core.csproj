@@ -109,6 +109,15 @@
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Collections\ConcurrentHashSet.cs" />
+    <Compile Include="Components\BootLoader.cs" />
+    <Compile Include="Components\DisableComponentAttribute.cs" />
+    <Compile Include="Components\EnableComponentAttribute.cs" />
+    <Compile Include="Components\IUmbracoComponent.cs" />
+    <Compile Include="Components\IUmbracoCoreComponent.cs" />
+    <Compile Include="Components\IUmbracoUserComponent.cs" />
+    <Compile Include="Components\RequireComponentAttribute.cs" />
+    <Compile Include="Components\UmbracoComponentBase.cs" />
+    <Compile Include="Components\UmbracoCoreComponent.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
@@ -208,7 +217,7 @@
     <Compile Include="Constants-DataTypes.cs" />
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
-    <Compile Include="CoreBootManager.cs" />
+    <Compile Include="CoreRuntime.cs" />
     <Compile Include="DependencyInjection\Current.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
@@ -321,7 +330,6 @@
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
-    <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
@@ -718,8 +726,6 @@
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="NetworkHelper.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
-    <Compile Include="ObjectResolution\ResolverCollection.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
@@ -1123,7 +1129,7 @@
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="ExpressionHelper.cs" />
-    <Compile Include="IBootManager.cs" />
+    <Compile Include="IRuntime.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="Strings\DefaultShortStringHelperConfig.cs" />
@@ -1137,10 +1143,7 @@
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
     <Compile Include="ObjectResolution\Resolution.cs" />
-    <Compile Include="ObjectResolution\ResolverBase.cs" />
-    <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Services\PublishStatus.cs" />
     <Compile Include="Services\PublishStatusType.cs" />

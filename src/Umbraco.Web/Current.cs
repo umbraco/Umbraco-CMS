@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -24,9 +25,7 @@ using CoreCurrent = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Web
 {
-    // must remain internal - this class is here to support the transition from singletons
-    // and resolvers to injection - by providing a static access to singleton services - it
-    // is initialized once with a service container, in WebBootManager.
+    // see notes in Umbraco.Core.DependencyInjection.Current.
     public static class Current
     {
         private static readonly object Locker = new object();
@@ -51,7 +50,7 @@ namespace Umbraco.Web
             CoreCurrent.Reset();
         }
 
-        public static ServiceContainer Container
+        private static ServiceContainer Container
             => CoreCurrent.Container;
 
         // Facade
@@ -200,6 +199,8 @@ namespace Umbraco.Web
 
         // proxy Core for convenience
 
+        public static PluginManager PluginManager => CoreCurrent.PluginManager;
+
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 
         public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
@@ -227,6 +228,8 @@ namespace Umbraco.Web
         public static ILogger Logger => CoreCurrent.Logger;
 
         public static IProfiler Profiler => CoreCurrent.Profiler;
+
+        public static ProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
 
         #endregion
     }

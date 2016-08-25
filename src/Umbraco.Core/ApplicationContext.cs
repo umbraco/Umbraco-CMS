@@ -348,12 +348,6 @@ namespace Umbraco.Core
                     ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
                 }
 
-                // reset all resolvers
-                ResolverCollection.ResetAll();
-
-                // reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
-                Resolution.Reset();
-
                 // reset the instance objects
                 ApplicationCache = null;
                 if (_databaseContext != null) //need to check the internal field here

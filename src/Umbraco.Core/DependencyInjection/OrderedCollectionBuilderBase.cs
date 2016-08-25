@@ -59,6 +59,27 @@ namespace Umbraco.Core.DependencyInjection
         }
 
         /// <summary>
+        ///  Appends types to the collections.
+        /// </summary>
+        /// <param name="types">The types to append.</param>
+        /// <returns>The builder.</returns>
+        public TBuilder Append(Func<IServiceFactory, IEnumerable<Type>> types)
+        {
+            Configure(list =>
+            {
+                foreach (var type in types(Container))
+                {
+                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
+                    if (typeof(TItem).IsAssignableFrom(type) == false)
+                        throw new InvalidOperationException($"Cannot register type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+                    if (list.Contains(type)) list.Remove(type);
+                    list.Add(type);
+                }
+            });
+            return This;
+        }
+
+        /// <summary>
         /// Appends a type after another type.
         /// </summary>
         /// <typeparam name="TAfter">The other type.</typeparam>
