@@ -274,13 +274,13 @@
         //remove all trashed nodes        
         rightCol.find("li[rel='trashed']").closest(".item").remove();
 
-        //live click handlers for the removal of items
-        $(".item a.close", rightCol).live("click", function () {
+        //click handlers for the removal of items
+        $(".item a.close", rightCol).on("click", function () {
             $(this).closest(".item").remove();
             StorePickedNodes(hiddenField, rightCol);
         });
-        //create live click handlers to the right hand items
-        $(".item ul li a", rightCol).live("click", function () {
+        //create click handlers to the right hand items
+        $(".item ul li a", rightCol).on("click", function () {
             SyncItems($(this).parent());
         });
 

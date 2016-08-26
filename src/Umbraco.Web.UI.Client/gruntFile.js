@@ -491,6 +491,10 @@ module.exports = function (grunt) {
                             keepExpandedHierarchy: false,
                             files: ['jquery-ui.min.js']
                         },
+                        'jquery-migrate': {
+                            keepExpandedHierarchy: false,
+                            files: ['jquery-migrate.min.js']
+                        },
                         'tinymce': {
                             files: ['plugins/**', 'themes/**', 'tinymce.min.js']
                         },
