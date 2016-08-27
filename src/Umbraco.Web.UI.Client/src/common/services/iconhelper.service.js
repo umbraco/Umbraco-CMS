@@ -181,7 +181,11 @@ function iconHelper($q, $timeout) {
                                     if(hasPseudo>0){
                                         s = s.substring(0, hasPseudo);
                                     }
-
+                                    var hasDots = s.indexOf(".");
+                                    if (hasDots>0) {
+                                        s = s.replace(/\./g, " ");
+                                    }
+                                    
                                     if(collectedIcons.indexOf(s) < 0){
                                         collectedIcons.push(s);
                                     }
