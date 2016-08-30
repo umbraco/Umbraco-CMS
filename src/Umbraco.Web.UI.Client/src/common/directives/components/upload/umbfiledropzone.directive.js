@@ -87,7 +87,6 @@ angular.module("umbraco.directives")
 						} else {
 							scope.queue.push(file);
 						}
-
 					}
 
 				});
@@ -95,7 +94,6 @@ angular.module("umbraco.directives")
 				//when queue is done, kick the uploader
 				if(!scope.working){
 
-console.log(scope.acceptedMediatypes);
 					// Upload not allowed
 					if(!scope.acceptedMediatypes || !scope.acceptedMediatypes.length){
 						files.map(function(file){
@@ -268,8 +266,6 @@ console.log(scope.acceptedMediatypes);
 
 			};
 
-			}
-
-
-		};
-	});
+		}
+	};
+});

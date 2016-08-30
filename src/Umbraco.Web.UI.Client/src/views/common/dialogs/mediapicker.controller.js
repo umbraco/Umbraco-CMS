@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $cookies, $element, $timeout) {
 
             var dialogOptions = $scope.dialogOptions;
 
@@ -11,12 +11,16 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
 
-
             //preload selected item
             $scope.target = undefined;
             if(dialogOptions.currentTarget){
                 $scope.target = dialogOptions.currentTarget;
             }
+
+            $scope.acceptedMediatypes = [];
+            mediaTypeHelper.getAllowedImagetypes($scope.startNodeId).then(function(types){
+                $scope.acceptedMediatypes = types;
+            });
 
             $scope.upload = function(v){
                angular.element(".umb-file-dropzone-directive .file-select").click();
@@ -65,6 +69,10 @@ angular.module("umbraco")
                                 return f.path.indexOf($scope.startNodeId) !== -1;
                             });
                         });
+
+                    mediaTypeHelper.getAllowedImagetypes(folder.id).then(function(types){
+                    $scope.acceptedMediatypes = types;
+                });
                 }
                 else {
                     $scope.path = [];
@@ -76,7 +84,7 @@ angular.module("umbraco")
                         $scope.searchTerm = "";
                         $scope.images = data.items ? data.items : [];
                     });
-
+                
                 $scope.currentFolder = folder;      
             };
             
