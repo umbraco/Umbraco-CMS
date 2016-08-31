@@ -131,7 +131,7 @@ namespace Umbraco.Core
 
             container.RegisterInstance(new PluginManager(cache.RuntimeCache, ProfilingLogger));
 
-            // register from roots
+            // register from roots // fixme - components?!
             container.RegisterFrom<ConfigurationCompositionRoot>(); // fixme - used to be before caches?
             container.RegisterFrom<RepositoryCompositionRoot>();
             container.RegisterFrom<ServicesCompositionRoot>();

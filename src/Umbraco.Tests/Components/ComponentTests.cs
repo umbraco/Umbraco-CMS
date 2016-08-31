@@ -95,7 +95,48 @@ namespace Umbraco.Tests.Components
             Assert.AreEqual("Umbraco.Tests.Components.ComponentTests+SomeResource", Initialized[0]);
         }
 
-        public class Component1 : UmbracoComponentBase
+        [Test]
+        public void Requires1()
+        {
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+
+            var logger = Mock.Of<ILogger>();
+            var profiler = new LogProfiler(logger);
+            container.RegisterInstance(logger);
+            container.RegisterInstance(profiler);
+            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) });
+            Assert.AreEqual(2, Composed.Count);
+            Assert.AreEqual(typeof(Component6), Composed[0]);
+            Assert.AreEqual(typeof(Component8), Composed[1]);
+        }
+
+        [Test]
+        public void Requires2()
+        {
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+
+            var logger = Mock.Of<ILogger>();
+            var profiler = new LogProfiler(logger);
+            container.RegisterInstance(logger);
+            container.RegisterInstance(profiler);
+            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) });
+            Assert.AreEqual(3, Composed.Count);
+            Assert.AreEqual(typeof(Component4), Composed[0]);
+            Assert.AreEqual(typeof(Component2), Composed[1]);
+            Assert.AreEqual(typeof(Component9), Composed[2]);
+        }
+
+        public class TestComponentBase : UmbracoComponentBase
         {
             public override void Compose(ServiceContainer container)
             {
@@ -103,48 +144,45 @@ namespace Umbraco.Tests.Components
                 Composed.Add(GetType());
             }
         }
+
+        public class Component1 : TestComponentBase
+        { }
 
         [RequireComponent(typeof(Component4))]
-        public class Component2 : UmbracoComponentBase, IUmbracoCoreComponent
-        {
-            public override void Compose(ServiceContainer container)
-            {
-                base.Compose(container);
-                Composed.Add(GetType());
-            }
-        }
+        public class Component2 : TestComponentBase, IUmbracoCoreComponent
+        { }
 
-        public class Component3 : UmbracoComponentBase, IUmbracoUserComponent
-        {
-            public override void Compose(ServiceContainer container)
-            {
-                base.Compose(container);
-                Composed.Add(GetType());
-            }
-        }
+        public class Component3 : TestComponentBase, IUmbracoUserComponent
+        { }
 
-        public class Component4 : UmbracoComponentBase
-        {
-            public override void Compose(ServiceContainer container)
-            {
-                base.Compose(container);
-                Composed.Add(GetType());
-            }
-        }
+        public class Component4 : TestComponentBase
+        { }
 
-        public class Component5 : UmbracoComponentBase
+        public class Component5 : TestComponentBase
         {
-            public override void Compose(ServiceContainer container)
-            {
-                base.Compose(container);
-                Composed.Add(GetType());
-            }
-
             public void Initialize(ISomeResource resource)
             {
                 Initialized.Add(resource.GetType().FullName);
             }
         }
+
+        [DisableComponent]
+        public class Component6 : TestComponentBase
+        { }
+
+        public class Component7 : TestComponentBase
+        { }
+
+        [DisableComponent(typeof(Component7))]
+        [EnableComponent(typeof(Component6))]
+        public class Component8 : TestComponentBase
+        { }
+
+        public interface ITestComponent : IUmbracoUserComponent
+        { }
+
+        public class Component9 : TestComponentBase, ITestComponent
+        { }
 
         public interface ISomeResource { }
 

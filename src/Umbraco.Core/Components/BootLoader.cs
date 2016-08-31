@@ -140,15 +140,28 @@ namespace Umbraco.Core.Components
                 componentTypeList.Remove(kvp.Key);
 
             // sort the components according to their dependencies
-            var coreComponentTypes = componentTypeList.Where(x => x.Implements<IUmbracoCoreComponent>()).ToArray();
             var items = new List<TopologicalSorter.DependencyField<Type>>();
             var temp = new List<Type>(); // reduce allocs
             foreach (var type in componentTypeList)
             {
                 temp.Clear();
-                if (type == typeof(UmbracoCoreComponent)) temp.AddRange(coreComponentTypes);
-                if (type.Implements<IUmbracoUserComponent>()) temp.Add(typeof(UmbracoCoreComponent));
-                temp.AddRange(type.GetCustomAttributes<RequireComponentAttribute>().Select(x => x.RequiredType));
+
+                // get attributes
+                // these attributes are *not* inherited because we want to custom-inherit for interfaces only
+                var attributes = type
+                    .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequireComponentAttribute>())
+                    .Concat(type.GetCustomAttributes<RequireComponentAttribute>());
+
+                // requiring an interface => require any enabled component implementing that interface
+                // requiring a class => require only that class
+                foreach (var attr in attributes)
+                {
+                    if (attr.RequiredType.IsInterface)
+                        temp.AddRange(componentTypeList.Where(x => attr.RequiredType.IsAssignableFrom(x)));
+                    else
+                        temp.Add(attr.RequiredType);
+                }
+
                 var dependsOn = temp.Distinct().ToArray();
 
                 // check for broken dependencies
