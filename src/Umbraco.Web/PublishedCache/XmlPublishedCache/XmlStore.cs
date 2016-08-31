@@ -14,7 +14,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
@@ -92,11 +91,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 InitializeFilePersister();
             }
 
-            // need to wait for resolution to be frozen
-            if (Resolution.IsFrozen)
-                OnResolutionFrozen(testing, enableRepositoryEvents);
-            else
-                Resolution.Frozen += (sender, args) => OnResolutionFrozen(testing, enableRepositoryEvents);
+            Initialize(testing, enableRepositoryEvents);
         }
 
         // internal for unit tests
@@ -169,7 +164,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _released = (registered == false);
         }
 
-        private void OnResolutionFrozen(bool testing, bool enableRepositoryEvents)
+        private void Initialize(bool testing, bool enableRepositoryEvents)
         {
             if (testing == false || enableRepositoryEvents)
                 InitializeRepositoryEvents();

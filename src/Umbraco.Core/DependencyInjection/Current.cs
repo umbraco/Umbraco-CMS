@@ -47,6 +47,7 @@ namespace Umbraco.Core.DependencyInjection
             _logger = null;
             _profiler = null;
             _profilingLogger = null;
+            _applicationContext = null;
 
             Resetted?.Invoke(null, EventArgs.Empty);
         }
@@ -54,6 +55,18 @@ namespace Umbraco.Core.DependencyInjection
         internal static event EventHandler Resetted;
 
         #region Getters
+
+        // fixme - refactor
+        // some of our tests want to *set* the current application context and bypass the container
+        // so for the time being we support it, however we should fix our tests
+
+        private static ApplicationContext _applicationContext;
+
+        public static ApplicationContext ApplicationContext
+        {
+            get { return _applicationContext ?? (_applicationContext = Container.GetInstance<ApplicationContext>()); }
+            set { _applicationContext = value; }
+        }
 
         public static PluginManager PluginManager
             => Container.GetInstance<PluginManager>();

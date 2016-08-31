@@ -2,7 +2,6 @@
 using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DependencyInjection;

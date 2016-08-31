@@ -23,7 +23,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Tests.Web.Mvc
 {
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Web.Mvc
         [SetUp]
         public void SetUp()
         {
-            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         [TearDown]
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Web.Mvc
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            ApplicationContext.EnsureContext(appCtx, true);
+            Current.ApplicationContext = appCtx; // FIXME horrible
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object, appCtx,

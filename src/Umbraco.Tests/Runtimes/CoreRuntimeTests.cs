@@ -46,9 +46,23 @@ namespace Umbraco.Tests.Runtimes
         // test runtime - inheriting from core runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
-                : base(umbracoApplication, logger)
-            { }
+            private readonly ProfilingLogger _proflog;
+
+            public TestRuntime(UmbracoApplicationBase umbracoApplication, ProfilingLogger proflog)
+                : base(umbracoApplication)
+            {
+                _proflog = proflog;
+            }
+
+            public override void Boot(ServiceContainer container)
+            {
+                // do it before anything else - this is the only place where it's possible
+                container.RegisterInstance<ILogger>(_proflog.Logger);
+                container.RegisterInstance<IProfiler>(_proflog.Profiler);
+                container.RegisterInstance<ProfilingLogger>(_proflog);
+
+                base.Boot(container);
+            }
 
             protected override void Compose1(ServiceContainer container)
             {

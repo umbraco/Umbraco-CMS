@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;

@@ -11,7 +11,6 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -70,8 +69,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
-            Resolution.Freeze();
-
             //Create the Sql CE database
             using (var engine = new SqlCeEngine(settings.ConnectionString))
             {
@@ -83,8 +80,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [TearDown]
         public virtual void TearDown()
         {
-            Resolution.Reset();
-
             TestHelper.CleanContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;

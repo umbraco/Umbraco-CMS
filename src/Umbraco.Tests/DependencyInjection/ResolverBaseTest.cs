@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Plugins;
 
 namespace Umbraco.Tests.DependencyInjection
@@ -31,7 +30,6 @@ namespace Umbraco.Tests.DependencyInjection
         [TearDown]
         public void TearDown()
         {
-            Resolution.Reset();
             Current.Reset();
         }
 

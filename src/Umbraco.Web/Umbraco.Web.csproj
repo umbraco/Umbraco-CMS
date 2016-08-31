@@ -222,6 +222,7 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
     <Compile Include="PublishedCache\PublishedFragment.cs" />
     <Compile Include="PublishedCache\PublishedFragmentProperty.cs" />
@@ -267,6 +268,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\FacadeService.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedFragmentExtensions.cs" />

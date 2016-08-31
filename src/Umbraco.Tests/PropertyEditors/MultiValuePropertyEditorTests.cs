@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
@@ -109,7 +110,7 @@ namespace Umbraco.Tests.PropertyEditors
             {
                 IsReady = true
             };
-            ApplicationContext.Current = appContext;
+            Current.ApplicationContext = appContext;
 
             var defaultVals = new Dictionary<string, object>();
             var persisted = new PreValueCollection(new Dictionary<string, PreValue>

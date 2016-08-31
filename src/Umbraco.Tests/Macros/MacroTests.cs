@@ -13,9 +13,11 @@ using umbraco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.Macros;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Current = Umbraco.Core.DependencyInjection.Current;
 
 namespace Umbraco.Tests.Macros
 {
@@ -32,7 +34,7 @@ namespace Umbraco.Tests.Macros
                 new StaticCacheProvider(),
                 new NullCacheProvider(),
                 new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
-            ApplicationContext.Current = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefault());
         }
@@ -40,9 +42,9 @@ namespace Umbraco.Tests.Macros
         [TearDown]
         public void TearDown()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
-            ApplicationContext.Current.DisposeIfDisposable();
-            ApplicationContext.Current = null;
+            Current.ApplicationContext.ApplicationCache.RuntimeCache.ClearAllCache();
+            Current.ApplicationContext.DisposeIfDisposable();
+            Current.Reset();
         }
 
         [TestCase("123", "IntProp", typeof(int))]

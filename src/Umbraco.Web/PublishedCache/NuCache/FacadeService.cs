@@ -14,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
@@ -141,13 +140,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _domainStore = new SnapDictionary<int, Domain>();
 
-            if (Resolution.IsFrozen)
-                OnResolutionFrozen();
-            else
-                Resolution.Frozen += (sender, args) => OnResolutionFrozen();
+            LoadCaches();
         }
 
-        private void OnResolutionFrozen()
+        private void LoadCaches()
         {
             lock (_storesLock)
             {

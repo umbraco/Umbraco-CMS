@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
@@ -52,7 +51,6 @@ namespace Umbraco.Tests.TestHelpers
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
             SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe);
 
-            Resolution.Freeze();
             SetUp();
         }
 
@@ -62,7 +60,6 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
-            Resolution.Reset();
             //MappingResolver.Reset();
             PluginManager.Current = null;
             Current.Reset();

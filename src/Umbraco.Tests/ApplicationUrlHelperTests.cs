@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;

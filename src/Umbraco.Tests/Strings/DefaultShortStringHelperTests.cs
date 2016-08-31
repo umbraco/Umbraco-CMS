@@ -11,7 +11,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 

@@ -4,7 +4,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
-using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
 {
@@ -28,7 +27,7 @@ namespace Umbraco.Core.Sync
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
-        public static Func<HttpRequestBase, string> ApplicationUrlProvider 
+        public static Func<HttpRequestBase, string> ApplicationUrlProvider // FIXME need another way to do it, eg an interface, injected!
         {
             get
             {
@@ -36,10 +35,7 @@ namespace Umbraco.Core.Sync
             }
             set
             {
-                using (Resolution.Configuration)
-                {
-                    _applicationUrlProvider = value;
-                }
+                _applicationUrlProvider = value;
             } 
         } 
 

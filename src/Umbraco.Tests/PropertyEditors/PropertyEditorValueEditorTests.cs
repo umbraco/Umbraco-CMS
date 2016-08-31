@@ -8,7 +8,6 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 

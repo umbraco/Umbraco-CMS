@@ -199,6 +199,8 @@ namespace Umbraco.Web
 
         // proxy Core for convenience
 
+        public static ApplicationContext ApplicationContext => CoreCurrent.ApplicationContext;
+
         public static PluginManager PluginManager => CoreCurrent.PluginManager;
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;

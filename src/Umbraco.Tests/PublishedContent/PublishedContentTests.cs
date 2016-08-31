@@ -59,8 +59,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.TearDown();
             PluginManager.Current = _pluginManager;
-            ApplicationContext.Current.DisposeIfDisposable();
-            ApplicationContext.Current = null;
+            Core.DependencyInjection.Current.Reset();
         }
 
 	    protected override void FreezeResolution()

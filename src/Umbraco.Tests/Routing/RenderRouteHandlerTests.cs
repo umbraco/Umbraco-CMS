@@ -1,5 +1,6 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -29,12 +30,31 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
             
-			var webBoot = new WebRuntime(new UmbracoApplication(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),  true);
+			var webBoot = new TestRuntime(new UmbracoApplication());
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
 			//webBoot.Complete(null);
 			webBoot.CreateRoutes();
 		}
+
+	    public class TestRuntime : WebRuntime
+	    {
+	        public TestRuntime(UmbracoApplicationBase umbracoApplication) 
+                : base(umbracoApplication)
+	        { }
+
+	        public override void Boot(ServiceContainer container)
+	        {
+                // do it before anything else - this is the only place where it's possible
+	            var logger = Mock.Of<ILogger>();
+                container.RegisterInstance<ILogger>(logger);
+	            var profiler = Mock.Of<IProfiler>();
+                container.RegisterInstance<IProfiler>(profiler);
+                container.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
+
+                base.Boot(container);
+	        }
+	    }
 
         protected override void FreezeResolution()
         {

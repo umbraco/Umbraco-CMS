@@ -16,7 +16,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
@@ -36,11 +35,10 @@ namespace Umbraco.Core
     public class CoreRuntime : IRuntime
     {
         private BootLoader _bootLoader;
-
         private DisposableTimer _timer;
 
+        // fixme cleanup these
         private IServiceContainer _appStartupEvtContainer;
-
         private bool _isInitialized;
         private bool _isStarted;
         private bool _isComplete;
@@ -78,7 +76,17 @@ namespace Umbraco.Core
 
         private RuntimeState _state; // fixme what about web?!
 
-        // fixme - temp
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
+        /// </summary>
+        /// <param name="umbracoApplication">The Umbraco HttpApplication.</param>
+        public CoreRuntime(UmbracoApplicationBase umbracoApplication)
+        {
+            if (umbracoApplication == null) throw new ArgumentNullException(nameof(umbracoApplication));
+            UmbracoApplication = umbracoApplication;
+        }
+
+        /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
             // create and register essential stuff
@@ -91,6 +99,9 @@ namespace Umbraco.Core
 
             // then compose
             Compose(container);
+
+            // fixme!
+            Compose1(container);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -129,16 +140,18 @@ namespace Umbraco.Core
 
         protected virtual void Compose1(ServiceContainer container)
         {
-            // fixme need to cleanup below
+            ServiceProvider = new ActivatorServiceProvider();
+
+            //create the plugin manager
+            //TODO: this is currently a singleton but it would be better if it weren't. Unfortunately the only way to get
+            // rid of this singleton would be to put it into IoC and then use the ServiceLocator pattern.
+            PluginManager.Current = PluginManager = Current.PluginManager; //new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger, true);
 
             //TODO: Don't think we'll need this when the resolvers are all container resolvers
             container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
             container.RegisterSingleton<ApplicationContext>();
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
-        }
 
-        protected virtual void Compose2(ServiceContainer container)
-        {
             // fixme - should we capture Logger, etc here or use factory?
 
             // register manifest builder, will be injected in eg PropertyEditorCollectionBuilder
@@ -163,17 +176,18 @@ namespace Umbraco.Core
 
             // register a server registrar, by default it's the db registrar unless the dev
             // has the legacy dist calls enabled - fixme - should obsolete the legacy thing
-            container.RegisterSingleton(_ => UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled
+            container.RegisterSingleton(factory => UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled
                 ? (IServerRegistrar)new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings())
                 : (IServerRegistrar)new DatabaseServerRegistrar(
-                    new Lazy<IServerRegistrationService>(() => ApplicationContext.Services.ServerRegistrationService),
+                    new Lazy<IServerRegistrationService>(() => factory.GetInstance<ApplicationContext>().Services.ServerRegistrationService),
                     new DatabaseServerRegistrarOptions()));
 
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden in the web startup
             // fixme - painful, have to take care of lifetime! - we CANNOT ask users to remember!
             // fixme - same issue with PublishedContentModelFactory and many more, I guess!
-            container.RegisterSingleton<IServerMessenger>(_ => new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
+            container.RegisterSingleton<IServerMessenger>(factory 
+                => new DatabaseServerMessenger(factory.GetInstance<ApplicationContext>(), true, new DatabaseServerMessengerOptions()));
 
             CacheRefresherCollectionBuilder.Register(container)
                 .AddProducer(factory => factory.GetInstance<PluginManager>().ResolveCacheRefreshers());
@@ -198,6 +212,11 @@ namespace Umbraco.Core
             container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
 
+        /// <summary>
+        /// Gets the Umbraco HttpApplication.
+        /// </summary>
+        protected UmbracoApplicationBase UmbracoApplication { get; }
+
         #region Locals
 
         protected ILogger Logger { get; private set; }
@@ -212,6 +231,8 @@ namespace Umbraco.Core
         #endregion
 
         #region Getters
+
+        // getters can be implemented by runtimes inheriting from CoreRuntime
 
         protected virtual IEnumerable<Type> GetComponentTypes() => Current.PluginManager.ResolveTypes<IUmbracoComponent>();
 
@@ -237,12 +258,12 @@ namespace Umbraco.Core
         // tries to connect to db (if configured)
         private void EnsureDatabaseConnection()
         {
-            if (ApplicationContext.IsConfigured == false) return;
-            if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+            if (Current.ApplicationContext.IsConfigured == false) return;
+            if (Current.ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
 
             for (var i = 0; i < 5; i++)
             {
-                if (ApplicationContext.DatabaseContext.CanConnect) return;
+                if (Current.ApplicationContext.DatabaseContext.CanConnect) return;
                 Thread.Sleep(1000);
             }
 
@@ -257,7 +278,8 @@ namespace Umbraco.Core
                 //foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
                 foreach (var m in Container.GetAllInstances<ModelMapperConfiguration>())
                 {
-                    m.ConfigureMappings(configuration, ApplicationContext);
+                    Logger.Debug<CoreRuntime>("FIXME " + m.GetType().FullName);
+                    m.ConfigureMappings(configuration, Current.ApplicationContext);
                 }
             });
         }
@@ -277,29 +299,10 @@ namespace Umbraco.Core
 
         // FIXME everything below needs to be sorted out!
 
-        protected ApplicationContext ApplicationContext { get; private set; }
-
-        protected CacheHelper ApplicationCache { get; private set; }
-
-        protected UmbracoApplicationBase UmbracoApplication { get; }
 
         protected ServiceContainer Container => Current.Container; // fixme kill
 
         protected IServiceProvider ServiceProvider { get; private set; }
-
-        public CoreRuntime(UmbracoApplicationBase umbracoApplication)
-        {
-            if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
-            UmbracoApplication = umbracoApplication;
-        }
-
-        internal CoreRuntime(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
-        {
-            if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
-            if (logger == null) throw new ArgumentNullException("logger");
-            UmbracoApplication = umbracoApplication;
-            ProfilingLogger = logger;
-        }
 
         public virtual IRuntime Initialize()
         {
@@ -312,22 +315,9 @@ namespace Umbraco.Core
                 string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.GetSemanticVersion().ToSemanticString(), NetworkHelper.MachineName),
                 "Umbraco application startup complete");
 
-            ServiceProvider = new ActivatorServiceProvider();
-
-            //create the plugin manager
-            //TODO: this is currently a singleton but it would be better if it weren't. Unfortunately the only way to get
-            // rid of this singleton would be to put it into IoC and then use the ServiceLocator pattern.
-            PluginManager.Current = PluginManager = Current.PluginManager; //new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger, true);
 
             // register
-            Compose1(Container);
-
-            //set the singleton resolved from the core container
-            // fixme - last thing to understand before we merge the two Compose() methods!
-            ApplicationContext.Current = ApplicationContext = Container.GetInstance<ApplicationContext>();
-
-            // register - why 2?
-            Compose2(Container);
+            //Compose1(Container);
 
             //TODO: Remove these for v8!
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
@@ -356,7 +346,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                        x.OnApplicationInitialized(UmbracoApplication, Current.ApplicationContext);
                     }
                 }
                 catch (Exception ex)
@@ -394,7 +384,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+                        x.OnApplicationStarting(UmbracoApplication, Current.ApplicationContext);
                     }
                 }
                 catch (Exception ex)
@@ -432,7 +422,7 @@ namespace Umbraco.Core
 
             //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
             // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
-            ((UserService) ApplicationContext.Services.UserService).IsUpgrading = true;
+            ((UserService) Current.ApplicationContext.Services.UserService).IsUpgrading = true;
 
 
 
@@ -447,7 +437,7 @@ namespace Umbraco.Core
                         //only log if more than 150ms
                         150))
                     {
-                        x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                        x.OnApplicationStarted(UmbracoApplication, Current.ApplicationContext);
                     }
                 }
                 catch (Exception ex)
@@ -472,20 +462,15 @@ namespace Umbraco.Core
             _isComplete = true;
 
             // we're ready to serve content!
-            ApplicationContext.IsReady = true;
+            Current.ApplicationContext.IsReady = true;
 
             //stop the timer and log the output
             _timer.Dispose();
             return this;
 		}
 
-
-        /// <summary>
-        /// Freeze resolution to not allow Resolvers to be modified
-        /// </summary>
         protected virtual void FreezeResolution()
         {
-            Resolution.Freeze();
         }
     }
 }

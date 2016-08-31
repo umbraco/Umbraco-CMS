@@ -4,7 +4,6 @@ using System.Threading;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -66,43 +65,10 @@ namespace Umbraco.Core
             Initialize();
         }
 
-	    /// <summary>
-	    /// Sets and/or ensures that a global application context exists.
-	    /// </summary>
-	    /// <param name="appContext">The application context instance.</param>
-	    /// <param name="replaceContext">A value indicating whether to replace the existing context, if any.</param>
-	    /// <returns>The current global application context.</returns>
-	    /// <remarks>This is NOT thread safe. For Unit Tests only.</remarks>
-	    public static ApplicationContext EnsureContext(ApplicationContext appContext, bool replaceContext)
-	    {
-            if (Current != null && replaceContext == false)
-                return Current;
-
-	        return Current = appContext;
-	    }
-
         /// <summary>
-        /// Sets and/or ensures that a global application context exists.
+        /// Gets the current global application context.
         /// </summary>
-        /// <param name="cache">A cache helper.</param>
-        /// <param name="logger">A logger.</param>
-        /// <param name="dbContext">A database context.</param>
-        /// <param name="serviceContext">A service context.</param>
-	    /// <param name="replaceContext">A value indicating whether to replace the existing context, if any.</param>
-        /// <returns>The current global application context.</returns>
-        /// <remarks>This is NOT thread safe. For Unit Tests only.</remarks>
-        public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ProfilingLogger logger, bool replaceContext)
-        {
-            if (Current != null && replaceContext == false)
-                    return Current;
-
-            return Current = new ApplicationContext(dbContext, serviceContext, cache, logger);
-        }
-
-	    /// <summary>
-    	/// Gets the current global application context.
-    	/// </summary>
-    	public static ApplicationContext Current { get; internal set; }
+        public static ApplicationContext Current => DependencyInjection.Current.ApplicationContext; // fixme - obsolete
 
 		/// <summary>
 		/// Returns the application wide cache accessor

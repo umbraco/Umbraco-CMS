@@ -5,7 +5,6 @@ using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Strings

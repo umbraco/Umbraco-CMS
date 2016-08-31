@@ -12,7 +12,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -82,8 +81,7 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.CleanUmbracoSettingsConfig();
 
             // reset the app context, this should reset most things that require resetting like ALL resolvers
-            ApplicationContext.Current.DisposeIfDisposable();
-            ApplicationContext.Current = null;
+            Core.DependencyInjection.Current.Reset();
 
             // reset plugin manager
             ResetPluginManager();
@@ -208,7 +206,7 @@ namespace Umbraco.Tests.TestHelpers
         private void SetupApplicationContext()
         {
             var applicationContext = CreateApplicationContext();
-            ApplicationContext.Current = applicationContext;
+            Container.Register<ApplicationContext>(_ => applicationContext);
         }
 
         /// <summary>
@@ -269,7 +267,6 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void FreezeResolution()
         {
-            Resolution.Freeze();
         }
 
         protected ApplicationContext ApplicationContext => ApplicationContext.Current;

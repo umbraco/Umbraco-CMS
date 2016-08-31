@@ -1143,7 +1143,6 @@
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="ObjectResolution\Resolution.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Services\PublishStatus.cs" />
     <Compile Include="Services\PublishStatusType.cs" />

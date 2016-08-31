@@ -38,6 +38,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
 using Umbraco.Web.DependencyInjection;
@@ -56,24 +57,62 @@ namespace Umbraco.Web
     /// Represents the Web Umbraco runtime.
     /// </summary>
     /// <remarks>On top of CoreRuntime, handles all of the web-related aspects of Umbraco (startup, etc).</remarks>
-    public class WebRuntime : CoreRuntime
+    public class WebRuntime : CoreRuntime // fixme - probably crazy but... could it be a component?!
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebRuntime"/> class.
+        /// </summary>
+        /// <param name="umbracoApplication"></param>
+        public WebRuntime(UmbracoApplicationBase umbracoApplication)
+            : base(umbracoApplication)
+        { }
+
+        /// <inheritdoc/>
         public override void Boot(ServiceContainer container)
         {
             base.Boot(container);
+
+            // that one must come *last* because there is no "request scope" during boot,
+            // and components are initialized within a scope so that anything they create
+            // that is per-scope is disposed one they have initialized.
+            container.EnablePerWebRequestScope();
+
+            // fixme - see compose + if it's here then components cannot change anything?
+            // should we use collections? eg MvcControllerCollection and ApiControllerCollection?
+            var pluginManager = container.GetInstance<PluginManager>();
+            container.EnableMvc(); // that one does enable PerWebRequest scope
+            container.RegisterMvcControllers(pluginManager, GetType().Assembly);
+            container.EnableWebApi(GlobalConfiguration.Configuration);
+            container.RegisterApiControllers(pluginManager, GetType().Assembly);
         }
 
+        /// <inheritdoc/>
         public override void Terminate()
         {
             base.Terminate();
         }
 
+        /// <inheritdoc/>
+        public override void Compose(ServiceContainer container)
+        {
+            base.Compose(container);
+
+            // fixme
+            var pluginManager = container.GetInstance<PluginManager>();
+
+            // fixme - suspecting one of these to enable PerWebRequest scope
+            //container.EnableMvc(); // yes, that one!
+            //container.RegisterMvcControllers(pluginManager, GetType().Assembly);
+            //container.EnableWebApi(GlobalConfiguration.Configuration);
+            //container.RegisterApiControllers(pluginManager, GetType().Assembly);
+        }
+
         protected override void Compose1(ServiceContainer container)
         {
-            base.Compose1(container);
-
             // register model mappers
             container.RegisterFrom<WebModelMappersCompositionRoot>();
+
+            base.Compose1(container);
 
             // support web request scope
             // note: everything that is PerRequestLifeTime will be disposed by LightInject at the end of the request
@@ -98,23 +137,6 @@ namespace Umbraco.Web
             // have to use the hybrid thing...
             container.RegisterSingleton<IUmbracoDatabaseAccessor, HybridUmbracoDatabaseAccessor>();
 
-            // register the XML facade service
-            //container.RegisterSingleton<IFacadeService>(factory => new PublishedCache.XmlPublishedCache.FacadeService(
-            //    factory.GetInstance<ServiceContext>(),
-            //    factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-            //    factory.GetInstance<CacheHelper>().RequestCache,
-            //    factory.GetAllInstances<IUrlSegmentProvider>(),
-            //    factory.GetInstance<IFacadeAccessor>()));
-
-            // register the NuCache facade service
-            container.RegisterSingleton<IFacadeService>(factory => new PublishedCache.NuCache.FacadeService(
-                new PublishedCache.NuCache.FacadeService.Options { FacadeCacheIsApplicationRequestCache = true },
-                factory.GetInstance<ApplicationContext>().MainDom,
-                factory.GetInstance<ServiceContext>(),
-                factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-                factory.GetInstance<IFacadeAccessor>(),
-                factory.GetInstance<ILogger>()));
-
             // register a per-request UmbracoContext object
             // no real need to be per request but assuming it is faster
             container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
@@ -129,11 +151,6 @@ namespace Umbraco.Web
             container.RegisterSingleton<ISectionService, SectionService>();
 
             container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
-        }
-
-        protected override void Compose2(ServiceContainer container)
-        {
-            base.Compose2(container);
 
             // fixme moved too wtf
             //// IoC setup for LightInject for MVC/WebApi
@@ -157,11 +174,12 @@ namespace Umbraco.Web
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
                 //set the legacy one by default - this maintains backwards compat
-                container.Register<IServerMessenger>(_ => new BatchedWebServiceServerMessenger(() =>
+                container.Register<IServerMessenger>(factory => new BatchedWebServiceServerMessenger(() =>
                 {
+                    var applicationContext = factory.GetInstance<ApplicationContext>();
                     //we should not proceed to change this if the app/database is not configured since there will
                     // be no user, plus we don't need to have server messages sent if this is the case.
-                    if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+                    if (applicationContext.IsConfigured && applicationContext.DatabaseContext.IsDatabaseConfigured)
                     {
                         //disable if they are not enabled
                         if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
@@ -171,7 +189,7 @@ namespace Umbraco.Web
 
                         try
                         {
-                            var user = ApplicationContext.Services.UserService.GetUserById(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
+                            var user = applicationContext.Services.UserService.GetUserById(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
                             return new Tuple<string, string>(user.Username, user.RawPasswordValue);
                         }
                         catch (Exception e)
@@ -186,8 +204,8 @@ namespace Umbraco.Web
             }
             else
             {
-                container.Register<IServerMessenger>(_ => new BatchedDatabaseServerMessenger(
-                    ApplicationContext,
+                container.Register<IServerMessenger>(factory => new BatchedDatabaseServerMessenger(
+                    factory.GetInstance<ApplicationContext>(),
                     true,
                     //Default options for web including the required callbacks to build caches
                     new DatabaseServerMessengerOptions
@@ -247,7 +265,7 @@ namespace Umbraco.Web
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            Container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
             ContentFinderCollectionBuilder.Register(container)
                 // all built-in finders in the correct order,
@@ -375,7 +393,7 @@ namespace Umbraco.Web
                 $"umbraco-api-{meta.ControllerName}",
                 url, // url to match
                 new { controller = meta.ControllerName, id = UrlParameter.Optional },
-                new[] { meta.ControllerNamespace });            
+                new[] { meta.ControllerNamespace });
             if (route.DataTokens == null) // web api routes don't set the data tokens object
                 route.DataTokens = new RouteValueDictionary();
             route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "api"); //ensure the umbraco token is set
@@ -398,20 +416,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        public WebRuntime(UmbracoApplicationBase umbracoApplication)
-            : base(umbracoApplication)
-        { }
-
-        /// <summary>
-        /// Constructor for unit tests, ensures some resolvers are not initialized
-        /// </summary>
-        /// <param name="umbracoApplication"></param>
-        /// <param name="logger"></param>
-        /// <param name="isForTesting"></param>
-        internal WebRuntime(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger, bool isForTesting)
-            : base(umbracoApplication, logger)
-        { }
-
         /// <summary>
         /// Initialize objects before anything during the boot cycle happens
         /// </summary>
@@ -428,13 +432,15 @@ namespace Umbraco.Web
 
             base.Initialize();
 
-            // fixme - only here so that everything above can have its OWN scope
+            // fixme - only here so that everything above can have its OWN scope => must come AFTER?? we have initialized all the components... OR?!
+            // so that should basically happen AFTER we have Compose() and Initialize() each component = wtf?
             // this is all completely fucked
-            Container.EnablePerWebRequestScope();
-            Container.EnableMvc();
-            Container.RegisterMvcControllers(PluginManager, GetType().Assembly);
-            Container.EnableWebApi(GlobalConfiguration.Configuration);
-            Container.RegisterApiControllers(PluginManager, GetType().Assembly);
+            //Container.EnablePerWebRequestScope(); // THAT ONE is causing the issue
+            // the rest is moving to Compose?
+            //Container.EnableMvc();
+            //Container.RegisterMvcControllers(PluginManager, GetType().Assembly);
+            //Container.EnableWebApi(GlobalConfiguration.Configuration);
+            //Container.RegisterApiControllers(PluginManager, GetType().Assembly);
 
             //setup mvc and webapi services
             SetupMvcAndWebApi();
@@ -477,10 +483,10 @@ namespace Umbraco.Web
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
             var httpContext = new HttpContextWrapper(UmbracoApplication.Context);
-            UmbracoContext.EnsureContext(
-                httpContext, ApplicationContext,
+            UmbracoContext.EnsureContext( // fixme - refactor! UmbracoContext & UmbracoRequestContext!
+                httpContext, Current.ApplicationContext,
                 Current.FacadeService,
-                new WebSecurity(httpContext, ApplicationContext),
+                new WebSecurity(httpContext, Current.ApplicationContext),
                 UmbracoConfig.For.UmbracoSettings(),
                 Current.UrlProviders,
                 false);
@@ -500,7 +506,7 @@ namespace Umbraco.Web
             ConfigureGlobalFilters();
 
             //set routes
-            CreateRoutes();
+            CreateRoutes(); // fixme - throws, wtf?!
 
             base.Complete(afterComplete);
 
@@ -544,7 +550,7 @@ namespace Umbraco.Web
 
         protected virtual void RebuildIndexes(bool onlyEmptyIndexes)
         {
-            if (ApplicationContext.IsConfigured == false || ApplicationContext.DatabaseContext.IsDatabaseConfigured == false)
+            if (Current.ApplicationContext.IsConfigured == false || Current.ApplicationContext.DatabaseContext.IsDatabaseConfigured == false)
             {
                 return;
             }
