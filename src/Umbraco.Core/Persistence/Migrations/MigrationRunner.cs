@@ -171,8 +171,8 @@ namespace Umbraco.Core.Persistence.Migrations
                 from migrationAttribute in migrationAttributes
                 where migrationAttribute != null
                 where
-                    migrationAttribute.TargetVersion > currentVersionToCompare &&
-                    migrationAttribute.TargetVersion <= targetVersionToCompare &&
+                    migrationAttribute.TargetVersion > targetVersionToCompare &&
+                    migrationAttribute.TargetVersion <= currentVersionToCompare &&
                     migrationAttribute.ProductName == _productName &&
                     //filter if the migration specifies a minimum current version for which to execute
                     (migrationAttribute.MinimumCurrentVersion == null || currentVersionToCompare >= migrationAttribute.MinimumCurrentVersion)
