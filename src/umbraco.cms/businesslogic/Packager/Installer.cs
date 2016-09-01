@@ -285,11 +285,44 @@ namespace umbraco.cms.businesslogic.packager
                     else if (File.Exists(destFile))
                         File.Delete(destFile);
 
-                    // Move the file
-                    File.Move(sourceFile, destFile);
+                    // Copy the file
+                    // SJ: Note - this used to do a move but some packages included the same file to be
+                    // copied to multiple locations like so:
+                    //
+                    // <file>
+                    //   <guid>my-icon.png</guid>
+                    //   <orgPath>/umbraco/Images/</orgPath>
+                    //   <orgName>my-icon.png</orgName>
+                    // </file> 
+                    // <file>
+                    //   <guid>my-icon.png</guid>
+                    //   <orgPath>/App_Plugins/MyPlugin/Images</orgPath>
+                    //   <orgName>my-icon.png</orgName>
+                    // </file> 
+                    //
+                    // Since this file unzips as a flat list of files, moving the file the first time means
+                    // that when you try to do that a second time, it would result in a FileNotFoundException
+                    try
+                    {
+                        File.Copy(sourceFile, destFile);
+                    }
+                    catch (Exception exception)
+                    {
+                        // Make sure to log the error before throwing so package devs know where to look for the problem
+                        LogHelper.Error<Installer>(string.Format("Error copying file from {0} to {1}", sourceFile, destFile), exception);
+                        throw;
+                    }
 
                     //PPH log file install
                     insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                }
+
+                // Once we're done copying, remove all the files 
+                foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                {
+                    var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+                    if (File.Exists(sourceFile))
+                        File.Delete(sourceFile);
                 }
 
                 // log that a user has install files
@@ -302,7 +335,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 insPack.Save();
 
-                
+
             }
         }
 
@@ -331,7 +364,7 @@ namespace umbraco.cms.businesslogic.packager
                             currentUser = userById;
                     }
                 }
-                
+
 
                 //Xml as XElement which is used with the new PackagingService
                 var rootElement = Config.DocumentElement.GetXElement();
@@ -504,15 +537,15 @@ namespace umbraco.cms.businesslogic.packager
             RequirementsPatch = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/patch").FirstChild.Value);
 
             var reqNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements");
-            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null 
-                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true) 
+            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null
+                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true)
                 : RequirementsType.Legacy;
             var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl");
             if (iconNode != null && iconNode.FirstChild != null)
             {
                 IconUrl = iconNode.FirstChild.Value;
             }
-            
+
             Author = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
             AuthorUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
 
@@ -630,7 +663,7 @@ namespace umbraco.cms.businesslogic.packager
                 Control = XmlHelper.GetNodeValue(controlNode);
             }
         }
-        
+
         /// <summary>
         /// This uses the old method of fetching and only supports the packages.umbraco.org repository.
         /// </summary>
@@ -760,7 +793,7 @@ namespace umbraco.cms.businesslogic.packager
             {
                 File.Delete(zipName);
             }
-            
+
 
             return tempDir;
 
