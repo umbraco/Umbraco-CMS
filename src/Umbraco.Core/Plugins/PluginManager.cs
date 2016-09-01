@@ -29,10 +29,7 @@ namespace Umbraco.Core.Plugins
     public class PluginManager
     {
         private const string CacheKey = "umbraco-plugins.list";
-        private static object _instanceLocker = new object();
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        private static PluginManager _instance;
-        private static bool _hasInstance;
 
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ProfilingLogger _logger;
@@ -96,42 +93,17 @@ namespace Umbraco.Core.Plugins
             }
         }
 
-        // fixme - somehow we NEED to get rid of this Current accessor
+        public static PluginManager Current => DependencyInjection.Current.PluginManager;
 
-        /// <summary>
-        /// Gets the current plugin manager.
-        /// </summary>
-        /// <remarks>
-        /// <para>Ensures that no matter what, only one plugin manager is created, and thus proper caching always takes place.</para>
-        /// <para>The setter is generally only used for unit tests + when creating the master plugin manager in CoreBootManager.</para>
-        /// </remarks>
-        public static PluginManager Current
+        internal static PluginManager Default
         {
             get
             {
-                return LazyInitializer.EnsureInitialized(ref _instance, ref _hasInstance, ref _instanceLocker, () =>
-                {
-                    var appctx = ApplicationContext.Current;
-                    var cacheProvider = appctx == null // fixme - should Current have an ApplicationCache?
-                        ? new NullCacheProvider()
-                        : appctx.ApplicationCache.RuntimeCache;
-                    ProfilingLogger profilingLogger;
-                    if (appctx == null)
-                    {
-                        // fixme - should Current have a ProfilingLogger?
-                        profilingLogger = new ProfilingLogger(DependencyInjection.Current.Logger, DependencyInjection.Current.Profiler);
-                    }
-                    else
-                    {
-                        profilingLogger = appctx.ProfilingLogger;
-                    }
-                    return new PluginManager(cacheProvider, profilingLogger);
-                });
-            }
-            internal set
-            {
-                _hasInstance = true;
-                _instance = value;
+                var appctx = ApplicationContext.Current;
+                var cacheProvider = appctx == null // fixme - should Current have an ApplicationCache?
+                    ? new NullCacheProvider()
+                    : appctx.ApplicationCache.RuntimeCache;
+                return new PluginManager(cacheProvider, DependencyInjection.Current.ProfilingLogger);
             }
         }
 
@@ -449,112 +421,116 @@ namespace Umbraco.Core.Plugins
 
         #region Resolve Types
 
-        private IEnumerable<Type> ResolveTypes<T>(
-            Func<IEnumerable<Type>> finder,
-            TypeResolutionKind resolutionType,
-            bool cacheResult)
-        {
-            using (var readLock = new UpgradeableReadLock(Locker))
-            {
-                var typesFound = new List<Type>();
+        private bool _reportedChange;
 
+        private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder, TypeResolutionKind resolutionType, bool cacheResult)
+        {
+            using (var rlock = new UpgradeableReadLock(Locker))
+            {
                 using (_logger.DebugDuration<PluginManager>(
-                    $"Starting resolution types of {typeof(T).FullName}",
-                    $"Completed resolution of types of {typeof(T).FullName}", // cannot contain typesFound.Count as it's evaluated before the find!
+                    $"Resolving {typeof(T).FullName}",
+                    $"Resolved {typeof(T).FullName}", // cannot contain typesFound.Count as it's evaluated before the find!
                     50))
                 {
-                    //check if the TypeList already exists, if so return it, if not we'll create it
-                    var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
+                    // resolve within a lock & timer
+                    return ResolveTypes2<T>(finder, resolutionType, cacheResult, rlock);
+                }
+            }
 
-                    //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
-                    if (cacheResult && typeList != null)
+        }
+
+        private IEnumerable<Type> ResolveTypes2<T>(Func<IEnumerable<Type>> finder, TypeResolutionKind resolutionType, bool cacheResult, UpgradeableReadLock rlock)
+        {
+            // check if the TypeList already exists, if so return it, if not we'll create it
+            var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
+
+            //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
+            if (cacheResult && typeList != null)
+            {
+                _logger.Logger.Debug<PluginManager>($"Resolving {typeof(T).FullName} ({resolutionType}): found a cached type list.");
+            }
+
+            //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
+            if (cacheResult == false || typeList == null)
+            {
+                // upgrade to a write lock since we're adding to the collection
+                rlock.UpgradeToWriteLock();
+
+                typeList = new TypeList<T>(resolutionType);
+
+                var scan = RequiresRescanning || File.Exists(GetPluginListFilePath()) == false;
+
+                if (scan)
+                {
+                    // either we have to rescan, or we could not find the cache file:
+                    // report (only once) and scan and update the cache file
+                    if (_reportedChange == false)
                     {
-                        _logger.Logger.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
+                        _logger.Logger.Debug<PluginManager>("Assemblies changes detected, need to rescan everything.");
+                        _reportedChange = true;
                     }
-
-                    //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
-                    if (cacheResult == false || typeList == null)
-                    {
-                        //upgrade to a write lock since we're adding to the collection
-                        readLock.UpgradeToWriteLock();
-
-                        typeList = new TypeList<T>(resolutionType);
-
-                        //we first need to look into our cache file (this has nothing to do with the 'cacheResult' parameter which caches in memory).
-                        //if assemblies have not changed and the cache file actually exists, then proceed to try to lookup by the cache file.
-                        if (RequiresRescanning == false && File.Exists(GetPluginListFilePath()))
-                        {
-                            var fileCacheResult = TryGetCachedPluginsFromFile<T>(resolutionType);
-
-                            //here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
-                            //in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
-                            //so in this instance there will never be a result.
-                            if (fileCacheResult.Exception is CachedPluginNotFoundInFileException)
-                            {
-                                _logger.Logger.Debug<PluginManager>("Tried to find typelist for type {0} and resolution {1} in file cache but the type was not found so loading types by assembly scan ", () => typeof(T), () => resolutionType);
-
-                                //we don't have a cache for this so proceed to look them up by scanning
-                                LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
-                            }
-                            else
-                            {
-                                if (fileCacheResult.Success)
-                                {
-                                    var successfullyLoadedFromCache = true;
-                                    //we have a previous cache for this so we don't need to scan we just load what has been found in the file
-                                    foreach (var t in fileCacheResult.Result)
-                                    {
-                                        try
-                                        {
-                                            //we use the build manager to ensure we get all types loaded, this is slightly slower than
-                                            //Type.GetType but if the types in the assembly aren't loaded yet then we have problems with that.
-                                            var type = BuildManager.GetType(t, true);
-                                            typeList.AddType(type);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            //if there are any exceptions loading types, we have to exist, this should never happen so
-                                            //we will need to revert to scanning for types.
-                                            successfullyLoadedFromCache = false;
-                                            _logger.Logger.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
-                                            break;
-                                        }
-                                    }
-                                    if (successfullyLoadedFromCache == false)
-                                    {
-                                        //we need to manually load by scanning if loading from the file was not successful.
-                                        LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
-                                    }
-                                    else
-                                    {
-                                        _logger.Logger.Debug<PluginManager>("Loaded plugin types {0} with resolution {1} from persisted cache", () => typeof(T), () => resolutionType);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            _logger.Logger.Debug<PluginManager>("Assembly changes detected, loading types {0} for resolution {1} by assembly scan", () => typeof(T), () => resolutionType);
-
-                            //we don't have a cache for this so proceed to look them up by scanning
-                            LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
-                        }
-
-                        //only add the cache if we are to cache the results
-                        if (cacheResult)
-                        {
-                            //add the type list to the collection
-                            var added = _types.Add(typeList);
-
-                            _logger.Logger.Debug<PluginManager>("Caching of typelist for type {0} and resolution {1} was successful = {2}", () => typeof(T), () => resolutionType, () => added);
-
-                        }
-                    }
-                    typesFound = typeList.GetTypes().ToList();
                 }
 
-                return typesFound;
+                if (scan == false)
+                {
+                    // if we don't have to scan, try the cache file
+                    var fileCacheResult = TryGetCachedPluginsFromFile<T>(resolutionType);
+
+                    // here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
+                    // in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
+                    // so in this instance there will never be a result.
+                    if (fileCacheResult.Exception is CachedPluginNotFoundInFileException || fileCacheResult.Success == false)
+                    {
+                        _logger.Logger.Debug<PluginManager>($"Resolving {typeof(T).FullName} ({resolutionType}): failed to load from cache file, must scan assemblies.");
+                        scan = true;
+                    }
+                    else
+                    {
+                        // successfully retrieved types from the file cache: load
+                        foreach (var type in fileCacheResult.Result)
+                        {
+                            try
+                            {
+                                // we use the build manager to ensure we get all types loaded, this is slightly slower than
+                                // Type.GetType but if the types in the assembly aren't loaded yet it would fail whereas
+                                // BuildManager will load them
+                                typeList.AddType(BuildManager.GetType(type, true));
+                            }
+                            catch (Exception ex)
+                            {
+                                // in case of any exception, we have to exit, and revert to scanning
+                                _logger.Logger.Error<PluginManager>($"Resolving {typeof(T).FullName} ({resolutionType}): failed to load cache file type {type}, reverting to scanning assemblies.", ex);
+                                scan = true;
+                                break;
+                            }
+                        }
+                        if (scan == false)
+                        {
+                            _logger.Logger.Debug<PluginManager>($"Resolving {typeof(T).FullName} ({resolutionType}): loaded types from cache file.");
+                        }
+                    }
+                }
+
+                if (scan)
+                {
+                    // either we had to scan, or we could not resolve the types from the cache file - scan now
+                    _logger.Logger.Debug<PluginManager>($"Resolving {typeof(T).FullName} ({resolutionType}): scanning assemblies.");
+                    LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
+                }
+
+                if (scan && cacheResult)
+                {
+                    // if we are to cache the results, add the list to the collection
+                    var added = _types.Add(typeList);
+                    _logger.Logger.Debug<PluginManager>($"Resolved {typeof(T).FullName} ({resolutionType}), caching (added = {added.ToString().ToLowerInvariant()}).");
+                }
+                else
+                {
+                    _logger.Logger.Debug<PluginManager>($"Resolved {typeof(T).FullName} ({resolutionType}).");
+                }
             }
+
+            return typeList.GetTypes().ToList();
         }
 
         /// <summary>

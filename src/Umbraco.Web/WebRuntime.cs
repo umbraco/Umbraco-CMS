@@ -72,18 +72,10 @@ namespace Umbraco.Web
         {
             base.Boot(container);
 
-            // that one must come *last* because there is no "request scope" during boot,
-            // and components are initialized within a scope so that anything they create
-            // that is per-scope is disposed one they have initialized.
-            container.EnablePerWebRequestScope();
-
-            // fixme - see compose + if it's here then components cannot change anything?
-            // should we use collections? eg MvcControllerCollection and ApiControllerCollection?
-            var pluginManager = container.GetInstance<PluginManager>();
-            container.EnableMvc(); // that one does enable PerWebRequest scope
-            container.RegisterMvcControllers(pluginManager, GetType().Assembly);
-            container.EnableWebApi(GlobalConfiguration.Configuration);
-            container.RegisterApiControllers(pluginManager, GetType().Assembly);
+            // now is the time to switch over to perWebRequest scopes
+            var smp = container.ScopeManagerProvider as MixedScopeManagerProvider;
+            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedScopeManagerProvider.");
+            smp.EnablePerWebRequestScope();
         }
 
         /// <inheritdoc/>
@@ -96,202 +88,6 @@ namespace Umbraco.Web
         public override void Compose(ServiceContainer container)
         {
             base.Compose(container);
-
-            // fixme
-            var pluginManager = container.GetInstance<PluginManager>();
-
-            // fixme - suspecting one of these to enable PerWebRequest scope
-            //container.EnableMvc(); // yes, that one!
-            //container.RegisterMvcControllers(pluginManager, GetType().Assembly);
-            //container.EnableWebApi(GlobalConfiguration.Configuration);
-            //container.RegisterApiControllers(pluginManager, GetType().Assembly);
-        }
-
-        protected override void Compose1(ServiceContainer container)
-        {
-            // register model mappers
-            container.RegisterFrom<WebModelMappersCompositionRoot>();
-
-            base.Compose1(container);
-
-            // support web request scope
-            // note: everything that is PerRequestLifeTime will be disposed by LightInject at the end of the request
-            // fixme - temp - moved to... find it
-            //container.EnablePerWebRequestScope();
-
-            // register the http context and umbraco context accessors
-            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
-            // we have no http context, eg when booting Umbraco or in background threads, so instead
-            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // replaces HttpContext.Current
-            container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
-
-            // register a per-request HttpContextBase object
-            // is per-request so only one wrapper is created per request
-            container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), new PerRequestLifeTime());
-
-            // register the facade accessor - the "current" facade is in the umbraco context
-            container.RegisterSingleton<IFacadeAccessor, UmbracoContextFacadeAccessor>();
-
-            // register the umbraco database accessor
-            // have to use the hybrid thing...
-            container.RegisterSingleton<IUmbracoDatabaseAccessor, HybridUmbracoDatabaseAccessor>();
-
-            // register a per-request UmbracoContext object
-            // no real need to be per request but assuming it is faster
-            container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
-
-            // register the umbraco helper
-            container.RegisterSingleton<UmbracoHelper>();
-
-            // replace some services
-            container.RegisterSingleton<IEventMessagesFactory, DefaultEventMessagesFactory>();
-            container.RegisterSingleton<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
-            container.RegisterSingleton<ISectionService, SectionService>();
-
-            container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
-
-            // fixme moved too wtf
-            //// IoC setup for LightInject for MVC/WebApi
-            //container.EnableMvc();
-            //container.RegisterMvcControllers(PluginManager, GetType().Assembly);
-            //container.EnableWebApi(GlobalConfiguration.Configuration);
-            //container.RegisterApiControllers(PluginManager, GetType().Assembly);
-
-            XsltExtensionCollectionBuilder.Register(container)
-                .AddExtensionObjectProducer(() => PluginManager.ResolveXsltExtensions());
-
-            EditorValidatorCollectionBuilder.Register(container)
-                .AddProducer(() => PluginManager.ResolveTypes<IEditorValidator>());
-
-            // set the default RenderMvcController
-            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
-
-            //Override the default server messenger, we need to check if the legacy dist calls is enabled, if that is the
-            // case, then we'll set the default messenger to be the old one, otherwise we'll set it to the db messenger
-            // which will always be on.
-            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-            {
-                //set the legacy one by default - this maintains backwards compat
-                container.Register<IServerMessenger>(factory => new BatchedWebServiceServerMessenger(() =>
-                {
-                    var applicationContext = factory.GetInstance<ApplicationContext>();
-                    //we should not proceed to change this if the app/database is not configured since there will
-                    // be no user, plus we don't need to have server messages sent if this is the case.
-                    if (applicationContext.IsConfigured && applicationContext.DatabaseContext.IsDatabaseConfigured)
-                    {
-                        //disable if they are not enabled
-                        if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
-                        {
-                            return null;
-                        }
-
-                        try
-                        {
-                            var user = applicationContext.Services.UserService.GetUserById(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
-                            return new Tuple<string, string>(user.Username, user.RawPasswordValue);
-                        }
-                        catch (Exception e)
-                        {
-                            ProfilingLogger.Logger.Error<WebRuntime>("An error occurred trying to set the IServerMessenger during application startup", e);
-                            return null;
-                        }
-                    }
-                    ProfilingLogger.Logger.Warn<WebRuntime>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
-                    return null;
-                }), new PerContainerLifetime());
-            }
-            else
-            {
-                container.Register<IServerMessenger>(factory => new BatchedDatabaseServerMessenger(
-                    factory.GetInstance<ApplicationContext>(),
-                    true,
-                    //Default options for web including the required callbacks to build caches
-                    new DatabaseServerMessengerOptions
-                    {
-                        //These callbacks will be executed if the server has not been synced
-                        // (i.e. it is a new server or the lastsynced.txt file has been removed)
-                        InitializingCallbacks = new Action[]
-                        {
-                            //rebuild the xml cache file if the server is not synced
-                            () =>
-                            {
-                                // rebuild the facade caches entirely, if the server is not synced
-                                // this is equivalent to DistributedCache RefreshAllFacade but local only
-                                // (we really should have a way to reuse RefreshAllFacade... locally)
-                                // note: refresh all content & media caches does refresh content types too
-    					        var svc = Current.FacadeService;
-                                bool ignored1, ignored2;
-                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
-                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1);
-                            },
-                            //rebuild indexes if the server is not synced
-                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
-                            // indexes then they can adjust this logic themselves.
-                            () => RebuildIndexes(false)
-                        }
-                    }), new PerContainerLifetime());
-            }
-
-            ActionCollectionBuilder.Register(container)
-                .SetProducer(() => PluginManager.ResolveActions());
-
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(PluginManager.ResolveSurfaceControllers());
-            container.RegisterInstance(surfaceControllerTypes);
-
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(PluginManager.ResolveUmbracoApiControllers());
-            container.RegisterInstance(umbracoApiControllerTypes);
-
-            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
-            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
-            // here because there cannot be two converters for one property editor - and we want the full
-            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
-            // (the limited one, defined in Core, is there for tests) - same for others
-            container.GetInstance<PropertyValueConverterCollectionBuilder>()
-                .Remove<TinyMceValueConverter>()
-                .Remove<TextStringValueConverter>()
-                .Remove<MarkdownEditorValueConverter>()
-                .Remove<ImageCropperValueConverter>();
-
-            // add all known factories, devs can then modify this list on application
-            // startup either by binding to events or in their own global.asax
-            FilteredControllerFactoryCollectionBuilder.Register(container)
-                .Append<RenderControllerFactory>();
-
-            UrlProviderCollectionBuilder.Register(container)
-                //.Append<AliasUrlProvider>() // not enabled by default
-                .Append<DefaultUrlProvider>()
-                .Append<CustomRouteUrlProvider>();
-
-            container.Register<IContentLastChanceFinder, ContentFinderByLegacy404>();
-
-            ContentFinderCollectionBuilder.Register(container)
-                // all built-in finders in the correct order,
-                // devs can then modify this list on application startup
-                .Append<ContentFinderByPageIdQuery>()
-                .Append<ContentFinderByNiceUrl>()
-                .Append<ContentFinderByIdPath>()
-                .Append<ContentFinderByNiceUrlAndTemplate>()
-                .Append<ContentFinderByProfile>()
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
-
-            container.Register<ISiteDomainHelper, SiteDomainHelper>();
-
-            ThumbnailProviderCollectionBuilder.Register(container)
-                .Add(PluginManager.ResolveThumbnailProviders());
-
-            ImageUrlProviderCollectionBuilder.Register(container)
-                .Append(PluginManager.ResolveImageUrlProviders());
-
-            container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
-
-            HealthCheckCollectionBuilder.Register(container)
-                .AddProducer(() => PluginManager.ResolveTypes<HealthCheck.HealthCheck>())
-                .Exclude<XmlDataIntegrityHealthCheck>(); // fixme must remove else NuCache dies!
-            // but we should also have one for NuCache AND NuCache should be a component that does all this
         }
 
         #region Getters
@@ -476,9 +272,9 @@ namespace Umbraco.Web
         /// Override this method in order to ensure that the UmbracoContext is also created, this can only be
         /// created after resolution is frozen!
         /// </summary>
-        protected override void FreezeResolution()
+        protected override void Complete2()
         {
-            base.FreezeResolution();
+            base.Complete2();
 
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717

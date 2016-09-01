@@ -5,6 +5,7 @@ using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -96,7 +97,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [TearDown]
         public virtual void TearDown()
         {
-            PluginManager.Current = null;
+            Current.PluginManager = null;
 			
             TestHelper.CleanContentDirectories();
 

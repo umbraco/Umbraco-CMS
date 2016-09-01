@@ -17,7 +17,7 @@ namespace Umbraco.Core.Components
         private IUmbracoComponent[] _components;
         private bool _booted;
 
-        private const int LogThresholdMilliseconds = 200;
+        private const int LogThresholdMilliseconds = 100;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
@@ -29,37 +29,6 @@ namespace Umbraco.Core.Components
             _container = container;
             _proflog = container.GetInstance<ProfilingLogger>();
         }
-
-        // fixme - sort out it all
-        // fixme - what about executing when no database? when not configured? see all event handler!
-        // rules
-        //
-        // UmbracoCoreComponent is special and requires every IUmbracoCoreComponent
-        // IUmbracoUserComponent is special and requires UmbracoCoreComponent
-        //
-        // process Enable/Disable for *all* regardless of whether they'll end up being enabled or disabled
-        // process Require *only* for those that end up being enabled
-        // requiring something that's disabled is going to cause an exception
-        //
-        // works:
-        // gets the list of all discovered components
-        // handles dependencies and order via topological graph
-        // handle enable/disable (precedence?)
-        // OR vice-versa as, if it's disabled, it has no dependency!
-        // BUT then the order is pretty much random - bah
-        // for each component, run Compose
-        // for each component, discover & run Initialize methods
-        //
-        // should we register components on a clone? (benchmark!)
-        // should we get then in a scope => disposed?
-        // do we want to keep them around?
-        // +
-        // what's with ServiceProvider and PluginManager?
-        //
-        // do we need events?
-        // initialize, starting, started
-        // become
-        // ?, compose, initialize
 
         private class EnableInfo
         {
@@ -74,6 +43,7 @@ namespace Umbraco.Core.Components
             using (_proflog.TraceDuration<BootLoader>($"Booting Umbraco {UmbracoVersion.GetSemanticVersion().ToSemanticString()} on {NetworkHelper.MachineName}.", "Booted."))
             {
                 var orderedComponentTypes = PrepareComponentTypes(componentTypes);
+
                 InstanciateComponents(orderedComponentTypes);
                 ComposeComponents();
                 InitializeComponents();
@@ -95,19 +65,20 @@ namespace Umbraco.Core.Components
         {
             var componentTypeList = componentTypes.ToList();
 
+            // cannot remove that one - ever
             if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
                 componentTypeList.Add(typeof(UmbracoCoreComponent));
 
             var enabled = new Dictionary<Type, EnableInfo>();
 
             // process the enable/disable attributes
+            // these two attributes are *not* inherited and apply to *classes* only (not interfaces).
             // remote declarations (when a component enables/disables *another* component)
             // have priority over local declarations (when a component disables itself) so that
-            // ppl can enable components that, by default, are disabled
+            // ppl can enable components that, by default, are disabled.
             // what happens in case of conflicting remote declarations is unspecified. more
             // precisely, the last declaration to be processed wins, but the order of the
-            // declarations depends on the type finder and is unspecified
-            // we *could* fix this by adding a weight property to both attributes...
+            // declarations depends on the type finder and is unspecified.
             foreach (var componentType in componentTypeList)
             {
                 foreach (var attr in componentType.GetCustomAttributes<EnableComponentAttribute>())
@@ -146,29 +117,52 @@ namespace Umbraco.Core.Components
             {
                 temp.Clear();
 
+                //// for tests
+                //Console.WriteLine("Components & Dependencies:");
+                //Console.WriteLine(type.FullName);
+                //foreach (var attribute in type.GetCustomAttributes<RequireComponentAttribute>())
+                //    Console.WriteLine("  -> " + attribute.RequiredType + (attribute.Weak.HasValue ? (attribute.Weak.Value ? " (weak)" : " (strong)") : ""));
+                //foreach (var i in type.GetInterfaces())
+                //{
+                //    Console.WriteLine("  " + i.FullName);
+                //    foreach (var attribute in i.GetCustomAttributes<RequireComponentAttribute>())
+                //        Console.WriteLine("    -> " + attribute.RequiredType + (attribute.Weak.HasValue ? (attribute.Weak.Value ? " (weak)" : " (strong)") : ""));
+                //}
+                //Console.WriteLine("/");
+                //Console.WriteLine();
+
                 // get attributes
-                // these attributes are *not* inherited because we want to custom-inherit for interfaces only
+                // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
                 var attributes = type
                     .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequireComponentAttribute>())
                     .Concat(type.GetCustomAttributes<RequireComponentAttribute>());
 
-                // requiring an interface => require any enabled component implementing that interface
-                // requiring a class => require only that class
+                // what happens in case of conflicting attributes (different strong/weak for same type) is not specified.
                 foreach (var attr in attributes)
                 {
+                    // requiring an interface = require any enabled component implementing that interface
+                    // unless strong, and then require at least one enabled component implementing that interface
                     if (attr.RequiredType.IsInterface)
-                        temp.AddRange(componentTypeList.Where(x => attr.RequiredType.IsAssignableFrom(x)));
+                    {
+                        var implems = componentTypeList.Where(x => attr.RequiredType.IsAssignableFrom(x)).ToList();
+                        if (implems.Count > 0)
+                            temp.AddRange(implems);
+                        else if (attr.Weak == false) // if explicitely set to !weak, is strong, else is weak
+                            throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                    }
+                    // requiring a class = require that the component is enabled
+                    // unless weak, and then requires it if it is enabled
                     else
-                        temp.Add(attr.RequiredType);
+                    {
+                        if (componentTypeList.Contains(attr.RequiredType))
+                            temp.Add(attr.RequiredType);
+                        else if (attr.Weak != true) // if not explicitely set to weak, is strong
+                            throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
+                    }
                 }
 
-                var dependsOn = temp.Distinct().ToArray();
-
-                // check for broken dependencies
-                foreach (var broken in temp.Where(x => componentTypeList.Contains(x) == false))
-                    throw new Exception($"Broken component dependency: {type.FullName} -> {broken.FullName}.");
-
-                items.Add(new TopologicalSorter.DependencyField<Type>(type.FullName, dependsOn.Select(x => x.FullName).ToArray(), new Lazy<Type>(() => type)));
+                var dependsOn = temp.Distinct().Select(x => x.FullName).ToArray();
+                items.Add(new TopologicalSorter.DependencyField<Type>(type.FullName, dependsOn, new Lazy<Type>(() => type)));
             }
             return TopologicalSorter.GetSortedItems(items);
         }

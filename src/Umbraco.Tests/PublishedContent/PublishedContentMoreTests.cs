@@ -33,7 +33,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
+            Core.DependencyInjection.Current.PluginManager = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
                 {
                     AssembliesToScan = _pluginManager.AssembliesToScan
                         .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
@@ -76,7 +76,6 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.TearDown();
 
-            PluginManager.Current = _pluginManager;
             Core.DependencyInjection.Current.Reset();
         }
 

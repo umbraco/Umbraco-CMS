@@ -68,8 +68,17 @@ namespace Umbraco.Core.DependencyInjection
             set { _applicationContext = value; }
         }
 
+        // fixme - refactor
+        // some of our tests did mess with the current plugin manager
+        // so for the time being we support it, however we should fix our tests
+
+        private static PluginManager _pluginManager;
+
         public static PluginManager PluginManager
-            => Container.GetInstance<PluginManager>();
+        {
+            get { return _pluginManager ?? (_pluginManager = Container.TryGetInstance<PluginManager>() ?? PluginManager.Default); }
+            set { _pluginManager = value; }
+        }
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();

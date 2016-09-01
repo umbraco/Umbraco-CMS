@@ -37,6 +37,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LightInject.Web">
+      <HintPath>C:\Users\Stéphane\.nuget\packages\LightInject.Web\1.0.0.7\lib\net45\LightInject.Web.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -112,6 +115,7 @@
     <Compile Include="Components\BootLoader.cs" />
     <Compile Include="Components\DisableComponentAttribute.cs" />
     <Compile Include="Components\EnableComponentAttribute.cs" />
+    <Compile Include="Components\IRuntimeComponent.cs" />
     <Compile Include="Components\IUmbracoComponent.cs" />
     <Compile Include="Components\IUmbracoCoreComponent.cs" />
     <Compile Include="Components\IUmbracoUserComponent.cs" />
@@ -218,6 +222,7 @@
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="CoreRuntime.cs" />
+    <Compile Include="CoreRuntimeComponent.cs" />
     <Compile Include="DependencyInjection\Current.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
@@ -231,6 +236,7 @@
     <Compile Include="DependencyInjection\BuilderCollectionBase.cs" />
     <Compile Include="DependencyInjection\CollectionBuilderBase.cs" />
     <Compile Include="DependencyInjection\LazyCollectionBuilderBase.cs" />
+    <Compile Include="DependencyInjection\MixedScopeManagerProvider.cs" />
     <Compile Include="DependencyInjection\OrderedCollectionBuilderBase.cs" />
     <Compile Include="DependencyInjection\WeightedCollectionBuilderBase.cs" />
     <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />

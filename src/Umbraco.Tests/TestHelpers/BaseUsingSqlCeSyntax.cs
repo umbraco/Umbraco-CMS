@@ -38,7 +38,7 @@ namespace Umbraco.Tests.TestHelpers
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var pluginManager = PluginManager.Current = new PluginManager(new NullCacheProvider(),
+            var pluginManager = new PluginManager(new NullCacheProvider(),
                 logger,
                 false);
             container.RegisterInstance(pluginManager);
@@ -61,7 +61,6 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void TearDown()
         {
             //MappingResolver.Reset();
-            PluginManager.Current = null;
             Current.Reset();
         }
     }

@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
+            Core.DependencyInjection.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
                 AssembliesToScan = _pluginManager.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })
@@ -58,7 +58,8 @@ namespace Umbraco.Tests.PublishedContent
         public override void TearDown()
         {
             base.TearDown();
-            PluginManager.Current = _pluginManager;
+            // fixme - wtf, restoring? keeping it accross tests for perfs I guess?
+            //PluginManager.Current = _pluginManager;
             Core.DependencyInjection.Current.Reset();
         }
 

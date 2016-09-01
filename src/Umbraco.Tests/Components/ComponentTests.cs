@@ -136,6 +136,59 @@ namespace Umbraco.Tests.Components
             Assert.AreEqual(typeof(Component9), Composed[2]);
         }
 
+        [Test]
+        public void WeakDependencies()
+        {
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+
+            var logger = Mock.Of<ILogger>();
+            var profiler = new LogProfiler(logger);
+            container.RegisterInstance(logger);
+            container.RegisterInstance(profiler);
+            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component10) });
+            Assert.AreEqual(1, Composed.Count);
+            Assert.AreEqual(typeof(Component10), Composed[0]);
+
+            thing = new BootLoader(container);
+            Composed.Clear();
+            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }));
+
+            thing = new BootLoader(container);
+            Composed.Clear();
+            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }));
+
+            thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component12) });
+            Assert.AreEqual(1, Composed.Count);
+            Assert.AreEqual(typeof(Component12), Composed[0]);
+        }
+
+        [Test]
+        public void DisableMissing()
+        {
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore();
+
+            var logger = Mock.Of<ILogger>();
+            var profiler = new LogProfiler(logger);
+            container.RegisterInstance(logger);
+            container.RegisterInstance(profiler);
+            container.RegisterInstance(new ProfilingLogger(logger, profiler));
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component6), typeof(Component8) }); // 8 disables 7 which is not in the list
+            Assert.AreEqual(2, Composed.Count);
+            Assert.AreEqual(typeof(Component6), Composed[0]);
+            Assert.AreEqual(typeof(Component8), Composed[1]);
+        }
+
         public class TestComponentBase : UmbracoComponentBase
         {
             public override void Compose(ServiceContainer container)
@@ -182,6 +235,18 @@ namespace Umbraco.Tests.Components
         { }
 
         public class Component9 : TestComponentBase, ITestComponent
+        { }
+
+        [RequireComponent(typeof(ITestComponent))]
+        public class Component10 : TestComponentBase
+        { }
+
+        [RequireComponent(typeof(ITestComponent), false)]
+        public class Component11 : TestComponentBase
+        { }
+
+        [RequireComponent(typeof(Component4), true)]
+        public class Component12 : TestComponentBase, IUmbracoCoreComponent
         { }
 
         public interface ISomeResource { }

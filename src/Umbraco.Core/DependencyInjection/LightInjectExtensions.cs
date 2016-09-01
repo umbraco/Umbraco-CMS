@@ -27,6 +27,9 @@ namespace Umbraco.Core.DependencyInjection
             // dependencies for properties that is annotated with the InjectAttribute."
             container.EnableAnnotatedPropertyInjection();
 
+            // see notes in MixedScopeManagerProvider
+            container.ScopeManagerProvider = new MixedScopeManagerProvider();
+
             // self-register
             container.Register<IServiceContainer>(_ => container);
 

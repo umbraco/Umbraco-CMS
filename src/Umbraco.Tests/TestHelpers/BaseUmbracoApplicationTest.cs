@@ -189,7 +189,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManagerResetRequired)
             {
-                PluginManager.Current = null;
+                Core.DependencyInjection.Current.PluginManager = null;
             }
         }
 
@@ -246,9 +246,10 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupPluginManager()
         {
-            if (PluginManager.Current == null || PluginManagerResetRequired)
+            // fixme - oops
+            if (/*PluginManager.Current == null ||*/ PluginManagerResetRequired)
             {
-                PluginManager.Current = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
+                Core.DependencyInjection.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
                 {
                     AssembliesToScan = new[]
                     {
@@ -266,8 +267,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Inheritors can override this to setup any resolvers before resolution is frozen
         /// </summary>
         protected virtual void FreezeResolution()
-        {
-        }
+        { }
 
         protected ApplicationContext ApplicationContext => ApplicationContext.Current;
 

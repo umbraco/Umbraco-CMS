@@ -64,17 +64,6 @@ namespace Umbraco.Tests.Runtimes
                 base.Boot(container);
             }
 
-            protected override void Compose1(ServiceContainer container)
-            {
-                base.Compose1(container);
-
-                container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
-                container.Register<DatabaseContext>(factory => new DatabaseContext(
-                    factory.GetInstance<IDatabaseFactory>(),
-                    factory.GetInstance<ILogger>()), new PerContainerLifetime());
-                container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
-            }
-
             protected override IEnumerable<Type> GetComponentTypes()
             {
                 return new[] { typeof(TestComponent) };
@@ -99,6 +88,13 @@ namespace Umbraco.Tests.Runtimes
             public override void Compose(ServiceContainer container)
             {
                 base.Compose(container);
+
+                container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
+                container.Register<DatabaseContext>(factory => new DatabaseContext(
+                    factory.GetInstance<IDatabaseFactory>(),
+                    factory.GetInstance<ILogger>()), new PerContainerLifetime());
+                container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
+
                 Composed = true;
             }
 
