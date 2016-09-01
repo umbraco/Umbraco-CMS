@@ -288,15 +288,20 @@ namespace Umbraco.Web.Models.Mapping
         internal static IDictionary<string, bool> GetMemberGroupValue(string username)
         {
             var userRoles = username.IsNullOrWhiteSpace() ? null : Roles.GetRolesForUser(username);
-            var result = new Dictionary<string, bool>();
-            foreach (var role in Roles.GetAllRoles().Distinct())
-            {
+
+            // create a dictionary of all roles (except internal roles) + "false"
+            var result = Roles.GetAllRoles().Distinct()
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
-                {
-                    result.Add(role, userRoles != null && userRoles.Contains(role));
-                }
-            }
+                .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .ToDictionary(x => x, x => false);
+
+            // if user has no roles, just return the dictionary
+            if (userRoles == null) return result;
+
+            // else update the dictionary to "true" for the user roles (except internal roles)
+            foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+                result[userRole] = true;
+
             return result;
         }
 
