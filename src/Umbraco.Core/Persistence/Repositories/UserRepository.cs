@@ -357,7 +357,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<UserDto>(x => x.Id >= id)
                 .OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
-            var ids = Database.Page<int>(0, count, idsQuery).Items.ToArray();
+            // first page is index 1, not zero
+            var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
 
             // now get the actual users and ensure they are ordered properly (same clause)
             return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(x => x.Id);

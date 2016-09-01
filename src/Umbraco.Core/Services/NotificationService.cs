@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -15,7 +16,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Strings;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = ((UserService) _userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds)/*.OrderBy(x => x.UserId)*/.ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds, Constants.ObjectTypes.DocumentGuid).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;
@@ -90,16 +90,9 @@ namespace Umbraco.Core.Services
                     // lazy load all versions
                     if (allVersions == null) allVersions = _contentService.GetVersions(entity.Id).ToList();
 
-                    // notify
-                    try
-                    {
-                        SendNotification(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
-                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, user.Name, user.Email));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                    }
+                    // queue notification
+                    var req = CreateNotificationRequest(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                    Enqueue(req);
 
                     // skip other notifications for this user
                     while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
@@ -145,7 +138,7 @@ namespace Umbraco.Core.Services
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = ((UserService)_userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>())/*.OrderBy(x => x.UserId)*/.ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.DocumentGuid).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;
@@ -169,15 +162,9 @@ namespace Umbraco.Core.Services
                             ? allVersionsDictionary[content.Id]
                             : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
 
-                        try
-                        {
-                            SendNotification(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
-                            _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, user.Name, user.Email));
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                        }
+                        // queue notification
+                        var req = CreateNotificationRequest(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                        Enqueue(req);
                     }
 
                     // skip other notifications for this user
@@ -189,44 +176,13 @@ namespace Umbraco.Core.Services
                 id = users.Count == pagesz ? users.Last().Id + 1 : -1;
 
             } while (id > 0);
-
-            int totalUsers;
-            var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers.Where(x => x.IsApproved))
-            {
-                var userNotifications = GetUserNotifications(u).ToArray();
-
-                foreach (var content in entitiesL)
-                {
-                    var userNotificationsByPath = FilterUserNotificationsByPath(userNotifications, content.Path);
-                    var notificationForAction = userNotificationsByPath.FirstOrDefault(x => x.Action == action);
-                    if (notificationForAction == null) continue;
-
-                    var allVersions = allVersionsDictionary.ContainsKey(content.Id)
-                        ? allVersionsDictionary[content.Id]
-                        : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
-
-                    try
-                    {
-                        SendNotification(operatingUser, u, content, allVersions,
-                            actionName, http, createSubject, createBody);
-
-                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
-                            action, u.Name, u.Email));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                    }
-                }
-            }
         }
 
-        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds)
+        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
             var uow = _uowProvider.GetUnitOfWork();
             var repository = new NotificationsRepository(uow);
-            return repository.GetUsersNotifications(userIds, action, nodeIds);
+            return repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
         }
 
         /// <summary>
@@ -340,7 +296,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http,
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http,
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
@@ -471,26 +427,7 @@ namespace Umbraco.Core.Services
                     string.Format("https://{0}", serverName));
             }
 
-
-            // send it  asynchronously, we don't want to got up all of the request time to send emails!
-            ThreadPool.QueueUserWorkItem(state =>
-                {
-                    try
-                    {
-                        using (mail)
-                        {
-                            using (var sender = new SmtpClient())
-                            {
-                                sender.Send(mail);
-                            }
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                    }
-                });
+            return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
         }
 
         private static string ReplaceLinks(string text, HttpRequestBase request)
@@ -577,6 +514,93 @@ namespace Umbraco.Core.Services
 
             return sb.ToString();
         }
+
+        // manage notifications
+        // ideally, would need to use IBackgroundTasks - but they are not part of Core!
+
+        private static readonly object Locker = new object();
+        private static readonly BlockingCollection<NotificationRequest> Queue = new BlockingCollection<NotificationRequest>();
+        private static volatile bool _running;
+
+        private void Enqueue(NotificationRequest notification)
+        {
+            Queue.Add(notification);
+            if (_running) return;
+            lock (Locker)
+            {
+                if (_running) return;
+                Process(Queue);
+                _running = true;
+            }
+        }
+
+        private class NotificationRequest
+        {
+            public NotificationRequest(MailMessage mail, string action, string userName, string email)
+            {
+                Mail = mail;
+                Action = action;
+                UserName = userName;
+                Email = email;
+            }
+
+            public MailMessage Mail { get; private set; }
+
+            public string Action { get; private set; }
+
+            public string UserName { get; private set; }
+
+            public string Email { get; private set; }
+        }
+
+        private void Process(BlockingCollection<NotificationRequest> notificationRequests)
+        {
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                var s = new SmtpClient();
+                try
+                {
+                    _logger.Debug<NotificationService>("Begin processing notifications.");
+                    while (true)
+                    {
+                        NotificationRequest request;
+                        while (notificationRequests.TryTake(out request, 8 * 1000)) // stay on for 8s
+                        {
+                            try
+                            {
+                                if (Sendmail != null) Sendmail(s, request.Mail, _logger); else s.Send(request.Mail);
+                                _logger.Debug<NotificationService>(string.Format("Notification \"{0}\" sent to {1} ({2})", request.Action, request.UserName, request.Email));
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                                s.Dispose();
+                                s = new SmtpClient();
+                            }
+                            finally
+                            {
+                                request.Mail.Dispose();
+                            }
+                        }
+                        lock (Locker)
+                        {
+                            if (notificationRequests.Count > 0) continue; // last chance
+                            _running = false; // going down
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    s.Dispose();
+                }
+                _logger.Debug<NotificationService>("Done processing notifications.");
+            });
+        }
+
+        // for tests
+        internal static Action<SmtpClient, MailMessage, ILogger> Sendmail;
+            //= (_, msg, logger) => logger.Debug<NotificationService>("Email " + msg.To.ToString());
 
         #endregion
     }
