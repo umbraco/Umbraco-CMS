@@ -55,38 +55,61 @@ namespace Umbraco.Core.Services
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
-            if ((entity is IContent) == false)
+            if (entity is IContent == false)
                 throw new NotSupportedException();
 
             var content = (IContent) entity;
 
-            // lazily get versions - into a list to ensure we can enumerate multiple times
+            // lazily get versions
             List<IContent> allVersions = null;
 
-            int totalUsers;
-            var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
-            foreach (var u in allUsers.Where(x => x.IsApproved))
+            // do not load *all* users in memory at once
+            // do not load notifications *per user* (N+1 select)
+            // cannot load users & notifications in 1 query (combination btw User2AppDto and User2NodeNotifyDto)
+            // => get batches of users, get all their notifications in 1 query
+            // re. users:
+            //  users being (dis)approved = not an issue, filtered in memory not in SQL
+            //  users being modified or created = not an issue, ordering by ID, as long as we don't *insert* low IDs
+            //  users being deleted = not an issue for GetNextUsers
+            var id = 0;
+            var nodeIds = content.Path.Split(',').Select(int.Parse).ToArray();
+            const int pagesz = 400; // load batches of 400 users
+            do
             {
-                var userNotifications = GetUserNotifications(u, content.Path);
-                var notificationForAction = userNotifications.FirstOrDefault(x => x.Action == action);
-                if (notificationForAction == null) continue;
+                // users are returned ordered by id, notifications are returned ordered by user id
+                var users = ((UserService) _userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds)/*.OrderBy(x => x.UserId)*/.ToList();
+                if (notifications.Count == 0) break;
 
-                if (allVersions == null) // lazy load
-                    allVersions = _contentService.GetVersions(entity.Id).ToList();
-
-                try
+                var i = 0;
+                foreach (var user in users)
                 {
-                    SendNotification(operatingUser, u, content, allVersions, 
-                        actionName, http, createSubject, createBody);
+                    // continue if there's no notification for this user
+                    if (notifications[i].UserId != user.Id) continue; // next user
 
-                    _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
-                        action, u.Name, u.Email));
+                    // lazy load all versions
+                    if (allVersions == null) allVersions = _contentService.GetVersions(entity.Id).ToList();
+
+                    // notify
+                    try
+                    {
+                        SendNotification(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, user.Name, user.Email));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                    }
+
+                    // skip other notifications for this user
+                    while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
+                    if (i >= notifications.Count) break; // break if no more notifications
                 }
-                catch (Exception ex)
-                {
-                    _logger.Error<NotificationService>("An error occurred sending notification", ex);
-                }
-            }
+
+                // load more users if any
+                id = users.Count == pagesz ? users.Last().Id + 1 : -1;
+
+            } while (id > 0);
         }
 
         /// <summary>
@@ -106,14 +129,66 @@ namespace Umbraco.Core.Services
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
-            if ((entities is IEnumerable<IContent>) == false)
+            if (entities is IEnumerable<IContent> == false)
                 throw new NotSupportedException();
 
-            // ensure we can enumerate multiple times
             var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
+            var paths = new List<int[]>();
 
-            // lazily get versions - into lists to ensure we can enumerate multiple times
+            // lazily get versions
             var allVersionsDictionary = new Dictionary<int, List<IContent>>();
+
+            // see notes above
+            var id = 0;
+            const int pagesz = 400; // load batches of 400 users
+            do
+            {
+                // users are returned ordered by id, notifications are returned ordered by user id
+                var users = ((UserService)_userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>())/*.OrderBy(x => x.UserId)*/.ToList();
+                if (notifications.Count == 0) break;
+
+                var i = 0;
+                foreach (var user in users)
+                {
+                    // continue if there's no notification for this user
+                    if (notifications[i].UserId != user.Id) continue; // next user
+
+                    for (var j = 0; j < entitiesL.Count; j++)
+                    {
+                        var content = entitiesL[j];
+                        int[] path;
+                        if (paths.Count < j)
+                            paths.Add(path = content.Path.Split(',').Select(int.Parse).ToArray());
+                        else path = paths[j];
+
+                        // test if the notification applies to the path ie to this entity
+                        if (path.Contains(notifications[i].EntityId) == false) continue; // next entity
+
+                        var allVersions = allVersionsDictionary.ContainsKey(content.Id)
+                            ? allVersionsDictionary[content.Id]
+                            : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
+
+                        try
+                        {
+                            SendNotification(operatingUser, user, content, allVersions, actionName, http, createSubject, createBody);
+                            _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, user.Name, user.Email));
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                        }
+                    }
+
+                    // skip other notifications for this user
+                    while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
+                    if (i >= notifications.Count) break; // break if no more notifications
+                }
+
+                // load more users if any
+                id = users.Count == pagesz ? users.Last().Id + 1 : -1;
+
+            } while (id > 0);
 
             int totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
@@ -127,13 +202,13 @@ namespace Umbraco.Core.Services
                     var notificationForAction = userNotificationsByPath.FirstOrDefault(x => x.Action == action);
                     if (notificationForAction == null) continue;
 
-                    var allVersions = allVersionsDictionary.ContainsKey(content.Id) // lazy load
+                    var allVersions = allVersionsDictionary.ContainsKey(content.Id)
                         ? allVersionsDictionary[content.Id]
                         : allVersionsDictionary[content.Id] = _contentService.GetVersions(content.Id).ToList();
 
                     try
                     {
-                        SendNotification(operatingUser, u, content, allVersions, 
+                        SendNotification(operatingUser, u, content, allVersions,
                             actionName, http, createSubject, createBody);
 
                         _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})",
@@ -147,6 +222,12 @@ namespace Umbraco.Core.Services
             }
         }
 
+        private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            var repository = new NotificationsRepository(uow);
+            return repository.GetUsersNotifications(userIds, action, nodeIds);
+        }
 
         /// <summary>
         /// Gets the notifications for the user
@@ -184,7 +265,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
             var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
+            return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 
         /// <summary>
@@ -259,7 +340,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http, 
+        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http,
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
@@ -290,16 +371,16 @@ namespace Umbraco.Core.Services
                 {
                     var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
                     oldText = oldProperty.Value != null ? oldProperty.Value.ToString() : "";
-                    
+
                     // replace html with char equivalent
                     ReplaceHtmlSymbols(ref oldText);
                     ReplaceHtmlSymbols(ref newText);
                 }
-                
+
 
                 // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
                 // TODO: We should probably allow more than just tinymce??
-                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias) 
+                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias)
                     && string.CompareOrdinal(oldText, newText) != 0)
                 {
                     summary.Append("<tr>");
@@ -340,14 +421,14 @@ namespace Umbraco.Core.Services
             string[] subjectVars = {
                                        http.Request.ServerVariables["SERVER_NAME"] + ":" +
                                        http.Request.Url.Port +
-                                       IOHelper.ResolveUrl(SystemDirectories.Umbraco), 
+                                       IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                        actionName,
                                        content.Name
                                    };
             string[] bodyVars = {
-                                    mailingUser.Name, 
-                                    actionName, 
-                                    content.Name, 
+                                    mailingUser.Name,
+                                    actionName,
+                                    content.Name,
                                     performingUser.Name,
                                     http.Request.ServerVariables["SERVER_NAME"] + ":" + http.Request.Url.Port + IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     content.Id.ToString(CultureInfo.InvariantCulture), summary.ToString(),
@@ -357,10 +438,10 @@ namespace Umbraco.Core.Services
                                                   /*umbraco.library.NiceUrl(documentObject.Id))*/
                                                   content.Id + ".aspx",
                                                   protocol)
-                                    
+
                                 };
 
-            // create the mail message 
+            // create the mail message
             var mail = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
@@ -401,9 +482,9 @@ namespace Umbraco.Core.Services
                             using (var sender = new SmtpClient())
                             {
                                 sender.Send(mail);
-                            }    
+                            }
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -484,7 +565,7 @@ namespace Umbraco.Core.Services
                         pos++;
                     } // while
                     sb.Append("</span>");
-                } // if                
+                } // if
             } // while
 
             // write rest of unchanged chars
