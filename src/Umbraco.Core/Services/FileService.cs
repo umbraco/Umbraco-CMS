@@ -558,6 +558,22 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetTemplateFileContent(string filepath)
+        {
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetFileContent(filepath);
+            }
+        }
+
+        public void SetTemplateFileContent(string filepath, Stream content)
+        {
+            using (var repository = RepositoryFactory.CreateTemplateRepository(UowProvider.GetUnitOfWork()))
+            {
+                repository.SetFileContent(filepath, content);
+            }
+        }
+
         #endregion
 
         #region Partial Views

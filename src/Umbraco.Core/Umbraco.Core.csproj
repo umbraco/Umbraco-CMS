@@ -368,6 +368,8 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Media\MediaHelper.cs" />
+    <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
@@ -412,6 +414,7 @@
     <Compile Include="Models\Rdbms\MigrationDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployChecksumDto.cs" />
     <Compile Include="Models\Rdbms\UmbracoDeployDependencyDto.cs" />
+    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
@@ -518,7 +521,6 @@
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
-    <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
@@ -572,7 +574,6 @@
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\ImageHelper.cs" />
-    <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="ModelMapperHelper.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />

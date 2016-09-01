@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -9,7 +10,9 @@ using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -1292,6 +1295,38 @@ namespace Umbraco.Core.Services
             {
                 auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
                 uow.Commit();
+            }
+        }
+
+        public Stream GetMediaFileContent(string filepath)
+        {
+            if (MediaHelper.FileSystem.FileExists(filepath) == false)
+                return null;
+            try
+            {
+                return MediaHelper.FileSystem.OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetMediaFileContent(string filepath, Stream stream)
+        {
+            MediaHelper.FileSystem.AddFile(filepath, stream, true);
+        }
+
+        public void DeleteMediaFile(string filepath)
+        {
+            ImageHelper.DeleteFile(MediaHelper.FileSystem, filepath, true);
+        }
+
+        public void GenerateThumbnails(string filepath, PropertyType propertyType)
+        {
+            using (var filestream = MediaHelper.FileSystem.OpenFile(filepath))
+            {
+                ImageHelper.GenerateThumbnails(MediaHelper.FileSystem, filestream, filepath, propertyType);
             }
         }
 

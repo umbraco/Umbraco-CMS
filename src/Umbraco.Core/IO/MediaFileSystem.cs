@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.IO
 {
@@ -25,48 +27,50 @@ namespace Umbraco.Core.IO
             _contentConfig = contentConfig;
         }
 
-	    public string GetRelativePath(int propertyId, string fileName)
+        // none of the methods below are used in Core anymore
+
+        [Obsolete("This low-level method should NOT exist.")]
+        public string GetRelativePath(int propertyId, string fileName)
 		{
-            var seperator = _contentConfig.UploadAllowDirectories
+            var sep = _contentConfig.UploadAllowDirectories
 				? Path.DirectorySeparatorChar
 				: '-';
 
-			return propertyId.ToString(CultureInfo.InvariantCulture) + seperator + fileName;
+			return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
 		}
 
+        [Obsolete("This low-level method should NOT exist.", false)]
         public string GetRelativePath(string subfolder, string fileName)
         {
-            var seperator = _contentConfig.UploadAllowDirectories
+            var sep = _contentConfig.UploadAllowDirectories
                 ? Path.DirectorySeparatorChar
                 : '-';
 
-            return subfolder + seperator + fileName;
+            return subfolder + sep + fileName;
         }
 
+        [Obsolete("Use ImageHelper.GetThumbnails instead.", false)]
 		public IEnumerable<string> GetThumbnails(string path)
-		{
-			var parentDirectory = Path.GetDirectoryName(path);
-			var extension = Path.GetExtension(path);
-
-			return GetFiles(parentDirectory)
-				.Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb") || x.StartsWith(path.TrimEnd(extension) + "_big-thumb"))
-				.ToList();
+        {
+            return ImageHelper.GetThumbnails(this, path);
 		}
 
-		public void DeleteFile(string path, bool deleteThumbnails)
+        [Obsolete("Use ImageHelper.DeleteFile instead.", false)]
+        public void DeleteFile(string path, bool deleteThumbnails)
 		{
-			DeleteFile(path);
-
-			if (deleteThumbnails == false)
-				return;
-
-			DeleteThumbnails(path);
+            ImageHelper.DeleteFile(this, path, deleteThumbnails);
 		}
 
-		public void DeleteThumbnails(string path)
+        [Obsolete("Use ImageHelper.DeleteThumbnails instead.", false)]
+        public void DeleteThumbnails(string path)
 		{
-			GetThumbnails(path)
-				.ForEach(DeleteFile);
+            ImageHelper.DeleteThumbnails(this, path);
 		}
+
+        [Obsolete("Use ImageHelper.CopyThumbnails instead.", false)]
+        public void CopyThumbnails(string sourcePath, string targetPath)
+	    {
+            ImageHelper.CopyThumbnails(this, sourcePath, targetPath);
+        }
 	}
 }

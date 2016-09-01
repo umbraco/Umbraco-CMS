@@ -16,7 +16,7 @@ namespace Umbraco.Core.IO
         void DeleteDirectory(string path, bool recursive);
 
         bool DirectoryExists(string path);
-        
+
         void AddFile(string path, Stream stream);
 
         void AddFile(string path, Stream stream, bool overrideIfExists);
@@ -30,7 +30,6 @@ namespace Umbraco.Core.IO
         void DeleteFile(string path);
 
         bool FileExists(string path);
-
 
         string GetRelativePath(string fullPathOrUrl);
 
